@@ -551,7 +551,7 @@ public class Terminal<B extends Backend> implements AutoCloseable {
 | `Clear` | Stateless | ✅ Done | Clears area (for layering widgets) |
 | `Gauge` | Stateless | ✅ Done | Progress percentage display |
 | `LineGauge` | Stateless | ✅ Done | Progress as line |
-| `Sparkline` | Stateless | ❌ TODO | Single dataset sparkline visualization |
+| `Sparkline` | Stateless | ✅ Done | Single dataset sparkline visualization |
 | `BarChart` | Stateless | ❌ TODO | Multiple datasets as bars |
 | `Table` | Stateful | ✅ Done | Grid with rows/columns and selection |
 | `Tabs` | Stateful | ✅ Done | Tab bar with selection |
@@ -1569,7 +1569,7 @@ class BlockTest {
 ### Phase 8: Visualization Widgets 🔄 IN PROGRESS
 - [x] `Gauge` (progress bar with unicode block characters)
 - [x] `LineGauge` (progress as horizontal line)
-- [ ] `Sparkline`
+- [x] `Sparkline`
 - [ ] `BarChart`
 - [ ] `Chart` (line/scatter)
 - [ ] `Canvas` with shapes
@@ -1589,7 +1589,7 @@ class BlockTest {
 
 **Test Summary:**
 - jratatui-core: 81 tests passing
-- jratatui-widgets: 173 tests passing
+- jratatui-widgets: 191 tests passing
 
 ### Phase 11: Polish & Documentation ❌ TODO
 - [ ] Comprehensive Javadoc
