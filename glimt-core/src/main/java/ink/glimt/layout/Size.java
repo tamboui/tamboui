@@ -14,23 +14,49 @@ public final class Size {
     private final int width;
     private final int height;
 
+    /**
+     * Creates a size.
+     *
+     * @param width  the width
+     * @param height the height
+     */
     public Size(int width, int height) {
         this.width = width;
         this.height = height;
     }
 
+    /**
+     * Returns the width.
+     *
+     * @return the width
+     */
     public int width() {
         return width;
     }
 
+    /**
+     * Returns the height.
+     *
+     * @return the height
+     */
     public int height() {
         return height;
     }
 
+    /**
+     * Returns the area (width * height).
+     *
+     * @return the area
+     */
     public int area() {
         return width * height;
     }
 
+    /**
+     * Returns true if either dimension is zero.
+     *
+     * @return true if width or height is zero
+     */
     public boolean isEmpty() {
         return width == 0 || height == 0;
     }

@@ -31,6 +31,9 @@ public enum AnsiColor {
         this.code = code;
     }
 
+    /**
+     * Returns the ANSI palette index (0-15).
+     */
     public int code() {
         return code;
     }

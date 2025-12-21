@@ -35,10 +35,18 @@ public interface Color {
     final class Ansi implements Color {
         private final AnsiColor color;
 
+        /**
+         * Creates an ANSI color.
+         *
+         * @param color the ANSI palette entry
+         */
         public Ansi(AnsiColor color) {
             this.color = color;
         }
 
+        /**
+         * Returns the ANSI color.
+         */
         public AnsiColor color() {
             return color;
         }
@@ -72,6 +80,11 @@ public interface Color {
     final class Indexed implements Color {
         private final int index;
 
+        /**
+         * Creates an indexed color.
+         *
+         * @param index palette index (0-255)
+         */
         public Indexed(int index) {
             if (index < 0 || index > 255) {
                 throw new IllegalArgumentException("Color index must be 0-255: " + index);
@@ -79,6 +92,7 @@ public interface Color {
             this.index = index;
         }
 
+        /** Returns the palette index. */
         public int index() {
             return index;
         }
@@ -114,6 +128,13 @@ public interface Color {
         private final int g;
         private final int b;
 
+        /**
+         * Creates an RGB color.
+         *
+         * @param r red component (0-255)
+         * @param g green component (0-255)
+         * @param b blue component (0-255)
+         */
         public Rgb(int r, int g, int b) {
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
                 throw new IllegalArgumentException(
@@ -124,18 +145,24 @@ public interface Color {
             this.b = b;
         }
 
+        /** Returns the red component. */
         public int r() {
             return r;
         }
 
+        /** Returns the green component. */
         public int g() {
             return g;
         }
 
+        /** Returns the blue component. */
         public int b() {
             return b;
         }
 
+        /**
+         * Creates an RGB color from a hex string (e.g. {@code #112233} or {@code 112233}).
+         */
         public static Rgb fromHex(String hex) {
             String h = hex.startsWith("#") ? hex.substring(1) : hex;
             if (h.length() != 6) {
@@ -198,18 +225,35 @@ public interface Color {
     Color BRIGHT_WHITE = new Ansi(AnsiColor.BRIGHT_WHITE);
 
     // Factory methods
+    /**
+     * Creates an ANSI 16 color.
+     *
+     * @param color the ANSI color
+     * @return a color instance
+     */
     static Color ansi(AnsiColor color) {
         return new Ansi(color);
     }
 
+    /**
+     * Creates a 256-color indexed value.
+     *
+     * @param index palette index (0-255)
+     */
     static Color indexed(int index) {
         return new Indexed(index);
     }
 
+    /**
+     * Creates an RGB true-color value.
+     */
     static Color rgb(int r, int g, int b) {
         return new Rgb(r, g, b);
     }
 
+    /**
+     * Creates an RGB true-color value from a {@code #rrggbb} string.
+     */
     static Color hex(String hex) {
         return Rgb.fromHex(hex);
     }

@@ -31,60 +31,110 @@ public final class Layout {
         this.flex = flex;
     }
 
+    /**
+     * Creates a vertical layout (top-to-bottom).
+     */
     public static Layout vertical() {
         return new Layout(Direction.VERTICAL, listCopyOf(), Margin.NONE, 0, Flex.START);
     }
 
+    /**
+     * Creates a horizontal layout (left-to-right).
+     */
     public static Layout horizontal() {
         return new Layout(Direction.HORIZONTAL, listCopyOf(), Margin.NONE, 0, Flex.START);
     }
 
+    /**
+     * Sets the constraints to apply when splitting.
+     *
+     * @param constraints ordered constraints corresponding to each split
+     * @return a new layout with these constraints
+     */
     public Layout constraints(Constraint... constraints) {
         return new Layout(direction, Arrays.asList(constraints), margin, spacing, flex);
     }
 
+    /**
+     * Sets the constraints to apply when splitting.
+     *
+     * @param constraints ordered constraints corresponding to each split
+     * @return a new layout with these constraints
+     */
     public Layout constraints(List<Constraint> constraints) {
         return new Layout(direction, constraints, margin, spacing, flex);
     }
 
+    /**
+     * Sets the outer margin.
+     *
+     * @param margin the margin to apply
+     * @return a new layout with this margin
+     */
     public Layout margin(Margin margin) {
         return new Layout(direction, constraints, margin, spacing, flex);
     }
 
+    /**
+     * Sets a uniform outer margin.
+     *
+     * @param value margin in cells applied to all sides
+     * @return a new layout with this margin
+     */
     public Layout margin(int value) {
         return new Layout(direction, constraints, Margin.uniform(value), spacing, flex);
     }
 
+    /**
+     * Sets the spacing (in cells) between split areas.
+     *
+     * @param spacing spacing between adjacent areas
+     * @return a new layout with this spacing
+     */
     public Layout spacing(int spacing) {
         return new Layout(direction, constraints, margin, spacing, flex);
     }
 
+    /**
+     * Sets how remaining space is distributed.
+     *
+     * @param flex flex mode for distributing extra space
+     * @return a new layout with this flex mode
+     */
     public Layout flex(Flex flex) {
         return new Layout(direction, constraints, margin, spacing, flex);
     }
 
+    /** Returns the layout direction. */
     public Direction direction() {
         return direction;
     }
 
+    /** Returns the constraints for the split. */
     public List<Constraint> constraints() {
         return constraints;
     }
 
+    /** Returns the outer margin. */
     public Margin margin() {
         return margin;
     }
 
+    /** Returns the spacing between areas. */
     public int spacing() {
         return spacing;
     }
 
+    /** Returns the flex mode used to distribute extra space. */
     public Flex flex() {
         return flex;
     }
 
     /**
      * Split the given area according to this layout's constraints.
+     *
+     * @param area the area to split
+     * @return rectangles representing each split region, in order
      */
     public List<Rect> split(Rect area) {
         if (constraints.isEmpty()) {

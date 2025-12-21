@@ -56,6 +56,7 @@ public final class TuiConfig {
      * Returns a configuration suitable for animated applications.
      *
      * @param tickRate the interval between tick events (e.g., Duration.ofMillis(16) for ~60fps)
+     * @return configuration with ticks enabled
      */
     public static TuiConfig withAnimation(Duration tickRate) {
         return builder().tickRate(tickRate).build();
@@ -75,30 +76,51 @@ public final class TuiConfig {
         return tickRate != null;
     }
 
+    /**
+     * Returns whether raw mode is enabled.
+     */
     public boolean rawMode() {
         return rawMode;
     }
 
+    /**
+     * Returns whether the alternate screen buffer is used.
+     */
     public boolean alternateScreen() {
         return alternateScreen;
     }
 
+    /**
+     * Returns whether the cursor should be hidden.
+     */
     public boolean hideCursor() {
         return hideCursor;
     }
 
+    /**
+     * Returns whether mouse capture is enabled.
+     */
     public boolean mouseCapture() {
         return mouseCapture;
     }
 
+    /**
+     * Returns the poll timeout for reading events.
+     */
     public Duration pollTimeout() {
         return pollTimeout;
     }
 
+    /**
+     * Returns the tick interval, or null if ticks are disabled.
+     */
     public Duration tickRate() {
         return tickRate;
     }
 
+    /**
+     * Returns whether a shutdown hook is registered to restore the terminal.
+     */
     public boolean shutdownHook() {
         return shutdownHook;
     }
@@ -160,6 +182,12 @@ public final class TuiConfig {
         private Builder() {
         }
 
+        /**
+         * Sets whether to register a JVM shutdown hook for cleanup.
+         *
+         * @param shutdownHook true to register a shutdown hook
+         * @return this builder
+         */
         public Builder shutdownHook(boolean shutdownHook) {
             this.shutdownHook = shutdownHook;
             return this;
@@ -167,6 +195,9 @@ public final class TuiConfig {
 
         /**
          * Sets whether to enable raw mode.
+         *
+         * @param rawMode true to enable raw mode
+         * @return this builder
          */
         public Builder rawMode(boolean rawMode) {
             this.rawMode = rawMode;
@@ -175,6 +206,9 @@ public final class TuiConfig {
 
         /**
          * Sets whether to use alternate screen buffer.
+         *
+         * @param alternateScreen true to use alternate screen
+         * @return this builder
          */
         public Builder alternateScreen(boolean alternateScreen) {
             this.alternateScreen = alternateScreen;
@@ -183,6 +217,9 @@ public final class TuiConfig {
 
         /**
          * Sets whether to hide the cursor.
+         *
+         * @param hideCursor true to hide the cursor
+         * @return this builder
          */
         public Builder hideCursor(boolean hideCursor) {
             this.hideCursor = hideCursor;
@@ -191,6 +228,9 @@ public final class TuiConfig {
 
         /**
          * Sets whether to capture mouse events.
+         *
+         * @param mouseCapture true to enable mouse capture
+         * @return this builder
          */
         public Builder mouseCapture(boolean mouseCapture) {
             this.mouseCapture = mouseCapture;
@@ -199,6 +239,9 @@ public final class TuiConfig {
 
         /**
          * Sets the timeout for polling events.
+         *
+         * @param pollTimeout poll timeout duration (non-null)
+         * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
             this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(100);
@@ -210,6 +253,7 @@ public final class TuiConfig {
          * Set to null to disable tick events.
          *
          * @param tickRate the tick interval (e.g., Duration.ofMillis(16) for ~60fps)
+         * @return this builder
          */
         public Builder tickRate(Duration tickRate) {
             this.tickRate = tickRate;

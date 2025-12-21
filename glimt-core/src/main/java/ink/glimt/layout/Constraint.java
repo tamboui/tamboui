@@ -15,6 +15,11 @@ public interface Constraint {
     final class Length implements Constraint {
         private final int value;
 
+        /**
+         * Creates a fixed length constraint.
+         *
+         * @param value size in cells (>= 0)
+         */
         public Length(int value) {
             if (value < 0) {
                 throw new IllegalArgumentException("Length cannot be negative: " + value);
@@ -55,6 +60,11 @@ public interface Constraint {
     final class Percentage implements Constraint {
         private final int value;
 
+        /**
+         * Creates a percentage constraint.
+         *
+         * @param value percentage 0-100
+         */
         public Percentage(int value) {
             if (value < 0 || value > 100) {
                 throw new IllegalArgumentException("Percentage must be between 0 and 100: " + value);
@@ -96,6 +106,12 @@ public interface Constraint {
         private final int numerator;
         private final int denominator;
 
+        /**
+         * Creates a ratio constraint.
+         *
+         * @param numerator   numerator (>=0)
+         * @param denominator denominator (>0)
+         */
         public Ratio(int numerator, int denominator) {
             if (denominator <= 0) {
                 throw new IllegalArgumentException("Denominator must be positive: " + denominator);
@@ -146,6 +162,11 @@ public interface Constraint {
     final class Min implements Constraint {
         private final int value;
 
+        /**
+         * Creates a minimum size constraint.
+         *
+         * @param value minimum size (>=0)
+         */
         public Min(int value) {
             if (value < 0) {
                 throw new IllegalArgumentException("Min cannot be negative: " + value);
@@ -186,6 +207,11 @@ public interface Constraint {
     final class Max implements Constraint {
         private final int value;
 
+        /**
+         * Creates a maximum size constraint.
+         *
+         * @param value maximum size (>=0)
+         */
         public Max(int value) {
             if (value < 0) {
                 throw new IllegalArgumentException("Max cannot be negative: " + value);
@@ -226,6 +252,11 @@ public interface Constraint {
     final class Fill implements Constraint {
         private final int weight;
 
+        /**
+         * Creates a fill constraint.
+         *
+         * @param weight weight for distributing remaining space (>=1)
+         */
         public Fill(int weight) {
             if (weight < 1) {
                 throw new IllegalArgumentException("Fill weight must be at least 1: " + weight);
@@ -233,6 +264,9 @@ public interface Constraint {
             this.weight = weight;
         }
 
+        /**
+         * Creates a fill constraint with weight 1.
+         */
         public Fill() {
             this(1);
         }
@@ -265,30 +299,72 @@ public interface Constraint {
     }
 
     // Convenience factory methods
+    /**
+     * Creates a fixed length constraint.
+     *
+     * @param value length in cells
+     * @return length constraint
+     */
     static Constraint length(int value) {
         return new Length(value);
     }
 
+    /**
+     * Creates a percentage constraint.
+     *
+     * @param value percentage 0-100
+     * @return percentage constraint
+     */
     static Constraint percentage(int value) {
         return new Percentage(value);
     }
 
+    /**
+     * Creates a ratio constraint.
+     *
+     * @param numerator   numerator
+     * @param denominator denominator
+     * @return ratio constraint
+     */
     static Constraint ratio(int numerator, int denominator) {
         return new Ratio(numerator, denominator);
     }
 
+    /**
+     * Creates a minimum size constraint.
+     *
+     * @param value minimum size
+     * @return min constraint
+     */
     static Constraint min(int value) {
         return new Min(value);
     }
 
+    /**
+     * Creates a maximum size constraint.
+     *
+     * @param value maximum size
+     * @return max constraint
+     */
     static Constraint max(int value) {
         return new Max(value);
     }
 
+    /**
+     * Creates a fill constraint with a custom weight.
+     *
+     * @param weight fill weight
+     * @return fill constraint
+     */
     static Constraint fill(int weight) {
         return new Fill(weight);
     }
 
+    /**
+     * Creates a fill constraint with weight 1.
+     *
+     * @return fill constraint
+     */
     static Constraint fill() {
         return new Fill(1);
     }

@@ -15,6 +15,15 @@ public final class MouseEvent implements Event {
     private final int y;
     private final KeyModifiers modifiers;
 
+    /**
+     * Creates a mouse event.
+     *
+     * @param kind      kind of mouse event
+     * @param button    button involved (or {@link MouseButton#NONE})
+     * @param x         x coordinate (0-based)
+     * @param y         y coordinate (0-based)
+     * @param modifiers keyboard modifiers active during the event
+     */
     public MouseEvent(
         MouseEventKind kind,
         MouseButton button,
@@ -31,6 +40,11 @@ public final class MouseEvent implements Event {
 
     /**
      * Creates a mouse press event.
+     *
+     * @param button button pressed
+     * @param x      x coordinate
+     * @param y      y coordinate
+     * @return mouse event
      */
     public static MouseEvent press(MouseButton button, int x, int y) {
         return new MouseEvent(MouseEventKind.PRESS, button, x, y, KeyModifiers.NONE);
@@ -38,6 +52,11 @@ public final class MouseEvent implements Event {
 
     /**
      * Creates a mouse release event.
+     *
+     * @param button button released
+     * @param x      x coordinate
+     * @param y      y coordinate
+     * @return mouse event
      */
     public static MouseEvent release(MouseButton button, int x, int y) {
         return new MouseEvent(MouseEventKind.RELEASE, button, x, y, KeyModifiers.NONE);
@@ -45,6 +64,10 @@ public final class MouseEvent implements Event {
 
     /**
      * Creates a mouse move event.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return mouse event
      */
     public static MouseEvent move(int x, int y) {
         return new MouseEvent(MouseEventKind.MOVE, MouseButton.NONE, x, y, KeyModifiers.NONE);
@@ -52,6 +75,11 @@ public final class MouseEvent implements Event {
 
     /**
      * Creates a mouse drag event.
+     *
+     * @param button button held during drag
+     * @param x      x coordinate
+     * @param y      y coordinate
+     * @return mouse event
      */
     public static MouseEvent drag(MouseButton button, int x, int y) {
         return new MouseEvent(MouseEventKind.DRAG, button, x, y, KeyModifiers.NONE);
@@ -59,6 +87,10 @@ public final class MouseEvent implements Event {
 
     /**
      * Creates a scroll up event.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return mouse event
      */
     public static MouseEvent scrollUp(int x, int y) {
         return new MouseEvent(MouseEventKind.SCROLL_UP, MouseButton.NONE, x, y, KeyModifiers.NONE);
@@ -66,6 +98,10 @@ public final class MouseEvent implements Event {
 
     /**
      * Creates a scroll down event.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return mouse event
      */
     public static MouseEvent scrollDown(int x, int y) {
         return new MouseEvent(MouseEventKind.SCROLL_DOWN, MouseButton.NONE, x, y, KeyModifiers.NONE);
@@ -106,22 +142,27 @@ public final class MouseEvent implements Event {
         return kind == MouseEventKind.SCROLL_UP || kind == MouseEventKind.SCROLL_DOWN;
     }
 
+    /** Returns the event kind. */
     public MouseEventKind kind() {
         return kind;
     }
 
+    /** Returns the button involved in the event. */
     public MouseButton button() {
         return button;
     }
 
+    /** Returns the x coordinate (0-based). */
     public int x() {
         return x;
     }
 
+    /** Returns the y coordinate (0-based). */
     public int y() {
         return y;
     }
 
+    /** Returns active keyboard modifiers. */
     public KeyModifiers modifiers() {
         return modifiers;
     }

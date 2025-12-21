@@ -21,6 +21,14 @@ public final class Rect {
     private final int width;
     private final int height;
 
+    /**
+     * Creates a rectangle at the given position and size.
+     *
+     * @param x      left coordinate
+     * @param y      top coordinate
+     * @param width  width in cells
+     * @param height height in cells
+     */
     public Rect(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -28,73 +36,139 @@ public final class Rect {
         this.height = height;
     }
 
+    /**
+     * Creates a rectangle at origin with the given size.
+     *
+     * @param width  width in cells
+     * @param height height in cells
+     * @return a rectangle starting at (0,0)
+     */
     public static Rect of(int width, int height) {
         return new Rect(0, 0, width, height);
     }
 
+    /**
+     * Creates a rectangle from a position and size.
+     *
+     * @param position top-left position
+     * @param size     size of the rectangle
+     * @return a rectangle at the given position and size
+     */
     public static Rect of(Position position, Size size) {
         return new Rect(position.x(), position.y(), size.width(), size.height());
     }
 
+    /** Returns the x coordinate.
+     * @return x coordinate */
     public int x() {
         return x;
     }
 
+    /** Returns the y coordinate.
+     * @return y coordinate */
     public int y() {
         return y;
     }
 
+    /** Returns the width.
+     * @return width */
     public int width() {
         return width;
     }
 
+    /** Returns the height.
+     * @return height */
     public int height() {
         return height;
     }
 
+    /** Returns the left edge (same as {@link #x()}).
+     * @return left edge */
     public int left() {
         return x;
     }
 
+    /** Returns the right edge (exclusive).
+     * @return right edge */
     public int right() {
         return x + width;
     }
 
+    /** Returns the top edge (same as {@link #y()}).
+     * @return top edge */
     public int top() {
         return y;
     }
 
+    /** Returns the bottom edge (exclusive).
+     * @return bottom edge */
     public int bottom() {
         return y + height;
     }
 
+    /**
+     * Returns area (width * height).
+     *
+     * @return area in cells
+     */
     public int area() {
         return width * height;
     }
 
+    /**
+     * Returns true if width or height is zero.
+     *
+     * @return true if empty
+     */
     public boolean isEmpty() {
         return width == 0 || height == 0;
     }
 
+    /**
+     * Returns the top-left position.
+     *
+     * @return position
+     */
     public Position position() {
         return new Position(x, y);
     }
 
+    /**
+     * Returns the size.
+     *
+     * @return size
+     */
     public Size size() {
         return new Size(width, height);
     }
 
+    /**
+     * Returns true if the given position lies inside this rectangle.
+     *
+     * @param pos position to test
+     * @return true if contained
+     */
     public boolean contains(Position pos) {
         return pos.x() >= x && pos.x() < right()
             && pos.y() >= y && pos.y() < bottom();
     }
 
+    /**
+     * Returns true if the given coordinates lie inside this rectangle.
+     *
+     * @param px x coordinate
+     * @param py y coordinate
+     * @return true if contained
+     */
     public boolean contains(int px, int py) {
         return px >= x && px < right() && py >= y && py < bottom();
     }
 
     /**
      * Returns the inner area after applying the given margin.
+     *
+     * @param margin margin to subtract
+     * @return inner rectangle (clamped to non-negative size)
      */
     public Rect inner(Margin margin) {
         int newX = x + margin.left();
@@ -106,6 +180,9 @@ public final class Rect {
 
     /**
      * Returns the intersection of this rectangle with another.
+     *
+     * @param other rectangle to intersect with
+     * @return overlapping rectangle, or {@link #ZERO} if none
      */
     public Rect intersection(Rect other) {
         int x1 = Math.max(this.x, other.x);
@@ -121,6 +198,9 @@ public final class Rect {
 
     /**
      * Returns the union of this rectangle with another.
+     *
+     * @param other rectangle to union with
+     * @return bounding rectangle covering both
      */
     public Rect union(Rect other) {
         if (this.isEmpty()) {
@@ -138,6 +218,8 @@ public final class Rect {
 
     /**
      * Returns a stream of all positions (cells) within this rectangle, row by row.
+     *
+     * @return stream of positions
      */
     public Stream<Position> positions() {
         return IntStream.range(y, bottom())
@@ -148,6 +230,8 @@ public final class Rect {
 
     /**
      * Returns an iterator over rows in this rectangle.
+     *
+     * @return iterable of row rectangles (height=1)
      */
     public Iterable<Rect> rows() {
         return () -> new Iterator<Rect>() {
@@ -172,6 +256,8 @@ public final class Rect {
 
     /**
      * Returns an iterator over columns in this rectangle.
+     *
+     * @return iterable of column rectangles (width=1)
      */
     public Iterable<Rect> columns() {
         return () -> new Iterator<Rect>() {
@@ -196,6 +282,9 @@ public final class Rect {
 
     /**
      * Clamps another rectangle to fit within this one.
+     *
+     * @param inner rectangle to clamp
+     * @return clamped rectangle
      */
     public Rect clamp(Rect inner) {
         int clampedX = Math.max(x, Math.min(inner.x, right() - inner.width));

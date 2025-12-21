@@ -21,6 +21,9 @@ public enum BorderType {
         this.set = set;
     }
 
+    /**
+     * Returns the border characters for this type.
+     */
     public BorderSet set() {
         return set;
     }
