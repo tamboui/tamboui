@@ -31,6 +31,8 @@ public final class TabsState {
 
     /**
      * Creates a new tabs state with the given selection.
+     *
+     * @param selected the initial selected tab index
      */
     public TabsState(int selected) {
         this.selected = Math.max(0, selected);
@@ -38,6 +40,8 @@ public final class TabsState {
 
     /**
      * Returns the index of the currently selected tab, or null if nothing is selected.
+     *
+     * @return the selected tab index, or null if nothing is selected
      */
     public Integer selected() {
         return selected;
@@ -45,6 +49,8 @@ public final class TabsState {
 
     /**
      * Selects the tab at the given index.
+     *
+     * @param index the tab index to select
      */
     public void select(int index) {
         this.selected = Math.max(0, index);

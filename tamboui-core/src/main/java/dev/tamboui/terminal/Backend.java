@@ -18,66 +18,96 @@ public interface Backend extends AutoCloseable {
 
     /**
      * Draws the given cell updates to the terminal.
+     *
+     * @param updates the cell updates to draw
+     * @throws IOException if drawing fails
      */
     void draw(Iterable<CellUpdate> updates) throws IOException;
 
     /**
      * Flushes any buffered output to the terminal.
+     *
+     * @throws IOException if flushing fails
      */
     void flush() throws IOException;
 
     /**
      * Clears the terminal screen.
+     *
+     * @throws IOException if clearing fails
      */
     void clear() throws IOException;
 
     /**
      * Returns the current terminal size.
+     *
+     * @return the terminal size
+     * @throws IOException if the size cannot be determined
      */
     Size size() throws IOException;
 
     /**
      * Shows the cursor.
+     *
+     * @throws IOException if showing the cursor fails
      */
     void showCursor() throws IOException;
 
     /**
      * Hides the cursor.
+     *
+     * @throws IOException if hiding the cursor fails
      */
     void hideCursor() throws IOException;
 
     /**
      * Gets the current cursor position.
+     *
+     * @return the current cursor position
+     * @throws IOException if the position cannot be determined
      */
     Position getCursorPosition() throws IOException;
 
     /**
      * Sets the cursor position.
+     *
+     * @param position the position to set the cursor to
+     * @throws IOException if setting the cursor position fails
      */
     void setCursorPosition(Position position) throws IOException;
 
     /**
      * Enters the alternate screen buffer.
+     *
+     * @throws IOException if entering alternate screen fails
      */
     void enterAlternateScreen() throws IOException;
 
     /**
      * Leaves the alternate screen buffer.
+     *
+     * @throws IOException if leaving alternate screen fails
      */
     void leaveAlternateScreen() throws IOException;
 
     /**
      * Enables raw mode (disables line buffering and echo).
+     *
+     * @throws IOException if enabling raw mode fails
      */
     void enableRawMode() throws IOException;
 
     /**
      * Disables raw mode.
+     *
+     * @throws IOException if disabling raw mode fails
      */
     void disableRawMode() throws IOException;
 
     /**
      * Enables mouse capture.
+     *
+     * @throws IOException if enabling mouse capture fails
      */
     default void enableMouseCapture() throws IOException {
         // Optional: not all backends support mouse
@@ -85,6 +115,8 @@ public interface Backend extends AutoCloseable {
 
     /**
      * Disables mouse capture.
+     *
+     * @throws IOException if disabling mouse capture fails
      */
     default void disableMouseCapture() throws IOException {
         // Optional: not all backends support mouse
@@ -92,6 +124,9 @@ public interface Backend extends AutoCloseable {
 
     /**
      * Scrolls the screen up by the given number of lines.
+     *
+     * @param lines the number of lines to scroll up
+     * @throws IOException if scrolling fails
      */
     default void scrollUp(int lines) throws IOException {
         // Optional
@@ -99,6 +134,9 @@ public interface Backend extends AutoCloseable {
 
     /**
      * Scrolls the screen down by the given number of lines.
+     *
+     * @param lines the number of lines to scroll down
+     * @throws IOException if scrolling fails
      */
     default void scrollDown(int lines) throws IOException {
         // Optional
@@ -131,6 +169,8 @@ public interface Backend extends AutoCloseable {
 
     /**
      * Closes this backend and releases any resources.
+     *
+     * @throws IOException if closing fails
      */
     @Override
     void close() throws IOException;

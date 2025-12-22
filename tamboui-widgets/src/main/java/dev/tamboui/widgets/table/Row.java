@@ -46,6 +46,9 @@ public final class Row {
 
     /**
      * Creates a row from cells.
+     *
+     * @param cells the cells to include in the row
+     * @return a new row
      */
     public static Row from(Cell... cells) {
         return new Row(Arrays.asList(cells), Style.EMPTY, 0, 0);
@@ -53,6 +56,9 @@ public final class Row {
 
     /**
      * Creates a row from cells.
+     *
+     * @param cells the cells to include in the row
+     * @return a new row
      */
     public static Row from(List<Cell> cells) {
         return new Row(cells, Style.EMPTY, 0, 0);
@@ -60,6 +66,9 @@ public final class Row {
 
     /**
      * Creates a row from strings (each string becomes a cell).
+     *
+     * @param contents the string contents for each cell
+     * @return a new row
      */
     public static Row from(String... contents) {
         List<Cell> cells = new ArrayList<>(contents.length);
@@ -71,6 +80,8 @@ public final class Row {
 
     /**
      * Creates an empty row.
+     *
+     * @return a new empty row
      */
     public static Row empty() {
         return new Row(listCopyOf(), Style.EMPTY, 0, 0);
@@ -78,6 +89,8 @@ public final class Row {
 
     /**
      * Returns the cells in this row.
+     *
+     * @return the cells in this row
      */
     public List<Cell> cells() {
         return cells;
@@ -85,6 +98,8 @@ public final class Row {
 
     /**
      * Returns the style of this row.
+     *
+     * @return the style of this row
      */
     public Style style() {
         return style;
@@ -92,6 +107,8 @@ public final class Row {
 
     /**
      * Returns the height of this row.
+     *
+     * @return the height of this row
      */
     public int height() {
         // Use explicit height or calculate from cell content
@@ -107,6 +124,8 @@ public final class Row {
 
     /**
      * Returns the bottom margin of this row.
+     *
+     * @return the bottom margin of this row
      */
     public int bottomMargin() {
         return bottomMargin;
@@ -114,6 +133,9 @@ public final class Row {
 
     /**
      * Returns a new row with the given style.
+     *
+     * @param style the style to apply
+     * @return a new row with the style
      */
     public Row style(Style style) {
         return new Row(this.cells, style, this.height, this.bottomMargin);
@@ -121,6 +143,9 @@ public final class Row {
 
     /**
      * Returns a new row with the given height.
+     *
+     * @param height the height to set
+     * @return a new row with the height
      */
     public Row height(int height) {
         return new Row(this.cells, this.style, Math.max(1, height), this.bottomMargin);
@@ -128,6 +153,9 @@ public final class Row {
 
     /**
      * Returns a new row with the given bottom margin.
+     *
+     * @param margin the bottom margin to set
+     * @return a new row with the bottom margin
      */
     public Row bottomMargin(int margin) {
         return new Row(this.cells, this.style, this.height, Math.max(0, margin));
@@ -135,6 +163,8 @@ public final class Row {
 
     /**
      * Returns the total height including bottom margin.
+     *
+     * @return the total height including bottom margin
      */
     public int totalHeight() {
         return height() + bottomMargin;

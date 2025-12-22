@@ -38,6 +38,9 @@ public final class Cell {
 
     /**
      * Creates a cell from a string.
+     *
+     * @param content the cell content
+     * @return a new cell
      */
     public static Cell from(String content) {
         return new Cell(Text.from(content), Style.EMPTY);
@@ -45,6 +48,9 @@ public final class Cell {
 
     /**
      * Creates a cell from a span.
+     *
+     * @param span the span to use as content
+     * @return a new cell
      */
     public static Cell from(Span span) {
         return new Cell(Text.from(span), Style.EMPTY);
@@ -52,6 +58,9 @@ public final class Cell {
 
     /**
      * Creates a cell from a line.
+     *
+     * @param line the line to use as content
+     * @return a new cell
      */
     public static Cell from(Line line) {
         return new Cell(Text.from(line), Style.EMPTY);
@@ -59,6 +68,9 @@ public final class Cell {
 
     /**
      * Creates a cell from text.
+     *
+     * @param text the text to use as content
+     * @return a new cell
      */
     public static Cell from(Text text) {
         return new Cell(text, Style.EMPTY);
@@ -66,6 +78,8 @@ public final class Cell {
 
     /**
      * Creates an empty cell.
+     *
+     * @return a new empty cell
      */
     public static Cell empty() {
         return new Cell(Text.empty(), Style.EMPTY);
@@ -73,6 +87,8 @@ public final class Cell {
 
     /**
      * Returns the content of this cell.
+     *
+     * @return the cell content
      */
     public Text content() {
         return content;
@@ -80,6 +96,8 @@ public final class Cell {
 
     /**
      * Returns the style of this cell.
+     *
+     * @return the cell style
      */
     public Style style() {
         return style;
@@ -87,6 +105,9 @@ public final class Cell {
 
     /**
      * Returns a new cell with the given style.
+     *
+     * @param style the style to apply
+     * @return a new cell with the style
      */
     public Cell style(Style style) {
         return new Cell(this.content, style);
@@ -94,6 +115,8 @@ public final class Cell {
 
     /**
      * Returns the width of this cell (maximum line width).
+     *
+     * @return the cell width
      */
     public int width() {
         return content.width();
@@ -101,6 +124,8 @@ public final class Cell {
 
     /**
      * Returns the height of this cell (number of lines).
+     *
+     * @return the cell height
      */
     public int height() {
         return Math.max(1, content.height());

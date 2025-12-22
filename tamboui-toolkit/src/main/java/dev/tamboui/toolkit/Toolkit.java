@@ -58,6 +58,9 @@ public final class Toolkit {
 
     /**
      * Creates a text element with the given content.
+     *
+     * @param content the text content
+     * @return a new text element
      */
     public static TextElement text(String content) {
         return new TextElement(content);
@@ -65,6 +68,9 @@ public final class Toolkit {
 
     /**
      * Creates a text element from any value (uses toString).
+     *
+     * @param value the value to convert to text
+     * @return a new text element
      */
     public static TextElement text(Object value) {
         return new TextElement(value);
@@ -72,6 +78,9 @@ public final class Toolkit {
 
     /**
      * Creates a text element with multiple values concatenated.
+     *
+     * @param values the values to concatenate
+     * @return a new text element
      */
     public static TextElement text(Object... values) {
         StringBuilder sb = new StringBuilder();
@@ -85,6 +94,10 @@ public final class Toolkit {
 
     /**
      * Creates a panel with a title and children.
+     *
+     * @param title the panel title
+     * @param children the child elements
+     * @return a new panel
      */
     public static Panel panel(String title, Element... children) {
         return new Panel(title, children);
@@ -92,6 +105,9 @@ public final class Toolkit {
 
     /**
      * Creates a panel without a title.
+     *
+     * @param children the child elements
+     * @return a new panel
      */
     public static Panel panel(Element... children) {
         return new Panel(children);
@@ -99,6 +115,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty panel.
+     *
+     * @return a new empty panel
      */
     public static Panel panel() {
         return new Panel();
@@ -106,6 +124,9 @@ public final class Toolkit {
 
     /**
      * Creates a horizontal row layout.
+     *
+     * @param children the child elements
+     * @return a new row
      */
     public static Row row(Element... children) {
         return new Row(children);
@@ -113,6 +134,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty row.
+     *
+     * @return a new empty row
      */
     public static Row row() {
         return new Row();
@@ -120,6 +143,9 @@ public final class Toolkit {
 
     /**
      * Creates a vertical column layout.
+     *
+     * @param children the child elements
+     * @return a new column
      */
     public static Column column(Element... children) {
         return new Column(children);
@@ -127,6 +153,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty column.
+     *
+     * @return a new empty column
      */
     public static Column column() {
         return new Column();
@@ -136,6 +164,8 @@ public final class Toolkit {
 
     /**
      * Creates a spacer that fills available space.
+     *
+     * @return a new spacer
      */
     public static Spacer spacer() {
         return Spacer.fill();
@@ -143,6 +173,9 @@ public final class Toolkit {
 
     /**
      * Creates a spacer with a fixed length.
+     *
+     * @param length the fixed length
+     * @return a new spacer
      */
     public static Spacer spacer(int length) {
         return Spacer.length(length);
@@ -152,6 +185,9 @@ public final class Toolkit {
 
     /**
      * Creates a length constraint.
+     *
+     * @param value the length value
+     * @return a new length constraint
      */
     public static Constraint length(int value) {
         return Constraint.length(value);
@@ -159,6 +195,9 @@ public final class Toolkit {
 
     /**
      * Creates a percentage constraint.
+     *
+     * @param value the percentage value
+     * @return a new percentage constraint
      */
     public static Constraint percent(int value) {
         return Constraint.percentage(value);
@@ -166,6 +205,8 @@ public final class Toolkit {
 
     /**
      * Creates a fill constraint with weight 1.
+     *
+     * @return a new fill constraint
      */
     public static Constraint fill() {
         return Constraint.fill();
@@ -173,6 +214,9 @@ public final class Toolkit {
 
     /**
      * Creates a fill constraint with the given weight.
+     *
+     * @param weight the fill weight
+     * @return a new fill constraint
      */
     public static Constraint fill(int weight) {
         return Constraint.fill(weight);
@@ -180,6 +224,9 @@ public final class Toolkit {
 
     /**
      * Creates a minimum constraint.
+     *
+     * @param value the minimum value
+     * @return a new minimum constraint
      */
     public static Constraint min(int value) {
         return Constraint.min(value);
@@ -187,6 +234,9 @@ public final class Toolkit {
 
     /**
      * Creates a maximum constraint.
+     *
+     * @param value the maximum value
+     * @return a new maximum constraint
      */
     public static Constraint max(int value) {
         return Constraint.max(value);
@@ -194,6 +244,10 @@ public final class Toolkit {
 
     /**
      * Creates a ratio constraint.
+     *
+     * @param numerator the numerator
+     * @param denominator the denominator
+     * @return a new ratio constraint
      */
     public static Constraint ratio(int numerator, int denominator) {
         return Constraint.ratio(numerator, denominator);
@@ -209,6 +263,9 @@ public final class Toolkit {
      * int count = 0;
      * lazy(() -> text("Count: " + count))
      * }</pre>
+     *
+     * @param supplier the supplier that provides the element
+     * @return a new lazy element
      */
     public static Element lazy(Supplier<? extends Element> supplier) {
         return new LazyElement(supplier);
@@ -220,6 +277,10 @@ public final class Toolkit {
      * <pre>{@code
      * panel("Counter", () -> text("Count: " + count))
      * }</pre>
+     *
+     * @param title the panel title
+     * @param contentSupplier the supplier that provides the content
+     * @return a new panel
      */
     public static Panel panel(String title, Supplier<? extends Element> contentSupplier) {
         return new Panel(title, new LazyElement(contentSupplier));
@@ -227,6 +288,9 @@ public final class Toolkit {
 
     /**
      * Creates a panel with lazy content (no title).
+     *
+     * @param contentSupplier the supplier that provides the content
+     * @return a new panel
      */
     public static Panel panel(Supplier<? extends Element> contentSupplier) {
         return new Panel(new LazyElement(contentSupplier));
@@ -234,6 +298,9 @@ public final class Toolkit {
 
     /**
      * Creates a row with lazy content.
+     *
+     * @param contentSupplier the supplier that provides the content
+     * @return a new row
      */
     public static Row row(Supplier<? extends Element> contentSupplier) {
         return new Row(new LazyElement(contentSupplier));
@@ -241,6 +308,9 @@ public final class Toolkit {
 
     /**
      * Creates a column with lazy content.
+     *
+     * @param contentSupplier the supplier that provides the content
+     * @return a new column
      */
     public static Column column(Supplier<? extends Element> contentSupplier) {
         return new Column(new LazyElement(contentSupplier));
@@ -250,6 +320,9 @@ public final class Toolkit {
 
     /**
      * Creates a gauge with the given ratio (0.0-1.0).
+     *
+     * @param ratio the ratio value (0.0-1.0)
+     * @return a new gauge element
      */
     public static GaugeElement gauge(double ratio) {
         return new GaugeElement(ratio);
@@ -257,6 +330,9 @@ public final class Toolkit {
 
     /**
      * Creates a gauge with the given percentage (0-100).
+     *
+     * @param percent the percentage value (0-100)
+     * @return a new gauge element
      */
     public static GaugeElement gauge(int percent) {
         return new GaugeElement(percent);
@@ -264,6 +340,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty gauge.
+     *
+     * @return a new empty gauge element
      */
     public static GaugeElement gauge() {
         return new GaugeElement();
@@ -273,6 +351,9 @@ public final class Toolkit {
 
     /**
      * Creates a line gauge with the given ratio (0.0-1.0).
+     *
+     * @param ratio the ratio value (0.0-1.0)
+     * @return a new line gauge element
      */
     public static LineGaugeElement lineGauge(double ratio) {
         return new LineGaugeElement(ratio);
@@ -280,6 +361,9 @@ public final class Toolkit {
 
     /**
      * Creates a line gauge with the given percentage (0-100).
+     *
+     * @param percent the percentage value (0-100)
+     * @return a new line gauge element
      */
     public static LineGaugeElement lineGauge(int percent) {
         return new LineGaugeElement(percent);
@@ -287,6 +371,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty line gauge.
+     *
+     * @return a new empty line gauge element
      */
     public static LineGaugeElement lineGauge() {
         return new LineGaugeElement();
@@ -296,6 +382,9 @@ public final class Toolkit {
 
     /**
      * Creates a sparkline with the given data values.
+     *
+     * @param data the data values
+     * @return a new sparkline element
      */
     public static SparklineElement sparkline(long... data) {
         return new SparklineElement(data);
@@ -303,6 +392,9 @@ public final class Toolkit {
 
     /**
      * Creates a sparkline with the given data values.
+     *
+     * @param data the data values
+     * @return a new sparkline element
      */
     public static SparklineElement sparkline(int... data) {
         return new SparklineElement(data);
@@ -310,6 +402,9 @@ public final class Toolkit {
 
     /**
      * Creates a sparkline with the given data values.
+     *
+     * @param data the data values
+     * @return a new sparkline element
      */
     public static SparklineElement sparkline(Collection<? extends Number> data) {
         return new SparklineElement(data);
@@ -317,6 +412,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty sparkline.
+     *
+     * @return a new empty sparkline element
      */
     public static SparklineElement sparkline() {
         return new SparklineElement();
@@ -326,6 +423,9 @@ public final class Toolkit {
 
     /**
      * Creates a list with the given items.
+     *
+     * @param items the list items
+     * @return a new list element
      */
     public static ListElement list(String... items) {
         return new ListElement(items);
@@ -333,6 +433,9 @@ public final class Toolkit {
 
     /**
      * Creates a list with the given items.
+     *
+     * @param items the list items
+     * @return a new list element
      */
     public static ListElement list(List<String> items) {
         return new ListElement(items);
@@ -340,6 +443,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty list.
+     *
+     * @return a new empty list element
      */
     public static ListElement list() {
         return new ListElement();
@@ -349,6 +454,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty table.
+     *
+     * @return a new empty table element
      */
     public static TableElement table() {
         return new TableElement();
@@ -358,6 +465,9 @@ public final class Toolkit {
 
     /**
      * Creates tabs with the given titles.
+     *
+     * @param titles the tab titles
+     * @return a new tabs element
      */
     public static TabsElement tabs(String... titles) {
         return new TabsElement(titles);
@@ -365,6 +475,9 @@ public final class Toolkit {
 
     /**
      * Creates tabs with the given titles.
+     *
+     * @param titles the tab titles
+     * @return a new tabs element
      */
     public static TabsElement tabs(List<String> titles) {
         return new TabsElement(titles);
@@ -372,6 +485,8 @@ public final class Toolkit {
 
     /**
      * Creates empty tabs.
+     *
+     * @return a new empty tabs element
      */
     public static TabsElement tabs() {
         return new TabsElement();
@@ -381,6 +496,9 @@ public final class Toolkit {
 
     /**
      * Creates a text input with the given state.
+     *
+     * @param state the text input state
+     * @return a new text input element
      */
     public static TextInputElement textInput(TextInputState state) {
         return new TextInputElement(state);
@@ -388,6 +506,8 @@ public final class Toolkit {
 
     /**
      * Creates a text input with a new state.
+     *
+     * @return a new text input element
      */
     public static TextInputElement textInput() {
         return new TextInputElement();
@@ -397,6 +517,9 @@ public final class Toolkit {
 
     /**
      * Creates a bar chart with the given values.
+     *
+     * @param values the bar chart values
+     * @return a new bar chart element
      */
     public static BarChartElement barChart(long... values) {
         return new BarChartElement().data(values);
@@ -404,6 +527,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty bar chart.
+     *
+     * @return a new empty bar chart element
      */
     public static BarChartElement barChart() {
         return new BarChartElement();
@@ -413,6 +538,8 @@ public final class Toolkit {
 
     /**
      * Creates an empty chart.
+     *
+     * @return a new empty chart element
      */
     public static ChartElement chart() {
         return new ChartElement();
@@ -422,6 +549,12 @@ public final class Toolkit {
 
     /**
      * Creates a canvas with the given bounds.
+     *
+     * @param xMin the minimum x coordinate
+     * @param xMax the maximum x coordinate
+     * @param yMin the minimum y coordinate
+     * @param yMax the maximum y coordinate
+     * @return a new canvas element
      */
     public static CanvasElement canvas(double xMin, double xMax, double yMin, double yMax) {
         return new CanvasElement().bounds(xMin, xMax, yMin, yMax);
@@ -429,6 +562,8 @@ public final class Toolkit {
 
     /**
      * Creates a canvas with default bounds (0.0-1.0).
+     *
+     * @return a new canvas element
      */
     public static CanvasElement canvas() {
         return new CanvasElement();
@@ -438,6 +573,9 @@ public final class Toolkit {
 
     /**
      * Creates a calendar showing the given date's month.
+     *
+     * @param date the date to display
+     * @return a new calendar element
      */
     public static CalendarElement calendar(LocalDate date) {
         return new CalendarElement(date);
@@ -445,6 +583,8 @@ public final class Toolkit {
 
     /**
      * Creates a calendar showing the current month.
+     *
+     * @return a new calendar element
      */
     public static CalendarElement calendar() {
         return new CalendarElement();
@@ -454,6 +594,9 @@ public final class Toolkit {
 
     /**
      * Creates a scrollbar with the given state.
+     *
+     * @param state the scrollbar state
+     * @return a new scrollbar element
      */
     public static ScrollbarElement scrollbar(ScrollbarState state) {
         return new ScrollbarElement().state(state);
@@ -461,6 +604,11 @@ public final class Toolkit {
 
     /**
      * Creates a scrollbar with the given parameters.
+     *
+     * @param contentLength the total content length
+     * @param viewportLength the visible viewport length
+     * @param position the current scroll position
+     * @return a new scrollbar element
      */
     public static ScrollbarElement scrollbar(int contentLength, int viewportLength, int position) {
         return new ScrollbarElement().state(contentLength, viewportLength, position);
@@ -468,6 +616,8 @@ public final class Toolkit {
 
     /**
      * Creates a scrollbar.
+     *
+     * @return a new scrollbar element
      */
     public static ScrollbarElement scrollbar() {
         return new ScrollbarElement();

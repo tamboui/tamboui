@@ -43,6 +43,8 @@ public final class Frame {
 
     /**
      * Returns the area available for rendering.
+     *
+     * @return the rendering area
      */
     public Rect area() {
         return area;
@@ -50,6 +52,8 @@ public final class Frame {
 
     /**
      * Returns the underlying buffer.
+     *
+     * @return the buffer
      */
     public Buffer buffer() {
         return buffer;
@@ -57,6 +61,8 @@ public final class Frame {
 
     /**
      * Returns the terminal width.
+     *
+     * @return the terminal width
      */
     public int width() {
         return area.width();
@@ -64,6 +70,8 @@ public final class Frame {
 
     /**
      * Returns the terminal height.
+     *
+     * @return the terminal height
      */
     public int height() {
         return area.height();
@@ -71,6 +79,9 @@ public final class Frame {
 
     /**
      * Renders a widget to the given area.
+     *
+     * @param widget the widget to render
+     * @param area the area to render within
      */
     public void renderWidget(Widget widget, Rect area) {
         widget.render(area, buffer);
@@ -78,6 +89,11 @@ public final class Frame {
 
     /**
      * Renders a stateful widget to the given area.
+     *
+     * @param <S> the state type
+     * @param widget the stateful widget to render
+     * @param area the area to render within
+     * @param state the widget state
      */
     public <S> void renderStatefulWidget(StatefulWidget<S> widget, Rect area, S state) {
         widget.render(area, buffer, state);
@@ -86,6 +102,8 @@ public final class Frame {
     /**
      * Sets the cursor position. The cursor will be shown at this position
      * after the frame is drawn.
+     *
+     * @param position the cursor position
      */
     public void setCursorPosition(Position position) {
         this.cursorPosition = position;
@@ -94,6 +112,9 @@ public final class Frame {
 
     /**
      * Sets the cursor position using x and y coordinates.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
      */
     public void setCursorPosition(int x, int y) {
         setCursorPosition(new Position(x, y));
@@ -101,6 +122,8 @@ public final class Frame {
 
     /**
      * Returns the cursor position if set.
+     *
+     * @return the cursor position, or empty if not set
      */
     Optional<Position> cursorPosition() {
         return Optional.ofNullable(cursorPosition);
@@ -108,6 +131,8 @@ public final class Frame {
 
     /**
      * Returns whether the cursor should be visible.
+     *
+     * @return true if the cursor should be visible, false otherwise
      */
     boolean isCursorVisible() {
         return cursorVisible;

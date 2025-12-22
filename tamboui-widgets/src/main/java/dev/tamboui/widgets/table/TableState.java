@@ -36,6 +36,8 @@ public final class TableState {
 
     /**
      * Returns the index of the currently selected row, or null if nothing is selected.
+     *
+     * @return the selected row index, or null if nothing is selected
      */
     public Integer selected() {
         return selected;
@@ -43,6 +45,8 @@ public final class TableState {
 
     /**
      * Returns the scroll offset.
+     *
+     * @return the scroll offset
      */
     public int offset() {
         return offset;
@@ -50,6 +54,8 @@ public final class TableState {
 
     /**
      * Selects the row at the given index.
+     *
+     * @param index the row index to select
      */
     public void select(int index) {
         this.selected = Math.max(0, index);
@@ -141,6 +147,8 @@ public final class TableState {
 
     /**
      * Sets the scroll offset directly.
+     *
+     * @param offset the scroll offset to set
      */
     public void setOffset(int offset) {
         this.offset = Math.max(0, offset);

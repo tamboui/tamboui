@@ -31,6 +31,9 @@ public final class Buffer {
 
     /**
      * Creates an empty buffer filled with empty cells.
+     *
+     * @param area the area for the buffer
+     * @return a new empty buffer
      */
     public static Buffer empty(Rect area) {
         Cell[] content = new Cell[area.area()];
@@ -40,6 +43,10 @@ public final class Buffer {
 
     /**
      * Creates a buffer filled with the given cell.
+     *
+     * @param area the area for the buffer
+     * @param cell the cell to fill the buffer with
+     * @return a new buffer filled with the given cell
      */
     public static Buffer filled(Rect area, Cell cell) {
         Cell[] content = new Cell[area.area()];
@@ -47,20 +54,39 @@ public final class Buffer {
         return new Buffer(area, content);
     }
 
+    /**
+     * Returns the area of this buffer.
+     *
+     * @return the buffer area
+     */
     public Rect area() {
         return area;
     }
 
+    /**
+     * Returns the width of this buffer.
+     *
+     * @return the buffer width
+     */
     public int width() {
         return area.width();
     }
 
+    /**
+     * Returns the height of this buffer.
+     *
+     * @return the buffer height
+     */
     public int height() {
         return area.height();
     }
 
     /**
      * Gets the cell at the given position.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return the cell at the position, or an empty cell if out of bounds
      */
     public Cell get(int x, int y) {
         if (!area.contains(x, y)) {
@@ -71,6 +97,9 @@ public final class Buffer {
 
     /**
      * Gets the cell at the given position.
+     *
+     * @param pos the position
+     * @return the cell at the position, or an empty cell if out of bounds
      */
     public Cell get(Position pos) {
         return get(pos.x(), pos.y());
@@ -78,6 +107,10 @@ public final class Buffer {
 
     /**
      * Sets the cell at the given position.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param cell the cell to set
      */
     public void set(int x, int y, Cell cell) {
         if (area.contains(x, y)) {
@@ -87,6 +120,9 @@ public final class Buffer {
 
     /**
      * Sets the cell at the given position.
+     *
+     * @param pos the position
+     * @param cell the cell to set
      */
     public void set(Position pos, Cell cell) {
         set(pos.x(), pos.y(), cell);
@@ -95,6 +131,12 @@ public final class Buffer {
     /**
      * Sets a string at the given position with the given style.
      * Returns the x position after the last character written.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param string the string to set
+     * @param style the style to apply
+     * @return the x position after the last character written
      */
     public int setString(int x, int y, String string, Style style) {
         if (y < area.top() || y >= area.bottom()) {
@@ -124,6 +166,11 @@ public final class Buffer {
     /**
      * Sets a span at the given position.
      * Returns the x position after the last character written.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param span the span to set
+     * @return the x position after the last character written
      */
     public int setSpan(int x, int y, Span span) {
         return setString(x, y, span.content(), span.style());
@@ -132,6 +179,11 @@ public final class Buffer {
     /**
      * Sets a line at the given position.
      * Returns the x position after the last character written.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param line the line to set
+     * @return the x position after the last character written
      */
     public int setLine(int x, int y, Line line) {
         int col = x;
@@ -144,6 +196,9 @@ public final class Buffer {
 
     /**
      * Sets the style for all cells in the given area.
+     *
+     * @param area the area to set the style for
+     * @param style the style to apply
      */
     public void setStyle(Rect area, Style style) {
         Rect intersection = this.area.intersection(area);
@@ -161,6 +216,9 @@ public final class Buffer {
 
     /**
      * Fills the given area with the specified cell.
+     *
+     * @param area the area to fill
+     * @param cell the cell to fill with
      */
     public void fill(Rect area, Cell cell) {
         Rect intersection = this.area.intersection(area);
@@ -184,6 +242,8 @@ public final class Buffer {
 
     /**
      * Resets the buffer to empty cells within the given area.
+     *
+     * @param area the area to clear
      */
     public void clear(Rect area) {
         fill(area, Cell.EMPTY);
@@ -191,6 +251,10 @@ public final class Buffer {
 
     /**
      * Merges another buffer into this one at the specified position.
+     *
+     * @param other the buffer to merge
+     * @param offsetX the x offset for merging
+     * @param offsetY the y offset for merging
      */
     public void merge(Buffer other, int offsetX, int offsetY) {
         for (int y = 0; y < other.height(); y++) {
@@ -207,6 +271,9 @@ public final class Buffer {
     /**
      * Calculates the differences between this buffer and another.
      * Returns a list of cell updates needed to transform this buffer into the other.
+     *
+     * @param other the buffer to compare with
+     * @return a list of cell updates representing the differences
      */
     public List<CellUpdate> diff(Buffer other) {
         List<CellUpdate> updates = new ArrayList<>();

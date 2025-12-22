@@ -26,6 +26,12 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     private Buffer previousBuffer;
     private boolean hiddenCursor;
 
+    /**
+     * Creates a new terminal instance with the given backend.
+     *
+     * @param backend the backend to use for terminal operations
+     * @throws IOException if initialization fails
+     */
     public Terminal(B backend) throws IOException {
         this.backend = backend;
         this.hiddenCursor = false;
@@ -38,6 +44,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Returns the backend.
+     *
+     * @return the backend instance
      */
     public B backend() {
         return backend;
@@ -45,6 +53,9 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Returns the current terminal size.
+     *
+     * @return the terminal size
+     * @throws IOException if the size cannot be determined
      */
     public Size size() throws IOException {
         return backend.size();
@@ -53,6 +64,10 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     /**
      * Draws a frame using the provided rendering function.
      * This is the main rendering entry point.
+     *
+     * @param renderer the function that renders to the frame
+     * @return a completed frame containing the rendered buffer
+     * @throws IOException if drawing fails
      */
     public CompletedFrame draw(Consumer<Frame> renderer) throws IOException {
         // Handle resize if needed
@@ -107,6 +122,9 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Resizes the terminal buffers.
+     *
+     * @param area the new terminal area
+     * @throws IOException if resizing fails
      */
     private void resize(Rect area) throws IOException {
         currentBuffer = Buffer.empty(area);
@@ -116,6 +134,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Clears the terminal and resets the buffers.
+     *
+     * @throws IOException if clearing fails
      */
     public void clear() throws IOException {
         backend.clear();
@@ -126,6 +146,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Shows the cursor.
+     *
+     * @throws IOException if showing the cursor fails
      */
     public void showCursor() throws IOException {
         backend.showCursor();
@@ -134,6 +156,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Hides the cursor.
+     *
+     * @throws IOException if hiding the cursor fails
      */
     public void hideCursor() throws IOException {
         backend.hideCursor();
@@ -142,11 +166,18 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Returns the current terminal area.
+     *
+     * @return the current terminal area
      */
     public Rect area() {
         return currentBuffer.area();
     }
 
+    /**
+     * Closes the terminal and releases resources.
+     *
+     * @throws IOException if closing fails
+     */
     @Override
     public void close() throws IOException {
         if (hiddenCursor) {
