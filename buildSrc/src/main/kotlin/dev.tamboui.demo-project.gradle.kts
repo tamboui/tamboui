@@ -12,7 +12,7 @@ dependencies {
     runtimeOnly(project(":tamboui-jline"))
 }
 
-tasks.withType<JavaExec>() {
+tasks.withType<JavaExec>().configureEach {
     enabled = false
 }
 
@@ -25,8 +25,6 @@ java {
 graalvmNative {
     binaries {
         named("main") {
-            sharedLibrary = false
-
             buildArgs.addAll(
                 "--no-fallback",
                 "--initialize-at-build-time=org.jline",

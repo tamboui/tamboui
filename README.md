@@ -283,6 +283,20 @@ Then look into `build/repo` for the generated artifacts.
 
 To run the demos, you can either run them on the JVM or compile them to a native executable.
 
+### Convenience Scripts
+
+You can use the `./run-demo.sh` script to run any demo directly without building/installing first. For example, to run the `sparkline-demo`:
+
+```bash
+./run-demo.sh sparkline-demo
+```
+
+To run it as a native executable:
+
+```bash
+./run-demo.sh sparkline-demo --native
+```
+
 #### JVM
 
 To run a demo on the JVM, first install the distribution and then execute the generated script.
