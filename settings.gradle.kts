@@ -6,7 +6,8 @@ include(
     "tamboui-jline",
     "tamboui-tui",
     "tamboui-picocli",
-    "tamboui-toolkit"
+    "tamboui-toolkit",
+    "tamboui-tfx"
 )
 
 File(settingsDir, "demos").listFiles()?.forEach {
