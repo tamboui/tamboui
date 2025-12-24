@@ -107,6 +107,9 @@ public final class Paragraph implements Widget {
             return;
         }
 
+        // Apply style to text area (after block renders, matching ratatui behavior)
+        buffer.setStyle(textArea, style);
+
         // Get lines to render based on overflow mode
         List<Line> lines = processLines(text.lines(), textArea.width());
 

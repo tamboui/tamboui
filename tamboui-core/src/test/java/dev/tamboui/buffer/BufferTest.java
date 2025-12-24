@@ -73,6 +73,28 @@ class BufferTest {
     }
 
     @Test
+    @DisplayName("Buffer setString patches existing cell styles (preserves background)")
+    void setStringPatchesStyle() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        // First set background color on area
+        Style bgStyle = Style.EMPTY.bg(Color.BLUE);
+        buffer.setStyle(new Rect(0, 0, 10, 1), bgStyle);
+
+        // Then set text with foreground color only
+        Style textStyle = Style.EMPTY.fg(Color.RED);
+        buffer.setString(0, 0, "Hi", textStyle);
+
+        // Text cells should have both foreground (from textStyle) and background (from bgStyle)
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
+        assertThat(buffer.get(0, 0).style().bg()).contains(Color.BLUE);
+        assertThat(buffer.get(1, 0).style().fg()).contains(Color.RED);
+        assertThat(buffer.get(1, 0).style().bg()).contains(Color.BLUE);
+
+        // Cells after text should still have background
+        assertThat(buffer.get(2, 0).style().bg()).contains(Color.BLUE);
+    }
+
+    @Test
     @DisplayName("Buffer diff returns changed cells")
     void diff() {
         Rect area = new Rect(0, 0, 5, 1);
