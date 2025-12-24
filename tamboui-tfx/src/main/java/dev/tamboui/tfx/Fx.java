@@ -27,7 +27,7 @@ import dev.tamboui.style.Color;
  *       {@code fadeFromFg}, {@code paint}, {@code paintFg}, {@code paintBg}</li>
  *   <li><b>Text Effects:</b> {@code dissolve}, {@code dissolveTo}, {@code coalesce},
  *       {@code coalesceFrom}</li>
- *   <li><b>Motion Effects:</b> {@code sweepIn}, {@code sweepOut}</li>
+ *   <li><b>Motion Effects:</b> {@code sweepIn}, {@code sweepOut}, {@code slideIn}, {@code slideOut}</li>
  *   <li><b>Composition:</b> {@code sequence}, {@code parallel}</li>
  * </ul>
  * <p>
@@ -308,6 +308,74 @@ public final class Fx {
     }
     
     /**
+     * Creates a slide effect that slides in using block characters (shutter animation).
+     * 
+     * @param direction The direction of the slide
+     * @param gradientLength The length of the gradient transition
+     * @param randomness The maximum random offset (0 for uniform)
+     * @param colorBehindCell The color behind the sliding cells
+     * @param timer The effect timer
+     * @return A slide effect
+     */
+    public static Effect slideIn(Motion direction, int gradientLength, int randomness,
+                                 Color colorBehindCell, EffectTimer timer) {
+        // Slide in is slide out with reversed direction and timer (matching Rust)
+        return slideOut(direction.flipped(), gradientLength, randomness, colorBehindCell, timer).reversed();
+    }
+    
+    /**
+     * Creates a slide effect that slides in using block characters (shutter animation).
+     * 
+     * @param direction The direction of the slide
+     * @param gradientLength The length of the gradient transition
+     * @param randomness The maximum random offset (0 for uniform)
+     * @param colorBehindCell The color behind the sliding cells
+     * @param durationMs Duration in milliseconds
+     * @param interpolation The interpolation method
+     * @return A slide effect
+     */
+    public static Effect slideIn(Motion direction, int gradientLength, int randomness,
+                                 Color colorBehindCell, long durationMs, Interpolation interpolation) {
+        return slideIn(direction, gradientLength, randomness, colorBehindCell,
+            EffectTimer.fromMs(durationMs, interpolation));
+    }
+    
+    /**
+     * Creates a slide effect that slides out using block characters (shutter animation).
+     * 
+     * @param direction The direction of the slide
+     * @param gradientLength The length of the gradient transition
+     * @param randomness The maximum random offset (0 for uniform)
+     * @param colorBehindCell The color behind the sliding cells
+     * @param timer The effect timer
+     * @return A slide effect
+     */
+    public static Effect slideOut(Motion direction, int gradientLength, int randomness,
+                                  Color colorBehindCell, EffectTimer timer) {
+        // Apply timer mirroring if direction flips timer (matching Rust)
+        EffectTimer finalTimer = direction.flipsTimer() ? timer.mirrored() : timer;
+        return Effect.of(dev.tamboui.tfx.effects.SlideShader.slideOut(
+            direction, gradientLength, randomness, colorBehindCell, finalTimer));
+    }
+    
+    /**
+     * Creates a slide effect that slides out using block characters (shutter animation).
+     * 
+     * @param direction The direction of the slide
+     * @param gradientLength The length of the gradient transition
+     * @param randomness The maximum random offset (0 for uniform)
+     * @param colorBehindCell The color behind the sliding cells
+     * @param durationMs Duration in milliseconds
+     * @param interpolation The interpolation method
+     * @return A slide effect
+     */
+    public static Effect slideOut(Motion direction, int gradientLength, int randomness,
+                                  Color colorBehindCell, long durationMs, Interpolation interpolation) {
+        return slideOut(direction, gradientLength, randomness, colorBehindCell,
+            EffectTimer.fromMs(durationMs, interpolation));
+    }
+    
+    /**
      * Creates a paint effect that applies foreground and/or background colors.
      * 
      * @param fg The foreground color to apply (null to skip)
@@ -420,6 +488,34 @@ public final class Fx {
      */
     public static Effect parallel(java.util.List<Effect> effects) {
         return Effect.of(dev.tamboui.tfx.effects.ParallelEffect.of(effects));
+    }
+    
+    /**
+     * Creates an expand effect that grows outward from the center in both directions.
+     * <p>
+     * The expand effect fills the area with the specified style (including background color),
+     * then reveals the content as it expands. It uses block characters for smooth transitions.
+     * 
+     * @param direction The direction of expansion (horizontal or vertical)
+     * @param style The style to apply during expansion (foreground and background colors)
+     * @param timer The effect timer
+     * @return An expand effect
+     */
+    public static Effect expand(ExpandDirection direction, dev.tamboui.style.Style style, EffectTimer timer) {
+        return Effect.of(new dev.tamboui.tfx.effects.ExpandShader(direction, style, timer));
+    }
+    
+    /**
+     * Creates an expand effect that grows outward from the center in both directions.
+     * 
+     * @param direction The direction of expansion (horizontal or vertical)
+     * @param style The style to apply during expansion (foreground and background colors)
+     * @param durationMs Duration in milliseconds
+     * @param interpolation The interpolation method
+     * @return An expand effect
+     */
+    public static Effect expand(ExpandDirection direction, dev.tamboui.style.Style style, long durationMs, Interpolation interpolation) {
+        return expand(direction, style, EffectTimer.fromMs(durationMs, interpolation));
     }
 }
 

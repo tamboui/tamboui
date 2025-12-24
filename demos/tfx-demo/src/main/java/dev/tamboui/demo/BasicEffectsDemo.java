@@ -14,6 +14,7 @@ import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
 import dev.tamboui.tfx.EffectTimer;
+import dev.tamboui.tfx.ExpandDirection;
 import dev.tamboui.tfx.Fx;
 import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.Motion;
@@ -57,7 +58,7 @@ import java.util.function.Supplier;
  */
 public class BasicEffectsDemo {
     
-    private Instant lastFrame = Instant.now();
+    private Instant lastFrame;
     private EffectManager effectManager;
     private EffectsRepository effects;
     private int activeEffectIdx = 0;
@@ -90,7 +91,7 @@ public class BasicEffectsDemo {
         try (TuiRunner tui = TuiRunner.create(config)) {
             tui.run(
                 (event, runner) -> {
-                    if (Keys.isQuit(event)) {
+                    if (Keys.isQuit(event) || Keys.isEscape(event)) {
                         runner.quit();
                         return false;
                     }
@@ -152,8 +153,18 @@ public class BasicEffectsDemo {
                     
                     // Process effects on content area
                     Instant now = Instant.now();
-                    long deltaMs = java.time.Duration.between(lastFrame, now).toMillis();
-                    lastFrame = now;
+                    long deltaMs;
+                    if (lastFrame == null) {
+                        // First frame - initialize to avoid huge delta
+                        lastFrame = now;
+                        deltaMs = 16; // Assume ~60fps for first frame
+                    } else {
+                        deltaMs = java.time.Duration.between(lastFrame, now).toMillis();
+                        // Clamp delta to reasonable maximum (e.g., 100ms) to avoid jumps
+                        // This handles cases where the app was paused or had a long delay
+                        deltaMs = Math.min(deltaMs, 100);
+                        lastFrame = now;
+                    }
                     
                     TFxDuration delta = TFxDuration.fromMillis(deltaMs);
                     if (effectManager.isRunning()) {
@@ -229,7 +240,7 @@ public class BasicEffectsDemo {
             Line.from("Many effects are composable, e.g. `parallel`, `sequence`, `repeating`."),
             Line.from("Most effects have a lifetime, after which they report done()."),
             Line.from("Effects such as `never_complete`, `temporary` influence or override this."),
-            Line.from(""),
+            Line.from("Symbols: !@#$%^&*()"),
             Line.from("The text in this window will undergo a random transition"),
             Line.from("when any of the following keys are pressed:")
         ).fg(LIGHT3);
@@ -280,12 +291,12 @@ public class BasicEffectsDemo {
                 () -> Fx.sweepIn(Motion.LEFT_TO_RIGHT, 30, 0, screenBg, slow, Interpolation.QuadOut)
             ));
             
-            // Smooth expand and reversed (simulated with sequence of sweeps)
+            // Smooth expand and reversed
             effects.add(new EffectEntry(
                 "smooth expand and reversed",
                 () -> Fx.sequence(
-                    Fx.sweepIn(Motion.UP_TO_DOWN, 20, 0, bg, 1200, Interpolation.QuadOut),
-                    Fx.sweepOut(Motion.LEFT_TO_RIGHT, 20, 0, bg, 1200, Interpolation.QuadOut)
+                    Fx.expand(ExpandDirection.VERTICAL, Style.EMPTY.fg(bg).bg(screenBg), 1200, Interpolation.QuadOut),
+                    Fx.expand(ExpandDirection.HORIZONTAL, Style.EMPTY.fg(bg).bg(screenBg), 1200, Interpolation.QuadOut).reversed()
                 )
             ));
             
@@ -309,15 +320,15 @@ public class BasicEffectsDemo {
                 )
             ));
             
-            // Slide in/out (simulated with sweeps)
+            // Slide in/out
             effects.add(new EffectEntry(
                 "slide in/out",
                 () -> Fx.sequence(
                     Fx.parallel(
                         Fx.fadeFromFg(bg, 2000, Interpolation.ExpoInOut),
-                        Fx.sweepIn(Motion.UP_TO_DOWN, 20, 0, DARK0_HARD, medium, Interpolation.Linear)
+                        Fx.slideIn(Motion.UP_TO_DOWN, 20, 0, DARK0_HARD, medium, Interpolation.Linear)
                     ),
-                    Fx.sweepOut(Motion.LEFT_TO_RIGHT, 80, 0, DARK0_HARD, medium, Interpolation.Linear)
+                    Fx.slideOut(Motion.LEFT_TO_RIGHT, 80, 0, DARK0_HARD, medium, Interpolation.Linear)
                 )
             ));
             

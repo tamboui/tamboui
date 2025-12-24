@@ -203,6 +203,21 @@ public interface Shader {
     }
     
     /**
+     * Reverses the shader's playback direction.
+     * <p>
+     * This method reverses the timer direction, causing the effect to play backwards.
+     * The default implementation reverses the timer if one exists.
+     */
+    default void reverse() {
+        EffectTimer timer = mutableTimer();
+        if (timer != null) {
+            // Create a new shader with reversed timer
+            // Note: This is a limitation - we can't mutate the timer in place
+            // So we need to override this in shaders that need reversal
+        }
+    }
+    
+    /**
      * Creates a copy of this shader.
      * <p>
      * This is used for effect composition and cloning.

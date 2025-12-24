@@ -73,23 +73,24 @@ public final class DissolveShader implements Shader {
     @Override
     public void execute(TFxDuration duration, Rect area, Buffer buffer) {
         float alpha = timer.alpha();
+        Rect effectArea = this.area != null ? this.area : area;
+        effectArea = effectArea.intersection(buffer.area());
         
         CellFilter filter = cellFilter != null ? cellFilter : CellFilter.all();
-        CellIterator iterator = new CellIterator(buffer, area, filter);
+        CellIterator iterator = new CellIterator(buffer, effectArea, filter);
         iterator.forEachCellMutable((pos, mutable) -> {
             Cell cell = mutable.cell();
             
-            // Only dissolve cells that have content
-            if (!cell.isEmpty() && cell.symbol() != null && !" ".equals(cell.symbol())) {
-                // Use random thresholding - if alpha exceeds random value, dissolve the cell
-                float randomValue = rng.genF32();
-                if (alpha > randomValue) {
-                    // Dissolve: replace with space
-                    if (dissolvedStyle != null) {
-                        mutable.setCell(new Cell(" ", dissolvedStyle));
-                    } else {
-                        mutable.setSymbol(" ");
-                    }
+            // Use random thresholding - if alpha exceeds random value, dissolve the cell
+            // This matches Rust's logic: process all cells that match the filter
+            float randomValue = rng.genF32();
+            if (alpha > randomValue) {
+                // Dissolve: set symbol to space and apply dissolved style
+                // Matching Rust: cell.set_char(' ') and cell.set_style(style)
+                mutable.setSymbol(" ");
+                if (dissolvedStyle != null) {
+                    // Apply the full dissolved style (matching Rust's set_style behavior)
+                    mutable.setCell(new Cell(" ", dissolvedStyle));
                 }
             }
         });

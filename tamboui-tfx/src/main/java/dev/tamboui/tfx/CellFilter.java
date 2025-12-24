@@ -268,12 +268,21 @@ public abstract class CellFilter {
             if (symbol == null || symbol.isEmpty() || " ".equals(symbol)) {
                 return false;
             }
-            // Check if symbol contains text characters (letters, numbers, common punctuation)
+            // Check if symbol contains text characters (letters, numbers, punctuation, and common symbols)
+            // Base matches Rust: is_alphabetic() || is_numeric() || " ?!.,:;()".contains(ch)
+            // Extended to include common symbols that are part of text content: @#$%^&*+-=_[ ]{}|\/<>"'~`
             for (int i = 0; i < symbol.length(); i++) {
                 char c = symbol.charAt(i);
                 if (Character.isLetterOrDigit(c) || 
                     c == '?' || c == '!' || c == '.' || c == ',' || 
-                    c == ':' || c == ';' || c == '(' || c == ')') {
+                    c == ':' || c == ';' || c == '(' || c == ')' ||
+                    // Extended: common symbols that should be considered part of text content
+                    c == '@' || c == '#' || c == '$' || c == '%' || 
+                    c == '^' || c == '&' || c == '*' || c == '+' || 
+                    c == '-' || c == '=' || c == '_' || c == '[' || 
+                    c == ']' || c == '{' || c == '}' || c == '|' || 
+                    c == '\\' || c == '/' || c == '<' || c == '>' || 
+                    c == '"' || c == '\'' || c == '`' || c == '~') {
                     return true;
                 }
             }

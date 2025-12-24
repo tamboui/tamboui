@@ -146,5 +146,23 @@ public final class Effect {
     Shader shader() {
         return shader;
     }
+    
+    /**
+     * Creates a new Effect with the shader's reverse flag toggled.
+     * <p>
+     * This reverses the playback direction of the effect, causing it to play backwards.
+     * <p>
+     * In Rust, this takes ownership and mutates in place, but in Java we create a new
+     * immutable instance to match the behavior of EffectTimer.reversed().
+     * 
+     * @return A new Effect instance with the shader's reverse flag toggled
+     */
+    public Effect reversed() {
+        // Create a new shader with reversed timer
+        // We need to copy the shader and reverse its timer
+        Shader newShader = shader.copy();
+        newShader.reverse();  // This will be handled by the shader implementation
+        return new Effect(newShader);
+    }
 }
 

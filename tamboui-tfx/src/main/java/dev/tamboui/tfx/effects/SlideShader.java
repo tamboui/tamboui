@@ -8,10 +8,8 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.tfx.CellFilter;
 import dev.tamboui.tfx.CellIterator;
-import dev.tamboui.tfx.TFxColorSpace;
 import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.Motion;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.SimpleRng;
@@ -20,39 +18,45 @@ import dev.tamboui.tfx.DirectionalVariance;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 
 /**
- * A sweep effect that transitions from a faded color to the original content.
+ * A slide effect that uses block characters to create a "shutter" animation.
+ * Cells gradually fill with block characters (█, ▇, ▆, etc.) based on the direction.
  */
-public final class SweepShader implements Shader {
+public final class SlideShader implements Shader {
+    
+    // Block characters for vertical sliding (from full to empty)
+    private static final char[] SHRINK_V = {'█', '▇', '▆', '▅', '▄', '▃', '▂', '▁', ' '};
+    // Block characters for horizontal sliding (from full to empty)
+    private static final char[] SHRINK_H = {'█', '▉', '▊', '▋', '▌', '▍', '▎', '▏', ' '};
+    private static final int LAST_IDX = SHRINK_H.length - 1;
     
     private final Motion direction;
     private final int gradientLength;
     private final int randomness;
-    private final Color fadedColor;
+    private final Color colorBehindCell;
     private final EffectTimer timer;
     private Rect area;
     private CellFilter cellFilter;
     private SimpleRng rng;
-    private TFxColorSpace colorSpace;
     
     /**
-     * Creates a sweep shader that sweeps in from a specified color.
+     * Creates a slide shader that slides out in the specified direction.
      */
-    public static SweepShader sweepIn(Motion direction, int gradientLength, int randomness,
-                                      Color fadedColor, EffectTimer timer) {
-        return new SweepShader(direction, gradientLength, randomness, fadedColor, timer);
+    public static SlideShader slideOut(Motion direction, int gradientLength, int randomness,
+                                      Color colorBehindCell, EffectTimer timer) {
+        return new SlideShader(direction, gradientLength, randomness, colorBehindCell, timer);
     }
     
-    private SweepShader(Motion direction, int gradientLength, int randomness,
-                        Color fadedColor, EffectTimer timer) {
+    private SlideShader(Motion direction, int gradientLength, int randomness,
+                       Color colorBehindCell, EffectTimer timer) {
         this.direction = direction;
         this.gradientLength = gradientLength;
         this.randomness = randomness;
-        this.fadedColor = fadedColor;
+        this.colorBehindCell = colorBehindCell;
         this.timer = timer;
         this.rng = SimpleRng.defaultRng();
-        this.colorSpace = TFxColorSpace.HSL; // Default to HSL
     }
     
     @Override
@@ -60,9 +64,9 @@ public final class SweepShader implements Shader {
         boolean isReversed = timer.isReversed();
         boolean flipsTimer = direction.flipsTimer();
         if (isReversed ^ flipsTimer) {
-            return "sweep_out";
+            return "slide_in";
         } else {
-            return "sweep_in";
+            return "slide_out";
         }
     }
     
@@ -90,7 +94,7 @@ public final class SweepShader implements Shader {
         SlidingWindowAlpha windowAlpha = SlidingWindowAlpha.create(
             direction, effectArea, alpha, gradientLength + randomness);
         
-        // Create directional variance for randomness (clone RNG to avoid mutation)
+        // Create directional variance for randomness
         DirectionalVariance axisJitter = DirectionalVariance.withRng(
             new SimpleRng(rng.state()), direction, randomness);
         
@@ -107,10 +111,9 @@ public final class SweepShader implements Shader {
                     if (!filter.matches(pos, cell, effectArea)) {
                         continue;
                     }
-                    // Apply variance offset to position for alpha calculation (clamped to >= 0)
                     Position offsetPos = offset(pos, rowVariance);
                     float cellAlpha = windowAlpha.alpha(offsetPos);
-                    applyAlpha(buffer, pos, cell, cellAlpha);
+                    updateCell(buffer, pos, cell, cellAlpha);
                 }
             }
         } else {
@@ -118,7 +121,7 @@ public final class SweepShader implements Shader {
             int[] colVariances = new int[effectArea.width()];
             for (int x = 0; x < effectArea.width(); x++) {
                 Position colVariance = axisJitter.next();
-                colVariances[x] = colVariance.y(); // For vertical, variance is on y-axis
+                colVariances[x] = colVariance.y();
             }
             
             for (int y = effectArea.top(); y < effectArea.bottom(); y++) {
@@ -128,44 +131,60 @@ public final class SweepShader implements Shader {
                     if (!filter.matches(pos, cell, effectArea)) {
                         continue;
                     }
-                    // Apply variance offset to position for alpha calculation (clamped to >= 0)
                     int colVariance = colVariances[x - effectArea.left()];
-                    Position offsetPos = new Position(x, Math.max(0, y + colVariance));
+                    Position offsetPos = new Position(
+                        Math.max(0, pos.x()),
+                        Math.max(0, pos.y() + colVariance)
+                    );
                     float cellAlpha = windowAlpha.alpha(offsetPos);
-                    applyAlpha(buffer, pos, cell, cellAlpha);
+                    updateCell(buffer, pos, cell, cellAlpha);
                 }
             }
         }
     }
     
-    private static Position offset(Position p, Position translate) {
-        // Clamp to >= 0 (matching Rust behavior)
-        return new Position(Math.max(0, p.x() + translate.x()), Math.max(0, p.y() + translate.y()));
+    private void updateCell(Buffer buffer, Position pos, Cell cell, float cellAlpha) {
+        if (cellAlpha <= 0.0f) {
+            // Not affected yet - leave cell unchanged
+            return;
+        }
+        
+        // Get the original background color (before any effects)
+        // This is what we'll use as the foreground for block characters
+        java.util.Optional<Color> originalBg = cell.style().bg();
+        Color blockFg = originalBg.isPresent() ? originalBg.get() : Color.BLACK;
+        
+        // Set the new background to color_behind_cell
+        // For block characters: fg = original bg, bg = color_behind_cell (matching Rust)
+        dev.tamboui.style.Style blockStyle = dev.tamboui.style.Style.EMPTY
+            .fg(blockFg)
+            .bg(colorBehindCell);
+        
+        if (cellAlpha >= 1.0f) {
+            // Fully slid - set to space with block style
+            buffer.set(pos, new Cell(" ", blockStyle));
+        } else {
+            // Partially slid - use block character based on alpha
+            // The block character uses the original background as foreground
+            char blockChar = slidedCell(cellAlpha);
+            buffer.set(pos, new Cell(String.valueOf(blockChar), blockStyle));
+        }
     }
     
-    private void applyAlpha(Buffer buffer, Position pos, Cell cell, float cellAlpha) {
-        // Apply circular out interpolation for smoother transition
-        float modAlpha = Interpolation.CircOut.alpha(cellAlpha);
+    private char slidedCell(float alpha) {
+        float clamped = Math.max(0.0f, Math.min(1.0f, alpha));
+        int charIdx = Math.round(LAST_IDX * clamped);
+        charIdx = Math.min(charIdx, LAST_IDX);
         
-        if (cellAlpha <= 0.0f) {
-            // Fully faded - use faded color
-            buffer.set(pos, cell.style(dev.tamboui.style.Style.EMPTY.fg(fadedColor).bg(fadedColor)));
-        } else if (cellAlpha >= 1.0f) {
-            // Fully revealed - keep original
-            // Nothing to do
+        if (direction == Motion.LEFT_TO_RIGHT || direction == Motion.RIGHT_TO_LEFT) {
+            return SHRINK_H[charIdx];
         } else {
-            // Transition - interpolate between faded and original using ColorSpace
-            java.util.Optional<Color> cellFg = cell.style().fg();
-            java.util.Optional<Color> cellBg = cell.style().bg();
-            
-            Color targetFg = cellFg.isPresent() ? cellFg.get() : Color.WHITE;
-            Color targetBg = cellBg.isPresent() ? cellBg.get() : Color.BLACK;
-            
-            Color interpolatedFg = colorSpace.lerp(fadedColor, targetFg, modAlpha);
-            Color interpolatedBg = colorSpace.lerp(fadedColor, targetBg, modAlpha);
-            
-            buffer.set(pos, cell.patchStyle(dev.tamboui.style.Style.EMPTY.fg(interpolatedFg).bg(interpolatedBg)));
+            return SHRINK_V[charIdx];
         }
+    }
+    
+    private static Position offset(Position p, Position translate) {
+        return new Position(Math.max(0, p.x() + translate.x()), Math.max(0, p.y() + translate.y()));
     }
     
     @Override
@@ -204,24 +223,14 @@ public final class SweepShader implements Shader {
     }
     
     @Override
-    public TFxColorSpace colorSpace() {
-        return colorSpace;
-    }
-    
-    @Override
-    public void setColorSpace(TFxColorSpace colorSpace) {
-        this.colorSpace = colorSpace;
-    }
-    
-    @Override
     public Shader copy() {
-        SweepShader copy = new SweepShader(
-            direction, gradientLength, randomness, fadedColor,
-            EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation()));
+        SlideShader copy = new SlideShader(
+            direction, gradientLength, randomness, colorBehindCell,
+            EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation())
+        );
         copy.area = area;
         copy.cellFilter = cellFilter;
         copy.rng = new SimpleRng(rng.state());
-        copy.colorSpace = colorSpace;
         return copy;
     }
 }
