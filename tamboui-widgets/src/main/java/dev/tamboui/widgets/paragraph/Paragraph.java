@@ -79,6 +79,9 @@ public final class Paragraph implements Widget {
             return;
         }
 
+        // Apply style to text area (after block renders, matching ratatui behavior)
+        buffer.setStyle(textArea, style);
+
         // Get lines to render (wrapped if needed)
         List<Line> lines = wrap == Wrap.NONE
             ? text.lines()

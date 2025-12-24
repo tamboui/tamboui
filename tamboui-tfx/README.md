@@ -406,6 +406,10 @@ The following features from the original Rust library are not yet implemented:
 - `resize_area` — Scale effect bounds
 - `translate_buf` — Copy and move buffer content
 
+## Known Issues
+
+See [TFX_PORT_ISSUES.md](../../TFX_PORT_ISSUES.md) for issues discovered during the port that need to be addressed in the core TamboUI libraries.
+
 ❌ **Advanced Features**
 
 - Effect DSL (runtime effect compilation from strings)
