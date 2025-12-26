@@ -4,17 +4,19 @@
  */
 package dev.tamboui.widgets.list;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Style;
-import dev.tamboui.text.Line;
-import dev.tamboui.widgets.StatefulWidget;
-import dev.tamboui.widgets.block.Block;
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.widgets.StatefulWidget;
+import dev.tamboui.widgets.block.Block;
 
 /**
  * A list widget for displaying selectable items.
@@ -105,8 +107,22 @@ public final class ListWidget implements StatefulWidget<ListState> {
             List<Line> lines = item.content().lines();
 
             for (int lineIdx = startLine; lineIdx < startLine + visibleHeight && lineIdx < lines.size(); lineIdx++) {
-                Line line = lines.get(lineIdx);
-                buffer.setLine(contentX, y, line.patchStyle(itemStyle));
+                Line line = lines.get(lineIdx).patchStyle(itemStyle);
+                
+                // Truncate line to fit within contentWidth
+                int col_x = contentX;
+                List<Span> spans = line.spans();
+                for (Span span : spans) {
+                    if (col_x >= listArea.right()) {
+                        break;
+                    }
+                    String text = span.content();
+                    int remainingWidth = Math.min(text.length(), contentWidth - (col_x - contentX));
+                    if (remainingWidth > 0) {
+                        buffer.setString(col_x, y, text.substring(0, remainingWidth), span.style());
+                        col_x += remainingWidth;
+                    }
+                }
                 y++;
             }
 

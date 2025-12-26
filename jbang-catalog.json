@@ -1,7 +1,7 @@
 {
   "aliases": {
     "hello-world-demo": {
-      "script-ref": "demos/hello-world-demo/src/main/java/dev/tamboui/demo/HelloWorldDemo.java"
+      "script-ref": "demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorld.java"
     },
     "table-demo": {
       "script-ref": "demos/table-demo/src/main/java/dev/tamboui/demo/TableDemo.java"
@@ -44,6 +44,12 @@
     },
     "toolkit-demo": {
       "script-ref": "demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
+    },
+    "logo-demo": {
+      "script-ref": "demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
+    },
+    "run-demo": {
+      "script-ref": ".jbang/tambouiDemos.java"
     }
   }
 }

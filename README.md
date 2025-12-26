@@ -31,7 +31,6 @@ It provides a comprehensive set of widgets and a layout system for building rich
 | `tamboui-tui` | High-level TUI framework with TuiRunner, event handling, and key helpers |
 | `tamboui-toolkit` | Fluent DSL for declarative UI construction with components and focus management |
 | `tamboui-picocli` | Optional PicoCLI integration for CLI argument parsing |
-| `demos/*` | Demo applications showcasing widgets and features |
 
 ## Requirements
 
@@ -145,7 +144,7 @@ import static dev.tamboui.toolkit.Toolkit.*;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 
-public class HelloDsl extends ToolkitApp {
+public class HelloToolkit extends ToolkitApp {
 
     @Override
     protected Element render() {
@@ -157,7 +156,7 @@ public class HelloDsl extends ToolkitApp {
     }
 
     public static void main(String[] args) throws Exception {
-        new HelloDsl().run();
+        new HelloToolkit().run();
     }
 }
 ```
@@ -315,7 +314,7 @@ If your IDE supports JBang you can open the demo .java files and run them direct
 
 #### Bash
 
-You can use the `./run-demo.sh` script to run any demo directly without building/installing first. For example, to run the `sparkline-demo`:
+You can use the `./run-demo.sh` script or `./jbang run-demo` to run any demo directly without building/installing first. For example, to run the `sparkline-demo`:
 
 ```bash
 ./run-demo.sh sparkline-demo

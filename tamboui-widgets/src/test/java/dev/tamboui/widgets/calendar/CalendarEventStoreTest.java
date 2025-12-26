@@ -96,8 +96,12 @@ class CalendarEventStoreTest {
             .add(newYear, blue)
             .add(july4, red);
 
-        assertThat(store.size()).isEqualTo(4);
-        assertThat(store.getStyle(LocalDate.now())).isEqualTo(red);
+        if(LocalDate.now().equals(christmas)) {
+            assertThat(store.size()).isEqualTo(3);
+        } else {
+            assertThat(store.size()).isEqualTo(4);
+            assertThat(store.getStyle(LocalDate.now())).isEqualTo(red);
+        }
         assertThat(store.getStyle(christmas)).isEqualTo(green);
         assertThat(store.getStyle(newYear)).isEqualTo(blue);
         assertThat(store.getStyle(july4)).isEqualTo(red);
