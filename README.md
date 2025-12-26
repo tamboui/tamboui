@@ -2,6 +2,9 @@
 
 A Java library for building modern terminal user interfaces.
 
+![TamboUI Logo](assets/tamboui-hires.png)
+
+
 TamboUI brings the TUI paradigms seen in things like Rust's [ratatui](https://github.com/ratatui/ratatui) or Go's [bubbletea](https://github.com/charmbracelet/bubbletea/) to the Java ecosystem.
 
 TamboUI is pronounced like "[tambouille](https://www.howtopronounce.com/french/tambouille)" (\tɑ̃.buj\) in French, or "tan-bouy".
