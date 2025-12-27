@@ -15,6 +15,9 @@
     "barchart-demo": {
       "script-ref": "demos/barchart-demo/src/main/java/dev/tamboui/demo/BarChartDemo.java"
     },
+    "block-demo": {
+      "script-ref": "demos/block-demo/src/main/java/dev/tamboui/demo/BlockDemo.java"
+    },
     "tui-demo": {
       "script-ref": "demos/tui-demo/src/main/java/dev/tamboui/demo/TuiDemo.java"
     },
