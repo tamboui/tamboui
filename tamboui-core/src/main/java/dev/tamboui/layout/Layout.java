@@ -96,6 +96,16 @@ public final class Layout {
     }
 
     /**
+     * Sets the spacing between split areas using a Spacing object.
+     *
+     * @param spacing spacing between adjacent areas (can be Space or Overlap)
+     * @return a new layout with this spacing
+     */
+    public Layout spacing(Spacing spacing) {
+        return new Layout(direction, constraints, margin, spacing.value(), flex);
+    }
+
+    /**
      * Sets how remaining space is distributed.
      *
      * @param flex flex mode for distributing extra space

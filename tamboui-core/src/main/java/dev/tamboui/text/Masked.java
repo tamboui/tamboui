@@ -49,7 +49,11 @@ public final class Masked {
             return "";
         }
         int codePointCount = inner.codePointCount(0, inner.length());
-        return String.valueOf(maskChar).repeat(codePointCount);
+        StringBuilder sb = new StringBuilder(codePointCount);
+        for (int i = 0; i < codePointCount; i++) {
+            sb.append(maskChar);
+        }
+        return sb.toString();
     }
 
     /**

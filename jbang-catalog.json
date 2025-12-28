@@ -56,6 +56,9 @@
     },
     "list-demo": {
       "script-ref": "demos/list-demo/src/main/java/dev/tamboui/demo/ListDemo.java"
+    },
+    "collapsed-borders-demo": {
+      "script-ref": "demos/collapsed-borders-demo/src/main/java/dev/tamboui/demo/CollapsedBordersDemo.java"
     }
   }
 }
