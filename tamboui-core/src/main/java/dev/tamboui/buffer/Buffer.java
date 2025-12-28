@@ -55,6 +55,44 @@ public final class Buffer {
     }
 
     /**
+     * Creates a buffer from an array of strings.
+     * Each string represents a line in the buffer.
+     * The buffer area is determined by the maximum line width and the number of lines.
+     * Lines shorter than the maximum width are padded with spaces.
+     *
+     * @param lines the lines to create the buffer from
+     * @return a new buffer containing the lines
+     */
+    public static Buffer withLines(String... lines) {
+        if (lines.length == 0) {
+            return empty(new Rect(0, 0, 0, 0));
+        }
+
+        // Find the maximum width
+        int maxWidth = 0;
+        for (String line : lines) {
+            if (line != null) {
+                // Count code points for proper Unicode width
+                int width = line.codePointCount(0, line.length());
+                maxWidth = Math.max(maxWidth, width);
+            }
+        }
+
+        int height = lines.length;
+        Rect area = new Rect(0, 0, maxWidth, height);
+        Buffer buffer = empty(area);
+
+        for (int y = 0; y < height; y++) {
+            String line = lines[y];
+            if (line != null) {
+                buffer.setString(0, y, line, Style.EMPTY);
+            }
+        }
+
+        return buffer;
+    }
+
+    /**
      * Returns the area of this buffer.
      *
      * @return the buffer area

@@ -8,9 +8,13 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
+import dev.tamboui.symbols.merge.MergeStrategy;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
 import dev.tamboui.widgets.Widget;
 
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * A block is a container widget with optional borders and titles.
@@ -24,6 +28,7 @@ public final class Block implements Widget {
     private final Style borderStyle;
     private final Style style;
     private final Padding padding;
+    private final MergeStrategy mergeStrategy;
 
     private Block(Builder builder) {
         this.title = builder.title;
@@ -33,6 +38,7 @@ public final class Block implements Widget {
         this.borderStyle = builder.borderStyle;
         this.style = builder.style;
         this.padding = builder.padding;
+        this.mergeStrategy = builder.mergeStrategy;
     }
 
     public static Builder builder() {
@@ -107,31 +113,39 @@ public final class Block implements Widget {
     private void renderBorders(Rect area, Buffer buffer) {
         BorderSet set = borderType.set();
 
-        // Top border
+        // When merge strategy is not REPLACE, skip corner positions when rendering sides
+        // This prevents corners from being merged with side characters incorrectly
+        boolean isReplace = mergeStrategy == MergeStrategy.REPLACE;
+        int leftInset = area.left() + (isReplace || !borders.contains(Borders.LEFT) ? 0 : 1);
+        int topInset = area.top() + (isReplace || !borders.contains(Borders.TOP) ? 0 : 1);
+        int rightInset = area.right() - 1 - (isReplace || !borders.contains(Borders.RIGHT) ? 0 : 1);
+        int bottomInset = area.bottom() - 1 - (isReplace || !borders.contains(Borders.BOTTOM) ? 0 : 1);
+
+        // Top border (skip corners if not REPLACE)
         if (borders.contains(Borders.TOP) && area.height() > 0) {
-            for (int x = area.left(); x < area.right(); x++) {
-                buffer.set(x, area.top(), new Cell(set.horizontal(), borderStyle));
+            for (int x = leftInset; x <= rightInset; x++) {
+                setBorderCell(buffer, x, area.top(), set.horizontal(), borderStyle);
             }
         }
 
-        // Bottom border
+        // Bottom border (skip corners if not REPLACE)
         if (borders.contains(Borders.BOTTOM) && area.height() > 1) {
-            for (int x = area.left(); x < area.right(); x++) {
-                buffer.set(x, area.bottom() - 1, new Cell(set.horizontal(), borderStyle));
+            for (int x = leftInset; x <= rightInset; x++) {
+                setBorderCell(buffer, x, area.bottom() - 1, set.horizontal(), borderStyle);
             }
         }
 
-        // Left border
+        // Left border (skip corners if not REPLACE)
         if (borders.contains(Borders.LEFT) && area.width() > 0) {
-            for (int y = area.top(); y < area.bottom(); y++) {
-                buffer.set(area.left(), y, new Cell(set.vertical(), borderStyle));
+            for (int y = topInset; y <= bottomInset; y++) {
+                setBorderCell(buffer, area.left(), y, set.vertical(), borderStyle);
             }
         }
 
-        // Right border
+        // Right border (skip corners if not REPLACE)
         if (borders.contains(Borders.RIGHT) && area.width() > 1) {
-            for (int y = area.top(); y < area.bottom(); y++) {
-                buffer.set(area.right() - 1, y, new Cell(set.vertical(), borderStyle));
+            for (int y = topInset; y <= bottomInset; y++) {
+                setBorderCell(buffer, area.right() - 1, y, set.vertical(), borderStyle);
             }
         }
 
@@ -142,16 +156,48 @@ public final class Block implements Widget {
         boolean hasRight = borders.contains(Borders.RIGHT);
 
         if (hasTop && hasLeft) {
-            buffer.set(area.left(), area.top(), new Cell(set.topLeft(), borderStyle));
+            setBorderCell(buffer, area.left(), area.top(), set.topLeft(), borderStyle);
         }
         if (hasTop && hasRight && area.width() > 1) {
-            buffer.set(area.right() - 1, area.top(), new Cell(set.topRight(), borderStyle));
+            setBorderCell(buffer, area.right() - 1, area.top(), set.topRight(), borderStyle);
         }
         if (hasBottom && hasLeft && area.height() > 1) {
-            buffer.set(area.left(), area.bottom() - 1, new Cell(set.bottomLeft(), borderStyle));
+            setBorderCell(buffer, area.left(), area.bottom() - 1, set.bottomLeft(), borderStyle);
         }
         if (hasBottom && hasRight && area.width() > 1 && area.height() > 1) {
-            buffer.set(area.right() - 1, area.bottom() - 1, new Cell(set.bottomRight(), borderStyle));
+            setBorderCell(buffer, area.right() - 1, area.bottom() - 1, set.bottomRight(), borderStyle);
+        }
+    }
+    
+    private void setBorderCell(Buffer buffer, int x, int y, String symbol, Style style) {
+        if (mergeStrategy != MergeStrategy.REPLACE) {
+            Cell existing = buffer.get(x, y);
+            String existingSymbol = existing.symbol();
+            boolean existingIsText = !isBorderSymbol(existingSymbol);
+            boolean newIsBorder = isBorderSymbol(symbol);
+            
+            // If existing cell is empty (space), just set the new cell
+            if (" ".equals(existingSymbol)) {
+                buffer.set(x, y, new Cell(symbol, style));
+                return;
+            }
+            
+            // Check if existing cell contains non-border text (like titles)
+            // If we're trying to draw a border over non-border text, preserve the text but update style
+            if (existingIsText && newIsBorder) {
+                // Preserve existing non-border text (like titles) when drawing borders
+                // But update the style to match the new cell's style
+                buffer.set(x, y, new Cell(existing.symbol(), style));
+                return;
+            }
+            
+            // Both are borders (or existing is a border) - merge the symbols
+            Cell merged = existing.mergeSymbol(symbol, mergeStrategy);
+            // Use the new cell's style (last rendered takes precedence for style)
+            buffer.set(x, y, new Cell(merged.symbol(), style));
+        } else {
+            // REPLACE strategy - just set the cell directly
+            buffer.set(x, y, new Cell(symbol, style));
         }
     }
 
@@ -188,7 +234,81 @@ public final class Block implements Widget {
                 break;
         }
 
-        buffer.setLine(x, y, title.content());
+        // Apply borderStyle to title if it's set (non-empty)
+        Line titleLine = title.content();
+        if (!borderStyle.equals(Style.EMPTY)) {
+            titleLine = titleLine.patchStyle(borderStyle);
+        }
+        
+        // When merge strategy is active, only render title if cells are empty or borders
+        // This prevents overwriting titles from overlapping blocks
+        if (mergeStrategy != MergeStrategy.REPLACE) {
+            renderTitleWithMerge(x, y, titleLine, buffer);
+        } else {
+            buffer.setLine(x, y, titleLine);
+        }
+    }
+    
+    private void renderTitleWithMerge(int x, int y, Line titleLine, Buffer buffer) {
+        List<Span> spans = titleLine.spans();
+        int col = x;
+        for (Span span : spans) {
+            String content = span.content();
+            for (int i = 0; i < content.length(); ) {
+                int codePoint = content.codePointAt(i);
+                String symbol = new String(Character.toChars(codePoint));
+                
+                Cell existing = buffer.get(col, y);
+                String existingSymbol = existing.symbol();
+                
+                // In Ratatui, titles are rendered using Line.render() which calls set_symbol()
+                // directly, overwriting cells. However, when merge strategy is active,
+                // we should preserve existing non-border text (like other titles).
+                // Only write to cells that are:
+                // 1. Empty (space character) - can be overwritten
+                // 2. Border characters - can be overwritten (borders are merged separately)
+                // 3. NOT non-border text (like other titles) - should be preserved
+                
+                // In Ratatui, Line.render() uses set_symbol() which overwrites cells.
+                // However, when merge strategy is active (EXACT/FUZZY), we should preserve
+                // existing non-border text (like other titles) when they don't overlap.
+                // Only write to cells that are:
+                // 1. Empty (space character) - can be overwritten
+                // 2. Border characters - can be overwritten (borders are merged separately)
+                // 3. NOT non-border text (like other titles) - should be preserved
+                
+                // Check if cell is empty (space) or contains a border character
+                // In Ratatui, Cell.symbol() returns " " if the symbol is None (empty cell)
+                // So we check for space character to identify empty cells
+                boolean isEmpty = " ".equals(existingSymbol);
+                boolean isBorder = isBorderSymbol(existingSymbol);
+                
+                // Only write to empty cells or cells with border characters
+                // This preserves existing title text from other blocks when they don't overlap
+                // If cell contains non-border text (like another title), preserve it
+                if (isEmpty || isBorder) {
+                    buffer.set(col, y, new Cell(symbol, span.style()));
+                } else {
+                    // Cell contains existing non-border text (like another title)
+                    // Preserve the symbol but update the style to match the new title's style
+                    // This ensures all titles get the same style when blocks overlap
+                    buffer.set(col, y, new Cell(existingSymbol, span.style()));
+                }
+                // This allows titles from different blocks to coexist when they don't overlap,
+                // while ensuring they all share the same style
+                
+                col++;
+                i += Character.charCount(codePoint);
+            }
+        }
+    }
+    
+    private boolean isBorderSymbol(String symbol) {
+        if (symbol == null || symbol.isEmpty()) {
+            return false;
+        }
+        int codePoint = symbol.codePointAt(0);
+        return codePoint >= 0x2500 && codePoint <= 0x257F;
     }
 
     public static final class Builder {
@@ -199,6 +319,7 @@ public final class Block implements Widget {
         private Style borderStyle = Style.EMPTY;
         private Style style = Style.EMPTY;
         private Padding padding = Padding.NONE;
+        private MergeStrategy mergeStrategy = MergeStrategy.REPLACE;
 
         private Builder() {}
 
@@ -249,6 +370,20 @@ public final class Block implements Widget {
 
         public Builder padding(int value) {
             this.padding = Padding.uniform(value);
+            return this;
+        }
+
+        /**
+         * Sets the merge strategy for borders.
+         * <p>
+         * When blocks are rendered with overlapping borders, this strategy determines
+         * how the borders are merged. See {@link MergeStrategy} for details.
+         *
+         * @param mergeStrategy the merge strategy to use
+         * @return this builder
+         */
+        public Builder mergeBorders(MergeStrategy mergeStrategy) {
+            this.mergeStrategy = mergeStrategy;
             return this;
         }
 

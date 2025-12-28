@@ -27,7 +27,9 @@ public final class ListWidget implements StatefulWidget<ListState> {
     private final Block block;
     private final Style style;
     private final Style highlightStyle;
-    private final String highlightSymbol;
+    private final Line highlightSymbol;
+    private final ListDirection direction;
+    private final boolean repeatHighlightSymbol;
 
     private ListWidget(Builder builder) {
         this.items = listCopyOf(builder.items);
@@ -35,6 +37,8 @@ public final class ListWidget implements StatefulWidget<ListState> {
         this.style = builder.style;
         this.highlightStyle = builder.highlightStyle;
         this.highlightSymbol = builder.highlightSymbol;
+        this.direction = builder.direction;
+        this.repeatHighlightSymbol = builder.repeatHighlightSymbol;
     }
 
     public static Builder builder() {
@@ -70,63 +74,151 @@ public final class ListWidget implements StatefulWidget<ListState> {
             state.scrollToSelected(listArea.height(), items);
         }
 
-        int symbolWidth = highlightSymbol.length();
+        int symbolWidth = highlightSymbol.width();
+        // Always reserve space for symbol to keep content aligned
         int contentWidth = listArea.width() - symbolWidth;
         if (contentWidth <= 0) {
             return;
         }
 
-        int y = listArea.top();
-        int offset = state.offset();
-        int currentOffset = 0;
+        // Items stay in original order - direction only affects rendering position
+        List<ListItem> orderedItems = items;
 
-        for (int i = 0; i < items.size() && y < listArea.bottom(); i++) {
-            ListItem item = items.get(i);
-            int itemHeight = item.height();
+        // Selected index stays the same - no adjustment needed
+        Integer selectedIndex = state.selected();
 
-            // Skip items before the visible area
-            if (currentOffset + itemHeight <= offset) {
-                currentOffset += itemHeight;
-                continue;
-            }
+        if (direction == ListDirection.BOTTOM_TO_TOP) {
+            // Render from bottom to top
+            int y = listArea.bottom() - 1;
+            int offset = state.offset();
+            int totalHeight = orderedItems.stream().mapToInt(ListItem::height).sum();
+            int currentOffset = 0;
 
-            // Calculate visible portion of this item
-            int startLine = Math.max(0, offset - currentOffset);
-            int visibleHeight = Math.min(itemHeight - startLine, listArea.bottom() - y);
+            for (int i = 0; i < orderedItems.size() && y >= listArea.top(); i++) {
+                ListItem item = orderedItems.get(i);
+                int itemHeight = item.height();
 
-            boolean isSelected = state.selected() != null && state.selected() == i;
-            Style itemStyle = item.style().patch(isSelected ? highlightStyle : Style.EMPTY);
+                // Skip items after the visible area (from bottom)
+                int itemBottomOffset = totalHeight - currentOffset - itemHeight;
+                if (itemBottomOffset + itemHeight <= offset) {
+                    currentOffset += itemHeight;
+                    continue;
+                }
 
-            // Draw highlight symbol
-            if (isSelected && symbolWidth > 0) {
-                buffer.setString(listArea.left(), y, highlightSymbol, highlightStyle);
-            }
+                // Calculate visible portion of this item
+                int itemStartOffset = itemBottomOffset;
+                int startLine = Math.max(0, offset - itemStartOffset);
 
-            // Draw item content
-            int contentX = listArea.left() + symbolWidth;
-            List<Line> lines = item.content().lines();
+                boolean isSelected = selectedIndex != null && selectedIndex == i;
+                Style itemStyle = item.style().patch(isSelected ? highlightStyle : Style.EMPTY);
 
-            for (int lineIdx = startLine; lineIdx < startLine + visibleHeight && lineIdx < lines.size(); lineIdx++) {
-                Line line = lines.get(lineIdx).patchStyle(itemStyle);
-                
-                // Truncate line to fit within contentWidth
-                int col_x = contentX;
-                List<Span> spans = line.spans();
-                for (Span span : spans) {
-                    if (col_x >= listArea.right()) {
-                        break;
+                // Draw item content from bottom to top
+                List<Line> lines = item.content().lines();
+                int itemY = y;
+
+                for (int lineIdx = itemHeight - 1; lineIdx >= startLine && itemY >= listArea.top(); lineIdx--) {
+                    if (lineIdx >= lines.size()) {
+                        itemY--;
+                        continue;
                     }
+
+                    // For bottom-to-top, we render from bottom to top, so:
+                    // - First line visually (top) is at lineIdx = 0 (rendered last)
+                    // - Last line visually (bottom) is at lineIdx = itemHeight - 1 (rendered first)
+                    // Always reserve space for symbol on all lines to keep content aligned
+                    int contentX = listArea.left() + symbolWidth;
+                    int availableWidth = contentWidth;
+                    
+                    // Draw highlight symbol on each line if selected
+                    // If repeatHighlightSymbol is true, show on all lines; otherwise only on first line (top visually)
+                    boolean shouldShowSymbol = isSelected && symbolWidth > 0 
+                        && (lineIdx == 0 || repeatHighlightSymbol);
+                    if (shouldShowSymbol) {
+                        buffer.setLine(listArea.left(), itemY, highlightSymbol);
+                    }
+
+                    Line line = lines.get(lineIdx).patchStyle(itemStyle);
+                    
+                    // Truncate line to fit within available width
+                    int col_x = contentX;
+                    List<Span> spans = line.spans();
+                    for (Span span : spans) {
+                        if (col_x >= listArea.right()) {
+                            break;
+                        }
                     String text = span.content();
-                    int remainingWidth = Math.min(text.length(), contentWidth - (col_x - contentX));
+                    int remainingWidth = Math.min(text.length(), availableWidth - (col_x - contentX));
+                    if (remainingWidth > 0) {
+                        buffer.setString(col_x, itemY, text.substring(0, remainingWidth), span.style());
+                        col_x += remainingWidth;
+                    }
+                    }
+                    itemY--;
+                }
+
+                y = itemY;
+                currentOffset += itemHeight;
+            }
+        } else {
+            // Render from top to bottom (default)
+            int y = listArea.top();
+            int offset = state.offset();
+            int currentOffset = 0;
+
+            for (int i = 0; i < orderedItems.size() && y < listArea.bottom(); i++) {
+                ListItem item = orderedItems.get(i);
+                int itemHeight = item.height();
+
+                // Skip items before the visible area
+                if (currentOffset + itemHeight <= offset) {
+                    currentOffset += itemHeight;
+                    continue;
+                }
+
+                // Calculate visible portion of this item
+                int startLine = Math.max(0, offset - currentOffset);
+                int visibleHeight = Math.min(itemHeight - startLine, listArea.bottom() - y);
+
+                boolean isSelected = selectedIndex != null && selectedIndex == i;
+                Style itemStyle = item.style().patch(isSelected ? highlightStyle : Style.EMPTY);
+
+                // Draw item content
+                List<Line> lines = item.content().lines();
+
+                for (int lineIdx = startLine; lineIdx < startLine + visibleHeight && lineIdx < lines.size(); lineIdx++) {
+                    // Always reserve space for symbol on all lines to keep content aligned
+                    int contentX = listArea.left() + symbolWidth;
+                    int availableWidth = contentWidth;
+                    
+                    // Draw highlight symbol on each line if selected
+                    // If repeatHighlightSymbol is true, show on all lines; otherwise only on first line
+                    boolean shouldShowSymbol = isSelected && symbolWidth > 0 
+                        && (lineIdx == startLine || repeatHighlightSymbol);
+                    if (shouldShowSymbol) {
+                        buffer.setLine(listArea.left(), y, highlightSymbol);
+                    }
+
+                    Line line = lines.get(lineIdx).patchStyle(itemStyle);
+                    
+                    // Truncate line to fit within available width
+                    int col_x = contentX;
+                    List<Span> spans = line.spans();
+                    for (Span span : spans) {
+                        if (col_x >= listArea.right()) {
+                            break;
+                        }
+                    String text = span.content();
+                    int remainingWidth = Math.min(text.length(), availableWidth - (col_x - contentX));
                     if (remainingWidth > 0) {
                         buffer.setString(col_x, y, text.substring(0, remainingWidth), span.style());
                         col_x += remainingWidth;
                     }
+                    }
+                    y++;
                 }
-                y++;
-            }
 
-            currentOffset += itemHeight;
+                currentOffset += itemHeight;
+            }
         }
     }
 
@@ -135,7 +227,9 @@ public final class ListWidget implements StatefulWidget<ListState> {
         private Block block;
         private Style style = Style.EMPTY;
         private Style highlightStyle = Style.EMPTY.reversed();
-        private String highlightSymbol = ">> ";
+        private Line highlightSymbol = Line.from(">> ");
+        private ListDirection direction = ListDirection.TOP_TO_BOTTOM;
+        private boolean repeatHighlightSymbol = false;
 
         private Builder() {}
 
@@ -174,8 +268,45 @@ public final class ListWidget implements StatefulWidget<ListState> {
             return this;
         }
 
-        public Builder highlightSymbol(String highlightSymbol) {
+        /**
+         * Sets the highlight symbol as a Line (which can include styling).
+         *
+         * @param highlightSymbol the line to use as the highlight symbol
+         * @return this builder
+         */
+        public Builder highlightSymbol(Line highlightSymbol) {
             this.highlightSymbol = highlightSymbol;
+            return this;
+        }
+
+        /**
+         * Sets the highlight symbol as a string (convenience method).
+         *
+         * @param highlightSymbol the string to use as the highlight symbol
+         * @return this builder
+         */
+        public Builder highlightSymbol(String highlightSymbol) {
+            this.highlightSymbol = Line.from(highlightSymbol);
+            return this;
+        }
+
+        /**
+         * Sets the direction for rendering list items.
+         *
+         * @param direction the direction (default: TOP_TO_BOTTOM)
+         */
+        public Builder direction(ListDirection direction) {
+            this.direction = direction != null ? direction : ListDirection.TOP_TO_BOTTOM;
+            return this;
+        }
+
+        /**
+         * Sets whether to repeat the highlight symbol on all lines of multiline items.
+         *
+         * @param repeatHighlightSymbol if true, repeat symbol on all lines (default: false)
+         */
+        public Builder repeatHighlightSymbol(boolean repeatHighlightSymbol) {
+            this.repeatHighlightSymbol = repeatHighlightSymbol;
             return this;
         }
 

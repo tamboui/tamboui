@@ -7,8 +7,12 @@ package dev.tamboui.assertj;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
+import dev.tamboui.style.Style;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -32,8 +36,8 @@ final class BufferDiffFormatter {
         StringBuilder sb = new StringBuilder();
 
         // Format actual buffer
-        sb.append(" left: ").append(formatBuffer(actual)).append("\n");
-        sb.append(" right: ").append(formatBuffer(expected));
+        sb.append(" actual: ").append(formatBuffer(actual)).append("\n");
+        sb.append(" expected: ").append(formatBuffer(expected));
 
         return sb.toString();
     }
@@ -68,9 +72,16 @@ final class BufferDiffFormatter {
         }
         sb.append("    ],\n");
 
-        // Styles (simplified - could be enhanced to show style differences)
+        // Format styles - only include non-empty styles
+        List<String> styleLines = formatStyleLines(buffer);
         sb.append("    styles: [\n");
-        sb.append("        x: 0, y: 0, fg: Reset, bg: Reset, modifier: NONE,\n");
+        for (int i = 0; i < styleLines.size(); i++) {
+            sb.append("        ").append(styleLines.get(i));
+            if (i < styleLines.size() - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+        }
         sb.append("    ]\n");
         sb.append("}");
 
@@ -99,6 +110,83 @@ final class BufferDiffFormatter {
         }
 
         return lines;
+    }
+
+    private static List<String> formatStyleLines(Buffer buffer) {
+        List<String> styleLines = new ArrayList<>();
+        Rect area = buffer.area();
+
+        for (int y = area.top(); y < area.bottom(); y++) {
+            for (int x = area.left(); x < area.right(); x++) {
+                Cell cell = buffer.get(x, y);
+                Style style = cell.style();
+                
+                // Only include non-empty styles
+                if (!style.equals(Style.EMPTY)) {
+                    StringBuilder styleLine = new StringBuilder();
+                    styleLine.append("x: ").append(x).append(", y: ").append(y);
+                    
+                    // Format foreground color
+                    if (style.fg().isPresent()) {
+                        styleLine.append(", fg: ").append(formatColor(style.fg().get()));
+                    } else {
+                        styleLine.append(", fg: Reset");
+                    }
+                    
+                    // Format background color
+                    if (style.bg().isPresent()) {
+                        styleLine.append(", bg: ").append(formatColor(style.bg().get()));
+                    } else {
+                        styleLine.append(", bg: Reset");
+                    }
+                    
+                    // Format modifiers
+                    EnumSet<Modifier> modifiers = style.effectiveModifiers();
+                    if (modifiers.isEmpty()) {
+                        styleLine.append(", modifier: NONE");
+                    } else {
+                        styleLine.append(", modifier: ").append(formatModifiers(modifiers));
+                    }
+                    
+                    styleLines.add(styleLine.toString());
+                }
+            }
+        }
+
+        // If no styles found, add a placeholder
+        if (styleLines.isEmpty()) {
+            styleLines.add("x: 0, y: 0, fg: Reset, bg: Reset, modifier: NONE");
+        }
+
+        return styleLines;
+    }
+
+    private static String formatColor(Color color) {
+        if (color == null) {
+            return "Reset";
+        }
+        if (color instanceof Color.Reset) {
+            return "Reset";
+        } else if (color instanceof Color.Ansi) {
+            return ((Color.Ansi) color).color().name();
+        } else if (color instanceof Color.Indexed) {
+            return "Indexed(" + ((Color.Indexed) color).index() + ")";
+        } else if (color instanceof Color.Rgb) {
+            Color.Rgb rgb = (Color.Rgb) color;
+            return String.format("Rgb(%d, %d, %d)", rgb.r(), rgb.g(), rgb.b());
+        }
+        return color.toString();
+    }
+
+    private static String formatModifiers(EnumSet<Modifier> modifiers) {
+        if (modifiers.isEmpty()) {
+            return "NONE";
+        }
+        List<String> modifierNames = new ArrayList<>();
+        for (Modifier mod : modifiers) {
+            modifierNames.add(mod.name());
+        }
+        return String.join(" | ", modifierNames);
     }
 }
 

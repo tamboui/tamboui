@@ -57,6 +57,17 @@ public final class ListState {
     }
 
     /**
+     * Selects the last item.
+     *
+     * @param itemCount the total number of items
+     */
+    public void selectLast(int itemCount) {
+        if (itemCount > 0) {
+            this.selected = itemCount - 1;
+        }
+    }
+
+    /**
      * Selects the next item.
      *
      * @param itemCount the total number of items

@@ -146,8 +146,8 @@ class BufferTest {
         } catch (AssertionError e) {
             // Verify the error message contains formatted buffer output
             String message = e.getMessage();
-            assertThat(message).contains("left:");
-            assertThat(message).contains("right:");
+            assertThat(message).contains("actual:");
+            assertThat(message).contains("expected:");
             assertThat(message).contains("Buffer {");
             assertThat(message).contains("content:");
         }

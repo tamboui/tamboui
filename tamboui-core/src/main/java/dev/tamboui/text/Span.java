@@ -29,6 +29,22 @@ public final class Span {
     }
 
     /**
+     * Creates a span from a masked string.
+     * The masked value will be used as the content.
+     */
+    public static Span from(Masked masked) {
+        return new Span(masked.value(), Style.EMPTY);
+    }
+
+    /**
+     * Creates a styled span from a masked string.
+     * The masked value will be used as the content.
+     */
+    public static Span styled(Masked masked, Style style) {
+        return new Span(masked.value(), style);
+    }
+
+    /**
      * Returns the display width of this span (simplified - counts code points).
      * For proper Unicode width handling, a library like ICU4J would be needed.
      */

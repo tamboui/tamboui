@@ -15,6 +15,9 @@
     "barchart-demo": {
       "script-ref": "demos/barchart-demo/src/main/java/dev/tamboui/demo/BarChartDemo.java"
     },
+    "block-demo": {
+      "script-ref": "demos/block-demo/src/main/java/dev/tamboui/demo/BlockDemo.java"
+    },
     "tui-demo": {
       "script-ref": "demos/tui-demo/src/main/java/dev/tamboui/demo/TuiDemo.java"
     },
@@ -47,6 +50,15 @@
     },
     "logo-demo": {
       "script-ref": "demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
+    },
+    "paragraph-demo": {
+      "script-ref": "demos/paragraph-demo/src/main/java/dev/tamboui/demo/ParagraphDemo.java"
+    },
+    "list-demo": {
+      "script-ref": "demos/list-demo/src/main/java/dev/tamboui/demo/ListDemo.java"
+    },
+    "collapsed-borders-demo": {
+      "script-ref": "demos/collapsed-borders-demo/src/main/java/dev/tamboui/demo/CollapsedBordersDemo.java"
     }
   }
 }
