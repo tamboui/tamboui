@@ -212,16 +212,67 @@ public final class Layout {
             sizes[i] = Math.max(mins[i], Math.min(maxs[i], sizes[i]));
         }
 
+        // Calculate consumed space and remaining space for flex distribution
+        int consumed = 0;
+        for (int size : sizes) {
+            consumed += size;
+        }
+        consumed += totalSpacing;
+        int remainingSpace = Math.max(0, available - consumed);
+
+        // Apply flex mode: calculate starting offset and extra gap
+        int startOffset = 0;
+        int extraGap = 0;
+        int n = sizes.length;
+
+        if (remainingSpace > 0 && n > 0) {
+            switch (flex) {
+                case LEGACY:
+                    // Add remaining space to the last element
+                    sizes[n - 1] += remainingSpace;
+                    break;
+                case START:
+                    // Elements packed at start (default, no adjustment needed)
+                    break;
+                case END:
+                    // Elements packed at end
+                    startOffset = remainingSpace;
+                    break;
+                case CENTER:
+                    // Elements centered
+                    startOffset = remainingSpace / 2;
+                    break;
+                case SPACE_BETWEEN:
+                    // Space distributed between elements (no space at edges)
+                    if (n > 1) {
+                        extraGap = remainingSpace / (n - 1);
+                    }
+                    break;
+                case SPACE_AROUND:
+                    // Space distributed around elements (half space at edges)
+                    if (n > 0) {
+                        extraGap = remainingSpace / n;
+                        startOffset = extraGap / 2;
+                    }
+                    break;
+                case SPACE_EVENLY:
+                    // Space distributed evenly (equal gaps including edges)
+                    extraGap = remainingSpace / (n + 1);
+                    startOffset = extraGap;
+                    break;
+            }
+        }
+
         // Build rectangles
         List<Rect> result = new ArrayList<>(constraints.size());
-        int pos = direction == Direction.HORIZONTAL ? inner.x() : inner.y();
+        int pos = (direction == Direction.HORIZONTAL ? inner.x() : inner.y()) + startOffset;
 
         for (int i = 0; i < sizes.length; i++) {
             Rect rect = direction == Direction.HORIZONTAL
                 ? new Rect(pos, inner.y(), sizes[i], inner.height())
                 : new Rect(inner.x(), pos, inner.width(), sizes[i]);
             result.add(rect);
-            pos += sizes[i] + spacing;
+            pos += sizes[i] + spacing + extraGap;
         }
 
         return result;

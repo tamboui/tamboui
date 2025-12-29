@@ -8,6 +8,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
@@ -23,6 +24,7 @@ public final class Column extends StyledElement<Column> {
 
     private final List<Element> children = new ArrayList<>();
     private int spacing = 0;
+    private Flex flex = Flex.START;
 
     public Column() {
     }
@@ -36,6 +38,14 @@ public final class Column extends StyledElement<Column> {
      */
     public Column spacing(int spacing) {
         this.spacing = Math.max(0, spacing);
+        return this;
+    }
+
+    /**
+     * Sets the flex mode for distributing remaining space.
+     */
+    public Column flex(Flex flex) {
+        this.flex = flex != null ? flex : Flex.START;
         return this;
     }
 
@@ -78,6 +88,7 @@ public final class Column extends StyledElement<Column> {
         }
 
         List<Rect> areas = Layout.vertical()
+            .flex(flex)
             .constraints(constraints.toArray(new Constraint[0]))
             .split(area);
 
