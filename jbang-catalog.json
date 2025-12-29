@@ -37,6 +37,9 @@
     "helloworld-demo": {
       "script-ref": "tamboui-tui/demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorld.java"
     },
+    "figlet-demo": {
+      "script-ref": "demos/figlet-demo/src/main/java/dev/tamboui/demo/FigletDemo.java"
+    },
     "logo-demo": {
       "script-ref": "tamboui-tui/demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
     },
