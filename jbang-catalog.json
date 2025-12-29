@@ -48,6 +48,9 @@
     "toolkit-demo": {
       "script-ref": "demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
     },
+    "figlet-demo": {
+      "script-ref": "demos/figlet-demo/src/main/java/dev/tamboui/demo/FigletDemo.java"
+    },
     "logo-demo": {
       "script-ref": "demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
     },
