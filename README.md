@@ -121,7 +121,7 @@ import picocli.CommandLine.Option;
 public class MyApp extends TuiCommand {
 
     @Option(names = {"-t", "--title"}, description = "Window title")
-    private String title = "My App";
+    private final String title = "My App";
 
     @Override
     protected void runTui(TuiRunner runner) throws Exception {

@@ -240,7 +240,9 @@ public final class Canvas implements Widget {
             double xRange = xBounds[1] - xBounds[0];
             double yRange = yBounds[1] - yBounds[0];
 
-            if (xRange == 0 || yRange == 0) continue;
+            if (xRange == 0 || yRange == 0) {
+                continue;
+            }
 
             int screenX = (int) Math.round((label.x() - xBounds[0]) / xRange * (area.width() - 1));
             int screenY = (int) Math.round((yBounds[1] - label.y()) / yRange * (area.height() - 1));

@@ -55,7 +55,7 @@ public class TableDemo {
     );
 
     private boolean running = true;
-    private TableState tableState = new TableState();
+    private final TableState tableState = new TableState();
 
     public static void main(String[] args) throws Exception {
         new TableDemo().run();

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
@@ -82,6 +83,7 @@ public final class Column extends StyledElement<Column> {
             .split(area);
 
         // Render children (skipping spacing areas) and register them for events
+        DefaultRenderContext internalContext = (DefaultRenderContext) context;
         int childIndex = 0;
         for (int i = 0; i < areas.size() && childIndex < children.size(); i++) {
             if (spacing > 0 && i % 2 == 1) {
@@ -91,8 +93,7 @@ public final class Column extends StyledElement<Column> {
             Element child = children.get(childIndex);
             Rect childArea = areas.get(i);
             child.render(frame, childArea, context);
-            // Always register children - EventRouter will handle event dispatch
-            context.registerElement(child, childArea);
+            internalContext.registerElement(child, childArea);
             childIndex++;
         }
     }

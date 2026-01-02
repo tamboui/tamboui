@@ -39,6 +39,9 @@ public final class TuiConfig {
 
     /**
      * Returns the default configuration.
+     * <p>
+     * By default, tick events are generated every 100ms to ensure periodic UI refresh.
+     * Use {@link Builder#noTick()} to disable automatic ticking.
      */
     public static TuiConfig defaults() {
         return new TuiConfig(
@@ -47,7 +50,7 @@ public final class TuiConfig {
                 true,                        // hideCursor
                 false,                       // mouseCapture
                 Duration.ofMillis(100),      // pollTimeout
-                null,                         // tickRate (disabled),
+                Duration.ofMillis(100),      // tickRate
                 true
         );
     }
@@ -176,7 +179,7 @@ public final class TuiConfig {
         private boolean hideCursor = true;
         private boolean mouseCapture = false;
         private Duration pollTimeout = Duration.ofMillis(100);
-        private Duration tickRate = null;
+        private Duration tickRate = Duration.ofMillis(100);
         private boolean shutdownHook = true;
 
         private Builder() {
@@ -257,6 +260,18 @@ public final class TuiConfig {
          */
         public Builder tickRate(Duration tickRate) {
             this.tickRate = tickRate;
+            return this;
+        }
+
+        /**
+         * Disables automatic tick events.
+         * <p>
+         * Use this for purely event-driven UIs that only need to refresh on user input.
+         *
+         * @return this builder
+         */
+        public Builder noTick() {
+            this.tickRate = null;
             return this;
         }
 

@@ -238,8 +238,12 @@ public final class Chart implements Widget {
         double xRange = xMax - xMin;
         double yRange = yMax - yMin;
 
-        if (xRange == 0) xRange = 1;
-        if (yRange == 0) yRange = 1;
+        if (xRange == 0) {
+            xRange = 1;
+        }
+        if (yRange == 0) {
+            yRange = 1;
+        }
 
         int[] screenX = new int[data.length];
         int[] screenY = new int[data.length];
@@ -326,7 +330,9 @@ public final class Chart implements Widget {
                 buffer.setString(x0, y0, lineChar, style);
             }
 
-            if (x0 == x1 && y0 == y1) break;
+            if (x0 == x1 && y0 == y1) {
+                break;
+            }
 
             int e2 = 2 * err;
             if (e2 > -dy) {
@@ -341,11 +347,21 @@ public final class Chart implements Widget {
     }
 
     private String getLineChar(int dx, int dy, int sx, int sy) {
-        if (dx == 0) return "│";
-        if (dy == 0) return "─";
-        if (dx > dy * 2) return "─";
-        if (dy > dx * 2) return "│";
-        if (sx == sy) return "╲";
+        if (dx == 0) {
+            return "│";
+        }
+        if (dy == 0) {
+            return "─";
+        }
+        if (dx > dy * 2) {
+            return "─";
+        }
+        if (dy > dx * 2) {
+            return "│";
+        }
+        if (sx == sy) {
+            return "╲";
+        }
         return "╱";
     }
 

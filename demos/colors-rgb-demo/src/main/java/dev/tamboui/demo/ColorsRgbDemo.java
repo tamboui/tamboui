@@ -37,8 +37,8 @@ import java.util.List;
 public class ColorsRgbDemo {
 
     private boolean running = true;
-    private FpsWidget fpsWidget = new FpsWidget();
-    private ColorsWidget colorsWidget = new ColorsWidget();
+    private final FpsWidget fpsWidget = new FpsWidget();
+    private final ColorsWidget colorsWidget = new ColorsWidget();
 
     public static void main(String[] args) throws Exception {
         new ColorsRgbDemo().run();
@@ -145,7 +145,7 @@ public class ColorsRgbDemo {
      * Uses half-block characters (▀) to display two rows of pixels per screen row.
      */
     private static class ColorsWidget {
-        private List<List<Color.Rgb>> colors = new ArrayList<>();
+        private final List<List<Color.Rgb>> colors = new ArrayList<>();
         private int frameCount = 0;
 
         public void render(Frame frame, Rect area) {

@@ -4,47 +4,13 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.toolkit.event.EventRouter;
-import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.toolkit.component.ComponentTree;
-import dev.tamboui.layout.Rect;
-
 /**
- * Context provided during rendering, giving access to focus state, event routing, and component tree.
+ * Context provided during rendering, giving access to focus state.
+ * <p>
+ * This interface exposes only what user code needs during rendering.
+ * Internal framework functionality is handled automatically.
  */
-public final class RenderContext {
-
-    private final FocusManager focusManager;
-    private final ComponentTree componentTree;
-    private final EventRouter eventRouter;
-
-    public RenderContext(FocusManager focusManager, ComponentTree componentTree, EventRouter eventRouter) {
-        this.focusManager = focusManager;
-        this.componentTree = componentTree;
-        this.eventRouter = eventRouter;
-    }
-
-    /**
-     * Creates an empty context for simple rendering without focus management.
-     */
-    public static RenderContext empty() {
-        FocusManager fm = new FocusManager();
-        return new RenderContext(fm, new ComponentTree(), new EventRouter(fm));
-    }
-
-    /**
-     * Returns the focus manager.
-     */
-    public FocusManager focusManager() {
-        return focusManager;
-    }
-
-    /**
-     * Returns the component tree.
-     */
-    public ComponentTree componentTree() {
-        return componentTree;
-    }
+public interface RenderContext {
 
     /**
      * Returns whether the element with the given ID is currently focused.
@@ -52,37 +18,20 @@ public final class RenderContext {
      * @param elementId the element ID to check
      * @return true if focused, false otherwise
      */
-    public boolean isFocused(String elementId) {
-        return focusManager.isFocused(elementId);
-    }
+    boolean isFocused(String elementId);
 
     /**
      * Returns whether any element is currently focused.
      *
      * @return true if an element is focused
      */
-    public boolean hasFocus() {
-        return focusManager.focusedId() != null;
-    }
+    boolean hasFocus();
 
     /**
-     * Returns the event router.
+     * Creates an empty context for simple rendering without focus management.
+     * Primarily useful for testing.
      */
-    public EventRouter eventRouter() {
-        return eventRouter;
-    }
-
-    /**
-     * Registers an element for event routing.
-     * Should be called during rendering to track elements.
-     *
-     * @param element the element to register
-     * @param area the rendered area
-     */
-    public void registerElement(Element element, Rect area) {
-        eventRouter.registerElement(element, area);
-        if (element.isFocusable() && element.id() != null) {
-            focusManager.registerFocusable(element.id(), area);
-        }
+    static RenderContext empty() {
+        return DefaultRenderContext.createEmpty();
     }
 }

@@ -10,6 +10,7 @@ import dev.tamboui.toolkit.elements.CalendarElement;
 import dev.tamboui.toolkit.elements.CanvasElement;
 import dev.tamboui.toolkit.elements.ChartElement;
 import dev.tamboui.toolkit.elements.Column;
+import dev.tamboui.toolkit.elements.DialogElement;
 import dev.tamboui.toolkit.elements.GaugeElement;
 import dev.tamboui.toolkit.elements.LazyElement;
 import dev.tamboui.toolkit.elements.LineGaugeElement;
@@ -26,6 +27,8 @@ import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -158,6 +161,40 @@ public final class Toolkit {
      */
     public static Column column() {
         return new Column();
+    }
+
+    // ==================== Dialog ====================
+
+    /**
+     * Creates a dialog with a title and children.
+     * <p>
+     * Dialogs auto-center in their parent area and clear the background.
+     *
+     * @param title the dialog title
+     * @param children the child elements
+     * @return a new dialog element
+     */
+    public static DialogElement dialog(String title, Element... children) {
+        return new DialogElement(title, children);
+    }
+
+    /**
+     * Creates a dialog without a title.
+     *
+     * @param children the child elements
+     * @return a new dialog element
+     */
+    public static DialogElement dialog(Element... children) {
+        return new DialogElement(children);
+    }
+
+    /**
+     * Creates an empty dialog.
+     *
+     * @return a new empty dialog element
+     */
+    public static DialogElement dialog() {
+        return new DialogElement();
     }
 
     // ==================== Spacer ====================
@@ -427,8 +464,8 @@ public final class Toolkit {
      * @param items the list items
      * @return a new list element
      */
-    public static ListElement list(String... items) {
-        return new ListElement(items);
+    public static ListElement<?> list(String... items) {
+        return new ListElement<>(items);
     }
 
     /**
@@ -437,8 +474,8 @@ public final class Toolkit {
      * @param items the list items
      * @return a new list element
      */
-    public static ListElement list(List<String> items) {
-        return new ListElement(items);
+    public static ListElement<?> list(List<String> items) {
+        return new ListElement<>(items);
     }
 
     /**
@@ -446,8 +483,8 @@ public final class Toolkit {
      *
      * @return a new empty list element
      */
-    public static ListElement list() {
-        return new ListElement();
+    public static ListElement<?> list() {
+        return new ListElement<>();
     }
 
     // ==================== Table ====================
@@ -621,5 +658,48 @@ public final class Toolkit {
      */
     public static ScrollbarElement scrollbar() {
         return new ScrollbarElement();
+    }
+
+    // ==================== Input Utilities ====================
+
+    /**
+     * Handles common key events for text input.
+     * <p>
+     * Handles: character input, backspace, delete, left/right arrows, home/end.
+     *
+     * @param state the text input state to modify
+     * @param event the key event to handle
+     * @return true if the event was handled, false otherwise
+     */
+    public static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
+        switch (event.code()) {
+            case BACKSPACE:
+                state.deleteBackward();
+                return true;
+            case DELETE:
+                state.deleteForward();
+                return true;
+            case LEFT:
+                state.moveCursorLeft();
+                return true;
+            case RIGHT:
+                state.moveCursorRight();
+                return true;
+            case HOME:
+                state.moveCursorToStart();
+                return true;
+            case END:
+                state.moveCursorToEnd();
+                return true;
+            case CHAR:
+                char c = event.character();
+                if (c >= 32 && c < 127) {
+                    state.insert(c);
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
     }
 }

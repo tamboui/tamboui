@@ -85,7 +85,7 @@ public class TabsDemo {
     };
 
     private boolean running = true;
-    private TabsState tabsState = new TabsState(0);
+    private final TabsState tabsState = new TabsState(0);
 
     public static void main(String[] args) throws Exception {
         new TabsDemo().run();

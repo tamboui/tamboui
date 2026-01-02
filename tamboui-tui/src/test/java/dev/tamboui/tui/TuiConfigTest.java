@@ -23,7 +23,8 @@ class TuiConfigTest {
         assertThat(config.hideCursor()).isTrue();
         assertThat(config.mouseCapture()).isFalse();
         assertThat(config.pollTimeout()).isEqualTo(Duration.ofMillis(100));
-        assertThat(config.ticksEnabled()).isFalse();
+        assertThat(config.ticksEnabled()).isTrue();
+        assertThat(config.tickRate()).isEqualTo(Duration.ofMillis(100));
         assertThat(config.shutdownHook()).isTrue();
     }
 
@@ -80,10 +81,11 @@ class TuiConfigTest {
     }
 
     @Test
-    @DisplayName("ticksEnabled returns false when tickRate is null")
-    void ticksEnabledFalseWhenNullRate() {
-        TuiConfig config = TuiConfig.builder().build();
+    @DisplayName("ticksEnabled returns false when noTick() is used")
+    void ticksEnabledFalseWhenNoTick() {
+        TuiConfig config = TuiConfig.builder().noTick().build();
         assertThat(config.ticksEnabled()).isFalse();
+        assertThat(config.tickRate()).isNull();
     }
 
     @Test

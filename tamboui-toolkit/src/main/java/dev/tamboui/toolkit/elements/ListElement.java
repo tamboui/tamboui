@@ -21,6 +21,7 @@ import dev.tamboui.widgets.list.ListWidget;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * A DSL wrapper for the ListWidget.
@@ -34,15 +35,18 @@ import java.util.List;
  *     .rounded()
  * }</pre>
  */
-public final class ListElement extends StyledElement<ListElement> {
+public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     private final List<ListItem> items = new ArrayList<>();
+    private List<T> data;
+    private Function<T, ListItem> itemRenderer;
     private ListState state;
     private Style highlightStyle = Style.EMPTY.reversed();
     private String highlightSymbol = ">> ";
     private String title;
     private BorderType borderType;
     private Color borderColor;
+    private boolean autoScroll;
 
     public ListElement() {
     }
@@ -62,7 +66,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the list items from strings.
      */
-    public ListElement items(String... items) {
+    public ListElement<T> items(String... items) {
         this.items.clear();
         for (String item : items) {
             this.items.add(ListItem.from(item));
@@ -73,7 +77,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the list items from a collection.
      */
-    public ListElement items(List<String> items) {
+    public ListElement<T> items(List<String> items) {
         this.items.clear();
         for (String item : items) {
             this.items.add(ListItem.from(item));
@@ -84,7 +88,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the list items from ListItem objects.
      */
-    public ListElement listItems(ListItem... items) {
+    public ListElement<T> listItems(ListItem... items) {
         this.items.clear();
         this.items.addAll(Arrays.asList(items));
         return this;
@@ -93,7 +97,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Adds an item to the list.
      */
-    public ListElement add(String item) {
+    public ListElement<T> add(String item) {
         this.items.add(ListItem.from(item));
         return this;
     }
@@ -101,7 +105,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Adds an item to the list.
      */
-    public ListElement add(ListItem item) {
+    public ListElement<T> add(ListItem item) {
         this.items.add(item);
         return this;
     }
@@ -109,7 +113,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the list state for selection tracking.
      */
-    public ListElement state(ListState state) {
+    public ListElement<T> state(ListState state) {
         this.state = state;
         return this;
     }
@@ -117,7 +121,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the highlight style for selected items.
      */
-    public ListElement highlightStyle(Style style) {
+    public ListElement<T> highlightStyle(Style style) {
         this.highlightStyle = style;
         return this;
     }
@@ -125,7 +129,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the highlight color for selected items.
      */
-    public ListElement highlightColor(Color color) {
+    public ListElement<T> highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
         return this;
     }
@@ -133,7 +137,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the symbol displayed before the selected item.
      */
-    public ListElement highlightSymbol(String symbol) {
+    public ListElement<T> highlightSymbol(String symbol) {
         this.highlightSymbol = symbol;
         return this;
     }
@@ -141,7 +145,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the title.
      */
-    public ListElement title(String title) {
+    public ListElement<T> title(String title) {
         this.title = title;
         return this;
     }
@@ -149,7 +153,7 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Uses rounded borders.
      */
-    public ListElement rounded() {
+    public ListElement<T> rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
@@ -157,8 +161,64 @@ public final class ListElement extends StyledElement<ListElement> {
     /**
      * Sets the border color.
      */
-    public ListElement borderColor(Color color) {
+    public ListElement<T> borderColor(Color color) {
         this.borderColor = color;
+        return this;
+    }
+
+    /**
+     * Sets the data items and a renderer function.
+     * <p>
+     * The renderer function is called at render time to convert each data item
+     * to a ListItem. This allows the list to reflect the current state of your data.
+     *
+     * @param data the list of data items
+     * @param renderer function to convert each item to a ListItem
+     * @return this element
+     */
+    public <U> ListElement<U> data(List<U> data, Function<U, ListItem> renderer) {
+        @SuppressWarnings("unchecked")
+        ListElement<U> self = (ListElement<U>) this;
+        self.data = data;
+        self.itemRenderer = renderer;
+        self.items.clear();
+        return self;
+    }
+
+    /**
+     * Sets the renderer function for converting data items to ListItems.
+     * <p>
+     * The renderer is called at render time for each data item.
+     *
+     * @param renderer function to convert each item to a ListItem
+     * @return this element
+     */
+    public ListElement<T> itemRenderer(Function<T, ListItem> renderer) {
+        this.itemRenderer = renderer;
+        return this;
+    }
+
+    /**
+     * Enables auto-scroll to keep the selected item visible.
+     * <p>
+     * When enabled, the list automatically scrolls to show the selected item
+     * before rendering.
+     *
+     * @return this element
+     */
+    public ListElement<T> autoScroll() {
+        this.autoScroll = true;
+        return this;
+    }
+
+    /**
+     * Sets whether auto-scroll is enabled.
+     *
+     * @param enabled true to enable auto-scroll
+     * @return this element
+     */
+    public ListElement<T> autoScroll(boolean enabled) {
+        this.autoScroll = enabled;
         return this;
     }
 
@@ -168,8 +228,31 @@ public final class ListElement extends StyledElement<ListElement> {
             return;
         }
 
+        // Build the effective items list
+        List<ListItem> effectiveItems;
+        if (data != null && itemRenderer != null) {
+            // Convert data to ListItems at render time
+            effectiveItems = new ArrayList<>(data.size());
+            for (T item : data) {
+                effectiveItems.add(itemRenderer.apply(item));
+            }
+        } else {
+            effectiveItems = items;
+        }
+
+        // Auto-scroll if enabled
+        ListState effectiveState = state != null ? state : new ListState();
+        if (autoScroll && state != null) {
+            // Calculate visible height (area height minus border if present)
+            int visibleHeight = area.height();
+            if (title != null || borderType != null) {
+                visibleHeight -= 2; // Top and bottom border
+            }
+            state.scrollToSelected(visibleHeight, effectiveItems);
+        }
+
         ListWidget.Builder builder = ListWidget.builder()
-            .items(items)
+            .items(effectiveItems)
             .style(style)
             .highlightStyle(highlightStyle)
             .highlightSymbol(highlightSymbol);
@@ -189,7 +272,6 @@ public final class ListElement extends StyledElement<ListElement> {
         }
 
         ListWidget widget = builder.build();
-        ListState effectiveState = state != null ? state : new ListState();
         frame.renderStatefulWidget(widget, area, effectiveState);
     }
 }

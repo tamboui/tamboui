@@ -110,17 +110,10 @@ public final class EventRouter {
             return EventResult.UNHANDLED;
         }
 
-        // Escape cancels drag or clears focus
-        if (Keys.isEscape(event)) {
-            if (draggingElement != null) {
-                endDrag(-1, -1);
-                return EventResult.HANDLED;
-            }
-            if (focusManager.focusedId() != null) {
-                focusManager.clearFocus();
-                return EventResult.HANDLED;
-            }
-            return EventResult.UNHANDLED;
+        // Escape cancels drag first
+        if (Keys.isEscape(event) && draggingElement != null) {
+            endDrag(-1, -1);
+            return EventResult.HANDLED;
         }
 
         // Route to focused element first
@@ -153,6 +146,12 @@ public final class EventRouter {
                     return result;
                 }
             }
+        }
+
+        // Escape clears focus if no element handled it
+        if (Keys.isEscape(event) && focusManager.focusedId() != null) {
+            focusManager.clearFocus();
+            return EventResult.HANDLED;
         }
 
         return EventResult.UNHANDLED;

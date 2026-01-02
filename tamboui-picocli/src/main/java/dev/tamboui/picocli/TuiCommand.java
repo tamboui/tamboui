@@ -45,7 +45,7 @@ import java.util.concurrent.Callable;
 public abstract class TuiCommand implements Callable<Integer> {
 
     @Mixin
-    private TuiMixin tuiOptions = new TuiMixin();
+    private final TuiMixin tuiOptions = new TuiMixin();
 
     /**
      * Runs the TUI application.

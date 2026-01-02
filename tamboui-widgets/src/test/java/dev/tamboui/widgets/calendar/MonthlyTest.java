@@ -61,7 +61,9 @@ class MonthlyTest {
                     break;
                 }
             }
-            if (hasContent) break;
+            if (hasContent) {
+                break;
+            }
         }
         assertThat(hasContent).isTrue();
     }
@@ -157,7 +159,9 @@ class MonthlyTest {
                     break;
                 }
             }
-            if (foundStyledDay) break;
+            if (foundStyledDay) {
+                break;
+            }
         }
         assertThat(foundStyledDay).isTrue();
     }
@@ -248,7 +252,9 @@ class MonthlyTest {
                     }
                 }
             }
-            if (foundStyledDay) break;
+            if (foundStyledDay) {
+                break;
+            }
         }
         assertThat(foundStyledDay).isTrue();
     }

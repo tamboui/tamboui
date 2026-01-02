@@ -87,7 +87,7 @@ public class PicoCLIDemo extends TuiCommand {
     )
     private String highlightColorName;
 
-    private ListState listState = new ListState();
+    private final ListState listState = new ListState();
 
     private Color getHighlightColor() {
         return switch (highlightColorName.toUpperCase()) {

@@ -198,7 +198,9 @@ public final class Monthly implements Widget {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 7; i++) {
             int dayIndex = (firstDayOfWeek.getValue() - 1 + i) % 7;
-            if (i > 0) sb.append(" ");
+            if (i > 0) {
+                sb.append(" ");
+            }
             sb.append(WEEKDAY_ABBREV[dayIndex]);
         }
 
@@ -229,7 +231,9 @@ public final class Monthly implements Widget {
             Style[] styles = new Style[7];
 
             for (int day = 0; day < 7; day++) {
-                if (day > 0) line.append(" ");
+                if (day > 0) {
+                    line.append(" ");
+                }
 
                 String dayStr = String.format("%2d", currentDate.getDayOfMonth());
                 line.append(dayStr);

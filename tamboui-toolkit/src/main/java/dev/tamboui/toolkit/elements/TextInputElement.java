@@ -6,16 +6,20 @@ package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.input.TextInput;
 import dev.tamboui.widgets.input.TextInputState;
+
+import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
 /**
  * A DSL wrapper for the TextInput widget.
@@ -127,6 +131,19 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     public TextInputElement borderColor(Color color) {
         this.borderColor = color;
         return this;
+    }
+
+    /**
+     * Handles a key event for text input.
+     * <p>
+     * Handles: character input, backspace, delete, left/right arrows, home/end.
+     *
+     * @param event the key event
+     * @return HANDLED if the event was processed, UNHANDLED otherwise
+     */
+    @Override
+    public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        return handleTextInputKey(state, event) ? EventResult.HANDLED : EventResult.UNHANDLED;
     }
 
     @Override

@@ -68,7 +68,7 @@ final class FloatingPanelsArea implements Element {
         var relY = Math.max(0, Math.min(fp.y, area.height() - content.height()));
         var panelArea = new Rect(area.x() + relX, area.y() + relY, content.width(), content.height());
 
-        var focused = fp.panelId().equals(context.focusManager().focusedId());
+        var focused = context.isFocused(fp.panelId());
         var borderColor = focused ? Color.WHITE : content.color();
 
         var p = panel(content.title(), () -> content.render(focused))

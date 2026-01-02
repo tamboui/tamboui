@@ -25,10 +25,14 @@ final class ProgressPanel extends PanelContent {
         if (tick % 3 == 0) {
             if (progressDirection) {
                 progressValue++;
-                if (progressValue >= 100) progressDirection = false;
+                if (progressValue >= 100) {
+                    progressDirection = false;
+                }
             } else {
                 progressValue--;
-                if (progressValue <= 0) progressDirection = true;
+                if (progressValue <= 0) {
+                    progressDirection = true;
+                }
             }
         }
     }

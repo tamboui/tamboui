@@ -268,21 +268,21 @@ class ToolkitTest {
         @Test
         @DisplayName("list() creates empty ListElement")
         void emptyList() {
-            ListElement element = list();
+            ListElement<?> element = list();
             assertThat(element).isInstanceOf(ListElement.class);
         }
 
         @Test
         @DisplayName("list(String...) creates ListElement with items")
         void listWithItems() {
-            ListElement element = list("Item 1", "Item 2", "Item 3");
+            ListElement<?> element = list("Item 1", "Item 2", "Item 3");
             assertThat(element).isInstanceOf(ListElement.class);
         }
 
         @Test
         @DisplayName("list(List<String>) creates ListElement with items")
         void listWithItemsList() {
-            ListElement element = list(Arrays.asList("A", "B", "C"));
+            ListElement<?> element = list(Arrays.asList("A", "B", "C"));
             assertThat(element).isInstanceOf(ListElement.class);
         }
     }

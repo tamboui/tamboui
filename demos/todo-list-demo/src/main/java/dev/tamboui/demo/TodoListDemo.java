@@ -29,7 +29,7 @@ import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.widgets.paragraph.Wrap;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -286,7 +286,7 @@ public class TodoListDemo {
             .text(Text.from(info))
             .block(block)
             .style(Style.EMPTY.fg(Color.indexed(250)))
-            .wrap(Wrap.WORD)
+            .overflow(Overflow.WRAP_WORD)
             .build();
 
         frame.renderWidget(paragraph, area);

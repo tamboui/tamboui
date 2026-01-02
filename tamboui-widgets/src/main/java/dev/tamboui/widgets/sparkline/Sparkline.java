@@ -119,14 +119,30 @@ public final class Sparkline implements Widget {
          * Returns the symbol for the given fill level (0.0 to 1.0).
          */
         public String symbolForLevel(double level) {
-            if (level <= 0.0) return empty;
-            if (level <= 0.125) return oneEighth;
-            if (level <= 0.250) return oneQuarter;
-            if (level <= 0.375) return threeEighths;
-            if (level <= 0.500) return half;
-            if (level <= 0.625) return fiveEighths;
-            if (level <= 0.750) return threeQuarters;
-            if (level <= 0.875) return sevenEighths;
+            if (level <= 0.0) {
+                return empty;
+            }
+            if (level <= 0.125) {
+                return oneEighth;
+            }
+            if (level <= 0.250) {
+                return oneQuarter;
+            }
+            if (level <= 0.375) {
+                return threeEighths;
+            }
+            if (level <= 0.500) {
+                return half;
+            }
+            if (level <= 0.625) {
+                return fiveEighths;
+            }
+            if (level <= 0.750) {
+                return threeQuarters;
+            }
+            if (level <= 0.875) {
+                return sevenEighths;
+            }
             return full;
         }
 

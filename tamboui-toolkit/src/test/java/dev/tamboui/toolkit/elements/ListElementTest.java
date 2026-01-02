@@ -27,7 +27,7 @@ class ListElementTest {
     @DisplayName("ListElement fluent API chains correctly")
     void fluentApiChaining() {
         ListState state = new ListState();
-        ListElement element = list("Item 1", "Item 2", "Item 3")
+        ListElement<?> element = list("Item 1", "Item 2", "Item 3")
             .state(state)
             .highlightSymbol("> ")
             .highlightColor(Color.YELLOW)
@@ -41,28 +41,28 @@ class ListElementTest {
     @Test
     @DisplayName("list() creates empty element")
     void emptyList() {
-        ListElement element = list();
+        ListElement<?> element = list();
         assertThat(element).isNotNull();
     }
 
     @Test
     @DisplayName("list(String...) creates element with items")
     void listWithItems() {
-        ListElement element = list("A", "B", "C");
+        ListElement<?> element = list("A", "B", "C");
         assertThat(element).isNotNull();
     }
 
     @Test
     @DisplayName("list(List<String>) creates element with items")
     void listWithItemsList() {
-        ListElement element = list(Arrays.asList("X", "Y", "Z"));
+        ListElement<?> element = list(Arrays.asList("X", "Y", "Z"));
         assertThat(element).isNotNull();
     }
 
     @Test
     @DisplayName("items() method replaces items")
     void itemsMethod() {
-        ListElement element = list()
+        ListElement<?> element = list()
             .items("New 1", "New 2");
         assertThat(element).isNotNull();
     }
@@ -132,7 +132,7 @@ class ListElementTest {
     @Test
     @DisplayName("highlightSymbol sets the indicator")
     void highlightSymbol() {
-        ListElement element = list("A", "B")
+        ListElement<?> element = list("A", "B")
             .highlightSymbol("→ ");
         assertThat(element).isNotNull();
     }
@@ -140,7 +140,7 @@ class ListElementTest {
     @Test
     @DisplayName("highlightStyle sets the style")
     void highlightStyle() {
-        ListElement element = list("A", "B")
+        ListElement<?> element = list("A", "B")
             .highlightColor(Color.GREEN);
         assertThat(element).isNotNull();
     }

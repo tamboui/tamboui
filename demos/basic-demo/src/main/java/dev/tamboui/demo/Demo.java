@@ -54,9 +54,9 @@ public class Demo {
     }
 
     private boolean running = true;
-    private ListState listState = new ListState();
-    private TextInputState inputState = new TextInputState();
-    private List<String> items = new ArrayList<>(List.of(DEFAULT_ITEMS));
+    private final ListState listState = new ListState();
+    private final TextInputState inputState = new TextInputState();
+    private final List<String> items = new ArrayList<>(List.of(DEFAULT_ITEMS));
     private FocusedWidget focused = FocusedWidget.LIST;
     private int counter = 0;
 

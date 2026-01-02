@@ -99,7 +99,9 @@ public final class Rectangle implements Shape {
         while (true) {
             painter.paint(x0, y0, color);
 
-            if (x0 == x1 && y0 == y1) break;
+            if (x0 == x1 && y0 == y1) {
+                break;
+            }
 
             int e2 = 2 * err;
             if (e2 > -dy) {

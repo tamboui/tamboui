@@ -64,8 +64,12 @@ public abstract class Spacing {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Space)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Space)) {
+                return false;
+            }
             Space space = (Space) o;
             return value == space.value;
         }
@@ -101,8 +105,12 @@ public abstract class Spacing {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Overlap)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Overlap)) {
+                return false;
+            }
             Overlap overlap = (Overlap) o;
             return value == overlap.value;
         }

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.component;
 
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
@@ -157,10 +158,12 @@ public abstract class Component implements Element, Focusable {
 
     @Override
     public final void render(Frame frame, Rect area, RenderContext renderContext) {
+        DefaultRenderContext internalContext = (DefaultRenderContext) renderContext;
+
         // Initialize context
         this.context = new ComponentContext(
             componentId,
-            renderContext.focusManager().isFocused(componentId),
+            internalContext.focusManager().isFocused(componentId),
             renderContext
         );
 
@@ -171,12 +174,12 @@ public abstract class Component implements Element, Focusable {
         }
 
         // Register in component tree
-        renderContext.componentTree().register(componentId, this);
-        renderContext.componentTree().setArea(componentId, area);
+        internalContext.componentTree().register(componentId, this);
+        internalContext.componentTree().setArea(componentId, area);
 
         // Register as focusable
         if (componentId != null) {
-            renderContext.focusManager().registerFocusable(componentId, area);
+            internalContext.focusManager().registerFocusable(componentId, area);
         }
 
         // Render the component's content

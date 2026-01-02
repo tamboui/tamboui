@@ -27,7 +27,7 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.widgets.paragraph.Wrap;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.io.IOException;
 
@@ -186,7 +186,7 @@ public class ParagraphDemo {
         Paragraph paragraph = Paragraph.builder()
             .text(text)
             .style(Style.EMPTY.fg(Color.WHITE))
-            .wrap(Wrap.CHARACTER)
+            .overflow(Overflow.WRAP_CHARACTER)
             .scroll(scrollOffset)
             .block(Block.builder()
                 .borders(Borders.ALL)

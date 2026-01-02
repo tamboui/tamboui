@@ -157,8 +157,12 @@ final class BorderSymbol {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BorderSymbol)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BorderSymbol)) {
+            return false;
+        }
         BorderSymbol that = (BorderSymbol) o;
         return right == that.right && up == that.up && left == that.left && down == that.down;
     }

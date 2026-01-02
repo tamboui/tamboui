@@ -5,6 +5,7 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Constraint;
@@ -19,6 +20,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +34,7 @@ public final class Panel extends StyledElement<Panel> {
 
     private String title;
     private String bottomTitle;
+    private Overflow titleOverflow = Overflow.CLIP;
     private BorderType borderType = BorderType.PLAIN;
     private Color borderColor;
     private Color focusedBorderColor;
@@ -63,6 +66,30 @@ public final class Panel extends StyledElement<Panel> {
      */
     public Panel bottomTitle(String title) {
         this.bottomTitle = title;
+        return this;
+    }
+
+    /**
+     * Sets the title overflow mode.
+     */
+    public Panel titleOverflow(Overflow overflow) {
+        this.titleOverflow = overflow;
+        return this;
+    }
+
+    /**
+     * Truncate title with ellipsis at end if it doesn't fit: "Long title..."
+     */
+    public Panel titleEllipsis() {
+        this.titleOverflow = Overflow.ELLIPSIS;
+        return this;
+    }
+
+    /**
+     * Truncate title with ellipsis at start if it doesn't fit: "...ong title"
+     */
+    public Panel titleEllipsisStart() {
+        this.titleOverflow = Overflow.ELLIPSIS_START;
         return this;
     }
 
@@ -160,9 +187,6 @@ public final class Panel extends StyledElement<Panel> {
         // Track rendered area for event routing
         setRenderedArea(area);
 
-        // Register this element for event routing
-        context.registerElement(this, area);
-
         // Determine border color based on focus
         boolean isFocused = elementId != null && context.isFocused(elementId);
         Color effectiveBorderColor = isFocused && focusedBorderColor != null
@@ -180,7 +204,7 @@ public final class Panel extends StyledElement<Panel> {
         }
 
         if (title != null) {
-            blockBuilder.title(Title.from(Line.from(Span.raw(title))));
+            blockBuilder.title(Title.from(Line.from(Span.raw(title))).overflow(titleOverflow));
         }
 
         if (bottomTitle != null) {
@@ -211,12 +235,12 @@ public final class Panel extends StyledElement<Panel> {
             .split(innerArea);
 
         // Render children and register them for events
+        DefaultRenderContext internalContext = (DefaultRenderContext) context;
         for (int i = 0; i < children.size() && i < areas.size(); i++) {
             Element child = children.get(i);
             Rect childArea = areas.get(i);
             child.render(frame, childArea, context);
-            // Always register children - EventRouter will handle event dispatch
-            context.registerElement(child, childArea);
+            internalContext.registerElement(child, childArea);
         }
     }
 }

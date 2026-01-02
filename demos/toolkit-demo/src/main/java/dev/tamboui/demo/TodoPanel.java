@@ -102,11 +102,15 @@ final class TodoPanel extends PanelContent {
     EventResult handleKey(KeyEvent event) {
         // Navigation
         if (Keys.isUp(event)) {
-            if (selectedIndex > -1) selectedIndex--;
+            if (selectedIndex > -1) {
+                selectedIndex--;
+            }
             return EventResult.HANDLED;
         }
         if (Keys.isDown(event)) {
-            if (selectedIndex < items.size() - 1) selectedIndex++;
+            if (selectedIndex < items.size() - 1) {
+                selectedIndex++;
+            }
             return EventResult.HANDLED;
         }
 
@@ -133,11 +137,15 @@ final class TodoPanel extends PanelContent {
                 return EventResult.HANDLED;
             }
             if (Keys.isArrowLeft(event)) {
-                if (cursorPosition > 0) cursorPosition--;
+                if (cursorPosition > 0) {
+                    cursorPosition--;
+                }
                 return EventResult.HANDLED;
             }
             if (Keys.isArrowRight(event)) {
-                if (cursorPosition < inputBuffer.length()) cursorPosition++;
+                if (cursorPosition < inputBuffer.length()) {
+                    cursorPosition++;
+                }
                 return EventResult.HANDLED;
             }
             if (event.code() == KeyCode.ENTER) {

@@ -141,8 +141,12 @@ class ScrollbarTest {
         boolean hasTrack = false;
         for (int y = 0; y < 5; y++) {
             String symbol = buffer.get(4, y).symbol();
-            if (symbol.equals("▓")) hasThumb = true;
-            if (symbol.equals("░")) hasTrack = true;
+            if (symbol.equals("▓")) {
+                hasThumb = true;
+            }
+            if (symbol.equals("░")) {
+                hasTrack = true;
+            }
         }
         assertThat(hasThumb).isTrue();
         assertThat(hasTrack).isTrue();

@@ -12,6 +12,7 @@ import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widgets.Widget;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -201,6 +202,8 @@ public final class Block implements Widget {
         }
     }
 
+    private static final String ELLIPSIS = "...";
+
     private void renderTitle(Title title, Rect area, Buffer buffer, boolean top) {
         int y = top ? area.top() : area.bottom() - 1;
         int availableWidth = area.width();
@@ -216,7 +219,16 @@ public final class Block implements Widget {
             return;
         }
 
-        int titleWidth = Math.min(title.content().width(), availableWidth);
+        // Apply overflow handling if title is too wide
+        Line titleLine = title.content();
+        int contentWidth = titleLine.width();
+
+        if (contentWidth > availableWidth) {
+            titleLine = applyTitleOverflow(titleLine, availableWidth, title.overflow());
+            contentWidth = titleLine.width();
+        }
+
+        int titleWidth = Math.min(contentWidth, availableWidth);
         int startX = area.left() + (borders.contains(Borders.LEFT) ? 1 : 0);
 
         // Calculate x position based on alignment
@@ -235,11 +247,10 @@ public final class Block implements Widget {
         }
 
         // Apply borderStyle to title if it's set (non-empty)
-        Line titleLine = title.content();
         if (!borderStyle.equals(Style.EMPTY)) {
             titleLine = titleLine.patchStyle(borderStyle);
         }
-        
+
         // When merge strategy is active, only render title if cells are empty or borders
         // This prevents overwriting titles from overlapping blocks
         if (mergeStrategy != MergeStrategy.REPLACE) {
@@ -247,6 +258,70 @@ public final class Block implements Widget {
         } else {
             buffer.setLine(x, y, titleLine);
         }
+    }
+
+    private Line applyTitleOverflow(Line line, int maxWidth, Overflow overflow) {
+        if (overflow == Overflow.CLIP || overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
+            // CLIP: just let it be clipped by the buffer
+            // WRAP modes don't make sense for titles, treat as CLIP
+            return line;
+        }
+
+        // Extract text content and style
+        String fullText = lineToString(line);
+        Style lineStyle = getLineStyle(line);
+
+        if (maxWidth <= ELLIPSIS.length()) {
+            // Not enough room for ellipsis, just clip
+            return Line.from(new Span(fullText.substring(0, Math.min(fullText.length(), maxWidth)), lineStyle));
+        }
+
+        String truncated;
+        switch (overflow) {
+            case ELLIPSIS:
+                truncated = truncateEnd(fullText, maxWidth);
+                break;
+            case ELLIPSIS_START:
+                truncated = truncateStart(fullText, maxWidth);
+                break;
+            case ELLIPSIS_MIDDLE:
+                truncated = truncateMiddle(fullText, maxWidth);
+                break;
+            default:
+                return line;
+        }
+
+        return Line.from(new Span(truncated, lineStyle));
+    }
+
+    private String truncateEnd(String text, int maxWidth) {
+        int availableChars = maxWidth - ELLIPSIS.length();
+        return text.substring(0, availableChars) + ELLIPSIS;
+    }
+
+    private String truncateStart(String text, int maxWidth) {
+        int availableChars = maxWidth - ELLIPSIS.length();
+        return ELLIPSIS + text.substring(text.length() - availableChars);
+    }
+
+    private String truncateMiddle(String text, int maxWidth) {
+        int availableChars = maxWidth - ELLIPSIS.length();
+        int leftChars = (availableChars + 1) / 2;
+        int rightChars = availableChars / 2;
+        return text.substring(0, leftChars) + ELLIPSIS + text.substring(text.length() - rightChars);
+    }
+
+    private String lineToString(Line line) {
+        StringBuilder sb = new StringBuilder();
+        for (Span span : line.spans()) {
+            sb.append(span.content());
+        }
+        return sb.toString();
+    }
+
+    private Style getLineStyle(Line line) {
+        List<Span> spans = line.spans();
+        return spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
     }
     
     private void renderTitleWithMerge(int x, int y, Line titleLine, Buffer buffer) {
