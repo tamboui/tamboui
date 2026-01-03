@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
@@ -309,6 +310,124 @@ class LayoutElementsTest {
 
             // Should render without error
             assertThat(buffer).isNotNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("Flex tests")
+    class FlexTests {
+
+        @Test
+        @DisplayName("Row flex API chains correctly")
+        void rowFlexChaining() {
+            Row element = row(text("A"), text("B"))
+                .flex(Flex.CENTER)
+                .spacing(1);
+
+            assertThat(element).isInstanceOf(Row.class);
+        }
+
+        @Test
+        @DisplayName("Column flex API chains correctly")
+        void columnFlexChaining() {
+            Column element = column(text("A"), text("B"))
+                .flex(Flex.END)
+                .spacing(1);
+
+            assertThat(element).isInstanceOf(Column.class);
+        }
+
+        @Test
+        @DisplayName("Panel flex API chains correctly")
+        void panelFlexChaining() {
+            Panel element = panel("Title", text("Content"))
+                .flex(Flex.SPACE_BETWEEN)
+                .rounded();
+
+            assertThat(element).isInstanceOf(Panel.class);
+        }
+
+        @Test
+        @DisplayName("Row with flex END positions children at end")
+        void rowFlexEnd() {
+            Rect area = new Rect(0, 0, 20, 1);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            row(
+                text("A").length(5),
+                text("B").length(5)
+            ).flex(Flex.END).render(frame, area, RenderContext.empty());
+
+            // With flex END, children should be at the end (offset by 10)
+            assertThat(buffer.get(10, 0).symbol()).isEqualTo("A");
+            assertThat(buffer.get(15, 0).symbol()).isEqualTo("B");
+        }
+
+        @Test
+        @DisplayName("Row with flex CENTER centers children")
+        void rowFlexCenter() {
+            Rect area = new Rect(0, 0, 20, 1);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            row(
+                text("A").length(5),
+                text("B").length(5)
+            ).flex(Flex.CENTER).render(frame, area, RenderContext.empty());
+
+            // With flex CENTER, children should be centered (offset by 5)
+            assertThat(buffer.get(5, 0).symbol()).isEqualTo("A");
+            assertThat(buffer.get(10, 0).symbol()).isEqualTo("B");
+        }
+
+        @Test
+        @DisplayName("Column with flex END positions children at end")
+        void columnFlexEnd() {
+            Rect area = new Rect(0, 0, 10, 10);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            column(
+                text("A").length(2),
+                text("B").length(2)
+            ).flex(Flex.END).render(frame, area, RenderContext.empty());
+
+            // With flex END, children should be at the end (offset by 6)
+            assertThat(buffer.get(0, 6).symbol()).isEqualTo("A");
+            assertThat(buffer.get(0, 8).symbol()).isEqualTo("B");
+        }
+
+        @Test
+        @DisplayName("Column with flex CENTER centers children")
+        void columnFlexCenter() {
+            Rect area = new Rect(0, 0, 10, 10);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            column(
+                text("A").length(2),
+                text("B").length(2)
+            ).flex(Flex.CENTER).render(frame, area, RenderContext.empty());
+
+            // With flex CENTER, children should be centered (offset by 3)
+            assertThat(buffer.get(0, 3).symbol()).isEqualTo("A");
+            assertThat(buffer.get(0, 5).symbol()).isEqualTo("B");
+        }
+
+        @Test
+        @DisplayName("Null flex defaults to START")
+        void nullFlexDefaultsToStart() {
+            Rect area = new Rect(0, 0, 20, 1);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            row(
+                text("A").length(5)
+            ).flex(null).render(frame, area, RenderContext.empty());
+
+            // Should start at position 0
+            assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
         }
     }
 }

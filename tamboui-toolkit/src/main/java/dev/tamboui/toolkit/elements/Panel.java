@@ -9,6 +9,7 @@ import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -40,6 +41,7 @@ public final class Panel extends StyledElement<Panel> {
     private Color focusedBorderColor;
     private final List<Element> children = new ArrayList<>();
     private boolean focusable;
+    private Flex flex = Flex.START;
 
     public Panel() {
     }
@@ -158,6 +160,14 @@ public final class Panel extends StyledElement<Panel> {
     }
 
     /**
+     * Sets the flex mode for distributing remaining space among children.
+     */
+    public Panel flex(Flex flex) {
+        this.flex = flex != null ? flex : Flex.START;
+        return this;
+    }
+
+    /**
      * Adds a child element.
      */
     public Panel add(Element child) {
@@ -231,6 +241,7 @@ public final class Panel extends StyledElement<Panel> {
         }
 
         List<Rect> areas = Layout.vertical()
+            .flex(flex)
             .constraints(constraints.toArray(new Constraint[0]))
             .split(innerArea);
 
