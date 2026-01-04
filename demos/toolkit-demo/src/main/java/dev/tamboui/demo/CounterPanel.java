@@ -7,7 +7,6 @@ package dev.tamboui.demo;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.style.Color;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -34,11 +33,11 @@ final class CounterPanel extends PanelContent {
 
     @Override
     EventResult handleKey(KeyEvent event) {
-        if (Keys.isChar(event, 'k') || Keys.isChar(event, 'K')) {
+        if (event.isCharIgnoreCase('k')) {
             counter++;
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, 'j') || Keys.isChar(event, 'J')) {
+        if (event.isCharIgnoreCase('j')) {
             counter--;
             return EventResult.HANDLED;
         }

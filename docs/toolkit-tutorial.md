@@ -34,7 +34,6 @@ dependencies {
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.text.Overflow;
@@ -219,11 +218,11 @@ public class TodoApp {
     }
 
     private static EventResult handleInputMode(KeyEvent event, TodoController ctrl) {
-        if (Keys.isEscape(event)) {
+        if (event.isCancel()) {
             ctrl.cancelInput();
             return EventResult.HANDLED;
         }
-        if (Keys.isSelect(event)) {
+        if (event.isSelect()) {
             ctrl.submitInput();
             return EventResult.HANDLED;
         }
@@ -235,11 +234,11 @@ public class TodoApp {
     }
 
     private static EventResult handleNormalMode(KeyEvent event, TodoController ctrl) {
-        if (Keys.isChar(event, 'a')) { ctrl.startInput(); return EventResult.HANDLED; }
-        if (Keys.isUp(event)) { ctrl.moveUp(); return EventResult.HANDLED; }
-        if (Keys.isDown(event)) { ctrl.moveDown(); return EventResult.HANDLED; }
-        if (Keys.isSelect(event)) { ctrl.toggleSelected(); return EventResult.HANDLED; }
-        if (Keys.isChar(event, 'd')) { ctrl.deleteSelected(); return EventResult.HANDLED; }
+        if (event.isChar('a')) { ctrl.startInput(); return EventResult.HANDLED; }
+        if (event.isUp()) { ctrl.moveUp(); return EventResult.HANDLED; }
+        if (event.isDown()) { ctrl.moveDown(); return EventResult.HANDLED; }
+        if (event.isSelect()) { ctrl.toggleSelected(); return EventResult.HANDLED; }
+        if (event.isChar('d')) { ctrl.deleteSelected(); return EventResult.HANDLED; }
         return EventResult.UNHANDLED;
     }
 }
@@ -276,7 +275,7 @@ panel("My App")
     .id("main")
     .focusable()
     .onKeyEvent(event -> {
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             controller.moveUp();
             return EventResult.HANDLED;
         }
@@ -322,7 +321,7 @@ public class MyView implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Handle events for the entire view
-        if (Keys.isEscape(event) && controller.hasDialog()) {
+        if (event.isCancel() && controller.hasDialog()) {
             controller.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -705,7 +704,7 @@ Return `HANDLED` to consume the event, `UNHANDLED` to let others process it:
 
 ```java
 .onKeyEvent(event -> {
-    if (Keys.isUp(event)) {
+    if (event.isUp()) {
         controller.moveUp();
         return EventResult.HANDLED;   // Event consumed, stop here
     }
@@ -721,13 +720,13 @@ When implementing `Element.handleKeyEvent()`, the `focused` parameter tells you 
 @Override
 public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
     // Always handle ESC for dialogs (regardless of focus)
-    if (Keys.isEscape(event) && controller.hasDialog()) {
+    if (event.isCancel() && controller.hasDialog()) {
         controller.dismissDialog();
         return EventResult.HANDLED;
     }
 
     // Navigation only when we "own" the UI
-    if (Keys.isUp(event)) {
+    if (event.isUp()) {
         controller.moveUp();
         return EventResult.HANDLED;
     }
@@ -740,31 +739,90 @@ public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
 
 ### Key Utilities
 
-The `Keys` class provides convenient matchers. Some methods include vim-style alternatives for ergonomic keyboard navigation:
+KeyEvent provides convenience methods that delegate to the configured `KeyMap`. The default keymap (`standard`) uses only arrow keys:
 
-| Method | Keys Matched |
-|--------|--------------|
-| `Keys.isQuit(event)` | q, Q, Ctrl+C |
-| `Keys.isUp(event)` | Up arrow, k, K |
-| `Keys.isDown(event)` | Down arrow, j, J |
-| `Keys.isLeft(event)` | Left arrow, h, H |
-| `Keys.isRight(event)` | Right arrow, l, L |
-| `Keys.isHome(event)` | Home, g |
-| `Keys.isEnd(event)` | End, G |
-| `Keys.isPageUp(event)` | Page Up, Ctrl+U |
-| `Keys.isPageDown(event)` | Page Down, Ctrl+D |
-| `Keys.isSelect(event)` | Enter, Space |
-| `Keys.isEnter(event)` | Enter only |
-| `Keys.isEscape(event)` | Escape |
-| `Keys.isTab(event)` | Tab |
-| `Keys.isBackTab(event)` | Shift+Tab |
-| `Keys.isChar(event, 'c')` | Specific character |
+| Method | Keys Matched (Standard) |
+|--------|-------------------------|
+| `event.isQuit()` | q, Q, Ctrl+C |
+| `event.isUp()` | Up arrow |
+| `event.isDown()` | Down arrow |
+| `event.isLeft()` | Left arrow |
+| `event.isRight()` | Right arrow |
+| `event.isHome()` | Home |
+| `event.isEnd()` | End |
+| `event.isPageUp()` | Page Up |
+| `event.isPageDown()` | Page Down |
+| `event.isSelect()` | Enter, Space |
+| `event.isConfirm()` | Enter only |
+| `event.isCancel()` | Escape |
+| `event.isFocusNext()` | Tab |
+| `event.isFocusPrevious()` | Shift+Tab |
+| `event.isChar('x')` | Specific character (case-sensitive) |
+| `event.isCharIgnoreCase('x')` | Specific character (case-insensitive) |
+| `event.isKey(KeyCode.F5)` | Specific key code |
 
-**Note:** These are convenience methods. If the vim-style bindings conflict with your application's needs, use `Keys.isChar()` or check key codes directly instead of the composite matchers.
+### Configurable Keymaps
+
+You can configure different keymaps via `TuiConfig`:
+
+```java
+import dev.tamboui.tui.keymap.KeyMaps;
+
+TuiConfig config = TuiConfig.builder()
+    .keyMap(KeyMaps.vim())  // Enable vim-style navigation
+    .build();
+```
+
+Available keymaps:
+- `KeyMaps.standard()` - Arrow keys only (default, safe for text input)
+- `KeyMaps.vim()` - hjkl navigation, g/G for home/end, Ctrl+u/d for page navigation
+- `KeyMaps.emacs()` - Ctrl+n/p/f/b navigation
+- `KeyMaps.intellij()` - IntelliJ IDEA-style bindings
+- `KeyMaps.vscode()` - VS Code-style bindings
+
+You can also create custom keymaps:
+
+```java
+import dev.tamboui.tui.keymap.*;
+
+KeyMap custom = KeyMaps.standard()
+    .toBuilder()
+    .bind(Action.QUIT, KeyBinding.ch('x'))  // Quit with 'x' instead of 'q'
+    .build();
+```
+
+### Loading Keymaps from Properties Files
+
+You can load keymaps from standard Java properties files:
+
+```properties
+# my-keymap.properties
+MOVE_UP = Up, k, K
+MOVE_DOWN = Down, j, J
+CONFIRM = Enter
+CANCEL = Escape
+QUIT = q, Ctrl+c
+```
+
+Load from a file or classpath resource:
+
+```java
+// From filesystem
+KeyMap keymap = KeyMaps.load(Path.of("/path/to/keymap.properties"));
+
+// From classpath resource
+KeyMap keymap = KeyMaps.loadResource("/keymaps/custom.properties");
+```
+
+Binding syntax supports:
+- Key names: `Up`, `Down`, `Enter`, `Tab`, `Escape`, `Backspace`, `Delete`, `Home`, `End`, `PageUp`, `PageDown`, `F1`-`F12`
+- Characters: Single character like `k`, `q`
+- Modifiers: `Ctrl+c`, `Alt+x`, `Shift+Tab`
+- Space: Use the word `Space`
 
 ### Checking Key Codes Directly
 
-For keys not covered by `Keys` utilities, check the key code directly:
+For keys not covered by the keymap convenience methods, check the key code directly:
 
 ```java
 import dev.tamboui.tui.event.KeyCode;
@@ -970,7 +1028,7 @@ public class MyView implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // ESC should dismiss dialog, not clear focus
-        if (Keys.isEscape(event) && controller.hasDialog()) {
+        if (event.isCancel() && controller.hasDialog()) {
             controller.dismissDialog();
             return EventResult.HANDLED;  // Prevents ESC from clearing focus
         }
@@ -1045,7 +1103,7 @@ public class MyKeyHandler {
 
     public EventResult handle(KeyEvent event) {
         // Check ESC first for dialogs
-        if (Keys.isEscape(event) && controller.hasDialog()) {
+        if (event.isCancel() && controller.hasDialog()) {
             controller.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -1061,11 +1119,11 @@ public class MyKeyHandler {
     }
 
     private EventResult handleInputMode(KeyEvent event) {
-        if (Keys.isEscape(event)) {
+        if (event.isCancel()) {
             controller.cancelInput();
             return EventResult.HANDLED;
         }
-        if (Keys.isEnter(event)) {
+        if (event.isConfirm()) {
             controller.submitInput();
             return EventResult.HANDLED;
         }
@@ -1081,11 +1139,11 @@ public class MyKeyHandler {
     }
 
     private EventResult handleDialogMode(KeyEvent event) {
-        if (Keys.isChar(event, 'y') || Keys.isChar(event, 'Y')) {
+        if (event.isCharIgnoreCase('y')) {
             controller.confirmDialog();
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, 'n') || Keys.isChar(event, 'N')) {
+        if (event.isCharIgnoreCase('n')) {
             controller.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -1094,7 +1152,7 @@ public class MyKeyHandler {
 
     private EventResult handleNormalMode(KeyEvent event) {
         // Navigation, actions, etc.
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             controller.moveUp();
             return EventResult.HANDLED;
         }
@@ -1279,7 +1337,7 @@ public class MyApp {
 2. **Not handling ESC before other keys**: Dialogs won't dismiss properly
 3. **Transparent dialog backgrounds**: Use `Clear.INSTANCE` before rendering overlays
 4. **Returning UNHANDLED in input mode**: Unwanted characters may leak through
-5. **Key binding conflicts**: If using `Keys.isUp()` etc., be aware they include vim keys (j/k/h/l). Use `Keys.isChar()` or check `event.code()` directly for precise control
+5. **Key binding conflicts**: With the `vim` keymap, `event.isUp()` etc. match vim keys (hjkl). Use the `standard` keymap (default) or check `event.code()` directly for precise control
 
 ---
 
@@ -1292,7 +1350,6 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.style.Color;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
@@ -1432,18 +1489,18 @@ public class TodoApp {
 
     static EventResult handleKey(KeyEvent event, Controller ctrl) {
         if (ctrl.isEditing()) {
-            if (Keys.isEscape(event)) { ctrl.cancelEditing(); return EventResult.HANDLED; }
-            if (Keys.isSelect(event)) { ctrl.submit(); return EventResult.HANDLED; }
+            if (event.isCancel()) { ctrl.cancelEditing(); return EventResult.HANDLED; }
+            if (event.isSelect()) { ctrl.submit(); return EventResult.HANDLED; }
             if (event.code() == KeyCode.CHAR && event.character() >= 32) { ctrl.typeChar(event.character()); return EventResult.HANDLED; }
             if (event.code() == KeyCode.BACKSPACE) { ctrl.backspace(); return EventResult.HANDLED; }
             return EventResult.UNHANDLED;
         }
 
-        if (Keys.isChar(event, 'a')) { ctrl.startEditing(); return EventResult.HANDLED; }
-        if (Keys.isUp(event)) { ctrl.cursorUp(); return EventResult.HANDLED; }
-        if (Keys.isDown(event)) { ctrl.cursorDown(); return EventResult.HANDLED; }
-        if (Keys.isSelect(event)) { ctrl.toggle(); return EventResult.HANDLED; }
-        if (Keys.isChar(event, 'd')) { ctrl.delete(); return EventResult.HANDLED; }
+        if (event.isChar('a')) { ctrl.startEditing(); return EventResult.HANDLED; }
+        if (event.isUp()) { ctrl.cursorUp(); return EventResult.HANDLED; }
+        if (event.isDown()) { ctrl.cursorDown(); return EventResult.HANDLED; }
+        if (event.isSelect()) { ctrl.toggle(); return EventResult.HANDLED; }
+        if (event.isChar('d')) { ctrl.delete(); return EventResult.HANDLED; }
         return EventResult.UNHANDLED;
     }
 

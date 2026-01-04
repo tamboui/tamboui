@@ -11,6 +11,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.EventParser;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
 
@@ -36,7 +37,10 @@ import java.util.function.Consumer;
  * try (var tui = TuiRunner.create()) {
  *     tui.run(
  *         (event, runner) -> {
- *             if (Keys.isQuit(event)) { runner.quit(); return false; }
+ *             if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
+ *                 runner.quit();
+ *                 return false;
+ *             }
  *             return handleEvent(event);
  *         },
  *         frame -> renderUI(frame)
@@ -195,7 +199,7 @@ public final class TuiRunner implements AutoCloseable {
 
         // Read from terminal
         try {
-            return EventParser.readEvent(backend, (int) timeout.toMillis());
+            return EventParser.readEvent(backend, (int) timeout.toMillis(), config.keyMap());
         } catch (IOException e) {
             return null;
         }

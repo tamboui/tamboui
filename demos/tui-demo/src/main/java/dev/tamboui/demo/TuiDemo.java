@@ -17,7 +17,6 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.event.Event;
@@ -79,7 +78,7 @@ public class TuiDemo {
 
     private boolean handleEvent(Event event, TuiRunner runner) {
         // Quit on q, Q, or Ctrl+C
-        if (Keys.isQuit(event)) {
+        if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
             runner.quit();
             return false;
         }
@@ -101,28 +100,28 @@ public class TuiDemo {
     }
 
     private boolean handleKeyEvent(KeyEvent k) {
-        // Navigation with vim keys or arrows
-        if (Keys.isLeft(k) || Keys.isUp(k)) {
+        // Navigation with arrows (or vim keys if using vim keymap)
+        if (k.isLeft() || k.isUp()) {
             selectedPanel = Math.max(0, selectedPanel - 1);
             logEvent("Key: navigate left/up");
             return true;
         }
-        if (Keys.isRight(k) || Keys.isDown(k)) {
+        if (k.isRight() || k.isDown()) {
             selectedPanel = Math.min(2, selectedPanel + 1);
             logEvent("Key: navigate right/down");
             return true;
         }
 
         // Select with Enter or Space
-        if (Keys.isSelect(k)) {
+        if (k.isSelect()) {
             counter++;
             logEvent("Key: select (counter=" + counter + ")");
             return true;
         }
 
         // Function keys
-        if (Keys.isFunctionKey(k)) {
-            int num = Keys.functionKeyNumber(k);
+        if (isFunctionKey(k)) {
+            int num = functionKeyNumber(k);
             logEvent("Key: F" + num);
             return true;
         }
@@ -134,6 +133,34 @@ public class TuiDemo {
         }
 
         return false;
+    }
+
+    private static boolean isFunctionKey(KeyEvent k) {
+        switch (k.code()) {
+            case F1: case F2: case F3: case F4: case F5: case F6:
+            case F7: case F8: case F9: case F10: case F11: case F12:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static int functionKeyNumber(KeyEvent k) {
+        switch (k.code()) {
+            case F1: return 1;
+            case F2: return 2;
+            case F3: return 3;
+            case F4: return 4;
+            case F5: return 5;
+            case F6: return 6;
+            case F7: return 7;
+            case F8: return 8;
+            case F9: return 9;
+            case F10: return 10;
+            case F11: return 11;
+            case F12: return 12;
+            default: return -1;
+        }
     }
 
     private boolean handleMouseEvent(MouseEvent m) {

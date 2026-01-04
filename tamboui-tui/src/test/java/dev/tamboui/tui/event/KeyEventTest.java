@@ -109,4 +109,24 @@ class KeyEventTest {
         assertThat(KeyEvent.ofChar('c').isCtrlC()).isFalse();
         assertThat(KeyEvent.ofChar('x', KeyModifiers.CTRL).isCtrlC()).isFalse();
     }
+
+    @Test
+    @DisplayName("isCharIgnoreCase matches both cases")
+    void isCharIgnoreCaseMatchesBothCases() {
+        KeyEvent lower = KeyEvent.ofChar('a');
+        KeyEvent upper = KeyEvent.ofChar('A');
+
+        assertThat(lower.isCharIgnoreCase('a')).isTrue();
+        assertThat(lower.isCharIgnoreCase('A')).isTrue();
+        assertThat(upper.isCharIgnoreCase('a')).isTrue();
+        assertThat(upper.isCharIgnoreCase('A')).isTrue();
+        assertThat(lower.isCharIgnoreCase('b')).isFalse();
+    }
+
+    @Test
+    @DisplayName("isCharIgnoreCase returns false for non-CHAR key codes")
+    void isCharIgnoreCaseFalseForNonChar() {
+        KeyEvent event = KeyEvent.ofKey(KeyCode.ENTER);
+        assertThat(event.isCharIgnoreCase('a')).isFalse();
+    }
 }

@@ -11,7 +11,6 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
@@ -111,7 +110,7 @@ final class FloatingPanelsArea implements Element {
             return EventResult.HANDLED;
         }
 
-        if (Keys.isChar(event, 'x') || Keys.isChar(event, 'X')) {
+        if (event.isCharIgnoreCase('x')) {
             panels.removeIf(p -> p.id == fp.id);
             return EventResult.HANDLED;
         }
@@ -126,12 +125,16 @@ final class FloatingPanelsArea implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (Keys.isChar(event, '1')) { createPanel(new ClockPanel()); return EventResult.HANDLED; }
-        if (Keys.isChar(event, '2')) { createPanel(new CounterPanel()); return EventResult.HANDLED; }
-        if (Keys.isChar(event, '3')) { createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED; }
-        if (Keys.isChar(event, '4')) { createPanel(new QuotePanel()); return EventResult.HANDLED; }
-        if (Keys.isChar(event, '5')) { createPanel(new ProgressPanel()); return EventResult.HANDLED; }
-        if (Keys.isChar(event, '6')) { createPanel(new TodoPanel()); return EventResult.HANDLED; }
+        if (event.code() == KeyCode.CHAR) {
+            switch (event.character()) {
+                case '1': createPanel(new ClockPanel()); return EventResult.HANDLED;
+                case '2': createPanel(new CounterPanel()); return EventResult.HANDLED;
+                case '3': createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED;
+                case '4': createPanel(new QuotePanel()); return EventResult.HANDLED;
+                case '5': createPanel(new ProgressPanel()); return EventResult.HANDLED;
+                case '6': createPanel(new TodoPanel()); return EventResult.HANDLED;
+            }
+        }
         return EventResult.UNHANDLED;
     }
 

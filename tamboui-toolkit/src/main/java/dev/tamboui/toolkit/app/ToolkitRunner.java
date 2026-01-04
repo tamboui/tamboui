@@ -11,10 +11,10 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.TickEvent;
 
 import java.util.function.Supplier;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  *         .id("counter")
  *         .focusable()
  *         .onKeyEvent(event -> {
- *             if (Keys.isUp(event)) {
+ *             if (event.isUp()) {
  *                 count[0]++;
  *                 return EventResult.HANDLED;
  *             }
@@ -134,7 +134,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         // Handle quit only if event wasn't consumed by an element
-        if (Keys.isQuit(event)) {
+        if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
             quit();
             return false;
         }

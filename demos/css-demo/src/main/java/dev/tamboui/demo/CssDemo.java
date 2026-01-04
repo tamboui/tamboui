@@ -15,7 +15,6 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.list.ListState;
@@ -151,16 +150,16 @@ public class CssDemo implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (Keys.isChar(event, 't') || Keys.isChar(event, 'T')) {
+        if (event.isCharIgnoreCase('t')) {
             toggleTheme();
             return EventResult.HANDLED;
         }
         // List navigation
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             listState.selectPrevious();
             return EventResult.HANDLED;
         }
-        if (Keys.isDown(event)) {
+        if (event.isDown()) {
             listState.selectNext(listItems.size());
             return EventResult.HANDLED;
         }

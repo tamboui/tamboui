@@ -4,6 +4,9 @@
  */
 package dev.tamboui.tui;
 
+import dev.tamboui.tui.keymap.KeyMap;
+import dev.tamboui.tui.keymap.KeyMaps;
+
 import java.time.Duration;
 
 /**
@@ -18,6 +21,7 @@ public final class TuiConfig {
     private final Duration pollTimeout;
     private final Duration tickRate;
     private final boolean shutdownHook;
+    private final KeyMap keyMap;
 
     public TuiConfig(
             boolean rawMode,
@@ -26,7 +30,8 @@ public final class TuiConfig {
             boolean mouseCapture,
             Duration pollTimeout,
             Duration tickRate,
-            boolean shutdownHook
+            boolean shutdownHook,
+            KeyMap keyMap
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -35,6 +40,7 @@ public final class TuiConfig {
         this.pollTimeout = pollTimeout;
         this.tickRate = tickRate;
         this.shutdownHook = shutdownHook;
+        this.keyMap = keyMap;
     }
 
     /**
@@ -51,7 +57,8 @@ public final class TuiConfig {
                 false,                       // mouseCapture
                 Duration.ofMillis(100),      // pollTimeout
                 Duration.ofMillis(100),      // tickRate
-                true
+                true,                        // shutdownHook
+                KeyMaps.defaults()           // keyMap
         );
     }
 
@@ -128,6 +135,16 @@ public final class TuiConfig {
         return shutdownHook;
     }
 
+    /**
+     * Returns the keymap used for semantic key action matching.
+     *
+     * @return the configured keymap
+     * @see KeyMaps
+     */
+    public KeyMap keyMap() {
+        return keyMap;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -142,7 +159,8 @@ public final class TuiConfig {
                 && hideCursor == that.hideCursor
                 && mouseCapture == that.mouseCapture
                 && pollTimeout.equals(that.pollTimeout)
-                && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null);
+                && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
+                && keyMap.equals(that.keyMap);
     }
 
     @Override
@@ -153,20 +171,22 @@ public final class TuiConfig {
         result = 31 * result + Boolean.hashCode(mouseCapture);
         result = 31 * result + pollTimeout.hashCode();
         result = 31 * result + (tickRate != null ? tickRate.hashCode() : 0);
+        result = 31 * result + keyMap.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, shutdownHook=%s]",
+                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, shutdownHook=%s, keyMap=%s]",
                 rawMode,
                 alternateScreen,
                 hideCursor,
                 mouseCapture,
                 pollTimeout,
                 tickRate,
-                shutdownHook
+                shutdownHook,
+                keyMap
         );
     }
 
@@ -181,6 +201,7 @@ public final class TuiConfig {
         private Duration pollTimeout = Duration.ofMillis(100);
         private Duration tickRate = Duration.ofMillis(100);
         private boolean shutdownHook = true;
+        private KeyMap keyMap = KeyMaps.defaults();
 
         private Builder() {
         }
@@ -276,6 +297,26 @@ public final class TuiConfig {
         }
 
         /**
+         * Sets the keymap for semantic key action matching.
+         * <p>
+         * Use predefined keymaps from {@link KeyMaps}:
+         * <ul>
+         *   <li>{@link KeyMaps#standard()} - Arrow keys only (default)</li>
+         *   <li>{@link KeyMaps#vim()} - Vim-style navigation (hjkl)</li>
+         *   <li>{@link KeyMaps#emacs()} - Emacs-style navigation (Ctrl+n/p/f/b)</li>
+         *   <li>{@link KeyMaps#intellij()} - IntelliJ IDEA-style</li>
+         *   <li>{@link KeyMaps#vscode()} - VS Code-style</li>
+         * </ul>
+         *
+         * @param keyMap the keymap to use
+         * @return this builder
+         */
+        public Builder keyMap(KeyMap keyMap) {
+            this.keyMap = keyMap != null ? keyMap : KeyMaps.defaults();
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          */
         public TuiConfig build() {
@@ -286,7 +327,8 @@ public final class TuiConfig {
                     mouseCapture,
                     pollTimeout,
                     tickRate,
-                    shutdownHook
+                    shutdownHook,
+                    keyMap
             );
         }
     }

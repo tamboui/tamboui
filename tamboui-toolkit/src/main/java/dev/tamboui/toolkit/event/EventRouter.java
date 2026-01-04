@@ -8,7 +8,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
@@ -91,14 +90,14 @@ public final class EventRouter {
 
     private EventResult routeKeyEvent(KeyEvent event) {
         // Handle focus navigation first
-        if (Keys.isTab(event)) {
+        if (event.isFocusNext()) {
             if (focusManager.focusNext()) {
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
         }
 
-        if (Keys.isBackTab(event)) {
+        if (event.isFocusPrevious()) {
             if (focusManager.focusPrevious()) {
                 return EventResult.HANDLED;
             }
@@ -106,7 +105,7 @@ public final class EventRouter {
         }
 
         // Escape cancels drag first
-        if (Keys.isEscape(event) && draggingElement != null) {
+        if (event.isCancel() && draggingElement != null) {
             endDrag(-1, -1);
             return EventResult.HANDLED;
         }
@@ -144,7 +143,7 @@ public final class EventRouter {
         }
 
         // Escape clears focus if no element handled it
-        if (Keys.isEscape(event) && focusManager.focusedId() != null) {
+        if (event.isCancel() && focusManager.focusedId() != null) {
             focusManager.clearFocus();
             return EventResult.HANDLED;
         }
