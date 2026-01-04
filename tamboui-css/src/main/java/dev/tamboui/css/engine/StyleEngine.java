@@ -27,10 +27,38 @@ import java.util.function.Supplier;
  * <p>
  * The StyleEngine manages stylesheets, resolves styles for elements,
  * and supports live stylesheet switching for theming.
+ *
+ * <h2>Stylesheet Types</h2>
  * <p>
- * Usage:
+ * The engine supports two types of stylesheets:
+ * <ul>
+ *   <li><b>Inline stylesheets</b>: Added via {@link #addStylesheet(String)} or {@link #loadStylesheet(String)}.
+ *       Multiple inline stylesheets can be registered and are <em>all always applied</em>,
+ *       in the order they were added. Use these for base styles that should always be present.</li>
+ *   <li><b>Named stylesheets</b>: Added via {@link #addStylesheet(String, String)} or
+ *       {@link #loadStylesheet(String, String)}. Only <em>one named stylesheet is active</em> at a time,
+ *       selectable via {@link #setActiveStylesheet(String)}. Use these for themes that can be switched
+ *       at runtime.</li>
+ * </ul>
+ *
+ * <h2>Cascade Order</h2>
+ * <p>
+ * When resolving styles, rules are collected in the following order:
+ * <ol>
+ *   <li>All inline stylesheets (in registration order)</li>
+ *   <li>The active named stylesheet</li>
+ * </ol>
+ * Later rules override earlier ones following standard CSS cascade rules,
+ * so the active named stylesheet can override inline styles.
+ *
+ * <h2>Usage Example</h2>
  * <pre>
  * StyleEngine engine = StyleEngine.create();
+ *
+ * // Add base styles (always applied)
+ * engine.addStylesheet("* { padding: 1; }");
+ *
+ * // Load theme stylesheets (only one active at a time)
  * engine.loadStylesheet("dark", "/themes/dark.tcss");
  * engine.loadStylesheet("light", "/themes/light.tcss");
  * engine.setActiveStylesheet("dark");
