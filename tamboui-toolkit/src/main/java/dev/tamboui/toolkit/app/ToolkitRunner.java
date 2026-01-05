@@ -115,6 +115,11 @@ public final class ToolkitRunner implements AutoCloseable {
                     root.render(frame, frame.area(), renderContext);
                     renderContext.registerElement(root, frame.area());
                 }
+
+                // Auto-focus first focusable element if nothing is focused
+                if (focusManager.focusedId() == null && !focusManager.focusOrder().isEmpty()) {
+                    focusManager.setFocus(focusManager.focusOrder().get(0));
+                }
             }
         );
     }
