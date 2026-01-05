@@ -14,7 +14,7 @@ import java.util.ServiceLoader;
  * <p>
  * This factory discovers {@link BackendProvider} implementations on the classpath
  * and uses them to create backend instances. Applications should include exactly
- * one backend provider on the classpath (e.g., tamboui-jline or tamboui-jline4).
+ * one backend provider on the classpath (e.g., tamboui-jline).
  *
  * @see BackendProvider
  * @see Backend
@@ -43,7 +43,7 @@ public final class BackendFactory {
         if (providers.isEmpty()) {
             throw new IllegalStateException(
                 "No BackendProvider found on classpath. " +
-                "Add a backend dependency such as tamboui-jline or tamboui-jline4."
+                "Add a backend dependency such as tamboui-jline."
             );
         }
 
