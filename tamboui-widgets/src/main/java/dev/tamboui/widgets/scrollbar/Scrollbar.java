@@ -7,7 +7,7 @@ package dev.tamboui.widgets.scrollbar;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
-import dev.tamboui.widgets.StatefulWidget;
+import dev.tamboui.widget.StatefulWidget;
 
 import java.util.Objects;
 

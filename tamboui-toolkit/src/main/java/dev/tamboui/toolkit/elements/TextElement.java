@@ -8,6 +8,7 @@ import dev.tamboui.css.cascade.ResolvedStyle;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Alignment;
+import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
@@ -111,6 +112,59 @@ public final class TextElement extends StyledElement<TextElement> {
     public TextElement right() {
         this.alignment = Alignment.RIGHT;
         return this;
+    }
+
+    /**
+     * Returns the layout constraint for this text element.
+     * <p>
+     * If no explicit constraint is set, a sensible default is calculated based on
+     * the content and overflow mode:
+     * <ul>
+     *   <li>For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses {@code min(lineCount)}
+     *       to ensure at least minimum height while allowing growth for wrapped content.</li>
+     *   <li>For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to let
+     *       the container decide (typically using {@code fill()}).</li>
+     * </ul>
+     *
+     * @return the constraint for this element
+     */
+    @Override
+    public Constraint constraint() {
+        if (layoutConstraint != null) {
+            return layoutConstraint;
+        }
+
+        // For wrapping modes, use min constraint to allow growth for wrapped text
+        // For non-wrapping modes, return null to let the container decide
+        if (overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
+            return Constraint.min(countLines());
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculates a height constraint based on content line count and overflow mode.
+     * Used by vertical containers (Column) to determine the height for this text element.
+     *
+     * @return height constraint based on line count
+     */
+    Constraint calculateHeightConstraint() {
+        int lineCount = countLines();
+        if (overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
+            return Constraint.min(lineCount);
+        }
+        return Constraint.length(lineCount);
+    }
+
+    private int countLines() {
+        int lineCount = 1;
+        for (int i = 0; i < content.length(); i++) {
+            if (content.charAt(i) == '\n') {
+                lineCount++;
+            }
+        }
+        return lineCount;
     }
 
     @Override

@@ -7,8 +7,8 @@ package dev.tamboui.terminal;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.widgets.StatefulWidget;
-import dev.tamboui.widgets.Widget;
+import dev.tamboui.widget.StatefulWidget;
+import dev.tamboui.widget.Widget;
 
 import java.util.Optional;
 

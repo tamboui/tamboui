@@ -1,6 +1,6 @@
 rootProject.name = "tamboui-parent"
 
-include(
+val modules = listOf(
     "tamboui-core",
     "tamboui-css",
     "tamboui-widgets",
@@ -12,10 +12,24 @@ include(
     "tamboui-processor"
 )
 
-File(settingsDir, "demos").listFiles()?.forEach {
-    if (it.isDirectory) {
-        include("demos:${it.name}")
+include(*modules.toTypedArray())
+
+fun includeDemosFrom(demosDir: File, projectPathPrefix: String) {
+    demosDir.listFiles()?.filter { it.isDirectory }?.forEach { demo ->
+        val projectPath = "$projectPathPrefix${demo.name}"
+        include(projectPath)
+        project(":$projectPath").projectDir = demo
     }
+}
+
+// Include demos from root demos directory (for demo-selector which spans all modules)
+val rootDemosDir = File(settingsDir, "demos")
+includeDemosFrom(rootDemosDir, "demos:")
+
+// Include demos from each module's demos directory
+modules.forEach { module ->
+    val moduleDemosDir = File(settingsDir, "$module/demos")
+    includeDemosFrom(moduleDemosDir, "$module:demos:")
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

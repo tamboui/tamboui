@@ -8,7 +8,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
-import dev.tamboui.widgets.Widget;
+import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 

@@ -1,3 +1,4 @@
+import dev.tamboui.build.DemoExtension
 import gradle.kotlin.dsl.accessors._d7c1cb8291fcf7e869bfba85a0dc6ae2.java
 
 plugins {
@@ -55,3 +56,30 @@ graalvmNative {
 
     toolchainDetection.set(false)
 }
+
+val demoExtension = extensions.create("demo", DemoExtension::class)
+demoExtension.displayName.convention(provider {
+    // Convert "barchart-demo" to "Barchart" (remove -demo suffix, capitalize)
+    val baseName = project.name.removeSuffix("-demo")
+    baseName.split("-").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+})
+demoExtension.description.convention(provider { project.description ?: "" })
+demoExtension.module.convention(provider {
+    // Extract module from path: :tamboui-widgets:demos:foo -> "Widgets"
+    val path = project.path
+    if (path.startsWith(":demos:")) {
+        "Other"
+    } else {
+        val parts = path.split(":")
+        if (parts.size >= 2) {
+            val moduleName = parts[1].removePrefix("tamboui-")
+            if (moduleName.length <= 3) {
+                moduleName.uppercase()
+            } else {
+                moduleName.replaceFirstChar { it.uppercase() }
+            }
+        } else {
+            "Unknown"
+        }
+    }
+})

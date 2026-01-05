@@ -4,7 +4,7 @@
  */
 package dev.tamboui.tui.bindings.processor;
 
-import dev.tamboui.tui.bindings.OnAction;
+import dev.tamboui.annotations.OnAction;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -44,7 +44,7 @@ import java.util.Set;
  * Generates {@code ActionHandlerRegistrar} implementations and
  * META-INF/services entries for automatic discovery via ServiceLoader.
  */
-@SupportedAnnotationTypes("dev.tamboui.tui.bindings.OnAction")
+@SupportedAnnotationTypes("dev.tamboui.annotations.OnAction")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class OnActionProcessor extends AbstractProcessor {
 

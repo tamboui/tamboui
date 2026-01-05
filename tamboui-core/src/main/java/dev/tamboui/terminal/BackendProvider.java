@@ -15,7 +15,7 @@ import java.io.IOException;
  * the fully qualified class name of the implementation.
  * <p>
  * Applications should include exactly one backend provider on the classpath
- * (e.g., either tamboui-jline or tamboui-jline4, but not both).
+ * (e.g., tamboui-jline).
  *
  * @see BackendFactory
  * @see Backend

@@ -19,6 +19,9 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
+import dev.tamboui.widgets.scrollbar.Scrollbar;
+import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
+import dev.tamboui.widgets.scrollbar.ScrollbarState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +46,8 @@ import java.util.function.Function;
  *   <li>{@code ListContainer-item} - styles each list item</li>
  *   <li>{@code ListContainer-item:selected} - styles the selected item</li>
  *   <li>{@code ListContainer-item:nth-child(odd/even)} - zebra striping</li>
+ *   <li>{@code ListContainer-scrollbar-thumb} - styles the scrollbar thumb</li>
+ *   <li>{@code ListContainer-scrollbar-track} - styles the scrollbar track</li>
  * </ul>
  */
 public final class ListContainer<T> extends StyledElement<ListContainer<T>> {
@@ -60,6 +65,9 @@ public final class ListContainer<T> extends StyledElement<ListContainer<T>> {
     private BorderType borderType;
     private Color borderColor;
     private boolean autoScroll;
+    private boolean showScrollbar;
+    private Color scrollbarThumbColor;
+    private Color scrollbarTrackColor;
 
     public ListContainer() {
     }
@@ -235,6 +243,49 @@ public final class ListContainer<T> extends StyledElement<ListContainer<T>> {
         return this;
     }
 
+    /**
+     * Enables showing a scrollbar on the right side of the list.
+     *
+     * @return this element
+     */
+    public ListContainer<T> scrollbar() {
+        this.showScrollbar = true;
+        return this;
+    }
+
+    /**
+     * Sets whether a scrollbar is shown.
+     *
+     * @param enabled true to show a scrollbar
+     * @return this element
+     */
+    public ListContainer<T> scrollbar(boolean enabled) {
+        this.showScrollbar = enabled;
+        return this;
+    }
+
+    /**
+     * Sets the scrollbar thumb color.
+     *
+     * @param color the thumb color
+     * @return this element
+     */
+    public ListContainer<T> scrollbarThumbColor(Color color) {
+        this.scrollbarThumbColor = color;
+        return this;
+    }
+
+    /**
+     * Sets the scrollbar track color.
+     *
+     * @param color the track color
+     * @return this element
+     */
+    public ListContainer<T> scrollbarTrackColor(Color color) {
+        this.scrollbarTrackColor = color;
+        return this;
+    }
+
     @Override
     protected void renderContent(Frame frame, Rect area, RenderContext context) {
         if (area.isEmpty()) {
@@ -311,5 +362,74 @@ public final class ListContainer<T> extends StyledElement<ListContainer<T>> {
 
         ListWidget widget = builder.build();
         frame.renderStatefulWidget(widget, area, effectiveState);
+
+        // Render scrollbar if enabled
+        if (showScrollbar && totalItems > 0) {
+            // Calculate scrollbar area (inside border, on the right edge)
+            Rect scrollbarArea;
+            if (title != null || borderType != null) {
+                // Adjust for border: 1 from top, 1 from bottom, 1 from right edge
+                scrollbarArea = new Rect(
+                    area.x() + area.width() - 2,
+                    area.y() + 1,
+                    1,
+                    Math.max(1, area.height() - 2)
+                );
+            } else {
+                // No border: rightmost column
+                scrollbarArea = new Rect(
+                    area.x() + area.width() - 1,
+                    area.y(),
+                    1,
+                    area.height()
+                );
+            }
+
+            // Calculate visible height for viewport
+            int viewportHeight = scrollbarArea.height();
+
+            // Build scrollbar state from list state
+            ScrollbarState scrollbarState = new ScrollbarState()
+                .contentLength(totalItems)
+                .viewportContentLength(viewportHeight)
+                .position(effectiveState.offset());
+
+            // Resolve scrollbar styles: explicit > CSS > default
+            Style thumbStyle = null;
+            Style trackStyle = null;
+
+            // Check CSS for scrollbar-thumb style
+            Style cssThumbStyle = context.childStyle("scrollbar-thumb");
+            if (!cssThumbStyle.equals(context.currentStyle())) {
+                thumbStyle = cssThumbStyle;
+            }
+            // Explicit color overrides CSS
+            if (scrollbarThumbColor != null) {
+                thumbStyle = Style.EMPTY.fg(scrollbarThumbColor);
+            }
+
+            // Check CSS for scrollbar-track style
+            Style cssTrackStyle = context.childStyle("scrollbar-track");
+            if (!cssTrackStyle.equals(context.currentStyle())) {
+                trackStyle = cssTrackStyle;
+            }
+            // Explicit color overrides CSS
+            if (scrollbarTrackColor != null) {
+                trackStyle = Style.EMPTY.fg(scrollbarTrackColor);
+            }
+
+            // Build and render scrollbar
+            Scrollbar.Builder scrollbarBuilder = Scrollbar.builder()
+                .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
+
+            if (thumbStyle != null) {
+                scrollbarBuilder.thumbStyle(thumbStyle);
+            }
+            if (trackStyle != null) {
+                scrollbarBuilder.trackStyle(trackStyle);
+            }
+
+            frame.renderStatefulWidget(scrollbarBuilder.build(), scrollbarArea, scrollbarState);
+        }
     }
 }

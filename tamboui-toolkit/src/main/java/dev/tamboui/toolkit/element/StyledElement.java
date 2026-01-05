@@ -227,10 +227,21 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
         if (context instanceof DefaultRenderContext) {
             DefaultRenderContext ctx = (DefaultRenderContext) context;
             ctx.withElement(this, effectiveStyle, () -> renderContent(frame, area, context));
+            // Self-register for event routing if this element needs events
+            if (needsEventRouting()) {
+                ctx.registerElement(this, area);
+            }
         } else {
             // Fallback for non-default contexts (e.g., testing)
             renderContent(frame, area, context);
         }
+    }
+
+    /**
+     * Returns whether this element needs to be registered with the event router.
+     */
+    private boolean needsEventRouting() {
+        return draggable || keyHandler != null || mouseHandler != null;
     }
 
     /**

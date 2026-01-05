@@ -10,7 +10,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.widgets.Widget;
+import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
 import java.util.List;

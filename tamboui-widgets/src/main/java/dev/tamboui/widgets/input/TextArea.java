@@ -10,7 +10,7 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.widgets.StatefulWidget;
+import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
 
 /**

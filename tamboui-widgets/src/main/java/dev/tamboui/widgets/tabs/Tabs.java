@@ -9,7 +9,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.widgets.StatefulWidget;
+import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 

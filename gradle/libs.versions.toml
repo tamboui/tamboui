@@ -9,6 +9,7 @@ oshi = "6.9.2"
 animal-sniffer = "2.0.0"
 sniffer18-signature = "1.0"
 compile-testing = "0.21.0"
+gradle-tooling-api = "9.2.1"
 
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }
@@ -24,6 +25,7 @@ animal-sniffer-plugin = { module = "ru.vyarus:gradle-animalsniffer-plugin", vers
 oshi-core = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
 sniffer18-signature = { module = "org.codehaus.mojo.signature:java18", version.ref = "sniffer18-signature" }
 compile-testing = { module = "com.google.testing.compile:compile-testing", version.ref = "compile-testing" }
+gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle-tooling-api" }
 
 [bundles]
 testing = ["junit-jupiter", "junit-platform-launcher", "assertj-core"]

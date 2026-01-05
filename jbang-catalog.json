@@ -1,73 +1,92 @@
 {
   "aliases": {
-    "hello-world-demo": {
-      "script-ref": "demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorld.java"
-    },
-    "table-demo": {
-      "script-ref": "demos/table-demo/src/main/java/dev/tamboui/demo/TableDemo.java"
-    },
-    "sparkline-demo": {
-      "script-ref": "demos/sparkline-demo/src/main/java/dev/tamboui/demo/SparklineDemo.java"
-    },
-    "calendar-demo": {
-      "script-ref": "demos/calendar-demo/src/main/java/dev/tamboui/demo/CalendarDemo.java"
+    "run-demo": {
+      "script-ref": ".jbang/tambouiDemos.java",
+      "description": "Run TamboUI demos interactively"
     },
     "barchart-demo": {
-      "script-ref": "demos/barchart-demo/src/main/java/dev/tamboui/demo/BarChartDemo.java"
-    },
-    "block-demo": {
-      "script-ref": "demos/block-demo/src/main/java/dev/tamboui/demo/BlockDemo.java"
-    },
-    "tui-demo": {
-      "script-ref": "demos/tui-demo/src/main/java/dev/tamboui/demo/TuiDemo.java"
-    },
-    "gauge-demo": {
-      "script-ref": "demos/gauge-demo/src/main/java/dev/tamboui/demo/GaugeDemo.java"
-    },
-    "chart-demo": {
-      "script-ref": "demos/chart-demo/src/main/java/dev/tamboui/demo/ChartDemo.java"
-    },
-    "tabs-demo": {
-      "script-ref": "demos/tabs-demo/src/main/java/dev/tamboui/demo/TabsDemo.java"
-    },
-    "picocli-demo": {
-      "script-ref": "demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
-    },
-    "jtop-demo": {
-      "script-ref": "demos/jtop-demo/src/main/java/dev/tamboui/demo/JTopDemo.java"
+      "script-ref": "tamboui-widgets/demos/barchart-demo/src/main/java/dev/tamboui/demo/BarChartDemo.java"
     },
     "basic-demo": {
-      "script-ref": "demos/basic-demo/src/main/java/dev/tamboui/demo/Demo.java"
+      "script-ref": "tamboui-widgets/demos/basic-demo/src/main/java/dev/tamboui/demo/Demo.java"
     },
-    "scrollbar-demo": {
-      "script-ref": "demos/scrollbar-demo/src/main/java/dev/tamboui/demo/ScrollbarDemo.java"
+    "block-demo": {
+      "script-ref": "tamboui-widgets/demos/block-demo/src/main/java/dev/tamboui/demo/BlockDemo.java"
+    },
+    "calendar-demo": {
+      "script-ref": "tamboui-widgets/demos/calendar-demo/src/main/java/dev/tamboui/demo/CalendarDemo.java"
     },
     "canvas-demo": {
-      "script-ref": "demos/canvas-demo/src/main/java/dev/tamboui/demo/CanvasDemo.java"
+      "script-ref": "tamboui-widgets/demos/canvas-demo/src/main/java/dev/tamboui/demo/CanvasDemo.java"
     },
-    "toolkit-demo": {
-      "script-ref": "demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
-    },
-    "logo-demo": {
-      "script-ref": "demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
-    },
-    "paragraph-demo": {
-      "script-ref": "demos/paragraph-demo/src/main/java/dev/tamboui/demo/ParagraphDemo.java"
-    },
-    "list-demo": {
-      "script-ref": "demos/list-demo/src/main/java/dev/tamboui/demo/ListDemo.java"
+    "chart-demo": {
+      "script-ref": "tamboui-widgets/demos/chart-demo/src/main/java/dev/tamboui/demo/ChartDemo.java"
     },
     "collapsed-borders-demo": {
-      "script-ref": "demos/collapsed-borders-demo/src/main/java/dev/tamboui/demo/CollapsedBordersDemo.java"
-    },
-    "todo-list-demo": {
-      "script-ref": "demos/todo-list-demo/src/main/java/dev/tamboui/demo/TodoListDemo.java"
-    },
-    "input-form-demo": {
-      "script-ref": "demos/input-form-demo/src/main/java/dev/tamboui/demo/InputFormDemo.java"
+      "script-ref": "tamboui-widgets/demos/collapsed-borders-demo/src/main/java/dev/tamboui/demo/CollapsedBordersDemo.java"
     },
     "colors-rgb-demo": {
-      "script-ref": "demos/colors-rgb-demo/src/main/java/dev/tamboui/demo/ColorsRgbDemo.java"
+      "script-ref": "tamboui-widgets/demos/colors-rgb-demo/src/main/java/dev/tamboui/demo/ColorsRgbDemo.java"
+    },
+    "gauge-demo": {
+      "script-ref": "tamboui-widgets/demos/gauge-demo/src/main/java/dev/tamboui/demo/GaugeDemo.java"
+    },
+    "input-form-demo": {
+      "script-ref": "tamboui-widgets/demos/input-form-demo/src/main/java/dev/tamboui/demo/InputFormDemo.java"
+    },
+    "list-demo": {
+      "script-ref": "tamboui-widgets/demos/list-demo/src/main/java/dev/tamboui/demo/ListDemo.java"
+    },
+    "paragraph-demo": {
+      "script-ref": "tamboui-widgets/demos/paragraph-demo/src/main/java/dev/tamboui/demo/ParagraphDemo.java"
+    },
+    "scrollbar-demo": {
+      "script-ref": "tamboui-widgets/demos/scrollbar-demo/src/main/java/dev/tamboui/demo/ScrollbarDemo.java"
+    },
+    "sparkline-demo": {
+      "script-ref": "tamboui-widgets/demos/sparkline-demo/src/main/java/dev/tamboui/demo/SparklineDemo.java"
+    },
+    "table-demo": {
+      "script-ref": "tamboui-widgets/demos/table-demo/src/main/java/dev/tamboui/demo/TableDemo.java"
+    },
+    "tabs-demo": {
+      "script-ref": "tamboui-widgets/demos/tabs-demo/src/main/java/dev/tamboui/demo/TabsDemo.java"
+    },
+    "todo-list-demo": {
+      "script-ref": "tamboui-widgets/demos/todo-list-demo/src/main/java/dev/tamboui/demo/TodoListDemo.java"
+    },
+    "custom-component-demo": {
+      "script-ref": "tamboui-toolkit/demos/custom-component-demo/src/main/java/dev/tamboui/demo/CustomComponentDemo.java"
+    },
+    "filemanager-demo": {
+      "script-ref": "tamboui-toolkit/demos/filemanager-demo/src/main/java/dev/tamboui/demo/filemanager/FileManagerDemo.java"
+    },
+    "jtop-demo": {
+      "script-ref": "tamboui-toolkit/demos/jtop-demo/src/main/java/dev/tamboui/demo/JTopDemo.java"
+    },
+    "textarea-demo": {
+      "script-ref": "tamboui-toolkit/demos/textarea-demo/src/main/java/dev/tamboui/demo/TextAreaDemo.java"
+    },
+    "toolkit-demo": {
+      "script-ref": "tamboui-toolkit/demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
+    },
+    "helloworld-demo": {
+      "script-ref": "tamboui-tui/demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorld.java"
+    },
+    "logo-demo": {
+      "script-ref": "tamboui-tui/demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
+    },
+    "tui-demo": {
+      "script-ref": "tamboui-tui/demos/tui-demo/src/main/java/dev/tamboui/demo/TuiDemo.java"
+    },
+    "css-demo": {
+      "script-ref": "tamboui-css/demos/css-demo/src/main/java/dev/tamboui/demo/CssDemo.java"
+    },
+    "css-no-toolkit-demo": {
+      "script-ref": "tamboui-css/demos/css-no-toolkit-demo/src/main/java/dev/tamboui/demo/CssNoToolkitDemo.java"
+    },
+    "picocli-demo": {
+      "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     }
   }
 }

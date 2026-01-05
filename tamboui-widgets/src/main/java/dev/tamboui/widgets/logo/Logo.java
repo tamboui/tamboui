@@ -8,7 +8,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Text;
-import dev.tamboui.widgets.Widget;
+import dev.tamboui.widget.Widget;
 
 /**
  * A widget that renders the Tamboui logo.

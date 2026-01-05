@@ -9,4 +9,5 @@ dependencies {
     api(projects.tambouiWidgets)
     api(projects.tambouiTui)
     api(projects.tambouiCss)
+    testImplementation(testFixtures(projects.tambouiCore))
 }

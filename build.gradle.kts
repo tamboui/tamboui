@@ -1,4 +1,4 @@
 plugins {
-    id("dev.tamboui.maven-central-publishing")
+    id("dev.tamboui.parent")
 }
 

@@ -21,7 +21,7 @@ class OnActionProcessorTest {
                 "test.MyHandler",
                 "package test;\n" +
                 "\n" +
-                "import dev.tamboui.tui.bindings.OnAction;\n" +
+                "import dev.tamboui.annotations.OnAction;\n" +
                 "import dev.tamboui.tui.event.Event;\n" +
                 "\n" +
                 "public class MyHandler {\n" +
@@ -58,7 +58,7 @@ class OnActionProcessorTest {
                 "test.MyHandler",
                 "package test;\n" +
                 "\n" +
-                "import dev.tamboui.tui.bindings.OnAction;\n" +
+                "import dev.tamboui.annotations.OnAction;\n" +
                 "import dev.tamboui.tui.event.Event;\n" +
                 "\n" +
                 "public class MyHandler {\n" +
@@ -86,7 +86,7 @@ class OnActionProcessorTest {
                 "test.Handler1",
                 "package test;\n" +
                 "\n" +
-                "import dev.tamboui.tui.bindings.OnAction;\n" +
+                "import dev.tamboui.annotations.OnAction;\n" +
                 "import dev.tamboui.tui.event.Event;\n" +
                 "\n" +
                 "public class Handler1 {\n" +
@@ -99,7 +99,7 @@ class OnActionProcessorTest {
                 "test.Handler2",
                 "package test;\n" +
                 "\n" +
-                "import dev.tamboui.tui.bindings.OnAction;\n" +
+                "import dev.tamboui.annotations.OnAction;\n" +
                 "import dev.tamboui.tui.event.Event;\n" +
                 "\n" +
                 "public class Handler2 {\n" +
@@ -125,7 +125,7 @@ class OnActionProcessorTest {
                 "test.MyHandler",
                 "package test;\n" +
                 "\n" +
-                "import dev.tamboui.tui.bindings.OnAction;\n" +
+                "import dev.tamboui.annotations.OnAction;\n" +
                 "\n" +
                 "public class MyHandler {\n" +
                 "    @OnAction(\"action\")\n" +
@@ -150,7 +150,7 @@ class OnActionProcessorTest {
                 "test.MyHandler",
                 "package test;\n" +
                 "\n" +
-                "import dev.tamboui.tui.bindings.OnAction;\n" +
+                "import dev.tamboui.annotations.OnAction;\n" +
                 "import dev.tamboui.tui.bindings.Actions;\n" +
                 "import dev.tamboui.tui.event.Event;\n" +
                 "\n" +

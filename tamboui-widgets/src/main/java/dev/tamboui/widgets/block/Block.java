@@ -11,7 +11,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.widgets.Widget;
+import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.text.Overflow;
 
 import java.util.EnumSet;

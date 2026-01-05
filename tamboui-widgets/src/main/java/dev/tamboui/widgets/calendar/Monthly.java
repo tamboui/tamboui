@@ -7,7 +7,7 @@ package dev.tamboui.widgets.calendar;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
-import dev.tamboui.widgets.Widget;
+import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
 import java.time.DayOfWeek;

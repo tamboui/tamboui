@@ -74,6 +74,10 @@ public final class Column extends StyledElement<Column> {
         for (int i = 0; i < children.size(); i++) {
             Element child = children.get(i);
             Constraint c = child.constraint();
+            if (c == null) {
+                // For text elements without explicit constraint, calculate height from content
+                c = calculateDefaultConstraint(child);
+            }
             constraints.add(c != null ? c : Constraint.fill());
 
             // Add spacing constraint between children
@@ -100,5 +104,17 @@ public final class Column extends StyledElement<Column> {
             internalContext.registerElement(child, childArea);
             childIndex++;
         }
+    }
+
+    /**
+     * Calculates a default height constraint for elements that return null.
+     * For text elements, this returns a constraint based on line count.
+     */
+    private Constraint calculateDefaultConstraint(Element child) {
+        if (child instanceof TextElement) {
+            TextElement text = (TextElement) child;
+            return text.calculateHeightConstraint();
+        }
+        return null;
     }
 }

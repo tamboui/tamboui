@@ -1,5 +1,10 @@
 # TamboUI
 
+[![Release](https://img.shields.io/github/release/tamboui/tamboui.svg)](https://github.com/tamboui/tamboui/releases)
+[![Downloads](https://img.shields.io/github/downloads/tamboui/tamboui/total.svg)](https://hanadigital.github.io/grev/?user=jbangdev&repo=jbang)
+[![Build Status](https://github.com/tamboui/tamboui/workflows/Tests/badge.svg)](https://github.com/tamboui/tamboui/actions)
+[![Chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://tamboui.zulipchat.com)
+
 A Java library for building modern terminal user interfaces.
 
 TamboUI brings the TUI paradigms seen in things like Rust's [ratatui](https://github.com/ratatui/ratatui) or Go's [bubbletea](https://github.com/charmbracelet/bubbletea/) to the Java ecosystem.
@@ -9,6 +14,36 @@ TamboUI is pronounced like "[tambouille](https://www.howtopronounce.com/french/t
 It provides a comprehensive set of widgets and a layout system for building rich terminal applications with modern Java idioms.
 
 > **Note:** TamboUI is still experimental and under active development. APIs may/will change. Feedback, issues, and contributions are welcome!
+
+### Snapshots
+
+Currently TamboUI is only available as snapshot builds. You can use the following Maven repository to access snapshot versions:
+
+```xml
+<repository>
+    <id>ossrh-snapshots</id>
+    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    <releases>
+        <enabled>false</enabled>
+    </releases>
+    <snapshots>
+        <enabled>true</enabled>
+    </snapshots>
+</repository>
+```
+
+Gradle:
+
+```kotlin
+repositories {
+    maven {
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+}
+```
 
 ### Key Features
 
