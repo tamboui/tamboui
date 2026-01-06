@@ -1,7 +1,6 @@
 plugins {
     `java-library`
     id("dev.tamboui.publishing")
-    id("ru.vyarus.animalsniffer")
 }
 
 val isIDEASync = providers.systemProperty("idea.sync.active").isPresent
@@ -57,9 +56,6 @@ dependencies {
     val libs = versionCatalogs.named("libs")
     testImplementation(platform(libs.findLibrary("junit.bom").orElseThrow()))
     testImplementation(libs.findBundle("testing").orElseThrow())
-    signature(libs.findLibrary("sniffer18-signature").orElseThrow()) {
-        artifact { type = "signature" }
-    }
     // java11 source set needs access to main classes for module-info compilation
     "java11Implementation"(sourceSets.main.get().output)
 }

@@ -6,8 +6,6 @@ native-build-tools = "0.11.1"
 picocli = "4.7.6"
 nexus = "2.0.0"
 oshi = "6.9.2"
-animal-sniffer = "2.0.0"
-sniffer18-signature = "1.0"
 gradle-tooling-api = "9.2.1"
 
 [libraries]
@@ -20,14 +18,8 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 graalvm-native = { module = "org.graalvm.buildtools:native-gradle-plugin", version.ref = "native-build-tools" }
 nexus-publishing-plugin = { module = "io.github.gradle-nexus.publish-plugin:io.github.gradle-nexus.publish-plugin.gradle.plugin", version.ref = "nexus" }
-animal-sniffer-plugin = { module = "ru.vyarus:gradle-animalsniffer-plugin", version.ref = "animal-sniffer" }
 oshi-core = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
-sniffer18-signature = { module = "org.codehaus.mojo.signature:java18", version.ref = "sniffer18-signature" }
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle-tooling-api" }
 
 [bundles]
 testing = ["junit-jupiter", "junit-platform-launcher", "assertj-core"]
-
-[plugins]
-animal-sniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animal-sniffer" }
-
