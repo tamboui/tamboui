@@ -7,9 +7,10 @@ package dev.tamboui.toolkit.component;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.focus.Focusable;
-import dev.tamboui.layout.Constraint;
+import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.tui.event.KeyEvent;
@@ -18,20 +19,16 @@ import dev.tamboui.tui.event.MouseEvent;
 /**
  * Base class for stateful components with event handling.
  * <p>
- * Components can handle their own key and mouse events when focused.
- * State should be managed using regular instance fields in subclasses:
+ * Components handle key and mouse events when focused using
+ * {@code @OnAction} annotations:
  *
  * <pre>{@code
- * public class CounterComponent extends Component {
- *     private int count = 0;  // State as instance field
+ * public class CounterComponent extends Component<CounterComponent> {
+ *     private int count = 0;
  *
- *     @Override
- *     protected EventResult onKeyEvent(KeyEvent event) {
- *         if (Keys.isUp(event)) {
- *             count++;
- *             return EventResult.HANDLED;
- *         }
- *         return EventResult.UNHANDLED;
+ *     @OnAction(Actions.MOVE_UP)
+ *     void increment(Event event) {
+ *         count++;
  *     }
  *
  *     @Override
@@ -41,112 +38,24 @@ import dev.tamboui.tui.event.MouseEvent;
  * }
  * }</pre>
  */
-public abstract class Component implements Element, Focusable {
+public abstract class Component<T extends Component<T>> extends StyledElement<T> implements Focusable {
 
-    private String componentId;
-    private Constraint layoutConstraint;
-    private ComponentContext context;
-    private boolean mounted = false;
-
-    /**
-     * Sets the component ID.
-     *
-     * @param id the component ID
-     * @return this component for chaining
-     */
-    public Component id(String id) {
-        this.componentId = id;
-        return this;
-    }
-
-    @Override
-    public String id() {
-        return componentId;
-    }
-
-    /**
-     * Sets the layout constraint.
-     *
-     * @param constraint the constraint
-     * @return this component for chaining
-     */
-    public Component constraint(Constraint constraint) {
-        this.layoutConstraint = constraint;
-        return this;
-    }
-
-    @Override
-    public Constraint constraint() {
-        return layoutConstraint;
-    }
+    private ActionHandler actionHandler;
+    private RenderContext currentRenderContext;
 
     @Override
     public boolean isFocusable() {
         return true;
     }
 
-    // Lifecycle methods
-
     /**
-     * Called when the component is first mounted.
-     * Override to perform initialization.
-     */
-    protected void onMount() {
-    }
-
-    /**
-     * Called when the component is removed from the tree.
-     * Override to perform cleanup.
-     */
-    protected void onUnmount() {
-    }
-
-    // Event handling
-
-    /**
-     * Handles key events when this component is focused.
+     * Returns whether this component is currently focused.
      *
-     * @param event the key event
-     * @return HANDLED if the event was handled, UNHANDLED otherwise
+     * @return true if focused
      */
-    protected EventResult onKeyEvent(KeyEvent event) {
-        return EventResult.UNHANDLED;
+    protected boolean isFocused() {
+        return currentRenderContext != null && currentRenderContext.isFocused(elementId);
     }
-
-    /**
-     * Handles mouse events within this component's area.
-     *
-     * @param event the mouse event
-     * @return HANDLED if the event was handled, UNHANDLED otherwise
-     */
-    protected EventResult onMouseEvent(MouseEvent event) {
-        return EventResult.UNHANDLED;
-    }
-
-    // Focus callbacks
-
-    /**
-     * Called when this component gains focus.
-     */
-    protected void onFocusGained() {
-    }
-
-    /**
-     * Called when this component loses focus.
-     */
-    protected void onFocusLost() {
-    }
-
-    /**
-     * Returns the component context providing access to focus state and app state.
-     *
-     * @return the component context
-     */
-    protected ComponentContext context() {
-        return context;
-    }
-
-    // Rendering
 
     /**
      * Renders the component's content.
@@ -157,30 +66,23 @@ public abstract class Component implements Element, Focusable {
     protected abstract Element render();
 
     @Override
-    public final void render(Frame frame, Rect area, RenderContext renderContext) {
-        DefaultRenderContext internalContext = (DefaultRenderContext) renderContext;
-
-        // Initialize context
-        this.context = new ComponentContext(
-            componentId,
-            internalContext.focusManager().isFocused(componentId),
-            renderContext
-        );
-
-        // Handle mount lifecycle
-        if (!mounted) {
-            mounted = true;
-            onMount();
+    protected final void renderContent(Frame frame, Rect area, RenderContext renderContext) {
+        if (elementId == null) {
+            throw new IllegalStateException(
+                    "Component " + getClass().getSimpleName() + " must have an id. Use .id(\"myId\") when creating the component.");
         }
 
-        // Register in component tree
-        internalContext.componentTree().register(componentId, this);
-        internalContext.componentTree().setArea(componentId, area);
+        DefaultRenderContext internalContext = (DefaultRenderContext) renderContext;
+        this.currentRenderContext = renderContext;
+
+        // Create ActionHandler on first render
+        if (actionHandler == null) {
+            actionHandler = new ActionHandler(internalContext.bindings())
+                    .registerAnnotated(this);
+        }
 
         // Register as focusable
-        if (componentId != null) {
-            internalContext.focusManager().registerFocusable(componentId, area);
-        }
+        internalContext.focusManager().registerFocusable(elementId, area);
 
         // Render the component's content
         Element content = render();
@@ -191,30 +93,23 @@ public abstract class Component implements Element, Focusable {
 
     /**
      * Called internally to handle key events.
-     * Routes to onKeyEvent if the component is focused.
+     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
      */
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (focused) {
-            return onKeyEvent(event);
+        if (focused && actionHandler != null && actionHandler.dispatch(event)) {
+            return EventResult.HANDLED;
         }
         return EventResult.UNHANDLED;
     }
 
     /**
      * Called internally to handle mouse events.
+     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
      */
     public EventResult handleMouseEvent(MouseEvent event) {
-        return onMouseEvent(event);
-    }
-
-    /**
-     * Called when focus state changes.
-     */
-    public void notifyFocusChange(boolean focused) {
-        if (focused) {
-            onFocusGained();
-        } else {
-            onFocusLost();
+        if (actionHandler != null && actionHandler.dispatch(event)) {
+            return EventResult.HANDLED;
         }
+        return EventResult.UNHANDLED;
     }
 }

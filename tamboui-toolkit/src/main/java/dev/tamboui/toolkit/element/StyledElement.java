@@ -10,6 +10,7 @@ import dev.tamboui.toolkit.event.DragHandler;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.toolkit.event.MouseEventHandler;
+import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -387,6 +388,26 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      */
     public T onKeyEvent(KeyEventHandler handler) {
         this.keyHandler = handler;
+        return self();
+    }
+
+    /**
+     * Sets an action handler for this element.
+     * <p>
+     * This is a convenience method that dispatches both key and mouse events
+     * to the action handler. Key events are dispatched when this element is focused,
+     * mouse events when clicking on the element.
+     *
+     * @param handler the action handler to use
+     * @return this element for chaining
+     */
+    public T onAction(ActionHandler handler) {
+        onKeyEvent(event -> handler.dispatch(event)
+                ? EventResult.HANDLED
+                : EventResult.UNHANDLED);
+        onMouseEvent(event -> handler.dispatch(event)
+                ? EventResult.HANDLED
+                : EventResult.UNHANDLED);
         return self();
     }
 

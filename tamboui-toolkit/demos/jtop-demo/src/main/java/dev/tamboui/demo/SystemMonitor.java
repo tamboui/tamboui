@@ -26,7 +26,6 @@ import dev.tamboui.text.Span;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -431,7 +430,7 @@ final class SystemMonitor implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (Keys.isChar(event, 's') || Keys.isChar(event, 'S')) {
+        if (event.isCharIgnoreCase('s')) {
             sortMode = switch (sortMode) {
                 case CPU -> SystemMetrics.SortMode.MEMORY;
                 case MEMORY -> SystemMetrics.SortMode.PID;
@@ -439,7 +438,7 @@ final class SystemMonitor implements Element {
             };
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, 'c') || Keys.isChar(event, 'C')) {
+        if (event.isCharIgnoreCase('c')) {
             cpuViewMode = switch (cpuViewMode) {
                 case BARS -> CpuViewMode.SPARKLINES;
                 case SPARKLINES -> CpuViewMode.CHART;

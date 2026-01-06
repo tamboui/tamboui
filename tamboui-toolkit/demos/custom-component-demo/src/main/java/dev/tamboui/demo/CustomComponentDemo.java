@@ -8,12 +8,17 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.css.parser.CssParseException;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.bindings.ActionHandler;
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextAreaState;
 
@@ -31,7 +36,7 @@ import static dev.tamboui.toolkit.Toolkit.*;
  *   <li>Live CSS editing in a text area</li>
  *   <li>Real-time CSS application to ProgressCard components</li>
  *   <li>CSS parse error display</li>
- *   <li>Custom ProgressCard component with CSS styling</li>
+ *   <li>Custom ProgressCard component with @OnAction for keyboard control</li>
  * </ul>
  */
 public class CustomComponentDemo implements Element {
@@ -96,30 +101,24 @@ public class CustomComponentDemo implements Element {
         // Apply initial CSS
         applyUserCss(DEFAULT_CSS);
 
-        // Create sample progress cards with keyboard control enabled
+        // Create sample progress cards
         cards.add(new ProgressCard()
             .id("card-1")
             .title("Setup Environment")
             .description("Install dependencies and configure tools")
-            .progress(1.0)
-            .updateStatusClass()
-            .enableKeyboardControl());
+            .progress(1.0));
 
         cards.add(new ProgressCard()
             .id("card-2")
             .title("Build Application")
             .description("Compile source code and run tests")
-            .progress(0.65)
-            .updateStatusClass()
-            .enableKeyboardControl());
+            .progress(0.65));
 
         cards.add(new ProgressCard()
             .id("card-3")
             .title("Deploy to Production")
             .description("Push to production servers")
-            .progress(0.0)
-            .updateStatusClass()
-            .enableKeyboardControl());
+            .progress(0.0));
     }
 
     public static void main(String[] args) throws Exception {
@@ -128,12 +127,28 @@ public class CustomComponentDemo implements Element {
     }
 
     public void run() throws Exception {
+        // Create bindings with increment/decrement actions for ProgressCard
+        var bindings = BindingSets.standard()
+                .toBuilder()
+                .bind("increment", KeyTrigger.ch('+'))
+                .bind("decrement", KeyTrigger.ch('-'))
+                .build();
+
         var config = TuiConfig.builder()
             .mouseCapture(true)
-            .tickRate(Duration.ofMillis(100))
+            .noTick()
             .build();
 
-        try (var runner = ToolkitRunner.create(config)) {
+        try (var runner = ToolkitRunner.builder()
+                .config(config)
+                .bindings(bindings)
+                .build()) {
+
+            // Register global quit handler
+            var globalHandler = new ActionHandler(bindings)
+                    .on(Actions.QUIT, e -> runner.quit());
+            runner.eventRouter().addGlobalHandler(globalHandler);
+
             runner.styleEngine(styleEngine);
             runner.run(() -> this);
         }

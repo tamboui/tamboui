@@ -16,7 +16,6 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.Clear;
@@ -205,7 +204,7 @@ public final class DialogElement extends StyledElement<DialogElement> {
         }
 
         // Handle Enter to confirm
-        if (Keys.isEnter(event)) {
+        if (event.isConfirm()) {
             if (onConfirm != null) {
                 onConfirm.run();
             }

@@ -24,17 +24,17 @@ import dev.tamboui.tui.TuiConfig;
  *     protected Element render() {
  *         return panel("Counter",
  *             text("Count: " + count).bold().cyan(),
- *             text("[j/k] to change").dim()
+ *             text("[Up/Down] to change").dim()
  *         )
  *         .rounded()
  *         .id("main")
  *         .focusable()
  *         .onKeyEvent(event -> {
- *             if (Keys.isUp(event)) {
+ *             if (event.isUp()) {
  *                 count++;
  *                 return EventResult.HANDLED;
  *             }
- *             if (Keys.isDown(event)) {
+ *             if (event.isDown()) {
  *                 count--;
  *                 return EventResult.HANDLED;
  *             }

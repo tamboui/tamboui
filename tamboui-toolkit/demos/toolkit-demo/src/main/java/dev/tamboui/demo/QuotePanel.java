@@ -7,7 +7,6 @@ package dev.tamboui.demo;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.style.Color;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -41,11 +40,11 @@ final class QuotePanel extends PanelContent {
 
     @Override
     EventResult handleKey(KeyEvent event) {
-        if (Keys.isRight(event) || Keys.isChar(event, 'l') || Keys.isChar(event, 'L')) {
+        if (event.isRight() || event.isCharIgnoreCase('l')) {
             quoteIndex = (quoteIndex + 1) % QUOTES.length;
             return EventResult.HANDLED;
         }
-        if (Keys.isLeft(event) || Keys.isChar(event, 'h') || Keys.isChar(event, 'H')) {
+        if (event.isLeft() || event.isCharIgnoreCase('h')) {
             quoteIndex = (quoteIndex - 1 + QUOTES.length) % QUOTES.length;
             return EventResult.HANDLED;
         }

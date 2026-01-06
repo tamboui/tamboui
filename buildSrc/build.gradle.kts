@@ -12,7 +12,6 @@ repositories {
 dependencies {
     implementation(libs.graalvm.native)
     implementation(libs.nexus.publishing.plugin)
-    implementation(libs.animal.sniffer.plugin)
 }
 
 java {

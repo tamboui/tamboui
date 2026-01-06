@@ -18,7 +18,6 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
@@ -115,7 +114,7 @@ public class PicoCLIDemo extends TuiCommand {
     }
 
     private boolean handleEvent(Event event, TuiRunner runner) {
-        if (Keys.isQuit(event)) {
+        if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
             runner.quit();
             return false;
         }
@@ -128,32 +127,32 @@ public class PicoCLIDemo extends TuiCommand {
     }
 
     private boolean handleKey(KeyEvent k) {
-        if (Keys.isUp(k)) {
+        if (k.isUp()) {
             listState.selectPrevious();
             return true;
         }
-        if (Keys.isDown(k)) {
+        if (k.isDown()) {
             listState.selectNext(items.size());
             return true;
         }
-        if (Keys.isHome(k)) {
+        if (k.isHome()) {
             listState.selectFirst();
             return true;
         }
-        if (Keys.isEnd(k)) {
+        if (k.isEnd()) {
             listState.select(items.size() - 1);
             return true;
         }
 
         // 'a' to add item
-        if (Keys.isChar(k, 'a') || Keys.isChar(k, 'A')) {
+        if (k.isChar('a') || k.isChar('A')) {
             items.add("New Item " + (items.size() + 1));
             listState.select(items.size() - 1);
             return true;
         }
 
         // 'd' to delete item
-        if (Keys.isChar(k, 'd') || Keys.isChar(k, 'D')) {
+        if (k.isChar('d') || k.isChar('D')) {
             Integer selected = listState.selected();
             if (selected != null && items.size() > 1) {
                 items.remove((int) selected);

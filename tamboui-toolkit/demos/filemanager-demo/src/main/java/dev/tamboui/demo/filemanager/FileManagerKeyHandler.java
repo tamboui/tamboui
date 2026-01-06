@@ -5,7 +5,6 @@
 package dev.tamboui.demo.filemanager;
 
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
@@ -37,7 +36,7 @@ public class FileManagerKeyHandler {
         var dialogType = manager.currentDialog();
 
         if (dialogType == FileManagerController.DialogType.ERROR) {
-            if (Keys.isSelect(event) || Keys.isEscape(event)) {
+            if (event.isSelect() || event.isCancel()) {
                 manager.dismissDialog();
                 return EventResult.HANDLED;
             }
@@ -45,11 +44,11 @@ public class FileManagerKeyHandler {
         }
 
         // Confirmation dialogs
-        if (Keys.isChar(event, 'y') || Keys.isChar(event, 'Y')) {
+        if (event.isCharIgnoreCase('y')) {
             manager.confirmDialog();
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, 'n') || Keys.isChar(event, 'N') || Keys.isEscape(event)) {
+        if (event.isCharIgnoreCase('n') || event.isCancel()) {
             manager.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -61,102 +60,102 @@ public class FileManagerKeyHandler {
         var browser = manager.activeBrowser();
 
         // Navigation
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             browser.cursorUp();
             return EventResult.HANDLED;
         }
-        if (Keys.isDown(event)) {
+        if (event.isDown()) {
             browser.cursorDown();
             return EventResult.HANDLED;
         }
-        if (Keys.isPageUp(event)) {
+        if (event.isPageUp()) {
             browser.pageUp();
             return EventResult.HANDLED;
         }
-        if (Keys.isPageDown(event)) {
+        if (event.isPageDown()) {
             browser.pageDown();
             return EventResult.HANDLED;
         }
-        if (Keys.isHome(event)) {
+        if (event.isHome()) {
             browser.cursorToStart();
             return EventResult.HANDLED;
         }
-        if (Keys.isEnd(event)) {
+        if (event.isEnd()) {
             browser.cursorToEnd();
             return EventResult.HANDLED;
         }
 
         // Enter directory or open file (Enter only, not Space)
-        if (Keys.isEnter(event)) {
+        if (event.isConfirm()) {
             browser.enter();
             return EventResult.HANDLED;
         }
 
         // Go to parent directory
-        if (event.code() == KeyCode.BACKSPACE) {
+        if (event.isKey(KeyCode.BACKSPACE)) {
             browser.navigateUp();
             return EventResult.HANDLED;
         }
 
         // Switch between panels
-        if (Keys.isTab(event) || Keys.isBackTab(event)) {
+        if (event.isFocusNext() || event.isFocusPrevious()) {
             manager.switchSide();
             return EventResult.HANDLED;
         }
-        if (Keys.isLeft(event)) {
+        if (event.isLeft()) {
             manager.setActiveSide(FileManagerController.Side.LEFT);
             return EventResult.HANDLED;
         }
-        if (Keys.isRight(event)) {
+        if (event.isRight()) {
             manager.setActiveSide(FileManagerController.Side.RIGHT);
             return EventResult.HANDLED;
         }
 
         // Marking files
-        if (event.code() == KeyCode.INSERT || Keys.isChar(event, ' ')) {
+        if (event.isKey(KeyCode.INSERT) || event.isChar(' ')) {
             browser.toggleMark();
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, '+')) {
+        if (event.isChar('+')) {
             browser.markAll();
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, '-')) {
+        if (event.isChar('-')) {
             browser.unmarkAll();
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, '*')) {
+        if (event.isChar('*')) {
             browser.invertMarks();
             return EventResult.HANDLED;
         }
 
         // File operations (F5, F6, F7, F8)
-        if (event.code() == KeyCode.F5 || Keys.isChar(event, 'c') || Keys.isChar(event, 'C')) {
+        if (event.isKey(KeyCode.F5) || event.isCharIgnoreCase('c')) {
             manager.promptCopy();
             return EventResult.HANDLED;
         }
-        if (event.code() == KeyCode.F6 || Keys.isChar(event, 'm') || Keys.isChar(event, 'M')) {
+        if (event.isKey(KeyCode.F6) || event.isCharIgnoreCase('m')) {
             manager.promptMove();
             return EventResult.HANDLED;
         }
-        if (event.code() == KeyCode.F7 || Keys.isChar(event, 'n') || Keys.isChar(event, 'N')) {
+        if (event.isKey(KeyCode.F7) || event.isCharIgnoreCase('n')) {
             manager.promptMkdir();
             return EventResult.HANDLED;
         }
-        if (event.code() == KeyCode.F8 || Keys.isChar(event, 'd') || Keys.isChar(event, 'D')) {
+        if (event.isKey(KeyCode.F8) || event.isCharIgnoreCase('d')) {
             manager.promptDelete();
             return EventResult.HANDLED;
         }
 
         // Refresh
-        if (Keys.isChar(event, 'r') || Keys.isChar(event, 'R')) {
+        if (event.isCharIgnoreCase('r')) {
             manager.leftBrowser().refresh();
             manager.rightBrowser().refresh();
             return EventResult.HANDLED;
         }
 
         // Go to directory
-        if (Keys.isChar(event, 'o') || Keys.isChar(event, 'O')) {
+        if (event.isCharIgnoreCase('o')) {
             manager.promptGoto();
             return EventResult.HANDLED;
         }

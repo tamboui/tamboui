@@ -8,7 +8,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.tui.Keys;
+import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
@@ -36,6 +36,7 @@ public final class EventRouter {
     private final FocusManager focusManager;
     private final List<Element> elements = new ArrayList<>();
     private final IdentityHashMap<Element, Rect> elementAreas = new IdentityHashMap<>();
+    private final List<GlobalEventHandler> globalHandlers = new ArrayList<>();
 
     // Drag state
     private Element draggingElement;
@@ -45,6 +46,39 @@ public final class EventRouter {
 
     public EventRouter(FocusManager focusManager) {
         this.focusManager = focusManager;
+    }
+
+    /**
+     * Adds a global event handler that is called before element-specific handlers.
+     * Global handlers can intercept events before they reach elements.
+     *
+     * @param handler the handler to add
+     */
+    public void addGlobalHandler(GlobalEventHandler handler) {
+        globalHandlers.add(handler);
+    }
+
+    /**
+     * Adds an action handler as a global event handler.
+     * <p>
+     * This is a convenience method that wraps the action handler.
+     * Events are dispatched to the action handler before reaching elements.
+     *
+     * @param handler the action handler to add
+     */
+    public void addGlobalHandler(ActionHandler handler) {
+        addGlobalHandler(event -> handler.dispatch(event)
+                ? EventResult.HANDLED
+                : EventResult.UNHANDLED);
+    }
+
+    /**
+     * Removes a global event handler.
+     *
+     * @param handler the handler to remove
+     */
+    public void removeGlobalHandler(GlobalEventHandler handler) {
+        globalHandlers.remove(handler);
     }
 
     /**
@@ -75,11 +109,22 @@ public final class EventRouter {
 
     /**
      * Routes an event to the appropriate element(s).
+     * <p>
+     * Global handlers are called first, in registration order.
+     * If any global handler returns HANDLED, the event is not routed to elements.
      *
      * @param event the event to route
-     * @return HANDLED if any element handled the event, UNHANDLED otherwise
+     * @return HANDLED if any handler handled the event, UNHANDLED otherwise
      */
     public EventResult route(Event event) {
+        // Call global handlers first
+        for (GlobalEventHandler handler : globalHandlers) {
+            EventResult result = handler.handle(event);
+            if (result.isHandled()) {
+                return result;
+            }
+        }
+
         if (event instanceof KeyEvent) {
             return routeKeyEvent((KeyEvent) event);
         }
@@ -91,14 +136,14 @@ public final class EventRouter {
 
     private EventResult routeKeyEvent(KeyEvent event) {
         // Handle focus navigation first
-        if (Keys.isTab(event)) {
+        if (event.isFocusNext()) {
             if (focusManager.focusNext()) {
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
         }
 
-        if (Keys.isBackTab(event)) {
+        if (event.isFocusPrevious()) {
             if (focusManager.focusPrevious()) {
                 return EventResult.HANDLED;
             }
@@ -106,7 +151,7 @@ public final class EventRouter {
         }
 
         // Escape cancels drag first
-        if (Keys.isEscape(event) && draggingElement != null) {
+        if (event.isCancel() && draggingElement != null) {
             endDrag(-1, -1);
             return EventResult.HANDLED;
         }
@@ -144,7 +189,7 @@ public final class EventRouter {
         }
 
         // Escape clears focus if no element handled it
-        if (Keys.isEscape(event) && focusManager.focusedId() != null) {
+        if (event.isCancel() && focusManager.focusedId() != null) {
             focusManager.clearFocus();
             return EventResult.HANDLED;
         }

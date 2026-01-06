@@ -5,16 +5,18 @@
 package dev.tamboui.toolkit.app;
 
 import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.toolkit.component.ComponentTree;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
+import dev.tamboui.tui.bindings.ActionHandler;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.TickEvent;
 
 import java.util.function.Supplier;
@@ -40,7 +42,7 @@ import java.util.function.Supplier;
  *         .id("counter")
  *         .focusable()
  *         .onKeyEvent(event -> {
- *             if (Keys.isUp(event)) {
+ *             if (event.isUp()) {
  *                 count[0]++;
  *                 return EventResult.HANDLED;
  *             }
@@ -54,16 +56,14 @@ public final class ToolkitRunner implements AutoCloseable {
 
     private final TuiRunner tuiRunner;
     private final FocusManager focusManager;
-    private final ComponentTree componentTree;
     private final EventRouter eventRouter;
     private final DefaultRenderContext renderContext;
 
     private ToolkitRunner(TuiRunner tuiRunner) {
         this.tuiRunner = tuiRunner;
         this.focusManager = new FocusManager();
-        this.componentTree = new ComponentTree();
         this.eventRouter = new EventRouter(focusManager);
-        this.renderContext = new DefaultRenderContext(focusManager, componentTree, eventRouter);
+        this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
     }
 
     /**
@@ -104,7 +104,6 @@ public final class ToolkitRunner implements AutoCloseable {
             frame -> {
                 // Clear state before each render
                 focusManager.clearFocusables();
-                componentTree.clear();
                 eventRouter.clear();
 
                 // Get the current element tree
@@ -139,7 +138,7 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         // Handle quit only if event wasn't consumed by an element
-        if (Keys.isQuit(event)) {
+        if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
             quit();
             return false;
         }
@@ -198,5 +197,131 @@ public final class ToolkitRunner implements AutoCloseable {
     @Override
     public void close() {
         tuiRunner.close();
+    }
+
+    /**
+     * Creates a builder for configuring a ToolkitRunner.
+     * <p>
+     * The builder provides a fluent API for configuring bindings,
+     * style engine, and automatic registration of action handlers.
+     *
+     * <pre>{@code
+     * try (var runner = ToolkitRunner.builder()
+     *         .bindings(BindingSets.vim())
+     *         .app(this)
+     *         .withAutoBindingRegistration()
+     *         .build()) {
+     *
+     *     runner.run(() -> ...);
+     * }
+     * }</pre>
+     *
+     * @return a new builder
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder for {@link ToolkitRunner} instances.
+     * <p>
+     * Provides a fluent API for configuring the toolkit application including
+     * bindings, style engine, and auto-registration of annotated action handlers.
+     */
+    public static final class Builder {
+        private TuiConfig config = TuiConfig.defaults();
+        private Bindings bindings = BindingSets.defaults();
+        private StyleEngine styleEngine;
+        private Object app;
+        private boolean autoBindingRegistration;
+
+        private Builder() {
+        }
+
+        /**
+         * Sets the application object containing {@code @OnAction} annotated methods.
+         * <p>
+         * This object will be used for automatic action handler registration
+         * when {@link #withAutoBindingRegistration()} is called.
+         *
+         * @param app the application object
+         * @return this builder
+         */
+        public Builder app(Object app) {
+            this.app = app;
+            return this;
+        }
+
+        /**
+         * Sets the TUI configuration.
+         *
+         * @param config the configuration
+         * @return this builder
+         */
+        public Builder config(TuiConfig config) {
+            this.config = config;
+            return this;
+        }
+
+        /**
+         * Sets the bindings to use for action matching.
+         *
+         * @param bindings the bindings
+         * @return this builder
+         */
+        public Builder bindings(Bindings bindings) {
+            this.bindings = bindings;
+            return this;
+        }
+
+        /**
+         * Sets the style engine for CSS styling.
+         *
+         * @param styleEngine the style engine
+         * @return this builder
+         */
+        public Builder styleEngine(StyleEngine styleEngine) {
+            this.styleEngine = styleEngine;
+            return this;
+        }
+
+        /**
+         * Enables automatic registration of action handlers.
+         * <p>
+         * Discovers and registers handlers for methods annotated with
+         * {@code @OnAction} on the application object set via {@link #app(Object)}.
+         *
+         * @return this builder
+         */
+        public Builder withAutoBindingRegistration() {
+            this.autoBindingRegistration = true;
+            return this;
+        }
+
+        /**
+         * Builds and returns a configured ToolkitRunner.
+         *
+         * @return a new ToolkitRunner
+         * @throws Exception if terminal initialization fails
+         */
+        public ToolkitRunner build() throws Exception {
+            ToolkitRunner runner = ToolkitRunner.create(config);
+
+            // Set bindings on render context for Component auto-registration
+            runner.renderContext.setBindings(bindings);
+
+            if (styleEngine != null) {
+                runner.styleEngine(styleEngine);
+            }
+
+            // Register global action handlers from annotated app object
+            if (autoBindingRegistration && app != null) {
+                ActionHandler globalHandler = new ActionHandler(bindings)
+                        .registerAnnotated(app);
+                runner.eventRouter().addGlobalHandler(globalHandler);
+            }
+
+            return runner;
+        }
     }
 }

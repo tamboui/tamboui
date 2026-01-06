@@ -12,7 +12,8 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.toolkit.component.ComponentTree;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.layout.Rect;
 
 import java.util.ArrayDeque;
@@ -34,15 +35,14 @@ import java.util.Set;
 public final class DefaultRenderContext implements RenderContext {
 
     private final FocusManager focusManager;
-    private final ComponentTree componentTree;
     private final EventRouter eventRouter;
     private final Deque<Style> styleStack = new ArrayDeque<>();
     private final Deque<Styleable> elementStack = new ArrayDeque<>();
     private StyleEngine styleEngine;
+    private Bindings bindings = BindingSets.defaults();
 
-    public DefaultRenderContext(FocusManager focusManager, ComponentTree componentTree, EventRouter eventRouter) {
+    public DefaultRenderContext(FocusManager focusManager, EventRouter eventRouter) {
         this.focusManager = focusManager;
-        this.componentTree = componentTree;
         this.eventRouter = eventRouter;
     }
 
@@ -51,7 +51,7 @@ public final class DefaultRenderContext implements RenderContext {
      */
     public static DefaultRenderContext createEmpty() {
         FocusManager fm = new FocusManager();
-        return new DefaultRenderContext(fm, new ComponentTree(), new EventRouter(fm));
+        return new DefaultRenderContext(fm, new EventRouter(fm));
     }
 
     /**
@@ -68,6 +68,24 @@ public final class DefaultRenderContext implements RenderContext {
      */
     public Optional<StyleEngine> styleEngine() {
         return Optional.ofNullable(styleEngine);
+    }
+
+    /**
+     * Sets the bindings used for action matching.
+     *
+     * @param bindings the bindings to use
+     */
+    public void setBindings(Bindings bindings) {
+        this.bindings = bindings != null ? bindings : BindingSets.defaults();
+    }
+
+    /**
+     * Returns the current bindings.
+     *
+     * @return the bindings
+     */
+    public Bindings bindings() {
+        return bindings;
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -251,15 +269,6 @@ public final class DefaultRenderContext implements RenderContext {
      */
     public FocusManager focusManager() {
         return focusManager;
-    }
-
-    /**
-     * Returns the component tree.
-     * <p>
-     * Internal use only.
-     */
-    public ComponentTree componentTree() {
-        return componentTree;
     }
 
     /**

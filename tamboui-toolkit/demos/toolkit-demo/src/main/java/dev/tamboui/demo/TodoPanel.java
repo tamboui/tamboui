@@ -7,7 +7,6 @@ package dev.tamboui.demo;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.style.Color;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
@@ -101,13 +100,13 @@ final class TodoPanel extends PanelContent {
     @Override
     EventResult handleKey(KeyEvent event) {
         // Navigation
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             if (selectedIndex > -1) {
                 selectedIndex--;
             }
             return EventResult.HANDLED;
         }
-        if (Keys.isDown(event)) {
+        if (event.isDown()) {
             if (selectedIndex < items.size() - 1) {
                 selectedIndex++;
             }
@@ -136,13 +135,13 @@ final class TodoPanel extends PanelContent {
                 }
                 return EventResult.HANDLED;
             }
-            if (Keys.isArrowLeft(event)) {
+            if (event.code() == KeyCode.LEFT) {
                 if (cursorPosition > 0) {
                     cursorPosition--;
                 }
                 return EventResult.HANDLED;
             }
-            if (Keys.isArrowRight(event)) {
+            if (event.code() == KeyCode.RIGHT) {
                 if (cursorPosition < inputBuffer.length()) {
                     cursorPosition++;
                 }

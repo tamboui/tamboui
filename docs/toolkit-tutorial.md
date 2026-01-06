@@ -13,7 +13,8 @@ This tutorial explains how to build terminal user interfaces (TUIs) using the Ta
 6. [Focus Management](#focus-management)
 7. [Styling](#styling)
 8. [Advanced Patterns](#advanced-patterns)
-9. [Complete Example](#complete-example)
+9. [Custom Components](#custom-components)
+10. [Complete Example](#complete-example)
 
 ---
 
@@ -34,7 +35,6 @@ dependencies {
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.text.Overflow;
@@ -219,11 +219,11 @@ public class TodoApp {
     }
 
     private static EventResult handleInputMode(KeyEvent event, TodoController ctrl) {
-        if (Keys.isEscape(event)) {
+        if (event.isCancel()) {
             ctrl.cancelInput();
             return EventResult.HANDLED;
         }
-        if (Keys.isSelect(event)) {
+        if (event.isSelect()) {
             ctrl.submitInput();
             return EventResult.HANDLED;
         }
@@ -235,11 +235,11 @@ public class TodoApp {
     }
 
     private static EventResult handleNormalMode(KeyEvent event, TodoController ctrl) {
-        if (Keys.isChar(event, 'a')) { ctrl.startInput(); return EventResult.HANDLED; }
-        if (Keys.isUp(event)) { ctrl.moveUp(); return EventResult.HANDLED; }
-        if (Keys.isDown(event)) { ctrl.moveDown(); return EventResult.HANDLED; }
-        if (Keys.isSelect(event)) { ctrl.toggleSelected(); return EventResult.HANDLED; }
-        if (Keys.isChar(event, 'd')) { ctrl.deleteSelected(); return EventResult.HANDLED; }
+        if (event.isChar('a')) { ctrl.startInput(); return EventResult.HANDLED; }
+        if (event.isUp()) { ctrl.moveUp(); return EventResult.HANDLED; }
+        if (event.isDown()) { ctrl.moveDown(); return EventResult.HANDLED; }
+        if (event.isSelect()) { ctrl.toggleSelected(); return EventResult.HANDLED; }
+        if (event.isChar('d')) { ctrl.deleteSelected(); return EventResult.HANDLED; }
         return EventResult.UNHANDLED;
     }
 }
@@ -276,7 +276,7 @@ panel("My App")
     .id("main")
     .focusable()
     .onKeyEvent(event -> {
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             controller.moveUp();
             return EventResult.HANDLED;
         }
@@ -322,7 +322,7 @@ public class MyView implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Handle events for the entire view
-        if (Keys.isEscape(event) && controller.hasDialog()) {
+        if (event.isCancel() && controller.hasDialog()) {
             controller.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -705,7 +705,7 @@ Return `HANDLED` to consume the event, `UNHANDLED` to let others process it:
 
 ```java
 .onKeyEvent(event -> {
-    if (Keys.isUp(event)) {
+    if (event.isUp()) {
         controller.moveUp();
         return EventResult.HANDLED;   // Event consumed, stop here
     }
@@ -721,13 +721,13 @@ When implementing `Element.handleKeyEvent()`, the `focused` parameter tells you 
 @Override
 public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
     // Always handle ESC for dialogs (regardless of focus)
-    if (Keys.isEscape(event) && controller.hasDialog()) {
+    if (event.isCancel() && controller.hasDialog()) {
         controller.dismissDialog();
         return EventResult.HANDLED;
     }
 
     // Navigation only when we "own" the UI
-    if (Keys.isUp(event)) {
+    if (event.isUp()) {
         controller.moveUp();
         return EventResult.HANDLED;
     }
@@ -740,31 +740,108 @@ public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
 
 ### Key Utilities
 
-The `Keys` class provides convenient matchers. Some methods include vim-style alternatives for ergonomic keyboard navigation:
+KeyEvent provides convenience methods that delegate to the configured `Bindings`. The default bindings (`standard`) uses only arrow keys:
 
-| Method | Keys Matched |
-|--------|--------------|
-| `Keys.isQuit(event)` | q, Q, Ctrl+C |
-| `Keys.isUp(event)` | Up arrow, k, K |
-| `Keys.isDown(event)` | Down arrow, j, J |
-| `Keys.isLeft(event)` | Left arrow, h, H |
-| `Keys.isRight(event)` | Right arrow, l, L |
-| `Keys.isHome(event)` | Home, g |
-| `Keys.isEnd(event)` | End, G |
-| `Keys.isPageUp(event)` | Page Up, Ctrl+U |
-| `Keys.isPageDown(event)` | Page Down, Ctrl+D |
-| `Keys.isSelect(event)` | Enter, Space |
-| `Keys.isEnter(event)` | Enter only |
-| `Keys.isEscape(event)` | Escape |
-| `Keys.isTab(event)` | Tab |
-| `Keys.isBackTab(event)` | Shift+Tab |
-| `Keys.isChar(event, 'c')` | Specific character |
+| Method | Keys Matched (Standard) |
+|--------|-------------------------|
+| `event.isQuit()` | q, Q, Ctrl+C |
+| `event.isUp()` | Up arrow |
+| `event.isDown()` | Down arrow |
+| `event.isLeft()` | Left arrow |
+| `event.isRight()` | Right arrow |
+| `event.isHome()` | Home |
+| `event.isEnd()` | End |
+| `event.isPageUp()` | Page Up |
+| `event.isPageDown()` | Page Down |
+| `event.isSelect()` | Enter, Space |
+| `event.isConfirm()` | Enter only |
+| `event.isCancel()` | Escape |
+| `event.isFocusNext()` | Tab |
+| `event.isFocusPrevious()` | Shift+Tab |
+| `event.isChar('x')` | Specific character (case-sensitive) |
+| `event.isCharIgnoreCase('x')` | Specific character (case-insensitive) |
+| `event.isKey(KeyCode.F5)` | Specific key code |
 
-**Note:** These are convenience methods. If the vim-style bindings conflict with your application's needs, use `Keys.isChar()` or check key codes directly instead of the composite matchers.
+### Configurable Bindings
+
+You can configure different binding sets via `TuiConfig`:
+
+```java
+import dev.tamboui.tui.bindings.BindingSets;
+
+TuiConfig config = TuiConfig.builder()
+    .bindings(BindingSets.vim())  // Enable vim-style navigation
+    .build();
+```
+
+Available binding sets:
+- `BindingSets.standard()` - Arrow keys only (default, safe for text input)
+- `BindingSets.vim()` - hjkl navigation, g/G for home/end, Ctrl+u/d for page navigation
+- `BindingSets.emacs()` - Ctrl+n/p/f/b navigation
+- `BindingSets.intellij()` - IntelliJ IDEA-style bindings
+- `BindingSets.vscode()` - VS Code-style bindings
+
+You can also create custom bindings:
+
+```java
+import dev.tamboui.tui.bindings.*;
+
+Bindings custom = BindingSets.standard()
+    .toBuilder()
+    .bind(Actions.QUIT, KeyTrigger.ch('x'))  // Quit with 'x' instead of 'q'
+    .bind("contextMenu", MouseTrigger.rightClick())  // Custom mouse action
+    .build();
+```
+
+### Loading Bindings from Properties Files
+
+You can load bindings from standard Java properties files. Loaded bindings extend the standard bindings by default:
+
+```properties
+# my-bindings.properties
+moveUp = Up, k, K
+moveDown = Down, j, J
+confirm = Enter
+cancel = Escape
+quit = q, Ctrl+c
+
+# Mouse bindings
+click = Mouse.Left.Press
+rightClick = Mouse.Right.Press
+ctrlClick = Ctrl+Mouse.Left.Press
+```
+
+Load from a file or classpath resource:
+
+```java
+// From filesystem - extends standard bindings
+Bindings bindings = BindingSets.load(Path.of("/path/to/bindings.properties"));
+
+// From classpath resource
+Bindings bindings = BindingSets.loadResource("/bindings/custom.properties");
+
+// Start with a different base (e.g., vim bindings)
+Bindings bindings = BindingSets.load(inputStream, BindingSets.vim());
+
+// Start with empty bindings (no defaults)
+Bindings bindings = BindingSets.load(inputStream, null);
+```
+
+Key binding syntax:
+- Key names: `Up`, `Down`, `Enter`, `Tab`, `Escape`, `Backspace`, `Delete`, `Home`, `End`, `PageUp`, `PageDown`, `F1`-`F12`
+- Characters: Single character like `k`, `q`
+- Modifiers: `Ctrl+c`, `Alt+x`, `Shift+Tab`
+- Space: Use the word `Space`
+
+Mouse binding syntax:
+- Format: `[Modifiers+]Mouse.Button.Kind`
+- Buttons: `Left`, `Right`, `Middle`
+- Kinds: `Press`, `Release`, `Drag`, `ScrollUp`, `ScrollDown`
+- Examples: `Mouse.Left.Press`, `Ctrl+Mouse.Left.Press`, `Mouse.ScrollUp`
 
 ### Checking Key Codes Directly
 
-For keys not covered by `Keys` utilities, check the key code directly:
+For keys not covered by the keymap convenience methods, check the key code directly:
 
 ```java
 import dev.tamboui.tui.event.KeyCode;
@@ -970,7 +1047,7 @@ public class MyView implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // ESC should dismiss dialog, not clear focus
-        if (Keys.isEscape(event) && controller.hasDialog()) {
+        if (event.isCancel() && controller.hasDialog()) {
             controller.dismissDialog();
             return EventResult.HANDLED;  // Prevents ESC from clearing focus
         }
@@ -1045,7 +1122,7 @@ public class MyKeyHandler {
 
     public EventResult handle(KeyEvent event) {
         // Check ESC first for dialogs
-        if (Keys.isEscape(event) && controller.hasDialog()) {
+        if (event.isCancel() && controller.hasDialog()) {
             controller.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -1061,11 +1138,11 @@ public class MyKeyHandler {
     }
 
     private EventResult handleInputMode(KeyEvent event) {
-        if (Keys.isEscape(event)) {
+        if (event.isCancel()) {
             controller.cancelInput();
             return EventResult.HANDLED;
         }
-        if (Keys.isEnter(event)) {
+        if (event.isConfirm()) {
             controller.submitInput();
             return EventResult.HANDLED;
         }
@@ -1081,11 +1158,11 @@ public class MyKeyHandler {
     }
 
     private EventResult handleDialogMode(KeyEvent event) {
-        if (Keys.isChar(event, 'y') || Keys.isChar(event, 'Y')) {
+        if (event.isCharIgnoreCase('y')) {
             controller.confirmDialog();
             return EventResult.HANDLED;
         }
-        if (Keys.isChar(event, 'n') || Keys.isChar(event, 'N')) {
+        if (event.isCharIgnoreCase('n')) {
             controller.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -1094,7 +1171,7 @@ public class MyKeyHandler {
 
     private EventResult handleNormalMode(KeyEvent event) {
         // Navigation, actions, etc.
-        if (Keys.isUp(event)) {
+        if (event.isUp()) {
             controller.moveUp();
             return EventResult.HANDLED;
         }
@@ -1279,7 +1356,120 @@ public class MyApp {
 2. **Not handling ESC before other keys**: Dialogs won't dismiss properly
 3. **Transparent dialog backgrounds**: Use `Clear.INSTANCE` before rendering overlays
 4. **Returning UNHANDLED in input mode**: Unwanted characters may leak through
-5. **Key binding conflicts**: If using `Keys.isUp()` etc., be aware they include vim keys (j/k/h/l). Use `Keys.isChar()` or check `event.code()` directly for precise control
+5. **Key binding conflicts**: With the `vim` keymap, `event.isUp()` etc. match vim keys (hjkl). Use the `standard` keymap (default) or check `event.code()` directly for precise control
+
+---
+
+## Custom Components
+
+For reusable, stateful UI elements with their own event handling, extend the `Component` class. Components automatically:
+
+- Integrate with focus management
+- Support `@OnAction` annotations for declarative event handling
+- Access focus state via `isFocused()`
+
+### Creating a Custom Component
+
+```java
+import dev.tamboui.toolkit.component.Component;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.tui.bindings.OnAction;
+import dev.tamboui.tui.event.Event;
+
+import static dev.tamboui.toolkit.Toolkit.*;
+
+public class CounterCard extends Component<CounterCard> {
+    private int count = 0;
+
+    // @OnAction methods are automatically registered
+    @OnAction("increment")
+    void onIncrement(Event event) {
+        count++;
+    }
+
+    @OnAction("decrement")
+    void onDecrement(Event event) {
+        count--;
+    }
+
+    @Override
+    protected Element render() {
+        // Access focus state directly
+        var borderColor = isFocused() ? Color.CYAN : Color.GRAY;
+
+        return panel(() -> column(
+                text("Count: " + count).bold(),
+                text("Press +/- to change").dim()
+        ))
+                .rounded()
+                .borderColor(borderColor)
+                .fill();
+    }
+}
+```
+
+### Using Custom Components
+
+Components **must have an ID** for focus and event handling to work:
+
+```java
+// Create component instances (reuse across renders)
+var counter1 = new CounterCard().id("counter-1");
+var counter2 = new CounterCard().id("counter-2");
+
+// Define bindings for custom actions
+var bindings = BindingSets.standard()
+        .toBuilder()
+        .bind("increment", KeyTrigger.ch('+'), KeyTrigger.ch('='))
+        .bind("decrement", KeyTrigger.ch('-'), KeyTrigger.ch('_'))
+        .build();
+
+try (var runner = ToolkitRunner.builder()
+        .bindings(bindings)
+        .build()) {
+
+    runner.run(() -> row(counter1, counter2));
+}
+```
+
+### How It Works
+
+1. **Bindings define action triggers**: `"increment"` is bound to `+` and `=` keys
+2. **Component registers @OnAction methods**: On first render, Component creates an ActionHandler and registers annotated methods
+3. **Focused component receives events**: When a component is focused, key events are dispatched to its ActionHandler
+4. **Methods are invoked**: Matching action triggers invoke the corresponding `@OnAction` method
+
+### Annotation Processing (Optional)
+
+For best performance, use the annotation processor to generate registrars at compile time:
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("dev.tamboui:tamboui-toolkit:VERSION")
+    implementation("dev.tamboui:tamboui-annotations:VERSION")
+    annotationProcessor("dev.tamboui:tamboui-processor:VERSION")
+}
+```
+
+If the annotation processor is not configured, `@OnAction` methods are discovered via reflection at runtime (works but slightly slower startup).
+
+### Component vs StyledElement
+
+| Feature | Component | StyledElement |
+|---------|-----------|---------------|
+| Focus management | Automatic | Manual |
+| @OnAction support | Yes | No |
+| Event handling | Via @OnAction | Via onKeyEvent() |
+| ID required | Yes | Optional |
+| Use case | Stateful, interactive widgets | Simple, styled elements |
+
+### Best Practices
+
+1. **Create components once, reuse**: Don't create new instances in render functions
+2. **Always set an ID**: Components throw an exception if rendered without an ID
+3. **Use isFocused()**: For focus-dependent styling in render()
+4. **Define custom bindings**: For component-specific actions like "increment"
 
 ---
 
@@ -1292,7 +1482,6 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.style.Color;
-import dev.tamboui.tui.Keys;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
@@ -1432,18 +1621,18 @@ public class TodoApp {
 
     static EventResult handleKey(KeyEvent event, Controller ctrl) {
         if (ctrl.isEditing()) {
-            if (Keys.isEscape(event)) { ctrl.cancelEditing(); return EventResult.HANDLED; }
-            if (Keys.isSelect(event)) { ctrl.submit(); return EventResult.HANDLED; }
+            if (event.isCancel()) { ctrl.cancelEditing(); return EventResult.HANDLED; }
+            if (event.isSelect()) { ctrl.submit(); return EventResult.HANDLED; }
             if (event.code() == KeyCode.CHAR && event.character() >= 32) { ctrl.typeChar(event.character()); return EventResult.HANDLED; }
             if (event.code() == KeyCode.BACKSPACE) { ctrl.backspace(); return EventResult.HANDLED; }
             return EventResult.UNHANDLED;
         }
 
-        if (Keys.isChar(event, 'a')) { ctrl.startEditing(); return EventResult.HANDLED; }
-        if (Keys.isUp(event)) { ctrl.cursorUp(); return EventResult.HANDLED; }
-        if (Keys.isDown(event)) { ctrl.cursorDown(); return EventResult.HANDLED; }
-        if (Keys.isSelect(event)) { ctrl.toggle(); return EventResult.HANDLED; }
-        if (Keys.isChar(event, 'd')) { ctrl.delete(); return EventResult.HANDLED; }
+        if (event.isChar('a')) { ctrl.startEditing(); return EventResult.HANDLED; }
+        if (event.isUp()) { ctrl.cursorUp(); return EventResult.HANDLED; }
+        if (event.isDown()) { ctrl.cursorDown(); return EventResult.HANDLED; }
+        if (event.isSelect()) { ctrl.toggle(); return EventResult.HANDLED; }
+        if (event.isChar('d')) { ctrl.delete(); return EventResult.HANDLED; }
         return EventResult.UNHANDLED;
     }
 

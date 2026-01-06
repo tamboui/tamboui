@@ -4,25 +4,25 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Layout;
-import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.toolkit.elements.GaugeElement;
-import dev.tamboui.toolkit.elements.TextElement;
-import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.toolkit.component.Component;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.annotations.bindings.OnAction;
+import dev.tamboui.tui.event.Event;
+
+import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * A custom component demonstrating CSS styling.
+ * A custom component demonstrating @OnAction annotations for keyboard handling.
  * Displays a task card with title, description, and progress bar.
+ * <p>
+ * Uses the Component base class which automatically:
+ * <ul>
+ *   <li>Registers @OnAction annotated methods for event handling</li>
+ *   <li>Manages focus state via isFocused()</li>
+ * </ul>
  */
-public final class ProgressCard extends StyledElement<ProgressCard> {
+public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Status of the task shown in the card.
@@ -75,34 +75,7 @@ public final class ProgressCard extends StyledElement<ProgressCard> {
      */
     public ProgressCard progress(double progress) {
         this.progress = Math.max(0.0, Math.min(1.0, progress));
-        // Auto-update status based on progress
-        if (this.progress >= 1.0) {
-            this.status = Status.COMPLETE;
-        } else if (this.progress > 0.0) {
-            this.status = Status.IN_PROGRESS;
-        } else {
-            this.status = Status.PENDING;
-        }
-        return this;
-    }
-
-    /**
-     * Enables keyboard handling for progress adjustment (+/-).
-     */
-    public ProgressCard enableKeyboardControl() {
-        onKeyEvent(event -> {
-            if (event.character() == '+' || event.character() == '=') {
-                progress(Math.min(1.0, progress + 0.1));
-                updateStatusClass();
-                return dev.tamboui.toolkit.event.EventResult.HANDLED;
-            }
-            if (event.character() == '-' || event.character() == '_') {
-                progress(Math.max(0.0, progress - 0.1));
-                updateStatusClass();
-                return dev.tamboui.toolkit.event.EventResult.HANDLED;
-            }
-            return dev.tamboui.toolkit.event.EventResult.UNHANDLED;
-        });
+        updateStatus();
         return this;
     }
 
@@ -120,100 +93,61 @@ public final class ProgressCard extends StyledElement<ProgressCard> {
         return status;
     }
 
-    @Override
-    public boolean isFocusable() {
-        return true;
+    // ═══════════════════════════════════════════════════════════════
+    // @OnAction handlers - automatically registered by Component
+    // ═══════════════════════════════════════════════════════════════
+
+    @OnAction("increment")
+    void onIncrement(Event event) {
+        progress(Math.min(1.0, progress + 0.1));
     }
 
+    @OnAction("decrement")
+    void onDecrement(Event event) {
+        progress(Math.max(0.0, progress - 0.1));
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Rendering
+    // ═══════════════════════════════════════════════════════════════
+
     @Override
-    protected void renderContent(Frame frame, Rect area, RenderContext context) {
-        if (area.isEmpty()) {
-            return;
-        }
+    protected Element render() {
+        var focused = isFocused();
 
-        // Get resolved CSS style
-        var cssStyle = context.resolveStyle(this);
-        var effectiveStyle = context.currentStyle();
+        // Use double border + cyan when focused for clear visual feedback
+        var panel = panel(() -> column(
+                // Title with CSS class
+                text(title).bold().addClass("card-title"),
+                // Description with CSS class
+                text(description).addClass("card-description"),
+                // Progress bar with status-based CSS class
+                gauge(progress)
+                        .label(String.format("%.0f%%", progress * 100))
+                        .addClass("progress-" + status.cssClass())
+        ))
+                .title(status.name())
+                .addClass(status.cssClass());
 
-        // Determine border color from CSS or focus state
-        var isFocused = elementId != null && context.isFocused(elementId);
-        Color borderColor;
-        if (isFocused) {
-            borderColor = Color.CYAN;
+        if (focused) {
+            // Clear focus indicator: double border + cyan
+            panel.doubleBorder().borderColor(Color.CYAN);
         } else {
-            borderColor = cssStyle
-                .flatMap(resolved -> resolved.getProperty("border-color"))
-                .flatMap(context::parseColor)
-                .orElse(Color.GRAY);
+            panel.rounded();
         }
 
-        // Get border type from CSS, default to PLAIN
-        BorderType borderType = cssStyle
-            .flatMap(resolved -> resolved.borderType())
-            .orElse(BorderType.PLAIN);
-
-        // Build the card border
-        var blockBuilder = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(borderType)
-            .style(effectiveStyle);
-
-        blockBuilder.borderStyle(Style.EMPTY.fg(borderColor));
-
-        var block = blockBuilder.build();
-        frame.renderWidget(block, area);
-
-        // Get inner area for content
-        var innerArea = block.inner(area);
-        if (innerArea.isEmpty()) {
-            return;
-        }
-
-        // Layout: title (1 line), description (1 line), progress (1 line)
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(1),  // Title
-                Constraint.length(1),  // Description
-                Constraint.length(1)   // Progress bar
-            )
-            .split(innerArea);
-
-        // Render title using TextElement with .card-title CSS class
-        if (!title.isEmpty() && !layout.isEmpty()) {
-            var titleElement = new TextElement(title)
-                .addClass("card-title")
-                .cssParent(this);  // Set parent for CSS inheritance
-            titleElement.render(frame, layout.getFirst(), context);
-        }
-
-        // Render description using TextElement with .card-description CSS class
-        if (!description.isEmpty() && layout.size() > 1) {
-            var descElement = new TextElement(description)
-                .addClass("card-description")
-                .cssParent(this);
-            descElement.render(frame, layout.get(1), context);
-        }
-
-        // Render progress bar using GaugeElement with status-based CSS class
-        if (layout.size() > 2) {
-            var gaugeElement = new GaugeElement()
-                .ratio(progress)
-                .label(String.format("%.0f%%", progress * 100))
-                .addClass("progress-" + status.cssClass())
-                .cssParent(this);
-            gaugeElement.render(frame, layout.get(2), context);
-        }
+        return panel.fill();
     }
 
-    /**
-     * Updates the CSS classes to include the status class.
-     * Call this before rendering if status changes.
-     */
-    public ProgressCard updateStatusClass() {
-        for (var value : Status.values()) {
-            removeClass(value.cssClass());
+    private void updateStatus() {
+        // Use epsilon comparison to handle floating point precision
+        // (0.1 + 0.1 + ... 10 times = 0.9999999999999999, not 1.0)
+        if (this.progress >= 0.999) {
+            this.status = Status.COMPLETE;
+        } else if (this.progress > 0.001) {
+            this.status = Status.IN_PROGRESS;
+        } else {
+            this.status = Status.PENDING;
         }
-        addClass(status.cssClass());
-        return this;
     }
 }
