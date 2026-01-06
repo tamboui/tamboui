@@ -52,11 +52,11 @@ public final class CascadeResolver {
      * @param variables CSS variables for value resolution
      * @return the resolved style
      */
-    public ResolvedStyle resolve(Styleable element,
-                                  PseudoClassState state,
-                                  List<Styleable> ancestors,
-                                  List<Rule> rules,
-                                  Map<String, String> variables) {
+    public CssStyleResolver resolve(Styleable element,
+                                     PseudoClassState state,
+                                     List<Styleable> ancestors,
+                                     List<Rule> rules,
+                                     Map<String, String> variables) {
         // 1. Find matching rules
         List<MatchedRule> matches = new ArrayList<>();
         for (Rule rule : rules) {
@@ -66,7 +66,7 @@ public final class CascadeResolver {
         }
 
         if (matches.isEmpty()) {
-            return ResolvedStyle.empty();
+            return CssStyleResolver.empty();
         }
 
         // 2. Sort by specificity, then source order
@@ -93,13 +93,13 @@ public final class CascadeResolver {
         Map<String, PropertyValue> finalProps = new LinkedHashMap<>(normalProps);
         finalProps.putAll(importantProps);
 
-        // 4. Convert to ResolvedStyle
-        return buildResolvedStyle(finalProps, variables);
+        // 4. Convert to CssStyleResolver
+        return buildCssStyleResolver(finalProps, variables);
     }
 
-    private ResolvedStyle buildResolvedStyle(Map<String, PropertyValue> props,
-                                              Map<String, String> variables) {
-        ResolvedStyle.Builder builder = ResolvedStyle.builder();
+    private CssStyleResolver buildCssStyleResolver(Map<String, PropertyValue> props,
+                                                    Map<String, String> variables) {
+        CssStyleResolver.Builder builder = CssStyleResolver.builder();
 
         for (Map.Entry<String, PropertyValue> entry : props.entrySet()) {
             String prop = entry.getKey();

@@ -28,7 +28,7 @@ class CascadeResolverTest {
         // Create a "TextElement" type element (no classes, no id)
         Styleable textElement = createStyleable("TextElement", null, Collections.emptySet());
 
-        ResolvedStyle resolved = engine.resolve(textElement);
+        CssStyleResolver resolved = engine.resolve(textElement);
 
         assertThat(resolved.hasProperties()).isTrue();
         assertThat(resolved.foreground()).isPresent();
@@ -51,7 +51,7 @@ class CascadeResolverTest {
 
         Styleable textElement = createStyleable("TextElement", null, Collections.emptySet());
 
-        ResolvedStyle resolved = engine.resolve(textElement);
+        CssStyleResolver resolved = engine.resolve(textElement);
 
         assertThat(resolved.hasProperties()).isTrue();
         assertThat(resolved.foreground()).isPresent();
@@ -69,7 +69,7 @@ class CascadeResolverTest {
         Styleable element = createStyleable("TextElement", null,
             new HashSet<>(Collections.singletonList("error")));
 
-        ResolvedStyle resolved = engine.resolve(element);
+        CssStyleResolver resolved = engine.resolve(element);
 
         // Should have color from .error (red) and background from * (white)
         assertThat(resolved.foreground()).isPresent();
@@ -94,7 +94,7 @@ class CascadeResolverTest {
         Styleable element = createStyleable("TextElement", null,
             new HashSet<>(Collections.singletonList("primary")));
 
-        ResolvedStyle resolved = engine.resolve(element);
+        CssStyleResolver resolved = engine.resolve(element);
 
         assertThat(resolved.foreground()).isPresent();
         assertThat(resolved.background()).isPresent();
@@ -120,7 +120,7 @@ class CascadeResolverTest {
         // Plain TextElement with no classes
         Styleable element = createStyleable("TextElement", null, Collections.emptySet());
 
-        ResolvedStyle resolved = engine.resolve(element);
+        CssStyleResolver resolved = engine.resolve(element);
 
         assertThat(resolved.hasProperties()).isTrue();
         assertThat(resolved.foreground()).isPresent();

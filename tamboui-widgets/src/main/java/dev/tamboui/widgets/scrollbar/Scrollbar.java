@@ -6,7 +6,12 @@ package dev.tamboui.widgets.scrollbar;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.widget.StatefulWidget;
 
 import java.util.Objects;
@@ -42,6 +47,22 @@ import java.util.Objects;
  * @see ScrollbarOrientation
  */
 public final class Scrollbar implements StatefulWidget<ScrollbarState> {
+
+    /**
+     * Property key for the thumb (position indicator) color.
+     * <p>
+     * CSS property name: {@code thumb-color}
+     */
+    public static final PropertyKey<Color> THUMB_COLOR =
+            PropertyKey.of("thumb-color", ColorConverter.INSTANCE);
+
+    /**
+     * Property key for the track (background) color.
+     * <p>
+     * CSS property name: {@code track-color}
+     */
+    public static final PropertyKey<Color> TRACK_COLOR =
+            PropertyKey.of("track-color", ColorConverter.INSTANCE);
 
     /**
      * Scrollbar symbol set for rendering.
@@ -173,10 +194,28 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         this.beginSymbol = builder.beginSymbol;
         this.endSymbol = builder.endSymbol;
         this.style = builder.style;
-        this.thumbStyle = builder.thumbStyle;
-        this.trackStyle = builder.trackStyle;
         this.beginStyle = builder.beginStyle;
         this.endStyle = builder.endStyle;
+
+        // Resolve style-aware properties
+        Color resolvedThumbColor = builder.thumbColor.resolve();
+        Color resolvedTrackColor = builder.trackColor.resolve();
+
+        Style baseThumbStyle = builder.thumbStyle;
+        if (resolvedThumbColor != null) {
+            baseThumbStyle = baseThumbStyle != null
+                    ? baseThumbStyle.fg(resolvedThumbColor)
+                    : Style.EMPTY.fg(resolvedThumbColor);
+        }
+        this.thumbStyle = baseThumbStyle;
+
+        Style baseTrackStyle = builder.trackStyle;
+        if (resolvedTrackColor != null) {
+            baseTrackStyle = baseTrackStyle != null
+                    ? baseTrackStyle.fg(resolvedTrackColor)
+                    : Style.EMPTY.fg(resolvedTrackColor);
+        }
+        this.trackStyle = baseTrackStyle;
     }
 
     /**
@@ -384,6 +423,13 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         private Style trackStyle;
         private Style beginStyle;
         private Style endStyle;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> thumbColor =
+                StyledProperty.of(THUMB_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> trackColor =
+                StyledProperty.of(TRACK_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -484,6 +530,46 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          */
         public Builder endStyle(Style endStyle) {
             this.endStyle = endStyle;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code thumb-color} and {@code track-color}
+         * will be resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the thumb (position indicator) color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the thumb color
+         * @return this builder
+         */
+        public Builder thumbColor(Color color) {
+            this.thumbColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the track (background) color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the track color
+         * @return this builder
+         */
+        public Builder trackColor(Color color) {
+            this.trackColor.set(color);
             return this;
         }
 

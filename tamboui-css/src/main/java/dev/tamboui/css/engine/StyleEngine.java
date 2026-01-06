@@ -7,7 +7,7 @@ package dev.tamboui.css.engine;
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CascadeResolver;
 import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.ResolvedStyle;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.model.Stylesheet;
 import dev.tamboui.css.parser.CssParser;
@@ -283,9 +283,9 @@ public final class StyleEngine {
      * @param ancestors the ancestor chain
      * @return the resolved style
      */
-    public ResolvedStyle resolve(Styleable element,
-                                  PseudoClassState state,
-                                  List<Styleable> ancestors) {
+    public CssStyleResolver resolve(Styleable element,
+                                     PseudoClassState state,
+                                     List<Styleable> ancestors) {
         List<Rule> allRules = collectRules();
         Map<String, String> allVariables = collectVariables();
 
@@ -298,7 +298,7 @@ public final class StyleEngine {
      * @param element the element to style
      * @return the resolved style
      */
-    public ResolvedStyle resolve(Styleable element) {
+    public CssStyleResolver resolve(Styleable element) {
         return resolve(element, PseudoClassState.NONE, Collections.<Styleable>emptyList());
     }
 

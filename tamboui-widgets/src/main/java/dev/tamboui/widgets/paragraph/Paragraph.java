@@ -11,18 +11,33 @@ import java.util.List;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.widgets.text.OverflowConverter;
 
 /**
  * A paragraph widget for displaying styled text.
+ * <p>
+ * Supports style-aware properties: {@code text-overflow}, {@code text-align},
+ * {@code background}, and {@code color}.
  */
 public final class Paragraph implements Widget {
+
+    /**
+     * Property key for text-overflow property.
+     */
+    public static final PropertyKey<Overflow> TEXT_OVERFLOW =
+            PropertyKey.of("text-overflow", OverflowConverter.INSTANCE);
 
     private static final String ELLIPSIS = "...";
 
@@ -36,10 +51,20 @@ public final class Paragraph implements Widget {
     private Paragraph(Builder builder) {
         this.text = builder.text;
         this.block = builder.block;
-        this.style = builder.style;
-        this.alignment = builder.alignment;
-        this.overflow = builder.overflow;
+        this.alignment = builder.alignment.resolve();
+        this.overflow = builder.overflow.resolve();
         this.scroll = builder.scroll;
+
+        Color resolvedBackground = builder.background.resolve();
+        Color resolvedForeground = builder.foreground.resolve();
+        Style baseStyle = builder.style;
+        if (resolvedBackground != null) {
+            baseStyle = baseStyle.bg(resolvedBackground);
+        }
+        if (resolvedForeground != null) {
+            baseStyle = baseStyle.fg(resolvedForeground);
+        }
+        this.style = baseStyle;
     }
 
     public static Builder builder() {
@@ -339,9 +364,18 @@ public final class Paragraph implements Widget {
         private Text text = Text.empty();
         private Block block;
         private Style style = Style.EMPTY;
-        private Alignment alignment = Alignment.LEFT;
-        private Overflow overflow = Overflow.CLIP;
         private int scroll = 0;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Alignment> alignment =
+                StyledProperty.of(StandardPropertyKeys.TEXT_ALIGN, Alignment.LEFT, () -> styleResolver);
+        private final StyledProperty<Overflow> overflow =
+                StyledProperty.of(TEXT_OVERFLOW, Overflow.CLIP, () -> styleResolver);
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> foreground =
+                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -366,7 +400,7 @@ public final class Paragraph implements Widget {
         }
 
         public Builder alignment(Alignment alignment) {
-            this.alignment = alignment;
+            this.alignment.set(alignment);
             return this;
         }
 
@@ -383,12 +417,48 @@ public final class Paragraph implements Widget {
         }
 
         public Builder overflow(Overflow overflow) {
-            this.overflow = overflow;
+            this.overflow.set(overflow);
+            return this;
+        }
+
+        /**
+         * Sets the background color.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the foreground (text) color.
+         *
+         * @param color the foreground color
+         * @return this builder
+         */
+        public Builder foreground(Color color) {
+            this.foreground.set(color);
             return this;
         }
 
         public Builder scroll(int scroll) {
             this.scroll = Math.max(0, scroll);
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code text-overflow} and {@code text-align}
+         * will fall back to resolved values if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 

@@ -6,7 +6,11 @@ package dev.tamboui.widgets.sparkline;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
@@ -237,7 +241,15 @@ public final class Sparkline implements Widget {
         this.block = builder.block;
         this.barSet = builder.barSet;
         this.direction = builder.direction;
-        this.style = builder.style;
+
+        // Resolve style-aware properties
+        Color resolvedFg = builder.foreground.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedFg != null) {
+            baseStyle = baseStyle.fg(resolvedFg);
+        }
+        this.style = baseStyle;
     }
 
     /**
@@ -333,7 +345,12 @@ public final class Sparkline implements Widget {
         private Block block;
         private BarSet barSet = BarSet.NINE_LEVELS;
         private RenderDirection direction = RenderDirection.LEFT_TO_RIGHT;
-        private Style style;
+        private Style style = Style.EMPTY;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> foreground =
+                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -418,7 +435,34 @@ public final class Sparkline implements Widget {
          * Sets the style for the sparkline bars.
          */
         public Builder style(Style style) {
-            this.style = style;
+            this.style = style != null ? style : Style.EMPTY;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code color} will be resolved
+         * if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the foreground (bar) color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the foreground color
+         * @return this builder
+         */
+        public Builder foreground(Color color) {
+            this.foreground.set(color);
             return this;
         }
 

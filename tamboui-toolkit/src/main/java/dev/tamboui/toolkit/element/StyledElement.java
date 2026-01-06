@@ -5,7 +5,7 @@
 package dev.tamboui.toolkit.element;
 
 import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.ResolvedStyle;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.toolkit.event.DragHandler;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.KeyEventHandler;
@@ -190,7 +190,7 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      * @return the effective style combining CSS and inline styles
      */
     private Style resolveEffectiveStyle(RenderContext context) {
-        Optional<ResolvedStyle> cssStyle = context.resolveStyle(this);
+        Optional<CssStyleResolver> cssStyle = context.resolveStyle(this);
         // CSS provides base, inline style overrides
         return cssStyle.map(resolvedStyle -> resolvedStyle.toStyle().patch(style)).orElseGet(() -> style);
     }

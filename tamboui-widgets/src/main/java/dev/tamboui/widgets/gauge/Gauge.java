@@ -7,7 +7,13 @@ package dev.tamboui.widgets.gauge;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
@@ -45,6 +51,14 @@ public final class Gauge implements Widget {
         "█"   // 8/8 - full
     };
 
+    /**
+     * Property key for the gauge (filled portion) color.
+     * <p>
+     * CSS property name: {@code gauge-color}
+     */
+    public static final PropertyKey<Color> GAUGE_COLOR =
+            PropertyKey.of("gauge-color", ColorConverter.INSTANCE);
+
     private final double ratio;
     private final Line label;
     private final Block block;
@@ -56,9 +70,23 @@ public final class Gauge implements Widget {
         this.ratio = builder.ratio;
         this.label = builder.label;
         this.block = builder.block;
-        this.style = builder.style;
-        this.gaugeStyle = builder.gaugeStyle;
         this.useUnicode = builder.useUnicode;
+
+        // Resolve style-aware properties
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedGaugeColor = builder.gaugeColor.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle.bg(resolvedBg);
+        }
+        this.style = baseStyle;
+
+        Style baseGaugeStyle = builder.gaugeStyle;
+        if (resolvedGaugeColor != null) {
+            baseGaugeStyle = baseGaugeStyle.fg(resolvedGaugeColor);
+        }
+        this.gaugeStyle = baseGaugeStyle;
     }
 
     public static Builder builder() {
@@ -165,6 +193,13 @@ public final class Gauge implements Widget {
         private Style style = Style.EMPTY;
         private Style gaugeStyle = Style.EMPTY;
         private boolean useUnicode = true;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> gaugeColor =
+                StyledProperty.of(GAUGE_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -249,6 +284,46 @@ public final class Gauge implements Widget {
          */
         public Builder useUnicode(boolean useUnicode) {
             this.useUnicode = useUnicode;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code gauge-color} and {@code background}
+         * will be resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the gauge (filled portion) color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the gauge color
+         * @return this builder
+         */
+        public Builder gaugeColor(Color color) {
+            this.gaugeColor.set(color);
             return this;
         }
 

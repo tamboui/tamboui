@@ -6,7 +6,7 @@ package dev.tamboui.toolkit.element;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.ResolvedStyle;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -85,7 +85,7 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     @Override
-    public Optional<ResolvedStyle> resolveStyle(Styleable element) {
+    public Optional<CssStyleResolver> resolveStyle(Styleable element) {
         if (styleEngine == null) {
             return Optional.empty();
         }
@@ -102,12 +102,12 @@ public final class DefaultRenderContext implements RenderContext {
         // Build ancestor chain
         List<Styleable> ancestors = buildAncestorChain(element);
 
-        ResolvedStyle resolved = styleEngine.resolve(element, state, ancestors);
+        CssStyleResolver resolved = styleEngine.resolve(element, state, ancestors);
         return resolved.hasProperties() ? Optional.of(resolved) : Optional.empty();
     }
 
     @Override
-    public Optional<ResolvedStyle> resolveStyle(String styleType, String... cssClasses) {
+    public Optional<CssStyleResolver> resolveStyle(String styleType, String... cssClasses) {
         if (styleEngine == null) {
             return Optional.empty();
         }
@@ -116,7 +116,7 @@ public final class DefaultRenderContext implements RenderContext {
                 ? new HashSet<>(Arrays.asList(cssClasses))
                 : Collections.emptySet();
         Styleable virtual = new VirtualStyleable(styleType, classes);
-        ResolvedStyle resolved = styleEngine.resolve(virtual, PseudoClassState.NONE, Collections.emptyList());
+        CssStyleResolver resolved = styleEngine.resolve(virtual, PseudoClassState.NONE, Collections.emptyList());
         return resolved.hasProperties() ? Optional.of(resolved) : Optional.empty();
     }
 
@@ -180,7 +180,7 @@ public final class DefaultRenderContext implements RenderContext {
         List<Styleable> ancestors = buildAncestorChain(parent);
         ancestors.add(parent);
 
-        ResolvedStyle resolved = styleEngine.resolve(virtual, state, ancestors);
+        CssStyleResolver resolved = styleEngine.resolve(virtual, state, ancestors);
         return resolved.hasProperties()
             ? currentStyle().patch(resolved.toStyle())
             : currentStyle();

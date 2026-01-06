@@ -6,7 +6,7 @@ package dev.tamboui.css.integration;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.ResolvedStyle;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Color;
@@ -55,7 +55,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Universal selector (*) - provides white foreground on black background")
         void universalSelector_providesWhiteOnBlack() {
             Styleable element = createStyleable("TextElement", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: white, background: black
@@ -70,7 +70,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel - black background and dark-gray border from Panel rule")
         void panel_hasBlackBackgroundAndBorder() {
             Styleable panel = createStyleable("Panel", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(panel);
+            CssStyleResolver resolved = styleEngine.resolve(panel);
             Style style = resolved.toStyle();
 
             // Expected: background: black (from Panel rule)
@@ -90,7 +90,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel - has padding: 1")
         void panel_hasPadding() {
             Styleable panel = createStyleable("Panel", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(panel);
+            CssStyleResolver resolved = styleEngine.resolve(panel);
 
             // Expected: padding: 1
             assertThat(resolved.padding()).isPresent();
@@ -101,7 +101,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".header - has text-align: center")
         void headerClass_hasCenterAlignment() {
             Styleable element = createStyleable("TextElement", null, setOf("header"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
 
             // Expected: text-align: center
             assertThat(resolved.alignment()).isPresent();
@@ -112,7 +112,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel:focus - has bold text-style")
         void panelFocus_hasBoldModifier() {
             Styleable panel = createStyleable("Panel", "my-panel", Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(), Collections.emptyList());
+            CssStyleResolver resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(), Collections.emptyList());
 
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
@@ -122,7 +122,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".status - dark gray background (#333333) with gray border (#666666)")
         void statusClass_hasDarkGrayBackgroundAndBorder() {
             Styleable element = createStyleable("Panel", null, setOf("status"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: background: #333333
@@ -146,7 +146,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".header - cyan foreground with bold text-style")
         void headerClass_hasCyanBold() {
             Styleable element = createStyleable("TextElement", null, setOf("header"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: cyan (from $accent variable)
@@ -165,7 +165,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".primary - cyan foreground with bold")
         void primaryClass_hasCyanBold() {
             Styleable element = createStyleable("TextElement", null, setOf("primary"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: cyan
@@ -180,7 +180,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".secondary - dark-gray foreground")
         void secondaryClass_hasDarkGray() {
             Styleable element = createStyleable("TextElement", null, setOf("secondary"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: dark-gray
@@ -192,7 +192,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".warning - light-yellow foreground")
         void warningClass_hasLightYellow() {
             Styleable element = createStyleable("TextElement", null, setOf("warning"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: light-yellow
@@ -204,7 +204,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".error - light-red bold foreground")
         void errorClass_hasLightRedBold() {
             Styleable element = createStyleable("TextElement", null, setOf("error"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: light-red, text-style: bold
@@ -217,7 +217,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".success - light-green foreground")
         void successClass_hasLightGreen() {
             Styleable element = createStyleable("TextElement", null, setOf("success"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: light-green
@@ -229,7 +229,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".info - light-cyan foreground")
         void infoClass_hasLightCyan() {
             Styleable element = createStyleable("TextElement", null, setOf("info"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: light-cyan
@@ -241,7 +241,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".dim - has dim text-style")
         void dimClass_hasDimModifier() {
             Styleable element = createStyleable("TextElement", null, setOf("dim"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
 
             // Expected: text-style: dim
             assertThat(resolved.modifiers()).contains(Modifier.DIM);
@@ -251,7 +251,7 @@ class CssDemoIntegrationTest {
         @DisplayName("#theme-indicator - cyan bold")
         void themeIndicatorId_hasCyanBold() {
             Styleable element = createStyleable("TextElement", "theme-indicator", Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: cyan, text-style: bold
@@ -264,7 +264,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Row - inherits white on black from *")
         void row_inheritsFromUniversal() {
             Styleable row = createStyleable("Row", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(row);
+            CssStyleResolver resolved = styleEngine.resolve(row);
             Style style = resolved.toStyle();
 
             assertThat(style.fg()).isPresent();
@@ -277,7 +277,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Column - inherits white on black from *")
         void column_inheritsFromUniversal() {
             Styleable column = createStyleable("Column", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(column);
+            CssStyleResolver resolved = styleEngine.resolve(column);
             Style style = resolved.toStyle();
 
             assertThat(style.fg()).isPresent();
@@ -304,7 +304,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Universal selector (*) - provides black foreground on #eeeeee background")
         void universalSelector_providesBlackOnLightGray() {
             Styleable element = createStyleable("TextElement", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: black
@@ -324,7 +324,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel - #eeeeee background and gray border from Panel rule")
         void panel_hasLightGrayBackgroundAndBorder() {
             Styleable panel = createStyleable("Panel", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(panel);
+            CssStyleResolver resolved = styleEngine.resolve(panel);
             Style style = resolved.toStyle();
 
             // Expected: background: #eeeeee (from $bg-primary variable)
@@ -344,7 +344,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel - has padding: 1")
         void panel_hasPadding() {
             Styleable panel = createStyleable("Panel", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(panel);
+            CssStyleResolver resolved = styleEngine.resolve(panel);
 
             // Expected: padding: 1
             assertThat(resolved.padding()).isPresent();
@@ -355,7 +355,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".header - has text-align: center")
         void headerClass_hasCenterAlignment() {
             Styleable element = createStyleable("TextElement", null, setOf("header"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
 
             // Expected: text-align: center
             assertThat(resolved.alignment()).isPresent();
@@ -366,7 +366,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel:focus - has bold text-style")
         void panelFocus_hasBoldModifier() {
             Styleable panel = createStyleable("Panel", "my-panel", Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(), Collections.emptyList());
+            CssStyleResolver resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(), Collections.emptyList());
 
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
@@ -376,7 +376,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".status - #c8c8c8 background with #888888 border")
         void statusClass_hasGrayBackgroundAndBorder() {
             Styleable element = createStyleable("Panel", null, setOf("status"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: background: #cccccc
@@ -400,7 +400,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".header - blue foreground with bold text-style")
         void headerClass_hasBlueBold() {
             Styleable element = createStyleable("TextElement", null, setOf("header"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: blue (from $accent variable)
@@ -415,7 +415,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".primary - blue foreground with bold")
         void primaryClass_hasBlueBold() {
             Styleable element = createStyleable("TextElement", null, setOf("primary"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: blue
@@ -430,7 +430,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".secondary - gray foreground")
         void secondaryClass_hasGray() {
             Styleable element = createStyleable("TextElement", null, setOf("secondary"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: gray
@@ -442,7 +442,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".warning - yellow foreground")
         void warningClass_hasYellow() {
             Styleable element = createStyleable("TextElement", null, setOf("warning"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: yellow
@@ -454,7 +454,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".error - red bold foreground")
         void errorClass_hasRedBold() {
             Styleable element = createStyleable("TextElement", null, setOf("error"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: red, text-style: bold
@@ -467,7 +467,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".success - green foreground")
         void successClass_hasGreen() {
             Styleable element = createStyleable("TextElement", null, setOf("success"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: green
@@ -479,7 +479,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".info - cyan foreground")
         void infoClass_hasCyan() {
             Styleable element = createStyleable("TextElement", null, setOf("info"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: cyan
@@ -491,7 +491,7 @@ class CssDemoIntegrationTest {
         @DisplayName(".dim - has dim text-style")
         void dimClass_hasDimModifier() {
             Styleable element = createStyleable("TextElement", null, setOf("dim"));
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
 
             // Expected: text-style: dim
             assertThat(resolved.modifiers()).contains(Modifier.DIM);
@@ -501,7 +501,7 @@ class CssDemoIntegrationTest {
         @DisplayName("#theme-indicator - blue bold")
         void themeIndicatorId_hasBlueBold() {
             Styleable element = createStyleable("TextElement", "theme-indicator", Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(element);
+            CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
             // Expected: color: blue, text-style: bold
@@ -514,7 +514,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Row - inherits black on #eeeeee from *")
         void row_inheritsFromUniversal() {
             Styleable row = createStyleable("Row", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(row);
+            CssStyleResolver resolved = styleEngine.resolve(row);
             Style style = resolved.toStyle();
 
             assertThat(style.fg()).isPresent();
@@ -527,7 +527,7 @@ class CssDemoIntegrationTest {
         @DisplayName("Column - inherits black on #eeeeee from *")
         void column_inheritsFromUniversal() {
             Styleable column = createStyleable("Column", null, Collections.emptySet());
-            ResolvedStyle resolved = styleEngine.resolve(column);
+            CssStyleResolver resolved = styleEngine.resolve(column);
             Style style = resolved.toStyle();
 
             assertThat(style.fg()).isPresent();
@@ -574,12 +574,12 @@ class CssDemoIntegrationTest {
 
             // Dark theme
             styleEngine.setActiveStylesheet("dark");
-            ResolvedStyle darkResolved = styleEngine.resolve(status);
+            CssStyleResolver darkResolved = styleEngine.resolve(status);
             Style darkStyle = darkResolved.toStyle();
 
             // Light theme
             styleEngine.setActiveStylesheet("light");
-            ResolvedStyle lightResolved = styleEngine.resolve(status);
+            CssStyleResolver lightResolved = styleEngine.resolve(status);
             Style lightStyle = lightResolved.toStyle();
 
             // Dark: #333333 background, #666666 border
@@ -616,13 +616,13 @@ class CssDemoIntegrationTest {
 
             // Dark theme: border-color should be dark-gray
             styleEngine.setActiveStylesheet("dark");
-            ResolvedStyle darkResolved = styleEngine.resolve(panel);
+            CssStyleResolver darkResolved = styleEngine.resolve(panel);
             assertThat(darkResolved.getProperty("border-color")).isPresent();
             assertThat(darkResolved.getProperty("border-color").get()).isEqualTo("dark-gray");
 
             // Light theme: border-color should be #888888
             styleEngine.setActiveStylesheet("light");
-            ResolvedStyle lightResolved = styleEngine.resolve(panel);
+            CssStyleResolver lightResolved = styleEngine.resolve(panel);
             assertThat(lightResolved.getProperty("border-color")).isPresent();
             assertThat(lightResolved.getProperty("border-color").get()).isEqualTo("#888888");
         }

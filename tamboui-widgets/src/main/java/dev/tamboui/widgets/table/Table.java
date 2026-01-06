@@ -8,7 +8,13 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Text;
 import dev.tamboui.text.Span;
@@ -19,6 +25,7 @@ import static dev.tamboui.util.CollectionUtil.listCopyOf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * A table widget for displaying data in rows and columns.
@@ -49,6 +56,14 @@ import java.util.List;
  */
 public final class Table implements StatefulWidget<TableState> {
 
+    /**
+     * Property key for the row highlight (selection) color.
+     * <p>
+     * CSS property name: {@code highlight-color}
+     */
+    public static final PropertyKey<Color> HIGHLIGHT_COLOR =
+            PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
+
     private final List<Row> rows;
     private final List<Constraint> widths;
     private final Row header;
@@ -61,16 +76,47 @@ public final class Table implements StatefulWidget<TableState> {
     private final HighlightSpacing highlightSpacing;
 
     private Table(Builder builder) {
-        this.rows = listCopyOf(builder.rows);
         this.widths = listCopyOf(builder.widths);
         this.header = builder.header;
         this.footer = builder.footer;
         this.block = builder.block;
-        this.style = builder.style;
-        this.rowHighlightStyle = builder.rowHighlightStyle;
         this.highlightSymbol = builder.highlightSymbol;
         this.columnSpacing = builder.columnSpacing;
         this.highlightSpacing = builder.highlightSpacing;
+
+        // Resolve style-aware properties
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedHighlightColor = builder.highlightColor.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle.bg(resolvedBg);
+        }
+        this.style = baseStyle;
+
+        Style baseHighlightStyle = builder.rowHighlightStyle;
+        if (resolvedHighlightColor != null) {
+            baseHighlightStyle = baseHighlightStyle.bg(resolvedHighlightColor);
+        }
+        this.rowHighlightStyle = baseHighlightStyle;
+
+        // Apply row style resolver if provided
+        if (builder.rowStyleResolver != null) {
+            List<Row> styledRows = new ArrayList<>(builder.rows.size());
+            int total = builder.rows.size();
+            for (int i = 0; i < total; i++) {
+                Row row = builder.rows.get(i);
+                Style rowStyle = builder.rowStyleResolver.apply(i, total);
+                if (rowStyle != null && !rowStyle.equals(Style.EMPTY)) {
+                    styledRows.add(row.style(row.style().patch(rowStyle)));
+                } else {
+                    styledRows.add(row);
+                }
+            }
+            this.rows = listCopyOf(styledRows);
+        } else {
+            this.rows = listCopyOf(builder.rows);
+        }
     }
 
     public static Builder builder() {
@@ -278,6 +324,14 @@ public final class Table implements StatefulWidget<TableState> {
         private String highlightSymbol = ">> ";
         private int columnSpacing = 1;
         private HighlightSpacing highlightSpacing = HighlightSpacing.WHEN_SELECTED;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+        private BiFunction<Integer, Integer, Style> rowStyleResolver;
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> highlightColor =
+                StyledProperty.of(HIGHLIGHT_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -384,6 +438,61 @@ public final class Table implements StatefulWidget<TableState> {
          */
         public Builder highlightSpacing(HighlightSpacing spacing) {
             this.highlightSpacing = spacing;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code background} and {@code highlight-color}
+         * will be resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the row highlight (selection) color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the highlight color
+         * @return this builder
+         */
+        public Builder highlightColor(Color color) {
+            this.highlightColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets a function to resolve styles for each row based on position.
+         * <p>
+         * The function receives the row index (0-based) and total row count,
+         * and returns a Style to apply to that row. This enables positional
+         * styling like alternating row colors.
+         *
+         * @param resolver function that takes (index, totalCount) and returns a Style
+         * @return this builder
+         */
+        public Builder rowStyleResolver(BiFunction<Integer, Integer, Style> resolver) {
+            this.rowStyleResolver = resolver;
             return this;
         }
 

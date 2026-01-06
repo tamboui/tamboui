@@ -7,7 +7,13 @@ package dev.tamboui.widgets.barchart;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
@@ -45,6 +51,30 @@ import java.util.List;
  * @see BarGroup
  */
 public final class BarChart implements Widget {
+
+    /**
+     * Property key for the default bar color.
+     * <p>
+     * CSS property name: {@code bar-color}
+     */
+    public static final PropertyKey<Color> BAR_COLOR =
+            PropertyKey.of("bar-color", ColorConverter.INSTANCE);
+
+    /**
+     * Property key for the value label color.
+     * <p>
+     * CSS property name: {@code value-color}
+     */
+    public static final PropertyKey<Color> VALUE_COLOR =
+            PropertyKey.of("value-color", ColorConverter.INSTANCE);
+
+    /**
+     * Property key for the bar label color.
+     * <p>
+     * CSS property name: {@code label-color}
+     */
+    public static final PropertyKey<Color> LABEL_COLOR =
+            PropertyKey.of("label-color", ColorConverter.INSTANCE);
 
     /**
      * Symbol set for rendering bar fills.
@@ -211,12 +241,46 @@ public final class BarChart implements Widget {
         this.barGap = builder.barGap;
         this.groupGap = builder.groupGap;
         this.direction = builder.direction;
-        this.style = builder.style;
-        this.barStyle = builder.barStyle;
-        this.valueStyle = builder.valueStyle;
-        this.labelStyle = builder.labelStyle;
         this.block = builder.block;
         this.barSet = builder.barSet;
+
+        // Resolve style-aware properties
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedBarColor = builder.barColor.resolve();
+        Color resolvedValueColor = builder.valueColor.resolve();
+        Color resolvedLabelColor = builder.labelColor.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle != null
+                    ? baseStyle.bg(resolvedBg)
+                    : Style.EMPTY.bg(resolvedBg);
+        }
+        this.style = baseStyle;
+
+        Style baseBarStyle = builder.barStyle;
+        if (resolvedBarColor != null) {
+            baseBarStyle = baseBarStyle != null
+                    ? baseBarStyle.fg(resolvedBarColor)
+                    : Style.EMPTY.fg(resolvedBarColor);
+        }
+        this.barStyle = baseBarStyle;
+
+        Style baseValueStyle = builder.valueStyle;
+        if (resolvedValueColor != null) {
+            baseValueStyle = baseValueStyle != null
+                    ? baseValueStyle.fg(resolvedValueColor)
+                    : Style.EMPTY.fg(resolvedValueColor);
+        }
+        this.valueStyle = baseValueStyle;
+
+        Style baseLabelStyle = builder.labelStyle;
+        if (resolvedLabelColor != null) {
+            baseLabelStyle = baseLabelStyle != null
+                    ? baseLabelStyle.fg(resolvedLabelColor)
+                    : Style.EMPTY.fg(resolvedLabelColor);
+        }
+        this.labelStyle = baseLabelStyle;
     }
 
     /**
@@ -468,6 +532,17 @@ public final class BarChart implements Widget {
         private Style labelStyle;
         private Block block;
         private BarSet barSet = BarSet.NINE_LEVELS;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> barColor =
+                StyledProperty.of(BAR_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> valueColor =
+                StyledProperty.of(VALUE_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> labelColor =
+                StyledProperty.of(LABEL_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -594,6 +669,73 @@ public final class BarChart implements Widget {
          */
         public Builder barSet(BarSet barSet) {
             this.barSet = barSet != null ? barSet : BarSet.NINE_LEVELS;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code background}, {@code bar-color},
+         * {@code value-color}, and {@code label-color} will be resolved
+         * if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the default bar color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the bar color
+         * @return this builder
+         */
+        public Builder barColor(Color color) {
+            this.barColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the value label color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the value color
+         * @return this builder
+         */
+        public Builder valueColor(Color color) {
+            this.valueColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the bar label color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the label color
+         * @return this builder
+         */
+        public Builder labelColor(Color color) {
+            this.labelColor.set(color);
             return this;
         }
 

@@ -25,7 +25,7 @@ import java.util.Set;
 public final class PropertyRegistry {
 
     private final Map<String, PropertyConverter<?>> converters;
-    private final ColorConverter colorConverter;
+    private final dev.tamboui.style.ColorConverter coreColorConverter;
     private final ModifierConverter modifierConverter;
     private final SpacingConverter spacingConverter;
     private final AlignmentConverter alignmentConverter;
@@ -34,18 +34,22 @@ public final class PropertyRegistry {
 
     private PropertyRegistry() {
         this.converters = new HashMap<>();
-        this.colorConverter = new ColorConverter();
+        this.coreColorConverter = dev.tamboui.style.ColorConverter.INSTANCE;
         this.modifierConverter = new ModifierConverter();
         this.spacingConverter = new SpacingConverter();
         this.alignmentConverter = new AlignmentConverter();
         this.borderTypeConverter = new BorderTypeConverter();
         this.widthConverter = new WidthConverter();
 
-        // Register default converters
-        converters.put("color", colorConverter);
-        converters.put("background", colorConverter);
-        converters.put("background-color", colorConverter);
-        converters.put("border-color", colorConverter);
+        // Register default converters - create adapter for core color converter
+        PropertyConverter<Color> colorAdapter = (value, variables) -> {
+            String resolved = PropertyConverter.resolveVariables(value, variables);
+            return coreColorConverter.convert(resolved);
+        };
+        converters.put("color", colorAdapter);
+        converters.put("background", colorAdapter);
+        converters.put("background-color", colorAdapter);
+        converters.put("border-color", colorAdapter);
         converters.put("text-style", modifierConverter);
         converters.put("padding", spacingConverter);
         converters.put("text-align", alignmentConverter);
@@ -70,7 +74,8 @@ public final class PropertyRegistry {
      * @return the converted color, or empty if conversion fails
      */
     public Optional<Color> convertColor(String value, Map<String, String> variables) {
-        return colorConverter.convert(value, variables);
+        String resolved = PropertyConverter.resolveVariables(value, variables);
+        return coreColorConverter.convert(resolved);
     }
 
     /**

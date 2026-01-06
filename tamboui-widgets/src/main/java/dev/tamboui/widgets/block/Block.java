@@ -7,7 +7,12 @@ package dev.tamboui.widgets.block;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
@@ -19,8 +24,17 @@ import java.util.List;
 
 /**
  * A block is a container widget with optional borders and titles.
+ * <p>
+ * Supports style-aware properties: {@code border-type}, {@code border-color},
+ * {@code background}, and {@code color}.
  */
 public final class Block implements Widget {
+
+    /**
+     * Property key for border-type property.
+     */
+    public static final PropertyKey<BorderType> BORDER_TYPE =
+            PropertyKey.of("border-type", BorderTypeConverter.INSTANCE);
 
     private final Title title;
     private final Title titleBottom;
@@ -35,11 +49,27 @@ public final class Block implements Widget {
         this.title = builder.title;
         this.titleBottom = builder.titleBottom;
         this.borders = builder.borders;
-        this.borderType = builder.borderType;
-        this.borderStyle = builder.borderStyle;
-        this.style = builder.style;
+        this.borderType = builder.borderType.resolve();
         this.padding = builder.padding;
         this.mergeStrategy = builder.mergeStrategy;
+
+        Color resolvedBorderColor = builder.borderColor.resolve();
+        if (resolvedBorderColor != null) {
+            this.borderStyle = builder.borderStyle.fg(resolvedBorderColor);
+        } else {
+            this.borderStyle = builder.borderStyle;
+        }
+
+        Color resolvedBackground = builder.background.resolve();
+        Color resolvedForeground = builder.foreground.resolve();
+        Style baseStyle = builder.style;
+        if (resolvedBackground != null) {
+            baseStyle = baseStyle.bg(resolvedBackground);
+        }
+        if (resolvedForeground != null) {
+            baseStyle = baseStyle.fg(resolvedForeground);
+        }
+        this.style = baseStyle;
     }
 
     public static Builder builder() {
@@ -388,11 +418,21 @@ public final class Block implements Widget {
         private Title title;
         private Title titleBottom;
         private EnumSet<Borders> borders = Borders.NONE;
-        private BorderType borderType = BorderType.PLAIN;
         private Style borderStyle = Style.EMPTY;
         private Style style = Style.EMPTY;
         private Padding padding = Padding.NONE;
         private MergeStrategy mergeStrategy = MergeStrategy.REPLACE;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<BorderType> borderType =
+                StyledProperty.of(BORDER_TYPE, BorderType.PLAIN, () -> styleResolver);
+        private final StyledProperty<Color> borderColor =
+                StyledProperty.of(StandardPropertyKeys.BORDER_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> foreground =
+                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -422,12 +462,59 @@ public final class Block implements Widget {
         }
 
         public Builder borderType(BorderType borderType) {
-            this.borderType = borderType;
+            this.borderType.set(borderType);
+            return this;
+        }
+
+        /**
+         * Sets the border color.
+         *
+         * @param color the border color
+         * @return this builder
+         */
+        public Builder borderColor(Color color) {
+            this.borderColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the background color.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the foreground (text) color.
+         *
+         * @param color the foreground color
+         * @return this builder
+         */
+        public Builder foreground(Color color) {
+            this.foreground.set(color);
             return this;
         }
 
         public Builder borderStyle(Style borderStyle) {
             this.borderStyle = borderStyle;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code border-type} and {@code border-color}
+         * will fall back to resolved values if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 

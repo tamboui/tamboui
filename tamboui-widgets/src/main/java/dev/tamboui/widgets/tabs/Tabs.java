@@ -6,7 +6,13 @@ package dev.tamboui.widgets.tabs;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.StatefulWidget;
@@ -37,6 +43,14 @@ import java.util.List;
  */
 public final class Tabs implements StatefulWidget<TabsState> {
 
+    /**
+     * Property key for the selected tab highlight color.
+     * <p>
+     * CSS property name: {@code highlight-color}
+     */
+    public static final PropertyKey<Color> HIGHLIGHT_COLOR =
+            PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
+
     private final List<Line> titles;
     private final Block block;
     private final Style style;
@@ -48,11 +62,25 @@ public final class Tabs implements StatefulWidget<TabsState> {
     private Tabs(Builder builder) {
         this.titles = listCopyOf(builder.titles);
         this.block = builder.block;
-        this.style = builder.style;
-        this.highlightStyle = builder.highlightStyle;
         this.divider = builder.divider;
         this.paddingLeft = builder.paddingLeft;
         this.paddingRight = builder.paddingRight;
+
+        // Resolve style-aware properties
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedHighlightColor = builder.highlightColor.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle.bg(resolvedBg);
+        }
+        this.style = baseStyle;
+
+        Style baseHighlightStyle = builder.highlightStyle;
+        if (resolvedHighlightColor != null) {
+            baseHighlightStyle = baseHighlightStyle.fg(resolvedHighlightColor);
+        }
+        this.highlightStyle = baseHighlightStyle;
     }
 
     public static Builder builder() {
@@ -173,6 +201,13 @@ public final class Tabs implements StatefulWidget<TabsState> {
         private Span divider = Span.raw(" | ");
         private String paddingLeft = "";
         private String paddingRight = "";
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> highlightColor =
+                StyledProperty.of(HIGHLIGHT_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -281,6 +316,46 @@ public final class Tabs implements StatefulWidget<TabsState> {
          */
         public Builder paddingRight(String padding) {
             this.paddingRight = padding;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code background} and {@code highlight-color}
+         * will be resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the selected tab highlight color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the highlight color
+         * @return this builder
+         */
+        public Builder highlightColor(Color color) {
+            this.highlightColor.set(color);
             return this;
         }
 

@@ -8,7 +8,13 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
@@ -18,6 +24,22 @@ import dev.tamboui.widgets.block.Block;
  */
 public final class TextInput implements StatefulWidget<TextInputState> {
 
+    /**
+     * Property key for the cursor color.
+     * <p>
+     * CSS property name: {@code cursor-color}
+     */
+    public static final PropertyKey<Color> CURSOR_COLOR =
+            PropertyKey.of("cursor-color", ColorConverter.INSTANCE);
+
+    /**
+     * Property key for the placeholder text color.
+     * <p>
+     * CSS property name: {@code placeholder-color}
+     */
+    public static final PropertyKey<Color> PLACEHOLDER_COLOR =
+            PropertyKey.of("placeholder-color", ColorConverter.INSTANCE);
+
     private final Block block;
     private final Style style;
     private final Style cursorStyle;
@@ -26,10 +48,34 @@ public final class TextInput implements StatefulWidget<TextInputState> {
 
     private TextInput(Builder builder) {
         this.block = builder.block;
-        this.style = builder.style;
-        this.cursorStyle = builder.cursorStyle;
         this.placeholder = builder.placeholder;
-        this.placeholderStyle = builder.placeholderStyle;
+
+        // Resolve style-aware properties
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedFg = builder.foreground.resolve();
+        Color resolvedCursorColor = builder.cursorColor.resolve();
+        Color resolvedPlaceholderColor = builder.placeholderColor.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle.bg(resolvedBg);
+        }
+        if (resolvedFg != null) {
+            baseStyle = baseStyle.fg(resolvedFg);
+        }
+        this.style = baseStyle;
+
+        Style baseCursorStyle = builder.cursorStyle;
+        if (resolvedCursorColor != null) {
+            baseCursorStyle = baseCursorStyle.bg(resolvedCursorColor);
+        }
+        this.cursorStyle = baseCursorStyle;
+
+        Style basePlaceholderStyle = builder.placeholderStyle;
+        if (resolvedPlaceholderColor != null) {
+            basePlaceholderStyle = basePlaceholderStyle.fg(resolvedPlaceholderColor);
+        }
+        this.placeholderStyle = basePlaceholderStyle;
     }
 
     public static Builder builder() {
@@ -123,6 +169,17 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         private Style cursorStyle = Style.EMPTY.reversed();
         private String placeholder = "";
         private Style placeholderStyle = Style.EMPTY.dim();
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> foreground =
+                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> cursorColor =
+                StyledProperty.of(CURSOR_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> placeholderColor =
+                StyledProperty.of(PLACEHOLDER_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -148,6 +205,73 @@ public final class TextInput implements StatefulWidget<TextInputState> {
 
         public Builder placeholderStyle(Style placeholderStyle) {
             this.placeholderStyle = placeholderStyle;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code color}, {@code background},
+         * {@code cursor-color}, and {@code placeholder-color} will be
+         * resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the foreground (text) color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the foreground color
+         * @return this builder
+         */
+        public Builder foreground(Color color) {
+            this.foreground.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the cursor color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the cursor color
+         * @return this builder
+         */
+        public Builder cursorColor(Color color) {
+            this.cursorColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the placeholder text color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the placeholder color
+         * @return this builder
+         */
+        public Builder placeholderColor(Color color) {
+            this.placeholderColor.set(color);
             return this;
         }
 

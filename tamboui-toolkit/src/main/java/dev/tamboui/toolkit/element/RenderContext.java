@@ -5,7 +5,7 @@
 package dev.tamboui.toolkit.element;
 
 import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.ResolvedStyle;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
@@ -43,7 +43,7 @@ public interface RenderContext {
      * @param element the element to resolve styles for
      * @return the resolved style, or empty if no CSS is applicable
      */
-    default Optional<ResolvedStyle> resolveStyle(Styleable element) {
+    default Optional<CssStyleResolver> resolveStyle(Styleable element) {
         return Optional.empty();
     }
 
@@ -57,7 +57,7 @@ public interface RenderContext {
      * @param cssClasses the CSS classes to apply
      * @return the resolved style, or empty if no CSS is applicable
      */
-    default Optional<ResolvedStyle> resolveStyle(String styleType, String... cssClasses) {
+    default Optional<CssStyleResolver> resolveStyle(String styleType, String... cssClasses) {
         return Optional.empty();
     }
 

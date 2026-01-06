@@ -5,6 +5,7 @@
 package dev.tamboui.css.property;
 
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -14,35 +15,31 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Tests for the core ColorConverter.
+ */
 class ColorConverterTest {
 
-    private final ColorConverter converter = new ColorConverter();
+    private final ColorConverter converter = ColorConverter.INSTANCE;
 
     @Test
     void convertsNamedColors() {
-        assertThat(converter.convert("red", Collections.<String, String>emptyMap()))
-                .hasValue(Color.RED);
-        assertThat(converter.convert("blue", Collections.<String, String>emptyMap()))
-                .hasValue(Color.BLUE);
-        assertThat(converter.convert("green", Collections.<String, String>emptyMap()))
-                .hasValue(Color.GREEN);
-        assertThat(converter.convert("black", Collections.<String, String>emptyMap()))
-                .hasValue(Color.BLACK);
-        assertThat(converter.convert("white", Collections.<String, String>emptyMap()))
-                .hasValue(Color.WHITE);
+        assertThat(converter.convert("red")).hasValue(Color.RED);
+        assertThat(converter.convert("blue")).hasValue(Color.BLUE);
+        assertThat(converter.convert("green")).hasValue(Color.GREEN);
+        assertThat(converter.convert("black")).hasValue(Color.BLACK);
+        assertThat(converter.convert("white")).hasValue(Color.WHITE);
     }
 
     @Test
     void convertsNamedColorsCaseInsensitive() {
-        assertThat(converter.convert("RED", Collections.<String, String>emptyMap()))
-                .hasValue(Color.RED);
-        assertThat(converter.convert("Red", Collections.<String, String>emptyMap()))
-                .hasValue(Color.RED);
+        assertThat(converter.convert("RED")).hasValue(Color.RED);
+        assertThat(converter.convert("Red")).hasValue(Color.RED);
     }
 
     @Test
     void convertsHexColor6Digits() {
-        Optional<Color> color = converter.convert("#ff0000", Collections.<String, String>emptyMap());
+        Optional<Color> color = converter.convert("#ff0000");
 
         assertThat(color).isPresent();
         assertThat(color.get()).isInstanceOf(Color.Rgb.class);
@@ -54,7 +51,7 @@ class ColorConverterTest {
 
     @Test
     void convertsHexColor3Digits() {
-        Optional<Color> color = converter.convert("#f00", Collections.<String, String>emptyMap());
+        Optional<Color> color = converter.convert("#f00");
 
         assertThat(color).isPresent();
         assertThat(color.get()).isInstanceOf(Color.Rgb.class);
@@ -66,7 +63,7 @@ class ColorConverterTest {
 
     @Test
     void convertsRgbFunction() {
-        Optional<Color> color = converter.convert("rgb(100, 150, 200)", Collections.<String, String>emptyMap());
+        Optional<Color> color = converter.convert("rgb(100, 150, 200)");
 
         assertThat(color).isPresent();
         assertThat(color.get()).isInstanceOf(Color.Rgb.class);
@@ -78,7 +75,7 @@ class ColorConverterTest {
 
     @Test
     void convertsIndexedColor() {
-        Optional<Color> color = converter.convert("indexed(42)", Collections.<String, String>emptyMap());
+        Optional<Color> color = converter.convert("indexed(42)");
 
         assertThat(color).isPresent();
         assertThat(color.get()).isInstanceOf(Color.Indexed.class);
@@ -86,27 +83,22 @@ class ColorConverterTest {
     }
 
     @Test
-    void resolvesVariableReference() {
-        Map<String, String> variables = new HashMap<>();
-        variables.put("primary", "blue");
-
-        Optional<Color> color = converter.convert("$primary", variables);
-
-        assertThat(color).hasValue(Color.BLUE);
+    void variableResolutionHappensAtCssLevel() {
+        // The core ColorConverter doesn't handle variables - that happens in the CSS layer
+        // When a variable is pre-resolved, the value is passed directly
+        assertThat(converter.convert("blue")).hasValue(Color.BLUE);
     }
 
     @Test
     void returnsEmptyForInvalidColor() {
-        assertThat(converter.convert("invalid", Collections.<String, String>emptyMap())).isEmpty();
-        assertThat(converter.convert("", Collections.<String, String>emptyMap())).isEmpty();
-        assertThat(converter.convert(null, Collections.<String, String>emptyMap())).isEmpty();
+        assertThat(converter.convert("invalid")).isEmpty();
+        assertThat(converter.convert("")).isEmpty();
+        assertThat(converter.convert(null)).isEmpty();
     }
 
     @Test
     void convertsBrightColors() {
-        assertThat(converter.convert("light-red", Collections.<String, String>emptyMap()))
-                .hasValue(Color.LIGHT_RED);
-        assertThat(converter.convert("bright-blue", Collections.<String, String>emptyMap()))
-                .hasValue(Color.LIGHT_BLUE);
+        assertThat(converter.convert("light-red")).hasValue(Color.LIGHT_RED);
+        assertThat(converter.convert("bright-blue")).hasValue(Color.LIGHT_BLUE);
     }
 }

@@ -4,12 +4,12 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.css.cascade.ResolvedStyle;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
@@ -20,11 +20,14 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
  * A simple text element that displays styled text.
+ * <p>
+ * CSS properties {@code text-overflow} and {@code text-align} are automatically
+ * resolved through the underlying {@link Paragraph} widget.
  */
 public final class TextElement extends StyledElement<TextElement> {
 
     private final String content;
-    private Overflow overflow = Overflow.CLIP;
+    private Overflow overflow;
     private Alignment alignment;
 
     public TextElement(String content) {
@@ -136,7 +139,8 @@ public final class TextElement extends StyledElement<TextElement> {
 
         // For wrapping modes, use min constraint to allow growth for wrapped text
         // For non-wrapping modes, return null to let the container decide
-        if (overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
+        Overflow currentOverflow = overflow != null ? overflow : Overflow.CLIP;
+        if (currentOverflow == Overflow.WRAP_CHARACTER || currentOverflow == Overflow.WRAP_WORD) {
             return Constraint.min(countLines());
         }
 
@@ -151,7 +155,8 @@ public final class TextElement extends StyledElement<TextElement> {
      */
     Constraint calculateHeightConstraint() {
         int lineCount = countLines();
-        if (overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
+        Overflow currentOverflow = overflow != null ? overflow : Overflow.CLIP;
+        if (currentOverflow == Overflow.WRAP_CHARACTER || currentOverflow == Overflow.WRAP_WORD) {
             return Constraint.min(lineCount);
         }
         return Constraint.length(lineCount);
@@ -176,22 +181,26 @@ public final class TextElement extends StyledElement<TextElement> {
         // Get the current style from the context (already resolved by StyledElement.render)
         Style effectiveStyle = context.currentStyle();
 
-        // Get alignment: programmatic > CSS > left (default)
-        Alignment effectiveAlignment = this.alignment;
-        if (effectiveAlignment == null) {
-            effectiveAlignment = context.resolveStyle(this)
-                .flatMap(ResolvedStyle::alignment)
-                .orElse(Alignment.LEFT);
+        // Get the CSS resolver for this element
+        StylePropertyResolver resolver = context.resolveStyle(this)
+                .map(r -> (StylePropertyResolver) r)
+                .orElse(StylePropertyResolver.empty());
+
+        // Build paragraph - CSS properties are resolved by the widget
+        Paragraph.Builder paragraphBuilder = Paragraph.builder()
+                .text(Text.from(Line.from(Span.styled(content, effectiveStyle))))
+                .style(effectiveStyle)
+                .styleResolver(resolver);
+
+        // Set programmatic overrides if specified
+        if (alignment != null) {
+            paragraphBuilder.alignment(alignment);
+        }
+        if (overflow != null) {
+            paragraphBuilder.overflow(overflow);
         }
 
-        // Create a styled span and render as a paragraph
-        Span span = Span.styled(content, effectiveStyle);
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from(Line.from(span)))
-            .style(effectiveStyle)
-            .alignment(effectiveAlignment)
-            .overflow(overflow)
-            .build();
+        Paragraph paragraph = paragraphBuilder.build();
         frame.renderWidget(paragraph, area);
     }
 

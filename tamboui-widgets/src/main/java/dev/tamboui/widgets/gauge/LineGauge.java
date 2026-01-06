@@ -7,7 +7,13 @@ package dev.tamboui.widgets.gauge;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
@@ -44,6 +50,22 @@ public final class LineGauge implements Widget {
      */
     public static final LineSet DOUBLE = new LineSet("═", "═");
 
+    /**
+     * Property key for the filled portion color.
+     * <p>
+     * CSS property name: {@code filled-color}
+     */
+    public static final PropertyKey<Color> FILLED_COLOR =
+            PropertyKey.of("filled-color", ColorConverter.INSTANCE);
+
+    /**
+     * Property key for the unfilled portion color.
+     * <p>
+     * CSS property name: {@code unfilled-color}
+     */
+    public static final PropertyKey<Color> UNFILLED_COLOR =
+            PropertyKey.of("unfilled-color", ColorConverter.INSTANCE);
+
     private final double ratio;
     private final Line label;
     private final Style style;
@@ -54,10 +76,30 @@ public final class LineGauge implements Widget {
     private LineGauge(Builder builder) {
         this.ratio = builder.ratio;
         this.label = builder.label;
-        this.style = builder.style;
-        this.filledStyle = builder.filledStyle;
-        this.unfilledStyle = builder.unfilledStyle;
         this.lineSet = builder.lineSet;
+
+        // Resolve style-aware properties
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedFilledColor = builder.filledColor.resolve();
+        Color resolvedUnfilledColor = builder.unfilledColor.resolve();
+
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle.bg(resolvedBg);
+        }
+        this.style = baseStyle;
+
+        Style baseFilledStyle = builder.filledStyle;
+        if (resolvedFilledColor != null) {
+            baseFilledStyle = baseFilledStyle.fg(resolvedFilledColor);
+        }
+        this.filledStyle = baseFilledStyle;
+
+        Style baseUnfilledStyle = builder.unfilledStyle;
+        if (resolvedUnfilledColor != null) {
+            baseUnfilledStyle = baseUnfilledStyle.fg(resolvedUnfilledColor);
+        }
+        this.unfilledStyle = baseUnfilledStyle;
     }
 
     public static Builder builder() {
@@ -173,6 +215,15 @@ public final class LineGauge implements Widget {
         private Style filledStyle = Style.EMPTY;
         private Style unfilledStyle = Style.EMPTY;
         private LineSet lineSet = NORMAL;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> filledColor =
+                StyledProperty.of(FILLED_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> unfilledColor =
+                StyledProperty.of(UNFILLED_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -255,6 +306,59 @@ public final class LineGauge implements Widget {
          */
         public Builder lineSet(LineSet lineSet) {
             this.lineSet = lineSet;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code filled-color}, {@code unfilled-color},
+         * and {@code background} will be resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the filled portion color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the filled color
+         * @return this builder
+         */
+        public Builder filledColor(Color color) {
+            this.filledColor.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the unfilled portion color programmatically.
+         * <p>
+         * This takes precedence over values from the style resolver.
+         *
+         * @param color the unfilled color
+         * @return this builder
+         */
+        public Builder unfilledColor(Color color) {
+            this.unfilledColor.set(color);
             return this;
         }
 

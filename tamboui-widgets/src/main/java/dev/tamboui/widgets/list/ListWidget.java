@@ -9,10 +9,15 @@ import static dev.tamboui.util.CollectionUtil.listCopyOf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.style.Width;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
@@ -33,13 +38,40 @@ public final class ListWidget implements StatefulWidget<ListState> {
     private final boolean repeatHighlightSymbol;
 
     private ListWidget(Builder builder) {
-        this.items = listCopyOf(builder.items);
         this.block = builder.block;
-        this.style = builder.style;
-        this.highlightStyle = builder.highlightStyle;
         this.highlightSymbol = builder.highlightSymbol;
         this.direction = builder.direction;
         this.repeatHighlightSymbol = builder.repeatHighlightSymbol;
+        this.highlightStyle = builder.highlightStyle;
+
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedFg = builder.foreground.resolve();
+        Style baseStyle = builder.style;
+        if (resolvedBg != null) {
+            baseStyle = baseStyle.bg(resolvedBg);
+        }
+        if (resolvedFg != null) {
+            baseStyle = baseStyle.fg(resolvedFg);
+        }
+        this.style = baseStyle;
+
+        // Apply item style resolver if provided
+        if (builder.itemStyleResolver != null) {
+            List<ListItem> styledItems = new ArrayList<>(builder.items.size());
+            int total = builder.items.size();
+            for (int i = 0; i < total; i++) {
+                ListItem item = builder.items.get(i);
+                Style itemStyle = builder.itemStyleResolver.apply(i, total);
+                if (itemStyle != null && !itemStyle.equals(Style.EMPTY)) {
+                    styledItems.add(item.style(item.style().patch(itemStyle)));
+                } else {
+                    styledItems.add(item);
+                }
+            }
+            this.items = listCopyOf(styledItems);
+        } else {
+            this.items = listCopyOf(builder.items);
+        }
     }
 
     public static Builder builder() {
@@ -245,6 +277,14 @@ public final class ListWidget implements StatefulWidget<ListState> {
         private Line highlightSymbol = Line.from(">> ");
         private ListDirection direction = ListDirection.TOP_TO_BOTTOM;
         private boolean repeatHighlightSymbol = false;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+        private BiFunction<Integer, Integer, Style> itemStyleResolver;
+
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> foreground =
+                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -280,6 +320,57 @@ public final class ListWidget implements StatefulWidget<ListState> {
 
         public Builder highlightStyle(Style highlightStyle) {
             this.highlightStyle = highlightStyle;
+            return this;
+        }
+
+        /**
+         * Sets a function to resolve styles for each item based on position.
+         * <p>
+         * The function receives the item index (0-based) and total item count,
+         * and returns a Style to apply to that item. This enables positional
+         * styling like alternating row colors.
+         *
+         * @param resolver function that takes (index, totalCount) and returns a Style
+         * @return this builder
+         */
+        public Builder itemStyleResolver(BiFunction<Integer, Integer, Style> resolver) {
+            this.itemStyleResolver = resolver;
+            return this;
+        }
+
+        /**
+         * Sets the property resolver for style-aware properties.
+         * <p>
+         * When set, properties like {@code color} and {@code background}
+         * will be resolved if not set programmatically.
+         *
+         * @param resolver the property resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the background color for items.
+         *
+         * @param color the background color
+         * @return this builder
+         */
+        public Builder background(Color color) {
+            this.background.set(color);
+            return this;
+        }
+
+        /**
+         * Sets the foreground (text) color for items.
+         *
+         * @param color the foreground color
+         * @return this builder
+         */
+        public Builder foreground(Color color) {
+            this.foreground.set(color);
             return this;
         }
 
