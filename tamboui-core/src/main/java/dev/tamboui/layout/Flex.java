@@ -36,5 +36,10 @@ public enum Flex {
     /**
      * Distribute space around elements.
      */
-    SPACE_AROUND
+    SPACE_AROUND,
+
+    /**
+     * Distribute space evenly (uniform gaps including edges).
+     */
+    SPACE_EVENLY
 }
