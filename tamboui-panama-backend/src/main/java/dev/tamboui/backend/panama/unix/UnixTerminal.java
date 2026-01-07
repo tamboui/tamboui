@@ -74,7 +74,7 @@ public final class UnixTerminal implements PlatformTerminal {
     private final ReentrantLock resizeLock = new ReentrantLock();
     private Runnable resizeHandler;
     private boolean resizePending;
-    private MemorySegment previousWinchHandler;
+    private MemorySegment previousSigaction;  // Previous sigaction struct (for restoration)
     private Arena signalArena;
 
     /**
@@ -107,7 +107,8 @@ public final class UnixTerminal implements PlatformTerminal {
         this.rawModeEnabled = false;
 
         // Save original terminal attributes
-        if (LibC.tcgetattr(ttyFd, savedTermios) != 0) {
+        int tcgetattrResult = LibC.tcgetattr(ttyFd, savedTermios);
+        if (tcgetattrResult != 0) {
             LibC.close(ttyFd);
             arena.close();
             throw new IOException("Failed to get terminal attributes");
@@ -256,7 +257,8 @@ public final class UnixTerminal implements PlatformTerminal {
      * @throws IOException if the size cannot be determined
      */
     public Size getSize() throws IOException {
-        if (LibC.ioctl(ttyFd, LibC.TIOCGWINSZ, winsize) == 0) {
+        int ioctlResult = LibC.ioctl(ttyFd, LibC.TIOCGWINSZ, winsize);
+        if (ioctlResult == 0) {
             var cols = Short.toUnsignedInt((short) WS_COL.get(winsize, 0L));
             var rows = Short.toUnsignedInt((short) WS_ROW.get(winsize, 0L));
             if (cols > 0 && rows > 0) {
@@ -342,7 +344,7 @@ public final class UnixTerminal implements PlatformTerminal {
 
             long written = 0;
             while (written < chunkSize) {
-                var result = LibC.write(ttyFd, writeBuffer.asSlice(written), chunkSize - written);
+                long result = LibC.write(ttyFd, writeBuffer.asSlice(written), chunkSize - written);
                 if (result < 0) {
                     throw new IOException("Write failed (errno=" + LibC.getLastErrno() + ")");
                 }
@@ -414,8 +416,26 @@ public final class UnixTerminal implements PlatformTerminal {
                     }
                 });
 
+                // Use sigaction() instead of signal() for better reliability on macOS
+                // Allocate sigaction structs
+                MemorySegment newSigaction = LibC.allocateSigaction(signalArena);
+                MemorySegment oldSigaction = LibC.allocateSigaction(signalArena);
+                
+                // Set up new sigaction: handler pointer, NULL trampoline, empty mask, SA_RESTART flag
+                LibC.setSigactionHandler(newSigaction, signalHandlerStub);
+                LibC.setSigactionTramp(newSigaction, MemorySegment.NULL);  // NULL for simple handlers
+                LibC.setSigactionMask(newSigaction, 0);
+                LibC.setSigactionFlags(newSigaction, LibC.SA_RESTART);
+                
                 // Install the signal handler and save the previous one
-                previousWinchHandler = LibC.signal(LibC.SIGWINCH, signalHandlerStub);
+                int sigactionResult = LibC.sigaction(LibC.SIGWINCH, newSigaction, oldSigaction);
+                
+                if (sigactionResult != 0) {
+                    throw new RuntimeException("Failed to install signal handler (errno=" + LibC.getLastErrno() + ")");
+                }
+                
+                // Save the old sigaction for restoration on close
+                previousSigaction = oldSigaction;
             }
         } finally {
             resizeLock.unlock();
@@ -451,10 +471,10 @@ public final class UnixTerminal implements PlatformTerminal {
                 disableRawMode();
             }
         } finally {
-            // Restore previous SIGWINCH handler
-            if (previousWinchHandler != null) {
-                LibC.signal(LibC.SIGWINCH, previousWinchHandler);
-                previousWinchHandler = null;
+            // Restore previous SIGWINCH handler using sigaction
+            if (previousSigaction != null) {
+                LibC.sigaction(LibC.SIGWINCH, previousSigaction, MemorySegment.NULL);
+                previousSigaction = null;
             }
             resizeHandler = null;
 
@@ -504,7 +524,7 @@ public final class UnixTerminal implements PlatformTerminal {
         }
 
         if ((revents & LibC.POLLIN) != 0) {
-            var bytesRead = LibC.read(ttyFd, readBuffer, 1);
+            long bytesRead = LibC.read(ttyFd, readBuffer, 1);
             if (bytesRead <= 0) {
                 return -1; // EOF
             }

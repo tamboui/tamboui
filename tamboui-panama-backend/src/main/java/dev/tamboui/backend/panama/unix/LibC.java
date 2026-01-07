@@ -4,6 +4,7 @@
  */
 package dev.tamboui.backend.panama.unix;
 
+import java.lang.foreign.AddressLayout;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -87,9 +88,20 @@ public final class LibC {
     private static final ThreadLocal<MemorySegment> CALL_STATE_SEGMENT =
             ThreadLocal.withInitial(() -> Arena.global().allocate(CALL_STATE_LAYOUT));
 
+    // Canonical layouts (matching jextract pattern)
+    private static final ValueLayout.OfInt C_INT = 
+            (ValueLayout.OfInt) Linker.nativeLinker().canonicalLayouts().get("int");
+    private static final ValueLayout.OfLong C_LONG = 
+            (ValueLayout.OfLong) Linker.nativeLinker().canonicalLayouts().get("long");
+    private static final AddressLayout C_POINTER = 
+            ((AddressLayout) Linker.nativeLinker().canonicalLayouts().get("void*"))
+                    .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, 
+                            (ValueLayout.OfByte) Linker.nativeLinker().canonicalLayouts().get("char")));
+    
     // Function descriptor for signal handlers: void handler(int signum)
+    // Use canonical C_INT layout (same as jextract) for proper platform-specific handling
     private static final FunctionDescriptor SIGNAL_HANDLER_DESC =
-            FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT);
+            FunctionDescriptor.ofVoid(C_INT);
 
     // Method handles for libc functions
     private static final MethodHandle TCGETATTR;
@@ -103,9 +115,14 @@ public final class LibC {
     private static final MethodHandle OPEN;
     private static final MethodHandle CLOSE;
     private static final MethodHandle SIGNAL;
+    private static final MethodHandle SIGACTION;
 
     // EINTR constant for handling interrupted system calls
     public static final int EINTR = 4;
+    
+    // sigaction flags (macOS)
+    public static final int SA_RESTART = 2;
+    public static final int SA_RESETHAND = 4;
 
     static {
         try {
@@ -119,9 +136,16 @@ public final class LibC {
                     FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
             );
 
+            // ioctl(int fd, unsigned long request, ...) - variadic function
+            // Use canonical layouts matching jextract: C_INT return, C_INT fd, C_LONG request
+            // For TIOCGWINSZ, the variadic arg is a pointer to winsize struct
+            // Use firstVariadicArg option to mark where variadic args start (after request)
+            FunctionDescriptor ioctlDesc = FunctionDescriptor.of(C_INT, C_INT, C_LONG, C_POINTER);
+            Linker.Option firstVariadicArg = Linker.Option.firstVariadicArg(2); // variadic args start at index 2 (after fd and request)
             IOCTL = LINKER.downcallHandle(
                     LIBC.find("ioctl").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS),
+                    ioctlDesc,
+                    firstVariadicArg,
                     CAPTURE_ERRNO
             );
 
@@ -166,9 +190,17 @@ public final class LibC {
             );
 
             // signal(int signum, void (*handler)(int)) returns previous handler
+            // Use canonical layouts matching jextract: C_POINTER return, C_INT signum, C_POINTER handler
             SIGNAL = LINKER.downcallHandle(
                     LIBC.find("signal").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
+                    FunctionDescriptor.of(C_POINTER, C_INT, C_POINTER)
+            );
+            
+            // sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
+            // Returns 0 on success, -1 on error
+            SIGACTION = LINKER.downcallHandle(
+                    LIBC.find("sigaction").orElseThrow(),
+                    FunctionDescriptor.of(C_INT, C_INT, C_POINTER, C_POINTER)
             );
         } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
@@ -361,7 +393,9 @@ public final class LibC {
     }
 
     /**
-     * Installs a signal handler.
+     * Installs a signal handler using signal().
+     * <p>
+     * Note: This is deprecated on macOS. Use {@link #sigaction(int, MemorySegment, MemorySegment)} instead.
      *
      * @param signum  the signal number
      * @param handler the handler function pointer (upcall stub)
@@ -374,12 +408,94 @@ public final class LibC {
             throw new RuntimeException("signal failed", t);
         }
     }
+    
+    /**
+     * Installs a signal handler using sigaction().
+     * <p>
+     * This is the preferred method on macOS as signal() is deprecated.
+     *
+     * @param signum the signal number
+     * @param act    the new sigaction structure (can be null)
+     * @param oldact the old sigaction structure to save previous handler (can be null)
+     * @return 0 on success, -1 on error
+     */
+    public static int sigaction(int signum, MemorySegment act, MemorySegment oldact) {
+        try {
+            return (int) SIGACTION.invokeExact(signum, act, oldact);
+        } catch (Throwable t) {
+            throw new RuntimeException("sigaction failed", t);
+        }
+    }
+    
+    /**
+     * Allocates a sigaction structure in the given arena.
+     *
+     * @param arena the arena to allocate in
+     * @return a memory segment for the sigaction struct
+     */
+    public static MemorySegment allocateSigaction(Arena arena) {
+        return arena.allocate(SIGACTION_LAYOUT);
+    }
+    
+    /**
+     * Sets the handler pointer in a sigaction structure.
+     *
+     * @param sigactionStruct the sigaction structure
+     * @param handler         the handler function pointer (upcall stub)
+     */
+    public static void setSigactionHandler(MemorySegment sigactionStruct, MemorySegment handler) {
+        SIGACTION_U_HANDLER.set(sigactionStruct, 0L, handler);
+    }
+    
+    /**
+     * Sets the flags in a sigaction structure.
+     *
+     * @param sigactionStruct the sigaction structure
+     * @param flags           the flags (e.g., SA_RESTART)
+     */
+    public static void setSigactionFlags(MemorySegment sigactionStruct, int flags) {
+        SIGACTION_FLAGS.set(sigactionStruct, 0L, flags);
+    }
+    
+    /**
+     * Sets the trampoline pointer in a sigaction structure.
+     * For simple signal handlers, this should be set to NULL.
+     *
+     * @param sigactionStruct the sigaction structure
+     * @param tramp           the trampoline function pointer (or NULL)
+     */
+    public static void setSigactionTramp(MemorySegment sigactionStruct, MemorySegment tramp) {
+        SIGACTION_TRAMP.set(sigactionStruct, 0L, tramp);
+    }
+    
+    /**
+     * Sets the signal mask in a sigaction structure.
+     *
+     * @param sigactionStruct the sigaction structure
+     * @param mask            the signal mask
+     */
+    public static void setSigactionMask(MemorySegment sigactionStruct, int mask) {
+        SIGACTION_MASK.set(sigactionStruct, 0L, mask);
+    }
+    
+    /**
+     * Gets the handler pointer from a sigaction structure.
+     *
+     * @param sigactionStruct the sigaction structure
+     * @return the handler function pointer
+     */
+    public static MemorySegment getSigactionHandler(MemorySegment sigactionStruct) {
+        return (MemorySegment) SIGACTION_U_HANDLER.get(sigactionStruct, 0L);
+    }
 
     /**
      * Creates an upcall stub for a signal handler.
      * <p>
      * The returned memory segment is valid for the lifetime of the provided arena.
      * The handler will be called with the signal number as parameter.
+     * <p>
+     * This follows the jextract pattern: create unbound MethodHandle first,
+     * then bind when creating the upcall stub.
      *
      * @param arena   the arena to allocate the stub in
      * @param handler the Java handler to call (receives signal number)
@@ -387,11 +503,12 @@ public final class LibC {
      */
     public static MemorySegment createSignalHandler(Arena arena, java.util.function.IntConsumer handler) {
         try {
-            MethodHandle target = java.lang.invoke.MethodHandles.lookup()
+            // Create unbound MethodHandle first (like jextract does)
+            MethodHandle unboundHandle = java.lang.invoke.MethodHandles.lookup()
                     .findVirtual(java.util.function.IntConsumer.class, "accept",
-                            java.lang.invoke.MethodType.methodType(void.class, int.class))
-                    .bindTo(handler);
-            return LINKER.upcallStub(target, SIGNAL_HANDLER_DESC, arena);
+                            SIGNAL_HANDLER_DESC.toMethodType());
+            // Bind handler when creating upcall stub (matches jextract pattern)
+            return LINKER.upcallStub(unboundHandle.bindTo(handler), SIGNAL_HANDLER_DESC, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException("Failed to create signal handler", e);
         }
@@ -422,6 +539,44 @@ public final class LibC {
             ValueLayout.JAVA_SHORT.withName("events"),
             ValueLayout.JAVA_SHORT.withName("revents")
     );
+    
+    /**
+     * Layout for the __sigaction_u union (macOS).
+     * This union contains either __sa_handler or __sa_sigaction pointer.
+     * Both are at offset 0 since it's a union.
+     */
+    private static final MemoryLayout SIGACTION_U_LAYOUT = MemoryLayout.unionLayout(
+            C_POINTER.withName("__sa_handler"),
+            C_POINTER.withName("__sa_sigaction")
+    );
+    
+    /**
+     * Layout for the sigaction structure (macOS).
+     * struct __sigaction {
+     *     union __sigaction_u __sigaction_u;  // handler pointer
+     *     void (*sa_tramp)(void *, int, int, siginfo_t *, void *);  // trampoline
+     *     int sa_mask;                        // signal mask
+     *     int sa_flags;                       // flags
+     * }
+     */
+    public static final MemoryLayout SIGACTION_LAYOUT = MemoryLayout.structLayout(
+            SIGACTION_U_LAYOUT.withName("__sigaction_u"),
+            C_POINTER.withName("sa_tramp"),  // trampoline pointer (must be NULL for simple handlers)
+            C_INT.withName("sa_mask"),
+            C_INT.withName("sa_flags")
+    );
+    
+    // VarHandle for accessing __sa_handler through the nested union in the struct
+    // Path: struct -> __sigaction_u union -> __sa_handler pointer
+    private static final VarHandle SIGACTION_U_HANDLER = SIGACTION_LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("__sigaction_u"),
+            MemoryLayout.PathElement.groupElement("__sa_handler"));
+    private static final VarHandle SIGACTION_TRAMP = SIGACTION_LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("sa_tramp"));
+    private static final VarHandle SIGACTION_MASK = SIGACTION_LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("sa_mask"));
+    private static final VarHandle SIGACTION_FLAGS = SIGACTION_LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("sa_flags"));
 
     /**
      * Creates a new termios struct in the given arena.
