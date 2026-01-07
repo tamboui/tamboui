@@ -466,6 +466,7 @@ isBackTab(event)   // Shift+Tab
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://melix.github.io/blog"><img src="https://avatars.githubusercontent.com/u/316357?v=4?s=100" width="100px;" alt="Cédric Champeau"/><br /><sub><b>Cédric Champeau</b></sub></a><br /><a href="#infra-melix" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#test-melix" title="Tests">⚠️</a> <a href="#code-melix" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://xam.dk"><img src="https://avatars.githubusercontent.com/u/54129?v=4?s=100" width="100px;" alt="Max Rydahl Andersen"/><br /><sub><b>Max Rydahl Andersen</b></sub></a><br /><a href="#infra-maxandersen" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#test-maxandersen" title="Tests">⚠️</a> <a href="#code-maxandersen" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/davsclaus"><img src="https://avatars.githubusercontent.com/u/477100?v=4?s=100" width="100px;" alt="Claus Ibsen"/><br /><sub><b>Claus Ibsen</b></sub></a><br /><a href="#code-davsclaus" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
