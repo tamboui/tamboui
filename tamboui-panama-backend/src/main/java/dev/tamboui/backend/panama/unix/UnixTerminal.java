@@ -83,10 +83,16 @@ public final class UnixTerminal implements PlatformTerminal {
      * @throws IOException if the terminal cannot be initialized
      */
     public UnixTerminal() throws IOException {
-        // Open /dev/tty directly to bypass any stdin/stdout redirection
-        var fd = LibC.open(DEV_TTY, LibC.O_RDWR);
-        if (fd < 0) {
-            throw new IOException("Failed to open " + DEV_TTY + " (errno=" + LibC.getLastErrno() + ")");
+        // On macOS, use stdin directly for input (poll doesn't work well with /dev/tty)
+        // On Linux, open /dev/tty to bypass any stdin/stdout redirection
+        int fd;
+        if (PlatformConstants.isMacOS()) {
+            fd = LibC.STDIN_FILENO;
+        } else {
+            fd = LibC.open(DEV_TTY, LibC.O_RDWR);
+            if (fd < 0) {
+                throw new IOException("Failed to open " + DEV_TTY + " (errno=" + LibC.getLastErrno() + ")");
+            }
         }
         this.ttyFd = fd;
         this.charset = detectCharset();
@@ -458,7 +464,10 @@ public final class UnixTerminal implements PlatformTerminal {
                 signalArena = null;
             }
 
-            LibC.close(ttyFd);
+            // Don't close stdin on macOS
+            if (!PlatformConstants.isMacOS()) {
+                LibC.close(ttyFd);
+            }
             arena.close();
         }
     }
@@ -469,10 +478,19 @@ public final class UnixTerminal implements PlatformTerminal {
         POLLFD_EVENTS.set(pollfd, 0L, LibC.POLLIN);
         POLLFD_REVENTS.set(pollfd, 0L, (short) 0);
 
-        var result = LibC.poll(pollfd, 1, timeoutMs);
-
-        if (result < 0) {
-            throw new IOException("poll() failed");
+        int result;
+        // Retry poll if interrupted by signal (EINTR)
+        while (true) {
+            result = LibC.poll(pollfd, 1, timeoutMs);
+            if (result >= 0) {
+                break;
+            }
+            // Check if interrupted by signal - if so, check for pending resize and retry
+            if (LibC.getLastErrno() == LibC.EINTR) {
+                checkResizePending();
+                continue;
+            }
+            throw new IOException("poll() failed (errno=" + LibC.getLastErrno() + ")");
         }
 
         if (result == 0) {

@@ -97,11 +97,15 @@ public final class LibC {
     private static final MethodHandle IOCTL;
     private static final MethodHandle READ;
     private static final MethodHandle WRITE;
-    private static final MethodHandle POLL;
+    private static final MethodHandle POLL_MACOS;  // nfds_t is unsigned int on macOS
+    private static final MethodHandle POLL_LINUX;  // nfds_t is unsigned long on Linux
     private static final MethodHandle ISATTY;
     private static final MethodHandle OPEN;
     private static final MethodHandle CLOSE;
     private static final MethodHandle SIGNAL;
+
+    // EINTR constant for handling interrupted system calls
+    public static final int EINTR = 4;
 
     static {
         try {
@@ -132,9 +136,17 @@ public final class LibC {
                     CAPTURE_ERRNO
             );
 
-            POLL = LINKER.downcallHandle(
+            // nfds_t is unsigned int (4 bytes) on macOS, unsigned long (8 bytes) on Linux
+            // We need separate handles because invokeExact requires exact type matching
+            POLL_MACOS = LINKER.downcallHandle(
                     LIBC.find("poll").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT)
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT),
+                    CAPTURE_ERRNO
+            );
+            POLL_LINUX = LINKER.downcallHandle(
+                    LIBC.find("poll").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT),
+                    CAPTURE_ERRNO
             );
 
             ISATTY = LINKER.downcallHandle(
@@ -272,15 +284,28 @@ public final class LibC {
 
     /**
      * Waits for events on file descriptors.
+     * <p>
+     * Uses a thread-local call state segment to capture errno.
+     * Check {@link #getLastErrno()} after a -1 return to determine the cause.
      *
      * @param fds     array of pollfd structures
      * @param nfds    number of file descriptors
      * @param timeout timeout in milliseconds (-1 for infinite)
      * @return number of descriptors with events, 0 for timeout, -1 on error
      */
-    public static int poll(MemorySegment fds, long nfds, int timeout) {
+    public static int poll(MemorySegment fds, int nfds, int timeout) {
         try {
-            return (int) POLL.invokeExact(fds, nfds, timeout);
+            MemorySegment callState = CALL_STATE_SEGMENT.get();
+            int result;
+            if (PlatformConstants.isMacOS()) {
+                result = (int) POLL_MACOS.invokeExact(callState, fds, nfds, timeout);
+            } else {
+                result = (int) POLL_LINUX.invokeExact(callState, fds, (long) nfds, timeout);
+            }
+            if (result < 0) {
+                lastErrno = (int) ERRNO_HANDLE.get(callState, 0L);
+            }
+            return result;
         } catch (Throwable t) {
             throw new RuntimeException("poll failed", t);
         }
