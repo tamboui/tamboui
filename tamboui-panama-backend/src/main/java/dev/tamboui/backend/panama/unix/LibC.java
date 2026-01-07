@@ -83,6 +83,10 @@ public final class LibC {
     private static final VarHandle ERRNO_HANDLE = CALL_STATE_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("errno"));
 
+    // Thread-local call state segment to avoid per-call Arena allocation
+    private static final ThreadLocal<MemorySegment> CALL_STATE_SEGMENT =
+            ThreadLocal.withInitial(() -> Arena.global().allocate(CALL_STATE_LAYOUT));
+
     // Function descriptor for signal handlers: void handler(int signum)
     private static final FunctionDescriptor SIGNAL_HANDLER_DESC =
             FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT);
@@ -193,11 +197,10 @@ public final class LibC {
         }
     }
 
-    // Thread-local arena for call state allocation
-    private static final ThreadLocal<Arena> CALL_STATE_ARENA = ThreadLocal.withInitial(Arena::ofConfined);
-
     /**
      * Performs an I/O control operation.
+     * <p>
+     * Uses a thread-local call state segment to avoid per-call Arena allocation.
      *
      * @param fd      file descriptor
      * @param request ioctl request code
@@ -205,8 +208,8 @@ public final class LibC {
      * @return 0 on success, -1 on error
      */
     public static int ioctl(int fd, long request, MemorySegment arg) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment callState = arena.allocate(CALL_STATE_LAYOUT);
+        try {
+            MemorySegment callState = CALL_STATE_SEGMENT.get();
             int result = (int) IOCTL.invokeExact(callState, fd, request, arg);
             if (result < 0) {
                 lastErrno = (int) ERRNO_HANDLE.get(callState, 0L);
@@ -246,6 +249,8 @@ public final class LibC {
 
     /**
      * Writes to a file descriptor.
+     * <p>
+     * Uses a thread-local call state segment to avoid per-call Arena allocation.
      *
      * @param fd    file descriptor
      * @param buf   buffer to write from
@@ -253,8 +258,8 @@ public final class LibC {
      * @return number of bytes written, -1 on error
      */
     public static long write(int fd, MemorySegment buf, long count) {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment callState = arena.allocate(CALL_STATE_LAYOUT);
+        try {
+            MemorySegment callState = CALL_STATE_SEGMENT.get();
             long result = (long) WRITE.invokeExact(callState, fd, buf, count);
             if (result < 0) {
                 lastErrno = (int) ERRNO_HANDLE.get(callState, 0L);

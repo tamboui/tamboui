@@ -32,11 +32,10 @@ import java.util.EnumSet;
  */
 public class PanamaBackend implements Backend {
 
-    private static final String ESC = "\033";
-    private static final String CSI = ESC + "[";
+    private static final int INITIAL_BUFFER_SIZE = 8192;
 
     private final PlatformTerminal terminal;
-    private final StringBuilder outputBuffer;
+    private final ByteArrayBuilder outputBuffer;
     private boolean inAlternateScreen;
     private boolean mouseEnabled;
 
@@ -50,7 +49,7 @@ public class PanamaBackend implements Backend {
      */
     public PanamaBackend() throws IOException {
         this.terminal = createPlatformTerminal();
-        this.outputBuffer = new StringBuilder(4096);
+        this.outputBuffer = new ByteArrayBuilder(INITIAL_BUFFER_SIZE);
         this.inAlternateScreen = false;
         this.mouseEnabled = false;
     }
@@ -78,26 +77,26 @@ public class PanamaBackend implements Backend {
                 lastStyle = cell.style();
             }
 
-            // Write symbol
-            outputBuffer.append(cell.symbol());
+            // Write symbol (may contain UTF-8 multi-byte characters)
+            outputBuffer.appendUtf8(cell.symbol());
         }
 
         // Reset style after drawing
-        outputBuffer.append(CSI).append("0m");
+        outputBuffer.csi().appendAscii("0m");
     }
 
     @Override
     public void flush() throws IOException {
         if (outputBuffer.length() > 0) {
-            terminal.write(outputBuffer.toString());
-            outputBuffer.setLength(0);
+            terminal.write(outputBuffer.buffer(), 0, outputBuffer.length());
+            outputBuffer.reset();
         }
     }
 
     @Override
     public void clear() throws IOException {
-        outputBuffer.append(CSI).append("2J");  // Clear entire screen
-        outputBuffer.append(CSI).append("H");   // Move cursor to home
+        outputBuffer.csi().appendAscii("2J");  // Clear entire screen
+        outputBuffer.csi().appendAscii("H");   // Move cursor to home
         flush();
     }
 
@@ -108,13 +107,13 @@ public class PanamaBackend implements Backend {
 
     @Override
     public void showCursor() throws IOException {
-        outputBuffer.append(CSI).append("?25h");
+        outputBuffer.csi().appendAscii("?25h");
         flush();
     }
 
     @Override
     public void hideCursor() throws IOException {
-        outputBuffer.append(CSI).append("?25l");
+        outputBuffer.csi().appendAscii("?25l");
         flush();
     }
 
@@ -133,14 +132,14 @@ public class PanamaBackend implements Backend {
 
     @Override
     public void enterAlternateScreen() throws IOException {
-        outputBuffer.append(CSI).append("?1049h");
+        outputBuffer.csi().appendAscii("?1049h");
         flush();
         inAlternateScreen = true;
     }
 
     @Override
     public void leaveAlternateScreen() throws IOException {
-        outputBuffer.append(CSI).append("?1049l");
+        outputBuffer.csi().appendAscii("?1049l");
         flush();
         inAlternateScreen = false;
     }
@@ -158,33 +157,33 @@ public class PanamaBackend implements Backend {
     @Override
     public void enableMouseCapture() throws IOException {
         // Enable mouse tracking modes
-        outputBuffer.append(CSI).append("?1000h");  // Normal tracking
-        outputBuffer.append(CSI).append("?1002h");  // Button event tracking
-        outputBuffer.append(CSI).append("?1015h");  // urxvt style
-        outputBuffer.append(CSI).append("?1006h");  // SGR extended mode
+        outputBuffer.csi().appendAscii("?1000h");  // Normal tracking
+        outputBuffer.csi().appendAscii("?1002h");  // Button event tracking
+        outputBuffer.csi().appendAscii("?1015h");  // urxvt style
+        outputBuffer.csi().appendAscii("?1006h");  // SGR extended mode
         flush();
         mouseEnabled = true;
     }
 
     @Override
     public void disableMouseCapture() throws IOException {
-        outputBuffer.append(CSI).append("?1006l");
-        outputBuffer.append(CSI).append("?1015l");
-        outputBuffer.append(CSI).append("?1002l");
-        outputBuffer.append(CSI).append("?1000l");
+        outputBuffer.csi().appendAscii("?1006l");
+        outputBuffer.csi().appendAscii("?1015l");
+        outputBuffer.csi().appendAscii("?1002l");
+        outputBuffer.csi().appendAscii("?1000l");
         flush();
         mouseEnabled = false;
     }
 
     @Override
     public void scrollUp(int lines) throws IOException {
-        outputBuffer.append(CSI).append(lines).append("S");
+        outputBuffer.csi().appendInt(lines).append((byte) 'S');
         flush();
     }
 
     @Override
     public void scrollDown(int lines) throws IOException {
-        outputBuffer.append(CSI).append(lines).append("T");
+        outputBuffer.csi().appendInt(lines).append((byte) 'T');
         flush();
     }
 
@@ -207,7 +206,7 @@ public class PanamaBackend implements Backend {
     public void close() throws IOException {
         try {
             // Reset state
-            outputBuffer.append(CSI).append("0m");  // Reset style
+            outputBuffer.csi().appendAscii("0m");  // Reset style
 
             if (mouseEnabled) {
                 disableMouseCapture();
@@ -226,62 +225,74 @@ public class PanamaBackend implements Backend {
 
     private void moveCursor(int x, int y) {
         // ANSI uses 1-based coordinates
-        outputBuffer.append(CSI).append(y + 1).append(";").append(x + 1).append("H");
+        outputBuffer.csi()
+                .appendInt(y + 1)
+                .append((byte) ';')
+                .appendInt(x + 1)
+                .append((byte) 'H');
     }
 
     private void applyStyle(Style style) {
-        outputBuffer.append(CSI).append("0");  // Reset first
+        outputBuffer.csi().append((byte) '0');  // Reset first
 
         // Foreground color
         style.fg().ifPresent(color -> {
-            outputBuffer.append(";");
-            outputBuffer.append(colorToAnsi(color, true));
+            outputBuffer.append((byte) ';');
+            appendColorToAnsi(color, true);
         });
 
         // Background color
         style.bg().ifPresent(color -> {
-            outputBuffer.append(";");
-            outputBuffer.append(colorToAnsi(color, false));
+            outputBuffer.append((byte) ';');
+            appendColorToAnsi(color, false);
         });
 
         // Modifiers
         EnumSet<Modifier> modifiers = style.effectiveModifiers();
         for (Modifier mod : modifiers) {
-            outputBuffer.append(";").append(mod.code());
+            outputBuffer.append((byte) ';').appendInt(mod.code());
         }
 
         // Underline color (if supported)
         style.underlineColor().ifPresent(color -> {
-            outputBuffer.append(";");
-            outputBuffer.append(underlineColorToAnsi(color));
+            outputBuffer.append((byte) ';');
+            appendUnderlineColorToAnsi(color);
         });
 
-        outputBuffer.append("m");
+        outputBuffer.append((byte) 'm');
     }
 
-    private String colorToAnsi(Color color, boolean foreground) {
+    private void appendColorToAnsi(Color color, boolean foreground) {
         if (color instanceof Color.Reset) {
-            return foreground ? "39" : "49";
-        } else if (color instanceof Color.Ansi) {
-            AnsiColor c = ((Color.Ansi) color).color();
-            return String.valueOf(foreground ? c.fgCode() : c.bgCode());
-        } else if (color instanceof Color.Indexed) {
-            int idx = ((Color.Indexed) color).index();
-            return (foreground ? "38;5;" : "48;5;") + idx;
+            outputBuffer.appendInt(foreground ? 39 : 49);
+        } else if (color instanceof Color.Ansi ansi) {
+            outputBuffer.appendInt(foreground ? ansi.color().fgCode() : ansi.color().bgCode());
+        } else if (color instanceof Color.Indexed indexed) {
+            outputBuffer.appendInt(foreground ? 38 : 48)
+                    .appendAscii(";5;")
+                    .appendInt(indexed.index());
         } else if (color instanceof Color.Rgb rgb) {
-            return (foreground ? "38;2;" : "48;2;") + rgb.r() + ";" + rgb.g() + ";" + rgb.b();
+            outputBuffer.appendInt(foreground ? 38 : 48)
+                    .appendAscii(";2;")
+                    .appendInt(rgb.r())
+                    .append((byte) ';')
+                    .appendInt(rgb.g())
+                    .append((byte) ';')
+                    .appendInt(rgb.b());
         }
-        return "";
     }
 
-    private String underlineColorToAnsi(Color color) {
-        if (color instanceof Color.Indexed) {
-            int idx = ((Color.Indexed) color).index();
-            return "58;5;" + idx;
+    private void appendUnderlineColorToAnsi(Color color) {
+        if (color instanceof Color.Indexed indexed) {
+            outputBuffer.appendAscii("58;5;").appendInt(indexed.index());
         } else if (color instanceof Color.Rgb rgb) {
-            return "58;2;" + rgb.r() + ";" + rgb.g() + ";" + rgb.b();
+            outputBuffer.appendAscii("58;2;")
+                    .appendInt(rgb.r())
+                    .append((byte) ';')
+                    .appendInt(rgb.g())
+                    .append((byte) ';')
+                    .appendInt(rgb.b());
         }
-        return "";
     }
 
     /**

@@ -185,10 +185,16 @@ public final class WindowsTerminal implements PlatformTerminal {
 
     @Override
     public void write(byte[] data) throws IOException {
-        if (data.length == 0) {
+        write(data, 0, data.length);
+    }
+
+    @Override
+    public void write(byte[] buffer, int offset, int length) throws IOException {
+        if (length == 0) {
             return;
         }
-        write(new String(data, StandardCharsets.UTF_8));
+        // Windows Console API uses UTF-16, so we need to convert from bytes
+        write(new String(buffer, offset, length, StandardCharsets.UTF_8));
     }
 
     @Override

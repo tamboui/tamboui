@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Unix terminal operations using Panama FFI.
@@ -55,18 +56,24 @@ public final class UnixTerminal implements PlatformTerminal {
     // Environment variables to check for charset detection, in order of precedence
     private static final String[] LOCALE_ENV_VARS = {"LC_ALL", "LC_CTYPE", "LANG"};
 
+    // Size of the reusable write buffer
+    private static final int WRITE_BUFFER_SIZE = 8192;
+
     private final Arena arena;
     private final MemorySegment savedTermios;
     private final MemorySegment currentTermios;
     private final MemorySegment winsize;
     private final MemorySegment pollfd;
     private final MemorySegment readBuffer;
+    private final MemorySegment writeBuffer;
     private final int ttyFd;
     private final Charset charset;
 
     private boolean rawModeEnabled;
     private int peekedChar = -2;
-    private volatile Runnable resizeHandler;
+    private final ReentrantLock resizeLock = new ReentrantLock();
+    private Runnable resizeHandler;
+    private boolean resizePending;
     private MemorySegment previousWinchHandler;
     private Arena signalArena;
 
@@ -90,6 +97,7 @@ public final class UnixTerminal implements PlatformTerminal {
         this.winsize = LibC.allocateWinsize(arena);
         this.pollfd = LibC.allocatePollfd(arena);
         this.readBuffer = arena.allocate(1);
+        this.writeBuffer = arena.allocate(WRITE_BUFFER_SIZE);
         this.rawModeEnabled = false;
 
         // Save original terminal attributes
@@ -254,12 +262,19 @@ public final class UnixTerminal implements PlatformTerminal {
 
     /**
      * Reads a single character from the terminal with timeout.
+     * <p>
+     * This method also checks for and dispatches pending resize events,
+     * ensuring resize handlers are called from the main event loop context
+     * rather than from signal handler context.
      *
      * @param timeoutMs timeout in milliseconds (-1 for infinite, 0 for non-blocking)
      * @return the character read, -1 for EOF, or -2 for timeout
      * @throws IOException if reading fails
      */
     public int read(int timeoutMs) throws IOException {
+        // Check for pending resize events (set by signal handler)
+        checkResizePending();
+
         // Return peeked character if available
         if (peekedChar != -2) {
             var c = peekedChar;
@@ -293,21 +308,43 @@ public final class UnixTerminal implements PlatformTerminal {
      * @throws IOException if writing fails
      */
     public void write(byte[] data) throws IOException {
-        if (data.length == 0) {
+        write(data, 0, data.length);
+    }
+
+    /**
+     * Writes a portion of a byte array to the terminal.
+     * <p>
+     * This method uses a reusable buffer to avoid per-call memory allocation.
+     * For large writes exceeding the buffer size, data is written in chunks.
+     *
+     * @param buffer the byte array containing data
+     * @param offset the start offset in the buffer
+     * @param length the number of bytes to write
+     * @throws IOException if writing fails
+     */
+    public void write(byte[] buffer, int offset, int length) throws IOException {
+        if (length == 0) {
             return;
         }
-        try (var writeArena = Arena.ofConfined()) {
-            var buffer = writeArena.allocate(data.length);
-            MemorySegment.copy(data, 0, buffer, ValueLayout.JAVA_BYTE, 0, data.length);
+
+        int remaining = length;
+        int currentOffset = offset;
+
+        while (remaining > 0) {
+            int chunkSize = Math.min(remaining, WRITE_BUFFER_SIZE);
+            MemorySegment.copy(buffer, currentOffset, writeBuffer, ValueLayout.JAVA_BYTE, 0, chunkSize);
 
             long written = 0;
-            while (written < data.length) {
-                var result = LibC.write(ttyFd, buffer.asSlice(written), data.length - written);
+            while (written < chunkSize) {
+                var result = LibC.write(ttyFd, writeBuffer.asSlice(written), chunkSize - written);
                 if (result < 0) {
                     throw new IOException("Write failed (errno=" + LibC.getLastErrno() + ")");
                 }
                 written += result;
             }
+
+            currentOffset += chunkSize;
+            remaining -= chunkSize;
         }
     }
 
@@ -343,27 +380,61 @@ public final class UnixTerminal implements PlatformTerminal {
      * Registers a handler to be called when the terminal is resized.
      * <p>
      * On Unix systems, this installs a SIGWINCH signal handler using Panama FFI.
+     * The signal handler sets a flag which is checked from the main event loop
+     * (via {@link #read(int)}), ensuring the handler is called from a safe context.
+     * <p>
      * Only one handler can be registered at a time; subsequent calls
      * will replace the previous handler.
      *
      * @param handler the handler to call on resize, or null to remove
      */
     public void onResize(Runnable handler) {
-        this.resizeHandler = handler;
-        if (handler != null && signalArena == null) {
-            // Create a dedicated arena for the signal handler that lives as long as needed
-            signalArena = Arena.ofShared();
+        resizeLock.lock();
+        try {
+            this.resizeHandler = handler;
+            if (handler != null && signalArena == null) {
+                // Create a dedicated arena for the signal handler that lives as long as needed
+                signalArena = Arena.ofShared();
 
-            // Create the upcall stub for our signal handler
-            var signalHandlerStub = LibC.createSignalHandler(signalArena, signum -> {
-                var currentHandler = resizeHandler;
-                if (currentHandler != null) {
-                    currentHandler.run();
-                }
-            });
+                // Create the upcall stub for our signal handler
+                // IMPORTANT: We only set a flag here, NOT call the handler directly.
+                // Calling complex code from signal context can cause crashes.
+                var signalHandlerStub = LibC.createSignalHandler(signalArena, signum -> {
+                    resizeLock.lock();
+                    try {
+                        resizePending = true;
+                    } finally {
+                        resizeLock.unlock();
+                    }
+                });
 
-            // Install the signal handler and save the previous one
-            previousWinchHandler = LibC.signal(LibC.SIGWINCH, signalHandlerStub);
+                // Install the signal handler and save the previous one
+                previousWinchHandler = LibC.signal(LibC.SIGWINCH, signalHandlerStub);
+            }
+        } finally {
+            resizeLock.unlock();
+        }
+    }
+
+    /**
+     * Checks if a resize event is pending and dispatches it.
+     * <p>
+     * This should be called from the main event loop, not from signal context.
+     */
+    private void checkResizePending() {
+        Runnable handler = null;
+        resizeLock.lock();
+        try {
+            if (resizePending) {
+                resizePending = false;
+                handler = resizeHandler;
+            }
+        } finally {
+            resizeLock.unlock();
+        }
+        // Call handler outside of lock to avoid deadlock
+        if (handler != null) {
+            handler.run();
         }
     }
 

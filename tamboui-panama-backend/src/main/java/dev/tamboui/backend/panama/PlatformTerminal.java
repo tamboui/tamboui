@@ -69,6 +69,19 @@ public interface PlatformTerminal extends AutoCloseable {
     void write(byte[] data) throws IOException;
 
     /**
+     * Writes a portion of a byte array to the terminal.
+     * <p>
+     * This method allows writing from a reusable buffer without
+     * creating intermediate byte array copies.
+     *
+     * @param buffer the byte array containing data
+     * @param offset the start offset in the buffer
+     * @param length the number of bytes to write
+     * @throws IOException if writing fails
+     */
+    void write(byte[] buffer, int offset, int length) throws IOException;
+
+    /**
      * Writes a string to the terminal.
      *
      * @param s the string to write
