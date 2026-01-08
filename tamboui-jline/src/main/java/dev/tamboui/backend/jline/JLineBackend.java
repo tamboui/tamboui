@@ -176,6 +176,16 @@ public class JLineBackend implements Backend {
     }
 
     @Override
+    public void writeRaw(byte[] data) throws IOException {
+        terminal.output().write(data);
+    }
+
+    @Override
+    public void writeRaw(String data) {
+        writer.print(data);
+    }
+
+    @Override
     public void onResize(Runnable handler) {
         terminal.handle(Signal.WINCH, signal -> handler.run());
     }

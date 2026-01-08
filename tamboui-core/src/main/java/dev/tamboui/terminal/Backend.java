@@ -9,6 +9,7 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Backend interface for terminal operations.
@@ -140,6 +141,32 @@ public interface Backend extends AutoCloseable {
      */
     default void scrollDown(int lines) throws IOException {
         // Optional
+    }
+
+    /**
+     * Writes raw bytes directly to the terminal output.
+     * <p>
+     * This is used for native image protocols (Sixel, Kitty, iTerm2) that
+     * require sending escape sequences with binary data.
+     *
+     * @param data the raw bytes to write
+     * @throws IOException if writing fails
+     */
+    default void writeRaw(byte[] data) throws IOException {
+        // Optional: not all backends support raw output
+        throw new UnsupportedOperationException("Raw output not supported by this backend");
+    }
+
+    /**
+     * Writes a raw string directly to the terminal output.
+     * <p>
+     * This is a convenience method for protocols that work with ASCII escape sequences.
+     *
+     * @param data the string to write
+     * @throws IOException if writing fails
+     */
+    default void writeRaw(String data) throws IOException {
+        writeRaw(data.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
