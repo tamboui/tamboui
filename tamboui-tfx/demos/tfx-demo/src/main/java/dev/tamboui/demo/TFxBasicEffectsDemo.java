@@ -56,12 +56,17 @@ import java.util.function.Supplier;
  * - ESC: Quit
  */
 public class TFxBasicEffectsDemo {
-    
+
     private Instant lastFrame;
     private EffectManager effectManager;
     private EffectsRepository effects;
     private int activeEffectIdx = 0;
     private Random rng = new Random();
+
+    // FPS tracking
+    private int frameCount = 0;
+    private Instant fpsLastUpdate;
+    private double currentFps = 0.0;
     
     // Gruvbox colors (approximated with RGB)
     private static final Color DARK0_HARD = Color.rgb(0x1d, 0x20, 0x21);
@@ -132,28 +137,45 @@ public class TFxBasicEffectsDemo {
                     return false;
                 },
                 frame -> {
+                    // Update FPS counter
+                    Instant now = Instant.now();
+                    frameCount++;
+                    if (fpsLastUpdate == null) {
+                        fpsLastUpdate = now;
+                    } else {
+                        long elapsed = java.time.Duration.between(fpsLastUpdate, now).toMillis();
+                        if (elapsed >= 500) { // Update FPS display every 500ms
+                            currentFps = frameCount * 1000.0 / elapsed;
+                            frameCount = 0;
+                            fpsLastUpdate = now;
+                        }
+                    }
+
                     // Render UI first
                     render(frame);
-                    
+
                     // Calculate content area for effects
                     Rect area = frame.area();
                     int contentWidth = 80;
                     int contentHeight = 17;
                     int contentX = (area.width() - contentWidth) / 2;
                     int contentY = (area.height() - contentHeight) / 2;
-                    
-                    if (contentX < 0) contentX = 0;
-                    if (contentY < 0) contentY = 0;
-                    
+
+                    if (contentX < 0) {
+                        contentX = 0;
+                    }
+                    if (contentY < 0) {
+                        contentY = 0;
+                    }
+
                     Rect contentArea = new Rect(
                         area.left() + contentX,
                         area.top() + contentY,
                         Math.min(contentWidth, area.width() - contentX),
                         Math.min(contentHeight, area.height() - contentY)
                     );
-                    
+
                     // Process effects on content area
-                    Instant now = Instant.now();
                     long deltaMs;
                     if (lastFrame == null) {
                         // First frame - initialize to avoid huge delta
@@ -166,7 +188,7 @@ public class TFxBasicEffectsDemo {
                         deltaMs = Math.min(deltaMs, 100);
                         lastFrame = now;
                     }
-                    
+
                     TFxDuration delta = TFxDuration.fromMillis(deltaMs);
                     if (effectManager.isRunning()) {
                         effectManager.processEffects(delta, frame.buffer(), contentArea);
@@ -184,9 +206,16 @@ public class TFxBasicEffectsDemo {
     
     private void render(Frame frame) {
         Rect area = frame.area();
-        
+
         // Clear and set background
         frame.buffer().fill(area, new dev.tamboui.buffer.Cell(" ", Style.EMPTY.bg(DARK0_HARD)));
+
+        // Display FPS in top-right corner
+        String fpsText = String.format("FPS: %.1f", currentFps);
+        int fpsX = area.right() - fpsText.length() - 1;
+        if (fpsX >= area.left()) {
+            frame.buffer().setString(fpsX, area.top(), fpsText, Style.EMPTY.fg(LIGHT4).bg(DARK0_HARD));
+        }
         
         // Create centered content area (80x17)
         int contentWidth = 80;

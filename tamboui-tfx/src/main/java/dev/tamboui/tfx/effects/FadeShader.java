@@ -95,22 +95,22 @@ public final class FadeShader implements Shader {
     @Override
     public void execute(TFxDuration duration, Rect area, Buffer buffer) {
         float globalAlpha = timer.alpha();
-        
+
         Pattern currentPattern = pattern != null ? pattern : IdentityPattern.INSTANCE;
-        
+
         CellFilter filter = cellFilter != null ? cellFilter : CellFilter.all();
         CellIterator iterator = new CellIterator(buffer, area, filter);
-        iterator.forEachCellMutable((pos, mutable) -> {
+        iterator.forEachCellMutable((x, y, mutable) -> {
             // Only modify cells that have content (not empty)
             Cell cell = mutable.cell();
             if (!cell.isEmpty()) {
                 // Apply pattern to get position-specific alpha
-                float positionAlpha = currentPattern.mapAlpha(globalAlpha, pos, area);
-                
+                float positionAlpha = currentPattern.mapAlpha(globalAlpha, x, y, area);
+
                 // Use ColorSpace for proper color interpolation
                 Color currentColor = colorSpace.lerp(fromColor, toColor, positionAlpha);
-                
-                mutable.patchStyle(dev.tamboui.style.Style.EMPTY.fg(currentColor));
+
+                mutable.setFg(currentColor);
             }
         });
     }

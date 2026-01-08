@@ -5,16 +5,14 @@
 package dev.tamboui.tfx.effects;
 
 import dev.tamboui.buffer.Buffer;
-import dev.tamboui.buffer.Cell;
-import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.CellIterator;
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Shader;
-import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.tfx.CellFilter;
+import dev.tamboui.tfx.CellIterator;
+import dev.tamboui.tfx.EffectTimer;
+import dev.tamboui.tfx.Shader;
+import dev.tamboui.tfx.TFxDuration;
 
 /**
  * A paint effect that immediately applies colors to cells.
@@ -90,21 +88,22 @@ public final class PaintShader implements Shader {
         if (alpha <= 0.0f) {
             return;
         }
-        
+
         CellFilter filter = cellFilter != null ? cellFilter : CellFilter.all();
         CellIterator iterator = new CellIterator(buffer, area, filter);
-        iterator.forEachCellMutable((pos, mutable) -> {
-            Style newStyle = mutable.cell().style();
-            
-            if (fg != null) {
-                newStyle = newStyle.fg(fg);
-            }
-            if (bg != null) {
-                newStyle = newStyle.bg(bg);
-            }
-            
-            mutable.setStyle(newStyle);
-        });
+
+        // Use optimized methods when only one color is being set
+        if (fg != null && bg == null) {
+            iterator.forEachCellMutable((x, y, mutable) -> mutable.setFg(fg));
+        } else if (fg == null && bg != null) {
+            iterator.forEachCellMutable((x, y, mutable) -> mutable.setBg(bg));
+        } else {
+            // Both colors - need to set style
+            iterator.forEachCellMutable((x, y, mutable) -> {
+                Style newStyle = mutable.cell().style().fg(fg).bg(bg);
+                mutable.setStyle(newStyle);
+            });
+        }
     }
     
     @Override

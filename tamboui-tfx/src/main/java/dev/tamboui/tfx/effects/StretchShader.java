@@ -5,18 +5,16 @@
 package dev.tamboui.tfx.effects;
 
 import dev.tamboui.buffer.Buffer;
-import dev.tamboui.buffer.Cell;
-import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.CellIterator;
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Motion;
-import dev.tamboui.tfx.Shader;
-import dev.tamboui.tfx.TFxMath;
-import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.tfx.CellFilter;
+import dev.tamboui.tfx.CellIterator;
+import dev.tamboui.tfx.EffectTimer;
+import dev.tamboui.tfx.Motion;
+import dev.tamboui.tfx.Shader;
+import dev.tamboui.tfx.TFxDuration;
+import dev.tamboui.tfx.TFxMath;
 
 /**
  * A shader that applies a stretching effect to terminal cells, expanding or shrinking
@@ -95,18 +93,18 @@ public final class StretchShader implements Shader {
         fillArea(inverseStyle(style), regions.filled, buffer);
         fillArea(style, regions.empty, buffer);
         
-        CellFilter filter = cellFilter != null ? cellFilter : dev.tamboui.tfx.CellFilter.all();
+        CellFilter filter = cellFilter != null ? cellFilter : CellFilter.all();
         CellIterator iterator = new CellIterator(buffer, regions.stretching, filter);
-        iterator.forEachCellMutable((pos, mutable) -> {
+        iterator.forEachCellMutable((x, y, mutable) -> {
             mutable.setSymbol(stretchChar.symbol);
             mutable.setStyle(stretchChar.style);
         });
     }
-    
+
     private void fillArea(Style fillStyle, Rect area, Buffer buffer) {
-        CellFilter filter = cellFilter != null ? cellFilter : dev.tamboui.tfx.CellFilter.all();
+        CellFilter filter = cellFilter != null ? cellFilter : CellFilter.all();
         CellIterator iterator = new CellIterator(buffer, area, filter);
-        iterator.forEachCellMutable((pos, mutable) -> {
+        iterator.forEachCellMutable((x, y, mutable) -> {
             mutable.setSymbol(" ");
             mutable.setStyle(fillStyle);
         });

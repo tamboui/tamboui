@@ -23,7 +23,12 @@ public final class IdentityPattern implements Pattern {
     public float mapAlpha(float globalAlpha, Position position, Rect area) {
         return globalAlpha;
     }
-    
+
+    @Override
+    public float mapAlpha(float globalAlpha, int x, int y, Rect area) {
+        return globalAlpha;
+    }
+
     @Override
     public String name() {
         return "identity";

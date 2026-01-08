@@ -55,19 +55,38 @@ import dev.tamboui.layout.Rect;
  * apply different strengths based on cell position relative to the pattern's geometry.
  */
 public interface Pattern {
-    
+
     /**
      * Maps a global alpha value to a position-specific alpha value.
-     * 
+     *
      * @param globalAlpha The global animation progress (0.0-1.0)
      * @param position The position of the cell
      * @param area The rectangular area where the pattern is applied
      * @return The position-specific alpha value (0.0-1.0)
      */
     float mapAlpha(float globalAlpha, Position position, Rect area);
-    
+
+    /**
+     * Maps a global alpha value to a position-specific alpha value using primitive coordinates.
+     * <p>
+     * This overload avoids Position object allocation in performance-critical loops.
+     * The default implementation creates a Position and delegates to
+     * {@link #mapAlpha(float, Position, Rect)}.
+     *
+     * @param globalAlpha The global animation progress (0.0-1.0)
+     * @param x The x coordinate of the cell
+     * @param y The y coordinate of the cell
+     * @param area The rectangular area where the pattern is applied
+     * @return The position-specific alpha value (0.0-1.0)
+     */
+    default float mapAlpha(float globalAlpha, int x, int y, Rect area) {
+        return mapAlpha(globalAlpha, new Position(x, y), area);
+    }
+
     /**
      * Returns the name of this pattern.
+     *
+     * @return the pattern name
      */
     String name();
 }

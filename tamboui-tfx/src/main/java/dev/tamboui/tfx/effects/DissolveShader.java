@@ -6,15 +6,14 @@ package dev.tamboui.tfx.effects;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
 import dev.tamboui.tfx.CellFilter;
 import dev.tamboui.tfx.CellIterator;
-import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tfx.EffectTimer;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.SimpleRng;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Style;
+import dev.tamboui.tfx.TFxDuration;
 
 /**
  * A dissolve effect that randomly dissolves text characters over time.
@@ -75,12 +74,10 @@ public final class DissolveShader implements Shader {
         float alpha = timer.alpha();
         Rect effectArea = this.area != null ? this.area : area;
         effectArea = effectArea.intersection(buffer.area());
-        
+
         CellFilter filter = cellFilter != null ? cellFilter : CellFilter.all();
         CellIterator iterator = new CellIterator(buffer, effectArea, filter);
-        iterator.forEachCellMutable((pos, mutable) -> {
-            Cell cell = mutable.cell();
-            
+        iterator.forEachCellMutable((x, y, mutable) -> {
             // Use random thresholding - if alpha exceeds random value, dissolve the cell
             // This matches Rust's logic: process all cells that match the filter
             float randomValue = rng.genF32();

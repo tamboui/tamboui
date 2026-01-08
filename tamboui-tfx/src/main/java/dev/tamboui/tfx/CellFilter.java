@@ -159,30 +159,58 @@ public abstract class CellFilter {
     
     /**
      * Checks if a cell matches this filter.
-     * 
+     *
      * @param position The cell's position
      * @param cell The cell to check
      * @param area The area being processed
      * @return true if the cell matches the filter
      */
     public abstract boolean matches(Position position, Cell cell, Rect area);
+
+    /**
+     * Checks if a cell matches this filter using primitive coordinates.
+     * <p>
+     * This overload avoids Position object allocation in performance-critical loops.
+     * The default implementation creates a Position and delegates to
+     * {@link #matches(Position, Cell, Rect)}. Subclasses that can work with
+     * primitive coordinates directly should override this method.
+     *
+     * @param x The cell's x coordinate
+     * @param y The cell's y coordinate
+     * @param cell The cell to check
+     * @param area The area being processed
+     * @return true if the cell matches the filter
+     */
+    public boolean matches(int x, int y, Cell cell, Rect area) {
+        return matches(new Position(x, y), cell, area);
+    }
     
     // Concrete implementations
     
     private static final class All extends CellFilter {
         static final All INSTANCE = new All();
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
             return true;
         }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
+            return true;
+        }
     }
-    
+
     private static final class None extends CellFilter {
         static final None INSTANCE = new None();
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
+            return false;
+        }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
             return false;
         }
     }
@@ -258,9 +286,18 @@ public abstract class CellFilter {
     
     private static final class Text extends CellFilter {
         static final Text INSTANCE = new Text();
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
+            return matchesCell(cell);
+        }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
+            return matchesCell(cell);
+        }
+
+        private static boolean matchesCell(Cell cell) {
             if (cell.isEmpty()) {
                 return false;
             }
@@ -273,15 +310,15 @@ public abstract class CellFilter {
             // Extended to include common symbols that are part of text content: @#$%^&*+-=_[ ]{}|\/<>"'~`
             for (int i = 0; i < symbol.length(); i++) {
                 char c = symbol.charAt(i);
-                if (Character.isLetterOrDigit(c) || 
-                    c == '?' || c == '!' || c == '.' || c == ',' || 
+                if (Character.isLetterOrDigit(c) ||
+                    c == '?' || c == '!' || c == '.' || c == ',' ||
                     c == ':' || c == ';' || c == '(' || c == ')' ||
                     // Extended: common symbols that should be considered part of text content
-                    c == '@' || c == '#' || c == '$' || c == '%' || 
-                    c == '^' || c == '&' || c == '*' || c == '+' || 
-                    c == '-' || c == '=' || c == '_' || c == '[' || 
-                    c == ']' || c == '{' || c == '}' || c == '|' || 
-                    c == '\\' || c == '/' || c == '<' || c == '>' || 
+                    c == '@' || c == '#' || c == '$' || c == '%' ||
+                    c == '^' || c == '&' || c == '*' || c == '+' ||
+                    c == '-' || c == '=' || c == '_' || c == '[' ||
+                    c == ']' || c == '{' || c == '}' || c == '|' ||
+                    c == '\\' || c == '/' || c == '<' || c == '>' ||
                     c == '"' || c == '\'' || c == '`' || c == '~') {
                     return true;
                 }
@@ -292,11 +329,11 @@ public abstract class CellFilter {
     
     private static final class AllOf extends CellFilter {
         private final List<CellFilter> filters;
-        
+
         AllOf(List<CellFilter> filters) {
             this.filters = new java.util.ArrayList<>(filters);
         }
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
             for (CellFilter filter : filters) {
@@ -306,15 +343,25 @@ public abstract class CellFilter {
             }
             return true;
         }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
+            for (CellFilter filter : filters) {
+                if (!filter.matches(x, y, cell, area)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
-    
+
     private static final class AnyOf extends CellFilter {
         private final List<CellFilter> filters;
-        
+
         AnyOf(List<CellFilter> filters) {
             this.filters = new java.util.ArrayList<>(filters);
         }
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
             for (CellFilter filter : filters) {
@@ -324,15 +371,25 @@ public abstract class CellFilter {
             }
             return false;
         }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
+            for (CellFilter filter : filters) {
+                if (filter.matches(x, y, cell, area)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
-    
+
     private static final class NoneOf extends CellFilter {
         private final List<CellFilter> filters;
-        
+
         NoneOf(List<CellFilter> filters) {
             this.filters = new java.util.ArrayList<>(filters);
         }
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
             for (CellFilter filter : filters) {
@@ -342,18 +399,33 @@ public abstract class CellFilter {
             }
             return true;
         }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
+            for (CellFilter filter : filters) {
+                if (filter.matches(x, y, cell, area)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
-    
+
     private static final class Not extends CellFilter {
         private final CellFilter filter;
-        
+
         Not(CellFilter filter) {
             this.filter = filter;
         }
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
             return !filter.matches(position, cell, area);
+        }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
+            return !filter.matches(x, y, cell, area);
         }
     }
     
@@ -372,13 +444,18 @@ public abstract class CellFilter {
     
     private static final class EvalCell extends CellFilter {
         private final java.util.function.Predicate<Cell> predicate;
-        
+
         EvalCell(java.util.function.Predicate<Cell> predicate) {
             this.predicate = predicate;
         }
-        
+
         @Override
         public boolean matches(Position position, Cell cell, Rect area) {
+            return predicate.test(cell);
+        }
+
+        @Override
+        public boolean matches(int x, int y, Cell cell, Rect area) {
             return predicate.test(cell);
         }
     }
