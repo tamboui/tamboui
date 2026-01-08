@@ -4,6 +4,9 @@
       "script-ref": ".jbang/tambouiDemos.java",
       "description": "Run TamboUI demos interactively"
     },
+    "fakodex-demo": {
+      "script-ref": "demos/fakodex-demo/src/main/java/dev/tamboui/demo/coding/CodingAssistantDemo.java"
+    },
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
@@ -37,9 +40,6 @@
     "helloworld-demo": {
       "script-ref": "tamboui-tui/demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorld.java"
     },
-    "figlet-demo": {
-      "script-ref": "demos/figlet-demo/src/main/java/dev/tamboui/demo/FigletDemo.java"
-    },
     "logo-demo": {
       "script-ref": "tamboui-tui/demos/logo-demo/src/main/java/dev/tamboui/demo/LogoDemo.java"
     },
@@ -70,6 +70,9 @@
     "colors-rgb-demo": {
       "script-ref": "tamboui-widgets/demos/colors-rgb-demo/src/main/java/dev/tamboui/demo/ColorsRgbDemo.java"
     },
+    "figlet-demo": {
+      "script-ref": "tamboui-widgets/demos/figlet-demo/src/main/java/dev/tamboui/demo/FigletDemo.java"
+    },
     "gauge-demo": {
       "script-ref": "tamboui-widgets/demos/gauge-demo/src/main/java/dev/tamboui/demo/GaugeDemo.java"
     },
@@ -96,6 +99,9 @@
     },
     "todo-list-demo": {
       "script-ref": "tamboui-widgets/demos/todo-list-demo/src/main/java/dev/tamboui/demo/TodoListDemo.java"
+    },
+    "wavetext-demo": {
+      "script-ref": "tamboui-widgets/demos/wavetext-demo/src/main/java/dev/tamboui/demo/WaveTextDemo.java"
     }
   }
 }

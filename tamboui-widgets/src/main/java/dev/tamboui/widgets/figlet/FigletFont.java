@@ -122,16 +122,20 @@ public final class FigletFont {
 
             boolean firstGlyph = true;
             int i = 0;
+            int prevCp = 0;
             while (i < inputLine.length()) {
                 int cp = inputLine.codePointAt(i);
                 i += Character.charCount(cp);
                 String[] glyph = glyphForCodePoint(cp);
+                boolean isSpace = (cp == ' ');
+                boolean prevWasSpace = (prevCp == ' ');
 
                 if (firstGlyph) {
                     for (int r = 0; r < height; r++) {
                         rows.get(r).append(glyph[r]);
                     }
                     firstGlyph = false;
+                    prevCp = cp;
                     continue;
                 }
 
@@ -144,10 +148,13 @@ public final class FigletFont {
                     }
                 }
 
-                if (!kerning) {
+                // Skip kerning for spaces - they should always be rendered as-is
+                // Also skip kerning when previous character was a space
+                if (!kerning || isSpace || prevWasSpace) {
                     for (int r = 0; r < height; r++) {
                         rows.get(r).append(glyph[r]);
                     }
+                    prevCp = cp;
                     continue;
                 }
 
@@ -184,6 +191,8 @@ public final class FigletFont {
                     }
                     rows.get(r).append(line.substring(shift));
                 }
+                
+                prevCp = cp;
             }
 
             for (int r = 0; r < height; r++) {
