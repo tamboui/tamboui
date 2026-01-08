@@ -4,6 +4,9 @@
       "script-ref": ".jbang/tambouiDemos.java",
       "description": "Run TamboUI demos interactively"
     },
+    "fakodex-demo": {
+      "script-ref": "demos/fakodex-demo/src/main/java/dev/tamboui/demo/coding/CodingAssistantDemo.java"
+    },
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
@@ -27,6 +30,9 @@
     },
     "jtop-demo": {
       "script-ref": "tamboui-toolkit/demos/jtop-demo/src/main/java/dev/tamboui/demo/JTopDemo.java"
+    },
+    "newyear-demo": {
+      "script-ref": "tamboui-toolkit/demos/newyear-demo/src/main/java/dev/tamboui/demo/NewYearDemo.java"
     },
     "textarea-demo": {
       "script-ref": "tamboui-toolkit/demos/textarea-demo/src/main/java/dev/tamboui/demo/TextAreaDemo.java"
@@ -93,6 +99,9 @@
     },
     "todo-list-demo": {
       "script-ref": "tamboui-widgets/demos/todo-list-demo/src/main/java/dev/tamboui/demo/TodoListDemo.java"
+    },
+    "wavetext-demo": {
+      "script-ref": "tamboui-widgets/demos/wavetext-demo/src/main/java/dev/tamboui/demo/WaveTextDemo.java"
     }
   }
 }
