@@ -13,6 +13,7 @@ public final class Size {
 
     private final int width;
     private final int height;
+    private final int cachedHashCode;
 
     /**
      * Creates a size.
@@ -23,6 +24,7 @@ public final class Size {
     public Size(int width, int height) {
         this.width = width;
         this.height = height;
+        this.cachedHashCode = 31 * width + height;
     }
 
     /**
@@ -70,14 +72,15 @@ public final class Size {
             return false;
         }
         Size size = (Size) o;
+        if (cachedHashCode != size.cachedHashCode) {
+            return false;
+        }
         return width == size.width && height == size.height;
     }
 
     @Override
     public int hashCode() {
-        int result = Integer.hashCode(width);
-        result = 31 * result + Integer.hashCode(height);
-        return result;
+        return cachedHashCode;
     }
 
     @Override

@@ -169,11 +169,15 @@ public final class Buffer {
     /**
      * Sets a string at the given position with the given style.
      * Returns the x position after the last character written.
+     * <p>
+     * This method patches the style of existing cells rather than replacing them,
+     * preserving background colors and other style attributes that were previously set.
+     * This matches the behavior of ratatui.rs.
      *
      * @param x the x coordinate
      * @param y the y coordinate
      * @param string the string to set
-     * @param style the style to apply
+     * @param style the style to apply (will be patched onto existing cell style)
      * @return the x position after the last character written
      */
     public int setString(int x, int y, String string, Style style) {
@@ -191,7 +195,9 @@ public final class Buffer {
             String symbol = new String(Character.toChars(codePoint));
 
             if (col >= area.left()) {
-                set(col, y, new Cell(symbol, style));
+                Cell existing = get(col, y);
+                Cell newCell = existing.patchStyle(style).symbol(symbol);
+                set(col, y, newCell);
             }
 
             col++;
@@ -327,10 +333,13 @@ public final class Buffer {
         }
 
         for (int i = 0; i < content.length; i++) {
-            if (!content[i].equals(other.content[i])) {
+            Cell thisCell = content[i];
+            Cell otherCell = other.content[i];
+            // Fast path: reference equality means same cell, no update needed
+            if (thisCell != otherCell && !thisCell.equals(otherCell)) {
                 int x = area.x() + (i % area.width());
                 int y = area.y() + (i / area.width());
-                updates.add(new CellUpdate(x, y, other.content[i]));
+                updates.add(new CellUpdate(x, y, otherCell));
             }
         }
 

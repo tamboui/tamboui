@@ -16,10 +16,18 @@ public final class Cell {
 
     private final String symbol;
     private final Style style;
+    private final int cachedHashCode;
 
     public Cell(String symbol, Style style) {
         this.symbol = symbol;
         this.style = style;
+        this.cachedHashCode = computeHashCode();
+    }
+
+    private int computeHashCode() {
+        int result = symbol.hashCode();
+        result = 31 * result + style.hashCode();
+        return result;
     }
 
     public String symbol() {
@@ -72,14 +80,15 @@ public final class Cell {
             return false;
         }
         Cell cell = (Cell) o;
+        if (cachedHashCode != cell.cachedHashCode) {
+            return false;
+        }
         return symbol.equals(cell.symbol) && style.equals(cell.style);
     }
 
     @Override
     public int hashCode() {
-        int result = symbol.hashCode();
-        result = 31 * result + style.hashCode();
-        return result;
+        return cachedHashCode;
     }
 
     @Override

@@ -15,6 +15,7 @@ public final class Margin {
     private final int right;
     private final int bottom;
     private final int left;
+    private final int cachedHashCode;
 
     /**
      * Creates a margin.
@@ -29,6 +30,15 @@ public final class Margin {
         this.right = right;
         this.bottom = bottom;
         this.left = left;
+        this.cachedHashCode = computeHashCode();
+    }
+
+    private int computeHashCode() {
+        int result = top;
+        result = 31 * result + right;
+        result = 31 * result + bottom;
+        result = 31 * result + left;
+        return result;
     }
 
     /**
@@ -135,6 +145,9 @@ public final class Margin {
             return false;
         }
         Margin margin = (Margin) o;
+        if (cachedHashCode != margin.cachedHashCode) {
+            return false;
+        }
         return top == margin.top
             && right == margin.right
             && bottom == margin.bottom
@@ -143,11 +156,7 @@ public final class Margin {
 
     @Override
     public int hashCode() {
-        int result = Integer.hashCode(top);
-        result = 31 * result + Integer.hashCode(right);
-        result = 31 * result + Integer.hashCode(bottom);
-        result = 31 * result + Integer.hashCode(left);
-        return result;
+        return cachedHashCode;
     }
 
     @Override

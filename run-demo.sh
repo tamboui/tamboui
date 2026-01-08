@@ -3,7 +3,7 @@
 set -e
 
 # Modules that can contain demos
-MODULES="tamboui-widgets tamboui-toolkit tamboui-tui tamboui-css tamboui-picocli"
+MODULES="tamboui-widgets tamboui-toolkit tamboui-tui tamboui-css tamboui-picocli tamboui-tfx"
 
 usage() {
     echo "Usage: $0 [demo-name] [--native]"

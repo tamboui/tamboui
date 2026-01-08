@@ -23,6 +23,7 @@ public final class Style {
     private final EnumSet<Modifier> addModifiers;
     private final EnumSet<Modifier> subModifiers;
     private final Map<Class<?>, Object> extensions;
+    private final int cachedHashCode;
 
     public static final Style EMPTY = new Style(
         null,
@@ -58,6 +59,43 @@ public final class Style {
         this.addModifiers = EnumSet.copyOf(addModifiers);
         this.subModifiers = EnumSet.copyOf(subModifiers);
         this.extensions = extensions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(new HashMap<>(extensions));
+        this.cachedHashCode = computeHashCode();
+    }
+
+    /**
+     * Private constructor that allows skipping defensive copies for internal use.
+     * This is used by performance-critical methods like {@link #patch(Style)} that
+     * have already created properly isolated EnumSets and Maps.
+     *
+     * @param fg the foreground color
+     * @param bg the background color
+     * @param underlineColor the underline color
+     * @param addModifiers the modifiers to add (must be an isolated copy)
+     * @param subModifiers the modifiers to subtract (must be an isolated copy)
+     * @param extensions the extensions map (must be unmodifiable or empty)
+     * @param skipCopy marker parameter to distinguish from public constructor
+     */
+    @SuppressWarnings("unused")
+    private Style(
+        Color fg,
+        Color bg,
+        Color underlineColor,
+        EnumSet<Modifier> addModifiers,
+        EnumSet<Modifier> subModifiers,
+        Map<Class<?>, Object> extensions,
+        boolean skipCopy
+    ) {
+        this.fg = fg;
+        this.bg = bg;
+        this.underlineColor = underlineColor;
+        this.addModifiers = addModifiers;
+        this.subModifiers = subModifiers;
+        this.extensions = extensions;
+        this.cachedHashCode = computeHashCode();
+    }
+
+    private int computeHashCode() {
+        return Objects.hash(fg, bg, underlineColor, addModifiers, subModifiers, extensions);
     }
 
     /**
@@ -345,28 +383,51 @@ public final class Style {
      * @return combined style
      */
     public Style patch(Style other) {
+        // Fast path: if other is EMPTY, return this unchanged
+        if (other == EMPTY) {
+            return this;
+        }
+
+        // Fast path: if this is EMPTY and other has no sub-modifiers, return other
+        if (this == EMPTY && other.subModifiers.isEmpty()) {
+            return other;
+        }
+
         Color newFg = other.fg != null ? other.fg : this.fg;
         Color newBg = other.bg != null ? other.bg : this.bg;
         Color newUnderlineColor = other.underlineColor != null ? other.underlineColor : this.underlineColor;
 
-        EnumSet<Modifier> newAddModifiers = EnumSet.copyOf(this.addModifiers);
-        newAddModifiers.removeAll(other.subModifiers);
-        newAddModifiers.addAll(other.addModifiers);
+        // Only copy EnumSets if modifications are needed
+        EnumSet<Modifier> newAddModifiers;
+        EnumSet<Modifier> newSubModifiers;
 
-        EnumSet<Modifier> newSubModifiers = EnumSet.copyOf(this.subModifiers);
-        newSubModifiers.removeAll(other.addModifiers);
-        newSubModifiers.addAll(other.subModifiers);
+        if (other.addModifiers.isEmpty() && other.subModifiers.isEmpty()) {
+            // No modifier changes - reuse existing sets (safe because EnumSets are defensively copied in constructor)
+            newAddModifiers = this.addModifiers;
+            newSubModifiers = this.subModifiers;
+        } else {
+            newAddModifiers = EnumSet.copyOf(this.addModifiers);
+            newAddModifiers.removeAll(other.subModifiers);
+            newAddModifiers.addAll(other.addModifiers);
 
-        // Merge extensions: other's extensions override this's
+            newSubModifiers = EnumSet.copyOf(this.subModifiers);
+            newSubModifiers.removeAll(other.addModifiers);
+            newSubModifiers.addAll(other.subModifiers);
+        }
+
+        // Fast path for extensions
         Map<Class<?>, Object> newExtensions;
         if (this.extensions.isEmpty() && other.extensions.isEmpty()) {
             newExtensions = Collections.emptyMap();
+        } else if (other.extensions.isEmpty()) {
+            newExtensions = this.extensions;
         } else {
             newExtensions = new HashMap<>(this.extensions);
             newExtensions.putAll(other.extensions);
         }
 
-        return new Style(newFg, newBg, newUnderlineColor, newAddModifiers, newSubModifiers, newExtensions);
+        // Use private constructor to avoid redundant defensive copies
+        return new Style(newFg, newBg, newUnderlineColor, newAddModifiers, newSubModifiers, newExtensions, false);
     }
 
     /**
@@ -422,6 +483,10 @@ public final class Style {
             return false;
         }
         Style style = (Style) o;
+        // Fast inequality check using cached hash
+        if (cachedHashCode != style.cachedHashCode) {
+            return false;
+        }
         return Objects.equals(fg, style.fg)
             && Objects.equals(bg, style.bg)
             && Objects.equals(underlineColor, style.underlineColor)
@@ -432,7 +497,7 @@ public final class Style {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fg, bg, underlineColor, addModifiers, subModifiers, extensions);
+        return cachedHashCode;
     }
 
     @Override

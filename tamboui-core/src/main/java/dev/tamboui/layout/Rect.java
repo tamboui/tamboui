@@ -20,6 +20,7 @@ public final class Rect {
     private final int y;
     private final int width;
     private final int height;
+    private final int cachedHashCode;
 
     /**
      * Creates a rectangle at the given position and size.
@@ -34,6 +35,15 @@ public final class Rect {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.cachedHashCode = computeHashCode();
+    }
+
+    private int computeHashCode() {
+        int result = x;
+        result = 31 * result + y;
+        result = 31 * result + width;
+        result = 31 * result + height;
+        return result;
     }
 
     /**
@@ -303,6 +313,9 @@ public final class Rect {
             return false;
         }
         Rect rect = (Rect) o;
+        if (cachedHashCode != rect.cachedHashCode) {
+            return false;
+        }
         return x == rect.x
             && y == rect.y
             && width == rect.width
@@ -311,11 +324,7 @@ public final class Rect {
 
     @Override
     public int hashCode() {
-        int result = Integer.hashCode(x);
-        result = 31 * result + Integer.hashCode(y);
-        result = 31 * result + Integer.hashCode(width);
-        result = 31 * result + Integer.hashCode(height);
-        return result;
+        return cachedHashCode;
     }
 
     @Override

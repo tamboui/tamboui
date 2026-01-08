@@ -14,10 +14,18 @@ public final class Span {
 
     private final String content;
     private final Style style;
+    private final int cachedHashCode;
 
     public Span(String content, Style style) {
         this.content = content;
         this.style = style;
+        this.cachedHashCode = computeHashCode();
+    }
+
+    private int computeHashCode() {
+        int result = content.hashCode();
+        result = 31 * result + style.hashCode();
+        return result;
     }
 
     public static Span raw(String content) {
@@ -153,14 +161,15 @@ public final class Span {
             return false;
         }
         Span span = (Span) o;
+        if (cachedHashCode != span.cachedHashCode) {
+            return false;
+        }
         return content.equals(span.content) && style.equals(span.style);
     }
 
     @Override
     public int hashCode() {
-        int result = content.hashCode();
-        result = 31 * result + style.hashCode();
-        return result;
+        return cachedHashCode;
     }
 
     @Override

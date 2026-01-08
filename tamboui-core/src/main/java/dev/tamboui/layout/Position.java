@@ -13,6 +13,7 @@ public final class Position {
 
     private final int x;
     private final int y;
+    private final int cachedHashCode;
 
     /**
      * Creates a position.
@@ -23,6 +24,7 @@ public final class Position {
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
+        this.cachedHashCode = 31 * x + y;
     }
 
     /**
@@ -59,14 +61,15 @@ public final class Position {
             return false;
         }
         Position that = (Position) o;
+        if (cachedHashCode != that.cachedHashCode) {
+            return false;
+        }
         return x == that.x && y == that.y;
     }
 
     @Override
     public int hashCode() {
-        int result = Integer.hashCode(x);
-        result = 31 * result + Integer.hashCode(y);
-        return result;
+        return cachedHashCode;
     }
 
     @Override

@@ -155,13 +155,6 @@ public final class ListWidget implements StatefulWidget<ListState> {
                         continue;
                     }
 
-                    // Fill the row background based on width property (default: fill)
-                    Width widthBtt = itemStyle.extension(Width.class, Width.FILL);
-                    if (widthBtt.isFill()) {
-                        Rect rowArea = new Rect(listArea.left(), itemY, listArea.width(), 1);
-                        buffer.setStyle(rowArea, itemStyle);
-                    }
-
                     // For bottom-to-top, we render from bottom to top, so:
                     // - First line visually (top) is at lineIdx = 0 (rendered last)
                     // - Last line visually (bottom) is at lineIdx = itemHeight - 1 (rendered first)
@@ -169,9 +162,17 @@ public final class ListWidget implements StatefulWidget<ListState> {
                     int contentX = listArea.left() + symbolWidth;
                     int availableWidth = contentWidth;
 
+                    // Fill the content area background based on width property (default: fill)
+                    // Only fill the content area, not the symbol area, so symbol keeps its own style
+                    Width widthBtt = itemStyle.extension(Width.class, Width.FILL);
+                    if (widthBtt.isFill()) {
+                        Rect rowArea = new Rect(contentX, itemY, contentWidth, 1);
+                        buffer.setStyle(rowArea, itemStyle);
+                    }
+
                     // Draw highlight symbol on each line if selected
                     // If repeatHighlightSymbol is true, show on all lines; otherwise only on first line (top visually)
-                    boolean shouldShowSymbol = isSelected && symbolWidth > 0 
+                    boolean shouldShowSymbol = isSelected && symbolWidth > 0
                         && (lineIdx == 0 || repeatHighlightSymbol);
                     if (shouldShowSymbol) {
                         buffer.setLine(listArea.left(), itemY, highlightSymbol);
@@ -226,20 +227,21 @@ public final class ListWidget implements StatefulWidget<ListState> {
                 List<Line> lines = item.content().lines();
 
                 for (int lineIdx = startLine; lineIdx < startLine + visibleHeight && lineIdx < lines.size(); lineIdx++) {
-                    // Fill the row background based on width property (default: fill)
-                    Width width = itemStyle.extension(Width.class, Width.FILL);
-                    if (width.isFill()) {
-                        Rect rowArea = new Rect(listArea.left(), y, listArea.width(), 1);
-                        buffer.setStyle(rowArea, itemStyle);
-                    }
-
                     // Always reserve space for symbol on all lines to keep content aligned
                     int contentX = listArea.left() + symbolWidth;
                     int availableWidth = contentWidth;
 
+                    // Fill the content area background based on width property (default: fill)
+                    // Only fill the content area, not the symbol area, so symbol keeps its own style
+                    Width width = itemStyle.extension(Width.class, Width.FILL);
+                    if (width.isFill()) {
+                        Rect rowArea = new Rect(contentX, y, contentWidth, 1);
+                        buffer.setStyle(rowArea, itemStyle);
+                    }
+
                     // Draw highlight symbol on each line if selected
                     // If repeatHighlightSymbol is true, show on all lines; otherwise only on first line
-                    boolean shouldShowSymbol = isSelected && symbolWidth > 0 
+                    boolean shouldShowSymbol = isSelected && symbolWidth > 0
                         && (lineIdx == startLine || repeatHighlightSymbol);
                     if (shouldShowSymbol) {
                         buffer.setLine(listArea.left(), y, highlightSymbol);

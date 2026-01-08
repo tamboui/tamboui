@@ -9,7 +9,8 @@ val modules = listOf(
     "tamboui-picocli",
     "tamboui-toolkit",
     "tamboui-annotations",
-    "tamboui-processor"
+    "tamboui-processor",
+    "tamboui-tfx"
 )
 
 include(*modules.toTypedArray())
