@@ -2,7 +2,7 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.tui;
+package dev.tamboui.inline;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
@@ -14,7 +14,6 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.text.Text;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.function.BiConsumer;
@@ -27,7 +26,7 @@ import java.util.function.BiConsumer;
  * area using {@link #println(String)}, which scrolls output while the status area
  * stays in place.
  *
- * <p>Unlike {@link TuiRunner}, InlineDisplay does NOT:
+ * <p>Unlike full TUI runners, InlineDisplay does NOT:
  * <ul>
  *   <li>Enter alternate screen mode</li>
  *   <li>Hide the cursor</li>

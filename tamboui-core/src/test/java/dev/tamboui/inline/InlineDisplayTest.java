@@ -2,11 +2,10 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.tui;
+package dev.tamboui.inline;
 
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -14,7 +13,6 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.widgets.paragraph.Paragraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,15 +93,12 @@ class InlineDisplayTest {
     }
 
     @Test
-    @DisplayName("render() draws widgets to buffer")
-    void renderDrawsWidgetsToBuffer() {
+    @DisplayName("render() draws to buffer")
+    void renderDrawsToBuffer() {
         InlineDisplay display = new InlineDisplay(2, 40, mockBackend, printWriter);
 
         display.render((area, buf) -> {
-            Paragraph.builder()
-                .text(Text.raw("Test content"))
-                .build()
-                .render(area, buf);
+            buf.setString(0, 0, "Test content", Style.EMPTY);
         });
 
         String output = stringWriter.toString();

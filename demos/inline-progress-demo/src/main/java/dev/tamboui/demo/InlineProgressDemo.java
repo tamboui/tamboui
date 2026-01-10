@@ -14,7 +14,9 @@ import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.tui.InlineDisplay;
+import dev.tamboui.inline.InlineDisplay;
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.widgets.gauge.Gauge;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
@@ -37,6 +39,15 @@ public class InlineProgressDemo {
     private static final String[] SPINNER = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
 
     public static void main(String[] args) throws Exception {
+        var scanner = new Scanner(System.in);
+        boolean restart;
+        do {
+            runDemo(scanner);
+            restart = promptRestart();
+        } while (restart);
+    }
+
+    private static void runDemo(Scanner scanner) throws Exception {
         System.out.println("=== Inline Progress Demo ===\n");
 
         // Part 1: Simple toAnsiString() usage
@@ -50,7 +61,7 @@ public class InlineProgressDemo {
         System.out.println();
 
         // Prompt user to continue
-        if (!promptContinue()) {
+        if (!promptContinue(scanner)) {
             System.out.println("Demo cancelled.");
             return;
         }
@@ -314,7 +325,7 @@ public class InlineProgressDemo {
         System.out.println("Run 'npm start' to begin.");
     }
 
-    private static boolean promptContinue() {
+    private static boolean promptContinue(Scanner scanner) {
         var buf = Buffer.empty(Rect.of(60, 1));
         Paragraph.builder()
             .text(Text.from(Line.from(
@@ -326,9 +337,36 @@ public class InlineProgressDemo {
         System.out.print(buf.toAnsiStringTrimmed());
         System.out.flush();
 
-        var scanner = new Scanner(System.in);
         var input = scanner.nextLine().trim().toLowerCase();
         return input.isEmpty() || input.startsWith("y");
+    }
+
+    private static boolean promptRestart() throws Exception {
+        System.out.println();
+        var buf = Buffer.empty(Rect.of(60, 1));
+        Paragraph.builder()
+            .text(Text.from(Line.from(
+                Span.styled("? ", Style.EMPTY.fg(Color.CYAN).addModifier(Modifier.BOLD)),
+                Span.raw("Press "),
+                Span.styled("r", Style.EMPTY.fg(Color.YELLOW).addModifier(Modifier.BOLD)),
+                Span.raw(" to restart or any other key to exit "))))
+            .build()
+            .render(buf.area(), buf);
+        System.out.print(buf.toAnsiStringTrimmed());
+        System.out.flush();
+
+        try (Backend backend = BackendFactory.create()) {
+            backend.enableRawMode();
+            int key = backend.read(0);
+            backend.disableRawMode();
+            System.out.println();
+            if (key == 'r' || key == 'R') {
+                System.out.println();
+                return true;
+            }
+            System.out.println("Goodbye!");
+            return false;
+        }
     }
 
     private static void printSuccess(String message) {

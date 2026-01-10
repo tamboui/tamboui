@@ -6,6 +6,7 @@
  */
 module dev.tamboui.core {
     exports dev.tamboui.buffer;
+    exports dev.tamboui.inline;
     exports dev.tamboui.layout;
     exports dev.tamboui.style;
     exports dev.tamboui.symbols.merge;
