@@ -5,6 +5,7 @@
 package dev.tamboui.toolkit.app;
 
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.terminal.Backend;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
@@ -100,6 +101,22 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /**
+     * Creates a ToolkitRunner with a custom backend.
+     * <p>
+     * This method is primarily intended for testing purposes, allowing
+     * the use of a test backend that doesn't interact with a real terminal.
+     *
+     * @param backend the backend to use
+     * @param config the configuration to use
+     * @return a new ToolkitRunner
+     * @throws Exception if terminal initialization fails
+     */
+    public static ToolkitRunner create(Backend backend, TuiConfig config) throws Exception {
+        TuiRunner tuiRunner = TuiRunner.create(backend, config);
+        return new ToolkitRunner(tuiRunner);
+    }
+
+    /**
      * Runs the application with the given element supplier.
      * The supplier is called each frame to get the current UI state.
      * <p>
@@ -127,8 +144,14 @@ public final class ToolkitRunner implements AutoCloseable {
                 }
 
                 // Auto-focus first focusable element if nothing is focused
+                // Prefer focusing the root panel (id="root") if it exists, otherwise first element
                 if (focusManager.focusedId() == null && !focusManager.focusOrder().isEmpty()) {
-                    focusManager.setFocus(focusManager.focusOrder().get(0));
+                    // Prefer "root" if it exists, otherwise first element
+                    if (focusManager.focusOrder().contains("root")) {
+                        focusManager.setFocus("root");
+                    } else {
+                        focusManager.setFocus(focusManager.focusOrder().get(0));
+                    }
                 }
             }
         );

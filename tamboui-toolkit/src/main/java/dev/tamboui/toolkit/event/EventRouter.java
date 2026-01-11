@@ -181,9 +181,18 @@ public final class EventRouter {
         // If not consumed, give all elements a chance to handle (for global hotkeys)
         for (Element element : elements) {
             if (focusedId == null || !focusedId.equals(element.id())) {
+                // Try element's handler first
                 EventResult result = element.handleKeyEvent(event, false);
                 if (result.isHandled()) {
                     return result;
+                }
+                // Also try lambda handler for unfocused elements (for global hotkeys)
+                KeyEventHandler handler = element.keyEventHandler();
+                if (handler != null) {
+                    result = handler.handle(event);
+                    if (result.isHandled()) {
+                        return result;
+                    }
                 }
             }
         }
@@ -249,7 +258,7 @@ public final class EventRouter {
                         }
                     }
 
-                    // Only stop here if we actually did something (focused or had handlers)
+                    // If element was focused, stop here (even if handler returned UNHANDLED)
                     // Otherwise continue to check elements underneath
                     if (wasFocused) {
                         return EventResult.HANDLED;
@@ -260,6 +269,28 @@ public final class EventRouter {
 
             // Clicked outside all elements - clear focus
             focusManager.clearFocus();
+        }
+        
+        // Handle RELEASE events (for non-drag clicks)
+        if (event.kind() == MouseEventKind.RELEASE && draggingElement == null) {
+            // Find element at position and route release event
+            for (int i = elements.size() - 1; i >= 0; i--) {
+                Element element = elements.get(i);
+                Rect area = getArea(element);
+                if (area != null && area.contains(event.x(), event.y())) {
+                    EventResult result = element.handleMouseEvent(event);
+                    if (result.isHandled()) {
+                        return result;
+                    }
+                    MouseEventHandler handler = element.mouseEventHandler();
+                    if (handler != null) {
+                        result = handler.handle(event);
+                        if (result.isHandled()) {
+                            return result;
+                        }
+                    }
+                }
+            }
         }
 
         // Route other mouse events to element at position
