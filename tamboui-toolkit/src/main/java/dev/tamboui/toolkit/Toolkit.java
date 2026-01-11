@@ -784,6 +784,10 @@ public final class Toolkit {
                 state.moveCursorToEnd();
                 return true;
             case CHAR:
+                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
+                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                    return false;
+                }
                 char c = event.character();
                 if (c >= 32 && c < 127) {
                     state.insert(c);

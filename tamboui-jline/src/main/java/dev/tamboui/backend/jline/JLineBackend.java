@@ -133,6 +133,11 @@ public class JLineBackend implements Backend {
     public void enableRawMode() throws IOException {
         savedAttributes = terminal.getAttributes();
         terminal.enterRawMode();
+        // Disable signal generation so Ctrl+C goes through the event system
+        // instead of generating SIGINT. This allows bindings to control quit behavior.
+        Attributes attrs = terminal.getAttributes();
+        attrs.setLocalFlag(Attributes.LocalFlag.ISIG, false);
+        terminal.setAttributes(attrs);
     }
 
     @Override
