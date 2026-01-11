@@ -304,15 +304,15 @@ public class FileManagerView implements Element {
         }
 
         String fileName = file.getFileName().toString();
-        boolean isPng = fileName.toLowerCase().endsWith(".png");
+        boolean isImage = isImageFile(fileName);
 
         // Calculate dialog size (use most of the screen)
         int dialogWidth = Math.min(area.width() - 4, 120);
         int dialogHeight = Math.min(area.height() - 4, 40);
 
-        // For PNG images, create the image widget first to get protocol name
+        // For image files, create the image widget first to get protocol name
         String dialogTitle = fileName;
-        if (isPng) {
+        if (isImage) {
             try {
                 ImageData imageData = ImageData.fromPath(file);
                 Image image = Image.builder()
@@ -330,7 +330,7 @@ public class FileManagerView implements Element {
         Element viewerElement = new Element() {
             @Override
             public void render(Frame frame, Rect renderArea, RenderContext ctx) {
-                if (isPng) {
+                if (isImage) {
                     renderImage(frame, renderArea, file);
                 } else {
                     renderTextFile(frame, renderArea, file);
@@ -346,7 +346,7 @@ public class FileManagerView implements Element {
         // Create dialog with viewer content
         currentDialog = dialog(dialogTitle,
                 viewerElement,
-                text(isPng 
+                text(isImage 
                         ? "[Esc] Close" 
                         : "[Esc] Close  [↑↓] Scroll  [PgUp/PgDn] Page").dim()
         ).rounded()
@@ -415,10 +415,10 @@ public class FileManagerView implements Element {
         }
 
         String fileName = file.getFileName().toString();
-        boolean isPng = fileName.toLowerCase().endsWith(".png");
+        boolean isImage = isImageFile(fileName);
 
         // Only handle scroll keys for text files
-        if (!isPng) {
+        if (!isImage) {
             if (event.isUp()) {
                 manager.scrollTextUp();
                 return EventResult.HANDLED;
@@ -439,6 +439,11 @@ public class FileManagerView implements Element {
         }
 
         return EventResult.UNHANDLED;
+    }
+
+    private static boolean isImageFile(String fileName) {
+        String lower = fileName.toLowerCase();
+        return lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg");
     }
 
     private static String formatSize(long size) {
