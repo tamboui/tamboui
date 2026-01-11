@@ -291,8 +291,13 @@ public final class DefaultRenderContext implements RenderContext {
      */
     public void registerElement(Element element, Rect area) {
         eventRouter.registerElement(element, area);
-        if (element.isFocusable() && element.id() != null) {
-            focusManager.registerFocusable(element.id(), area);
+        if (element.id() != null) {
+            if (element.isFocusable()) {
+                focusManager.registerFocusable(element.id(), area);
+            } else {
+                // Register non-focusable elements with IDs for widget selection in tests
+                focusManager.registerElement(element.id(), area);
+            }
         }
     }
 

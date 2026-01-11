@@ -8,6 +8,7 @@ import dev.tamboui.layout.Rect;
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ public final class FocusManager {
     private String focusedId;
     private final List<String> focusOrder = new ArrayList<>();
     private final Map<String, Rect> focusableAreas = new LinkedHashMap<>();
+    // Track all elements with IDs (for widget selection in tests), not just focusable ones
+    private final Map<String, Rect> allElementAreas = new LinkedHashMap<>();
 
     /**
      * Returns the ID of the currently focused element.
@@ -70,6 +73,20 @@ public final class FocusManager {
                 focusOrder.add(elementId);
             }
             focusableAreas.put(elementId, area);
+            allElementAreas.put(elementId, area);
+        }
+    }
+
+    /**
+     * Registers an element with an ID (for widget selection), even if not focusable.
+     * This allows non-focusable elements to be found by ID for testing.
+     *
+     * @param elementId the element ID
+     * @param area the rendered area
+     */
+    public void registerElement(String elementId, Rect area) {
+        if (elementId != null) {
+            allElementAreas.put(elementId, area);
         }
     }
 
@@ -80,6 +97,7 @@ public final class FocusManager {
     public void clearFocusables() {
         focusOrder.clear();
         focusableAreas.clear();
+        allElementAreas.clear();
     }
 
     /**
@@ -175,5 +193,18 @@ public final class FocusManager {
      */
     public List<String> focusOrder() {
         return listCopyOf(focusOrder);
+    }
+
+    /**
+     * Returns a map of all registered focusable element IDs to their areas.
+     * <p>
+     * This method is useful for testing and widget selection, allowing
+     * test code to find elements by ID and interact with them.
+     *
+     * @return an unmodifiable map of element IDs to their areas
+     */
+    public Map<String, Rect> focusableAreas() {
+        // Return all elements with IDs (not just focusable ones) for widget selection
+        return Collections.unmodifiableMap(new LinkedHashMap<>(allElementAreas));
     }
 }

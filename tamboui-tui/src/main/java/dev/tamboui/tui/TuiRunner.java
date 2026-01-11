@@ -14,7 +14,6 @@ import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.EventParser;
-import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
 
@@ -165,6 +164,40 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
+     * Creates a TuiRunner with a custom backend.
+     * <p>
+     * This method is primarily intended for testing purposes, allowing
+     * the use of a test backend that doesn't interact with a real terminal.
+     *
+     * @param backend the backend to use
+     * @param config the configuration to use
+     * @return a new TuiRunner
+     * @throws Exception if terminal initialization fails
+     */
+    public static TuiRunner create(Backend backend, TuiConfig config) throws Exception {
+        try {
+            if (config.rawMode()) {
+                backend.enableRawMode();
+            }
+            if (config.alternateScreen()) {
+                backend.enterAlternateScreen();
+            }
+            if (config.hideCursor()) {
+                backend.hideCursor();
+            }
+            if (config.mouseCapture()) {
+                backend.enableMouseCapture();
+            }
+
+            Terminal<Backend> terminal = new Terminal<>(backend);
+            return new TuiRunner(backend, terminal, config);
+        } catch (Exception e) {
+            backend.close();
+            throw e;
+        }
+    }
+
+    /**
      * Runs the main event loop with the given handler and renderer.
      *
      * @param handler  the event handler
@@ -253,6 +286,17 @@ public final class TuiRunner implements AutoCloseable {
      */
     public Backend backend() {
         return backend;
+    }
+
+    /**
+     * Injects an event into the event queue primarily for testing purposes
+     *
+     * @param event the event to inject
+     */
+    public void injectEvent(Event event) {
+        if (running.get()) {
+            eventQueue.offer(event);
+        }
     }
 
     private void generateTick() {
