@@ -206,8 +206,12 @@ public final class Block implements Widget {
     
     private void setBorderCell(Buffer buffer, int x, int y, String symbol, Style borderStyle) {
         Cell existing = buffer.get(x, y);
-        // Merge borderStyle with existing style to preserve background from buffer.setStyle()
-        Style mergedStyle = existing.style().patch(borderStyle);
+        // Preserve only the background color from existing style, not text modifiers like italic.
+        // Text modifiers should only apply to text content, not border characters.
+        Style baseStyle = existing.style().bg()
+            .map(bg -> Style.EMPTY.bg(bg))
+            .orElse(Style.EMPTY);
+        Style mergedStyle = baseStyle.patch(borderStyle);
 
         if (mergeStrategy != MergeStrategy.REPLACE) {
             String existingSymbol = existing.symbol();
