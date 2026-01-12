@@ -53,7 +53,7 @@ public final class ToolkitPilot implements Pilot {
     @Override
     public void press(KeyCode keyCode, KeyModifiers modifiers) {
         dev.tamboui.tui.event.KeyEvent event = dev.tamboui.tui.event.KeyEvent.ofKey(keyCode, modifiers);
-        injectEvent(event);
+        dispatch(event);
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class ToolkitPilot implements Pilot {
     @Override
     public void press(char c, KeyModifiers modifiers) {
         dev.tamboui.tui.event.KeyEvent event = dev.tamboui.tui.event.KeyEvent.ofChar(c, modifiers);
-        injectEvent(event);
+        dispatch(event);
     }
 
     @Override
@@ -91,13 +91,13 @@ public final class ToolkitPilot implements Pilot {
     @Override
     public void mousePress(MouseButton button, int x, int y) {
         dev.tamboui.tui.event.MouseEvent event = dev.tamboui.tui.event.MouseEvent.press(button, x, y);
-        injectEvent(event);
+        dispatch(event);
     }
 
     @Override
     public void mouseRelease(MouseButton button, int x, int y) {
         dev.tamboui.tui.event.MouseEvent event = dev.tamboui.tui.event.MouseEvent.release(button, x, y);
-        injectEvent(event);
+        dispatch(event);
     }
 
     @Override
@@ -122,13 +122,13 @@ public final class ToolkitPilot implements Pilot {
     @Override
     public void mouseMove(int x, int y) {
         dev.tamboui.tui.event.MouseEvent event = dev.tamboui.tui.event.MouseEvent.move(x, y);
-        injectEvent(event);
+        dispatch(event);
     }
 
     @Override
     public void resize(int width, int height) {
         dev.tamboui.tui.event.ResizeEvent event = dev.tamboui.tui.event.ResizeEvent.of(width, height);
-        injectEvent(event);
+        dispatch(event);
     }
 
     @Override
@@ -154,8 +154,8 @@ public final class ToolkitPilot implements Pilot {
         }
     }
 
-    private void injectEvent(dev.tamboui.tui.event.Event event) {
-        tuiRunner.injectEvent(event);
+    private void dispatch(dev.tamboui.tui.event.Event event) {
+        tuiRunner.dispatch(event);
         pause();
     }
 
@@ -182,7 +182,7 @@ public final class ToolkitPilot implements Pilot {
 
     @Override
     public Rect findElement(String elementId) throws ElementNotFoundException {
-        Map<String, Rect> areas = focusManager.focusableAreas();
+        Map<String, Rect> areas = focusManager.findElements();
         Rect area = areas.get(elementId);
         if (area == null) {
             throw new ElementNotFoundException("Element not found: " + elementId);
