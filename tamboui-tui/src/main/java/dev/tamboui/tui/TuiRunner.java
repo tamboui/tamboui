@@ -289,11 +289,11 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
-     * Injects an event into the event queue primarily for testing purposes
+     * Dispatches an event into the event queue primarily for testing purposes
      *
-     * @param event the event to inject
+     * @param event the event to dispatch
      */
-    public void injectEvent(Event event) {
+    public void dispatch(Event event) {
         if (running.get()) {
             eventQueue.offer(event);
         }

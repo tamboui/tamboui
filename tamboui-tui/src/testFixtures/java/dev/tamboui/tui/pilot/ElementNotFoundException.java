@@ -7,7 +7,7 @@ package dev.tamboui.tui.pilot;
 /**
  * Exception thrown when an element cannot be found by ID.
  */
-public class ElementNotFoundException extends Exception {
+public class ElementNotFoundException extends RuntimeException {
     /**
      * Creates a new exception with the given message.
      *
