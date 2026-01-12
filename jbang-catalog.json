@@ -16,6 +16,9 @@
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
+    "textvm-demo": {
+      "script-ref": "demos/textvm-demo/src/main/java/dev/tamboui/demo/JTextVM.java"
+    },
     "css-demo": {
       "script-ref": "tamboui-css/demos/css-demo/src/main/java/dev/tamboui/demo/CssDemo.java"
     },
