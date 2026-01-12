@@ -13,6 +13,7 @@ dependencies {
     testImplementation(testFixtures(projects.tambouiCore))
     testImplementation(testFixtures(projects.tambouiTui))
     testFixturesImplementation(projects.tambouiTui)
+    testFixturesImplementation(testFixtures(projects.tambouiTui))
     testFixturesImplementation(projects.tambouiCore)
     testFixturesImplementation(projects.tambouiWidgets)
 }
