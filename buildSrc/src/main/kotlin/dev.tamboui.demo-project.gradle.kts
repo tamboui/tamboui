@@ -12,7 +12,9 @@ plugins {
 dependencies {
     implementation(project(":tamboui-core"))
     implementation(project(":tamboui-widgets"))
+    // Order of backend dependencies matters: first one has higher priority
     runtimeOnly(project(":tamboui-panama-backend"))
+    runtimeOnly(project(":tamboui-jline"))
 }
 
 tasks.withType<JavaExec>().configureEach {

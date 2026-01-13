@@ -17,8 +17,11 @@ import java.util.stream.StreamSupport;
  * Factory for creating {@link Backend} instances using the {@link ServiceLoader} mechanism.
  * <p>
  * This factory discovers {@link BackendProvider} implementations on the classpath
- * and uses them to create backend instances. Applications should include exactly
- * one backend provider on the classpath (e.g., tamboui-jline).
+ * and uses them to create backend instances. When multiple providers are available,
+ * they are tried in order until one successfully creates a backend.
+ * <p>
+ * The provider order can be explicitly controlled via a comma-separated list
+ * (e.g., "panama,jline") in the system property or environment variable.
  *
  * @see BackendProvider
  * @see Backend
@@ -37,22 +40,23 @@ public final class BackendFactory {
      * <ol>
      *   <li>System property {@code tamboui.backend} (if set)</li>
      *   <li>Environment variable {@code TAMBOUI_BACKEND} (if set)</li>
-     *   <li>Auto-discovery via ServiceLoader (if exactly one provider is found)</li>
+     *   <li>Auto-discovery via ServiceLoader</li>
      * </ol>
      * <p>
      * The provider can be specified by:
      * <ul>
      *   <li>Simple name (e.g., "jline", "panama") - matches the provider's {@link BackendProvider#name()}</li>
      *   <li>Fully qualified class name (e.g., "dev.tamboui.backend.jline.JLineBackendProvider")</li>
+     *   <li>Comma-separated list (e.g., "panama,jline") - tries each in order until one succeeds</li>
      * </ul>
      * <p>
-     * If multiple providers are found and none is explicitly specified, an exception is thrown
-     * with a list of available providers.
+     * Providers are tried in order until one successfully creates a backend. If a provider
+     * fails (throws an exception), the next provider is attempted. This applies both to
+     * explicitly specified providers and auto-discovered ones.
      *
      * @return a new backend instance
      * @throws IOException if backend creation fails
-     * @throws IllegalStateException if no provider is found, multiple providers are found without explicit selection,
-     *                               or the specified provider cannot be found or instantiated
+     * @throws IllegalStateException if no provider is found or all providers fail
      */
     public static Backend create() throws IOException {
         // Check system property first, then environment variable
@@ -60,48 +64,17 @@ public final class BackendFactory {
         if (userSelectedProvider == null || userSelectedProvider.isEmpty()) {
             userSelectedProvider = System.getenv("TAMBOUI_BACKEND");
         }
-        String providerSpec = userSelectedProvider;
-        boolean isClassName = providerSpec != null && providerSpec.contains(".");
 
-        // Load all available providers (needed for simple name matching or auto-discovery)
+        // Load all available providers
         ServiceLoader<BackendProvider> loader = ServiceLoader.load(BackendProvider.class);
-        List<BackendProvider> providers = StreamSupport.stream(loader.spliterator(), false)
-                .filter(p -> {
-                    if (providerSpec == null || providerSpec.isEmpty()) {
-                        return true;
-                    }
-                    if (isClassName) {
-                        // If a class name is specified, filter to only that provider
-                        return p.getClass().getName().equals(providerSpec);
-                    }
-                    return p.name().equals(providerSpec);
-                })
+        List<BackendProvider> allProviders = StreamSupport.stream(loader.spliterator(), false)
                 .collect(Collectors.toList());
 
-        if (providers.isEmpty()) {
-            String details = "";
-            if (isClassName) {
-                details = " for class name '" + providerSpec + "'";
-            } else if (providerSpec != null && !providerSpec.isEmpty()) {
-                details = " for provider name '" + providerSpec + "'";
-            }
-            throw new IllegalStateException(
-                "No BackendProvider found on classpath" + details + ".\n" +
-                "Add a backend dependency such as tamboui-jline."
-            );
-        }
+        List<BackendProvider> providers = (userSelectedProvider != null && !userSelectedProvider.isEmpty())
+                ? resolveProviders(userSelectedProvider, allProviders)
+                : allProviders;
 
-        // No explicit selection - check if we have exactly one
-        if (providers.size() > 1) {
-            String availableProviders = formatAvailableProviders(providers);
-            throw new IllegalStateException(
-                "Multiple backend providers found on classpath.\n"+
-                "Include only one backend or specify which provider to use by setting the tamboui.backend system property " +
-                "or TAMBOUI_BACKEND environment variable to one of:\n" + availableProviders
-            );
-        }
-
-        Backend backend = providers.get(0).create();
+        Backend backend = tryProviders(providers);
 
         // Check if recording is enabled and wrap the backend
         RecordingConfig recordingConfig = RecordingConfig.load();
@@ -110,6 +83,73 @@ public final class BackendFactory {
         }
 
         return backend;
+    }
+
+    /**
+     * Resolves providers from a user specification, returning them in the specified order.
+     *
+     * @param providerSpec the provider specification (may be comma-separated)
+     * @param allProviders all available providers from ServiceLoader
+     * @return list of matching providers in the specified order
+     * @throws IllegalStateException if a specified provider is not found
+     */
+    private static List<BackendProvider> resolveProviders(String providerSpec, List<BackendProvider> allProviders) {
+        List<BackendProvider> resolved = new java.util.ArrayList<>();
+        for (String spec : providerSpec.split(",")) {
+            String trimmedSpec = spec.trim();
+            if (trimmedSpec.isEmpty()) {
+                continue;
+            }
+            boolean isClassName = trimmedSpec.contains(".");
+            BackendProvider provider = allProviders.stream()
+                    .filter(p -> isClassName
+                            ? p.getClass().getName().equals(trimmedSpec)
+                            : p.name().equals(trimmedSpec))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException(
+                            "No BackendProvider found on classpath for " +
+                            (isClassName ? "class name" : "provider name") +
+                            " '" + trimmedSpec + "'.\n" +
+                            "Add a backend dependency such as tamboui-jline."
+                    ));
+            resolved.add(provider);
+        }
+        return resolved;
+    }
+
+    /**
+     * Tries each provider in order until one successfully creates a backend.
+     *
+     * @param providers the providers to try
+     * @return a new backend instance
+     * @throws IllegalStateException if no provider succeeds
+     */
+    private static Backend tryProviders(List<BackendProvider> providers) {
+        if (providers.isEmpty()) {
+            throw new IllegalStateException(
+                "No BackendProvider found on classpath.\n" +
+                "Add a backend dependency such as tamboui-jline."
+            );
+        }
+
+        StringBuilder errors = new StringBuilder();
+        for (BackendProvider provider : providers) {
+            try {
+                System.err.println("Trying backend provider: " + provider.name());
+                return provider.create();
+            } catch (Exception e) {
+                if (errors.length() > 0) {
+                    errors.append("\n");
+                }
+                errors.append("  ").append(provider.name()).append(": ").append(e.getMessage());
+            }
+        }
+
+        throw new IllegalStateException(
+            "All backend providers failed to create a backend.\n" +
+            "Tried: " + formatAvailableProviders(providers) + "\n" +
+            "Errors:\n" + errors
+        );
     }
 
     /**
