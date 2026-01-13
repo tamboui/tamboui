@@ -145,7 +145,15 @@ public final class WindowsTerminal implements PlatformTerminal {
             if (timeoutMs == 0) {
                 return -2; // Non-blocking, no data
             }
-            // For now, we do a blocking read (proper timeout handling would require WaitForSingleObject)
+            // Wait for input with timeout using WaitForSingleObject
+            var waitResult = Kernel32.waitForSingleObject(inputHandle, timeoutMs);
+            if (waitResult == Kernel32.WAIT_TIMEOUT) {
+                return -2; // Timeout, no data
+            }
+            if (waitResult == Kernel32.WAIT_FAILED) {
+                throw new IOException("WaitForSingleObject failed (error=" + Kernel32.getLastError() + ")");
+            }
+            // WAIT_OBJECT_0: input is available, proceed to read
         }
 
         if (Kernel32.readConsoleInput(inputHandle, inputRecord, 1, intBuffer) == 0) {

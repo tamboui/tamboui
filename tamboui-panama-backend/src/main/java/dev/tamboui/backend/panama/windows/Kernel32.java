@@ -44,6 +44,11 @@ public final class Kernel32 {
     // Invalid handle value
     public static final long INVALID_HANDLE_VALUE = -1L;
 
+    // WaitForSingleObject return values
+    public static final int WAIT_OBJECT_0 = 0x00000000;
+    public static final int WAIT_TIMEOUT = 0x00000102;
+    public static final int WAIT_FAILED = 0xFFFFFFFF;
+
     private static final Linker LINKER = Linker.nativeLinker();
     private static final SymbolLookup KERNEL32;
 
@@ -56,6 +61,7 @@ public final class Kernel32 {
     private static final MethodHandle READ_CONSOLE_INPUT;
     private static final MethodHandle GET_NUMBER_OF_CONSOLE_INPUT_EVENTS;
     private static final MethodHandle GET_LAST_ERROR;
+    private static final MethodHandle WAIT_FOR_SINGLE_OBJECT;
 
     static {
         KERNEL32 = SymbolLookup.libraryLookup("kernel32", Arena.global());
@@ -101,6 +107,11 @@ public final class Kernel32 {
             GET_LAST_ERROR = LINKER.downcallHandle(
                     KERNEL32.find("GetLastError").orElseThrow(),
                     FunctionDescriptor.of(ValueLayout.JAVA_INT)
+            );
+
+            WAIT_FOR_SINGLE_OBJECT = LINKER.downcallHandle(
+                    KERNEL32.find("WaitForSingleObject").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
             );
         } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
@@ -231,6 +242,22 @@ public final class Kernel32 {
             return (int) GET_LAST_ERROR.invokeExact();
         } catch (Throwable t) {
             throw new RuntimeException("GetLastError failed", t);
+        }
+    }
+
+    /**
+     * Waits until the specified object is in the signaled state or the timeout interval elapses.
+     *
+     * @param handle    handle to the object
+     * @param timeoutMs timeout interval in milliseconds, or -1 (INFINITE) for no timeout
+     * @return WAIT_OBJECT_0 if the object is signaled, WAIT_TIMEOUT if timeout elapsed,
+     *         or WAIT_FAILED on error
+     */
+    public static int waitForSingleObject(MemorySegment handle, int timeoutMs) {
+        try {
+            return (int) WAIT_FOR_SINGLE_OBJECT.invokeExact(handle, timeoutMs);
+        } catch (Throwable t) {
+            throw new RuntimeException("WaitForSingleObject failed", t);
         }
     }
 
