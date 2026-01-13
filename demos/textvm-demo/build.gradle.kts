@@ -12,7 +12,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("dev.tamboui.demo.JTextVM")
+    mainClass = "dev.tamboui.demo.JTextVM"
     applicationDefaultJvmArgs = listOf(
         "--add-opens=jdk.attach/sun.tools.attach=ALL-UNNAMED",
         "--add-opens=jdk.internal.jvmstat/sun.jvmstat.perfdata.monitor.protocol.local=ALL-UNNAMED",
