@@ -203,6 +203,16 @@ public class PanamaBackend implements Backend {
     }
 
     @Override
+    public void writeRaw(byte[] data) throws IOException {
+        terminal.write(data);
+    }
+
+    @Override
+    public void writeRaw(String data) throws IOException {
+        terminal.write(data);
+    }
+
+    @Override
     public void close() throws IOException {
         try {
             // Reset state

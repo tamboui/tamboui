@@ -100,15 +100,11 @@ public final class BackendFactory {
             if (trimmedSpec.isEmpty()) {
                 continue;
             }
-            boolean isClassName = trimmedSpec.contains(".");
             BackendProvider provider = allProviders.stream()
-                    .filter(p -> isClassName
-                            ? p.getClass().getName().equals(trimmedSpec)
-                            : p.name().equals(trimmedSpec))
+                    .filter(p -> p.name().equals(trimmedSpec))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException(
-                            "No BackendProvider found on classpath for " +
-                            (isClassName ? "class name" : "provider name") +
+                            "No BackendProvider found on classpath for provider name" +
                             " '" + trimmedSpec + "'.\n" +
                             "Add a backend dependency such as tamboui-jline."
                     ));
@@ -135,7 +131,6 @@ public final class BackendFactory {
         StringBuilder errors = new StringBuilder();
         for (BackendProvider provider : providers) {
             try {
-                System.err.println("Trying backend provider: " + provider.name());
                 return provider.create();
             } catch (Exception e) {
                 if (errors.length() > 0) {
