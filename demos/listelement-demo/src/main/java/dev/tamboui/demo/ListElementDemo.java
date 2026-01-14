@@ -8,33 +8,33 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.elements.RichList;
+import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * Demonstrates RichList's ability to display rich content.
+ * Demonstrates ListElement's ability to display rich content.
  * <p>
  * Unlike the low-level ListWidget (which only accepts ListItem with text + style),
- * RichList accepts any StyledElement as items:
+ * ListElement accepts any StyledElement as items:
  * <ul>
  *   <li>Styled text with icons</li>
  *   <li>Rows combining multiple elements</li>
  *   <li>Nested panels and complex layouts</li>
  * </ul>
  * <p>
- * RichList also manages its own internal state for selection and scrolling,
+ * ListElement also manages its own internal state for selection and scrolling,
  * so no external ListState is needed.
  */
-public class RichListDemo extends ToolkitApp {
+public class ListElementDemo extends ToolkitApp {
 
-    private final RichList<?> richList;
+    private final ListElement<?> listElement;
 
-    public RichListDemo() {
+    public ListElementDemo() {
         // Each .add() creates ONE selectable item - all items are independent (flat list)
-        richList = list()
+        listElement = list()
             .add(text("1. Plain text item"))
             .add(text("2. Styled text").bold().cyan())
             .add(row(text("3. ").length(4), text("■ ").cyan().length(2), text("File: document.txt")))
@@ -56,7 +56,7 @@ public class RichListDemo extends ToolkitApp {
     }
 
     public static void main(String[] args) throws Exception {
-        new RichListDemo().run();
+        new ListElementDemo().run();
     }
 
     @Override
@@ -64,13 +64,13 @@ public class RichListDemo extends ToolkitApp {
         return column(
             // Header
             panel(
-                text(" Rich List Demo - RichList with StyledElement items ").bold().cyan()
+                text(" Rich List Demo - ListElement with StyledElement items ").bold().cyan()
             ).rounded().borderColor(Color.CYAN).length(3),
 
             // Main content
             row(
                 // The rich list
-                panel(richList)
+                panel(listElement)
                     .title("Rich Items (" + 12 + " items)")
                     .rounded()
                     .borderColor(Color.WHITE)
@@ -84,7 +84,7 @@ public class RichListDemo extends ToolkitApp {
                     column(
                         text("About This Demo").bold().cyan(),
                         text(""),
-                        text("RichList accepts any"),
+                        text("ListElement accepts any"),
                         text("StyledElement as items:"),
                         text(""),
                         text(" - Styled text").green(),
@@ -112,11 +112,11 @@ public class RichListDemo extends ToolkitApp {
 
     private EventResult handleKey(KeyEvent event) {
         if (event.isUp()) {
-            richList.selectPrevious();
+            listElement.selectPrevious();
             return EventResult.HANDLED;
         }
         if (event.isDown()) {
-            richList.selectNext(12);
+            listElement.selectNext(12);
             return EventResult.HANDLED;
         }
         return EventResult.UNHANDLED;

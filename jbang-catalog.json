@@ -17,7 +17,7 @@
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
     "rich-list-demo": {
-      "script-ref": "demos/rich-list-demo/src/main/java/dev/tamboui/demo/RichListDemo.java"
+      "script-ref": "demos/rich-list-demo/src/main/java/dev/tamboui/demo/ListElementDemo.java"
     },
     "css-demo": {
       "script-ref": "tamboui-css/demos/css-demo/src/main/java/dev/tamboui/demo/CssDemo.java"

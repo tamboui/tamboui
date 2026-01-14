@@ -12,7 +12,7 @@ import dev.tamboui.toolkit.elements.ChartElement;
 import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.GaugeElement;
 import dev.tamboui.toolkit.elements.LineGaugeElement;
-import dev.tamboui.toolkit.elements.RichList;
+import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.elements.Panel;
 import dev.tamboui.toolkit.elements.Row;
 import dev.tamboui.toolkit.elements.ScrollbarElement;
@@ -266,24 +266,24 @@ class ToolkitTest {
     class ListFactoryTests {
 
         @Test
-        @DisplayName("list() creates empty RichList")
+        @DisplayName("list() creates empty ListElement")
         void emptyList() {
-            RichList<?> element = list();
-            assertThat(element).isInstanceOf(RichList.class);
+            ListElement<?> element = list();
+            assertThat(element).isInstanceOf(ListElement.class);
         }
 
         @Test
-        @DisplayName("list(String...) creates RichList with items")
+        @DisplayName("list(String...) creates ListElement with items")
         void listWithItems() {
-            RichList<?> element = list("Item 1", "Item 2", "Item 3");
-            assertThat(element).isInstanceOf(RichList.class);
+            ListElement<?> element = list("Item 1", "Item 2", "Item 3");
+            assertThat(element).isInstanceOf(ListElement.class);
         }
 
         @Test
-        @DisplayName("list(List<String>) creates RichList with items")
+        @DisplayName("list(List<String>) creates ListElement with items")
         void listWithItemsList() {
-            RichList<?> element = list(Arrays.asList("A", "B", "C"));
-            assertThat(element).isInstanceOf(RichList.class);
+            ListElement<?> element = list(Arrays.asList("A", "B", "C"));
+            assertThat(element).isInstanceOf(ListElement.class);
         }
     }
 

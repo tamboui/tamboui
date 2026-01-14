@@ -424,7 +424,7 @@ Tables and text inputs need state objects. Lists manage their own state internal
 
 [source,java]
 ----
-private RichList<?> myList = list("Apple", "Banana", "Cherry")
+private ListElement<?> myList = list("Apple", "Banana", "Cherry")
     .highlightColor(Color.CYAN)
     .autoScroll();
 
@@ -432,7 +432,7 @@ private TableState tableState = new TableState();
 private TextInputState inputState = new TextInputState();
 
 // In render():
-myList  // RichList manages selection and scroll internally
+myList  // ListElement manages selection and scroll internally
 
 table()
     .header("Name", "Age")
@@ -444,7 +444,7 @@ textInput(inputState)
     .placeholder("Type here...")
 ----
 
-RichList provides methods for navigation:
+ListElement provides methods for navigation:
 [source,java]
 ----
 myList.selectNext(itemCount);  // Move selection down
@@ -527,7 +527,7 @@ public class TodoApp extends ToolkitApp {
         "Learn TamboUI",
         "Build something cool"
     ));
-    private final RichList<?> todoList = list()
+    private final ListElement<?> todoList = list()
         .highlightColor(Color.CYAN)
         .autoScroll();
 

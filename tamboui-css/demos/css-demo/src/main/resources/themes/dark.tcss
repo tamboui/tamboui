@@ -27,32 +27,32 @@ Panel:focus {
 }
 
 /* List styling */
-RichList {
+ListElement {
     background: $bg-primary;
     border-color: $border-color;
 }
 
-RichList:focus {
+ListElement:focus {
     border-color: $focus-color;
 }
 
 /* List item styles - using type-based sub-component naming */
-RichList-item {
+ListElement-item {
     color: $fg-primary;
 }
 
-RichList-item:selected {
+ListElement-item:selected {
     background: $highlight-bg;
     color: $accent;
     text-style: bold;
 }
 
 /* Zebra striping for list items */
-RichList-item:nth-child(even) {
+ListElement-item:nth-child(even) {
     background: #229922;
 }
 
-RichList-item:nth-child(odd) {
+ListElement-item:nth-child(odd) {
     background: #992299;
 }
 

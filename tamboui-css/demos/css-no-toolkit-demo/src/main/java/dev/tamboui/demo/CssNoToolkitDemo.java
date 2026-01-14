@@ -259,8 +259,8 @@ public class CssNoToolkitDemo {
     private void renderList(Frame frame, Rect area) {
         boolean isFocused = focusedPanel == 0;
 
-        CssStyleResolver listResolver = resolveStyle("RichList", "nav-list", Set.of(), isFocused);
-        CssStyleResolver selectedResolver = resolveStyleWithState("RichList-item", null, Set.of(), PseudoClassState.ofSelected());
+        CssStyleResolver listResolver = resolveStyle("ListElement", "nav-list", Set.of(), isFocused);
+        CssStyleResolver selectedResolver = resolveStyleWithState("ListElement-item", null, Set.of(), PseudoClassState.ofSelected());
 
         List<ListItem> items = new ArrayList<>();
         for (String item : listItems) {
@@ -274,7 +274,7 @@ public class CssNoToolkitDemo {
                     .withFirstChild(index == 0)
                     .withLastChild(index == total - 1)
                     .withNthChild(index + 1);
-                return resolveStyleWithState("RichList-item", null, Set.of(), state).toStyle();
+                return resolveStyleWithState("ListElement-item", null, Set.of(), state).toStyle();
             })
             .highlightStyle(selectedResolver.toStyle())
             .highlightSymbol("> ")

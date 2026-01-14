@@ -149,7 +149,7 @@ Wrap modes:
 
 A low-level scrollable list widget with selection. This is part of the widgets layer and requires manual state management with `ListState`.
 
-NOTE: **For Toolkit DSL users**: Use `RichList` instead (via `list()` factory method). It manages state internally and accepts any `StyledElement` as items. See <<listwidget-vs-listcontainer>>.
+NOTE: **For Toolkit DSL users**: Use `ListElement` instead (via `list()` factory method). It manages state internally and accepts any `StyledElement` as items. See <<listwidget-vs-listcontainer>>.
 
 [source,java]
 ----
@@ -187,13 +187,13 @@ State methods:
 * `state.selectLast(totalItems)` - Jump to last item
 
 [[listwidget-vs-listcontainer]]
-==== ListWidget vs RichList
+==== ListWidget vs ListElement
 
 TamboUI provides two list implementations at different API levels:
 
 [cols="1,2,2",options="header"]
 |===
-|Feature |ListWidget (widgets layer) |RichList (toolkit layer)
+|Feature |ListWidget (widgets layer) |ListElement (toolkit layer)
 
 |State management
 |External `ListState` required
@@ -214,7 +214,7 @@ TamboUI provides two list implementations at different API levels:
 
 **ListWidget** is for low-level control when you need to manage state externally or are building custom rendering with `TuiRunner`.
 
-**RichList** is for Toolkit DSL users who want:
+**ListElement** is for Toolkit DSL users who want:
 
 * Internal state management (no `ListState` needed)
 * Rich content (any `StyledElement` as items, not just text)
@@ -223,7 +223,7 @@ TamboUI provides two list implementations at different API levels:
 
 [source,java]
 ----
-// Toolkit DSL - RichList with rich content
+// Toolkit DSL - ListElement with rich content
 list()
     .add(row(text("⭐").yellow(), text(" Featured Item")))
     .add(text("Plain Item"))

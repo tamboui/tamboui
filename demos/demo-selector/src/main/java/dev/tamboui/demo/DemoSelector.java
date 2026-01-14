@@ -13,7 +13,7 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.toolkit.elements.RichList;
+import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.widgets.text.Overflow;
 import org.gradle.tooling.GradleConnector;
 
@@ -39,7 +39,7 @@ public class DemoSelector extends ToolkitApp {
 
     private static final String SELF_NAME = "demo-selector";
 
-    private final RichList<?> demoList;
+    private final ListElement<?> demoList;
     private final Map<String, List<DemoInfo>> demosByModule = new TreeMap<>();
     private final Set<String> expandedModules = new HashSet<>();
     private String filter = "";
@@ -213,7 +213,7 @@ public class DemoSelector extends ToolkitApp {
         var current = demoList.selected();
 
         // Note: Basic navigation (UP/DOWN/HOME/END) is now handled automatically
-        // by RichList via ContainerElement forwarding. Only custom behavior
+        // by ListElement via ContainerElement forwarding. Only custom behavior
         // (section jumping, collapse/expand, filtering) needs manual handling.
 
         // PAGE_DOWN: Jump to next section

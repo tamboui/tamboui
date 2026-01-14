@@ -17,7 +17,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.toolkit.elements.RichList;
+import dev.tamboui.toolkit.elements.ListElement;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -50,7 +50,7 @@ public class CssDemo implements Element {
         "Messages",
         "Notifications"
     );
-    private final RichList<?> navList;
+    private final ListElement<?> navList;
 
     public CssDemo() {
         styleEngine = StyleEngine.create();

@@ -34,7 +34,7 @@ import java.util.function.Function;
 /**
  * A scrollable container that displays a list of selectable items.
  * <p>
- * Unlike {@code ListWidget} (which only displays text), {@code RichList}
+ * Unlike {@code ListWidget} (which only displays text), {@code ListElement}
  * can display any {@link StyledElement} as list items, including complex
  * layouts like rows with multiple styled children.
  * <p>
@@ -55,17 +55,17 @@ import java.util.function.Function;
  * <p>
  * CSS selectors:
  * <ul>
- *   <li>{@code RichList} - styles the container (border, background)</li>
- *   <li>{@code RichList-item} - styles each list item</li>
- *   <li>{@code RichList-item:selected} - styles the selected item</li>
- *   <li>{@code RichList-item:nth-child(odd/even)} - zebra striping</li>
- *   <li>{@code RichList-scrollbar-thumb} - styles the scrollbar thumb</li>
- *   <li>{@code RichList-scrollbar-track} - styles the scrollbar track</li>
+ *   <li>{@code ListElement} - styles the container (border, background)</li>
+ *   <li>{@code ListElement-item} - styles each list item</li>
+ *   <li>{@code ListElement-item:selected} - styles the selected item</li>
+ *   <li>{@code ListElement-item:nth-child(odd/even)} - zebra striping</li>
+ *   <li>{@code ListElement-scrollbar-thumb} - styles the scrollbar thumb</li>
+ *   <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
  * </ul>
  *
  * @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
  */
-public final class RichList<T> extends StyledElement<RichList<T>> {
+public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     private static final Style DEFAULT_HIGHLIGHT_STYLE = Style.EMPTY.reversed();
     private static final String DEFAULT_HIGHLIGHT_SYMBOL = "> ";
@@ -90,16 +90,16 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     private int lastItemCount;
     private int lastViewportHeight;
 
-    public RichList() {
+    public ListElement() {
     }
 
-    public RichList(String... items) {
+    public ListElement(String... items) {
         for (String item : items) {
             this.items.add(new TextElement(item));
         }
     }
 
-    public RichList(List<String> items) {
+    public ListElement(List<String> items) {
         for (String item : items) {
             this.items.add(new TextElement(item));
         }
@@ -110,7 +110,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      *
      * @param items the list items as styled elements
      */
-    public RichList(StyledElement<?>... items) {
+    public ListElement(StyledElement<?>... items) {
         this.items.addAll(Arrays.asList(items));
     }
 
@@ -120,7 +120,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param items the text items
      * @return this element
      */
-    public RichList<T> items(String... items) {
+    public ListElement<T> items(String... items) {
         this.items.clear();
         for (String item : items) {
             this.items.add(new TextElement(item));
@@ -134,7 +134,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param items the text items
      * @return this element
      */
-    public RichList<T> items(List<String> items) {
+    public ListElement<T> items(List<String> items) {
         this.items.clear();
         for (String item : items) {
             this.items.add(new TextElement(item));
@@ -148,7 +148,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param elements the styled element items
      * @return this element
      */
-    public RichList<T> elements(StyledElement<?>... elements) {
+    public ListElement<T> elements(StyledElement<?>... elements) {
         this.items.clear();
         this.items.addAll(Arrays.asList(elements));
         return this;
@@ -160,7 +160,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param item the text to add
      * @return this element
      */
-    public RichList<T> add(String item) {
+    public ListElement<T> add(String item) {
         this.items.add(new TextElement(item));
         return this;
     }
@@ -171,7 +171,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param element the element to add
      * @return this element
      */
-    public RichList<T> add(StyledElement<?> element) {
+    public ListElement<T> add(StyledElement<?> element) {
         this.items.add(element);
         return this;
     }
@@ -182,7 +182,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param index the index to select
      * @return this element
      */
-    public RichList<T> selected(int index) {
+    public ListElement<T> selected(int index) {
         this.selectedIndex = Math.max(0, index);
         return this;
     }
@@ -199,7 +199,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     /**
      * Sets the highlight style for selected items.
      */
-    public RichList<T> highlightStyle(Style style) {
+    public ListElement<T> highlightStyle(Style style) {
         this.highlightStyle = style;
         return this;
     }
@@ -207,7 +207,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     /**
      * Sets the highlight color for selected items.
      */
-    public RichList<T> highlightColor(Color color) {
+    public ListElement<T> highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
         return this;
     }
@@ -215,7 +215,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     /**
      * Sets the symbol displayed before the selected item.
      */
-    public RichList<T> highlightSymbol(String symbol) {
+    public ListElement<T> highlightSymbol(String symbol) {
         this.highlightSymbol = symbol;
         return this;
     }
@@ -223,7 +223,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     /**
      * Sets the title.
      */
-    public RichList<T> title(String title) {
+    public ListElement<T> title(String title) {
         this.title = title;
         return this;
     }
@@ -231,7 +231,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     /**
      * Uses rounded borders.
      */
-    public RichList<T> rounded() {
+    public ListElement<T> rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
@@ -239,7 +239,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
     /**
      * Sets the border color.
      */
-    public RichList<T> borderColor(Color color) {
+    public ListElement<T> borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
@@ -255,9 +255,9 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param <U> the data item type
      * @return this element
      */
-    public <U> RichList<U> data(List<U> data, Function<U, StyledElement<?>> renderer) {
+    public <U> ListElement<U> data(List<U> data, Function<U, StyledElement<?>> renderer) {
         @SuppressWarnings("unchecked")
-        RichList<U> self = (RichList<U>) this;
+        ListElement<U> self = (ListElement<U>) this;
         self.data = data;
         self.itemRenderer = renderer;
         self.items.clear();
@@ -272,7 +272,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param renderer function to convert each item to a styled element
      * @return this element
      */
-    public RichList<T> itemRenderer(Function<T, StyledElement<?>> renderer) {
+    public ListElement<T> itemRenderer(Function<T, StyledElement<?>> renderer) {
         this.itemRenderer = renderer;
         return this;
     }
@@ -285,7 +285,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      *
      * @return this element
      */
-    public RichList<T> autoScroll() {
+    public ListElement<T> autoScroll() {
         this.autoScroll = true;
         return this;
     }
@@ -296,7 +296,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param enabled true to enable auto-scroll
      * @return this element
      */
-    public RichList<T> autoScroll(boolean enabled) {
+    public ListElement<T> autoScroll(boolean enabled) {
         this.autoScroll = enabled;
         return this;
     }
@@ -310,7 +310,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      *
      * @return this element
      */
-    public RichList<T> scrollToEnd() {
+    public ListElement<T> scrollToEnd() {
         this.autoScrollToEnd = true;
         return this;
     }
@@ -320,7 +320,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      *
      * @return this element
      */
-    public RichList<T> scrollbar() {
+    public ListElement<T> scrollbar() {
         this.showScrollbar = true;
         return this;
     }
@@ -331,7 +331,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param enabled true to show a scrollbar
      * @return this element
      */
-    public RichList<T> scrollbar(boolean enabled) {
+    public ListElement<T> scrollbar(boolean enabled) {
         this.showScrollbar = enabled;
         return this;
     }
@@ -345,7 +345,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      *
      * @return this element
      */
-    public RichList<T> displayOnly() {
+    public ListElement<T> displayOnly() {
         this.highlightSymbol = "";
         this.highlightStyle = Style.EMPTY;
         return this;
@@ -357,7 +357,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param color the thumb color
      * @return this element
      */
-    public RichList<T> scrollbarThumbColor(Color color) {
+    public ListElement<T> scrollbarThumbColor(Color color) {
         this.scrollbarThumbColor = color;
         return this;
     }
@@ -368,7 +368,7 @@ public final class RichList<T> extends StyledElement<RichList<T>> {
      * @param color the track color
      * @return this element
      */
-    public RichList<T> scrollbarTrackColor(Color color) {
+    public ListElement<T> scrollbarTrackColor(Color color) {
         this.scrollbarTrackColor = color;
         return this;
     }
