@@ -74,6 +74,62 @@ class BlockTest {
     }
 
     @Test
+    @DisplayName("Block inner area reserves space for title even without borders")
+    void innerWithTitleNoBorders() {
+        Block block = Block.builder()
+            .title("Title")
+            .build();
+        Rect area = new Rect(0, 0, 20, 5);
+
+        Rect inner = block.inner(area);
+
+        // Title takes 1 line even without borders
+        assertThat(inner.x()).isEqualTo(0);
+        assertThat(inner.y()).isEqualTo(1);
+        assertThat(inner.width()).isEqualTo(20);
+        assertThat(inner.height()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Block inner area reserves space for bottom title even without borders")
+    void innerWithBottomTitleNoBorders() {
+        Block block = Block.builder()
+            .titleBottom("Bottom")
+            .build();
+        Rect area = new Rect(0, 0, 20, 5);
+
+        Rect inner = block.inner(area);
+
+        // Bottom title takes 1 line even without borders
+        assertThat(inner.x()).isEqualTo(0);
+        assertThat(inner.y()).isEqualTo(0);
+        assertThat(inner.width()).isEqualTo(20);
+        assertThat(inner.height()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Block with title but no borders renders title and reserves inner space")
+    void titleWithoutBordersRendersCorrectly() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
+        Block block = Block.builder()
+            .title("Title")
+            .build();
+        block.render(buffer.area(), buffer);
+
+        // Title should be on line 0
+        Buffer expected = Buffer.withLines(
+            "Title     ",
+            "          ",
+            "          "
+        );
+        assertThat(buffer).isEqualTo(expected);
+
+        // Inner area should start at y=1
+        Rect inner = block.inner(buffer.area());
+        assertThat(inner).isEqualTo(new Rect(0, 1, 10, 2));
+    }
+
+    @Test
     @DisplayName("Block without borders")
     void noBorders() {
         Block block = Block.builder().build();
