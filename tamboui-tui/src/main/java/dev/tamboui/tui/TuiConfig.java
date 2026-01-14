@@ -14,6 +14,8 @@ import java.time.Duration;
  */
 public final class TuiConfig {
 
+    public static final int DEFAULT_POLL_TIMEOUT = 40;
+    public static final int DEFAULT_TICK_TIMEOUT = 40;
     private final boolean rawMode;
     private final boolean alternateScreen;
     private final boolean hideCursor;
@@ -22,6 +24,7 @@ public final class TuiConfig {
     private final Duration tickRate;
     private final boolean shutdownHook;
     private final Bindings bindings;
+    private final boolean fpsOverlayEnabled;
 
     public TuiConfig(
             boolean rawMode,
@@ -31,7 +34,8 @@ public final class TuiConfig {
             Duration pollTimeout,
             Duration tickRate,
             boolean shutdownHook,
-            Bindings bindings
+            Bindings bindings,
+            boolean fpsOverlayEnabled
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -41,6 +45,7 @@ public final class TuiConfig {
         this.tickRate = tickRate;
         this.shutdownHook = shutdownHook;
         this.bindings = bindings;
+        this.fpsOverlayEnabled = fpsOverlayEnabled;
     }
 
     /**
@@ -55,10 +60,11 @@ public final class TuiConfig {
                 true,                        // alternateScreen
                 true,                        // hideCursor
                 false,                       // mouseCapture
-                Duration.ofMillis(100),      // pollTimeout
-                Duration.ofMillis(100),      // tickRate
+                Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
+                Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
                 true,                        // shutdownHook
-                BindingSets.defaults()       // bindings
+                BindingSets.defaults(),      // bindings
+                false                        // fpsOverlayEnabled
         );
     }
 
@@ -145,6 +151,17 @@ public final class TuiConfig {
         return bindings;
     }
 
+    /**
+     * Returns whether the FPS overlay is enabled.
+     * <p>
+     * When enabled, press F12 to toggle overlay visibility.
+     *
+     * @return true if FPS overlay is enabled
+     */
+    public boolean fpsOverlayEnabled() {
+        return fpsOverlayEnabled;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -160,7 +177,8 @@ public final class TuiConfig {
                 && mouseCapture == that.mouseCapture
                 && pollTimeout.equals(that.pollTimeout)
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
-                && bindings.equals(that.bindings);
+                && bindings.equals(that.bindings)
+                && fpsOverlayEnabled == that.fpsOverlayEnabled;
     }
 
     @Override
@@ -172,13 +190,14 @@ public final class TuiConfig {
         result = 31 * result + pollTimeout.hashCode();
         result = 31 * result + (tickRate != null ? tickRate.hashCode() : 0);
         result = 31 * result + bindings.hashCode();
+        result = 31 * result + Boolean.hashCode(fpsOverlayEnabled);
         return result;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, shutdownHook=%s, bindings=%s]",
+                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
                 rawMode,
                 alternateScreen,
                 hideCursor,
@@ -186,7 +205,8 @@ public final class TuiConfig {
                 pollTimeout,
                 tickRate,
                 shutdownHook,
-                bindings
+                bindings,
+                fpsOverlayEnabled
         );
     }
 
@@ -198,10 +218,11 @@ public final class TuiConfig {
         private boolean alternateScreen = true;
         private boolean hideCursor = true;
         private boolean mouseCapture = false;
-        private Duration pollTimeout = Duration.ofMillis(100);
-        private Duration tickRate = Duration.ofMillis(100);
+        private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
+        private Duration tickRate = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private boolean shutdownHook = true;
         private Bindings bindings = BindingSets.defaults();
+        private boolean fpsOverlayEnabled = false;
 
         private Builder() {
         }
@@ -268,7 +289,7 @@ public final class TuiConfig {
          * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
-            this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(100);
+            this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
             return this;
         }
 
@@ -317,6 +338,19 @@ public final class TuiConfig {
         }
 
         /**
+         * Enables or disables the FPS overlay.
+         * <p>
+         * When enabled, press F12 to toggle overlay visibility.
+         *
+         * @param enabled true to enable the FPS overlay
+         * @return this builder
+         */
+        public Builder fpsOverlay(boolean enabled) {
+            this.fpsOverlayEnabled = enabled;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          */
         public TuiConfig build() {
@@ -328,7 +362,8 @@ public final class TuiConfig {
                     pollTimeout,
                     tickRate,
                     shutdownHook,
-                    bindings
+                    bindings,
+                    fpsOverlayEnabled
             );
         }
     }

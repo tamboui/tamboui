@@ -73,7 +73,6 @@ public final class Column extends ContainerElement<Column> {
             .split(area);
 
         // Render children (skipping spacing areas)
-        // Children self-register for events in their own render() if needed
         int childIndex = 0;
         for (int i = 0; i < areas.size() && childIndex < children.size(); i++) {
             if (spacing > 0 && i % 2 == 1) {
@@ -82,7 +81,7 @@ public final class Column extends ContainerElement<Column> {
             }
             Element child = children.get(childIndex);
             Rect childArea = areas.get(i);
-            child.render(frame, childArea, context);
+            context.renderChild(child, frame, childArea);
             childIndex++;
         }
     }

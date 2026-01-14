@@ -14,9 +14,11 @@ import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.EventParser;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
+import dev.tamboui.tui.overlay.FpsOverlay;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -68,6 +70,8 @@ public final class TuiRunner implements AutoCloseable {
     private final Thread shutdownHook;
     private volatile Instant lastTick;
     private volatile Size lastSize;
+    private final Duration effectivePollTimeout;
+    private final FpsOverlay fpsOverlay;
 
     private TuiRunner(Backend backend, Terminal<Backend> terminal, TuiConfig config) {
         this.backend = backend;
@@ -112,6 +116,16 @@ public final class TuiRunner implements AutoCloseable {
         } else {
             this.tickScheduler = null;
         }
+
+        // Compute effective poll timeout: never longer than tick rate to prevent tick accumulation
+        if (config.ticksEnabled() && config.tickRate().compareTo(config.pollTimeout()) < 0) {
+            this.effectivePollTimeout = config.tickRate();
+        } else {
+            this.effectivePollTimeout = config.pollTimeout();
+        }
+
+        // Create FPS overlay
+        this.fpsOverlay = new FpsOverlay(config.pollTimeout(), config.tickRate());
 
         // Register shutdown hook if enabled
         if (config.shutdownHook()) {
@@ -172,16 +186,35 @@ public final class TuiRunner implements AutoCloseable {
      * @throws Exception if an error occurs during execution
      */
     public void run(EventHandler handler, Renderer renderer) throws Exception {
+        // Wrap renderer to add FPS overlay
+        Renderer wrappedRenderer = frame -> {
+            fpsOverlay.recordFrame();
+            renderer.render(frame);
+            if (fpsOverlay.isVisible()) {
+                fpsOverlay.render(frame, frame.area());
+            }
+        };
+
         // Initial draw
-        terminal.draw(renderer::render);
+        terminal.draw(wrappedRenderer::render);
 
         while (running.get()) {
-            Event event = pollEvent(config.pollTimeout());
+            Event event = pollEvent(effectivePollTimeout);
 
             if (event != null) {
+                // Handle FPS overlay toggle: CTRL+SHIFT+F12
+                if (event instanceof KeyEvent) {
+                    KeyEvent keyEvent = (KeyEvent) event;
+                    if (keyEvent.code() == KeyCode.F12 && keyEvent.hasCtrl() && keyEvent.hasShift()) {
+                        fpsOverlay.toggle();
+                        terminal.draw(wrappedRenderer::render);
+                        continue;
+                    }
+                }
+
                 boolean shouldRedraw = handler.handle(event, this);
                 if (shouldRedraw && running.get()) {
-                    terminal.draw(renderer::render);
+                    terminal.draw(wrappedRenderer::render);
                 }
             }
         }

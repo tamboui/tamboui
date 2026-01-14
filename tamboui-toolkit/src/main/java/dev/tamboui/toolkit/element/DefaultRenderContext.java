@@ -10,6 +10,7 @@ import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.bindings.Bindings;
@@ -310,6 +311,12 @@ public final class DefaultRenderContext implements RenderContext {
         if (element.isFocusable() && element.id() != null) {
             focusManager.registerFocusable(element.id(), area);
         }
+    }
+
+    @Override
+    public void renderChild(Element child, Frame frame, Rect area) {
+        child.render(frame, area, this);
+        registerElement(child, area);
     }
 
     /**

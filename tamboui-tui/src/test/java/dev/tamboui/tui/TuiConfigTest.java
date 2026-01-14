@@ -22,9 +22,9 @@ class TuiConfigTest {
         assertThat(config.alternateScreen()).isTrue();
         assertThat(config.hideCursor()).isTrue();
         assertThat(config.mouseCapture()).isFalse();
-        assertThat(config.pollTimeout()).isEqualTo(Duration.ofMillis(100));
+        assertThat(config.pollTimeout()).isEqualTo(Duration.ofMillis(TuiConfig.DEFAULT_POLL_TIMEOUT));
         assertThat(config.ticksEnabled()).isTrue();
-        assertThat(config.tickRate()).isEqualTo(Duration.ofMillis(100));
+        assertThat(config.tickRate()).isEqualTo(Duration.ofMillis(TuiConfig.DEFAULT_TICK_TIMEOUT));
         assertThat(config.shutdownHook()).isTrue();
     }
 

@@ -135,7 +135,7 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     private boolean handleEvent(Event event) {
-        // Tick events always trigger a redraw for animations
+        // Tick events trigger a redraw for animations
         if (event instanceof TickEvent) {
             return true;
         }

@@ -6,8 +6,10 @@ package dev.tamboui.toolkit.element;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
 
 import java.util.Optional;
 
@@ -171,6 +173,28 @@ public interface RenderContext {
      */
     default Style childStyle(String childName, ChildPosition position, dev.tamboui.css.cascade.PseudoClassState state) {
         return currentStyle();  // fallback when no CSS engine
+    }
+
+    /**
+     * Renders a child element and registers it for event routing.
+     * <p>
+     * Container elements should use this method instead of calling {@code child.render()}
+     * directly. This ensures that all rendered elements are properly registered with
+     * the event router, enabling them to receive key and mouse events.
+     * <p>
+     * Example usage in a container element:
+     * <pre>{@code
+     * for (Element child : children) {
+     *     context.renderChild(child, frame, childArea);
+     * }
+     * }</pre>
+     *
+     * @param child the child element to render
+     * @param frame the frame to render to
+     * @param area the area to render within
+     */
+    default void renderChild(Element child, Frame frame, Rect area) {
+        child.render(frame, area, this);
     }
 
     /**

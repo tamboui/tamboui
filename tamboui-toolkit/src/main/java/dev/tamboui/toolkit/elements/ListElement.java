@@ -544,10 +544,10 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
                 frame.buffer().setString(listArea.left(), y, effectiveHighlightSymbol, effectiveHighlightStyle);
             }
 
-            // Render the item element (it self-registers for events if needed)
+            // Render the item element
             Rect itemArea = new Rect(contentX, y, contentWidth, visibleItemHeight);
             StyledElement<?> item = effectiveItems.get(i);
-            item.render(frame, itemArea, context);
+            context.renderChild(item, frame, itemArea);
 
             // Apply row background AFTER child renders
             // This ensures zebra/selection styling takes precedence over child's CSS background
