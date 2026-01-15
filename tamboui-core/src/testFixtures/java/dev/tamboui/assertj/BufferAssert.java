@@ -129,6 +129,26 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
+    /**
+     * Asserts that the symbol at the given position equals the expected symbol.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param expectedSymbol the expected symbol
+     * @return this assertion object
+     */
+    public BufferAssert hasSymbolAt(int x, int y, String expectedSymbol) {
+        isNotNull();
+
+        String actualSymbol = actual.get(x, y).symbol();
+        if (!actualSymbol.equals(expectedSymbol)) {
+            failWithMessage("Expected symbol at (%d, %d) to be <%s>, but was <%s>%n%nBuffer content:%n%s",
+                    x, y, expectedSymbol, actualSymbol, formatBuffer(actual));
+        }
+
+        return this;
+    }
+
     private String formatBuffer(Buffer buffer) {
         return BufferDiffFormatter.formatBuffer(buffer);
     }

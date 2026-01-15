@@ -44,13 +44,20 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public class CustomComponentDemo implements Element {
 
+    private boolean showHelp = false;
+
     private static final String DEFAULT_CSS = """
         /* Edit this CSS to style the cards! */
+
+        /* ══════════════════════════════════════════
+           ProgressCard Styles
+           ══════════════════════════════════════════ */
 
         ProgressCard {
             background: #1a1a1a;
             border-color: #666666;
             border-type: rounded;
+            height: 5;
         }
 
         ProgressCard:focus {
@@ -86,6 +93,100 @@ public class CustomComponentDemo implements Element {
 
         .progress-in-progress {
             color: yellow;
+        }
+
+        /* ══════════════════════════════════════════
+           Panel Styles
+           ══════════════════════════════════════════ */
+
+        .header-panel {
+            border-type: rounded;
+            height: 3;
+        }
+
+        .status-panel {
+            border-type: rounded;
+            height: 3;
+        }
+
+        #info-panel {
+            border-type: rounded;
+            spacing: 0;
+            height: 3;
+        }
+
+        .footer-panel {
+            border-type: rounded;
+            height: 3;
+        }
+
+        #css-editor {
+            border-type: rounded;
+            height: fill;
+        }
+
+        .editor-column {
+            height: 50%;
+        }
+
+        .preview-column {
+            height: fill;
+        }
+
+        .main-row {
+            height: fill;
+        }
+
+        /* ══════════════════════════════════════════
+           Text Styles
+           ══════════════════════════════════════════ */
+
+        .title {
+            color: cyan;
+            text-style: bold;
+        }
+
+        .dim {
+            text-style: dim;
+        }
+
+        .highlight {
+            color: yellow;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        /* ══════════════════════════════════════════
+           Flex Layout Properties
+           ══════════════════════════════════════════ */
+
+        .cards-container {
+            spacing: 1;
+            flex: start;
+            height: fill;
+        }
+
+        .header-row {
+            flex: space-between;
+        }
+
+        .footer-row {
+            flex: center;
+        }
+
+        /* Footer text uses 'fit' to size to content, enabling flex */
+        .footer-row .title {
+            width: fit;
+        }
+
+        .footer-row .dim {
+            width: fit;
         }
         """;
 
@@ -167,14 +268,15 @@ public class CustomComponentDemo implements Element {
         }
 
         column(
-            // Header
+            // Header - styling via CSS (.header-panel, .header-row, .title, .dim)
             panel(() -> row(
-                text(" Live CSS Editor Demo ").bold().cyan(),
+                text(" Live CSS Editor Demo ").addClass("title"),
                 spacer(),
-                text(" [Tab] Focus ").dim(),
-                text(" [+/-] Progress ").dim(),
-                text(" [q] Quit ").dim()
-            )).rounded().length(3),
+                text(" [Tab] Focus ").addClass("dim"),
+                text(" [+/-] Progress ").addClass("dim"),
+                text(" [h] Help ").addClass("dim"),
+                text(" [q] Quit ").addClass("dim")
+            ).addClass("header-row")).addClass("header-panel"),
 
             // Main content
             row(
@@ -183,53 +285,70 @@ public class CustomComponentDemo implements Element {
                     textArea(cssEditorState)
                         .title("CSS Editor - Edit to see live changes")
                         .showLineNumbers()
-                        .rounded()
-                        .id("css-editor")
-                        .fill(),
+                        .id("css-editor"),
 
-                    // Error/status display
+                    // Error/status display - styling via CSS (.status-panel, .error, .success)
                     panel(() -> {
                         if (parseError != null) {
-                            return text(parseError).red();
+                            return text(parseError).addClass("error");
                         } else {
-                            return text("CSS Valid").green();
+                            return text("CSS Valid").addClass("success");
                         }
-                    }).title("Status").rounded().length(3)
-                ).percent(50),
+                    }).title("Status").addClass("status-panel")
+                ).addClass("editor-column"),
 
-                // Right side - Preview
+                // Right side - Preview with cards container using CSS flex
                 column(
-                    panel(() -> column(
-                        text("Preview").bold().cyan(),
-                        spacer(1),
-                        text("Edit the CSS on the left to"),
-                        text("see changes applied live!"),
-                        spacer(1),
-                        text("Properties:").yellow(),
-                        text("  border-type: rounded|double|thick").dim(),
-                        text("  border-color: <color>").dim(),
-                        text("  background: <color>").dim()
-                    )).id("info-panel").rounded().length(12),
+                    // Compact info panel with hint
+                    panel(() -> row(
+                        text("Edit CSS to style the cards").addClass("dim"),
+                        spacer(),
+                        text("[h] Help").addClass("highlight")
+                    )).title("Preview").id("info-panel"),
 
-                    // The cards
-                    renderCard(0),
-                    renderCard(1),
-                    renderCard(2)
-                ).fill()
-            ).fill(),
+                    // The cards in a container - styling via CSS (.cards-container)
+                    column(
+                        renderCard(0),
+                        renderCard(1),
+                        renderCard(2)
+                    ).addClass("cards-container")
+                ).addClass("preview-column")
+            ).addClass("main-row"),
 
-            // Footer
+            // Footer - styling via CSS (.footer-panel, .footer-row)
+            // Text widths set via CSS width: fit, flex controls positioning
             panel(() -> row(
-                text("Edit CSS ").bold(),
-                text("to style ").dim(),
-                text("ProgressCard ").cyan(),
-                text("components in real-time").dim()
-            )).rounded().length(3)
+                text("Edit CSS ").addClass("title"),
+                text("to style ").addClass("dim"),
+                text("ProgressCard ").addClass("title"),
+                text("in real-time").addClass("dim")
+            ).addClass("footer-row")).addClass("footer-panel")
         ).render(frame, area, context);
+
+        // Show help dialog if requested
+        if (showHelp) {
+            dialog("CSS Properties Help",
+                text("Style Properties:").addClass("highlight"),
+                text("  border-type: plain|rounded|double|thick"),
+                text("  border-color: <color>"),
+                text("  background: <color>"),
+                text("  color: <color>"),
+                text("  text-style: bold|dim|italic|underline"),
+                spacer(1),
+                text("Layout Properties:").addClass("highlight"),
+                text("  height: fill | <number> | <percent>%"),
+                text("  width: fill | <number> | <percent>%"),
+                text("  flex: start|center|end|space-between"),
+                text("  spacing: <number>"),
+                spacer(1),
+                text("[Esc] Close").addClass("dim")
+            ).width(50).height(17).onCancel(() -> showHelp = false)
+             .render(frame, area, context);
+        }
     }
 
     private Element renderCard(int index) {
-        return cards.get(index).length(5);
+        return cards.get(index);
     }
 
     private void applyUserCss(String css) {
@@ -252,6 +371,21 @@ public class CustomComponentDemo implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        // Handle dialog events when shown
+        if (showHelp) {
+            if (event.isCancel()) {
+                showHelp = false;
+                return EventResult.HANDLED;
+            }
+            // Dialog is modal - consume all events
+            return EventResult.HANDLED;
+        }
+
+        // Handle 'h' to show help dialog
+        if (event.isChar('h')) {
+            showHelp = true;
+            return EventResult.HANDLED;
+        }
         // Tab and +/- are handled by the framework and individual components
         return EventResult.UNHANDLED;
     }

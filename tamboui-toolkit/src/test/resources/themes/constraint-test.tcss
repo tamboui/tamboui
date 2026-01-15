@@ -1,0 +1,48 @@
+/* Constraint CSS Test Theme */
+
+/* Height constraints for Column children */
+.height-fill {
+    height: fill;
+}
+
+.height-fixed {
+    height: 3;
+}
+
+.height-percent {
+    height: 50%;
+}
+
+.height-fit {
+    height: fit;
+}
+
+/* Width constraints for Row children */
+.width-fill {
+    width: fill;
+}
+
+.width-fixed {
+    width: 10;
+}
+
+.width-percent {
+    width: 25%;
+}
+
+.width-fit {
+    width: fit;
+}
+
+/* Descendant selector test */
+.parent-row {
+    flex: center;
+}
+
+.parent-row .child-text {
+    width: fit;
+}
+
+.parent-column .child-text {
+    height: fit;
+}

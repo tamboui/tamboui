@@ -43,6 +43,26 @@ public interface Element {
     }
 
     /**
+     * Returns the preferred width of this element in cells.
+     * Used when the element has a {@link Constraint.Fit} constraint.
+     *
+     * @return the preferred width, or 0 if not applicable
+     */
+    default int preferredWidth() {
+        return 0;
+    }
+
+    /**
+     * Returns the preferred height of this element in cells.
+     * Used when the element has a {@link Constraint.Fit} constraint.
+     *
+     * @return the preferred height, or 0 if not applicable
+     */
+    default int preferredHeight() {
+        return 0;
+    }
+
+    /**
      * Returns whether this element can receive focus.
      *
      * @return true if focusable, false otherwise

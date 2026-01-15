@@ -4,12 +4,16 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
+import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.StylePropertyResolver;
@@ -33,7 +37,16 @@ import java.util.List;
  * <p>
  * CSS properties {@code border-type} and {@code border-color} are automatically
  * resolved through the underlying {@link Block} widget.
- * Renders children vertically inside the bordered area.
+ * <p>
+ * Layout properties can be set via CSS or programmatically:
+ * <ul>
+ *   <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
+ *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code margin} - Margin around the panel: single value or CSS-style shorthand</li>
+ *   <li>{@code spacing} - Gap between children in cells</li>
+ * </ul>
+ * <p>
+ * Programmatic values override CSS values when both are set.
  */
 public final class Panel extends ContainerElement<Panel> {
 
@@ -44,6 +57,10 @@ public final class Panel extends ContainerElement<Panel> {
     private Color borderColor;
     private Color focusedBorderColor;
     private Padding padding;
+    private Direction direction;
+    private Flex flex;
+    private Margin margin;
+    private Integer spacing;
     private boolean fitToContent;
 
     public Panel() {
@@ -174,6 +191,89 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /**
+     * Sets the layout direction for children.
+     * <p>
+     * Can also be set via CSS {@code direction} property.
+     *
+     * @param direction the layout direction
+     * @return this panel for chaining
+     */
+    public Panel direction(Direction direction) {
+        this.direction = direction;
+        return this;
+    }
+
+    /**
+     * Sets the layout direction to horizontal.
+     *
+     * @return this panel for chaining
+     */
+    public Panel horizontal() {
+        this.direction = Direction.HORIZONTAL;
+        return this;
+    }
+
+    /**
+     * Sets the layout direction to vertical.
+     *
+     * @return this panel for chaining
+     */
+    public Panel vertical() {
+        this.direction = Direction.VERTICAL;
+        return this;
+    }
+
+    /**
+     * Sets the flex layout mode for positioning children.
+     * <p>
+     * Can also be set via CSS {@code flex} property.
+     *
+     * @param flex the flex mode
+     * @return this panel for chaining
+     */
+    public Panel flex(Flex flex) {
+        this.flex = flex;
+        return this;
+    }
+
+    /**
+     * Sets the margin around the panel.
+     * <p>
+     * Can also be set via CSS {@code margin} property.
+     *
+     * @param margin the margin
+     * @return this panel for chaining
+     */
+    public Panel margin(Margin margin) {
+        this.margin = margin;
+        return this;
+    }
+
+    /**
+     * Sets uniform margin around the panel.
+     *
+     * @param value the margin value for all sides
+     * @return this panel for chaining
+     */
+    public Panel margin(int value) {
+        this.margin = Margin.uniform(value);
+        return this;
+    }
+
+    /**
+     * Sets the spacing (gap) between children.
+     * <p>
+     * Can also be set via CSS {@code spacing} property.
+     *
+     * @param spacing the spacing in cells
+     * @return this panel for chaining
+     */
+    public Panel spacing(int spacing) {
+        this.spacing = spacing;
+        return this;
+    }
+
+    /**
      * Enables automatic height calculation to fit the panel's content.
      * <p>
      * When enabled, the constraint is computed dynamically based on:
@@ -232,13 +332,31 @@ public final class Panel extends ContainerElement<Panel> {
 
     @Override
     protected void renderContent(Frame frame, Rect area, RenderContext context) {
+        // Get CSS resolver for property resolution
+        CssStyleResolver cssResolver = context.resolveStyle(this).orElse(null);
+
+        // Resolve margin: programmatic > CSS > none
+        Margin effectiveMargin = this.margin;
+        if (effectiveMargin == null && cssResolver != null) {
+            effectiveMargin = cssResolver.margin().orElse(null);
+        }
+
+        // Apply margin to get the effective render area
+        Rect effectiveArea = area;
+        if (effectiveMargin != null) {
+            effectiveArea = effectiveMargin.inner(area);
+            if (effectiveArea.isEmpty()) {
+                return;
+            }
+        }
+
         // Get current style from context (already resolved by StyledElement.render)
         Style effectiveStyle = context.currentStyle();
 
         // Get the CSS resolver for this element
-        StylePropertyResolver resolver = context.resolveStyle(this)
-                .map(r -> (StylePropertyResolver) r)
-                .orElse(StylePropertyResolver.empty());
+        StylePropertyResolver resolver = cssResolver != null
+                ? cssResolver
+                : StylePropertyResolver.empty();
 
         // Determine border color: focus color > programmatic color
         boolean isFocused = elementId != null && context.isFocused(elementId);
@@ -248,10 +366,10 @@ public final class Panel extends ContainerElement<Panel> {
 
         // Get padding: programmatic > CSS > none
         Padding effectivePadding = this.padding;
-        if (effectivePadding == null) {
-            effectivePadding = context.resolveStyle(this)
-                    .flatMap(CssStyleResolver::padding)
-                    .orElse(Padding.NONE);
+        if (effectivePadding == null && cssResolver != null) {
+            effectivePadding = cssResolver.padding().orElse(Padding.NONE);
+        } else if (effectivePadding == null) {
+            effectivePadding = Padding.NONE;
         }
 
         // Build the block - CSS properties are resolved by the widget
@@ -280,25 +398,64 @@ public final class Panel extends ContainerElement<Panel> {
         Block block = blockBuilder.build();
 
         // Render the block
-        frame.renderWidget(block, area);
+        frame.renderWidget(block, effectiveArea);
 
         // Get inner area for children
-        Rect innerArea = block.inner(area);
+        Rect innerArea = block.inner(effectiveArea);
         if (innerArea.isEmpty() || children.isEmpty()) {
             return;
         }
 
-        // Layout children vertically
+        // Resolve layout properties: programmatic > CSS > defaults
+        Direction effectiveDirection = this.direction;
+        if (effectiveDirection == null && cssResolver != null) {
+            effectiveDirection = cssResolver.direction().orElse(Direction.VERTICAL);
+        } else if (effectiveDirection == null) {
+            effectiveDirection = Direction.VERTICAL;
+        }
+
+        Flex effectiveFlex = this.flex;
+        if (effectiveFlex == null && cssResolver != null) {
+            effectiveFlex = cssResolver.flex().orElse(null);
+        }
+
+        Integer effectiveSpacing = this.spacing;
+        if (effectiveSpacing == null && cssResolver != null) {
+            effectiveSpacing = cssResolver.spacing().orElse(null);
+        }
+
+        // Layout children using resolved direction, flex, and spacing
         List<Constraint> constraints = new ArrayList<>();
+        boolean isHorizontal = effectiveDirection == Direction.HORIZONTAL;
         for (Element child : children) {
             Constraint c = child.constraint();
+            // Check CSS constraint if programmatic is null (width for horizontal, height for vertical)
+            if (c == null && child instanceof Styleable) {
+                CssStyleResolver childCss = context.resolveStyle((Styleable) child).orElse(null);
+                if (childCss != null) {
+                    c = isHorizontal
+                            ? childCss.widthConstraint().orElse(null)
+                            : childCss.heightConstraint().orElse(null);
+                }
+            }
             // Default to fill() so children expand to use available space
             constraints.add(c != null ? c : Constraint.fill());
         }
 
-        List<Rect> areas = Layout.vertical()
-                .constraints(constraints.toArray(new Constraint[0]))
-                .split(innerArea);
+        Layout layout = effectiveDirection == Direction.HORIZONTAL
+                ? Layout.horizontal()
+                : Layout.vertical();
+
+        layout = layout.constraints(constraints.toArray(new Constraint[0]));
+
+        if (effectiveFlex != null) {
+            layout = layout.flex(effectiveFlex);
+        }
+        if (effectiveSpacing != null) {
+            layout = layout.spacing(effectiveSpacing);
+        }
+
+        List<Rect> areas = layout.split(innerArea);
 
         // Render children (they self-register for events in their own render() if needed)
         for (int i = 0; i < children.size() && i < areas.size(); i++) {

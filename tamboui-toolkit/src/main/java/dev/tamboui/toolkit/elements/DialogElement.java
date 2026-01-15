@@ -4,11 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -37,6 +41,15 @@ import java.util.List;
  *   <li>Clearing the background before rendering</li>
  *   <li>Calculating dimensions from content (or using fixed dimensions)</li>
  * </ul>
+ * <p>
+ * Layout properties for dialog content can be set via CSS or programmatically:
+ * <ul>
+ *   <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
+ *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code spacing} - Gap between children in cells</li>
+ * </ul>
+ * <p>
+ * Programmatic values override CSS values when both are set.
  *
  * <pre>{@code
  * dialog("Confirm Delete",
@@ -54,6 +67,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     private Integer fixedHeight;
     private int minWidth = 20;
     private int padding = 2;
+    private Direction direction;
+    private Flex flex;
+    private Integer spacing;
     private Runnable onConfirm;
     private Runnable onCancel;
 
@@ -138,6 +154,65 @@ public final class DialogElement extends ContainerElement<DialogElement> {
      */
     public DialogElement padding(int padding) {
         this.padding = padding;
+        return this;
+    }
+
+    /**
+     * Sets the layout direction for children.
+     * <p>
+     * Can also be set via CSS {@code direction} property.
+     *
+     * @param direction the layout direction
+     * @return this dialog for chaining
+     */
+    public DialogElement direction(Direction direction) {
+        this.direction = direction;
+        return this;
+    }
+
+    /**
+     * Sets the layout direction to horizontal.
+     *
+     * @return this dialog for chaining
+     */
+    public DialogElement horizontal() {
+        this.direction = Direction.HORIZONTAL;
+        return this;
+    }
+
+    /**
+     * Sets the layout direction to vertical.
+     *
+     * @return this dialog for chaining
+     */
+    public DialogElement vertical() {
+        this.direction = Direction.VERTICAL;
+        return this;
+    }
+
+    /**
+     * Sets the flex layout mode for positioning children.
+     * <p>
+     * Can also be set via CSS {@code flex} property.
+     *
+     * @param flex the flex mode
+     * @return this dialog for chaining
+     */
+    public DialogElement flex(Flex flex) {
+        this.flex = flex;
+        return this;
+    }
+
+    /**
+     * Sets the spacing (gap) between children.
+     * <p>
+     * Can also be set via CSS {@code spacing} property.
+     *
+     * @param spacing the spacing in cells
+     * @return this dialog for chaining
+     */
+    public DialogElement spacing(int spacing) {
+        this.spacing = spacing;
         return this;
     }
 
@@ -250,16 +325,60 @@ public final class DialogElement extends ContainerElement<DialogElement> {
             return;
         }
 
-        // Layout children vertically
+        // Get CSS resolver for property resolution
+        CssStyleResolver cssResolver = context.resolveStyle(this).orElse(null);
+
+        // Resolve direction: programmatic > CSS > VERTICAL
+        Direction effectiveDirection = this.direction;
+        if (effectiveDirection == null && cssResolver != null) {
+            effectiveDirection = cssResolver.direction().orElse(Direction.VERTICAL);
+        } else if (effectiveDirection == null) {
+            effectiveDirection = Direction.VERTICAL;
+        }
+
+        // Resolve flex: programmatic > CSS > START
+        Flex effectiveFlex = this.flex;
+        if (effectiveFlex == null && cssResolver != null) {
+            effectiveFlex = cssResolver.flex().orElse(Flex.START);
+        } else if (effectiveFlex == null) {
+            effectiveFlex = Flex.START;
+        }
+
+        // Resolve spacing: programmatic > CSS > 0
+        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        if (this.spacing == null && cssResolver != null) {
+            effectiveSpacing = cssResolver.spacing().orElse(0);
+        }
+
+        // Layout children using resolved direction, flex, and spacing
         List<Constraint> constraints = new ArrayList<>();
+        boolean isHorizontal = effectiveDirection == Direction.HORIZONTAL;
         for (Element child : children) {
             Constraint c = child.constraint();
+            // Check CSS constraint if programmatic is null (width for horizontal, height for vertical)
+            if (c == null && child instanceof Styleable) {
+                CssStyleResolver childCss = context.resolveStyle((Styleable) child).orElse(null);
+                if (childCss != null) {
+                    c = isHorizontal
+                            ? childCss.widthConstraint().orElse(null)
+                            : childCss.heightConstraint().orElse(null);
+                }
+            }
             constraints.add(c != null ? c : Constraint.length(1));
         }
 
-        List<Rect> areas = Layout.vertical()
-            .constraints(constraints.toArray(new Constraint[0]))
-            .split(innerArea);
+        Layout layout = effectiveDirection == Direction.HORIZONTAL
+            ? Layout.horizontal()
+            : Layout.vertical();
+
+        layout = layout.constraints(constraints.toArray(new Constraint[0]))
+            .flex(effectiveFlex);
+
+        if (effectiveSpacing > 0) {
+            layout = layout.spacing(effectiveSpacing);
+        }
+
+        List<Rect> areas = layout.split(innerArea);
 
         // Render children
         for (int i = 0; i < children.size() && i < areas.size(); i++) {

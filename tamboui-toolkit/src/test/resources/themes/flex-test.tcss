@@ -1,0 +1,31 @@
+/* Flex Layout Test Theme */
+
+/* Horizontal panel with spacing */
+.horizontal-panel {
+    direction: horizontal;
+    spacing: 2;
+}
+
+/* Vertical panel with flex center */
+.centered-panel {
+    direction: vertical;
+    flex: center;
+}
+
+/* Panel with margin */
+.margined-panel {
+    margin: 2;
+}
+
+/* Panel with symmetric margin */
+.symmetric-margin-panel {
+    margin: 1 3;
+}
+
+/* Panel with all layout properties */
+.full-flex-panel {
+    direction: horizontal;
+    flex: space-between;
+    spacing: 1;
+    margin: 1 2 1 2;
+}

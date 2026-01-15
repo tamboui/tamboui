@@ -186,6 +186,8 @@ Panel {
 
 === Properties
 
+==== Style Properties
+
 [cols="1,2,2",options="header"]
 |===
 |Property |Values |Example
@@ -219,9 +221,149 @@ Panel {
 |`text-align: center;`
 
 |`width`
-|Integer (columns)
-|`width: 40;`
+|fit, fill
+|`width: fit;`
 |===
+
+==== Layout Properties
+
+These properties control how elements are sized and positioned within their containers.
+
+[cols="1,2,2",options="header"]
+|===
+|Property |Values |Example
+
+|`height`
+|Constraint for vertical sizing (used by Column)
+|`height: 5;` `height: fill;` `height: 50%;`
+
+|`width`
+|Constraint for horizontal sizing (used by Row)
+|`width: 10;` `width: fit;` `width: 25%;`
+
+|`flex`
+|Flex positioning mode
+|`flex: center;` `flex: space-between;`
+
+|`spacing`
+|Gap between children in cells
+|`spacing: 1;`
+
+|`margin`
+|Margin around element (single value or top right bottom left)
+|`margin: 2;` `margin: 1 2 1 2;`
+
+|`direction`
+|Layout direction for panels
+|`direction: horizontal;` `direction: vertical;`
+|===
+
+===== Constraint Values
+
+The `height` and `width` properties accept constraint values:
+
+[cols="1,3",options="header"]
+|===
+|Value |Description
+
+|`<number>`
+|Fixed size in cells (e.g., `height: 5;`)
+
+|`<number>%`
+|Percentage of available space (e.g., `width: 50%;`)
+
+|`fill`
+|Fill available space with weight 1 (e.g., `height: fill;`)
+
+|`fill(<weight>)`
+|Fill with specified weight (e.g., `height: fill(2);`)
+
+|`fit`
+|Size to content (e.g., `width: fit;`)
+
+|`min(<value>)`
+|Minimum size (e.g., `height: min(3);`)
+
+|`max(<value>)`
+|Maximum size (e.g., `height: max(10);`)
+
+|`<n>/<d>`
+|Ratio (e.g., `width: 1/3;`)
+|===
+
+===== Flex Values
+
+The `flex` property controls how remaining space is distributed:
+
+[cols="1,3",options="header"]
+|===
+|Value |Description
+
+|`start`
+|Position items at the start, remaining space at end
+
+|`center`
+|Center items, distribute remaining space on both sides
+
+|`end`
+|Position items at the end, remaining space at start
+
+|`space-between`
+|Distribute items with space between them
+
+|`space-around`
+|Distribute items with space around each
+
+|`space-evenly`
+|Distribute items with equal space between and around
+|===
+
+===== Layout Example
+
+This example shows how to use CSS layout properties to create a centered footer:
+
+[source,css]
+----
+/* Center the footer content */
+.footer-row {
+    flex: center;
+}
+
+/* Size text to content width, allowing flex to center */
+.footer-row .title {
+    width: fit;
+}
+
+.footer-row .dim {
+    width: fit;
+}
+
+/* Fixed heights for header/footer panels */
+.header-panel {
+    height: 3;
+}
+
+.footer-panel {
+    height: 3;
+}
+
+/* Main content fills remaining space */
+.main-content {
+    height: fill;
+}
+----
+
+[source,java]
+----
+column(
+    panel(header()).addClass("header-panel"),
+    panel(content()).addClass("main-content"),
+    panel(() -> row(
+        text("Status: ").addClass("title"),
+        text("Ready").addClass("dim")
+    ).addClass("footer-row")).addClass("footer-panel")
+)
+----
 
 Named colors: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray`, `dark-gray`, and their bright variants.
 

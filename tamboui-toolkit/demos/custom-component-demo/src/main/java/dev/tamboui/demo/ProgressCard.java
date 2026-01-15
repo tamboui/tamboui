@@ -4,10 +4,9 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.style.Color;
+import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.toolkit.component.Component;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.tui.event.Event;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -113,22 +112,23 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     @Override
     protected Element render() {
-        var focused = isFocused();
-
-        // Use double border + cyan when focused for clear visual feedback
+        // All styling is via CSS classes - no programmatic styling here
+        // Constraints (length, fill) are kept programmatic as they have no CSS equivalent
         var panel = panel(() -> column(
-                // Title with CSS class
-                text(title).bold().addClass("card-title"),
-                // Description with CSS class
-                text(description).addClass("card-description"),
-                // Progress bar with status-based CSS class
+                // Title - styling via CSS (.card-title)
+                text(title).addClass("card-title").length(1),
+                // Description - styling via CSS (.card-description)
+                text(description).addClass("card-description").length(1),
+                // Progress bar - styling via CSS (.progress-complete, .progress-in-progress)
                 gauge(progress)
                         .label(String.format("%.0f%%", progress * 100))
                         .addClass("progress-" + status.cssClass())
+                        .fill()
         ))
                 .title(status.name())
-                .addClass(status.cssClass());
-        
+                .addClass(status.cssClass())
+                .cssParent(this);
+
         return panel.fill();
     }
 

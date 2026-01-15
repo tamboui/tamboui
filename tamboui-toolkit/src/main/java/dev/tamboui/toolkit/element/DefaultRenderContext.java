@@ -266,11 +266,20 @@ public final class DefaultRenderContext implements RenderContext {
 
     private List<Styleable> buildAncestorChain(Styleable element) {
         List<Styleable> ancestors = new ArrayList<>();
+
+        // First, try explicit cssParent chain (takes precedence)
         Optional<Styleable> parent = element.cssParent();
         while (parent.isPresent()) {
             ancestors.add(0, parent.get());
             parent = parent.get().cssParent();
         }
+
+        // If no explicit parent, use the element stack (runtime render hierarchy)
+        // This enables descendant selectors for dynamically created elements
+        if (ancestors.isEmpty() && !elementStack.isEmpty()) {
+            ancestors.addAll(elementStack);
+        }
+
         return ancestors;
     }
 

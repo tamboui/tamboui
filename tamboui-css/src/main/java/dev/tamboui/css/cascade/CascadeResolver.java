@@ -132,8 +132,28 @@ public final class CascadeResolver {
                             .ifPresent(builder::borderType);
                     break;
                 case "width":
-                    propertyRegistry.convertWidth(value, variables)
-                            .ifPresent(builder::width);
+                    propertyRegistry.convertConstraint(value, variables)
+                            .ifPresent(builder::widthConstraint);
+                    break;
+                case "flex":
+                    propertyRegistry.convertFlex(value, variables)
+                            .ifPresent(builder::flex);
+                    break;
+                case "direction":
+                    propertyRegistry.convertDirection(value, variables)
+                            .ifPresent(builder::direction);
+                    break;
+                case "margin":
+                    propertyRegistry.convertMargin(value, variables)
+                            .ifPresent(builder::margin);
+                    break;
+                case "spacing":
+                    propertyRegistry.convertSpacing(value, variables)
+                            .ifPresent(builder::spacing);
+                    break;
+                case "height":
+                    propertyRegistry.convertConstraint(value, variables)
+                            .ifPresent(builder::heightConstraint);
                     break;
                 default:
                     // Store as additional property for later use

@@ -173,6 +173,27 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     @Override
+    public int preferredWidth() {
+        // For multi-line text, return the longest line
+        int maxWidth = 0;
+        int currentWidth = 0;
+        for (int i = 0; i < content.length(); i++) {
+            if (content.charAt(i) == '\n') {
+                maxWidth = Math.max(maxWidth, currentWidth);
+                currentWidth = 0;
+            } else {
+                currentWidth++;
+            }
+        }
+        return Math.max(maxWidth, currentWidth);
+    }
+
+    @Override
+    public int preferredHeight() {
+        return countLines();
+    }
+
+    @Override
     protected void renderContent(Frame frame, Rect area, RenderContext context) {
         if (content.isEmpty()) {
             return;

@@ -5,6 +5,7 @@
 package dev.tamboui.css.cascade;
 
 import dev.tamboui.layout.Alignment;
+import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
@@ -44,9 +45,9 @@ class CssStyleResolverTest {
 
         // Child's foreground should override parent's
         assertThat(merged.foreground()).contains(Color.RED);
-        // Parent's background should be inherited
-        assertThat(merged.background()).contains(Color.WHITE);
-        // Parent's borderType should be inherited
+        // Background is NOT inherited per CSS spec
+        assertThat(merged.background()).isEmpty();
+        // borderType IS inherited (for nested panels)
         assertThat(merged.borderType()).contains(BorderType.DOUBLE);
     }
 
@@ -182,7 +183,8 @@ class CssStyleResolverTest {
     }
 
     @Test
-    void withFallbackInheritsPadding() {
+    void withFallbackDoesNotInheritPadding() {
+        // Padding is NOT inherited per CSS spec
         Padding parentPadding = Padding.uniform(2);
         CssStyleResolver parent = CssStyleResolver.builder()
                 .padding(parentPadding)
@@ -194,13 +196,15 @@ class CssStyleResolverTest {
 
         CssStyleResolver merged = child.withFallback(parent);
 
-        assertThat(merged.padding()).contains(parentPadding);
+        // Padding should NOT be inherited from parent
+        assertThat(merged.padding()).isEmpty();
     }
 
     @Test
     void toStyleIncludesInheritedProperties() {
+        // Only foreground (color) and modifiers (text-style) are inherited
         CssStyleResolver parent = CssStyleResolver.builder()
-                .background(Color.WHITE)
+                .foreground(Color.BLUE)
                 .addModifier(Modifier.BOLD)
                 .build();
 
@@ -211,8 +215,62 @@ class CssStyleResolverTest {
         CssStyleResolver merged = child.withFallback(parent);
 
         Style style = merged.toStyle();
+        // Child's foreground overrides parent's
         assertThat(style.fg()).contains(Color.RED);
-        assertThat(style.bg()).contains(Color.WHITE);
+        // Modifiers ARE inherited when child has none
         assertThat(style.addModifiers()).contains(Modifier.BOLD);
+    }
+
+    @Test
+    void withFallbackDoesNotInheritHeightConstraint() {
+        // Height constraint is NOT inherited (element-specific layout property)
+        CssStyleResolver parent = CssStyleResolver.builder()
+                .heightConstraint(Constraint.fill())
+                .build();
+
+        CssStyleResolver child = CssStyleResolver.builder()
+                .foreground(Color.RED)
+                .build();
+
+        CssStyleResolver merged = child.withFallback(parent);
+
+        // Height constraint should NOT be inherited from parent
+        assertThat(merged.heightConstraint()).isEmpty();
+    }
+
+    @Test
+    void withFallbackDoesNotInheritWidthConstraint() {
+        // Width constraint is NOT inherited (element-specific layout property)
+        CssStyleResolver parent = CssStyleResolver.builder()
+                .widthConstraint(Constraint.percentage(50))
+                .build();
+
+        CssStyleResolver child = CssStyleResolver.builder()
+                .foreground(Color.RED)
+                .build();
+
+        CssStyleResolver merged = child.withFallback(parent);
+
+        // Width constraint should NOT be inherited from parent
+        assertThat(merged.widthConstraint()).isEmpty();
+    }
+
+    @Test
+    void childConstraintsOverrideParent() {
+        CssStyleResolver parent = CssStyleResolver.builder()
+                .heightConstraint(Constraint.fill())
+                .widthConstraint(Constraint.fill())
+                .build();
+
+        CssStyleResolver child = CssStyleResolver.builder()
+                .heightConstraint(Constraint.length(5))
+                .widthConstraint(Constraint.fit())
+                .build();
+
+        CssStyleResolver merged = child.withFallback(parent);
+
+        // Child's constraints should be used
+        assertThat(merged.heightConstraint()).contains(Constraint.length(5));
+        assertThat(merged.widthConstraint()).contains(Constraint.fit());
     }
 }

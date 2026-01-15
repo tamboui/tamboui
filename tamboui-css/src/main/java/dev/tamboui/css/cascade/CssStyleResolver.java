@@ -5,6 +5,10 @@
 package dev.tamboui.css.cascade;
 
 import dev.tamboui.layout.Alignment;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Margin;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.PropertyKey;
@@ -44,6 +48,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
     private final Alignment alignment;
     private final BorderType borderType;
     private final Width width;
+    private final Flex flex;
+    private final Direction direction;
+    private final Margin margin;
+    private final Integer spacing;
+    private final Constraint heightConstraint;
+    private final Constraint widthConstraint;
     private final Map<String, String> additionalProperties;
 
     private CssStyleResolver(Color foreground,
@@ -53,6 +63,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
                              Alignment alignment,
                              BorderType borderType,
                              Width width,
+                             Flex flex,
+                             Direction direction,
+                             Margin margin,
+                             Integer spacing,
+                             Constraint heightConstraint,
+                             Constraint widthConstraint,
                              Map<String, String> additionalProperties) {
         this.foreground = foreground;
         this.background = background;
@@ -63,6 +79,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
         this.alignment = alignment;
         this.borderType = borderType;
         this.width = width;
+        this.flex = flex;
+        this.direction = direction;
+        this.margin = margin;
+        this.spacing = spacing;
+        this.heightConstraint = heightConstraint;
+        this.widthConstraint = widthConstraint;
         this.additionalProperties = Collections.unmodifiableMap(new HashMap<>(additionalProperties));
     }
 
@@ -72,8 +94,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
      * @return an empty CssStyleResolver
      */
     public static CssStyleResolver empty() {
-        return new CssStyleResolver(null, null, null, null, null, null, null,
-                Collections.<String, String>emptyMap());
+        return new CssStyleResolver(null, null, null, null, null, null, null, null,
+                null, null, null, null, null, Collections.<String, String>emptyMap());
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -113,6 +135,18 @@ public final class CssStyleResolver implements StylePropertyResolver {
                 return (Optional<T>) Optional.ofNullable(alignment);
             case "border-type":
                 return (Optional<T>) Optional.ofNullable(borderType);
+            case "flex":
+                return (Optional<T>) Optional.ofNullable(flex);
+            case "direction":
+                return (Optional<T>) Optional.ofNullable(direction);
+            case "margin":
+                return (Optional<T>) Optional.ofNullable(margin);
+            case "spacing":
+                return (Optional<T>) Optional.ofNullable(spacing);
+            case "height":
+                return (Optional<T>) Optional.ofNullable(heightConstraint);
+            case "width":
+                return (Optional<T>) Optional.ofNullable(widthConstraint);
             default:
                 return getProperty(name).flatMap(key::convert);
         }
@@ -187,6 +221,60 @@ public final class CssStyleResolver implements StylePropertyResolver {
     }
 
     /**
+     * Returns the flex layout mode, if set.
+     *
+     * @return the flex mode
+     */
+    public Optional<Flex> flex() {
+        return Optional.ofNullable(flex);
+    }
+
+    /**
+     * Returns the layout direction, if set.
+     *
+     * @return the direction
+     */
+    public Optional<Direction> direction() {
+        return Optional.ofNullable(direction);
+    }
+
+    /**
+     * Returns the margin, if set.
+     *
+     * @return the margin
+     */
+    public Optional<Margin> margin() {
+        return Optional.ofNullable(margin);
+    }
+
+    /**
+     * Returns the spacing (gap between elements), if set.
+     *
+     * @return the spacing
+     */
+    public Optional<Integer> spacing() {
+        return Optional.ofNullable(spacing);
+    }
+
+    /**
+     * Returns the height constraint (for vertical layouts), if set.
+     *
+     * @return the height constraint
+     */
+    public Optional<Constraint> heightConstraint() {
+        return Optional.ofNullable(heightConstraint);
+    }
+
+    /**
+     * Returns the width constraint (for horizontal layouts), if set.
+     *
+     * @return the width constraint
+     */
+    public Optional<Constraint> widthConstraint() {
+        return Optional.ofNullable(widthConstraint);
+    }
+
+    /**
      * Returns additional properties not mapped to specific fields.
      *
      * @return the additional properties map
@@ -240,17 +328,24 @@ public final class CssStyleResolver implements StylePropertyResolver {
     public boolean hasProperties() {
         return foreground != null || background != null ||
                 !modifiers.isEmpty() || padding != null || alignment != null ||
-                borderType != null || width != null || !additionalProperties.isEmpty();
+                borderType != null || width != null || flex != null ||
+                direction != null || margin != null || spacing != null ||
+                heightConstraint != null || widthConstraint != null ||
+                !additionalProperties.isEmpty();
     }
 
     /**
      * Creates a new resolver that uses this resolver's properties but falls back
-     * to the given resolver for properties not set in this resolver.
+     * to the given resolver for CSS-inheritable properties not set in this resolver.
      * <p>
-     * This enables CSS property inheritance from parent elements to children.
+     * Per CSS semantics, only certain properties inherit from parent to child:
+     * <ul>
+     *   <li>Inheritable: color (foreground), text-style (modifiers), border-type</li>
+     *   <li>Non-inheritable: spacing, flex, direction, margin, padding, alignment, width, background</li>
+     * </ul>
      *
-     * @param fallback the fallback resolver for missing properties
-     * @return a new resolver with fallback behavior
+     * @param fallback the fallback resolver for missing inheritable properties
+     * @return a new resolver with fallback behavior for inheritable properties only
      */
     public CssStyleResolver withFallback(CssStyleResolver fallback) {
         if (fallback == null) {
@@ -261,13 +356,21 @@ public final class CssStyleResolver implements StylePropertyResolver {
                 : !fallback.modifiers.isEmpty() ? fallback.modifiers
                 : null;
         return new CssStyleResolver(
+                // Inheritable properties - fall back to parent
                 foreground != null ? foreground : fallback.foreground,
-                background != null ? background : fallback.background,
+                background,  // NOT inherited per CSS spec
                 mergedModifiers,
-                padding != null ? padding : fallback.padding,
-                alignment != null ? alignment : fallback.alignment,
-                borderType != null ? borderType : fallback.borderType,
-                width != null ? width : fallback.width,
+                // Non-inheritable properties - use only this element's values
+                padding,
+                alignment,
+                borderType != null ? borderType : fallback.borderType,  // Inherit for nested panels
+                width,
+                flex,       // Layout-specific, not inherited
+                direction,  // Layout-specific, not inherited
+                margin,           // Element-specific, not inherited
+                spacing,          // Layout-specific, not inherited
+                heightConstraint, // Element-specific, not inherited
+                widthConstraint,  // Element-specific, not inherited
                 mergeProperties(additionalProperties, fallback.additionalProperties)
         );
     }
@@ -304,6 +407,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
         private Alignment alignment;
         private BorderType borderType;
         private Width width;
+        private Flex flex;
+        private Direction direction;
+        private Margin margin;
+        private Integer spacing;
+        private Constraint heightConstraint;
+        private Constraint widthConstraint;
         private final Map<String, String> additionalProperties = new HashMap<>();
 
         private Builder() {
@@ -398,6 +507,72 @@ public final class CssStyleResolver implements StylePropertyResolver {
         }
 
         /**
+         * Sets the flex layout mode.
+         *
+         * @param flex the flex mode
+         * @return this builder
+         */
+        public Builder flex(Flex flex) {
+            this.flex = flex;
+            return this;
+        }
+
+        /**
+         * Sets the layout direction.
+         *
+         * @param direction the direction
+         * @return this builder
+         */
+        public Builder direction(Direction direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        /**
+         * Sets the margin.
+         *
+         * @param margin the margin
+         * @return this builder
+         */
+        public Builder margin(Margin margin) {
+            this.margin = margin;
+            return this;
+        }
+
+        /**
+         * Sets the spacing (gap between elements).
+         *
+         * @param spacing the spacing
+         * @return this builder
+         */
+        public Builder spacing(Integer spacing) {
+            this.spacing = spacing;
+            return this;
+        }
+
+        /**
+         * Sets the height constraint (for vertical layouts).
+         *
+         * @param constraint the height constraint
+         * @return this builder
+         */
+        public Builder heightConstraint(Constraint constraint) {
+            this.heightConstraint = constraint;
+            return this;
+        }
+
+        /**
+         * Sets the width constraint (for horizontal layouts).
+         *
+         * @param constraint the width constraint
+         * @return this builder
+         */
+        public Builder widthConstraint(Constraint constraint) {
+            this.widthConstraint = constraint;
+            return this;
+        }
+
+        /**
          * Adds an additional property.
          *
          * @param name  the property name
@@ -416,7 +591,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
          */
         public CssStyleResolver build() {
             return new CssStyleResolver(foreground, background, modifiers, padding,
-                    alignment, borderType, width, additionalProperties);
+                    alignment, borderType, width, flex, direction, margin, spacing,
+                    heightConstraint, widthConstraint, additionalProperties);
         }
     }
 
@@ -440,6 +616,24 @@ public final class CssStyleResolver implements StylePropertyResolver {
         }
         if (borderType != null) {
             sb.append("borderType=").append(borderType).append(", ");
+        }
+        if (flex != null) {
+            sb.append("flex=").append(flex).append(", ");
+        }
+        if (direction != null) {
+            sb.append("direction=").append(direction).append(", ");
+        }
+        if (margin != null) {
+            sb.append("margin=").append(margin).append(", ");
+        }
+        if (spacing != null) {
+            sb.append("spacing=").append(spacing).append(", ");
+        }
+        if (heightConstraint != null) {
+            sb.append("height=").append(heightConstraint).append(", ");
+        }
+        if (widthConstraint != null) {
+            sb.append("width=").append(widthConstraint).append(", ");
         }
         if (!additionalProperties.isEmpty()) {
             sb.append("properties=").append(additionalProperties);

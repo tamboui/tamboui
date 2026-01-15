@@ -4,12 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
+import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
@@ -20,16 +23,26 @@ import java.util.List;
 
 /**
  * A horizontal layout container that arranges children in a row.
- *
- * <p>Supports flex modes for distributing remaining space:
+ * <p>
+ * Layout properties can be set via CSS or programmatically:
+ * <ul>
+ *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code spacing} - Gap between children in cells</li>
+ *   <li>{@code margin} - Margin around the row</li>
+ * </ul>
+ * <p>
+ * Programmatic values override CSS values when both are set.
+ * <p>
+ * Example usage:
  * <pre>
  * row(child1, child2, child3).flex(Flex.CENTER).spacing(1)
  * </pre>
  */
 public final class Row extends ContainerElement<Row> {
 
-    private int spacing = 0;
-    private Flex flex = Flex.START;
+    private Integer spacing;
+    private Flex flex;
+    private Margin margin;
 
     public Row() {
     }
@@ -40,6 +53,8 @@ public final class Row extends ContainerElement<Row> {
 
     /**
      * Sets the spacing between children.
+     * <p>
+     * Can also be set via CSS {@code spacing} property.
      *
      * @param spacing spacing in cells between adjacent children
      * @return this row for method chaining
@@ -51,13 +66,39 @@ public final class Row extends ContainerElement<Row> {
 
     /**
      * Sets how remaining space is distributed among children.
+     * <p>
+     * Can also be set via CSS {@code flex} property.
      *
      * @param flex the flex mode for space distribution
      * @return this row for method chaining
      * @see Flex
      */
     public Row flex(Flex flex) {
-        this.flex = flex != null ? flex : Flex.START;
+        this.flex = flex;
+        return this;
+    }
+
+    /**
+     * Sets the margin around the row.
+     * <p>
+     * Can also be set via CSS {@code margin} property.
+     *
+     * @param margin the margin
+     * @return this row for method chaining
+     */
+    public Row margin(Margin margin) {
+        this.margin = margin;
+        return this;
+    }
+
+    /**
+     * Sets uniform margin around the row.
+     *
+     * @param value the margin value for all sides
+     * @return this row for method chaining
+     */
+    public Row margin(int value) {
+        this.margin = Margin.uniform(value);
         return this;
     }
 
@@ -67,10 +108,42 @@ public final class Row extends ContainerElement<Row> {
             return;
         }
 
+        // Get CSS resolver for property resolution
+        CssStyleResolver cssResolver = context.resolveStyle(this).orElse(null);
+
+        // Resolve margin: programmatic > CSS > none
+        Margin effectiveMargin = this.margin;
+        if (effectiveMargin == null && cssResolver != null) {
+            effectiveMargin = cssResolver.margin().orElse(null);
+        }
+
+        // Apply margin to get the effective render area
+        Rect effectiveArea = area;
+        if (effectiveMargin != null) {
+            effectiveArea = effectiveMargin.inner(area);
+            if (effectiveArea.isEmpty()) {
+                return;
+            }
+        }
+
         // Fill background with current style
         Style effectiveStyle = context.currentStyle();
         if (effectiveStyle.bg().isPresent()) {
-            frame.buffer().setStyle(area, effectiveStyle);
+            frame.buffer().setStyle(effectiveArea, effectiveStyle);
+        }
+
+        // Resolve flex: programmatic > CSS > START
+        Flex effectiveFlex = this.flex;
+        if (effectiveFlex == null && cssResolver != null) {
+            effectiveFlex = cssResolver.flex().orElse(Flex.START);
+        } else if (effectiveFlex == null) {
+            effectiveFlex = Flex.START;
+        }
+
+        // Resolve spacing: programmatic > CSS > 0
+        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        if (this.spacing == null && cssResolver != null) {
+            effectiveSpacing = cssResolver.spacing().orElse(0);
         }
 
         // Build constraints, accounting for spacing
@@ -78,24 +151,36 @@ public final class Row extends ContainerElement<Row> {
         for (int i = 0; i < children.size(); i++) {
             Element child = children.get(i);
             Constraint c = child.constraint();
+            // Check CSS width constraint if programmatic is null (Row uses width)
+            if (c == null && child instanceof Styleable) {
+                CssStyleResolver childCss = context.resolveStyle((Styleable) child).orElse(null);
+                if (childCss != null) {
+                    c = childCss.widthConstraint().orElse(null);
+                }
+            }
+            // Handle Fit constraint by querying preferred width
+            if (c instanceof Constraint.Fit) {
+                int preferred = child.preferredWidth();
+                c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+            }
             constraints.add(c != null ? c : Constraint.fill());
 
             // Add spacing constraint between children
-            if (spacing > 0 && i < children.size() - 1) {
-                constraints.add(Constraint.length(spacing));
+            if (effectiveSpacing > 0 && i < children.size() - 1) {
+                constraints.add(Constraint.length(effectiveSpacing));
             }
         }
 
         List<Rect> areas = Layout.horizontal()
             .constraints(constraints.toArray(new Constraint[0]))
-            .flex(flex)
-            .split(area);
+            .flex(effectiveFlex)
+            .split(effectiveArea);
 
         // Render children (skipping spacing areas)
         // Children self-register for events in their own render() if needed
         int childIndex = 0;
         for (int i = 0; i < areas.size() && childIndex < children.size(); i++) {
-            if (spacing > 0 && i % 2 == 1) {
+            if (effectiveSpacing > 0 && i % 2 == 1) {
                 // Skip spacing area
                 continue;
             }

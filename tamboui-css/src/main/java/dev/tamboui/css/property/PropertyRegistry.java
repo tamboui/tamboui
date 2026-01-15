@@ -5,6 +5,10 @@
 package dev.tamboui.css.property;
 
 import dev.tamboui.layout.Alignment;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Margin;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Width;
@@ -31,6 +35,11 @@ public final class PropertyRegistry {
     private final AlignmentConverter alignmentConverter;
     private final BorderTypeConverter borderTypeConverter;
     private final WidthConverter widthConverter;
+    private final FlexConverter flexConverter;
+    private final DirectionConverter directionConverter;
+    private final MarginConverter marginConverter;
+    private final IntegerConverter integerConverter;
+    private final ConstraintConverter constraintConverter;
 
     private PropertyRegistry() {
         this.converters = new HashMap<>();
@@ -40,6 +49,11 @@ public final class PropertyRegistry {
         this.alignmentConverter = new AlignmentConverter();
         this.borderTypeConverter = new BorderTypeConverter();
         this.widthConverter = new WidthConverter();
+        this.flexConverter = new FlexConverter();
+        this.directionConverter = new DirectionConverter();
+        this.marginConverter = new MarginConverter();
+        this.integerConverter = new IntegerConverter();
+        this.constraintConverter = new ConstraintConverter();
 
         // Register default converters - create adapter for core color converter
         PropertyConverter<Color> colorAdapter = (value, variables) -> {
@@ -54,7 +68,12 @@ public final class PropertyRegistry {
         converters.put("padding", spacingConverter);
         converters.put("text-align", alignmentConverter);
         converters.put("border-type", borderTypeConverter);
-        converters.put("width", widthConverter);
+        converters.put("width", constraintConverter);
+        converters.put("flex", flexConverter);
+        converters.put("direction", directionConverter);
+        converters.put("margin", marginConverter);
+        converters.put("spacing", integerConverter);
+        converters.put("height", constraintConverter);
     }
 
     /**
@@ -131,6 +150,61 @@ public final class PropertyRegistry {
      */
     public Optional<Width> convertWidth(String value, Map<String, String> variables) {
         return widthConverter.convert(value, variables);
+    }
+
+    /**
+     * Converts CSS flex value.
+     *
+     * @param value     the CSS value
+     * @param variables the CSS variables
+     * @return the converted flex, or empty if conversion fails
+     */
+    public Optional<Flex> convertFlex(String value, Map<String, String> variables) {
+        return flexConverter.convert(value, variables);
+    }
+
+    /**
+     * Converts CSS direction value.
+     *
+     * @param value     the CSS value
+     * @param variables the CSS variables
+     * @return the converted direction, or empty if conversion fails
+     */
+    public Optional<Direction> convertDirection(String value, Map<String, String> variables) {
+        return directionConverter.convert(value, variables);
+    }
+
+    /**
+     * Converts CSS margin value.
+     *
+     * @param value     the CSS value
+     * @param variables the CSS variables
+     * @return the converted margin, or empty if conversion fails
+     */
+    public Optional<Margin> convertMargin(String value, Map<String, String> variables) {
+        return marginConverter.convert(value, variables);
+    }
+
+    /**
+     * Converts CSS spacing (integer) value.
+     *
+     * @param value     the CSS value
+     * @param variables the CSS variables
+     * @return the converted spacing, or empty if conversion fails
+     */
+    public Optional<Integer> convertSpacing(String value, Map<String, String> variables) {
+        return integerConverter.convert(value, variables);
+    }
+
+    /**
+     * Converts CSS height (constraint) value.
+     *
+     * @param value     the CSS value
+     * @param variables the CSS variables
+     * @return the converted constraint, or empty if conversion fails
+     */
+    public Optional<Constraint> convertConstraint(String value, Map<String, String> variables) {
+        return constraintConverter.convert(value, variables);
     }
 
     /**

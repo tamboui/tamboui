@@ -126,6 +126,23 @@ public final class Margin {
         return top + bottom;
     }
 
+    /**
+     * Returns the inner area after applying this margin.
+     * <p>
+     * The returned rect is inset by the margin values on each side.
+     * If the margin would result in negative dimensions, returns an empty rect.
+     *
+     * @param area the outer area
+     * @return the inner area with margin applied
+     */
+    public Rect inner(Rect area) {
+        int newX = area.x() + left;
+        int newY = area.y() + top;
+        int newWidth = Math.max(0, area.width() - horizontalTotal());
+        int newHeight = Math.max(0, area.height() - verticalTotal());
+        return new Rect(newX, newY, newWidth, newHeight);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
