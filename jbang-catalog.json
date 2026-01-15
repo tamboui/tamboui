@@ -13,6 +13,9 @@
     "flex-demo": {
       "script-ref": "demos/flex-demo/src/main/java/dev/tamboui/demo/flex/FlexDemo.java"
     },
+    "form-table-demo": {
+      "script-ref": "demos/form-table-demo/src/main/java/dev/tamboui/demo/layout/FormTableDemo.java"
+    },
     "inline-progress-demo": {
       "script-ref": "demos/inline-progress-demo/src/main/java/dev/tamboui/demo/InlineProgressDemo.java"
     },
