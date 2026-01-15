@@ -107,6 +107,35 @@ public final class ImageData {
     }
 
     /**
+     * Creates image data from a raw ARGB pixel array.
+     * <p>
+     * Pixels must be provided in row-major order, left-to-right, top-to-bottom.
+     * Each pixel is a 32-bit integer in ARGB format:
+     * bits 24-31 = alpha, bits 16-23 = red, bits 8-15 = green, bits 0-7 = blue.
+     * <p>
+     * The {@code pixels} array is not copied for performance reasons; callers must not
+     * modify it after passing it to this method.
+     *
+     * @param width  the image width
+     * @param height the image height
+     * @param pixels the ARGB pixels (length must be {@code width * height})
+     * @return the image data
+     */
+    public static ImageData fromArgbPixels(int width, int height, int[] pixels) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException(String.format("Invalid dimensions: %dx%d", width, height));
+        }
+        if (pixels == null) {
+            throw new IllegalArgumentException("Pixels must not be null");
+        }
+        if (pixels.length != width * height) {
+            throw new IllegalArgumentException(String.format(
+                "Invalid pixel array length: expected %d but got %d", width * height, pixels.length));
+        }
+        return new ImageData(width, height, pixels);
+    }
+
+    /**
      * Loads image data from a file path.
      *
      * @param path the path to the image file

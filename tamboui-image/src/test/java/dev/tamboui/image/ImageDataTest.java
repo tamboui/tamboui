@@ -23,6 +23,34 @@ class ImageDataTest {
     }
 
     @Test
+    void fromArgbPixels_creates_image_data() {
+        int[] pixels = new int[] {
+            0xFFFF0000, 0xFF00FF00,
+            0xFF0000FF, 0xFFFFFFFF
+        };
+        ImageData data = ImageData.fromArgbPixels(2, 2, pixels);
+
+        assertThat(data.width()).isEqualTo(2);
+        assertThat(data.height()).isEqualTo(2);
+        assertThat(data.pixelAt(0, 0)).isEqualTo(0xFFFF0000);
+        assertThat(data.pixelAt(1, 0)).isEqualTo(0xFF00FF00);
+        assertThat(data.pixelAt(0, 1)).isEqualTo(0xFF0000FF);
+        assertThat(data.pixelAt(1, 1)).isEqualTo(0xFFFFFFFF);
+    }
+
+    @Test
+    void fromArgbPixels_throws_for_invalid_args() {
+        assertThatThrownBy(() -> ImageData.fromArgbPixels(0, 10, new int[10]))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> ImageData.fromArgbPixels(10, 0, new int[10]))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> ImageData.fromArgbPixels(1, 1, null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> ImageData.fromArgbPixels(2, 2, new int[3]))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void pixelAt_returns_correct_value() {
         BufferedImage source = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
         source.setRGB(0, 0, 0xFFFF0000); // Red
