@@ -6,6 +6,8 @@ package dev.tamboui.layout;
 
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
+import dev.tamboui.layout.cassowary.LayoutSolver;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +15,26 @@ import java.util.List;
 /**
  * A layout defines how to split a rectangular area into smaller areas
  * based on constraints.
+ *
+ * <p>The layout uses a Cassowary constraint solver to compute sizes based on
+ * the provided constraints, then positions the resulting rectangles according
+ * to the {@link Flex} mode.
+ *
+ * <p>Example usage:
+ * <pre>
+ * Layout layout = Layout.horizontal()
+ *     .constraints(
+ *         Constraint.length(20),
+ *         Constraint.fill(),
+ *         Constraint.percentage(30))
+ *     .spacing(1)
+ *     .flex(Flex.CENTER);
+ *
+ * List&lt;Rect&gt; areas = layout.split(new Rect(0, 0, 100, 50));
+ * </pre>
+ *
+ * @see Constraint
+ * @see Flex
  */
 public final class Layout {
 
@@ -143,6 +165,10 @@ public final class Layout {
     /**
      * Split the given area according to this layout's constraints.
      *
+     * <p>The method uses the Cassowary constraint solver to compute optimal sizes
+     * based on the provided constraints, then positions the resulting rectangles
+     * according to the {@link Flex} mode.
+     *
      * @param area the area to split
      * @return rectangles representing each split region, in order
      */
@@ -158,82 +184,135 @@ public final class Layout {
         int totalSpacing = spacing * (constraints.size() - 1);
         int distributable = Math.max(0, available - totalSpacing);
 
-        int[] sizes = new int[constraints.size()];
-        int[] mins = new int[constraints.size()];
-        int[] maxs = new int[constraints.size()];
-        boolean[] isFill = new boolean[constraints.size()];
-        Arrays.fill(maxs, Integer.MAX_VALUE);
+        // Use Cassowary solver to compute sizes
+        LayoutSolver solver = new LayoutSolver();
+        int[] sizes = solver.solve(constraints, distributable, spacing, flex);
 
-        int remaining = distributable;
-        int fillWeight = 0;
-
-        // First pass: calculate fixed sizes and collect fill weights
-        for (int i = 0; i < constraints.size(); i++) {
-            Constraint c = constraints.get(i);
-            if (c instanceof Constraint.Length) {
-                int v = ((Constraint.Length) c).value();
-                sizes[i] = Math.min(v, distributable);
-                remaining -= sizes[i];
-            } else if (c instanceof Constraint.Percentage) {
-                int p = ((Constraint.Percentage) c).value();
-                sizes[i] = distributable * p / 100;
-                remaining -= sizes[i];
-            } else if (c instanceof Constraint.Ratio) {
-                Constraint.Ratio ratio = (Constraint.Ratio) c;
-                sizes[i] = distributable * ratio.numerator() / ratio.denominator();
-                remaining -= sizes[i];
-            } else if (c instanceof Constraint.Min) {
-                int v = ((Constraint.Min) c).value();
-                mins[i] = v;
-                isFill[i] = true;
-                fillWeight += 1;
-            } else if (c instanceof Constraint.Max) {
-                int v = ((Constraint.Max) c).value();
-                maxs[i] = v;
-                isFill[i] = true;
-                fillWeight += 1;
-            } else if (c instanceof Constraint.Fill) {
-                int w = ((Constraint.Fill) c).weight();
-                isFill[i] = true;
-                fillWeight += w;
-            }
+        // Calculate total size used and remaining space for flex positioning
+        int totalSize = 0;
+        for (int size : sizes) {
+            totalSize += size;
         }
+        int usedSpace = totalSize + totalSpacing;
+        int remainingSpace = Math.max(0, available - usedSpace);
 
-        // Second pass: distribute remaining space to Fill/Min/Max constraints
-        if (fillWeight > 0 && remaining > 0) {
-            for (int i = 0; i < constraints.size(); i++) {
-                if (isFill[i]) {
-                    Constraint c = constraints.get(i);
-                    int weight;
-                    if (c instanceof Constraint.Fill) {
-                        weight = ((Constraint.Fill) c).weight();
-                    } else if (c instanceof Constraint.Min || c instanceof Constraint.Max) {
-                        weight = 1;
-                    } else {
-                        weight = 0;
-                    }
-                    sizes[i] = remaining * weight / fillWeight;
-                }
-            }
-        }
+        // Calculate starting position based on flex mode
+        int startPos = direction == Direction.HORIZONTAL ? inner.x() : inner.y();
+        int[] gaps = computeFlexGaps(sizes.length, remainingSpace, flex);
 
-        // Third pass: apply min/max bounds
-        for (int i = 0; i < constraints.size(); i++) {
-            sizes[i] = Math.max(mins[i], Math.min(maxs[i], sizes[i]));
-        }
-
-        // Build rectangles
+        // Build rectangles with flex positioning
         List<Rect> result = new ArrayList<>(constraints.size());
-        int pos = direction == Direction.HORIZONTAL ? inner.x() : inner.y();
+        int pos = startPos + gaps[0]; // Initial gap for CENTER/END/SPACE_AROUND
 
         for (int i = 0; i < sizes.length; i++) {
             Rect rect = direction == Direction.HORIZONTAL
                 ? new Rect(pos, inner.y(), sizes[i], inner.height())
                 : new Rect(inner.x(), pos, inner.width(), sizes[i]);
             result.add(rect);
-            pos += sizes[i] + spacing;
+
+            // Calculate next position: current pos + size + spacing + flex gap
+            int flexGap = (i < sizes.length - 1) ? gaps[i + 1] : 0;
+            pos += sizes[i] + spacing + flexGap;
         }
 
         return result;
+    }
+
+    /**
+     * Computes the gaps for flex positioning.
+     *
+     * <p>Returns an array where:
+     * <ul>
+     *   <li>gaps[0] is the gap before the first element</li>
+     *   <li>gaps[1..n-1] are the gaps between elements (added to spacing)</li>
+     *   <li>gaps[n] is the gap after the last element (not used in positioning)</li>
+     * </ul>
+     *
+     * @param count          number of elements
+     * @param remainingSpace space available for distribution
+     * @param flex           the flex mode
+     * @return array of gaps
+     */
+    private int[] computeFlexGaps(int count, int remainingSpace, Flex flex) {
+        int[] gaps = new int[count + 1];
+
+        if (remainingSpace <= 0 || count == 0) {
+            return gaps;
+        }
+
+        switch (flex) {
+            case START:
+                // All elements packed at start, remaining space at end
+                gaps[count] = remainingSpace;
+                break;
+
+            case END:
+                // All elements packed at end, remaining space at start
+                gaps[0] = remainingSpace;
+                break;
+
+            case CENTER:
+                // Elements centered, half the remaining space on each side
+                gaps[0] = remainingSpace / 2;
+                gaps[count] = remainingSpace - gaps[0];
+                break;
+
+            case SPACE_BETWEEN:
+                // Space distributed between elements (not at edges)
+                if (count > 1) {
+                    int gapSize = remainingSpace / (count - 1);
+                    int leftover = remainingSpace % (count - 1);
+                    for (int i = 1; i < count; i++) {
+                        gaps[i] = gapSize + (i <= leftover ? 1 : 0);
+                    }
+                } else {
+                    // Single element: behave like CENTER
+                    gaps[0] = remainingSpace / 2;
+                    gaps[count] = remainingSpace - gaps[0];
+                }
+                break;
+
+            case SPACE_AROUND:
+                // Equal space around each element (half space at edges)
+                if (count > 0) {
+                    // Total units = count * 2 (each element has space on both sides)
+                    // Edge elements share their edge space, so effective units = count * 2
+                    // Edge space = gapSize / 2, between space = gapSize
+                    int totalUnits = count * 2;
+                    int unitSize = remainingSpace / totalUnits;
+                    int leftover = remainingSpace % totalUnits;
+
+                    // Start gap (half size)
+                    gaps[0] = unitSize + (leftover > 0 ? 1 : 0);
+                    if (leftover > 0) {
+                        leftover--;
+                    }
+
+                    // Between gaps (full size)
+                    for (int i = 1; i < count; i++) {
+                        int extra = Math.min(2, leftover);
+                        gaps[i] = unitSize * 2 + extra;
+                        leftover -= extra;
+                    }
+
+                    // End gap (half size, remaining leftover)
+                    gaps[count] = unitSize + leftover;
+                }
+                break;
+
+            case SPACE_EVENLY:
+                // Equal space everywhere: at edges and between all elements
+                if (count > 0) {
+                    int numGaps = count + 1;
+                    int gapSize = remainingSpace / numGaps;
+                    int leftover = remainingSpace % numGaps;
+                    for (int i = 0; i <= count; i++) {
+                        gaps[i] = gapSize + (i < leftover ? 1 : 0);
+                    }
+                }
+                break;
+        }
+
+        return gaps;
     }
 }

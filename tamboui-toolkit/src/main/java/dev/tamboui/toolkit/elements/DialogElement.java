@@ -263,7 +263,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
         // Render children
         for (int i = 0; i < children.size() && i < areas.size(); i++) {
-            children.get(i).render(frame, areas.get(i), context);
+            context.renderChild(children.get(i), frame, areas.get(i));
         }
     }
 

@@ -10,6 +10,9 @@
     "filemanager-demo": {
       "script-ref": "demos/filemanager-demo/src/main/java/dev/tamboui/demo/filemanager/FileManagerDemo.java"
     },
+    "flex-demo": {
+      "script-ref": "demos/flex-demo/src/main/java/dev/tamboui/demo/flex/FlexDemo.java"
+    },
     "inline-progress-demo": {
       "script-ref": "demos/inline-progress-demo/src/main/java/dev/tamboui/demo/InlineProgressDemo.java"
     },
@@ -18,6 +21,9 @@
     },
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
+    },
+    "rflex-demo": {
+      "script-ref": "demos/rflex-demo/src/main/java/dev/tamboui/demo/flex/RFlexDemo.java"
     },
     "css-demo": {
       "script-ref": "tamboui-css/demos/css-demo/src/main/java/dev/tamboui/demo/CssDemo.java"

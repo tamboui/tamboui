@@ -214,6 +214,30 @@ try (var tui = TuiRunner.create(config)) {
 
 Tick events fire at the configured rate - useful for animations, clocks, or any periodic updates.
 
+==== Disabling Ticks
+
+For purely event-driven UIs that only need to refresh on user input, you can disable ticks:
+
+[source,java]
+----
+var config = TuiConfig.builder()
+    .noTick()
+    .build();
+----
+
+Even with ticks disabled, the UI automatically redraws on terminal resize within the configured grace period (default 250ms).
+You can customize this:
+
+[source,java]
+----
+var config = TuiConfig.builder()
+    .noTick()
+    .resizeGracePeriod(Duration.ofMillis(100))  // Faster resize response
+    .build();
+----
+
+Set `resizeGracePeriod(null)` to disable automatic resize handling entirely (not recommended).
+
 === Semantic Key Checks
 
 `KeyEvent` provides semantic methods that respect the configured bindings:

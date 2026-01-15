@@ -134,4 +134,10 @@ public final class Actions {
      * Scroll down (mouse scroll wheel down).
      */
     public static final String SCROLL_DOWN = "scrollDown";
+
+    // Debug / Development
+    /**
+     * Toggle the FPS overlay.
+     */
+    public static final String TOGGLE_FPS_OVERLAY = "toggleFpsOverlay";
 }

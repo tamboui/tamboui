@@ -89,7 +89,7 @@ public class TextAreaDemo implements Element {
     public void run() throws Exception {
         var config = TuiConfig.builder()
             .mouseCapture(true)
-            .tickRate(Duration.ofMillis(100))
+            .noTick()
             .build();
 
         try (var runner = ToolkitRunner.create(config)) {

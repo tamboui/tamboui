@@ -40,7 +40,7 @@ public final class LazyElement implements Element {
     public void render(Frame frame, Rect area, RenderContext context) {
         lastElement = supplier.get();
         if (lastElement != null) {
-            lastElement.render(frame, area, context);
+            context.renderChild(lastElement, frame, area);
         }
     }
 

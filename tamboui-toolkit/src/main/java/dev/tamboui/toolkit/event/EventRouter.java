@@ -85,9 +85,15 @@ public final class EventRouter {
      * Registers an element for event routing.
      * Called during rendering to build the element list.
      * The area is stored internally - elements don't need to track it.
+     * <p>
+     * If an element is already registered, this updates its area but
+     * does not add a duplicate entry.
      */
     public void registerElement(Element element, Rect area) {
-        elements.add(element);
+        // Prevent duplicate registration (element identity check)
+        if (!elementAreas.containsKey(element)) {
+            elements.add(element);
+        }
         elementAreas.put(element, area);
     }
 

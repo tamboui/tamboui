@@ -87,7 +87,7 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
         // Render the component's content
         Element content = render();
         if (content != null) {
-            content.render(frame, area, renderContext);
+            renderContext.renderChild(content, frame, area);
         }
     }
 

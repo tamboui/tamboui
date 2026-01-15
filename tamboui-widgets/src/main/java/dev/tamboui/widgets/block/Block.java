@@ -85,7 +85,7 @@ public final class Block implements Widget {
     }
 
     /**
-     * Returns the inner area after accounting for borders and padding.
+     * Returns the inner area after accounting for borders, titles, and padding.
      */
     public Rect inner(Rect area) {
         int x = area.x();
@@ -101,11 +101,18 @@ public final class Block implements Widget {
         if (borders.contains(Borders.TOP)) {
             y += 1;
             height -= 1;
+        } else if (title != null) {
+            // Reserve space for title even without top border
+            y += 1;
+            height -= 1;
         }
         if (borders.contains(Borders.RIGHT)) {
             width -= 1;
         }
         if (borders.contains(Borders.BOTTOM)) {
+            height -= 1;
+        } else if (titleBottom != null) {
+            // Reserve space for bottom title even without bottom border
             height -= 1;
         }
 
@@ -206,12 +213,23 @@ public final class Block implements Widget {
     
     private void setBorderCell(Buffer buffer, int x, int y, String symbol, Style borderStyle) {
         Cell existing = buffer.get(x, y);
-        // Preserve only the background color from existing style, not text modifiers like italic.
-        // Text modifiers should only apply to text content, not border characters.
-        Style baseStyle = existing.style().bg()
-            .map(bg -> Style.EMPTY.bg(bg))
-            .orElse(Style.EMPTY);
-        Style mergedStyle = baseStyle.patch(borderStyle);
+        // For QUADRANT_OUTSIDE borders, the half-block characters need:
+        // - fg = content color (filled part)
+        // - bg = terminal default (empty part to blend with terminal background)
+        // So we should NOT preserve existing background for these borders.
+        // For regular borders, preserving background allows content background to show through.
+        Style mergedStyle;
+        if (borderType == BorderType.QUADRANT_OUTSIDE) {
+            // Don't preserve background - let border style control both fg and bg
+            mergedStyle = borderStyle;
+        } else {
+            // Preserve only the background color from existing style, not text modifiers like italic.
+            // Text modifiers should only apply to text content, not border characters.
+            Style baseStyle = existing.style().bg()
+                .map(bg -> Style.EMPTY.bg(bg))
+                .orElse(Style.EMPTY);
+            mergedStyle = baseStyle.patch(borderStyle);
+        }
 
         if (mergeStrategy != MergeStrategy.REPLACE) {
             String existingSymbol = existing.symbol();

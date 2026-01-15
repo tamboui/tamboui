@@ -8,6 +8,7 @@ import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -19,10 +20,16 @@ import java.util.List;
 
 /**
  * A vertical layout container that arranges children in a column.
+ *
+ * <p>Supports flex modes for distributing remaining space:
+ * <pre>
+ * column(child1, child2, child3).flex(Flex.CENTER).spacing(1)
+ * </pre>
  */
 public final class Column extends ContainerElement<Column> {
 
     private int spacing = 0;
+    private Flex flex = Flex.START;
 
     public Column() {
     }
@@ -33,9 +40,24 @@ public final class Column extends ContainerElement<Column> {
 
     /**
      * Sets the spacing between children.
+     *
+     * @param spacing spacing in cells between adjacent children
+     * @return this column for method chaining
      */
     public Column spacing(int spacing) {
         this.spacing = Math.max(0, spacing);
+        return this;
+    }
+
+    /**
+     * Sets how remaining space is distributed among children.
+     *
+     * @param flex the flex mode for space distribution
+     * @return this column for method chaining
+     * @see Flex
+     */
+    public Column flex(Flex flex) {
+        this.flex = flex != null ? flex : Flex.START;
         return this;
     }
 
@@ -70,10 +92,10 @@ public final class Column extends ContainerElement<Column> {
 
         List<Rect> areas = Layout.vertical()
             .constraints(constraints.toArray(new Constraint[0]))
+            .flex(flex)
             .split(area);
 
         // Render children (skipping spacing areas)
-        // Children self-register for events in their own render() if needed
         int childIndex = 0;
         for (int i = 0; i < areas.size() && childIndex < children.size(); i++) {
             if (spacing > 0 && i % 2 == 1) {
@@ -82,7 +104,7 @@ public final class Column extends ContainerElement<Column> {
             }
             Element child = children.get(childIndex);
             Rect childArea = areas.get(i);
-            child.render(frame, childArea, context);
+            context.renderChild(child, frame, childArea);
             childIndex++;
         }
     }

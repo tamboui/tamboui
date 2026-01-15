@@ -14,14 +14,23 @@ import java.time.Duration;
  */
 public final class TuiConfig {
 
+    public static final int DEFAULT_POLL_TIMEOUT = 40;
+    public static final int DEFAULT_TICK_TIMEOUT = 40;
+    /**
+     * Default grace period for resize events (250ms).
+     * This ensures resize events are processed within a reasonable time even when ticks are disabled.
+     */
+    public static final int DEFAULT_RESIZE_GRACE_PERIOD = 250;
     private final boolean rawMode;
     private final boolean alternateScreen;
     private final boolean hideCursor;
     private final boolean mouseCapture;
     private final Duration pollTimeout;
     private final Duration tickRate;
+    private final Duration resizeGracePeriod;
     private final boolean shutdownHook;
     private final Bindings bindings;
+    private final boolean fpsOverlayEnabled;
 
     public TuiConfig(
             boolean rawMode,
@@ -30,8 +39,10 @@ public final class TuiConfig {
             boolean mouseCapture,
             Duration pollTimeout,
             Duration tickRate,
+            Duration resizeGracePeriod,
             boolean shutdownHook,
-            Bindings bindings
+            Bindings bindings,
+            boolean fpsOverlayEnabled
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -39,8 +50,10 @@ public final class TuiConfig {
         this.mouseCapture = mouseCapture;
         this.pollTimeout = pollTimeout;
         this.tickRate = tickRate;
+        this.resizeGracePeriod = resizeGracePeriod;
         this.shutdownHook = shutdownHook;
         this.bindings = bindings;
+        this.fpsOverlayEnabled = fpsOverlayEnabled;
     }
 
     /**
@@ -55,10 +68,12 @@ public final class TuiConfig {
                 true,                        // alternateScreen
                 true,                        // hideCursor
                 false,                       // mouseCapture
-                Duration.ofMillis(100),      // pollTimeout
-                Duration.ofMillis(100),      // tickRate
+                Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
+                Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
+                Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD),  // resizeGracePeriod
                 true,                        // shutdownHook
-                BindingSets.defaults()       // bindings
+                BindingSets.defaults(),      // bindings
+                false                        // fpsOverlayEnabled
         );
     }
 
@@ -129,6 +144,19 @@ public final class TuiConfig {
     }
 
     /**
+     * Returns the resize grace period.
+     * <p>
+     * This defines the maximum time before resize events are processed,
+     * ensuring the UI redraws promptly on terminal resize even when
+     * ticks are disabled or have a long interval.
+     *
+     * @return the resize grace period, or null to use the poll timeout
+     */
+    public Duration resizeGracePeriod() {
+        return resizeGracePeriod;
+    }
+
+    /**
      * Returns whether a shutdown hook is registered to restore the terminal.
      */
     public boolean shutdownHook() {
@@ -143,6 +171,15 @@ public final class TuiConfig {
      */
     public Bindings bindings() {
         return bindings;
+    }
+
+    /**
+     * Returns whether the FPS overlay is enabled.
+     *
+     * @return true if FPS overlay is enabled
+     */
+    public boolean fpsOverlayEnabled() {
+        return fpsOverlayEnabled;
     }
 
     @Override
@@ -160,7 +197,9 @@ public final class TuiConfig {
                 && mouseCapture == that.mouseCapture
                 && pollTimeout.equals(that.pollTimeout)
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
-                && bindings.equals(that.bindings);
+                && (resizeGracePeriod != null ? resizeGracePeriod.equals(that.resizeGracePeriod) : that.resizeGracePeriod == null)
+                && bindings.equals(that.bindings)
+                && fpsOverlayEnabled == that.fpsOverlayEnabled;
     }
 
     @Override
@@ -171,22 +210,26 @@ public final class TuiConfig {
         result = 31 * result + Boolean.hashCode(mouseCapture);
         result = 31 * result + pollTimeout.hashCode();
         result = 31 * result + (tickRate != null ? tickRate.hashCode() : 0);
+        result = 31 * result + (resizeGracePeriod != null ? resizeGracePeriod.hashCode() : 0);
         result = 31 * result + bindings.hashCode();
+        result = 31 * result + Boolean.hashCode(fpsOverlayEnabled);
         return result;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, shutdownHook=%s, bindings=%s]",
+                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
                 rawMode,
                 alternateScreen,
                 hideCursor,
                 mouseCapture,
                 pollTimeout,
                 tickRate,
+                resizeGracePeriod,
                 shutdownHook,
-                bindings
+                bindings,
+                fpsOverlayEnabled
         );
     }
 
@@ -198,10 +241,12 @@ public final class TuiConfig {
         private boolean alternateScreen = true;
         private boolean hideCursor = true;
         private boolean mouseCapture = false;
-        private Duration pollTimeout = Duration.ofMillis(100);
-        private Duration tickRate = Duration.ofMillis(100);
+        private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
+        private Duration tickRate = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
+        private Duration resizeGracePeriod = Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD);
         private boolean shutdownHook = true;
         private Bindings bindings = BindingSets.defaults();
+        private boolean fpsOverlayEnabled = false;
 
         private Builder() {
         }
@@ -268,7 +313,7 @@ public final class TuiConfig {
          * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
-            this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(100);
+            this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
             return this;
         }
 
@@ -297,6 +342,23 @@ public final class TuiConfig {
         }
 
         /**
+         * Sets the resize grace period.
+         * <p>
+         * This defines the maximum time before resize events are processed,
+         * ensuring the UI redraws promptly on terminal resize even when
+         * ticks are disabled or have a long interval.
+         * <p>
+         * Default is {@value #DEFAULT_RESIZE_GRACE_PERIOD}ms.
+         *
+         * @param resizeGracePeriod the grace period, or null to disable automatic resize handling
+         * @return this builder
+         */
+        public Builder resizeGracePeriod(Duration resizeGracePeriod) {
+            this.resizeGracePeriod = resizeGracePeriod;
+            return this;
+        }
+
+        /**
          * Sets the bindings for semantic action matching.
          * <p>
          * Use predefined binding sets from {@link BindingSets}:
@@ -317,6 +379,17 @@ public final class TuiConfig {
         }
 
         /**
+         * Enables or disables the FPS overlay.
+         *
+         * @param enabled true to enable the FPS overlay
+         * @return this builder
+         */
+        public Builder fpsOverlay(boolean enabled) {
+            this.fpsOverlayEnabled = enabled;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          */
         public TuiConfig build() {
@@ -327,8 +400,10 @@ public final class TuiConfig {
                     mouseCapture,
                     pollTimeout,
                     tickRate,
+                    resizeGracePeriod,
                     shutdownHook,
-                    bindings
+                    bindings,
+                    fpsOverlayEnabled
             );
         }
     }

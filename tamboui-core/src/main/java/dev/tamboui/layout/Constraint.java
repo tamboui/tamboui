@@ -255,11 +255,11 @@ public interface Constraint {
         /**
          * Creates a fill constraint.
          *
-         * @param weight weight for distributing remaining space (>=1)
+         * @param weight weight for distributing remaining space (>=0)
          */
         public Fill(int weight) {
-            if (weight < 1) {
-                throw new IllegalArgumentException("Fill weight must be at least 1: " + weight);
+            if (weight < 0) {
+                throw new IllegalArgumentException("Fill weight must be non-negative: " + weight);
             }
             this.weight = weight;
         }

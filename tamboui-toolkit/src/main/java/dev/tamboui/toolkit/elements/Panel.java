@@ -300,11 +300,11 @@ public final class Panel extends ContainerElement<Panel> {
                 .constraints(constraints.toArray(new Constraint[0]))
                 .split(innerArea);
 
-        // Render children (they self-register for events in their own render() if needed)
+        // Render children
         for (int i = 0; i < children.size() && i < areas.size(); i++) {
             Element child = children.get(i);
             Rect childArea = areas.get(i);
-            child.render(frame, childArea, context);
+            context.renderChild(child, frame, childArea);
         }
     }
 

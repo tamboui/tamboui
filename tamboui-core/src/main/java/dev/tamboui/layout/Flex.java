@@ -9,11 +9,6 @@ package dev.tamboui.layout;
  */
 public enum Flex {
     /**
-     * Original tui-rs behavior for backwards compatibility.
-     */
-    LEGACY,
-
-    /**
      * Pack elements to the start.
      */
     START,
@@ -36,5 +31,12 @@ public enum Flex {
     /**
      * Distribute space around elements.
      */
-    SPACE_AROUND
+    SPACE_AROUND,
+
+    /**
+     * Distribute space evenly between and around elements.
+     * Unlike SPACE_AROUND which gives half-size gaps at edges,
+     * SPACE_EVENLY gives equal gaps everywhere.
+     */
+    SPACE_EVENLY
 }
