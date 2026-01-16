@@ -15,6 +15,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.text.Span;
 import dev.tamboui.widgets.tabs.Tabs;
 import dev.tamboui.widgets.tabs.TabsState;
 
@@ -163,6 +164,12 @@ public final class TabsElement extends StyledElement<TabsElement> {
             return;
         }
 
+        // Resolve base tab style from CSS
+        Style baseTabStyle = context.childStyle("tab");
+        Style effectiveTabStyle = baseTabStyle.equals(context.currentStyle())
+            ? context.currentStyle()
+            : context.currentStyle().patch(baseTabStyle);
+
         // Resolve highlight style: explicit > CSS > default
         Style effectiveHighlightStyle = highlightStyle;
         if (effectiveHighlightStyle == null) {
@@ -172,11 +179,17 @@ public final class TabsElement extends StyledElement<TabsElement> {
                 : cssStyle;
         }
 
+        // Resolve divider style from CSS
+        Style dividerCssStyle = context.childStyle("divider");
+        Span dividerSpan = dividerCssStyle.equals(context.currentStyle())
+            ? Span.raw(divider)
+            : Span.styled(divider, dividerCssStyle);
+
         Tabs.Builder builder = Tabs.builder()
             .titles(titles.toArray(new String[0]))
-            .style(context.currentStyle())
+            .style(effectiveTabStyle)
             .highlightStyle(effectiveHighlightStyle)
-            .divider(divider)
+            .divider(dividerSpan)
             .padding(paddingLeft, paddingRight);
 
         if (title != null || borderType != null) {

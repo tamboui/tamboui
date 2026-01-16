@@ -14,7 +14,8 @@ import dev.tamboui.widgets.block.Block;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
-import static org.assertj.core.api.Assertions.*;
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TabsTest {
 
@@ -215,5 +216,26 @@ class TabsTest {
             .addTitle(Line.from("Third"))
             .build();
         assertThat(tabs.size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("Divider inherits base style including background")
+    void dividerInheritsBaseStyle() {
+        Style baseStyle = Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE);
+        Tabs tabs = Tabs.builder()
+            .titles("A", "B")
+            .style(baseStyle)
+            .divider(" | ")
+            .build();
+        Rect area = new Rect(0, 0, 20, 1);
+        Buffer buffer = Buffer.empty(area);
+        TabsState state = new TabsState();
+
+        tabs.render(area, buffer, state);
+
+        // Divider at position 1-3 (" | ") should inherit the base style background
+        assertThat(buffer).at(2, 0)
+            .hasSymbol("|")
+            .hasBackground(Color.BLUE);
     }
 }

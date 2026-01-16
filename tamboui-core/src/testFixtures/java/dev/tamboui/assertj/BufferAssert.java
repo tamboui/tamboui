@@ -6,6 +6,8 @@ package dev.tamboui.assertj;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import org.assertj.core.api.AbstractAssert;
 
 /**
@@ -147,6 +149,177 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         }
 
         return this;
+    }
+
+    /**
+     * Asserts that the style at the given position equals the expected style.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param expectedStyle the expected style
+     * @return this assertion object
+     */
+    public BufferAssert hasStyleAt(int x, int y, Style expectedStyle) {
+        isNotNull();
+
+        Style actualStyle = actual.get(x, y).style();
+        if (!actualStyle.equals(expectedStyle)) {
+            failWithMessage("Expected style at (%d, %d) to be <%s>, but was <%s>",
+                    x, y, expectedStyle, actualStyle);
+        }
+
+        return this;
+    }
+
+    /**
+     * Asserts that the foreground color at the given position equals the expected color.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param expectedFg the expected foreground color
+     * @return this assertion object
+     */
+    public BufferAssert hasForegroundAt(int x, int y, Color expectedFg) {
+        isNotNull();
+
+        Style actualStyle = actual.get(x, y).style();
+        Color actualFg = actualStyle.fg().orElse(null);
+        if (expectedFg == null ? actualFg != null : !expectedFg.equals(actualFg)) {
+            failWithMessage("Expected foreground at (%d, %d) to be <%s>, but was <%s>",
+                    x, y, expectedFg, actualFg);
+        }
+
+        return this;
+    }
+
+    /**
+     * Asserts that the background color at the given position equals the expected color.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param expectedBg the expected background color
+     * @return this assertion object
+     */
+    public BufferAssert hasBackgroundAt(int x, int y, Color expectedBg) {
+        isNotNull();
+
+        Style actualStyle = actual.get(x, y).style();
+        Color actualBg = actualStyle.bg().orElse(null);
+        if (expectedBg == null ? actualBg != null : !expectedBg.equals(actualBg)) {
+            failWithMessage("Expected background at (%d, %d) to be <%s>, but was <%s>",
+                    x, y, expectedBg, actualBg);
+        }
+
+        return this;
+    }
+
+    /**
+     * Returns a cell assertion for the cell at the given position.
+     * <p>
+     * Allows fluent assertions on a specific cell:
+     * <pre>{@code
+     * assertThat(buffer).at(2, 0)
+     *     .hasSymbol("|")
+     *     .hasBackground(Color.BLUE);
+     * }</pre>
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @return a cell assertion object
+     */
+    public CellAssert at(int x, int y) {
+        isNotNull();
+        return new CellAssert(this, actual.get(x, y), x, y);
+    }
+
+    /**
+     * Fluent assertion for a cell at a specific position.
+     */
+    public static final class CellAssert {
+        private final BufferAssert bufferAssert;
+        private final Cell cell;
+        private final int x;
+        private final int y;
+
+        private CellAssert(BufferAssert bufferAssert, Cell cell, int x, int y) {
+            this.bufferAssert = bufferAssert;
+            this.cell = cell;
+            this.x = x;
+            this.y = y;
+        }
+
+        /**
+         * Asserts that the cell has the expected symbol.
+         *
+         * @param expectedSymbol the expected symbol
+         * @return this assertion object for chaining
+         */
+        public CellAssert hasSymbol(String expectedSymbol) {
+            String actualSymbol = cell.symbol();
+            if (!actualSymbol.equals(expectedSymbol)) {
+                throw new AssertionError(String.format(
+                        "Expected symbol at (%d, %d) to be <%s>, but was <%s>",
+                        x, y, expectedSymbol, actualSymbol));
+            }
+            return this;
+        }
+
+        /**
+         * Asserts that the cell has the expected style.
+         *
+         * @param expectedStyle the expected style
+         * @return this assertion object for chaining
+         */
+        public CellAssert hasStyle(Style expectedStyle) {
+            Style actualStyle = cell.style();
+            if (!actualStyle.equals(expectedStyle)) {
+                throw new AssertionError(String.format(
+                        "Expected style at (%d, %d) to be <%s>, but was <%s>",
+                        x, y, expectedStyle, actualStyle));
+            }
+            return this;
+        }
+
+        /**
+         * Asserts that the cell has the expected foreground color.
+         *
+         * @param expectedFg the expected foreground color
+         * @return this assertion object for chaining
+         */
+        public CellAssert hasForeground(Color expectedFg) {
+            Color actualFg = cell.style().fg().orElse(null);
+            if (expectedFg == null ? actualFg != null : !expectedFg.equals(actualFg)) {
+                throw new AssertionError(String.format(
+                        "Expected foreground at (%d, %d) to be <%s>, but was <%s>",
+                        x, y, expectedFg, actualFg));
+            }
+            return this;
+        }
+
+        /**
+         * Asserts that the cell has the expected background color.
+         *
+         * @param expectedBg the expected background color
+         * @return this assertion object for chaining
+         */
+        public CellAssert hasBackground(Color expectedBg) {
+            Color actualBg = cell.style().bg().orElse(null);
+            if (expectedBg == null ? actualBg != null : !expectedBg.equals(actualBg)) {
+                throw new AssertionError(String.format(
+                        "Expected background at (%d, %d) to be <%s>, but was <%s>",
+                        x, y, expectedBg, actualBg));
+            }
+            return this;
+        }
+
+        /**
+         * Returns to the buffer assertion for further buffer-level assertions.
+         *
+         * @return the parent buffer assertion
+         */
+        public BufferAssert and() {
+            return bufferAssert;
+        }
     }
 
     private String formatBuffer(Buffer buffer) {
