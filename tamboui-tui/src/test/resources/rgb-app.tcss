@@ -1,0 +1,83 @@
+/* RGB Color Switcher App Styles */
+
+/* Root panel - background changes based on state */
+#root {
+    border-type: none;
+}
+
+#root.red {
+    background: red;
+}
+
+#root.green {
+    background: green;
+}
+
+#root.blue {
+    background: blue;
+}
+
+/* Buttons */
+#red-button {
+    background: gray;
+    color: white;
+    text-align: center;
+    border-type: rounded;
+    border-color: #666666;
+}
+
+#green-button {
+    background: gray;
+    color: white;
+    text-align: center;
+    border-type: rounded;
+    border-color: #666666;
+}
+
+#blue-button {
+    background: gray;
+    color: white;
+    text-align: center;
+    border-type: rounded;
+    border-color: #666666;
+}
+
+#red-button:hover {
+    border-color: cyan;
+    text-style: bold;
+}
+
+#green-button:hover {
+    border-color: cyan;
+    text-style: bold;
+}
+
+#blue-button:hover {
+    border-color: cyan;
+    text-style: bold;
+}
+
+#red-button:focus {
+    border-color: cyan;
+    border-type: double;
+    text-style: bold;
+}
+
+#green-button:focus {
+    border-color: cyan;
+    border-type: double;
+    text-style: bold;
+}
+
+#blue-button:focus {
+    border-color: cyan;
+    border-type: double;
+    text-style: bold;
+}
+
+/* Title */
+.title {
+    color: white;
+    text-style: bold;
+    text-align: center;
+}
