@@ -145,7 +145,7 @@ public final class Tabs implements StatefulWidget<TabsState> {
                 if (x + divider.content().length() > tabsArea.right()) {
                     break;
                 }
-                x = buffer.setSpan(x, y, divider);
+                x = buffer.setSpan(x, y, divider.patchStyle(style));
             }
 
             Line title = titles.get(i);

@@ -5,9 +5,12 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.widgets.tabs.TabsState;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +18,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for TabsElement.
@@ -137,5 +141,127 @@ class TabsElementTest {
 
         // Should render without error
         assertThat(buffer).isNotNull();
+    }
+
+    @Test
+    @DisplayName("divider can be styled via CSS")
+    void dividerStyledViaCss() {
+        // Given CSS that styles the divider
+        String css = "TabsElement-divider { color: red; }";
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", css);
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        TabsElement element = tabs("A", "B").divider("|");
+
+        // When rendering with CSS context
+        context.withElement(element, Style.EMPTY, () -> {
+            element.render(frame, area, context);
+        });
+
+        // Then divider should have red foreground
+        // "A|B" - divider is at position 1
+        assertThat(buffer).at(1, 0)
+            .hasSymbol("|")
+            .hasForeground(Color.RED);
+    }
+
+    @Test
+    @DisplayName("selected tab can be styled via CSS")
+    void selectedTabStyledViaCss() {
+        // Given CSS that styles the selected tab
+        String css = "TabsElement-tab:selected { color: cyan; }";
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", css);
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        TabsElement element = tabs("A", "B").divider("|").selected(1);
+
+        // When rendering with CSS context
+        context.withElement(element, Style.EMPTY, () -> {
+            element.render(frame, area, context);
+        });
+
+        // Then selected tab "B" should have cyan foreground
+        // "A|B" - B is at position 2
+        assertThat(buffer).at(2, 0)
+            .hasSymbol("B")
+            .hasForeground(Color.CYAN);
+    }
+
+    @Test
+    @DisplayName("unselected tabs can be styled via CSS")
+    void unselectedTabsStyledViaCss() {
+        // Given CSS that styles unselected tabs
+        String css = "TabsElement-tab { color: gray; background: red; }";
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", css);
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        TabsElement element = tabs("A", "B").divider("|").selected(1);
+
+        // When rendering with CSS context
+        context.withElement(element, Style.EMPTY, () -> {
+            element.render(frame, area, context);
+        });
+
+        // Then unselected tab "A" should have gray foreground and red background
+        // "A|B" - A is at position 0
+        assertThat(buffer).at(0, 0)
+            .hasSymbol("A")
+            .hasForeground(Color.GRAY)
+            .hasBackground(Color.RED);
+    }
+
+    @Test
+    @DisplayName("divider inherits base style background via CSS")
+    void dividerInheritsBackgroundViaCss() {
+        // Given CSS that sets background on tabs and foreground on divider
+        String css = "TabsElement { background: blue; }\n" +
+                     "TabsElement-divider { color: yellow; }";
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", css);
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        TabsElement element = tabs("A", "B").divider("|");
+
+        // When rendering with CSS context
+        context.withElement(element, Style.EMPTY.bg(Color.BLUE), () -> {
+            element.render(frame, area, context);
+        });
+
+        // Then divider should have yellow foreground and blue background
+        assertThat(buffer).at(1, 0)
+            .hasSymbol("|")
+            .hasForeground(Color.YELLOW)
+            .hasBackground(Color.BLUE);
     }
 }
