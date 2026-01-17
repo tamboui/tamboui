@@ -55,11 +55,12 @@ import java.util.Objects;
  * reverse while preserving the visual curve shape (useful for ping-pong effects).
  */
 public final class EffectTimer {
-    
+
     private TFxDuration remaining;
     private final TFxDuration total;
     private Interpolation interpolation;
     private boolean reverse;
+    private LoopMode loopMode;
     
     /**
      * Creates a new EffectTimer with the specified duration in milliseconds and interpolation.
@@ -87,6 +88,34 @@ public final class EffectTimer {
         this.total = duration;
         this.interpolation = Objects.requireNonNull(interpolation);
         this.reverse = false;
+        this.loopMode = LoopMode.ONCE;
+    }
+
+    /**
+     * Sets the loop mode for this timer.
+     * <p>
+     * Loop mode controls what happens when the timer completes:
+     * <ul>
+     *   <li>{@link LoopMode#ONCE}: Timer completes and stays done (default)</li>
+     *   <li>{@link LoopMode#LOOP}: Timer resets to start and continues</li>
+     *   <li>{@link LoopMode#PING_PONG}: Timer reverses direction and continues</li>
+     * </ul>
+     *
+     * @param mode the loop mode
+     * @return this timer for chaining
+     */
+    public EffectTimer loopMode(LoopMode mode) {
+        this.loopMode = Objects.requireNonNull(mode);
+        return this;
+    }
+
+    /**
+     * Returns the current loop mode.
+     *
+     * @return the loop mode
+     */
+    public LoopMode loopMode() {
+        return loopMode;
     }
     
     /**
@@ -96,6 +125,7 @@ public final class EffectTimer {
         EffectTimer timer = new EffectTimer(total, interpolation);
         timer.remaining = remaining;
         timer.reverse = !this.reverse;
+        timer.loopMode = this.loopMode;
         return timer;
     }
     
@@ -117,6 +147,7 @@ public final class EffectTimer {
         EffectTimer timer = new EffectTimer(total, interpolation.flipped());
         timer.remaining = remaining;
         timer.reverse = !this.reverse;
+        timer.loopMode = this.loopMode;
         return timer;
     }
     
@@ -168,9 +199,17 @@ public final class EffectTimer {
     
     /**
      * Processes the timer by reducing the remaining duration by the specified amount.
-     * 
+     * <p>
+     * For looping timers, this method handles resetting or reversing the timer
+     * when it completes:
+     * <ul>
+     *   <li>{@link LoopMode#ONCE}: Returns overflow when complete</li>
+     *   <li>{@link LoopMode#LOOP}: Resets to start, returns null</li>
+     *   <li>{@link LoopMode#PING_PONG}: Reverses direction, returns null</li>
+     * </ul>
+     *
      * @param duration The amount of time to process
-     * @return The overflow duration if the timer has completed, or null if still running
+     * @return The overflow duration if the timer has completed (ONCE mode only), or null if still running
      */
     public TFxDuration process(TFxDuration duration) {
         if (remaining.asMillis() >= duration.asMillis()) {
@@ -178,15 +217,45 @@ public final class EffectTimer {
             return null;
         } else {
             TFxDuration overflow = duration.sub(remaining);
-            remaining = TFxDuration.ZERO;
-            return overflow;
+
+            switch (loopMode) {
+                case LOOP:
+                    // Reset to start and continue
+                    remaining = total;
+                    // Process any overflow time recursively (for very fast processing)
+                    if (overflow.asMillis() > 0 && total.asMillis() > 0) {
+                        return process(overflow);
+                    }
+                    return null;
+
+                case PING_PONG:
+                    // Reverse direction and reset
+                    reverse = !reverse;
+                    remaining = total;
+                    // Process any overflow time recursively
+                    if (overflow.asMillis() > 0 && total.asMillis() > 0) {
+                        return process(overflow);
+                    }
+                    return null;
+
+                case ONCE:
+                default:
+                    remaining = TFxDuration.ZERO;
+                    return overflow;
+            }
         }
     }
-    
+
     /**
      * Returns true if the timer has completed.
+     * <p>
+     * For looping timers ({@link LoopMode#LOOP} and {@link LoopMode#PING_PONG}),
+     * this method always returns false since looping timers never complete on their own.
      */
     public boolean done() {
+        if (loopMode != LoopMode.ONCE) {
+            return false;
+        }
         return remaining.isZero();
     }
     
@@ -199,24 +268,30 @@ public final class EffectTimer {
     
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof EffectTimer)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof EffectTimer)) {
+            return false;
+        }
         EffectTimer that = (EffectTimer) o;
         return reverse == that.reverse &&
                Objects.equals(remaining, that.remaining) &&
                Objects.equals(total, that.total) &&
-               interpolation == that.interpolation;
+               interpolation == that.interpolation &&
+               loopMode == that.loopMode;
     }
-    
+
     @Override
     public int hashCode() {
-        return Objects.hash(remaining, total, interpolation, reverse);
+        return Objects.hash(remaining, total, interpolation, reverse, loopMode);
     }
-    
+
     @Override
     public String toString() {
-        return "EffectTimer{remaining=" + remaining + ", total=" + total + 
-               ", interpolation=" + interpolation + ", reverse=" + reverse + "}";
+        return "EffectTimer{remaining=" + remaining + ", total=" + total +
+               ", interpolation=" + interpolation + ", reverse=" + reverse +
+               ", loopMode=" + loopMode + "}";
     }
 }
 

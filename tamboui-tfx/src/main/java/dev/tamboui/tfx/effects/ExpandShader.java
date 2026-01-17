@@ -142,9 +142,10 @@ public final class ExpandShader implements Shader {
     
     @Override
     public Shader copy() {
-        ExpandShader copy = new ExpandShader(direction, style,
-            EffectTimer.fromMs(stretchA.timer().duration().asMillis(), 
-                stretchA.timer().interpolation()));
+        EffectTimer timerCopy = EffectTimer.fromMs(stretchA.timer().duration().asMillis(),
+            stretchA.timer().interpolation());
+        timerCopy.loopMode(stretchA.timer().loopMode());  // Preserve loop mode
+        ExpandShader copy = new ExpandShader(direction, style, timerCopy);
         copy.area = area;
         copy.setCellFilter(cellFilter());
         // Preserve reversed state

@@ -38,6 +38,7 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.time.Duration;
 import java.time.Instant;
@@ -95,6 +96,7 @@ public final class TuiRunner implements AutoCloseable {
     private final AtomicReference<Renderer> activeRenderer;
     private final Duration effectivePollTimeout;
     private final FpsOverlay fpsOverlay;
+    private final List<PostRenderProcessor> postRenderProcessors;
     private volatile RenderError lastError;
     private volatile boolean inErrorState;
     private volatile int errorScroll;
@@ -159,6 +161,9 @@ public final class TuiRunner implements AutoCloseable {
         // Create FPS overlay
         this.fpsOverlay = new FpsOverlay(config.pollTimeout(), config.tickRate());
 
+        // Store post-render processors
+        this.postRenderProcessors = config.postRenderProcessors();
+
         // Register shutdown hook if enabled
         if (config.shutdownHook()) {
             this.shutdownHook = new Thread(this::cleanup, "tui-shutdown-hook");
@@ -222,10 +227,17 @@ public final class TuiRunner implements AutoCloseable {
      * @throws Exception if an error occurs during execution that cannot be handled
      */
     public void run(EventHandler handler, Renderer renderer) throws Exception {
-        // Wrap renderer to add FPS overlay
+        // Wrap renderer to add post-render processors and FPS overlay
         Renderer wrappedRenderer = frame -> {
             fpsOverlay.recordFrame();
             renderer.render(frame);
+
+            // Call post-render processors
+            for (PostRenderProcessor processor : postRenderProcessors) {
+                processor.process(frame);
+            }
+
+            // FPS overlay is always last
             if (fpsOverlay.isVisible()) {
                 fpsOverlay.render(frame, frame.area());
             }

@@ -49,6 +49,7 @@ public final class DefaultRenderContext implements RenderContext {
 
     private final FocusManager focusManager;
     private final EventRouter eventRouter;
+    private final ElementRegistry elementRegistry;
     private final Deque<Style> styleStack = new ArrayDeque<>();
     private final Deque<Styleable> elementStack = new ArrayDeque<>();
     private final Deque<CssStyleResolver> resolverStack = new ArrayDeque<>();
@@ -56,9 +57,18 @@ public final class DefaultRenderContext implements RenderContext {
     private Bindings bindings = BindingSets.defaults();
     private boolean faultTolerant;
 
+    /**
+     * Creates a new render context.
+     * <p>
+     * The ElementRegistry is obtained from the EventRouter.
+     *
+     * @param focusManager the focus manager
+     * @param eventRouter  the event router (must have an ElementRegistry)
+     */
     public DefaultRenderContext(FocusManager focusManager, EventRouter eventRouter) {
         this.focusManager = focusManager;
         this.eventRouter = eventRouter;
+        this.elementRegistry = eventRouter.elementRegistry();
     }
 
     /**
@@ -66,7 +76,8 @@ public final class DefaultRenderContext implements RenderContext {
      */
     public static DefaultRenderContext createEmpty() {
         FocusManager fm = new FocusManager();
-        return new DefaultRenderContext(fm, new EventRouter(fm));
+        ElementRegistry registry = new ElementRegistry();
+        return new DefaultRenderContext(fm, new EventRouter(fm, registry));
     }
 
     /**
@@ -358,16 +369,21 @@ public final class DefaultRenderContext implements RenderContext {
      * Registers an element for event routing and focus management.
      * Called by container elements after rendering children.
      * <p>
+     * The EventRouter handles registration in the ElementRegistry for ID-based lookups.
+     * <p>
      * Internal use only.
      *
      * @param element the element to register
      * @param area the rendered area
      */
     public void registerElement(Element element, Rect area) {
+        // EventRouter handles both event routing and ElementRegistry population
         eventRouter.registerElement(element, area);
+
         if (element.isFocusable()) {
-            if (element.id() != null) {
-                focusManager.registerFocusable(element.id(), area);
+            String id = element.id();
+            if (id != null) {
+                focusManager.registerFocusable(id, area);
             } else {
                 // This should only happen if a subclass overrides isFocusable() without ensuring an ID
                 LOGGER.warning("Focusable element of type " + element.getClass().getSimpleName()
@@ -375,6 +391,18 @@ public final class DefaultRenderContext implements RenderContext {
                         + "Ensure the element has an ID set.");
             }
         }
+    }
+
+    /**
+     * Returns the element registry for ID-based area lookups.
+     * <p>
+     * The registry is populated during rendering and can be used
+     * by effect systems to target elements by ID.
+     *
+     * @return the element registry
+     */
+    public ElementRegistry elementRegistry() {
+        return elementRegistry;
     }
 
     /**

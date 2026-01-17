@@ -216,7 +216,23 @@ public interface Shader {
             // So we need to override this in shaders that need reversal
         }
     }
-    
+
+    /**
+     * Sets the loop mode for this shader's timer.
+     * <p>
+     * This method sets the loop mode on the underlying timer, controlling
+     * what happens when the effect reaches its end. See {@link LoopMode}
+     * for available modes.
+     *
+     * @param mode the loop mode to set
+     */
+    default void setLoopMode(LoopMode mode) {
+        EffectTimer timer = mutableTimer();
+        if (timer != null) {
+            timer.loopMode(mode);
+        }
+    }
+
     /**
      * Creates a copy of this shader.
      * <p>

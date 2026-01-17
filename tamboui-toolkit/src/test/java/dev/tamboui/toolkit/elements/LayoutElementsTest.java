@@ -229,6 +229,37 @@ class LayoutElementsTest {
             // Both should be rendered with space distributed
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("L");
         }
+
+        @Test
+        @DisplayName("Row with fit() text elements uses natural width")
+        void fitTextElementsUseNaturalWidth() {
+            Rect area = new Rect(0, 0, 30, 1);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            // Three text elements with fit() - each should get exactly its content width
+            // "Hello " = 6 chars, "World" = 5 chars, "!" = 1 char
+            row(
+                text("Hello ").fit(),
+                text("World").fit(),
+                text("!").fit()
+            ).render(frame, area, RenderContext.empty());
+
+            // Text should render with no truncation, adjacent positions
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "H")      // start of "Hello "
+                .hasSymbolAt(5, 0, " ")      // trailing space of "Hello "
+                .hasSymbolAt(6, 0, "W")      // start of "World"
+                .hasSymbolAt(10, 0, "d")     // end of "World"
+                .hasSymbolAt(11, 0, "!");    // the "!"
+        }
+
+        @Test
+        @DisplayName("fit() constraint returns Constraint.fit()")
+        void fitReturnsCorrectConstraint() {
+            TextElement element = text("Hello").fit();
+            assertThat(element.constraint()).isEqualTo(Constraint.fit());
+        }
     }
 
     @Nested

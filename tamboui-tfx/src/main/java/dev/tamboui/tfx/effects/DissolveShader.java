@@ -130,10 +130,9 @@ public final class DissolveShader implements Shader {
     
     @Override
     public Shader copy() {
-        DissolveShader copy = new DissolveShader(
-            EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation()),
-            dissolvedStyle
-        );
+        EffectTimer timerCopy = EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation());
+        timerCopy.loopMode(timer.loopMode());  // Preserve loop mode
+        DissolveShader copy = new DissolveShader(timerCopy, dissolvedStyle);
         copy.area = area;
         copy.cellFilter = cellFilter;
         copy.rng = new SimpleRng(rng.state());

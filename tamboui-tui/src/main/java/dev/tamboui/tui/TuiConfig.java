@@ -11,6 +11,9 @@ import dev.tamboui.tui.error.RenderErrorHandlers;
 
 import java.io.PrintStream;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Configuration options for {@link TuiRunner}.
@@ -36,6 +39,7 @@ public final class TuiConfig {
     private final RenderErrorHandler errorHandler;
     private final PrintStream errorOutput;
     private final boolean fpsOverlayEnabled;
+    private final List<PostRenderProcessor> postRenderProcessors;
 
     public TuiConfig(
             boolean rawMode,
@@ -49,7 +53,8 @@ public final class TuiConfig {
             Bindings bindings,
             RenderErrorHandler errorHandler,
             PrintStream errorOutput,
-            boolean fpsOverlayEnabled
+            boolean fpsOverlayEnabled,
+            List<PostRenderProcessor> postRenderProcessors
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -63,6 +68,9 @@ public final class TuiConfig {
         this.errorHandler = errorHandler;
         this.errorOutput = errorOutput;
         this.fpsOverlayEnabled = fpsOverlayEnabled;
+        this.postRenderProcessors = postRenderProcessors != null
+                ? Collections.unmodifiableList(new ArrayList<>(postRenderProcessors))
+                : Collections.emptyList();
     }
 
     /**
@@ -84,7 +92,8 @@ public final class TuiConfig {
                 BindingSets.defaults(),      // bindings
                 RenderErrorHandlers.displayAndQuit(),  // errorHandler
                 System.err,                  // errorOutput
-                false                        // fpsOverlayEnabled
+                false,                       // fpsOverlayEnabled
+                Collections.emptyList()      // postRenderProcessors
         );
     }
 
@@ -215,6 +224,17 @@ public final class TuiConfig {
         return fpsOverlayEnabled;
     }
 
+    /**
+     * Returns the list of post-render processors.
+     * <p>
+     * Processors are called in order after the main renderer completes.
+     *
+     * @return an unmodifiable list of post-render processors
+     */
+    public List<PostRenderProcessor> postRenderProcessors() {
+        return postRenderProcessors;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -282,6 +302,7 @@ public final class TuiConfig {
         private RenderErrorHandler errorHandler = RenderErrorHandlers.displayAndQuit();
         private PrintStream errorOutput = System.err;
         private boolean fpsOverlayEnabled = false;
+        private final List<PostRenderProcessor> postRenderProcessors = new ArrayList<>();
 
         private Builder() {
         }
@@ -454,6 +475,23 @@ public final class TuiConfig {
         }
 
         /**
+         * Adds a post-render processor.
+         * <p>
+         * Post-render processors are called after each frame is rendered,
+         * allowing for effects, overlays, or other post-processing.
+         * Processors are called in the order they are added.
+         *
+         * @param processor the processor to add
+         * @return this builder
+         */
+        public Builder postRenderProcessor(PostRenderProcessor processor) {
+            if (processor != null) {
+                this.postRenderProcessors.add(processor);
+            }
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          */
         public TuiConfig build() {
@@ -469,7 +507,8 @@ public final class TuiConfig {
                     bindings,
                     errorHandler,
                     errorOutput,
-                    fpsOverlayEnabled
+                    fpsOverlayEnabled,
+                    postRenderProcessors
             );
         }
     }

@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Modules that can contain demos
-MODULES="tamboui-widgets tamboui-toolkit tamboui-tui tamboui-css tamboui-picocli tamboui-image tamboui-tfx"
+MODULES="tamboui-widgets tamboui-toolkit tamboui-tui tamboui-css tamboui-picocli tamboui-image tamboui-tfx tamboui-tfx-tui tamboui-tfx-toolkit"
 
 usage() {
     echo "Usage: $0 [demo-name] [--native]"

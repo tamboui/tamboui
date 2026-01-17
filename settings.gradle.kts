@@ -13,6 +13,8 @@ val modules = listOf(
     "tamboui-annotations",
     "tamboui-processor",
     "tamboui-tfx",
+    "tamboui-tfx-tui",
+    "tamboui-tfx-toolkit",
     "docs"
 )
 

@@ -389,6 +389,19 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
         return constraint(Constraint.max(max));
     }
 
+    /**
+     * Sets the constraint to fit the element's preferred size.
+     * <p>
+     * When used in a row, the element will take only as much width as needed
+     * (queried via {@link #preferredWidth()}). This is useful for inline text
+     * where you want each text element to use its natural width.
+     *
+     * @return this element for chaining
+     */
+    public T fit() {
+        return constraint(Constraint.fit());
+    }
+
     @Override
     public Constraint constraint() {
         return layoutConstraint;

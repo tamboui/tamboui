@@ -224,10 +224,10 @@ public final class SlideShader implements Shader {
     
     @Override
     public Shader copy() {
+        EffectTimer timerCopy = EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation());
+        timerCopy.loopMode(timer.loopMode());  // Preserve loop mode
         SlideShader copy = new SlideShader(
-            direction, gradientLength, randomness, colorBehindCell,
-            EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation())
-        );
+            direction, gradientLength, randomness, colorBehindCell, timerCopy);
         copy.area = area;
         copy.cellFilter = cellFilter;
         copy.rng = new SimpleRng(rng.state());

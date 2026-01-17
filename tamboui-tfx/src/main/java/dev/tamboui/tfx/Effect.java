@@ -154,7 +154,7 @@ public final class Effect {
      * <p>
      * In Rust, this takes ownership and mutates in place, but in Java we create a new
      * immutable instance to match the behavior of EffectTimer.reversed().
-     * 
+     *
      * @return A new Effect instance with the shader's reverse flag toggled
      */
     public Effect reversed() {
@@ -162,6 +162,49 @@ public final class Effect {
         // We need to copy the shader and reverse its timer
         Shader newShader = shader.copy();
         newShader.reverse();  // This will be handled by the shader implementation
+        return new Effect(newShader);
+    }
+
+    /**
+     * Creates a new Effect that loops continuously from the beginning.
+     * <p>
+     * When the effect reaches its end, it resets to the beginning and continues
+     * running. Looping effects never complete on their own and must be manually
+     * removed or cleared from the effect manager.
+     * <p>
+     * <b>Example:</b>
+     * <pre>{@code
+     * Effect looping = Fx.fadeToFg(Color.CYAN, 1000, Interpolation.SineInOut)
+     *     .loop();
+     * }</pre>
+     *
+     * @return A new Effect instance with continuous looping enabled
+     */
+    public Effect loop() {
+        Shader newShader = shader.copy();
+        newShader.setLoopMode(LoopMode.LOOP);
+        return new Effect(newShader);
+    }
+
+    /**
+     * Creates a new Effect that ping-pongs back and forth.
+     * <p>
+     * When the effect reaches its end, it reverses direction and plays backwards.
+     * When it reaches the beginning, it reverses again. This creates a smooth
+     * back-and-forth animation. Ping-pong effects never complete on their own
+     * and must be manually removed or cleared from the effect manager.
+     * <p>
+     * <b>Example:</b>
+     * <pre>{@code
+     * Effect pingPong = Fx.fadeToFg(Color.CYAN, 1000, Interpolation.SineInOut)
+     *     .pingPong();
+     * }</pre>
+     *
+     * @return A new Effect instance with ping-pong looping enabled
+     */
+    public Effect pingPong() {
+        Shader newShader = shader.copy();
+        newShader.setLoopMode(LoopMode.PING_PONG);
         return new Effect(newShader);
     }
 }

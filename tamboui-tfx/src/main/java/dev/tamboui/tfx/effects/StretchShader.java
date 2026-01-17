@@ -266,10 +266,15 @@ public final class StretchShader implements Shader {
     
     @Override
     public Shader copy() {
-        StretchShader copy = new StretchShader(style, direction, timer);
+        EffectTimer timerCopy = EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation());
+        timerCopy.loopMode(timer.loopMode());  // Preserve loop mode
+        // Preserve reversed state
+        if (timer.isReversed()) {
+            timerCopy = timerCopy.reversed();
+        }
+        StretchShader copy = new StretchShader(style, direction, timerCopy);
         copy.area = area;
         copy.cellFilter = cellFilter;
-        // Preserve reversed state - timer is already in the correct state
         return copy;
     }
     

@@ -143,8 +143,9 @@ public final class PaintShader implements Shader {
     
     @Override
     public Shader copy() {
-        PaintShader copy = new PaintShader(fg, bg,
-            EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation()));
+        EffectTimer timerCopy = EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation());
+        timerCopy.loopMode(timer.loopMode());  // Preserve loop mode
+        PaintShader copy = new PaintShader(fg, bg, timerCopy);
         copy.area = area;
         copy.cellFilter = cellFilter;
         return copy;

@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.app;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
@@ -22,6 +23,9 @@ import dev.tamboui.tui.event.TickEvent;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -71,15 +75,21 @@ public final class ToolkitRunner implements AutoCloseable {
     private final TuiRunner tuiRunner;
     private final FocusManager focusManager;
     private final EventRouter eventRouter;
+    private final ElementRegistry elementRegistry;
     private final DefaultRenderContext renderContext;
     private final ScheduledExecutorService scheduler;
     private final boolean faultTolerant;
-    private final PrintStream errorOutput;
+    private final List<ToolkitPostRenderProcessor> postRenderProcessors;
+    private volatile Duration lastElapsed = Duration.ZERO;
 
-    private ToolkitRunner(TuiRunner tuiRunner, boolean faultTolerant, PrintStream errorOutput) {
+    private ToolkitRunner(TuiRunner tuiRunner,
+                          boolean faultTolerant,
+                          PrintStream errorOutput,
+                          List<ToolkitPostRenderProcessor> toolkitPostRenderProcessors) {
         this.tuiRunner = tuiRunner;
         this.focusManager = new FocusManager();
-        this.eventRouter = new EventRouter(focusManager);
+        this.elementRegistry = new ElementRegistry();
+        this.eventRouter = new EventRouter(focusManager, elementRegistry);
         this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
         this.renderContext.setFaultTolerant(faultTolerant);
         this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
@@ -88,11 +98,11 @@ public final class ToolkitRunner implements AutoCloseable {
             return t;
         });
         this.faultTolerant = faultTolerant;
-        this.errorOutput = errorOutput;
+        this.postRenderProcessors = toolkitPostRenderProcessors;
     }
 
     private ToolkitRunner(TuiRunner tuiRunner) {
-        this(tuiRunner, false, NULL_OUTPUT);
+        this(tuiRunner, false, NULL_OUTPUT, Collections.emptyList());
     }
 
     /**
@@ -138,6 +148,7 @@ public final class ToolkitRunner implements AutoCloseable {
                 // Clear state before each render
                 focusManager.clearFocusables();
                 eventRouter.clear();
+                elementRegistry.clear();
 
                 // Get the current element tree
                 Element root = elementSupplier.get();
@@ -151,6 +162,11 @@ public final class ToolkitRunner implements AutoCloseable {
                 // Auto-focus first focusable element if nothing is focused
                 if (focusManager.focusedId() == null && !focusManager.focusOrder().isEmpty()) {
                     focusManager.setFocus(focusManager.focusOrder().get(0));
+                }
+
+                // Apply post-render processors (e.g., effects, overlays)
+                for (ToolkitPostRenderProcessor processor : postRenderProcessors) {
+                    processor.process(frame, elementRegistry, lastElapsed);
                 }
             }
         );
@@ -168,6 +184,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private boolean handleEvent(Event event) {
         // Tick events trigger a redraw for animations
         if (event instanceof TickEvent) {
+            lastElapsed = ((TickEvent) event).elapsed();
             return true;
         }
 
@@ -320,6 +337,16 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /**
+     * Returns the element registry for ID-based area lookups.
+     * <p>
+     * The registry is populated during rendering and can be used
+     * by effect systems to target elements by ID.
+     */
+    public ElementRegistry elementRegistry() {
+        return elementRegistry;
+    }
+
+    /**
      * Sets the style engine for CSS styling.
      * <p>
      * When set, elements will have their CSS styles resolved during rendering.
@@ -382,6 +409,7 @@ public final class ToolkitRunner implements AutoCloseable {
         private boolean autoBindingRegistration;
         private boolean faultTolerant;
         private PrintStream errorOutput = NULL_OUTPUT;
+        private final List<ToolkitPostRenderProcessor> toolkitPostRenderProcessors = new ArrayList<>();
 
         private Builder() {
         }
@@ -478,6 +506,20 @@ public final class ToolkitRunner implements AutoCloseable {
         }
 
         /**
+         * Adds a post-render processor.
+         * <p>
+         * Post-render processors are called after each frame is rendered,
+         * allowing for effects, overlays, or other post-processing.
+         *
+         * @param processor the processor to add
+         * @return this builder
+         */
+        public Builder postRenderProcessor(ToolkitPostRenderProcessor processor) {
+            this.toolkitPostRenderProcessors.add(processor);
+            return this;
+        }
+
+        /**
          * Builds and returns a configured ToolkitRunner.
          *
          * @return a new ToolkitRunner
@@ -485,7 +527,7 @@ public final class ToolkitRunner implements AutoCloseable {
          */
         public ToolkitRunner build() throws Exception {
             TuiRunner tuiRunner = TuiRunner.create(config);
-            ToolkitRunner runner = new ToolkitRunner(tuiRunner, faultTolerant, errorOutput);
+            ToolkitRunner runner = new ToolkitRunner(tuiRunner, faultTolerant, errorOutput, toolkitPostRenderProcessors);
 
             // Set bindings on render context for Component auto-registration
             runner.renderContext.setBindings(bindings);

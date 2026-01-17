@@ -215,9 +215,10 @@ public final class SweepShader implements Shader {
     
     @Override
     public Shader copy() {
+        EffectTimer timerCopy = EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation());
+        timerCopy.loopMode(timer.loopMode());  // Preserve loop mode
         SweepShader copy = new SweepShader(
-            direction, gradientLength, randomness, fadedColor,
-            EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation()));
+            direction, gradientLength, randomness, fadedColor, timerCopy);
         copy.area = area;
         copy.cellFilter = cellFilter;
         copy.rng = new SimpleRng(rng.state());

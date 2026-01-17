@@ -5,6 +5,7 @@
 package dev.tamboui.toolkit.event;
 
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.layout.Rect;
@@ -30,10 +31,14 @@ import java.util.List;
  * </ul>
  * <p>
  * Events can be consumed by handlers to stop propagation.
+ * <p>
+ * The router uses an {@link ElementRegistry} to track element areas by ID,
+ * which can be used by external systems (like effects) to look up element positions.
  */
 public final class EventRouter {
 
     private final FocusManager focusManager;
+    private final ElementRegistry elementRegistry;
     private final List<Element> elements = new ArrayList<>();
     private final IdentityHashMap<Element, Rect> elementAreas = new IdentityHashMap<>();
     private final List<GlobalEventHandler> globalHandlers = new ArrayList<>();
@@ -44,8 +49,15 @@ public final class EventRouter {
     private int dragStartX;
     private int dragStartY;
 
-    public EventRouter(FocusManager focusManager) {
+    /**
+     * Creates a new event router.
+     *
+     * @param focusManager    the focus manager for focus navigation
+     * @param elementRegistry the registry for tracking element areas by ID
+     */
+    public EventRouter(FocusManager focusManager, ElementRegistry elementRegistry) {
         this.focusManager = focusManager;
+        this.elementRegistry = elementRegistry;
     }
 
     /**
@@ -88,6 +100,9 @@ public final class EventRouter {
      * <p>
      * If an element is already registered, this updates its area but
      * does not add a duplicate entry.
+     * <p>
+     * Elements with IDs are also registered in the {@link ElementRegistry}
+     * for lookup by external systems (like effects).
      */
     public void registerElement(Element element, Rect area) {
         // Prevent duplicate registration (element identity check)
@@ -95,6 +110,12 @@ public final class EventRouter {
             elements.add(element);
         }
         elementAreas.put(element, area);
+
+        // Register in ElementRegistry for ID-based lookups
+        String id = element.id();
+        if (id != null) {
+            elementRegistry.register(id, area);
+        }
     }
 
     /**
@@ -111,6 +132,7 @@ public final class EventRouter {
     public void clear() {
         elements.clear();
         elementAreas.clear();
+        elementRegistry.clear();
     }
 
     /**
@@ -341,5 +363,17 @@ public final class EventRouter {
      */
     public int elementCount() {
         return elements.size();
+    }
+
+    /**
+     * Returns the element registry used by this router.
+     * <p>
+     * The registry contains ID-to-area mappings for all elements with IDs.
+     * External systems (like effects) can use this to look up element positions.
+     *
+     * @return the element registry
+     */
+    public ElementRegistry elementRegistry() {
+        return elementRegistry;
     }
 }

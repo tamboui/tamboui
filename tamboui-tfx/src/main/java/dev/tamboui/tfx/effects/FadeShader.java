@@ -172,7 +172,9 @@ public final class FadeShader implements Shader {
     
     @Override
     public Shader copy() {
-        FadeShader copy = new FadeShader(fromColor, toColor, EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation()));
+        EffectTimer timerCopy = EffectTimer.fromMs(timer.duration().asMillis(), timer.interpolation());
+        timerCopy.loopMode(timer.loopMode());  // Preserve loop mode
+        FadeShader copy = new FadeShader(fromColor, toColor, timerCopy);
         copy.area = area;
         copy.cellFilter = cellFilter;
         copy.colorSpace = colorSpace;

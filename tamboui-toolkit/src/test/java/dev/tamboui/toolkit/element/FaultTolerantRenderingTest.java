@@ -30,7 +30,8 @@ class FaultTolerantRenderingTest {
     @BeforeEach
     void setUp() {
         FocusManager focusManager = new FocusManager();
-        context = new DefaultRenderContext(focusManager, new EventRouter(focusManager));
+        ElementRegistry registry = new ElementRegistry();
+        context = new DefaultRenderContext(focusManager, new EventRouter(focusManager, registry));
         Buffer buffer = Buffer.empty(new Rect(0, 0, 40, 10));
         frame = Frame.forTesting(buffer);
         area = new Rect(0, 0, 40, 10);
@@ -127,7 +128,8 @@ class FaultTolerantRenderingTest {
         @DisplayName("fault-tolerant is disabled by default")
         void faultTolerantDisabledByDefault() {
             FocusManager fm = new FocusManager();
-            DefaultRenderContext newContext = new DefaultRenderContext(fm, new EventRouter(fm));
+            ElementRegistry registry = new ElementRegistry();
+            DefaultRenderContext newContext = new DefaultRenderContext(fm, new EventRouter(fm, registry));
 
             assertThat(newContext.isFaultTolerant()).isFalse();
         }
