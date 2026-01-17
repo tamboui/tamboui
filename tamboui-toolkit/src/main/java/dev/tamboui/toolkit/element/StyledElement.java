@@ -6,6 +6,7 @@ package dev.tamboui.toolkit.element;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.toolkit.event.DragHandler;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.KeyEventHandler;
@@ -254,6 +255,89 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      * @param context the render context
      */
     protected abstract void renderContent(Frame frame, Rect area, RenderContext context);
+
+    /**
+     * Resolves a style for a sub-component following the priority: explicit > CSS > default.
+     * <p>
+     * This helper method standardizes how element sub-components (like cursors, placeholders,
+     * scrollbar thumbs, etc.) resolve their styles. It enables CSS theming while preserving
+     * programmatic control when needed.
+     * <p>
+     * The resolution order is:
+     * <ol>
+     *   <li>If {@code explicitStyle} is non-null, use it (programmatic override)</li>
+     *   <li>Otherwise, check CSS via {@link RenderContext#childStyle(String)}</li>
+     *   <li>If CSS provides styles, use those</li>
+     *   <li>Otherwise, use {@code defaultStyle}</li>
+     * </ol>
+     * <p>
+     * Example usage in a TextInput element:
+     * <pre>{@code
+     * // In renderContent():
+     * Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle, DEFAULT_CURSOR_STYLE);
+     * Style effectivePlaceholderStyle = resolveEffectiveStyle(context, "placeholder", placeholderStyle, DEFAULT_PLACEHOLDER_STYLE);
+     * }</pre>
+     * <p>
+     * This enables CSS like:
+     * <pre>{@code
+     * TextInputElement-cursor { text-style: reversed; }
+     * TextInputElement-placeholder { color: gray; }
+     * }</pre>
+     *
+     * @param context the render context for CSS resolution
+     * @param childName the child name (e.g., "cursor", "placeholder", "thumb")
+     * @param explicitStyle the explicitly set style (may be null for CSS/default)
+     * @param defaultStyle the default style to use when no explicit or CSS style is set
+     * @return the resolved style
+     */
+    protected Style resolveEffectiveStyle(RenderContext context,
+                                          String childName,
+                                          Style explicitStyle,
+                                          Style defaultStyle) {
+        return resolveEffectiveStyle(context, childName, null, explicitStyle, defaultStyle);
+    }
+
+    /**
+     * Resolves a style for a sub-component with pseudo-class state, following the priority: explicit > CSS > default.
+     * <p>
+     * Use this overload for stateful children like selected items or focused tabs.
+     * <p>
+     * Example usage:
+     * <pre>{@code
+     * Style effectiveHighlightStyle = resolveEffectiveStyle(
+     *     context, "item", PseudoClassState.ofSelected(),
+     *     highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
+     * }</pre>
+     *
+     * @param context the render context for CSS resolution
+     * @param childName the child name (e.g., "item", "row", "tab")
+     * @param state the pseudo-class state (e.g., selected, hover), or null for none
+     * @param explicitStyle the explicitly set style (may be null for CSS/default)
+     * @param defaultStyle the default style to use when no explicit or CSS style is set
+     * @return the resolved style
+     */
+    protected Style resolveEffectiveStyle(RenderContext context,
+                                          String childName,
+                                          PseudoClassState state,
+                                          Style explicitStyle,
+                                          Style defaultStyle) {
+        // Priority 1: Explicit programmatic style
+        if (explicitStyle != null) {
+            return explicitStyle;
+        }
+
+        // Priority 2: CSS child style
+        Style cssStyle = state != null
+            ? context.childStyle(childName, state)
+            : context.childStyle(childName);
+        if (!cssStyle.equals(context.currentStyle())) {
+            // CSS provided specific styling for this child
+            return cssStyle;
+        }
+
+        // Priority 3: Default style
+        return defaultStyle;
+    }
 
     // Layout constraint
 

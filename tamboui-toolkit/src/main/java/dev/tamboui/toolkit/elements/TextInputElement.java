@@ -33,13 +33,33 @@ import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
  *     .title("Name")
  *     .rounded()
  * }</pre>
+ *
+ * <h2>CSS Child Selectors</h2>
+ * <p>
+ * The following child selectors can be used to style sub-components:
+ * <ul>
+ *   <li>{@code TextInputElement-cursor} - The cursor style (default: reversed)</li>
+ *   <li>{@code TextInputElement-placeholder} - The placeholder text style (default: dim)</li>
+ * </ul>
+ * <p>
+ * Example CSS:
+ * <pre>{@code
+ * TextInputElement-cursor { text-style: reversed; background: yellow; }
+ * TextInputElement-placeholder { color: gray; text-style: italic; }
+ * }</pre>
+ * <p>
+ * Note: Programmatic styles set via {@link #cursorStyle(Style)} or {@link #placeholderStyle(Style)}
+ * take precedence over CSS styles.
  */
 public final class TextInputElement extends StyledElement<TextInputElement> {
 
+    private static final Style DEFAULT_CURSOR_STYLE = Style.EMPTY.reversed();
+    private static final Style DEFAULT_PLACEHOLDER_STYLE = Style.EMPTY.dim();
+
     private TextInputState state;
-    private Style cursorStyle = Style.EMPTY.reversed();
+    private Style cursorStyle;
     private String placeholder = "";
-    private Style placeholderStyle = Style.EMPTY.dim();
+    private Style placeholderStyle;
     private String title;
     private BorderType borderType;
     private Color borderColor;
@@ -177,11 +197,15 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
             return;
         }
 
+        // Resolve styles with priority: explicit > CSS > default
+        Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle, DEFAULT_CURSOR_STYLE);
+        Style effectivePlaceholderStyle = resolveEffectiveStyle(context, "placeholder", placeholderStyle, DEFAULT_PLACEHOLDER_STYLE);
+
         TextInput.Builder builder = TextInput.builder()
             .style(context.currentStyle())
-            .cursorStyle(cursorStyle)
+            .cursorStyle(effectiveCursorStyle)
             .placeholder(placeholder)
-            .placeholderStyle(placeholderStyle);
+            .placeholderStyle(effectivePlaceholderStyle);
 
         if (title != null || borderType != null) {
             Block.Builder blockBuilder = Block.builder().borders(Borders.ALL);

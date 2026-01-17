@@ -24,8 +24,33 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  *     .state(scrollbarState)
  *     .thumbColor(Color.YELLOW)
  * }</pre>
+ *
+ * <h2>CSS Child Selectors</h2>
+ * <p>
+ * The following child selectors can be used to style sub-components:
+ * <ul>
+ *   <li>{@code ScrollbarElement-thumb} - The thumb/handle of the scrollbar</li>
+ *   <li>{@code ScrollbarElement-track} - The track/background of the scrollbar</li>
+ *   <li>{@code ScrollbarElement-begin} - The begin marker (up/left arrow)</li>
+ *   <li>{@code ScrollbarElement-end} - The end marker (down/right arrow)</li>
+ * </ul>
+ * <p>
+ * Example CSS:
+ * <pre>{@code
+ * ScrollbarElement-thumb { color: yellow; }
+ * ScrollbarElement-track { color: gray; }
+ * ScrollbarElement-begin { color: white; }
+ * ScrollbarElement-end { color: white; }
+ * }</pre>
+ * <p>
+ * Note: Programmatic styles set via the corresponding setter methods take precedence over CSS styles.
  */
 public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
+
+    private static final Style DEFAULT_THUMB_STYLE = Style.EMPTY;
+    private static final Style DEFAULT_TRACK_STYLE = Style.EMPTY;
+    private static final Style DEFAULT_BEGIN_STYLE = Style.EMPTY;
+    private static final Style DEFAULT_END_STYLE = Style.EMPTY;
 
     private ScrollbarOrientation orientation = ScrollbarOrientation.VERTICAL_RIGHT;
     private ScrollbarState state;
@@ -214,6 +239,12 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
             return;
         }
 
+        // Resolve styles with priority: explicit > CSS > default
+        Style effectiveThumbStyle = resolveEffectiveStyle(context, "thumb", thumbStyle, DEFAULT_THUMB_STYLE);
+        Style effectiveTrackStyle = resolveEffectiveStyle(context, "track", trackStyle, DEFAULT_TRACK_STYLE);
+        Style effectiveBeginStyle = resolveEffectiveStyle(context, "begin", beginStyle, DEFAULT_BEGIN_STYLE);
+        Style effectiveEndStyle = resolveEffectiveStyle(context, "end", endStyle, DEFAULT_END_STYLE);
+
         Scrollbar.Builder builder = Scrollbar.builder()
             .orientation(orientation)
             .style(context.currentStyle());
@@ -238,20 +269,21 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
             builder.endSymbol(endSymbol);
         }
 
-        if (thumbStyle != null) {
-            builder.thumbStyle(thumbStyle);
+        // Apply resolved styles (only if they have styling, not just EMPTY)
+        if (!effectiveThumbStyle.equals(Style.EMPTY)) {
+            builder.thumbStyle(effectiveThumbStyle);
         }
 
-        if (trackStyle != null) {
-            builder.trackStyle(trackStyle);
+        if (!effectiveTrackStyle.equals(Style.EMPTY)) {
+            builder.trackStyle(effectiveTrackStyle);
         }
 
-        if (beginStyle != null) {
-            builder.beginStyle(beginStyle);
+        if (!effectiveBeginStyle.equals(Style.EMPTY)) {
+            builder.beginStyle(effectiveBeginStyle);
         }
 
-        if (endStyle != null) {
-            builder.endStyle(endStyle);
+        if (!effectiveEndStyle.equals(Style.EMPTY)) {
+            builder.endStyle(effectiveEndStyle);
         }
 
         Scrollbar widget = builder.build();

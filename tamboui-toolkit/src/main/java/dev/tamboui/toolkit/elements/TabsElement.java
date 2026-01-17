@@ -171,13 +171,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
             : context.currentStyle().patch(baseTabStyle);
 
         // Resolve highlight style: explicit > CSS > default
-        Style effectiveHighlightStyle = highlightStyle;
-        if (effectiveHighlightStyle == null) {
-            Style cssStyle = context.childStyle("tab", PseudoClassState.ofSelected());
-            effectiveHighlightStyle = cssStyle.equals(context.currentStyle())
-                ? DEFAULT_HIGHLIGHT_STYLE
-                : cssStyle;
-        }
+        Style effectiveHighlightStyle = resolveEffectiveStyle(
+            context, "tab", PseudoClassState.ofSelected(),
+            highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
 
         // Resolve divider style from CSS
         Style dividerCssStyle = context.childStyle("divider");

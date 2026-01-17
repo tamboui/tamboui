@@ -535,13 +535,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         this.lastViewportHeight = visibleHeight;
 
         // Resolve highlight style: explicit > CSS > default
-        Style effectiveHighlightStyle = highlightStyle;
-        if (effectiveHighlightStyle == null) {
-            Style cssStyle = context.childStyle("item", PseudoClassState.ofSelected());
-            effectiveHighlightStyle = cssStyle.equals(context.currentStyle())
-                ? DEFAULT_HIGHLIGHT_STYLE
-                : cssStyle;
-        }
+        Style effectiveHighlightStyle = resolveEffectiveStyle(
+            context, "item", PseudoClassState.ofSelected(),
+            highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
 
         // Resolve highlight symbol
         String effectiveHighlightSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
@@ -688,32 +684,18 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
                 .viewportContentLength(visibleHeight)
                 .position(scrollOffset);
 
-            // Resolve scrollbar styles
-            Style thumbStyle = null;
-            Style trackStyle = null;
-
-            Style cssThumbStyle = context.childStyle("scrollbar-thumb");
-            if (!cssThumbStyle.equals(context.currentStyle())) {
-                thumbStyle = cssThumbStyle;
-            }
-            if (scrollbarThumbColor != null) {
-                thumbStyle = Style.EMPTY.fg(scrollbarThumbColor);
-            }
-
-            Style cssTrackStyle = context.childStyle("scrollbar-track");
-            if (!cssTrackStyle.equals(context.currentStyle())) {
-                trackStyle = cssTrackStyle;
-            }
-            if (scrollbarTrackColor != null) {
-                trackStyle = Style.EMPTY.fg(scrollbarTrackColor);
-            }
+            // Resolve scrollbar styles: explicit > CSS > default
+            Style explicitThumbStyle = scrollbarThumbColor != null ? Style.EMPTY.fg(scrollbarThumbColor) : null;
+            Style explicitTrackStyle = scrollbarTrackColor != null ? Style.EMPTY.fg(scrollbarTrackColor) : null;
+            Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle, Style.EMPTY);
+            Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle, Style.EMPTY);
 
             Scrollbar.Builder scrollbarBuilder = Scrollbar.builder()
                 .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
-            if (thumbStyle != null) {
+            if (!thumbStyle.equals(Style.EMPTY)) {
                 scrollbarBuilder.thumbStyle(thumbStyle);
             }
-            if (trackStyle != null) {
+            if (!trackStyle.equals(Style.EMPTY)) {
                 scrollbarBuilder.trackStyle(trackStyle);
             }
 

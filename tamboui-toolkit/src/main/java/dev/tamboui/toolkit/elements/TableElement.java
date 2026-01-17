@@ -216,13 +216,9 @@ public final class TableElement extends StyledElement<TableElement> {
         }
 
         // Resolve highlight style: explicit > CSS > default
-        Style effectiveHighlightStyle = highlightStyle;
-        if (effectiveHighlightStyle == null) {
-            Style cssStyle = context.childStyle("row", PseudoClassState.ofSelected());
-            effectiveHighlightStyle = cssStyle.equals(context.currentStyle())
-                ? DEFAULT_HIGHLIGHT_STYLE
-                : cssStyle;
-        }
+        Style effectiveHighlightStyle = resolveEffectiveStyle(
+            context, "row", PseudoClassState.ofSelected(),
+            highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
 
         // Resolve highlight symbol: explicit > default
         String effectiveHighlightSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
@@ -230,12 +226,9 @@ public final class TableElement extends StyledElement<TableElement> {
         // Resolve header style from CSS
         Row effectiveHeader = header;
         if (effectiveHeader != null && effectiveHeader.style().equals(Style.EMPTY)) {
-            Style headerStyle = context.childStyle("header");
-            if (!headerStyle.equals(context.currentStyle())) {
-                effectiveHeader = effectiveHeader.style(headerStyle);
-            } else {
-                effectiveHeader = effectiveHeader.style(DEFAULT_HEADER_STYLE);
-            }
+            // Header row has no explicit style, resolve from CSS or default
+            Style headerStyle = resolveEffectiveStyle(context, "header", null, DEFAULT_HEADER_STYLE);
+            effectiveHeader = effectiveHeader.style(headerStyle);
         }
 
         Table.Builder builder = Table.builder()

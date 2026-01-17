@@ -26,12 +26,29 @@ import dev.tamboui.widgets.gauge.Gauge;
  *     .gaugeColor(Color.GREEN)
  *     .title("Progress")
  * }</pre>
+ *
+ * <h2>CSS Child Selectors</h2>
+ * <p>
+ * The following child selectors can be used to style sub-components:
+ * <ul>
+ *   <li>{@code GaugeElement-filled} - The filled portion of the gauge</li>
+ * </ul>
+ * <p>
+ * Example CSS:
+ * <pre>{@code
+ * GaugeElement-filled { color: green; }
+ * }</pre>
+ * <p>
+ * Note: Programmatic styles set via {@link #gaugeStyle(Style)} or {@link #gaugeColor(Color)}
+ * take precedence over CSS styles.
  */
 public final class GaugeElement extends StyledElement<GaugeElement> {
 
+    private static final Style DEFAULT_FILLED_STYLE = Style.EMPTY;
+
     private double ratio = 0.0;
     private String label;
-    private Style gaugeStyle = Style.EMPTY;
+    private Style gaugeStyle;
     private boolean useUnicode = true;
     private String title;
     private BorderType borderType;
@@ -128,11 +145,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
         Style effectiveStyle = context.currentStyle();
 
-        // Use gaugeStyle if explicitly set, otherwise use the foreground color from CSS
-        Style effectiveGaugeStyle = gaugeStyle;
-        if (effectiveGaugeStyle.equals(Style.EMPTY) && effectiveStyle.fg().isPresent()) {
-            effectiveGaugeStyle = Style.EMPTY.fg(effectiveStyle.fg().get());
-        }
+        // Resolve filled style with priority: explicit > CSS > default
+        Style effectiveGaugeStyle = resolveEffectiveStyle(context, "filled", gaugeStyle, DEFAULT_FILLED_STYLE);
 
         Gauge.Builder builder = Gauge.builder()
             .ratio(ratio)

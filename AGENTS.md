@@ -157,6 +157,69 @@ class MyApp extends ToolkitApp {
 - keep each .tape short and focus. 
 - Try cover all demo features, but be aware they should not be too long as then the `.svg` renderings gets too big.
 
+## CSS-Compatible Elements
+
+When writing new Elements or modifying existing ones, follow these guidelines to ensure consistent CSS support:
+
+### The `resolveEffectiveStyle` Helper
+
+Use `StyledElement.resolveEffectiveStyle()` for sub-component styling with the priority order: **explicit > CSS > default**.
+
+```java
+// Simple case (no pseudo-class):
+Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle, DEFAULT_CURSOR_STYLE);
+
+// With pseudo-class state (e.g., :selected):
+Style effectiveHighlightStyle = resolveEffectiveStyle(
+    context, "item", PseudoClassState.ofSelected(),
+    highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
+```
+
+### Pattern for CSS-Compatible Fields
+
+1. **Make style fields nullable** (null = "use CSS or default"):
+   ```java
+   private Style cursorStyle;  // null, not Style.EMPTY
+   ```
+
+2. **Add default style constants**:
+   ```java
+   private static final Style DEFAULT_CURSOR_STYLE = Style.EMPTY.reversed();
+   private static final Style DEFAULT_PLACEHOLDER_STYLE = Style.EMPTY.dim();
+   ```
+
+3. **Use resolveEffectiveStyle in renderContent()**:
+   ```java
+   Style effectiveStyle = resolveEffectiveStyle(context, "child-name", explicitStyle, DEFAULT_STYLE);
+   ```
+
+### Documenting CSS Selectors
+
+Add a JavaDoc section to each Element class documenting its CSS child selectors:
+
+```java
+/**
+ * <h2>CSS Child Selectors</h2>
+ * <ul>
+ *   <li>{@code ElementName-cursor} - The cursor style (default: reversed)</li>
+ *   <li>{@code ElementName-placeholder} - The placeholder text style (default: dim)</li>
+ * </ul>
+ */
+```
+
+### Available CSS Child Selectors
+
+| Element | Child Selectors |
+|---------|-----------------|
+| TextInputElement | `-cursor`, `-placeholder` |
+| TextAreaElement | `-cursor`, `-placeholder`, `-line-number` |
+| GaugeElement | `-filled` |
+| LineGaugeElement | `-filled`, `-unfilled` |
+| ScrollbarElement | `-thumb`, `-track`, `-begin`, `-end` |
+| ListElement | `-item`, `-scrollbar-thumb`, `-scrollbar-track` |
+| TableElement | `-row`, `-header` |
+| TabsElement | `-tab`, `-divider` |
+
 ## PR Guidelines
 
 - Use `git add` for new files to include them in the commit
