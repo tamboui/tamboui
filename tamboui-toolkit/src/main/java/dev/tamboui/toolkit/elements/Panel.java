@@ -30,7 +30,10 @@ import dev.tamboui.widgets.text.Overflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A container element with borders and title.
@@ -113,6 +116,18 @@ public final class Panel extends ContainerElement<Panel> {
     public Panel titleEllipsisStart() {
         this.titleOverflow = Overflow.ELLIPSIS_START;
         return this;
+    }
+
+    @Override
+    public Map<String, String> styleAttributes() {
+        Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
+        if (title != null) {
+            attrs.put("title", title);
+        }
+        if (bottomTitle != null) {
+            attrs.put("bottom-title", bottomTitle);
+        }
+        return Collections.unmodifiableMap(attrs);
     }
 
     /**

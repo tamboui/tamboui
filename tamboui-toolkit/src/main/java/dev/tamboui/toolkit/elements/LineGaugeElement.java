@@ -12,6 +12,10 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.widgets.gauge.LineGauge;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * A DSL wrapper for the LineGauge widget.
  * <p>
@@ -139,6 +143,15 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
     public LineGaugeElement lineSet(LineGauge.LineSet lineSet) {
         this.lineSet = lineSet;
         return this;
+    }
+
+    @Override
+    public Map<String, String> styleAttributes() {
+        Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
+        if (label != null) {
+            attrs.put("label", label);
+        }
+        return Collections.unmodifiableMap(attrs);
     }
 
     @Override

@@ -21,7 +21,10 @@ import dev.tamboui.widgets.chart.LegendPosition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A DSL wrapper for the Chart widget.
@@ -144,6 +147,15 @@ public final class ChartElement extends StyledElement<ChartElement> {
     }
 
     @Override
+    public Map<String, String> styleAttributes() {
+        Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
+        if (title != null) {
+            attrs.put("title", title);
+        }
+        return Collections.unmodifiableMap(attrs);
+    }
+
+    @Override
     protected void renderContent(Frame frame, Rect area, RenderContext context) {
         if (area.isEmpty()) {
             return;
@@ -162,7 +174,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
         }
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL);
+            Block.Builder blockBuilder = Block.builder()
+                    .borders(Borders.ALL)
+                    .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));
             }
@@ -170,7 +184,7 @@ public final class ChartElement extends StyledElement<ChartElement> {
                 blockBuilder.borderType(borderType);
             }
             if (borderColor != null) {
-                blockBuilder.borderStyle(Style.EMPTY.fg(borderColor));
+                blockBuilder.borderColor(borderColor);
             }
             builder.block(blockBuilder.build());
         }

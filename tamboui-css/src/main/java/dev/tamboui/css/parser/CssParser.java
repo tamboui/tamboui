@@ -27,6 +27,8 @@ import java.util.*;
  *   <li>Descendant combinator: {@code Panel Button { ... }}</li>
  *   <li>Child combinator: {@code Panel > Button { ... }}</li>
  *   <li>Nested rules: {@code Panel { &:focus { ... } }}</li>
+ *   <li>Selector lists: {@code .foo, .bar { ... }}</li>
+ *   <li>Attribute selectors: {@code Panel[title="Test"] { ... }}</li>
  * </ul>
  */
 public final class CssParser {
@@ -91,11 +93,15 @@ public final class CssParser {
     }
 
     private List<Rule> parseRule(List<Selector> parentSelectors) {
-        Selector selector = parseSelector();
+        List<Selector> selectors = parseSelectorList();
 
         // Apply parent context for nested rules with &
         if (!parentSelectors.isEmpty()) {
-            selector = combineWithParent(parentSelectors, selector);
+            List<Selector> combined = new ArrayList<>();
+            for (Selector selector : selectors) {
+                combined.add(combineWithParent(parentSelectors, selector));
+            }
+            selectors = combined;
         }
 
         consume(Token.OpenBrace.class, "Expected '{' after selector");
@@ -107,11 +113,11 @@ public final class CssParser {
             // Check for nested rule (starts with &, selector, or nested block)
             if (check(Token.Delim.class) && peekDelim() == '&') {
                 // Nested rule with &
-                nestedRules.addAll(parseRule(Collections.singletonList(selector)));
+                nestedRules.addAll(parseRule(selectors));
             } else if (isStartOfSelector()) {
                 // Could be nested rule or property - look ahead
                 if (lookaheadIsNestedRule()) {
-                    nestedRules.addAll(parseRule(Collections.singletonList(selector)));
+                    nestedRules.addAll(parseRule(selectors));
                 } else {
                     parseDeclaration(declarations);
                 }
@@ -126,11 +132,25 @@ public final class CssParser {
 
         List<Rule> result = new ArrayList<>();
         if (!declarations.isEmpty()) {
-            result.add(new Rule(selector, declarations, ruleOrder++));
+            // All selectors in a selector list share the same source order
+            int order = ruleOrder++;
+            for (Selector selector : selectors) {
+                result.add(new Rule(selector, declarations, order));
+            }
         }
         result.addAll(nestedRules);
 
         return result;
+    }
+
+    private List<Selector> parseSelectorList() {
+        List<Selector> selectors = new ArrayList<>();
+        selectors.add(parseSelector());
+        while (check(Token.Comma.class)) {
+            advance(); // consume ','
+            selectors.add(parseSelector());
+        }
+        return selectors;
     }
 
     private void parseDeclaration(Map<String, PropertyValue> declarations) {
@@ -265,7 +285,62 @@ public final class CssParser {
             return new PseudoClassSelector(name);
         }
 
+        if (token instanceof Token.OpenBracket) {
+            return parseAttributeSelector();
+        }
+
         throw error("Expected selector");
+    }
+
+    private Selector parseAttributeSelector() {
+        advance(); // consume '['
+        Token.Ident attrName = consume(Token.Ident.class, "Expected attribute name");
+
+        // Check for operator
+        if (check(Token.CloseBracket.class)) {
+            // [attr] - existence check
+            advance();
+            return new AttributeSelector(attrName.value());
+        }
+
+        // Parse operator: =, ^=, $=, *=
+        AttributeSelector.Operator operator;
+        if (check(Token.Delim.class)) {
+            char c = peekDelim();
+            if (c == '=') {
+                advance();
+                operator = AttributeSelector.Operator.EQUALS;
+            } else if (c == '^') {
+                advance();
+                consume(Token.Delim.class, "Expected '=' after '^'");
+                operator = AttributeSelector.Operator.STARTS_WITH;
+            } else if (c == '$') {
+                advance();
+                consume(Token.Delim.class, "Expected '=' after '$'");
+                operator = AttributeSelector.Operator.ENDS_WITH;
+            } else if (c == '*') {
+                advance();
+                consume(Token.Delim.class, "Expected '=' after '*'");
+                operator = AttributeSelector.Operator.CONTAINS;
+            } else {
+                throw error("Expected attribute selector operator");
+            }
+        } else {
+            throw error("Expected attribute selector operator or ']'");
+        }
+
+        // Parse value (string or ident)
+        String value;
+        if (check(Token.StringToken.class)) {
+            value = ((Token.StringToken) advance()).value();
+        } else if (check(Token.Ident.class)) {
+            value = ((Token.Ident) advance()).value();
+        } else {
+            throw error("Expected attribute value");
+        }
+
+        consume(Token.CloseBracket.class, "Expected ']' after attribute value");
+        return new AttributeSelector(attrName.value(), operator, value);
     }
 
     private boolean isStartOfSelector() {
@@ -277,6 +352,9 @@ public final class CssParser {
             return true;
         }
         if (token instanceof Token.Colon) {
+            return true;
+        }
+        if (token instanceof Token.OpenBracket) {
             return true;
         }
         if (token instanceof Token.Delim) {
@@ -297,6 +375,9 @@ public final class CssParser {
         if (token instanceof Token.Colon) {
             return true;
         }
+        if (token instanceof Token.OpenBracket) {
+            return true;
+        }
         if (token instanceof Token.Delim) {
             char c = ((Token.Delim) token).value();
             return c == '.' || c == '*';
@@ -312,7 +393,18 @@ public final class CssParser {
             // Skip potential selector
             while (isStartOfSimpleSelector() ||
                    (check(Token.Delim.class) && peekDelim() == '>')) {
-                advance();
+                // Skip attribute selectors entirely
+                if (check(Token.OpenBracket.class)) {
+                    advance(); // consume '['
+                    while (!check(Token.CloseBracket.class) && !isAtEnd()) {
+                        advance();
+                    }
+                    if (check(Token.CloseBracket.class)) {
+                        advance(); // consume ']'
+                    }
+                } else {
+                    advance();
+                }
             }
             // If we hit '{', it's a nested rule
             return check(Token.OpenBrace.class);
@@ -328,8 +420,9 @@ public final class CssParser {
         // For now, simple descendant combination with first parent
         Selector parent = parentSelectors.get(0);
 
-        // If child is just pseudo-classes (like &:focus), combine as compound
+        // If child is class selectors or pseudo-classes (like &:focus or &.foo), combine as compound
         if (childSelector instanceof PseudoClassSelector ||
+            childSelector instanceof ClassSelector ||
             (childSelector instanceof CompoundSelector &&
              allPseudoOrClass((CompoundSelector) childSelector))) {
             if (parent instanceof CompoundSelector) {

@@ -5,6 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.layout.Constraint;
@@ -484,6 +486,61 @@ class TextAreaElementTest {
             TextAreaElement element = textArea().addClass("editor", "primary");
 
             assertThat(element.cssClasses()).contains("editor", "primary");
+        }
+    }
+
+    @Nested
+    @DisplayName("Style Attributes")
+    class StyleAttributes {
+
+        @Test
+        @DisplayName("styleAttributes exposes title")
+        void styleAttributes_exposesTitle() {
+            assertThat(textArea().title("Description").styleAttributes()).containsEntry("title", "Description");
+        }
+
+        @Test
+        @DisplayName("styleAttributes exposes placeholder")
+        void styleAttributes_exposesPlaceholder() {
+            assertThat(textArea().placeholder("Enter text...").styleAttributes()).containsEntry("placeholder", "Enter text...");
+        }
+
+        @Test
+        @DisplayName("Attribute selector [title] affects TextArea border color")
+        void attributeSelector_title_affectsBorderColor() {
+            StyleEngine styleEngine = StyleEngine.create();
+            styleEngine.addStylesheet("test", "TextAreaElement[title=\"Editor\"] { border-color: cyan; }");
+            styleEngine.setActiveStylesheet("test");
+
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.setStyleEngine(styleEngine);
+
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            textArea().title("Editor").rounded().render(frame, area, context);
+
+            assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+        }
+
+        @Test
+        @DisplayName("Attribute selector [placeholder] affects TextArea styling")
+        void attributeSelector_placeholder_affectsStyling() {
+            StyleEngine styleEngine = StyleEngine.create();
+            styleEngine.addStylesheet("test", "TextAreaElement[placeholder=\"Type here...\"] { border-color: yellow; }");
+            styleEngine.setActiveStylesheet("test");
+
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.setStyleEngine(styleEngine);
+
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            textArea().placeholder("Type here...").rounded().render(frame, area, context);
+
+            assertThat(buffer.get(0, 0).style().fg()).contains(Color.YELLOW);
         }
     }
 }

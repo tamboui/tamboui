@@ -5,6 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -14,8 +16,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for SparklineElement.
@@ -117,5 +120,30 @@ class SparklineElementTest {
     void withMaxValue() {
         SparklineElement element = sparkline(1, 2, 3).max(100L);
         assertThat(element).isNotNull();
+    }
+
+    @Test
+    @DisplayName("styleAttributes exposes title")
+    void styleAttributes_exposesTitle() {
+        assertThat(sparkline(1, 2, 3).title("CPU").styleAttributes()).containsEntry("title", "CPU");
+    }
+
+    @Test
+    @DisplayName("Attribute selector [title] affects Sparkline border color")
+    void attributeSelector_title_affectsBorderColor() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "SparklineElement[title=\"CPU\"] { border-color: cyan; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        sparkline(1, 2, 3, 4, 5).title("CPU").rounded().render(frame, area, context);
+
+        assertThat(buffer).at(0, 0).hasSymbol("╭").hasForeground(Color.CYAN);
     }
 }

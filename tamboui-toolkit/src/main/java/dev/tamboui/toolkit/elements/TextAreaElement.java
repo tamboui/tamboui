@@ -19,6 +19,10 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.input.TextArea;
 import dev.tamboui.widgets.input.TextAreaState;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * A DSL wrapper for the TextArea widget.
  * <p>
@@ -204,6 +208,18 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return true;
     }
 
+    @Override
+    public Map<String, String> styleAttributes() {
+        Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
+        if (title != null) {
+            attrs.put("title", title);
+        }
+        if (placeholder != null && !placeholder.isEmpty()) {
+            attrs.put("placeholder", placeholder);
+        }
+        return Collections.unmodifiableMap(attrs);
+    }
+
     /**
      * Handles a key event for text area input.
      * <p>
@@ -301,7 +317,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 : borderColor;
 
         if (title != null || borderType != null || effectiveBorderColor != null) {
-            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL);
+            Block.Builder blockBuilder = Block.builder()
+                    .borders(Borders.ALL)
+                    .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));
             }
@@ -309,7 +327,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 blockBuilder.borderType(borderType);
             }
             if (effectiveBorderColor != null) {
-                blockBuilder.borderStyle(Style.EMPTY.fg(effectiveBorderColor));
+                blockBuilder.borderColor(effectiveBorderColor);
             }
             builder.block(blockBuilder.build());
         }

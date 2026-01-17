@@ -30,7 +30,10 @@ import dev.tamboui.widgets.block.Title;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A dialog element that auto-centers in its parent area.
@@ -279,6 +282,15 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     @Override
+    public Map<String, String> styleAttributes() {
+        Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
+        if (title != null) {
+            attrs.put("title", title);
+        }
+        return Collections.unmodifiableMap(attrs);
+    }
+
+    @Override
     protected void renderContent(Frame frame, Rect area, RenderContext context) {
         if (area.isEmpty()) {
             return;
@@ -304,10 +316,11 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         Block.Builder blockBuilder = Block.builder()
             .borders(Borders.ALL)
             .borderType(borderType)
-            .style(context.currentStyle());
+            .style(context.currentStyle())
+            .styleResolver(styleResolver(context));
 
         if (borderColor != null) {
-            blockBuilder.borderStyle(Style.EMPTY.fg(borderColor));
+            blockBuilder.borderColor(borderColor);
         }
 
         if (title != null) {

@@ -99,8 +99,9 @@ public final class CssLexer {
             return readWhitespace(startPos);
         }
 
-        // Variable ($name)
-        if (c == '$') {
+        // Variable ($name) - only if followed by identifier character
+        // Otherwise $ is a delimiter (e.g., in $= attribute selector operator)
+        if (c == '$' && isIdentStart(peekNext())) {
             return readVariable(startPos);
         }
 
@@ -135,6 +136,10 @@ public final class CssLexer {
                 return new Token.OpenParen(startPos);
             case ')':
                 return new Token.CloseParen(startPos);
+            case '[':
+                return new Token.OpenBracket(startPos);
+            case ']':
+                return new Token.CloseBracket(startPos);
             case ':':
                 return new Token.Colon(startPos);
             case ';':
@@ -146,6 +151,10 @@ public final class CssLexer {
             case '*':
             case '&':
             case '!':
+            case '=':
+            case '^':
+            case '$':
+            case '~':
                 return new Token.Delim(c, startPos);
             default:
                 throw new CssParseException("Unexpected character: " + c, startPos);

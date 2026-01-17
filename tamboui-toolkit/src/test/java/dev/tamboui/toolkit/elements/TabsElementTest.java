@@ -264,4 +264,10 @@ class TabsElementTest {
             .hasForeground(Color.YELLOW)
             .hasBackground(Color.BLUE);
     }
+
+    @Test
+    @DisplayName("styleAttributes exposes title")
+    void styleAttributes_exposesTitle() {
+        assertThat(tabs("A", "B").title("Nav").styleAttributes()).containsEntry("title", "Nav");
+    }
 }

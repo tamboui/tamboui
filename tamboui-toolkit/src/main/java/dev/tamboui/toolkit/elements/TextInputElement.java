@@ -20,6 +20,10 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.input.TextInput;
 import dev.tamboui.widgets.input.TextInputState;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
 /**
@@ -173,6 +177,18 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         return this;
     }
 
+    @Override
+    public Map<String, String> styleAttributes() {
+        Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
+        if (title != null) {
+            attrs.put("title", title);
+        }
+        if (placeholder != null && !placeholder.isEmpty()) {
+            attrs.put("placeholder", placeholder);
+        }
+        return Collections.unmodifiableMap(attrs);
+    }
+
     /**
      * Handles a key event for text input.
      * <p>
@@ -208,7 +224,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
             .placeholderStyle(effectivePlaceholderStyle);
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL);
+            Block.Builder blockBuilder = Block.builder()
+                    .borders(Borders.ALL)
+                    .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));
             }
@@ -216,7 +234,7 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
                 blockBuilder.borderType(borderType);
             }
             if (borderColor != null) {
-                blockBuilder.borderStyle(Style.EMPTY.fg(borderColor));
+                blockBuilder.borderColor(borderColor);
             }
             builder.block(blockBuilder.build());
         }

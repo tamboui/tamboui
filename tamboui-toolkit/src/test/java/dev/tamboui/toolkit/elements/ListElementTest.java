@@ -5,6 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -456,5 +458,30 @@ class ListElementTest {
                 .as("Scrollbar should NOT be visible with null policy")
                 .isFalse();
         }
+    }
+
+    @Test
+    @DisplayName("styleAttributes exposes title")
+    void styleAttributes_exposesTitle() {
+        assertThat(list("One", "Two").title("Items").styleAttributes()).containsEntry("title", "Items");
+    }
+
+    @Test
+    @DisplayName("Attribute selector [title] affects List border color")
+    void attributeSelector_title_affectsBorderColor() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "ListElement[title=\"Items\"] { border-color: cyan; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 5);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        list("A", "B").title("Items").render(frame, area, context);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }
 }

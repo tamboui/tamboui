@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.element;
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.toolkit.event.DragHandler;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.KeyEventHandler;
@@ -22,7 +23,9 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -41,6 +44,7 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     protected Constraint layoutConstraint;
     protected String elementId;
     protected Set<String> cssClasses = new LinkedHashSet<>();
+    protected Map<String, String> styleAttrs = new LinkedHashMap<>();
     protected Styleable cssParent;
     protected KeyEventHandler keyHandler;
     protected MouseEventHandler mouseHandler;
@@ -339,6 +343,21 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
         return defaultStyle;
     }
 
+    /**
+     * Gets the StylePropertyResolver for CSS property resolution.
+     * <p>
+     * This is useful for passing to widgets like Block that need to resolve
+     * CSS properties beyond basic styling (e.g., border-type, border-color).
+     *
+     * @param context the render context
+     * @return the StylePropertyResolver, or an empty resolver if no CSS is available
+     */
+    protected StylePropertyResolver styleResolver(RenderContext context) {
+        return context.resolveStyle(this)
+                .map(r -> (StylePropertyResolver) r)
+                .orElse(StylePropertyResolver.empty());
+    }
+
     // Layout constraint
 
     public T constraint(Constraint constraint) {
@@ -499,6 +518,25 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
         return self();
     }
 
+    /**
+     * Sets a style attribute for attribute selector matching.
+     * <p>
+     * Style attributes can be used with CSS attribute selectors like
+     * {@code Panel[data-type="info"]} to target specific elements.
+     *
+     * @param name the attribute name
+     * @param value the attribute value
+     * @return this element for chaining
+     */
+    public T attr(String name, String value) {
+        if (value != null) {
+            this.styleAttrs.put(name, value);
+        } else {
+            this.styleAttrs.remove(name);
+        }
+        return self();
+    }
+
     // Styleable interface implementation
 
     @Override
@@ -514,6 +552,11 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     @Override
     public Optional<Styleable> cssParent() {
         return Optional.ofNullable(cssParent);
+    }
+
+    @Override
+    public Map<String, String> styleAttributes() {
+        return Collections.unmodifiableMap(styleAttrs);
     }
 
     // Event handlers

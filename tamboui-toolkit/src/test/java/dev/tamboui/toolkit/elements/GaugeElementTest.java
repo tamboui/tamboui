@@ -5,6 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -115,5 +117,55 @@ class GaugeElementTest {
             .render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("styleAttributes exposes title")
+    void styleAttributes_exposesTitle() {
+        assertThat(gauge(0.5).title("Progress").styleAttributes()).containsEntry("title", "Progress");
+    }
+
+    @Test
+    @DisplayName("styleAttributes exposes label")
+    void styleAttributes_exposesLabel() {
+        assertThat(gauge(0.5).label("50%").styleAttributes()).containsEntry("label", "50%");
+    }
+
+    @Test
+    @DisplayName("Attribute selector [title] affects Gauge border color")
+    void attributeSelector_title_affectsBorderColor() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "GaugeElement[title=\"Progress\"] { border-color: cyan; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        gauge(0.5).title("Progress").rounded().render(frame, area, context);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Test
+    @DisplayName("Attribute selector [label] affects Gauge styling")
+    void attributeSelector_label_affectsStyling() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "GaugeElement[label=\"50%\"] { border-color: green; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 20, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        gauge(0.5).label("50%").rounded().render(frame, area, context);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
     }
 }

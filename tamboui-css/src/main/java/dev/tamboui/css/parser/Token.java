@@ -321,6 +321,34 @@ public abstract class Token {
     }
 
     /**
+     * An opening bracket "[".
+     */
+    public static final class OpenBracket extends Token {
+        public OpenBracket(Position position) {
+            super(position);
+        }
+
+        @Override
+        public String toString() {
+            return "OpenBracket";
+        }
+    }
+
+    /**
+     * A closing bracket "]".
+     */
+    public static final class CloseBracket extends Token {
+        public CloseBracket(Position position) {
+            super(position);
+        }
+
+        @Override
+        public String toString() {
+            return "CloseBracket";
+        }
+    }
+
+    /**
      * Whitespace (spaces, tabs, newlines).
      * Usually filtered out before parsing but useful for preserving formatting.
      */

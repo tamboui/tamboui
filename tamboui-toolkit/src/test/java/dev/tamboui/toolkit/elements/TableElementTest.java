@@ -5,6 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -169,5 +171,30 @@ class TableElementTest {
             .header("H1", "H2")
             .footer("Total", "100");
         assertThat(element).isNotNull();
+    }
+
+    @Test
+    @DisplayName("styleAttributes exposes title")
+    void styleAttributes_exposesTitle() {
+        assertThat(table().title("Data").styleAttributes()).containsEntry("title", "Data");
+    }
+
+    @Test
+    @DisplayName("Attribute selector [title] affects Table border color")
+    void attributeSelector_title_affectsBorderColor() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "TableElement[title=\"Users\"] { border-color: cyan; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 30, 10);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        table().header("Name", "Age").row("Alice", "30").title("Users").rounded().render(frame, area, context);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }
 }
