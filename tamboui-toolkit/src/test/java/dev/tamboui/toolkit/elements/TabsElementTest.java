@@ -235,6 +235,54 @@ class TabsElementTest {
     }
 
     @Test
+    @DisplayName("tabs with class selector and descendant CSS rules")
+    void tabsWithClassSelectorCss() {
+        // Given CSS with class selector for ancestor matching
+        String css = ".tabs TabsElement-tab:selected {\n" +
+                     "    color: cyan;\n" +
+                     "    background: blue;\n" +
+                     "}\n" +
+                     "\n" +
+                     ".tabs TabsElement-tab {\n" +
+                     "    color: grey;\n" +
+                     "}\n" +
+                     "\n" +
+                     ".tabs TabsElement-divider {\n" +
+                     "    text-style: dim;\n" +
+                     "    color: grey;\n" +
+                     "}";
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", css);
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 30, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        TabsElement element = tabs("A", "B").divider(" | ").padding(" ", " ").selected(0).addClass("tabs");
+
+        // When rendering (StyledElement.render handles withElement internally)
+        element.render(frame, area, context);
+
+        // Rendered: " A | B "
+        // positions: 0=space, 1=A, 2=space, 3=space, 4=|, 5=space, 6=space, 7=B, 8=space
+
+        // Selected tab "A" should have cyan/blue
+        assertThat(buffer).at(1, 0)
+            .hasSymbol("A")
+            .hasForeground(Color.CYAN)
+            .hasBackground(Color.BLUE);
+
+        // Unselected tab "B" should have grey foreground
+        assertThat(buffer).at(7, 0)
+            .hasSymbol("B")
+            .hasForeground(Color.GRAY);
+    }
+
+    @Test
     @DisplayName("divider inherits base style background via CSS")
     void dividerInheritsBackgroundViaCss() {
         // Given CSS that sets background on tabs and foreground on divider
