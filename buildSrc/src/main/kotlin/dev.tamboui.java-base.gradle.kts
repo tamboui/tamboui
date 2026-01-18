@@ -40,26 +40,9 @@ tasks.withType<Test> {
 }
 
 tasks.withType<Javadoc>().configureEach {
-    // Javadoc may not overwrite previously-copied add-stylesheet/add-script artifacts on reruns.
-    // Delete the known output locations so theme tweaks reliably show up without a manual clean.
-    //
-    // Note: javadoc's --add-script option is not reliably additive across Gradle/Javadoc versions,
-    // so we generate a single combined script which contains both the GitHub config and the theme UI.
+    // Provide GitHub repo/ref config + theme UI via a single combined script.
     val combinedScript = project.layout.buildDirectory.file("tmp/javadoc/tamboui-javadoc.js").get().asFile
     doFirst {
-        val outDir = destinationDir
-        delete(
-            File(outDir, "resource-files/javadoc.css"),
-            File(outDir, "javadoc.css"),
-            File(outDir, "script-files/tamboui-javadoc.js"),
-            File(outDir, "script-dir/tamboui-javadoc.js"),
-            // Old names from earlier iterations
-            File(outDir, "script-files/javadoc-theme.js"),
-            File(outDir, "script-dir/javadoc-theme.js"),
-            File(outDir, "script-files/tamboui-javadoc-config.js"),
-            File(outDir, "script-dir/tamboui-javadoc-config.js")
-        )
-
         combinedScript.parentFile.mkdirs()
         val repo = providers.gradleProperty("tamboui.githubRepo").orElse("tamboui/tamboui").get()
         val ref = providers.gradleProperty("tamboui.githubRef").orElse("main").get()

@@ -70,19 +70,6 @@ public abstract class JavadocAggregatorPlugin implements Plugin<Project> {
 
             Provider<RegularFile> combinedScriptProvider = project.getLayout().getBuildDirectory().file("tmp/javadoc/tamboui-javadoc.js");
             javadoc.doFirst(task -> {
-                File outDir = javadoc.getDestinationDir();
-                project.delete(
-                        new File(outDir, "resource-files/javadoc.css"),
-                        new File(outDir, "javadoc.css"),
-                        new File(outDir, "script-files/tamboui-javadoc.js"),
-                        new File(outDir, "script-dir/tamboui-javadoc.js"),
-                        // Old names from earlier iterations
-                        new File(outDir, "script-files/javadoc-theme.js"),
-                        new File(outDir, "script-dir/javadoc-theme.js"),
-                        new File(outDir, "script-files/tamboui-javadoc-config.js"),
-                        new File(outDir, "script-dir/tamboui-javadoc-config.js")
-                );
-
                 File combinedScript = combinedScriptProvider.get().getAsFile();
                 combinedScript.getParentFile().mkdirs();
 
