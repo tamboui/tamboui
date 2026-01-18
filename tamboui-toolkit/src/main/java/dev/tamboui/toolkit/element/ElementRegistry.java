@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Registry that maps elements to their rendered areas with full CSS selector support.
@@ -66,6 +67,9 @@ import java.util.Set;
  */
 public final class ElementRegistry {
 
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+    private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
     private final Map<String, ElementInfo> elementsById = new HashMap<>();
     private final List<ElementInfo> allElements = new ArrayList<>();
 
@@ -188,10 +192,15 @@ public final class ElementRegistry {
         if (area == null) {
             return;
         }
-        ElementInfo info = new ElementInfo(elementId, type, cssClasses, attributes, area, parent);
-        allElements.add(info);
-        if (elementId != null) {
-            elementsById.put(elementId, info);
+        writeLock.lock();
+        try {
+            ElementInfo info = new ElementInfo(elementId, type, cssClasses, attributes, area, parent);
+            allElements.add(info);
+            if (elementId != null) {
+                elementsById.put(elementId, info);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -231,6 +240,7 @@ public final class ElementRegistry {
             return Optional.empty();
         }
 
+        readLock.lock();
         try {
             Selector parsed = SelectorParser.parse(selector);
 
@@ -253,6 +263,8 @@ public final class ElementRegistry {
             }
         } catch (IllegalArgumentException e) {
             // Invalid selector, return empty
+        } finally {
+            readLock.unlock();
         }
         return Optional.empty();
     }
@@ -281,6 +293,7 @@ public final class ElementRegistry {
             return Collections.emptyList();
         }
 
+        readLock.lock();
         try {
             Selector parsed = SelectorParser.parse(selector);
             List<ElementInfo> results = new ArrayList<>();
@@ -294,6 +307,8 @@ public final class ElementRegistry {
         } catch (IllegalArgumentException e) {
             // Invalid selector, return empty
             return Collections.emptyList();
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -309,8 +324,13 @@ public final class ElementRegistry {
         if (elementId == null) {
             return null;
         }
-        ElementInfo info = elementsById.get(elementId);
-        return info != null ? info.area : null;
+        readLock.lock();
+        try {
+            ElementInfo info = elementsById.get(elementId);
+            return info != null ? info.area : null;
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -320,7 +340,15 @@ public final class ElementRegistry {
      * @return true if registered
      */
     public boolean contains(String elementId) {
-        return elementId != null && elementsById.containsKey(elementId);
+        if (elementId == null) {
+            return false;
+        }
+        readLock.lock();
+        try {
+            return elementsById.containsKey(elementId);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -329,8 +357,13 @@ public final class ElementRegistry {
      * Should be called at the start of each render cycle.
      */
     public void clear() {
-        elementsById.clear();
-        allElements.clear();
+        writeLock.lock();
+        try {
+            elementsById.clear();
+            allElements.clear();
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
@@ -339,6 +372,11 @@ public final class ElementRegistry {
      * @return the count
      */
     public int size() {
-        return allElements.size();
+        readLock.lock();
+        try {
+            return allElements.size();
+        } finally {
+            readLock.unlock();
+        }
     }
 }

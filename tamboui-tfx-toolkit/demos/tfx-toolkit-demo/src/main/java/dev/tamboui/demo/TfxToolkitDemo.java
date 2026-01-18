@@ -9,6 +9,8 @@
 package dev.tamboui.demo;
 
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.text.MarkupParser;
 import dev.tamboui.tfx.Fx;
 import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.toolkit.ToolkitEffects;
@@ -45,7 +47,6 @@ public class TfxToolkitDemo {
     private static final Color ACCENT_COLOR = Color.rgb(0xff, 0x00, 0x80);
 
     private final ToolkitEffects effects = new ToolkitEffects();
-    private ToolkitRunner runner;
     private String statusMessage = "Press 1-4 to trigger effects, Space to clear";
 
     public static void main(String[] args) throws Exception {
@@ -62,15 +63,12 @@ public class TfxToolkitDemo {
                 .postRenderProcessor(effects.asPostRenderProcessor())
                 .build()) {
 
-            this.runner = r;
-
-            // Apply different looping effects to highlighted words
-            // Fade between white and highlight colors (never goes black)
-            effects.addEffect("word-looping",
+            // Apply different looping effects to highlighted words using CSS class selectors
+            effects.addEffectBySelector(".looping",
                 Fx.fadeTo(Color.WHITE, Color.rgb(0xff, 0x00, 0x80), 1000, Interpolation.SineInOut).pingPong());
-            effects.addEffect("word-effects",
+            effects.addEffectBySelector(".fx",
                 Fx.fadeTo(Color.WHITE, Color.rgb(0x00, 0xd9, 0xff), 1200, Interpolation.SineInOut).pingPong());
-            effects.addEffect("word-different",
+            effects.addEffectBySelector(".different",
                 Fx.fadeTo(Color.WHITE, Color.rgb(0x00, 0xff, 0x88), 1400, Interpolation.SineInOut).pingPong());
 
             r.run(this::buildUI);
@@ -109,30 +107,23 @@ public class TfxToolkitDemo {
                     )
                 ).id("content").addClass("main-panel").rounded().borderColor(CONTENT_COLOR).fill(),
 
-                // Looping effects panel - individual words have effects
-                panel("Looping Effects",
-                    column(
-                        text(""),
-                        row(
-                            text("Words with ").fg(Color.GRAY).fit(),
-                            text("looping").fg(Color.WHITE).id("word-looping").fit(),
-                            text(" colors").fg(Color.GRAY).fit()
-                        ),
-                        row(
-                            text("and smooth ").fg(Color.GRAY).fit(),
-                            text("effects").fg(Color.WHITE).id("word-effects").fit()
-                        ),
-                        row(
-                            text("on ").fg(Color.GRAY).fit(),
-                            text("different").fg(Color.WHITE).id("word-different").fit(),
-                            text(" words.").fg(Color.GRAY).fit()
-                        ),
-                        text(""),
-                        text("Colors fade smoothly").fg(Color.GRAY),
-                        text("between white and").fg(Color.GRAY),
-                        text("highlight colors.").fg(Color.GRAY)
-                    )
-                ).id("looping-panel").rounded().borderColor(ACCENT_COLOR).length(30)
+                // Looping effects panel - uses markupTextArea with custom style resolver
+                markupTextArea("""
+
+                    [gray]Words with [/gray][looping]looping[/looping][gray] colors[/gray]
+                    [gray]and smooth [/gray][fx]effects[/fx]
+                    [gray]on [/gray][different]different[/different][gray] words.[/gray]
+
+                    [gray]Colors fade smoothly[/gray]
+                    [gray]between white and[/gray]
+                    [gray]highlight colors.[/gray]
+                    """)
+                    .customResolver(this::resolveEffectStyle)
+                    .title("Looping Effects")
+                    .rounded()
+                    .borderColor(ACCENT_COLOR)
+                    .id("looping-panel")
+                    .length(30)
             ).fill(),
 
             // Footer panel - has .main-panel class
@@ -147,6 +138,13 @@ public class TfxToolkitDemo {
                 )
             ).id("footer").addClass("main-panel").rounded().borderColor(FOOTER_COLOR).length(3)
         );
+    }
+
+    private Style resolveEffectStyle(String tagName) {
+        return switch (tagName) {
+            case "looping", "fx", "different" -> Style.EMPTY.fg(Color.WHITE);
+            default -> null;
+        };
     }
 
     private EventResult handleKeyEvent(dev.tamboui.tui.event.KeyEvent event) {
@@ -190,12 +188,12 @@ public class TfxToolkitDemo {
 
         if (event.isChar(' ')) {
             effects.clear();
-            // Re-add the looping word effects after clearing
-            effects.addEffect("word-looping",
+            // Re-add the looping word effects after clearing (using CSS class selectors)
+            effects.addEffectBySelector(".looping",
                 Fx.fadeTo(Color.WHITE, Color.rgb(0xff, 0x00, 0x80), 1000, Interpolation.SineInOut).pingPong());
-            effects.addEffect("word-effects",
+            effects.addEffectBySelector(".fx",
                 Fx.fadeTo(Color.WHITE, Color.rgb(0x00, 0xd9, 0xff), 1200, Interpolation.SineInOut).pingPong());
-            effects.addEffect("word-different",
+            effects.addEffectBySelector(".different",
                 Fx.fadeTo(Color.WHITE, Color.rgb(0x00, 0xff, 0x88), 1400, Interpolation.SineInOut).pingPong());
             statusMessage = "Effects cleared";
             return EventResult.HANDLED;

@@ -30,6 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 /**
@@ -78,6 +79,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private final ElementRegistry elementRegistry;
     private final DefaultRenderContext renderContext;
     private final ScheduledExecutorService scheduler;
+    private final ReentrantLock renderLock = new ReentrantLock();
     private final boolean faultTolerant;
     private final List<ToolkitPostRenderProcessor> postRenderProcessors;
     private volatile Duration lastElapsed = Duration.ZERO;
@@ -145,28 +147,34 @@ public final class ToolkitRunner implements AutoCloseable {
         tuiRunner.run(
             (event, runner) -> handleEvent(event),
             frame -> {
-                // Clear state before each render
-                focusManager.clearFocusables();
-                eventRouter.clear();
-                elementRegistry.clear();
+                // Synchronize rendering to prevent concurrent access from scheduler thread
+                renderLock.lock();
+                try {
+                    // Clear state before each render
+                    focusManager.clearFocusables();
+                    eventRouter.clear();
+                    elementRegistry.clear();
 
-                // Get the current element tree
-                Element root = elementSupplier.get();
+                    // Get the current element tree
+                    Element root = elementSupplier.get();
 
-                // Render the element tree and register root for events
-                if (root != null) {
-                    root.render(frame, frame.area(), renderContext);
-                    renderContext.registerElement(root, frame.area());
-                }
+                    // Render the element tree and register root for events
+                    if (root != null) {
+                        root.render(frame, frame.area(), renderContext);
+                        renderContext.registerElement(root, frame.area());
+                    }
 
-                // Auto-focus first focusable element if nothing is focused
-                if (focusManager.focusedId() == null && !focusManager.focusOrder().isEmpty()) {
-                    focusManager.setFocus(focusManager.focusOrder().get(0));
-                }
+                    // Auto-focus first focusable element if nothing is focused
+                    if (focusManager.focusedId() == null && !focusManager.focusOrder().isEmpty()) {
+                        focusManager.setFocus(focusManager.focusOrder().get(0));
+                    }
 
-                // Apply post-render processors (e.g., effects, overlays)
-                for (ToolkitPostRenderProcessor processor : postRenderProcessors) {
-                    processor.process(frame, elementRegistry, lastElapsed);
+                    // Apply post-render processors (e.g., effects, overlays)
+                    for (ToolkitPostRenderProcessor processor : postRenderProcessors) {
+                        processor.process(frame, elementRegistry, lastElapsed);
+                    }
+                } finally {
+                    renderLock.unlock();
                 }
             }
         );

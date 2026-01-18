@@ -60,15 +60,34 @@ import java.time.Duration;
  */
 public final class ToolkitEffects {
 
-    private final ElementEffectRegistry registry;
-    private Duration lastElapsed;
+    private final ElementEffectRegistry registry = new ElementEffectRegistry();
+    private Duration lastElapsed = Duration.ZERO;
+    private int lastFrameWidth;
+    private int lastFrameHeight;
 
     /**
      * Creates a new ToolkitEffects instance.
+     * <p>
+     * When used with {@link #asPostRenderProcessor()}, the ElementRegistry
+     * is automatically provided by the ToolkitRunner on first render.
+     * <p>
+     * When used with TuiRunner via {@link #wrapHandler(EventHandler)} and
+     * {@link #wrapRenderer(Renderer)}, call {@link #setElementRegistry(ElementRegistry)}
+     * before running.
      */
     public ToolkitEffects() {
-        this.registry = new ElementEffectRegistry();
-        this.lastElapsed = Duration.ZERO;
+    }
+
+    /**
+     * Sets the ElementRegistry used to resolve element areas.
+     * <p>
+     * This is called automatically when using {@link #asPostRenderProcessor()}
+     * with ToolkitRunner. Only call this manually when using TuiRunner directly.
+     *
+     * @param elementRegistry the element registry
+     */
+    public void setElementRegistry(ElementRegistry elementRegistry) {
+        registry.setElementRegistry(elementRegistry);
     }
 
     /**
@@ -156,6 +175,20 @@ public final class ToolkitEffects {
     }
 
     /**
+     * Requests a refresh of effect areas after a resize or relayout.
+     * <p>
+     * Call this method when the terminal is resized or elements have been
+     * repositioned. The actual refresh happens on the next render cycle,
+     * ensuring the ElementRegistry has up-to-date data.
+     * <p>
+     * In ToolkitRunner with {@link #asPostRenderProcessor()}, this is called
+     * automatically on resize events.
+     */
+    public void requestRefresh() {
+        registry.requestRefresh();
+    }
+
+    /**
      * Wraps an event handler to capture tick timing and force redraws.
      * <p>
      * The wrapper:
@@ -196,17 +229,16 @@ public final class ToolkitEffects {
      *   <li>Processes all active effects on the buffer</li>
      * </ul>
      *
-     * @param renderer        the renderer to wrap
-     * @param elementRegistry the element registry containing element areas
+     * @param renderer the renderer to wrap
      * @return a wrapped renderer
      */
-    public Renderer wrapRenderer(Renderer renderer, ElementRegistry elementRegistry) {
+    public Renderer wrapRenderer(Renderer renderer) {
         return frame -> {
             // Render the UI first
             renderer.render(frame);
 
             // Resolve pending effects to element areas
-            registry.resolvePendingEffects(elementRegistry);
+            registry.resolvePendingEffects();
 
             // Process effects on the buffer
             if (registry.isRunning()) {
@@ -222,6 +254,8 @@ public final class ToolkitEffects {
      * This returns a processor that resolves pending effects to element areas
      * and processes all active effects on the buffer. The processor receives
      * elapsed time from ToolkitRunner, so no event handler wrapping is needed.
+     * <p>
+     * On resize, effect areas are automatically refreshed to match new element positions.
      * <p>
      * <b>Usage:</b>
      * <pre>{@code
@@ -239,8 +273,25 @@ public final class ToolkitEffects {
      */
     public ToolkitPostRenderProcessor asPostRenderProcessor() {
         return (frame, elementRegistry, elapsed) -> {
-            // Resolve pending effects to element areas
-            registry.resolvePendingEffects(elementRegistry);
+            // Set the registry on first call (or if it changed)
+            registry.setElementRegistry(elementRegistry);
+
+            // Detect frame size changes (resize events) and request refresh
+            int currentWidth = frame.area().width();
+            int currentHeight = frame.area().height();
+            boolean resized = (lastFrameWidth != 0 || lastFrameHeight != 0)
+                    && (currentWidth != lastFrameWidth || currentHeight != lastFrameHeight);
+
+            if (resized) {
+                registry.requestRefresh();
+            }
+
+            // Update tracked frame size
+            lastFrameWidth = currentWidth;
+            lastFrameHeight = currentHeight;
+
+            // Resolve pending effects (and handle refresh if requested)
+            registry.resolvePendingEffects();
 
             // Process effects on the buffer
             if (registry.isRunning()) {

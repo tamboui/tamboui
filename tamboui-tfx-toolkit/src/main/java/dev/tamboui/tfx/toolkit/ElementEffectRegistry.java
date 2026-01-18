@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -50,10 +51,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class ElementEffectRegistry {
 
     private final ReentrantLock lock = new ReentrantLock();
+    private ElementRegistry elementRegistry;
     private final Map<String, List<Effect>> pendingEffects = new LinkedHashMap<>();
     private final List<SelectorEffect> pendingSelectors = new ArrayList<>();
+    private final List<SelectorEffect> activeSelectors = new ArrayList<>();
+    private final Map<SelectorEffect, List<Effect>> selectorEffects = new LinkedHashMap<>();
     private final EffectManager globalEffects = new EffectManager();
     private final EffectManager runningEffects = new EffectManager();
+    private final AtomicBoolean refreshRequested = new AtomicBoolean();
 
     /**
      * A pending effect targeting elements matching a CSS selector.
@@ -70,15 +75,27 @@ public final class ElementEffectRegistry {
 
     /**
      * Creates a new ElementEffectRegistry.
+     * <p>
+     * The ElementRegistry must be set via {@link #setElementRegistry(ElementRegistry)}
+     * before calling {@link #resolvePendingEffects()}.
      */
     public ElementEffectRegistry() {
+    }
+
+    /**
+     * Sets the ElementRegistry used to resolve element areas.
+     *
+     * @param elementRegistry the element registry
+     */
+    public void setElementRegistry(ElementRegistry elementRegistry) {
+        this.elementRegistry = elementRegistry;
     }
 
     /**
      * Adds an effect that targets a specific element by ID.
      * <p>
      * The effect will be resolved to the element's rendered area when
-     * {@link #resolvePendingEffects(EventRouter)} is called.
+     * {@link #resolvePendingEffects()} is called.
      *
      * @param elementId the ID of the target element
      * @param effect    the effect to add
@@ -113,7 +130,7 @@ public final class ElementEffectRegistry {
      * Adds an effect that targets elements matching a CSS-like selector.
      * <p>
      * The effect will be applied to all elements matching the selector when
-     * {@link #resolvePendingEffects(ElementRegistry)} is called. Each matching
+     * {@link #resolvePendingEffects()} is called. Each matching
      * element receives a copy of the effect.
      * <p>
      * Supported selectors:
@@ -156,6 +173,17 @@ public final class ElementEffectRegistry {
     }
 
     /**
+     * Requests a refresh of effect areas on the next call to {@link #resolvePendingEffects()}.
+     * <p>
+     * Call this when element positions may have changed (e.g., after a resize).
+     * The actual refresh happens during the next {@link #resolvePendingEffects()} call,
+     * ensuring the ElementRegistry has up-to-date data after rendering.
+     */
+    public void requestRefresh() {
+        refreshRequested.set(true);
+    }
+
+    /**
      * Resolves pending effects to their target element areas.
      * <p>
      * This method queries the ElementRegistry for element areas and moves
@@ -163,22 +191,26 @@ public final class ElementEffectRegistry {
      * elements that are not currently rendered remain pending.
      * <p>
      * Selector-based effects are resolved using the registry's query methods
-     * and apply to all matching elements.
+     * and apply to all matching elements. If a refresh was requested via
+     * {@link #requestRefresh()}, existing effect areas are also updated.
      * <p>
      * This should be called after rendering completes but before
      * {@link #processEffects(TFxDuration, Buffer, Rect)}.
-     *
-     * @param registry the element registry containing element areas
      */
-    public void resolvePendingEffects(ElementRegistry registry) {
+    public void resolvePendingEffects() {
         lock.lock();
         try {
+            // Handle refresh request first (uses fresh registry data after render)
+            if (refreshRequested.getAndSet(false)) {
+                doRefreshAreas();
+            }
+
             // Resolve ID-based effects
             List<String> resolved = new ArrayList<>();
 
             for (Map.Entry<String, List<Effect>> entry : pendingEffects.entrySet()) {
                 String elementId = entry.getKey();
-                Rect area = registry.getArea(elementId);
+                Rect area = elementRegistry.getArea(elementId);
 
                 if (area != null) {
                     // Element is rendered, resolve effects to its area
@@ -194,17 +226,57 @@ public final class ElementEffectRegistry {
                 pendingEffects.remove(id);
             }
 
-            // Resolve selector-based effects
-            for (SelectorEffect se : pendingSelectors) {
-                List<ElementRegistry.ElementInfo> matches = registry.queryAll(se.selector);
+            // Resolve selector-based effects (iterate copy to allow clear)
+            for (SelectorEffect se : new ArrayList<>(pendingSelectors)) {
+                List<ElementRegistry.ElementInfo> matches = elementRegistry.queryAll(se.selector);
+                // Track selector and effect instances for later area refresh
+                activeSelectors.add(se);
+                List<Effect> effects = new ArrayList<>();
                 for (ElementRegistry.ElementInfo info : matches) {
-                    // Each match gets a copy of the effect
-                    runningEffects.addEffect(se.effect.copy().withArea(info.area()));
+                    Effect effectCopy = se.effect.copy().withArea(info.area());
+                    effects.add(effectCopy);
+                    runningEffects.addEffect(effectCopy);
                 }
+                selectorEffects.put(se, effects);
             }
             pendingSelectors.clear();
         } finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * Internal method to refresh selector-based effect areas.
+     * Called within the lock from resolvePendingEffects when refresh is requested.
+     */
+    private void doRefreshAreas() {
+        // Iterate over a copy to avoid ConcurrentModificationException
+        for (SelectorEffect se : new ArrayList<>(activeSelectors)) {
+            List<ElementRegistry.ElementInfo> matches = elementRegistry.queryAll(se.selector);
+            List<Effect> currentEffects = selectorEffects.get(se);
+            if (currentEffects != null) {
+                int matchCount = matches.size();
+                int effectCount = currentEffects.size();
+
+                // Update areas for effects that still have matching elements
+                for (int i = 0; i < Math.min(matchCount, effectCount); i++) {
+                    Effect effect = currentEffects.get(i);
+                    Rect newArea = matches.get(i).area();
+                    effect.setArea(newArea);
+                }
+
+                // If there are more matches than effects, create new effect instances
+                if (matchCount > effectCount) {
+                    for (int i = effectCount; i < matchCount; i++) {
+                        Effect newEffect = se.effect.copy().withArea(matches.get(i).area());
+                        currentEffects.add(newEffect);
+                        runningEffects.addEffect(newEffect);
+                    }
+                }
+                // Note: If there are fewer matches than effects, the extra effects
+                // will render to areas that may no longer exist, but this is acceptable
+                // since they'll just not be visible
+            }
         }
     }
 
@@ -253,6 +325,8 @@ public final class ElementEffectRegistry {
         try {
             pendingEffects.clear();
             pendingSelectors.clear();
+            activeSelectors.clear();
+            selectorEffects.clear();
             globalEffects.clear();
             runningEffects.clear();
         } finally {

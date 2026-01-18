@@ -26,6 +26,11 @@ import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextAreaElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
+import dev.tamboui.toolkit.elements.RichTextElement;
+import dev.tamboui.toolkit.elements.RichTextAreaElement;
+import dev.tamboui.toolkit.elements.MarkupTextElement;
+import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.text.Text;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.element.StyledElement;
@@ -124,6 +129,144 @@ public final class Toolkit {
      */
     public static WaveTextElement waveText(String text, Color color) {
         return new WaveTextElement(text, color);
+    }
+
+    // ==================== Rich Text ====================
+
+    /**
+     * Creates a simple inline rich text element with styled text.
+     * <p>
+     * For scrollable rich text with borders, use {@link #richTextArea(Text)}.
+     * <pre>{@code
+     * Text styledText = Text.from(
+     *     Line.from(Span.styled("Hello", Style.EMPTY.bold()), Span.raw(" World"))
+     * );
+     * richText(styledText).centered()
+     * }</pre>
+     *
+     * @param text the styled text to display
+     * @return a new rich text element
+     */
+    public static RichTextElement richText(Text text) {
+        return new RichTextElement(text);
+    }
+
+    /**
+     * Creates a simple inline rich text element from a plain string.
+     *
+     * @param content the text content
+     * @return a new rich text element
+     */
+    public static RichTextElement richText(String content) {
+        return new RichTextElement(content);
+    }
+
+    /**
+     * Creates an empty inline rich text element.
+     *
+     * @return a new empty rich text element
+     */
+    public static RichTextElement richText() {
+        return new RichTextElement();
+    }
+
+    /**
+     * Creates a scrollable rich text area with styled text.
+     * <p>
+     * Rich text areas support scrolling, borders, line numbers, and focus.
+     * <pre>{@code
+     * richTextArea(styledText)
+     *     .showLineNumbers()
+     *     .scrollbar(ScrollBarPolicy.AS_NEEDED)
+     *     .rounded()
+     * }</pre>
+     *
+     * @param text the styled text to display
+     * @return a new rich text area element
+     */
+    public static RichTextAreaElement richTextArea(Text text) {
+        return new RichTextAreaElement(text);
+    }
+
+    /**
+     * Creates a scrollable rich text area from a plain string.
+     *
+     * @param content the text content
+     * @return a new rich text area element
+     */
+    public static RichTextAreaElement richTextArea(String content) {
+        return new RichTextAreaElement(content);
+    }
+
+    /**
+     * Creates an empty scrollable rich text area.
+     *
+     * @return a new empty rich text area element
+     */
+    public static RichTextAreaElement richTextArea() {
+        return new RichTextAreaElement();
+    }
+
+    // ==================== Markup Text ====================
+
+    /**
+     * Creates a simple inline markup text element that parses BBCode-style markup.
+     * <p>
+     * For scrollable markup text with borders, use {@link #markupTextArea(String)}.
+     * <p>
+     * Supported markup:
+     * <ul>
+     *   <li>Modifiers: {@code [bold]}, {@code [italic]}, {@code [underlined]}, {@code [dim]}</li>
+     *   <li>Colors: {@code [red]}, {@code [green]}, {@code [blue]}, {@code [yellow]}, etc.</li>
+     *   <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
+     *   <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
+     *   <li>Escaped brackets: {@code [[} and {@code ]]}</li>
+     * </ul>
+     * <pre>{@code
+     * markupText("This is [red]red[/red] and [bold]bold[/bold].")
+     * }</pre>
+     *
+     * @param markup the markup text to parse and display
+     * @return a new markup text element
+     */
+    public static MarkupTextElement markupText(String markup) {
+        return new MarkupTextElement(markup);
+    }
+
+    /**
+     * Creates an empty inline markup text element.
+     *
+     * @return a new empty markup text element
+     */
+    public static MarkupTextElement markupText() {
+        return new MarkupTextElement();
+    }
+
+    /**
+     * Creates a scrollable markup text area that parses BBCode-style markup.
+     * <p>
+     * Markup text areas support scrolling, borders, and focus.
+     * <pre>{@code
+     * markupTextArea("[bold]Hello[/bold] World")
+     *     .scrollbar(ScrollBarPolicy.AS_NEEDED)
+     *     .rounded()
+     *     .focusable()
+     * }</pre>
+     *
+     * @param markup the markup text to parse and display
+     * @return a new markup text area element
+     */
+    public static MarkupTextAreaElement markupTextArea(String markup) {
+        return new MarkupTextAreaElement(markup);
+    }
+
+    /**
+     * Creates an empty scrollable markup text area.
+     *
+     * @return a new empty markup text area element
+     */
+    public static MarkupTextAreaElement markupTextArea() {
+        return new MarkupTextAreaElement();
     }
 
     // ==================== Containers ====================

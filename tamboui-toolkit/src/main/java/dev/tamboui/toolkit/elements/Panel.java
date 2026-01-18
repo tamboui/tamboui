@@ -53,8 +53,8 @@ import java.util.Map;
  */
 public final class Panel extends ContainerElement<Panel> {
 
-    private String title;
-    private String bottomTitle;
+    private Line title;
+    private Line bottomTitle;
     private Overflow titleOverflow = Overflow.CLIP;
     private BorderType borderType;
     private Color borderColor;
@@ -70,7 +70,7 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     public Panel(String title, Element... children) {
-        this.title = title;
+        this.title = Line.from(title);
         this.children.addAll(Arrays.asList(children));
     }
 
@@ -82,6 +82,27 @@ public final class Panel extends ContainerElement<Panel> {
      * Sets the panel title.
      */
     public Panel title(String title) {
+        this.title = Line.from(title);
+        return this;
+    }
+
+    /**
+     * Sets the panel title with styled text.
+     * <p>
+     * Example:
+     * <pre>{@code
+     * panel(...)
+     *     .title(Line.from(
+     *         Span.styled("Rich ", Style.EMPTY.fg(Color.CYAN).bold()),
+     *         Span.styled("live", Style.EMPTY.fg(Color.RED).bold()),
+     *         Span.styled(" editor", Style.EMPTY.fg(Color.CYAN).bold())
+     *     ))
+     * }</pre>
+     *
+     * @param title the styled title line
+     * @return this panel for chaining
+     */
+    public Panel title(Line title) {
         this.title = title;
         return this;
     }
@@ -90,6 +111,17 @@ public final class Panel extends ContainerElement<Panel> {
      * Sets the bottom title.
      */
     public Panel bottomTitle(String title) {
+        this.bottomTitle = Line.from(title);
+        return this;
+    }
+
+    /**
+     * Sets the bottom title with styled text.
+     *
+     * @param title the styled title line
+     * @return this panel for chaining
+     */
+    public Panel bottomTitle(Line title) {
         this.bottomTitle = title;
         return this;
     }
@@ -122,10 +154,10 @@ public final class Panel extends ContainerElement<Panel> {
     public Map<String, String> styleAttributes() {
         Map<String, String> attrs = new LinkedHashMap<>(super.styleAttributes());
         if (title != null) {
-            attrs.put("title", title);
+            attrs.put("title", title.rawContent());
         }
         if (bottomTitle != null) {
-            attrs.put("bottom-title", bottomTitle);
+            attrs.put("bottom-title", bottomTitle.rawContent());
         }
         return Collections.unmodifiableMap(attrs);
     }
@@ -450,7 +482,7 @@ public final class Panel extends ContainerElement<Panel> {
         }
 
         if (title != null) {
-            blockBuilder.title(Title.from(Line.from(Span.raw(title))).overflow(titleOverflow));
+            blockBuilder.title(Title.from(title).overflow(titleOverflow));
         }
 
         if (bottomTitle != null) {

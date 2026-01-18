@@ -130,6 +130,8 @@ class MyApp extends ToolkitApp {
 - You MUST use imports instead of fully qualified names in code
 - You SHOULD NOT name a method `getXXX` if it's not a simple getter returning a private field: prefer `computeXXX`, `fetchXXX`, `toXXX`, etc.
 - You MUST NOT add comments in source which cannot be understood without context
+- Tests SHOULD use the `BufferAssertions` test fixtures as much as possible
+- You CAN improve test fixtures to make tests more readable
 
 ## Testing Instructions
 

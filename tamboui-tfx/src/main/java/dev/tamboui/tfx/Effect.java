@@ -52,7 +52,7 @@ public final class Effect {
     
     /**
      * Creates a new Effect with the specified area.
-     * 
+     *
      * @param area The rectangular area where the effect will be applied
      * @return A new Effect instance with the specified area
      */
@@ -60,6 +60,19 @@ public final class Effect {
         Shader newShader = shader.copy();
         newShader.setArea(area);
         return new Effect(newShader);
+    }
+
+    /**
+     * Updates the area where this effect is applied.
+     * <p>
+     * Unlike {@link #withArea(Rect)} which creates a new Effect, this method
+     * mutates the existing effect. This is useful for updating looping effects
+     * when elements move or resize.
+     *
+     * @param area The new area where the effect will be applied
+     */
+    public void setArea(Rect area) {
+        shader.setArea(area);
     }
     
     /**
@@ -132,7 +145,7 @@ public final class Effect {
     public boolean running() {
         return shader.running();
     }
-    
+
     /**
      * Returns the name of the underlying shader.
      */
