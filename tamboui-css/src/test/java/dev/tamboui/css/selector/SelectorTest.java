@@ -460,9 +460,7 @@ class SelectorTest {
         }
     }
 
-    /**
-     * Base panel class for testing type hierarchy matching.
-     */
+    /// Base panel class for testing type hierarchy matching.
     private static class BasePanel implements Styleable {
         @Override
         public Optional<String> cssId() {
@@ -480,12 +478,11 @@ class SelectorTest {
         }
     }
 
-    /**
-     * Subclass of BasePanel for testing type hierarchy matching.
-     * CSS selectors for both "BasePanel" and "MyPanel" should match instances of this class.
-     */
+    /// Subclass of BasePanel for testing type hierarchy matching.
+    /// CSS selectors for both "BasePanel" and "MyPanel" should match instances of this class.
     private static class MyPanel extends BasePanel {
         // Inherits all methods from BasePanel
         // styleType() defaults to "MyPanel" (getClass().getSimpleName())
     }
 }
+

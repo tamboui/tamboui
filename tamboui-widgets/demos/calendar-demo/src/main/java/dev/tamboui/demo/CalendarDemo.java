@@ -32,15 +32,15 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
-/**
- * Demo TUI application showcasing the Calendar widget.
- * <p>
- * Demonstrates monthly calendar views with:
- * - Different styling options
- * - Event highlighting
- * - First day of week configuration
- * - Multi-month displays
- */
+/// Demo TUI application showcasing the Calendar widget.
+///
+///
+///
+/// Demonstrates monthly calendar views with:
+/// - Different styling options
+/// - Event highlighting
+/// - First day of week configuration
+/// - Multi-month displays
 public class CalendarDemo {
 
     private boolean running = true;
@@ -335,3 +335,4 @@ public class CalendarDemo {
         frame.renderWidget(footer, area);
     }
 }
+

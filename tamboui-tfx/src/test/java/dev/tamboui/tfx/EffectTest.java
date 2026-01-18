@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for Effect class.
- */
+/// Tests for Effect class.
 class EffectTest {
 
     @Nested
@@ -126,3 +124,4 @@ class EffectTest {
         }
     }
 }
+

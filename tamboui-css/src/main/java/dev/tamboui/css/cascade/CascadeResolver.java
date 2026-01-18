@@ -12,46 +12,39 @@ import dev.tamboui.css.property.PropertyRegistry;
 
 import java.util.*;
 
-/**
- * Resolves CSS cascade and specificity to produce final computed styles.
- * <p>
- * The cascade algorithm:
- * <ol>
- *   <li>Find all rules whose selectors match the element</li>
- *   <li>Sort by specificity (higher wins)</li>
- *   <li>For equal specificity, later rules win (source order)</li>
- *   <li>!important declarations override all non-important</li>
- *   <li>Merge all matching declarations into a final style</li>
- * </ol>
- */
+/// Resolves CSS cascade and specificity to produce final computed styles.
+///
+///
+///
+/// The cascade algorithm:
+///
+/// 1. Find all rules whose selectors match the element
+/// 1. Sort by specificity (higher wins)
+/// 1. For equal specificity, later rules win (source order)
+/// 1. !important declarations override all non-important
+/// 1. Merge all matching declarations into a final style
 public final class CascadeResolver {
 
     private final PropertyRegistry propertyRegistry;
 
-    /**
-     * Creates a new cascade resolver with the default property registry.
-     */
+    /// Creates a new cascade resolver with the default property registry.
     public CascadeResolver() {
         this.propertyRegistry = PropertyRegistry.createDefault();
     }
 
-    /**
-     * Creates a cascade resolver with a custom property registry.
-     */
+    /// Creates a cascade resolver with a custom property registry.
     public CascadeResolver(PropertyRegistry propertyRegistry) {
         this.propertyRegistry = propertyRegistry;
     }
 
-    /**
-     * Resolves the final computed style for an element.
-     *
-     * @param element   the element to style
-     * @param state     the pseudo-class state (focus, hover, etc.)
-     * @param ancestors the ancestor chain from root to parent
-     * @param rules     all rules from the stylesheet
-     * @param variables CSS variables for value resolution
-     * @return the resolved style
-     */
+    /// Resolves the final computed style for an element.
+    ///
+    /// @param element   the element to style
+    /// @param state     the pseudo-class state (focus, hover, etc.)
+    /// @param ancestors the ancestor chain from root to parent
+    /// @param rules     all rules from the stylesheet
+    /// @param variables CSS variables for value resolution
+    /// @return the resolved style
     public CssStyleResolver resolve(Styleable element,
                                      PseudoClassState state,
                                      List<Styleable> ancestors,
@@ -165,9 +158,7 @@ public final class CascadeResolver {
         return builder.build();
     }
 
-    /**
-     * Helper class for sorting matched rules.
-     */
+    /// Helper class for sorting matched rules.
     private static final class MatchedRule implements Comparable<MatchedRule> {
         final Rule rule;
         final int specificity;
@@ -191,3 +182,4 @@ public final class CascadeResolver {
         }
     }
 }
+

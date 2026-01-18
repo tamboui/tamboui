@@ -283,3 +283,4 @@ class BindingsLoadTest {
         assertThat(click.matches("anotherAction")).isTrue();
     }
 }
+

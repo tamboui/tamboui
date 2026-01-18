@@ -11,28 +11,24 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Converts multiple Buffer frames into an Asciinema cast file.
- * This is an internal API and not part of the public contract.
- *
- * <p>The asciicast v2 format is a newline-delimited JSON file where:
- * <ul>
- *   <li>First line contains header (terminal size, timestamp, metadata)</li>
- *   <li>Following lines are events [time, "o", data]</li>
- * </ul>
- *
- * @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
- */
+/// Converts multiple Buffer frames into an Asciinema cast file.
+/// This is an internal API and not part of the public contract.
+///
+///
+///
+/// The asciicast v2 format is a newline-delimited JSON file where:
+///
+/// - First line contains header (terminal size, timestamp, metadata)
+/// - Following lines are events [time, "o", data]
+///
+///
+/// @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
 final class AsciinemaAnimation {
 
-    /**
-     * ANSI escape sequence to move cursor to home position (top-left).
-     */
+    /// ANSI escape sequence to move cursor to home position (top-left).
     private static final String CURSOR_HOME = "\u001b[H";
 
-    /**
-     * ANSI escape sequence to clear entire screen.
-     */
+    /// ANSI escape sequence to clear entire screen.
     private static final String CLEAR_SCREEN = "\u001b[2J";
 
     private final List<TimedFrame> frames;
@@ -54,11 +50,9 @@ final class AsciinemaAnimation {
         }
     }
 
-    /**
-     * Removes consecutive duplicate frames, keeping only the first occurrence.
-     * The timing is preserved so that the displayed frame duration extends until
-     * the next different frame.
-     */
+    /// Removes consecutive duplicate frames, keeping only the first occurrence.
+    /// The timing is preserved so that the displayed frame duration extends until
+    /// the next different frame.
     private static List<TimedFrame> deduplicateFrames(List<TimedFrame> frames) {
         if (frames.size() <= 1) {
             return frames;
@@ -77,14 +71,12 @@ final class AsciinemaAnimation {
         return deduplicated;
     }
 
-    /**
-     * Creates an animation from plain buffers with evenly-spaced timing based on FPS.
-     * Used when real timestamps aren't available (e.g., System.out capture).
-     *
-     * @param buffers the list of buffer frames
-     * @param fps frames per second for timing calculation
-     * @return a new AsciinemaAnimation
-     */
+    /// Creates an animation from plain buffers with evenly-spaced timing based on FPS.
+    /// Used when real timestamps aren't available (e.g., System.out capture).
+    ///
+    /// @param buffers the list of buffer frames
+    /// @param fps frames per second for timing calculation
+    /// @return a new AsciinemaAnimation
     static AsciinemaAnimation fromBuffers(List<Buffer> buffers, int fps) {
         List<TimedFrame> timedFrames = new ArrayList<>(buffers.size());
         long frameIntervalMs = 1000 / fps;
@@ -94,11 +86,9 @@ final class AsciinemaAnimation {
         return new AsciinemaAnimation(timedFrames, fps);
     }
 
-    /**
-     * Generates the complete Asciinema cast file as a string.
-     *
-     * @return the cast file content
-     */
+    /// Generates the complete Asciinema cast file as a string.
+    ///
+    /// @return the cast file content
     String toCast() {
         if (frames.isEmpty()) {
             return "";
@@ -134,14 +124,12 @@ final class AsciinemaAnimation {
         return writer.toString();
     }
 
-    /**
-     * Builds the output string for a single frame using explicit cursor positioning.
-     * This ensures correct rendering in asciinema player by positioning each row explicitly.
-     *
-     * @param buffer the buffer to render
-     * @param isFirst whether this is the first frame
-     * @return the ANSI output string
-     */
+    /// Builds the output string for a single frame using explicit cursor positioning.
+    /// This ensures correct rendering in asciinema player by positioning each row explicitly.
+    ///
+    /// @param buffer the buffer to render
+    /// @param isFirst whether this is the first frame
+    /// @return the ANSI output string
     private String buildFrameOutput(Buffer buffer, boolean isFirst) {
         StringBuilder sb = new StringBuilder();
 
@@ -157,3 +145,4 @@ final class AsciinemaAnimation {
         return sb.toString();
     }
 }
+

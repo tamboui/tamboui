@@ -188,9 +188,7 @@ class InlineDisplayTest {
         assertThat(output).contains("styled");
     }
 
-    /**
-     * A minimal mock Backend for testing.
-     */
+    /// A minimal mock Backend for testing.
     private static class MockBackend implements Backend {
         boolean closed = false;
 
@@ -264,3 +262,4 @@ class InlineDisplayTest {
         }
     }
 }
+

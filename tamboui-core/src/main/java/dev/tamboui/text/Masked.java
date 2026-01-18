@@ -4,46 +4,43 @@
  */
 package dev.tamboui.text;
 
-/**
- * A wrapper around a string that is masked when displayed.
- * <p>
- * The masked string is displayed as a series of the same character. This might be used to display
- * a password field or similar secure data.
- * <p>
- * Example:
- * <pre>{@code
- * Masked password = new Masked("secret123", '*');
- * Span span = Span.styled(password.value(), Style.EMPTY.fg(Color.RED));
- * // span will display as "*********"
- * }</pre>
- */
+/// A wrapper around a string that is masked when displayed.
+///
+///
+///
+/// The masked string is displayed as a series of the same character. This might be used to display
+/// a password field or similar secure data.
+///
+///
+///
+/// Example:
+/// ```java
+/// Masked password = new Masked("secret123", '*');
+/// Span span = Span.styled(password.value(), Style.EMPTY.fg(Color.RED));
+/// // span will display as "*********"
+/// }
+/// ```
 public final class Masked {
 
     private final String inner;
     private final char maskChar;
 
-    /**
-     * Creates a new masked string.
-     *
-     * @param text the text to mask
-     * @param maskChar the character to use for masking
-     */
+    /// Creates a new masked string.
+    ///
+    /// @param text the text to mask
+    /// @param maskChar the character to use for masking
     public Masked(String text, char maskChar) {
         this.inner = text != null ? text : "";
         this.maskChar = maskChar;
     }
 
-    /**
-     * Returns the character used for masking.
-     */
+    /// Returns the character used for masking.
     public char maskChar() {
         return maskChar;
     }
 
-    /**
-     * Returns the underlying string, with all characters masked.
-     * Uses code point count to handle Unicode properly.
-     */
+    /// Returns the underlying string, with all characters masked.
+    /// Uses code point count to handle Unicode properly.
     public String value() {
         if (inner.isEmpty()) {
             return "";
@@ -56,10 +53,8 @@ public final class Masked {
         return sb.toString();
     }
 
-    /**
-     * Returns the original (unmasked) text.
-     * Use with caution - this exposes the sensitive data.
-     */
+    /// Returns the original (unmasked) text.
+    /// Use with caution - this exposes the sensitive data.
     public String original() {
         return inner;
     }
@@ -88,4 +83,5 @@ public final class Masked {
         return result;
     }
 }
+
 

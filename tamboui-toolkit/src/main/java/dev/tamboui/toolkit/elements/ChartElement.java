@@ -26,22 +26,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A DSL wrapper for the Chart widget.
- * <p>
- * Plots datasets in a cartesian coordinate system.
- * <pre>{@code
- * chart()
- *     .dataset(Dataset.builder()
- *         .name("Series 1")
- *         .data(new double[][] {{0,1}, {1,3}, {2,2}})
- *         .build())
- *     .xAxis(Axis.builder().bounds(0, 4).build())
- *     .yAxis(Axis.builder().bounds(0, 5).build())
- *     .title("My Chart")
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the Chart widget.
+///
+///
+///
+/// Plots datasets in a cartesian coordinate system.
+/// ```java
+/// chart()
+///     .dataset(Dataset.builder()
+///         .name("Series 1")
+///         .data(new double[][] {{0,1}, {1,3}, {2,2}})
+///         .build())
+///     .xAxis(Axis.builder().bounds(0, 4).build())
+///     .yAxis(Axis.builder().bounds(0, 5).build())
+///     .title("My Chart")
+///     .rounded()
+/// }
+/// ```
 public final class ChartElement extends StyledElement<ChartElement> {
 
     private final List<Dataset> datasets = new ArrayList<>();
@@ -55,92 +56,70 @@ public final class ChartElement extends StyledElement<ChartElement> {
     public ChartElement() {
     }
 
-    /**
-     * Adds a dataset.
-     */
+    /// Adds a dataset.
     public ChartElement dataset(Dataset dataset) {
         this.datasets.add(dataset);
         return this;
     }
 
-    /**
-     * Sets all datasets.
-     */
+    /// Sets all datasets.
     public ChartElement datasets(Dataset... datasets) {
         this.datasets.clear();
         this.datasets.addAll(Arrays.asList(datasets));
         return this;
     }
 
-    /**
-     * Sets all datasets from a list.
-     */
+    /// Sets all datasets from a list.
     public ChartElement datasets(List<Dataset> datasets) {
         this.datasets.clear();
         this.datasets.addAll(datasets);
         return this;
     }
 
-    /**
-     * Sets the X-axis configuration.
-     */
+    /// Sets the X-axis configuration.
     public ChartElement xAxis(Axis xAxis) {
         this.xAxis = xAxis != null ? xAxis : Axis.defaults();
         return this;
     }
 
-    /**
-     * Sets the Y-axis configuration.
-     */
+    /// Sets the Y-axis configuration.
     public ChartElement yAxis(Axis yAxis) {
         this.yAxis = yAxis != null ? yAxis : Axis.defaults();
         return this;
     }
 
-    /**
-     * Sets both axis bounds.
-     */
+    /// Sets both axis bounds.
     public ChartElement bounds(double xMin, double xMax, double yMin, double yMax) {
         this.xAxis = Axis.builder().bounds(xMin, xMax).build();
         this.yAxis = Axis.builder().bounds(yMin, yMax).build();
         return this;
     }
 
-    /**
-     * Sets the legend position.
-     */
+    /// Sets the legend position.
     public ChartElement legendPosition(LegendPosition position) {
         this.legendPosition = position;
         return this;
     }
 
-    /**
-     * Hides the legend.
-     */
+    /// Hides the legend.
     public ChartElement hideLegend() {
         this.legendPosition = null;
         return this;
     }
 
-    /**
-     * Sets the title.
-     */
+    /// Sets the title.
     public ChartElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public ChartElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public ChartElement borderColor(Color color) {
         this.borderColor = color;
         return this;
@@ -192,3 +171,4 @@ public final class ChartElement extends StyledElement<ChartElement> {
         frame.renderWidget(builder.build(), area);
     }
 }
+

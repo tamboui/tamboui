@@ -23,22 +23,23 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/**
- * A DSL wrapper for the Canvas widget.
- * <p>
- * Draws arbitrary shapes on a coordinate system.
- * <pre>{@code
- * canvas()
- *     .xBounds(-10, 10)
- *     .yBounds(-10, 10)
- *     .marker(Marker.BRAILLE)
- *     .paint(ctx -> {
- *         ctx.draw(new Circle(0, 0, 5, Color.RED));
- *     })
- *     .title("Drawing")
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the Canvas widget.
+///
+///
+///
+/// Draws arbitrary shapes on a coordinate system.
+/// ```java
+/// canvas()
+///     .xBounds(-10, 10)
+///     .yBounds(-10, 10)
+///     .marker(Marker.BRAILLE)
+///     .paint(ctx -> {
+///         ctx.draw(new Circle(0, 0, 5, Color.RED));
+///     })
+///     .title("Drawing")
+///     .rounded()
+/// }
+/// ```
 public final class CanvasElement extends StyledElement<CanvasElement> {
 
     private double xMin = 0.0;
@@ -55,27 +56,21 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     public CanvasElement() {
     }
 
-    /**
-     * Sets the X-axis bounds.
-     */
+    /// Sets the X-axis bounds.
     public CanvasElement xBounds(double min, double max) {
         this.xMin = min;
         this.xMax = max;
         return this;
     }
 
-    /**
-     * Sets the Y-axis bounds.
-     */
+    /// Sets the Y-axis bounds.
     public CanvasElement yBounds(double min, double max) {
         this.yMin = min;
         this.yMax = max;
         return this;
     }
 
-    /**
-     * Sets both axis bounds.
-     */
+    /// Sets both axis bounds.
     public CanvasElement bounds(double xMin, double xMax, double yMin, double yMax) {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -84,81 +79,61 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
         return this;
     }
 
-    /**
-     * Sets the marker type for rendering points.
-     */
+    /// Sets the marker type for rendering points.
     public CanvasElement marker(Marker marker) {
         this.marker = marker != null ? marker : Marker.BRAILLE;
         return this;
     }
 
-    /**
-     * Uses Braille marker (highest resolution).
-     */
+    /// Uses Braille marker (highest resolution).
     public CanvasElement braille() {
         this.marker = Marker.BRAILLE;
         return this;
     }
 
-    /**
-     * Uses half-block marker.
-     */
+    /// Uses half-block marker.
     public CanvasElement halfBlock() {
         this.marker = Marker.HALF_BLOCK;
         return this;
     }
 
-    /**
-     * Uses dot marker.
-     */
+    /// Uses dot marker.
     public CanvasElement dot() {
         this.marker = Marker.DOT;
         return this;
     }
 
-    /**
-     * Uses block marker.
-     */
+    /// Uses block marker.
     public CanvasElement block() {
         this.marker = Marker.BLOCK;
         return this;
     }
 
-    /**
-     * Sets the background color.
-     */
+    /// Sets the background color.
     public CanvasElement backgroundColor(Color color) {
         this.backgroundColor = color;
         return this;
     }
 
-    /**
-     * Sets the paint callback for drawing shapes.
-     */
+    /// Sets the paint callback for drawing shapes.
     public CanvasElement paint(Consumer<Context> callback) {
         this.paintCallback = callback;
         return this;
     }
 
-    /**
-     * Sets the title.
-     */
+    /// Sets the title.
     public CanvasElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public CanvasElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public CanvasElement borderColor(Color color) {
         this.borderColor = color;
         return this;
@@ -211,3 +186,4 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
         frame.renderWidget(builder.build(), area);
     }
 }
+

@@ -25,14 +25,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing RGB color support.
- * <p>
- * Displays the full range of RGB colors in an animated gradient.
- * Uses half-block characters (▀) to display two rows of pixels per screen row.
- * <p>
- * Requires a terminal that supports 24-bit color (true color).
- */
+/// Demo TUI application showcasing RGB color support.
+///
+///
+///
+/// Displays the full range of RGB colors in an animated gradient.
+/// Uses half-block characters (▀) to display two rows of pixels per screen row.
+///
+///
+///
+/// Requires a terminal that supports 24-bit color (true color).
 public class ColorsRgbDemo {
 
     private boolean running = true;
@@ -109,9 +111,7 @@ public class ColorsRgbDemo {
         frame.buffer().setLine(titleX, area.top(), titleLine);
     }
 
-    /**
-     * Widget that displays the current frames per second.
-     */
+    /// Widget that displays the current frames per second.
     private static class FpsWidget {
         private int frameCount = 0;
         private long lastTime = System.currentTimeMillis();
@@ -138,11 +138,11 @@ public class ColorsRgbDemo {
         }
     }
 
-    /**
-     * Widget that displays the full range of RGB colors.
-     * <p>
-     * Uses half-block characters (▀) to display two rows of pixels per screen row.
-     */
+    /// Widget that displays the full range of RGB colors.
+    ///
+    ///
+    ///
+    /// Uses half-block characters (▀) to display two rows of pixels per screen row.
     private static class ColorsWidget {
         private final List<List<Color.Rgb>> colors = new ArrayList<>();
         private int frameCount = 0;
@@ -217,14 +217,12 @@ public class ColorsRgbDemo {
             }
         }
 
-        /**
-         * Converts HSV color to RGB.
-         *
-         * @param h hue in degrees (0-360)
-         * @param s saturation (0-1)
-         * @param v value/brightness (0-1)
-         * @return RGB color
-         */
+        /// Converts HSV color to RGB.
+        ///
+        /// @param h hue in degrees (0-360)
+        /// @param s saturation (0-1)
+        /// @param v value/brightness (0-1)
+        /// @return RGB color
         private Color.Rgb hsvToRgb(float h, float s, float v) {
             float c = v * s;
             float hPrime = h / 60.0f;
@@ -271,4 +269,5 @@ public class ColorsRgbDemo {
         }
     }
 }
+
 

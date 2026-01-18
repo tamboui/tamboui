@@ -257,3 +257,4 @@ class ScrollbarStateTest {
         assertThat(state.scrollPercentage()).isEqualTo(0.0);
     }
 }
+

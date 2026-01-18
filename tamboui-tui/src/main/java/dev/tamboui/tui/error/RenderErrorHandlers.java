@@ -9,70 +9,69 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
-/**
- * Factory methods for common error handler implementations.
- * <p>
- * Provides pre-built handlers for common error handling scenarios:
- * <ul>
- *   <li>{@link #displayAndQuit()} - Default: show error in UI, wait for dismissal</li>
- *   <li>{@link #logAndQuit(PrintStream)} - Log to stream and quit immediately</li>
- *   <li>{@link #writeToFile(Path)} - Write to file then display in UI</li>
- * </ul>
- */
+/// Factory methods for common error handler implementations.
+///
+///
+///
+/// Provides pre-built handlers for common error handling scenarios:
+///
+/// - {@link #displayAndQuit()} - Default: show error in UI, wait for dismissal
+/// - {@link #logAndQuit(PrintStream)} - Log to stream and quit immediately
+/// - {@link #writeToFile(Path)} - Write to file then display in UI
 public final class RenderErrorHandlers {
 
     private RenderErrorHandlers() {
         // Factory class - no instantiation
     }
 
-    /**
-     * Returns the default handler that displays the error in the UI.
-     * <p>
-     * The error display shows the exception type, message, and a scrollable
-     * stack trace. Users can press 'q' to quit or use arrow keys to scroll.
-     *
-     * @return the default display-and-quit handler
-     */
+    /// Returns the default handler that displays the error in the UI.
+    ///
+    ///
+    ///
+    /// The error display shows the exception type, message, and a scrollable
+    /// stack trace. Users can press 'q' to quit or use arrow keys to scroll.
+    ///
+    /// @return the default display-and-quit handler
     public static RenderErrorHandler displayAndQuit() {
         return DisplayAndQuitHandler.INSTANCE;
     }
 
-    /**
-     * Returns a handler that logs the error to a stream and quits immediately.
-     * <p>
-     * The full stack trace is printed to the provided stream before the runner
-     * quits. The terminal is cleaned up before printing.
-     *
-     * @param output the output stream to log to
-     * @return a log-and-quit handler
-     */
+    /// Returns a handler that logs the error to a stream and quits immediately.
+    ///
+    ///
+    ///
+    /// The full stack trace is printed to the provided stream before the runner
+    /// quits. The terminal is cleaned up before printing.
+    ///
+    /// @param output the output stream to log to
+    /// @return a log-and-quit handler
     public static RenderErrorHandler logAndQuit(PrintStream output) {
         return new LogAndQuitHandler(output);
     }
 
-    /**
-     * Returns a handler that writes the error to a file, then displays in the UI.
-     * <p>
-     * This is useful when you want both a log file for debugging and immediate
-     * user feedback. If the file cannot be written, the handler falls back to
-     * just displaying in the UI.
-     *
-     * @param logFile the path to write the error log
-     * @return a write-to-file-then-display handler
-     */
+    /// Returns a handler that writes the error to a file, then displays in the UI.
+    ///
+    ///
+    ///
+    /// This is useful when you want both a log file for debugging and immediate
+    /// user feedback. If the file cannot be written, the handler falls back to
+    /// just displaying in the UI.
+    ///
+    /// @param logFile the path to write the error log
+    /// @return a write-to-file-then-display handler
     public static RenderErrorHandler writeToFile(Path logFile) {
         return new WriteToFileHandler(logFile);
     }
 
-    /**
-     * Returns a handler that suppresses errors and continues.
-     * <p>
-     * <strong>Warning:</strong> This is dangerous and should only be used in
-     * specific scenarios where you understand the implications. Errors are
-     * logged to the error output but rendering continues.
-     *
-     * @return a suppress handler
-     */
+    /// Returns a handler that suppresses errors and continues.
+    ///
+    ///
+    ///
+    /// **Warning:** This is dangerous and should only be used in
+    /// specific scenarios where you understand the implications. Errors are
+    /// logged to the error output but rendering continues.
+    ///
+    /// @return a suppress handler
     public static RenderErrorHandler suppress() {
         return SuppressHandler.INSTANCE;
     }
@@ -151,3 +150,4 @@ public final class RenderErrorHandlers {
         }
     }
 }
+

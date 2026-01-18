@@ -31,16 +31,18 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.time.Duration;
 import java.util.List;
 
-/**
- * Demo showcasing TFX integration with TuiRunner.
- * <p>
- * This demo shows how to use TfxIntegration to easily add effects to TUI applications.
- * <p>
- * Controls:
- * - 1-4: Trigger different effects
- * - Space: Clear all effects
- * - ESC/q: Quit
- */
+/// Demo showcasing TFX integration with TuiRunner.
+///
+///
+///
+/// This demo shows how to use TfxIntegration to easily add effects to TUI applications.
+///
+///
+///
+/// Controls:
+/// - 1-4: Trigger different effects
+/// - Space: Clear all effects
+/// - ESC/q: Quit
 public class TfxTuiDemo {
 
     private static final Color BG = Color.rgb(0x1a, 0x1a, 0x2e);
@@ -204,3 +206,4 @@ public class TfxTuiDemo {
         frame.renderWidget(Paragraph.builder().text(controls).build(), splits.get(2));
     }
 }
+

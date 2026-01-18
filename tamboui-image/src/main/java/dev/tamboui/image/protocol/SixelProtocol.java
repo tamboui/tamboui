@@ -16,23 +16,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Renders images using the Sixel graphics protocol.
- * <p>
- * Sixel is a DEC standard from the 1980s that encodes images as 6-pixel-high
- * horizontal strips. Each strip is encoded using ASCII characters where each
- * character represents a vertical column of 6 pixels.
- * <p>
- * Sixel is supported by: xterm (with configuration), mlterm, mintty, WezTerm,
- * Rio, Konsole (22+), and other terminals.
- *
- * <h2>Protocol Format</h2>
- * <pre>
- * ESC P [params] q [data] ESC \
- * </pre>
- *
- * @see <a href="https://en.wikipedia.org/wiki/Sixel">Sixel on Wikipedia</a>
- */
+/// Renders images using the Sixel graphics protocol.
+///
+///
+///
+/// Sixel is a DEC standard from the 1980s that encodes images as 6-pixel-high
+/// horizontal strips. Each strip is encoded using ASCII characters where each
+/// character represents a vertical column of 6 pixels.
+///
+///
+///
+/// Sixel is supported by: xterm (with configuration), mlterm, mintty, WezTerm,
+/// Rio, Konsole (22+), and other terminals.
+///
+/// ## Protocol Format
+/// ```
+/// ESC P [params] q [data] ESC \
+/// ```
+///
+/// @see <a href="https://en.wikipedia.org/wiki/Sixel">Sixel on Wikipedia</a>
 public final class SixelProtocol implements ImageProtocol {
 
     private static final String DCS = "\033P";  // Device Control String
@@ -45,18 +47,14 @@ public final class SixelProtocol implements ImageProtocol {
 
     private final int maxColors;
 
-    /**
-     * Creates a Sixel protocol with default settings (256 colors).
-     */
+    /// Creates a Sixel protocol with default settings (256 colors).
     public SixelProtocol() {
         this(MAX_COLORS);
     }
 
-    /**
-     * Creates a Sixel protocol with a custom color limit.
-     *
-     * @param maxColors maximum number of colors in the palette (1-256)
-     */
+    /// Creates a Sixel protocol with a custom color limit.
+    ///
+    /// @param maxColors maximum number of colors in the palette (1-256)
     public SixelProtocol(int maxColors) {
         this.maxColors = Math.max(1, Math.min(MAX_COLORS, maxColors));
     }
@@ -103,9 +101,7 @@ public final class SixelProtocol implements ImageProtocol {
         return TerminalImageProtocol.SIXEL;
     }
 
-    /**
-     * Encodes an image as Sixel data.
-     */
+    /// Encodes an image as Sixel data.
     private byte[] encodeSixel(ImageData image) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -201,9 +197,7 @@ public final class SixelProtocol implements ImageProtocol {
         return out.toByteArray();
     }
 
-    /**
-     * Appends a sixel character with optional repeat count.
-     */
+    /// Appends a sixel character with optional repeat count.
     private void appendSixel(StringBuilder sb, int sixelValue, int count) {
         char sixelChar = (char) (SIXEL_OFFSET + sixelValue);
         if (count > 3) {
@@ -216,9 +210,7 @@ public final class SixelProtocol implements ImageProtocol {
         }
     }
 
-    /**
-     * Builds a color palette from the image using simple quantization.
-     */
+    /// Builds a color palette from the image using simple quantization.
     private Map<Integer, Integer> buildPalette(ImageData image) {
         Map<Integer, Integer> colorCounts = new HashMap<>();
 
@@ -255,10 +247,8 @@ public final class SixelProtocol implements ImageProtocol {
         return palette;
     }
 
-    /**
-     * Quantizes a color to reduce the number of unique colors.
-     * Uses 6-6-6 RGB cube (216 colors) plus grayscale levels.
-     */
+    /// Quantizes a color to reduce the number of unique colors.
+    /// Uses 6-6-6 RGB cube (216 colors) plus grayscale levels.
     private static int quantizeColor(int argb) {
         int r = ImageData.red(argb);
         int g = ImageData.green(argb);
@@ -272,3 +262,4 @@ public final class SixelProtocol implements ImageProtocol {
         return 0xFF000000 | (r << 16) | (g << 8) | b;
     }
 }
+

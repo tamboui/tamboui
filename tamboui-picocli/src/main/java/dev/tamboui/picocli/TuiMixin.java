@@ -9,32 +9,33 @@ import picocli.CommandLine.Option;
 
 import java.time.Duration;
 
-/**
- * PicoCLI mixin that provides common TUI-related command line options.
- * <p>
- * Use this mixin to add TUI options to your existing commands without
- * extending {@link TuiCommand}.
- *
- * <pre>{@code
- * @Command(name = "myapp")
- * public class MyApp implements Callable<Integer> {
- *
- *     @Mixin
- *     TuiMixin tuiOptions;
- *
- *     @Override
- *     public Integer call() throws Exception {
- *         TuiConfig config = tuiOptions.toConfig();
- *         try (TuiRunner runner = TuiRunner.create(config)) {
- *             runner.run(...);
- *         }
- *         return 0;
- *     }
- * }
- * }</pre>
- *
- * @see TuiCommand
- */
+/// PicoCLI mixin that provides common TUI-related command line options.
+///
+///
+///
+/// Use this mixin to add TUI options to your existing commands without
+/// extending {@link TuiCommand}.
+///
+/// ```java
+/// @Command(name = "myapp")
+/// public class MyApp implements Callable<Integer> {
+///
+///     @Mixin
+///     TuiMixin tuiOptions;
+///
+///     @Override
+///     public Integer call() throws Exception {
+///         TuiConfig config = tuiOptions.toConfig();
+///         try (TuiRunner runner = TuiRunner.create(config)) {
+///             runner.run(...);
+///         }
+///         return 0;
+///     }
+/// }
+/// }
+/// ```
+///
+/// @see TuiCommand
 public class TuiMixin {
 
     @Option(
@@ -73,11 +74,9 @@ public class TuiMixin {
     )
     private int pollTimeoutMs;
 
-    /**
-     * Creates a TuiConfig based on the parsed CLI options.
-     *
-     * @return the TuiConfig
-     */
+    /// Creates a TuiConfig based on the parsed CLI options.
+    ///
+    /// @return the TuiConfig
     public TuiConfig toConfig() {
         TuiConfig.Builder builder = TuiConfig.builder()
                 .alternateScreen(!noAltScreen)
@@ -92,38 +91,29 @@ public class TuiMixin {
         return builder.build();
     }
 
-    /**
-     * Returns true if alternate screen mode is disabled.
-     */
+    /// Returns true if alternate screen mode is disabled.
     public boolean isNoAltScreen() {
         return noAltScreen;
     }
 
-    /**
-     * Returns true if the cursor should be shown.
-     */
+    /// Returns true if the cursor should be shown.
     public boolean isShowCursor() {
         return showCursor;
     }
 
-    /**
-     * Returns true if mouse capture is enabled.
-     */
+    /// Returns true if mouse capture is enabled.
     public boolean isMouseCapture() {
         return mouseCapture;
     }
 
-    /**
-     * Returns the tick rate in milliseconds, or 0 if ticks are disabled.
-     */
+    /// Returns the tick rate in milliseconds, or 0 if ticks are disabled.
     public int getTickRateMs() {
         return tickRateMs;
     }
 
-    /**
-     * Returns the poll timeout in milliseconds.
-     */
+    /// Returns the poll timeout in milliseconds.
     public int getPollTimeoutMs() {
         return pollTimeoutMs;
     }
 }
+

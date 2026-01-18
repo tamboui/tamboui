@@ -272,3 +272,4 @@ class TableTest {
         assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
     }
 }
+

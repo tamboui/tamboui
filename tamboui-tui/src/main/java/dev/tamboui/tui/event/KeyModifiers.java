@@ -4,21 +4,19 @@
  */
 package dev.tamboui.tui.event;
 
-/**
- * Represents keyboard modifier keys (Ctrl, Alt, Shift).
- */
+/// Represents keyboard modifier keys (Ctrl, Alt, Shift).
 public final class KeyModifiers {
 
-    /** No modifiers pressed. */
+    /// No modifiers pressed.
     public static final KeyModifiers NONE = new KeyModifiers(false, false, false);
 
-    /** Only Ctrl pressed. */
+    /// Only Ctrl pressed.
     public static final KeyModifiers CTRL = new KeyModifiers(true, false, false);
 
-    /** Only Alt pressed. */
+    /// Only Alt pressed.
     public static final KeyModifiers ALT = new KeyModifiers(false, true, false);
 
-    /** Only Shift pressed. */
+    /// Only Shift pressed.
     public static final KeyModifiers SHIFT = new KeyModifiers(false, false, true);
 
     private final boolean ctrl;
@@ -31,9 +29,7 @@ public final class KeyModifiers {
         this.shift = shift;
     }
 
-    /**
-     * Creates modifiers with the specified flags.
-     */
+    /// Creates modifiers with the specified flags.
     public static KeyModifiers of(boolean ctrl, boolean alt, boolean shift) {
         if (!ctrl && !alt && !shift) {
             return NONE;
@@ -53,16 +49,12 @@ public final class KeyModifiers {
         return shift;
     }
 
-    /**
-     * Returns true if no modifiers are pressed.
-     */
+    /// Returns true if no modifiers are pressed.
     public boolean isEmpty() {
         return !ctrl && !alt && !shift;
     }
 
-    /**
-     * Returns true if any modifier is pressed.
-     */
+    /// Returns true if any modifier is pressed.
     public boolean hasAny() {
         return ctrl || alt || shift;
     }
@@ -92,3 +84,4 @@ public final class KeyModifiers {
         return String.format("KeyModifiers[ctrl=%s, alt=%s, shift=%s]", ctrl, alt, shift);
     }
 }
+

@@ -26,35 +26,43 @@ import java.util.Map;
 
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
-/**
- * A DSL wrapper for the TextInput widget.
- * <p>
- * A single-line text input field. This element is always focusable to receive
- * keyboard input for text editing.
- * <pre>{@code
- * textInput(inputState)
- *     .placeholder("Enter name...")
- *     .title("Name")
- *     .rounded()
- * }</pre>
- *
- * <h2>CSS Child Selectors</h2>
- * <p>
- * The following child selectors can be used to style sub-components:
- * <ul>
- *   <li>{@code TextInputElement-cursor} - The cursor style (default: reversed)</li>
- *   <li>{@code TextInputElement-placeholder} - The placeholder text style (default: dim)</li>
- * </ul>
- * <p>
- * Example CSS:
- * <pre>{@code
- * TextInputElement-cursor { text-style: reversed; background: yellow; }
- * TextInputElement-placeholder { color: gray; text-style: italic; }
- * }</pre>
- * <p>
- * Note: Programmatic styles set via {@link #cursorStyle(Style)} or {@link #placeholderStyle(Style)}
- * take precedence over CSS styles.
- */
+/// A DSL wrapper for the TextInput widget.
+///
+///
+///
+/// A single-line text input field. This element is always focusable to receive
+/// keyboard input for text editing.
+/// ```java
+/// textInput(inputState)
+///     .placeholder("Enter name...")
+///     .title("Name")
+///     .rounded()
+/// }
+/// ```
+///
+/// ## CSS Child Selectors
+///
+///
+///
+/// The following child selectors can be used to style sub-components:
+///
+/// - {@code TextInputElement-cursor} - The cursor style (default: reversed)
+/// - {@code TextInputElement-placeholder} - The placeholder text style (default: dim)
+///
+///
+///
+///
+/// Example CSS:
+/// ```java
+/// TextInputElement-cursor { text-style: reversed; background: yellow; }
+/// TextInputElement-placeholder { color: gray; text-style: italic; }
+/// }
+/// ```
+///
+///
+///
+/// Note: Programmatic styles set via {@link #cursorStyle(Style)} or {@link #placeholderStyle(Style)}
+/// take precedence over CSS styles.
 public final class TextInputElement extends StyledElement<TextInputElement> {
 
     private static final Style DEFAULT_CURSOR_STYLE = Style.EMPTY.reversed();
@@ -85,27 +93,21 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         }
     }
 
-    /**
-     * TextInputElement is always focusable to receive keyboard input.
-     *
-     * @return always returns true
-     */
+    /// TextInputElement is always focusable to receive keyboard input.
+    ///
+    /// @return always returns true
     @Override
     public boolean isFocusable() {
         return true;
     }
 
-    /**
-     * Sets the text input state.
-     */
+    /// Sets the text input state.
     public TextInputElement state(TextInputState state) {
         this.state = state != null ? state : new TextInputState();
         return this;
     }
 
-    /**
-     * Sets the initial text.
-     */
+    /// Sets the initial text.
     public TextInputElement text(String text) {
         if (state != null && text != null) {
             state.setText(text);
@@ -113,65 +115,49 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         return this;
     }
 
-    /**
-     * Sets the placeholder text.
-     */
+    /// Sets the placeholder text.
     public TextInputElement placeholder(String placeholder) {
         this.placeholder = placeholder != null ? placeholder : "";
         return this;
     }
 
-    /**
-     * Sets the placeholder style.
-     */
+    /// Sets the placeholder style.
     public TextInputElement placeholderStyle(Style style) {
         this.placeholderStyle = style;
         return this;
     }
 
-    /**
-     * Sets the placeholder color.
-     */
+    /// Sets the placeholder color.
     public TextInputElement placeholderColor(Color color) {
         this.placeholderStyle = Style.EMPTY.fg(color);
         return this;
     }
 
-    /**
-     * Sets the cursor style.
-     */
+    /// Sets the cursor style.
     public TextInputElement cursorStyle(Style style) {
         this.cursorStyle = style;
         return this;
     }
 
-    /**
-     * Sets whether to show the cursor.
-     */
+    /// Sets whether to show the cursor.
     public TextInputElement showCursor(boolean show) {
         this.showCursor = show;
         return this;
     }
 
-    /**
-     * Sets the title for the border.
-     */
+    /// Sets the title for the border.
     public TextInputElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public TextInputElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public TextInputElement borderColor(Color color) {
         this.borderColor = color;
         return this;
@@ -189,16 +175,16 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         return Collections.unmodifiableMap(attrs);
     }
 
-    /**
-     * Handles a key event for text input.
-     * <p>
-     * Handles: character input, backspace, delete, left/right arrows, home/end.
-     * Only processes events when focused.
-     *
-     * @param event the key event
-     * @param focused whether this element is currently focused
-     * @return HANDLED if the event was processed, UNHANDLED otherwise
-     */
+    /// Handles a key event for text input.
+    ///
+    ///
+    ///
+    /// Handles: character input, backspace, delete, left/right arrows, home/end.
+    /// Only processes events when focused.
+    ///
+    /// @param event the key event
+    /// @param focused whether this element is currently focused
+    /// @return HANDLED if the event was processed, UNHANDLED otherwise
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (!focused) {
@@ -248,3 +234,4 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         }
     }
 }
+

@@ -11,9 +11,7 @@ import java.util.function.Supplier;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A panel displaying system information.
- */
+/// A panel displaying system information.
 final class SystemInfoPanel extends PanelContent {
     private final Supplier<String> uptimeSupplier;
 
@@ -38,3 +36,4 @@ final class SystemInfoPanel extends PanelContent {
         );
     }
 }
+

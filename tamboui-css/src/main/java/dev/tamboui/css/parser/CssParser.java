@@ -11,26 +11,25 @@ import dev.tamboui.css.selector.*;
 
 import java.util.*;
 
-/**
- * Recursive descent parser for Textual-style CSS.
- * <p>
- * Parses CSS input into a Stylesheet containing variables and rules.
- * Supports:
- * <ul>
- *   <li>Variables: {@code $name: value;}</li>
- *   <li>Type selectors: {@code Panel { ... }}</li>
- *   <li>ID selectors: {@code #sidebar { ... }}</li>
- *   <li>Class selectors: {@code .error { ... }}</li>
- *   <li>Universal selector: {@code * { ... }}</li>
- *   <li>Pseudo-classes: {@code :focus, :hover, :disabled}</li>
- *   <li>Compound selectors: {@code Panel.primary#sidebar}</li>
- *   <li>Descendant combinator: {@code Panel Button { ... }}</li>
- *   <li>Child combinator: {@code Panel > Button { ... }}</li>
- *   <li>Nested rules: {@code Panel { &:focus { ... } }}</li>
- *   <li>Selector lists: {@code .foo, .bar { ... }}</li>
- *   <li>Attribute selectors: {@code Panel[title="Test"] { ... }}</li>
- * </ul>
- */
+/// Recursive descent parser for Textual-style CSS.
+///
+///
+///
+/// Parses CSS input into a Stylesheet containing variables and rules.
+/// Supports:
+///
+/// - Variables: {@code $name: value;}
+/// - Type selectors: {@code Panel { ... }}
+/// - ID selectors: {@code #sidebar { ... }}
+/// - Class selectors: {@code .error { ... }}
+/// - Universal selector: {@code * { ... }}
+/// - Pseudo-classes: {@code :focus, :hover, :disabled}
+/// - Compound selectors: {@code Panel.primary#sidebar}
+/// - Descendant combinator: {@code Panel Button { ... }}
+/// - Child combinator: {@code Panel > Button { ... }}
+/// - Nested rules: {@code Panel { &:focus { ... } }}
+/// - Selector lists: {@code .foo, .bar { ... }}
+/// - Attribute selectors: {@code Panel[title="Test"] { ... }}
 public final class CssParser {
 
     private final List<Token> tokens;
@@ -43,13 +42,11 @@ public final class CssParser {
         this.ruleOrder = 0;
     }
 
-    /**
-     * Parses CSS input into a stylesheet.
-     *
-     * @param css the CSS source code
-     * @return the parsed stylesheet
-     * @throws CssParseException if parsing fails
-     */
+    /// Parses CSS input into a stylesheet.
+    ///
+    /// @param css the CSS source code
+    /// @return the parsed stylesheet
+    /// @throws CssParseException if parsing fails
     public static Stylesheet parse(String css) {
         CssLexer lexer = new CssLexer(css);
         List<Token> tokens = lexer.tokenizeFiltered();
@@ -533,3 +530,4 @@ public final class CssParser {
                 token.position());
     }
 }
+

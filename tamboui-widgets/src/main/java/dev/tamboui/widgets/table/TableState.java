@@ -6,91 +6,76 @@ package dev.tamboui.widgets.table;
 
 import java.util.List;
 
-/**
- * State for a {@link Table} widget.
- * <p>
- * Tracks the currently selected row and manages scrolling offset for tables
- * that don't fit in the display area.
- *
- * <pre>{@code
- * TableState state = new TableState();
- * state.select(0); // Select first row
- *
- * // In event handling:
- * state.selectNext(table.rows().size());
- * state.selectPrevious();
- * }</pre>
- */
+/// State for a {@link Table} widget.
+///
+///
+///
+/// Tracks the currently selected row and manages scrolling offset for tables
+/// that don't fit in the display area.
+///
+/// ```java
+/// TableState state = new TableState();
+/// state.select(0); // Select first row
+///
+/// // In event handling:
+/// state.selectNext(table.rows().size());
+/// state.selectPrevious();
+/// }
+/// ```
 public final class TableState {
 
     private Integer selected;
     private int offset;
 
-    /**
-     * Creates a new table state with no selection.
-     */
+    /// Creates a new table state with no selection.
     public TableState() {
         this.selected = null;
         this.offset = 0;
     }
 
-    /**
-     * Returns the index of the currently selected row, or null if nothing is selected.
-     *
-     * @return the selected row index, or null if nothing is selected
-     */
+    /// Returns the index of the currently selected row, or null if nothing is selected.
+    ///
+    /// @return the selected row index, or null if nothing is selected
     public Integer selected() {
         return selected;
     }
 
-    /**
-     * Returns the scroll offset.
-     *
-     * @return the scroll offset
-     */
+    /// Returns the scroll offset.
+    ///
+    /// @return the scroll offset
     public int offset() {
         return offset;
     }
 
-    /**
-     * Selects the row at the given index.
-     *
-     * @param index the row index to select
-     */
+    /// Selects the row at the given index.
+    ///
+    /// @param index the row index to select
     public void select(int index) {
         this.selected = Math.max(0, index);
     }
 
-    /**
-     * Clears the selection.
-     */
+    /// Clears the selection.
     public void clearSelection() {
         this.selected = null;
     }
 
-    /**
-     * Selects the first row.
-     */
+    /// Selects the first row.
     public void selectFirst() {
         this.selected = 0;
     }
 
-    /**
-     * Selects the last row.
-     *
-     * @param rowCount the total number of rows
-     */
+    /// Selects the last row.
+    ///
+    /// @param rowCount the total number of rows
     public void selectLast(int rowCount) {
         if (rowCount > 0) {
             this.selected = rowCount - 1;
         }
     }
 
-    /**
-     * Selects the next row.
-     *
-     * @param rowCount the total number of rows
-     */
+    /// Selects the next row.
+    ///
+    /// @param rowCount the total number of rows
     public void selectNext(int rowCount) {
         if (selected == null) {
             if (rowCount > 0) {
@@ -101,9 +86,7 @@ public final class TableState {
         }
     }
 
-    /**
-     * Selects the previous row.
-     */
+    /// Selects the previous row.
     public void selectPrevious() {
         if (selected == null) {
             selected = 0;
@@ -112,12 +95,10 @@ public final class TableState {
         }
     }
 
-    /**
-     * Scrolls to make the selected row visible.
-     *
-     * @param visibleRows the number of rows visible in the display area
-     * @param rows the list of rows
-     */
+    /// Scrolls to make the selected row visible.
+    ///
+    /// @param visibleRows the number of rows visible in the display area
+    /// @param rows the list of rows
     public void scrollToSelected(int visibleRows, List<Row> rows) {
         if (selected == null || rows.isEmpty()) {
             return;
@@ -145,12 +126,11 @@ public final class TableState {
         offset = Math.max(0, offset);
     }
 
-    /**
-     * Sets the scroll offset directly.
-     *
-     * @param offset the scroll offset to set
-     */
+    /// Sets the scroll offset directly.
+    ///
+    /// @param offset the scroll offset to set
     public void setOffset(int offset) {
         this.offset = Math.max(0, offset);
     }
 }
+

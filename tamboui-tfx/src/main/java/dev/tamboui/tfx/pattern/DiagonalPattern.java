@@ -7,59 +7,45 @@ package dev.tamboui.tfx.pattern;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 
-/**
- * Diagonal pattern that sweeps diagonally across the area.
- */
+/// Diagonal pattern that sweeps diagonally across the area.
 public final class DiagonalPattern implements Pattern {
     
-    /**
-     * Direction variants for diagonal sweep patterns.
-     */
+    /// Direction variants for diagonal sweep patterns.
     public enum DiagonalDirection {
-        /** Sweeps diagonally from top-left corner to bottom-right corner */
+        /// Sweeps diagonally from top-left corner to bottom-right corner
         TOP_LEFT_TO_BOTTOM_RIGHT,
-        /** Sweeps diagonally from top-right corner to bottom-left corner */
+        /// Sweeps diagonally from top-right corner to bottom-left corner
         TOP_RIGHT_TO_BOTTOM_LEFT,
-        /** Sweeps diagonally from bottom-left corner to top-right corner */
+        /// Sweeps diagonally from bottom-left corner to top-right corner
         BOTTOM_LEFT_TO_TOP_RIGHT,
-        /** Sweeps diagonally from bottom-right corner to top-left corner */
+        /// Sweeps diagonally from bottom-right corner to top-left corner
         BOTTOM_RIGHT_TO_TOP_LEFT
     }
     
     private final DiagonalDirection direction;
     private final TransitionProgress transition;
     
-    /**
-     * Creates a diagonal pattern from top-left to bottom-right.
-     */
+    /// Creates a diagonal pattern from top-left to bottom-right.
     public static DiagonalPattern topLeftToBottomRight() {
         return new DiagonalPattern(DiagonalDirection.TOP_LEFT_TO_BOTTOM_RIGHT, 2.0f);
     }
     
-    /**
-     * Creates a diagonal pattern from top-right to bottom-left.
-     */
+    /// Creates a diagonal pattern from top-right to bottom-left.
     public static DiagonalPattern topRightToBottomLeft() {
         return new DiagonalPattern(DiagonalDirection.TOP_RIGHT_TO_BOTTOM_LEFT, 2.0f);
     }
     
-    /**
-     * Creates a diagonal pattern from bottom-left to top-right.
-     */
+    /// Creates a diagonal pattern from bottom-left to top-right.
     public static DiagonalPattern bottomLeftToTopRight() {
         return new DiagonalPattern(DiagonalDirection.BOTTOM_LEFT_TO_TOP_RIGHT, 2.0f);
     }
     
-    /**
-     * Creates a diagonal pattern from bottom-right to top-left.
-     */
+    /// Creates a diagonal pattern from bottom-right to top-left.
     public static DiagonalPattern bottomRightToTopLeft() {
         return new DiagonalPattern(DiagonalDirection.BOTTOM_RIGHT_TO_TOP_LEFT, 2.0f);
     }
     
-    /**
-     * Creates a diagonal pattern with specified direction and transition width.
-     */
+    /// Creates a diagonal pattern with specified direction and transition width.
     public static DiagonalPattern newPattern(DiagonalDirection direction, float transitionWidth) {
         return new DiagonalPattern(direction, transitionWidth);
     }
@@ -69,9 +55,7 @@ public final class DiagonalPattern implements Pattern {
         this.transition = new TransitionProgress(transitionWidth);
     }
     
-    /**
-     * Creates a new pattern with a different transition width.
-     */
+    /// Creates a new pattern with a different transition width.
     public DiagonalPattern withTransitionWidth(float width) {
         return new DiagonalPattern(direction, width);
     }
@@ -119,5 +103,6 @@ public final class DiagonalPattern implements Pattern {
         return "diagonal_" + direction.name().toLowerCase();
     }
 }
+
 
 

@@ -21,23 +21,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A horizontal layout container that arranges children in a row.
- * <p>
- * Layout properties can be set via CSS or programmatically:
- * <ul>
- *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
- *   <li>{@code spacing} - Gap between children in cells</li>
- *   <li>{@code margin} - Margin around the row</li>
- * </ul>
- * <p>
- * Programmatic values override CSS values when both are set.
- * <p>
- * Example usage:
- * <pre>
- * row(child1, child2, child3).flex(Flex.CENTER).spacing(1)
- * </pre>
- */
+/// A horizontal layout container that arranges children in a row.
+///
+///
+///
+/// Layout properties can be set via CSS or programmatically:
+///
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code spacing} - Gap between children in cells
+/// - {@code margin} - Margin around the row
+///
+///
+///
+///
+/// Programmatic values override CSS values when both are set.
+///
+///
+///
+/// Example usage:
+/// ```
+/// row(child1, child2, child3).flex(Flex.CENTER).spacing(1)
+/// ```
 public final class Row extends ContainerElement<Row> {
 
     private Integer spacing;
@@ -51,52 +55,50 @@ public final class Row extends ContainerElement<Row> {
         this.children.addAll(Arrays.asList(children));
     }
 
-    /**
-     * Sets the spacing between children.
-     * <p>
-     * Can also be set via CSS {@code spacing} property.
-     *
-     * @param spacing spacing in cells between adjacent children
-     * @return this row for method chaining
-     */
+    /// Sets the spacing between children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code spacing} property.
+    ///
+    /// @param spacing spacing in cells between adjacent children
+    /// @return this row for method chaining
     public Row spacing(int spacing) {
         this.spacing = Math.max(0, spacing);
         return this;
     }
 
-    /**
-     * Sets how remaining space is distributed among children.
-     * <p>
-     * Can also be set via CSS {@code flex} property.
-     *
-     * @param flex the flex mode for space distribution
-     * @return this row for method chaining
-     * @see Flex
-     */
+    /// Sets how remaining space is distributed among children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code flex} property.
+    ///
+    /// @param flex the flex mode for space distribution
+    /// @return this row for method chaining
+    /// @see Flex
     public Row flex(Flex flex) {
         this.flex = flex;
         return this;
     }
 
-    /**
-     * Sets the margin around the row.
-     * <p>
-     * Can also be set via CSS {@code margin} property.
-     *
-     * @param margin the margin
-     * @return this row for method chaining
-     */
+    /// Sets the margin around the row.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code margin} property.
+    ///
+    /// @param margin the margin
+    /// @return this row for method chaining
     public Row margin(Margin margin) {
         this.margin = margin;
         return this;
     }
 
-    /**
-     * Sets uniform margin around the row.
-     *
-     * @param value the margin value for all sides
-     * @return this row for method chaining
-     */
+    /// Sets uniform margin around the row.
+    ///
+    /// @param value the margin value for all sides
+    /// @return this row for method chaining
     public Row margin(int value) {
         this.margin = Margin.uniform(value);
         return this;
@@ -211,3 +213,4 @@ public final class Row extends ContainerElement<Row> {
         }
     }
 }
+

@@ -9,9 +9,7 @@ import dev.tamboui.style.Color;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A panel with an auto-animating progress bar.
- */
+/// A panel with an auto-animating progress bar.
 final class ProgressPanel extends PanelContent {
     private int progressValue = 0;
     private boolean progressDirection = true;
@@ -50,3 +48,4 @@ final class ProgressPanel extends PanelContent {
         );
     }
 }
+

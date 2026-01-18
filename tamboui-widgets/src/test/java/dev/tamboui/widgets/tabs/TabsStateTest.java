@@ -144,3 +144,4 @@ class TabsStateTest {
         assertThat(state.selected()).isNull();
     }
 }
+

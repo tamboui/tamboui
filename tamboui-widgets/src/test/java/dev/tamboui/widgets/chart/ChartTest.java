@@ -371,3 +371,4 @@ class ChartTest {
         assertThat(chart).isNotNull();
     }
 }
+

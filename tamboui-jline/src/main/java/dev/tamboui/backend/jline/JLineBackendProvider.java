@@ -9,11 +9,11 @@ import dev.tamboui.terminal.BackendProvider;
 
 import java.io.IOException;
 
-/**
- * {@link BackendProvider} implementation for JLine 3.
- * <p>
- * This provider is registered via the Java {@link java.util.ServiceLoader} mechanism.
- */
+/// {@link BackendProvider} implementation for JLine 3.
+///
+///
+///
+/// This provider is registered via the Java {@link java.util.ServiceLoader} mechanism.
 public class JLineBackendProvider implements BackendProvider {
 
     @Override
@@ -26,3 +26,4 @@ public class JLineBackendProvider implements BackendProvider {
         return new JLineBackend();
     }
 }
+

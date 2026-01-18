@@ -4,40 +4,32 @@
  */
 package dev.tamboui.css.parser;
 
-/**
- * Exception thrown when CSS parsing fails.
- */
+/// Exception thrown when CSS parsing fails.
 public final class CssParseException extends RuntimeException {
 
     private final Token.Position position;
 
-    /**
-     * Creates a new parse exception with a message and position.
-     *
-     * @param message  the error message
-     * @param position the position in the source where the error occurred
-     */
+    /// Creates a new parse exception with a message and position.
+    ///
+    /// @param message  the error message
+    /// @param position the position in the source where the error occurred
     public CssParseException(String message, Token.Position position) {
         super(formatMessage(message, position));
         this.position = position;
     }
 
-    /**
-     * Creates a new parse exception with a message and cause.
-     *
-     * @param message the error message
-     * @param cause   the underlying cause
-     */
+    /// Creates a new parse exception with a message and cause.
+    ///
+    /// @param message the error message
+    /// @param cause   the underlying cause
     public CssParseException(String message, Throwable cause) {
         super(message, cause);
         this.position = Token.Position.UNKNOWN;
     }
 
-    /**
-     * Returns the position in the source where the error occurred.
-     *
-     * @return the error position
-     */
+    /// Returns the position in the source where the error occurred.
+    ///
+    /// @return the error position
     public Token.Position getPosition() {
         return position;
     }
@@ -50,3 +42,4 @@ public final class CssParseException extends RuntimeException {
         return "CSS parse error: " + message;
     }
 }
+

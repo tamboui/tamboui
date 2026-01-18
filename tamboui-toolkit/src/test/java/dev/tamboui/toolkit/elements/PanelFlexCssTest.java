@@ -20,9 +20,7 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests that Panel consumes CSS flex layout properties.
- */
+/// Tests that Panel consumes CSS flex layout properties.
 class PanelFlexCssTest {
 
     private StyleEngine styleEngine;
@@ -198,3 +196,4 @@ class PanelFlexCssTest {
         assertThat(borderChar).isNotEqualTo(" ");
     }
 }
+

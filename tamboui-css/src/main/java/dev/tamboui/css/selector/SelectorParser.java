@@ -7,32 +7,35 @@ package dev.tamboui.css.selector;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Parses CSS selector strings into {@link Selector} objects.
- * <p>
- * This parser supports the full CSS selector syntax used by the tamboui CSS module:
- * <ul>
- *   <li>{@code *} - Universal selector</li>
- *   <li>{@code Type} - Type selector</li>
- *   <li>{@code #id} - ID selector</li>
- *   <li>{@code .class} - Class selector</li>
- *   <li>{@code :pseudo} - Pseudo-class selector</li>
- *   <li>{@code [attr]} - Attribute existence selector</li>
- *   <li>{@code [attr=value]} - Attribute equals selector</li>
- *   <li>{@code [attr^=value]} - Attribute starts-with selector</li>
- *   <li>{@code [attr$=value]} - Attribute ends-with selector</li>
- *   <li>{@code [attr*=value]} - Attribute contains selector</li>
- *   <li>{@code A B} - Descendant combinator</li>
- *   <li>{@code A > B} - Child combinator</li>
- *   <li>{@code A.class#id} - Compound selectors</li>
- * </ul>
- * <p>
- * <b>Usage:</b>
- * <pre>{@code
- * Selector selector = SelectorParser.parse(".primary.large");
- * boolean matches = selector.matches(element, state, ancestors);
- * }</pre>
- */
+/// Parses CSS selector strings into {@link Selector} objects.
+///
+///
+///
+/// This parser supports the full CSS selector syntax used by the tamboui CSS module:
+///
+/// - {@code *} - Universal selector
+/// - {@code Type} - Type selector
+/// - {@code #id} - ID selector
+/// - {@code .class} - Class selector
+/// - {@code :pseudo} - Pseudo-class selector
+/// - {@code [attr]} - Attribute existence selector
+/// - {@code [attr=value]} - Attribute equals selector
+/// - {@code [attr^=value]} - Attribute starts-with selector
+/// - {@code [attr$=value]} - Attribute ends-with selector
+/// - {@code [attr*=value]} - Attribute contains selector
+/// - {@code A B} - Descendant combinator
+/// - {@code A > B} - Child combinator
+/// - {@code A.class#id} - Compound selectors
+///
+///
+///
+///
+/// **Usage:**
+/// ```java
+/// Selector selector = SelectorParser.parse(".primary.large");
+/// boolean matches = selector.matches(element, state, ancestors);
+/// }
+/// ```
 public final class SelectorParser {
 
     private final String input;
@@ -43,13 +46,11 @@ public final class SelectorParser {
         this.pos = 0;
     }
 
-    /**
-     * Parses a CSS selector string into a Selector object.
-     *
-     * @param selector the CSS selector string
-     * @return the parsed Selector
-     * @throws IllegalArgumentException if the selector is invalid
-     */
+    /// Parses a CSS selector string into a Selector object.
+    ///
+    /// @param selector the CSS selector string
+    /// @return the parsed Selector
+    /// @throws IllegalArgumentException if the selector is invalid
     public static Selector parse(String selector) {
         if (selector == null || selector.isEmpty()) {
             throw new IllegalArgumentException("Selector cannot be null or empty");
@@ -285,3 +286,4 @@ public final class SelectorParser {
         return c == '*' || c == '#' || c == '.' || c == ':' || c == '[' || Character.isLetter(c);
     }
 }
+

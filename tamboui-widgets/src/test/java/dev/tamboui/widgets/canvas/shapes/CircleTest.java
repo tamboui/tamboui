@@ -105,3 +105,4 @@ class CircleTest {
         // Should not throw, should do nothing
     }
 }
+

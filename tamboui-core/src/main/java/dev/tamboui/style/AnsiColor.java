@@ -4,9 +4,7 @@
  */
 package dev.tamboui.style;
 
-/**
- * Standard ANSI 16 colors (8 normal + 8 bright).
- */
+/// Standard ANSI 16 colors (8 normal + 8 bright).
 public enum AnsiColor {
     BLACK(0),
     RED(1),
@@ -31,24 +29,19 @@ public enum AnsiColor {
         this.code = code;
     }
 
-    /**
-     * Returns the ANSI palette index (0-15).
-     */
+    /// Returns the ANSI palette index (0-15).
     public int code() {
         return code;
     }
 
-    /**
-     * Returns the ANSI SGR code for foreground.
-     */
+    /// Returns the ANSI SGR code for foreground.
     public int fgCode() {
         return code < 8 ? 30 + code : 90 + (code - 8);
     }
 
-    /**
-     * Returns the ANSI SGR code for background.
-     */
+    /// Returns the ANSI SGR code for background.
     public int bgCode() {
         return code < 8 ? 40 + code : 100 + (code - 8);
     }
 }
+

@@ -11,19 +11,21 @@ import dev.tamboui.text.Span;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The drawing context for a {@link Canvas}.
- * <p>
- * Maintains the painting state during canvas operations, including
- * the grid of points, text labels, and layer management.
- * <p>
- * Applications typically don't create Context instances directly.
- * Instead, the Canvas widget creates and passes a Context to the
- * paint callback.
- *
- * @see Canvas
- * @see Painter
- */
+/// The drawing context for a {@link Canvas}.
+///
+///
+///
+/// Maintains the painting state during canvas operations, including
+/// the grid of points, text labels, and layer management.
+///
+///
+///
+/// Applications typically don't create Context instances directly.
+/// Instead, the Canvas widget creates and passes a Context to the
+/// paint callback.
+///
+/// @see Canvas
+/// @see Painter
 public class Context {
 
     private final int width;
@@ -41,15 +43,13 @@ public class Context {
     private final List<Color[][]> layers;
     private final List<Label> labels;
 
-    /**
-     * Creates a new drawing context.
-     *
-     * @param width    the terminal width in cells
-     * @param height   the terminal height in cells
-     * @param xBounds  the x-axis bounds [min, max]
-     * @param yBounds  the y-axis bounds [min, max]
-     * @param marker   the marker type for rendering
-     */
+    /// Creates a new drawing context.
+    ///
+    /// @param width    the terminal width in cells
+    /// @param height   the terminal height in cells
+    /// @param xBounds  the x-axis bounds [min, max]
+    /// @param yBounds  the y-axis bounds [min, max]
+    /// @param marker   the marker type for rendering
     public Context(int width, int height, double[] xBounds, double[] yBounds, Marker marker) {
         this.width = width;
         this.height = height;
@@ -86,138 +86,110 @@ public class Context {
         }
     }
 
-    /**
-     * Draws a shape on this context.
-     *
-     * @param shape the shape to draw
-     */
+    /// Draws a shape on this context.
+    ///
+    /// @param shape the shape to draw
     public void draw(Shape shape) {
         Painter painter = new Painter(this);
         shape.draw(painter);
     }
 
-    /**
-     * Prints text at the specified canvas coordinates.
-     * <p>
-     * Text is rendered on top of shapes and is not affected by layering.
-     *
-     * @param x    the x coordinate in canvas space
-     * @param y    the y coordinate in canvas space
-     * @param text the text to print
-     */
+    /// Prints text at the specified canvas coordinates.
+    ///
+    ///
+    ///
+    /// Text is rendered on top of shapes and is not affected by layering.
+    ///
+    /// @param x    the x coordinate in canvas space
+    /// @param y    the y coordinate in canvas space
+    /// @param text the text to print
     public void print(double x, double y, String text) {
         print(x, y, Line.from(text));
     }
 
-    /**
-     * Prints styled text at the specified canvas coordinates.
-     *
-     * @param x    the x coordinate in canvas space
-     * @param y    the y coordinate in canvas space
-     * @param line the styled line to print
-     */
+    /// Prints styled text at the specified canvas coordinates.
+    ///
+    /// @param x    the x coordinate in canvas space
+    /// @param y    the y coordinate in canvas space
+    /// @param line the styled line to print
     public void print(double x, double y, Line line) {
         labels.add(new Label(x, y, line));
     }
 
-    /**
-     * Prints a styled span at the specified canvas coordinates.
-     *
-     * @param x    the x coordinate in canvas space
-     * @param y    the y coordinate in canvas space
-     * @param span the styled span to print
-     */
+    /// Prints a styled span at the specified canvas coordinates.
+    ///
+    /// @param x    the x coordinate in canvas space
+    /// @param y    the y coordinate in canvas space
+    /// @param span the styled span to print
     public void print(double x, double y, Span span) {
         labels.add(new Label(x, y, Line.from(span)));
     }
 
-    /**
-     * Saves the current grid as a layer and resets for subsequent drawing.
-     * <p>
-     * Layers are composited from bottom to top when rendering.
-     */
+    /// Saves the current grid as a layer and resets for subsequent drawing.
+    ///
+    ///
+    ///
+    /// Layers are composited from bottom to top when rendering.
     public void layer() {
         layers.add(grid);
         grid = new Color[gridHeight][gridWidth];
     }
 
-    /**
-     * Paints a point at grid coordinates.
-     */
+    /// Paints a point at grid coordinates.
     void paint(int x, int y, Color color) {
         if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
             grid[y][x] = color;
         }
     }
 
-    /**
-     * Returns the x-axis bounds.
-     */
+    /// Returns the x-axis bounds.
     double[] xBounds() {
         return xBounds;
     }
 
-    /**
-     * Returns the y-axis bounds.
-     */
+    /// Returns the y-axis bounds.
     double[] yBounds() {
         return yBounds;
     }
 
-    /**
-     * Returns the grid width (in marker units).
-     */
+    /// Returns the grid width (in marker units).
     int gridWidth() {
         return gridWidth;
     }
 
-    /**
-     * Returns the grid height (in marker units).
-     */
+    /// Returns the grid height (in marker units).
     int gridHeight() {
         return gridHeight;
     }
 
-    /**
-     * Returns the terminal width in cells.
-     */
+    /// Returns the terminal width in cells.
     int width() {
         return width;
     }
 
-    /**
-     * Returns the terminal height in cells.
-     */
+    /// Returns the terminal height in cells.
     int height() {
         return height;
     }
 
-    /**
-     * Returns the marker type.
-     */
+    /// Returns the marker type.
     Marker marker() {
         return marker;
     }
 
-    /**
-     * Returns the current grid plus all saved layers.
-     */
+    /// Returns the current grid plus all saved layers.
     public List<Color[][]> allLayers() {
         List<Color[][]> all = new ArrayList<>(layers);
         all.add(grid);
         return all;
     }
 
-    /**
-     * Returns all text labels.
-     */
+    /// Returns all text labels.
     List<Label> labels() {
         return labels;
     }
 
-    /**
-     * A text label at canvas coordinates.
-     */
+    /// A text label at canvas coordinates.
     static final class Label {
         private final double x;
         private final double y;
@@ -242,3 +214,4 @@ public class Context {
         }
     }
 }
+

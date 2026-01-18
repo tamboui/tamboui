@@ -16,25 +16,26 @@ import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-/**
- * A calendar widget displaying a single month.
- * <p>
- * Renders a calendar grid for the month containing the display date,
- * with customizable styling for headers, weekdays, and individual dates.
- *
- * <pre>{@code
- * CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold());
- *
- * Monthly calendar = Monthly.of(LocalDate.now(), events)
- *     .showMonthHeader(Style.EMPTY.bold())
- *     .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN))
- *     .showSurrounding(Style.EMPTY.dim())
- *     .block(Block.bordered());
- * }</pre>
- *
- * @see DateStyler
- * @see CalendarEventStore
- */
+/// A calendar widget displaying a single month.
+///
+///
+///
+/// Renders a calendar grid for the month containing the display date,
+/// with customizable styling for headers, weekdays, and individual dates.
+///
+/// ```java
+/// CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold());
+///
+/// Monthly calendar = Monthly.of(LocalDate.now(), events)
+///     .showMonthHeader(Style.EMPTY.bold())
+///     .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN))
+///     .showSurrounding(Style.EMPTY.dim())
+///     .block(Block.bordered());
+/// }
+/// ```
+///
+/// @see DateStyler
+/// @see CalendarEventStore
 public final class Monthly implements Widget {
 
     private static final String[] WEEKDAY_ABBREV = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"};
@@ -61,72 +62,56 @@ public final class Monthly implements Widget {
         this.firstDayOfWeek = builder.firstDayOfWeek;
     }
 
-    /**
-     * Creates a calendar for the month containing the given date.
-     *
-     * @param displayDate the date determining which month to display
-     * @param dateStyler  the styler for individual dates
-     * @return a new Monthly calendar
-     */
+    /// Creates a calendar for the month containing the given date.
+    ///
+    /// @param displayDate the date determining which month to display
+    /// @param dateStyler  the styler for individual dates
+    /// @return a new Monthly calendar
     public static Monthly of(LocalDate displayDate, DateStyler dateStyler) {
         return new Builder(displayDate, dateStyler).build();
     }
 
-    /**
-     * Creates a calendar for the current month with no special styling.
-     */
+    /// Creates a calendar for the current month with no special styling.
     public static Monthly ofCurrentMonth() {
         return of(LocalDate.now(), date -> Style.EMPTY);
     }
 
-    /**
-     * Creates a builder for a calendar displaying the given month.
-     */
+    /// Creates a builder for a calendar displaying the given month.
     public static Builder builder(LocalDate displayDate, DateStyler dateStyler) {
         return new Builder(displayDate, dateStyler);
     }
 
-    /**
-     * Returns a new calendar with the month header shown.
-     */
+    /// Returns a new calendar with the month header shown.
     public Monthly showMonthHeader(Style style) {
         return toBuilder().monthHeaderStyle(style).build();
     }
 
-    /**
-     * Returns a new calendar with the weekdays header shown.
-     */
+    /// Returns a new calendar with the weekdays header shown.
     public Monthly showWeekdaysHeader(Style style) {
         return toBuilder().weekdaysHeaderStyle(style).build();
     }
 
-    /**
-     * Returns a new calendar with surrounding days shown.
-     * <p>
-     * Surrounding days are days from the previous/next month that
-     * appear in the calendar grid.
-     */
+    /// Returns a new calendar with surrounding days shown.
+    ///
+    ///
+    ///
+    /// Surrounding days are days from the previous/next month that
+    /// appear in the calendar grid.
     public Monthly showSurrounding(Style style) {
         return toBuilder().surroundingStyle(style).build();
     }
 
-    /**
-     * Returns a new calendar with the default date style.
-     */
+    /// Returns a new calendar with the default date style.
     public Monthly defaultStyle(Style style) {
         return toBuilder().defaultStyle(style).build();
     }
 
-    /**
-     * Returns a new calendar wrapped in a block.
-     */
+    /// Returns a new calendar wrapped in a block.
     public Monthly block(Block block) {
         return toBuilder().block(block).build();
     }
 
-    /**
-     * Returns a new calendar with the given first day of week.
-     */
+    /// Returns a new calendar with the given first day of week.
     public Monthly firstDayOfWeek(DayOfWeek dayOfWeek) {
         return toBuilder().firstDayOfWeek(dayOfWeek).build();
     }
@@ -288,9 +273,7 @@ public final class Monthly implements Widget {
         }
     }
 
-    /**
-     * Builder for {@link Monthly}.
-     */
+    /// Builder for {@link Monthly}.
     public static final class Builder {
         private final LocalDate displayDate;
         private final DateStyler dateStyler;
@@ -306,59 +289,46 @@ public final class Monthly implements Widget {
             this.dateStyler = dateStyler != null ? dateStyler : date -> Style.EMPTY;
         }
 
-        /**
-         * Shows the month header with the given style.
-         */
+        /// Shows the month header with the given style.
         public Builder monthHeaderStyle(Style style) {
             this.monthHeaderStyle = style;
             return this;
         }
 
-        /**
-         * Shows the weekdays header with the given style.
-         */
+        /// Shows the weekdays header with the given style.
         public Builder weekdaysHeaderStyle(Style style) {
             this.weekdaysHeaderStyle = style;
             return this;
         }
 
-        /**
-         * Shows surrounding days with the given style.
-         */
+        /// Shows surrounding days with the given style.
         public Builder surroundingStyle(Style style) {
             this.surroundingStyle = style;
             return this;
         }
 
-        /**
-         * Sets the default style for dates.
-         */
+        /// Sets the default style for dates.
         public Builder defaultStyle(Style style) {
             this.defaultStyle = style;
             return this;
         }
 
-        /**
-         * Wraps the calendar in a block.
-         */
+        /// Wraps the calendar in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the first day of the week.
-         */
+        /// Sets the first day of the week.
         public Builder firstDayOfWeek(DayOfWeek dayOfWeek) {
             this.firstDayOfWeek = dayOfWeek != null ? dayOfWeek : DayOfWeek.MONDAY;
             return this;
         }
 
-        /**
-         * Builds the calendar.
-         */
+        /// Builds the calendar.
         public Monthly build() {
             return new Monthly(this);
         }
     }
 }
+

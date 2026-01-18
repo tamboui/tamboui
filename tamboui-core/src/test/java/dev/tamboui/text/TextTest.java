@@ -71,3 +71,4 @@ class TextTest {
         assertThat(text.width()).isEqualTo(0);
     }
 }
+

@@ -14,10 +14,8 @@ import dev.tamboui.widget.Widget;
 import java.io.OutputStream;
 import java.util.Optional;
 
-/**
- * A frame represents a single render cycle.
- * Widgets are rendered to the frame's buffer.
- */
+/// A frame represents a single render cycle.
+/// Widgets are rendered to the frame's buffer.
 public final class Frame {
 
     private final Buffer buffer;
@@ -34,62 +32,52 @@ public final class Frame {
         this.cursorVisible = false;
     }
 
-    /**
-     * Creates a frame for testing purposes.
-     * This allows tests to create frames without going through Terminal.
-     *
-     * @param buffer the buffer to render to
-     * @return a new frame backed by the given buffer
-     */
+    /// Creates a frame for testing purposes.
+    /// This allows tests to create frames without going through Terminal.
+    ///
+    /// @param buffer the buffer to render to
+    /// @return a new frame backed by the given buffer
     public static Frame forTesting(Buffer buffer) {
         return new Frame(buffer, null);
     }
 
-    /**
-     * Returns the area available for rendering.
-     *
-     * @return the rendering area
-     */
+    /// Returns the area available for rendering.
+    ///
+    /// @return the rendering area
     public Rect area() {
         return area;
     }
 
-    /**
-     * Returns the underlying buffer.
-     *
-     * @return the buffer
-     */
+    /// Returns the underlying buffer.
+    ///
+    /// @return the buffer
     public Buffer buffer() {
         return buffer;
     }
 
-    /**
-     * Returns the terminal width.
-     *
-     * @return the terminal width
-     */
+    /// Returns the terminal width.
+    ///
+    /// @return the terminal width
     public int width() {
         return area.width();
     }
 
-    /**
-     * Returns the terminal height.
-     *
-     * @return the terminal height
-     */
+    /// Returns the terminal height.
+    ///
+    /// @return the terminal height
     public int height() {
         return area.height();
     }
 
-    /**
-     * Renders a widget to the given area.
-     * <p>
-     * If the widget implements {@link RawOutputCapable}, the raw output stream
-     * will be passed to enable native terminal protocol rendering.
-     *
-     * @param widget the widget to render
-     * @param area the area to render within
-     */
+    /// Renders a widget to the given area.
+    ///
+    ///
+    ///
+    /// If the widget implements {@link RawOutputCapable}, the raw output stream
+    /// will be passed to enable native terminal protocol rendering.
+    ///
+    /// @param widget the widget to render
+    /// @param area the area to render within
     public void renderWidget(Widget widget, Rect area) {
         if (widget instanceof RawOutputCapable) {
             ((RawOutputCapable) widget).render(area, buffer, rawOutput);
@@ -98,65 +86,56 @@ public final class Frame {
         }
     }
 
-    /**
-     * Renders a stateful widget to the given area.
-     *
-     * @param <S> the state type
-     * @param widget the stateful widget to render
-     * @param area the area to render within
-     * @param state the widget state
-     */
+    /// Renders a stateful widget to the given area.
+    ///
+    /// @param <S> the state type
+    /// @param widget the stateful widget to render
+    /// @param area the area to render within
+    /// @param state the widget state
     public <S> void renderStatefulWidget(StatefulWidget<S> widget, Rect area, S state) {
         widget.render(area, buffer, state);
     }
 
-    /**
-     * Sets the cursor position. The cursor will be shown at this position
-     * after the frame is drawn.
-     *
-     * @param position the cursor position
-     */
+    /// Sets the cursor position. The cursor will be shown at this position
+    /// after the frame is drawn.
+    ///
+    /// @param position the cursor position
     public void setCursorPosition(Position position) {
         this.cursorPosition = position;
         this.cursorVisible = true;
     }
 
-    /**
-     * Sets the cursor position using x and y coordinates.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     */
+    /// Sets the cursor position using x and y coordinates.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
     public void setCursorPosition(int x, int y) {
         setCursorPosition(new Position(x, y));
     }
 
-    /**
-     * Returns the cursor position if set.
-     *
-     * @return the cursor position, or empty if not set
-     */
+    /// Returns the cursor position if set.
+    ///
+    /// @return the cursor position, or empty if not set
     Optional<Position> cursorPosition() {
         return Optional.ofNullable(cursorPosition);
     }
 
-    /**
-     * Returns whether the cursor should be visible.
-     *
-     * @return true if the cursor should be visible, false otherwise
-     */
+    /// Returns whether the cursor should be visible.
+    ///
+    /// @return true if the cursor should be visible, false otherwise
     boolean isCursorVisible() {
         return cursorVisible;
     }
 
-    /**
-     * Returns the raw output stream for native protocol rendering.
-     * <p>
-     * Package-private: use {@link FrameInternal#rawOutput(Frame)} to access.
-     *
-     * @return the raw output stream, or null if not available
-     */
+    /// Returns the raw output stream for native protocol rendering.
+    ///
+    ///
+    ///
+    /// Package-private: use {@link FrameInternal#rawOutput(Frame)} to access.
+    ///
+    /// @return the raw output stream, or null if not available
     OutputStream rawOutput() {
         return rawOutput;
     }
 }
+

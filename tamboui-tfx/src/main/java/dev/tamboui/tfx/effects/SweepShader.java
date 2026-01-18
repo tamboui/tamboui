@@ -21,9 +21,7 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 
-/**
- * A sweep effect that transitions from a faded color to the original content.
- */
+/// A sweep effect that transitions from a faded color to the original content.
 public final class SweepShader implements Shader {
     
     private final Motion direction;
@@ -36,9 +34,7 @@ public final class SweepShader implements Shader {
     private SimpleRng rng;
     private TFxColorSpace colorSpace;
     
-    /**
-     * Creates a sweep shader that sweeps in from a specified color.
-     */
+    /// Creates a sweep shader that sweeps in from a specified color.
     public static SweepShader sweepIn(Motion direction, int gradientLength, int randomness,
                                       Color fadedColor, EffectTimer timer) {
         return new SweepShader(direction, gradientLength, randomness, fadedColor, timer);
@@ -226,4 +222,5 @@ public final class SweepShader implements Shader {
         return copy;
     }
 }
+
 

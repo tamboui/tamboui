@@ -10,9 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Tests for platform detection in PlatformConstants.
- */
+/// Tests for platform detection in PlatformConstants.
 class PlatformConstantsTest {
 
     @Test
@@ -65,3 +63,4 @@ class PlatformConstantsTest {
         }
     }
 }
+

@@ -10,19 +10,20 @@ import dev.tamboui.widgets.canvas.Shape;
 
 import java.util.Optional;
 
-/**
- * A rectangle defined by position and size.
- * <p>
- * The rectangle is positioned from its bottom-left corner in
- * canvas coordinate space (mathematical coordinates).
- *
- * <pre>{@code
- * // Rectangle at (10, 20) with width 30 and height 15
- * context.draw(new Rectangle(10, 20, 30, 15, Color.BLUE));
- * }</pre>
- *
- * @see Shape
- */
+/// A rectangle defined by position and size.
+///
+///
+///
+/// The rectangle is positioned from its bottom-left corner in
+/// canvas coordinate space (mathematical coordinates).
+///
+/// ```java
+/// // Rectangle at (10, 20) with width 30 and height 15
+/// context.draw(new Rectangle(10, 20, 30, 15, Color.BLUE));
+/// }
+/// ```
+///
+/// @see Shape
 public final class Rectangle implements Shape {
 
     private final double x;
@@ -39,9 +40,7 @@ public final class Rectangle implements Shape {
         this.color = color;
     }
 
-    /**
-     * Creates a rectangle at (x, y) with the given dimensions and color.
-     */
+    /// Creates a rectangle at (x, y) with the given dimensions and color.
     public static Rectangle of(double x, double y, double width, double height, Color color) {
         return new Rectangle(x, y, width, height, color);
     }
@@ -168,3 +167,4 @@ public final class Rectangle implements Shape {
             x, y, width, height, color);
     }
 }
+

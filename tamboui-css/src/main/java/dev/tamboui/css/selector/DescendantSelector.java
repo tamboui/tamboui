@@ -10,12 +10,12 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A descendant combinator selector that matches nested elements.
- * <p>
- * Example: {@code Panel Button { ... }} matches any Button that is
- * a descendant (child, grandchild, etc.) of a Panel.
- */
+/// A descendant combinator selector that matches nested elements.
+///
+///
+///
+/// Example: {@code Panel Button { ... }} matches any Button that is
+/// a descendant (child, grandchild, etc.) of a Panel.
 public final class DescendantSelector implements Selector {
 
     private final Selector ancestor;
@@ -85,3 +85,4 @@ public final class DescendantSelector implements Selector {
         return "DescendantSelector{" + toCss() + "}";
     }
 }
+

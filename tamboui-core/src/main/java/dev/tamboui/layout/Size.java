@@ -4,9 +4,7 @@
  */
 package dev.tamboui.layout;
 
-/**
- * A size representing width and height dimensions.
- */
+/// A size representing width and height dimensions.
 public final class Size {
 
     public static final Size ZERO = new Size(0, 0);
@@ -15,50 +13,40 @@ public final class Size {
     private final int height;
     private final int cachedHashCode;
 
-    /**
-     * Creates a size.
-     *
-     * @param width  the width
-     * @param height the height
-     */
+    /// Creates a size.
+    ///
+    /// @param width  the width
+    /// @param height the height
     public Size(int width, int height) {
         this.width = width;
         this.height = height;
         this.cachedHashCode = 31 * width + height;
     }
 
-    /**
-     * Returns the width.
-     *
-     * @return the width
-     */
+    /// Returns the width.
+    ///
+    /// @return the width
     public int width() {
         return width;
     }
 
-    /**
-     * Returns the height.
-     *
-     * @return the height
-     */
+    /// Returns the height.
+    ///
+    /// @return the height
     public int height() {
         return height;
     }
 
-    /**
-     * Returns the area (width * height).
-     *
-     * @return the area
-     */
+    /// Returns the area (width * height).
+    ///
+    /// @return the area
     public int area() {
         return width * height;
     }
 
-    /**
-     * Returns true if either dimension is zero.
-     *
-     * @return true if width or height is zero
-     */
+    /// Returns true if either dimension is zero.
+    ///
+    /// @return true if width or height is zero
     public boolean isEmpty() {
         return width == 0 || height == 0;
     }
@@ -88,3 +76,4 @@ public final class Size {
         return String.format("Size[width=%d, height=%d]", width, height);
     }
 }
+

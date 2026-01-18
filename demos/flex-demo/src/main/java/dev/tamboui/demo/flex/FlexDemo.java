@@ -18,16 +18,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo application showcasing Flex layout modes with practical examples.
- *
- * <p>Controls:
- * <ul>
- *   <li>1-4: Switch between examples</li>
- *   <li>Left/Right arrows: Cycle through Flex modes</li>
- *   <li>q: Quit</li>
- * </ul>
- */
+/// Demo application showcasing Flex layout modes with practical examples.
+///
+///
+///
+/// Controls:
+///
+/// - 1-4: Switch between examples
+/// - Left/Right arrows: Cycle through Flex modes
+/// - q: Quit
 public class FlexDemo {
 
     private static final Flex[] FLEX_MODES = {
@@ -45,12 +44,10 @@ public class FlexDemo {
     private static final AtomicInteger modeIndex = new AtomicInteger(0);
     private static final AtomicInteger exampleIndex = new AtomicInteger(0);
 
-    /**
-     * Entry point for the flex demo application.
-     *
-     * @param args command line arguments (not used)
-     * @throws Exception if an error occurs during execution
-     */
+    /// Entry point for the flex demo application.
+    ///
+    /// @param args command line arguments (not used)
+    /// @throws Exception if an error occurs during execution
     public static void main(String[] args) throws Exception {
         var config = TuiConfig.builder()
                 .tickRate(Duration.ofMillis(100))
@@ -163,9 +160,7 @@ public class FlexDemo {
         }
     }
 
-    /**
-     * Example 1: Fixed size items in horizontal and vertical layouts.
-     */
+    /// Example 1: Fixed size items in horizontal and vertical layouts.
     private static Element renderFixedSizeItems(Flex flex) {
         return column(
                 // Horizontal
@@ -194,9 +189,7 @@ public class FlexDemo {
         );
     }
 
-    /**
-     * Example 2: Mix of fixed-size and growing elements.
-     */
+    /// Example 2: Mix of fixed-size and growing elements.
     private static Element renderFixedVsGrowing(Flex flex) {
         return column(
                 // Fixed width items with flex
@@ -231,9 +224,7 @@ public class FlexDemo {
         );
     }
 
-    /**
-     * Example 3: Nested layouts demonstrating flex in containers.
-     */
+    /// Example 3: Nested layouts demonstrating flex in containers.
     private static Element renderNestedLayouts(Flex flex) {
         return row(
                 // Left: Vertical layout with fixed items
@@ -293,9 +284,7 @@ public class FlexDemo {
         );
     }
 
-    /**
-     * Example 4: Practical toolbar examples.
-     */
+    /// Example 4: Practical toolbar examples.
     private static Element renderToolbar(Flex flex) {
         return column(
                 // Simple toolbar
@@ -363,3 +352,4 @@ public class FlexDemo {
         return text(" " + label + " ").bold();
     }
 }
+

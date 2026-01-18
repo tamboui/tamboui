@@ -68,3 +68,4 @@ class ColorTest {
         assertThat(((Color.Indexed) color).index()).isEqualTo(128);
     }
 }
+

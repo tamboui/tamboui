@@ -14,21 +14,23 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-/**
- * Renders images using the iTerm2 inline images protocol.
- * <p>
- * The iTerm2 protocol uses OSC (Operating System Command) escape sequences
- * with base64-encoded image data. It's simpler than Kitty but widely supported.
- * <p>
- * Supported by: iTerm2, WezTerm, Ghostty, Konsole, mintty.
- *
- * <h2>Protocol Format</h2>
- * <pre>
- * ESC ] 1337 ; File = [arguments] : base64-data BEL
- * </pre>
- *
- * @see <a href="https://iterm2.com/documentation-images.html">iTerm2 Inline Images</a>
- */
+/// Renders images using the iTerm2 inline images protocol.
+///
+///
+///
+/// The iTerm2 protocol uses OSC (Operating System Command) escape sequences
+/// with base64-encoded image data. It's simpler than Kitty but widely supported.
+///
+///
+///
+/// Supported by: iTerm2, WezTerm, Ghostty, Konsole, mintty.
+///
+/// ## Protocol Format
+/// ```
+/// ESC ] 1337 ; File = [arguments] : base64-data BEL
+/// ```
+///
+/// @see <a href="https://iterm2.com/documentation-images.html">iTerm2 Inline Images</a>
 public final class ITermProtocol implements ImageProtocol {
 
     private static final String OSC = "\033]1337;File=";
@@ -37,18 +39,14 @@ public final class ITermProtocol implements ImageProtocol {
 
     private final boolean useStTerminator;
 
-    /**
-     * Creates an iTerm2 protocol instance using BEL terminator.
-     */
+    /// Creates an iTerm2 protocol instance using BEL terminator.
     public ITermProtocol() {
         this(false);
     }
 
-    /**
-     * Creates an iTerm2 protocol instance.
-     *
-     * @param useStTerminator if true, use ESC \ instead of BEL as terminator
-     */
+    /// Creates an iTerm2 protocol instance.
+    ///
+    /// @param useStTerminator if true, use ESC \ instead of BEL as terminator
     public ITermProtocol(boolean useStTerminator) {
         this.useStTerminator = useStTerminator;
     }
@@ -114,3 +112,4 @@ public final class ITermProtocol implements ImageProtocol {
         return TerminalImageProtocol.ITERM2;
     }
 }
+

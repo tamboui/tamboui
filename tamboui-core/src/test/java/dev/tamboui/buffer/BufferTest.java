@@ -312,3 +312,4 @@ class BufferTest {
         return count;
     }
 }
+

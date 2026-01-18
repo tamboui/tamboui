@@ -27,9 +27,7 @@ import java.io.PrintWriter;
 import java.util.EnumSet;
 import java.util.Objects;
 
-/**
- * JLine 3 based backend for terminal operations.
- */
+/// JLine 3 based backend for terminal operations.
 public class JLineBackend implements Backend {
 
     private static final String ESC = "\033";
@@ -312,10 +310,9 @@ public class JLineBackend implements Backend {
         return "";
     }
 
-    /**
-     * Returns the underlying JLine terminal for advanced operations.
-     */
+    /// Returns the underlying JLine terminal for advanced operations.
     public Terminal jlineTerminal() {
         return terminal;
     }
 }
+

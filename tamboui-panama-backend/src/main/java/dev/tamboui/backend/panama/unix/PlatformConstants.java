@@ -7,12 +7,12 @@ package dev.tamboui.backend.panama.unix;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.ValueLayout;
 
-/**
- * Platform-specific constants for Unix terminal operations.
- * <p>
- * This class provides the correct values for termios flags, control character
- * indices, and structure layouts that differ between Linux and macOS.
- */
+/// Platform-specific constants for Unix terminal operations.
+///
+///
+///
+/// This class provides the correct values for termios flags, control character
+/// indices, and structure layouts that differ between Linux and macOS.
 public final class PlatformConstants {
 
     private static final boolean IS_WINDOWS;
@@ -27,38 +27,30 @@ public final class PlatformConstants {
     private PlatformConstants() {
     }
 
-    /**
-     * Returns true if running on Windows.
-     *
-     * @return true if Windows, false otherwise
-     */
+    /// Returns true if running on Windows.
+    ///
+    /// @return true if Windows, false otherwise
     public static boolean isWindows() {
         return IS_WINDOWS;
     }
 
-    /**
-     * Returns true if running on macOS.
-     *
-     * @return true if macOS, false otherwise
-     */
+    /// Returns true if running on macOS.
+    ///
+    /// @return true if macOS, false otherwise
     public static boolean isMacOS() {
         return IS_MACOS;
     }
 
-    /**
-     * Returns true if running on Linux.
-     *
-     * @return true if Linux, false otherwise
-     */
+    /// Returns true if running on Linux.
+    ///
+    /// @return true if Linux, false otherwise
     public static boolean isLinux() {
         return !IS_WINDOWS && !IS_MACOS;
     }
 
-    /**
-     * Returns true if running on a Unix-like system (Linux or macOS).
-     *
-     * @return true if Unix-like, false otherwise
-     */
+    /// Returns true if running on a Unix-like system (Linux or macOS).
+    ///
+    /// @return true if Unix-like, false otherwise
     public static boolean isUnix() {
         return !IS_WINDOWS;
     }
@@ -92,30 +84,32 @@ public final class PlatformConstants {
     // Signal numbers (same on both platforms)
     public static final int SIGWINCH = 28;
 
-    /**
-     * Termios structure layout.
-     * <p>
-     * Linux layout:
-     * - c_iflag (4 bytes)
-     * - c_oflag (4 bytes)
-     * - c_cflag (4 bytes)
-     * - c_lflag (4 bytes)
-     * - c_line (1 byte)
-     * - c_cc[32] (32 bytes)
-     * - padding (3 bytes)
-     * - c_ispeed (4 bytes)
-     * - c_ospeed (4 bytes)
-     * <p>
-     * macOS layout:
-     * - c_iflag (8 bytes - unsigned long)
-     * - c_oflag (8 bytes)
-     * - c_cflag (8 bytes)
-     * - c_lflag (8 bytes)
-     * - c_cc[20] (20 bytes)
-     * - padding (4 bytes)
-     * - c_ispeed (8 bytes)
-     * - c_ospeed (8 bytes)
-     */
+    /// Termios structure layout.
+    ///
+    ///
+    ///
+    /// Linux layout:
+    /// - c_iflag (4 bytes)
+    /// - c_oflag (4 bytes)
+    /// - c_cflag (4 bytes)
+    /// - c_lflag (4 bytes)
+    /// - c_line (1 byte)
+    /// - c_cc[32] (32 bytes)
+    /// - padding (3 bytes)
+    /// - c_ispeed (4 bytes)
+    /// - c_ospeed (4 bytes)
+    ///
+    ///
+    ///
+    /// macOS layout:
+    /// - c_iflag (8 bytes - unsigned long)
+    /// - c_oflag (8 bytes)
+    /// - c_cflag (8 bytes)
+    /// - c_lflag (8 bytes)
+    /// - c_cc[20] (20 bytes)
+    /// - padding (4 bytes)
+    /// - c_ispeed (8 bytes)
+    /// - c_ospeed (8 bytes)
     public static final MemoryLayout TERMIOS_LAYOUT = IS_MACOS
             ? MemoryLayout.structLayout(
                     ValueLayout.JAVA_LONG.withName("c_iflag"),
@@ -139,15 +133,12 @@ public final class PlatformConstants {
                     ValueLayout.JAVA_INT.withName("c_ospeed")
             );
 
-    /**
-     * Offset to the c_cc array in the termios structure.
-     */
+    /// Offset to the c_cc array in the termios structure.
     public static final long TERMIOS_CC_OFFSET = IS_MACOS ? 32L : 17L;
 
-    /**
-     * Value layout for termios flags (int on Linux, long on macOS).
-     */
+    /// Value layout for termios flags (int on Linux, long on macOS).
     public static final ValueLayout TERMIOS_FLAG_LAYOUT = IS_MACOS
             ? ValueLayout.JAVA_LONG
             : ValueLayout.JAVA_INT;
 }
+

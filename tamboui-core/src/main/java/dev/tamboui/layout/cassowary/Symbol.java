@@ -6,26 +6,24 @@ package dev.tamboui.layout.cassowary;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Internal symbol type used in the simplex tableau.
- *
- * <p>Symbols represent variables in the internal tableau representation.
- * They can be external (user-defined variables), slack (for inequalities),
- * error (for non-required constraints), or dummy (temporary markers).
- */
+/// Internal symbol type used in the simplex tableau.
+///
+///
+///
+/// Symbols represent variables in the internal tableau representation.
+/// They can be external (user-defined variables), slack (for inequalities),
+/// error (for non-required constraints), or dummy (temporary markers).
 final class Symbol {
 
-    /**
-     * The type of symbol.
-     */
+    /// The type of symbol.
     enum Type {
-        /** External variable defined by the user. */
+        /// External variable defined by the user.
         EXTERNAL,
-        /** Slack variable added for inequality constraints. */
+        /// Slack variable added for inequality constraints.
         SLACK,
-        /** Error variable for non-required constraints. */
+        /// Error variable for non-required constraints.
         ERROR,
-        /** Dummy variable used during constraint addition. */
+        /// Dummy variable used during constraint addition.
         DUMMY
     }
 
@@ -39,56 +37,44 @@ final class Symbol {
         this.type = type;
     }
 
-    /**
-     * Creates an external symbol for a user-defined variable.
-     *
-     * @return a new external symbol
-     */
+    /// Creates an external symbol for a user-defined variable.
+    ///
+    /// @return a new external symbol
     static Symbol external() {
         return new Symbol(Type.EXTERNAL);
     }
 
-    /**
-     * Creates a slack symbol for an inequality constraint.
-     *
-     * @return a new slack symbol
-     */
+    /// Creates a slack symbol for an inequality constraint.
+    ///
+    /// @return a new slack symbol
     static Symbol slack() {
         return new Symbol(Type.SLACK);
     }
 
-    /**
-     * Creates an error symbol for a non-required constraint.
-     *
-     * @return a new error symbol
-     */
+    /// Creates an error symbol for a non-required constraint.
+    ///
+    /// @return a new error symbol
     static Symbol error() {
         return new Symbol(Type.ERROR);
     }
 
-    /**
-     * Creates a dummy symbol.
-     *
-     * @return a new dummy symbol
-     */
+    /// Creates a dummy symbol.
+    ///
+    /// @return a new dummy symbol
     static Symbol dummy() {
         return new Symbol(Type.DUMMY);
     }
 
-    /**
-     * Returns the unique identifier of this symbol.
-     *
-     * @return the symbol ID
-     */
+    /// Returns the unique identifier of this symbol.
+    ///
+    /// @return the symbol ID
     long id() {
         return id;
     }
 
-    /**
-     * Returns the type of this symbol.
-     *
-     * @return the symbol type
-     */
+    /// Returns the type of this symbol.
+    ///
+    /// @return the symbol type
     Type type() {
         return type;
     }
@@ -126,3 +112,4 @@ final class Symbol {
         }
     }
 }
+

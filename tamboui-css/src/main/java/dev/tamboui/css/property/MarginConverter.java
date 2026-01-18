@@ -9,16 +9,15 @@ import dev.tamboui.layout.Margin;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS margin values to Margin objects.
- * <p>
- * Supports the following formats:
- * <ul>
- *   <li>{@code "1"} - uniform margin on all sides</li>
- *   <li>{@code "1 2"} - vertical (top/bottom) and horizontal (left/right)</li>
- *   <li>{@code "1 2 3 4"} - top, right, bottom, left (CSS order)</li>
- * </ul>
- */
+/// Converts CSS margin values to Margin objects.
+///
+///
+///
+/// Supports the following formats:
+///
+/// - {@code "1"} - uniform margin on all sides
+/// - {@code "1 2"} - vertical (top/bottom) and horizontal (left/right)
+/// - {@code "1 2 3 4"} - top, right, bottom, left (CSS order)
 public final class MarginConverter implements PropertyConverter<Margin> {
 
     @Override
@@ -56,3 +55,4 @@ public final class MarginConverter implements PropertyConverter<Margin> {
         }
     }
 }
+

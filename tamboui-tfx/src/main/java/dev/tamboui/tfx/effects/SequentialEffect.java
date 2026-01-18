@@ -16,54 +16,61 @@ import dev.tamboui.layout.Rect;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Shader implementation that runs multiple effects sequentially, one after another.
- * <p>
- * SequentialEffect composes multiple effects into a chain, where each effect runs
- * to completion before the next one begins. This allows creating complex animations
- * by combining simple effects.
- * <p>
- * <b>Design Philosophy:</b>
- * <p>
- * Sequential composition enables building sophisticated animations from simple
- * building blocks. Each effect in the sequence runs independently, and overflow
- * time from one effect is automatically passed to the next.
- * <p>
- * <b>Behavior:</b>
- * <ul>
- *   <li>Effects run in the order they are provided</li>
- *   <li>Each effect must complete before the next begins</li>
- *   <li>Overflow time from completed effects is passed to the next effect</li>
- *   <li>The sequence completes when all effects have completed</li>
- * </ul>
- * <p>
- * <b>Usage Pattern:</b>
- * <pre>{@code
- * // Chain fade-in followed by dissolve
- * Effect sequence = Fx.sequence(
- *     Fx.fadeFromFg(Color.BLACK, 500, Interpolation.QuadOut),
- *     Fx.dissolve(800, Interpolation.Linear)
- * );
- * }</pre>
- * <p>
- * This shader is typically created through {@link dev.tamboui.tfx.Fx#sequence(Effect...)}
- * rather than directly.
- */
+/// Shader implementation that runs multiple effects sequentially, one after another.
+///
+///
+///
+/// SequentialEffect composes multiple effects into a chain, where each effect runs
+/// to completion before the next one begins. This allows creating complex animations
+/// by combining simple effects.
+///
+///
+///
+/// **Design Philosophy:**
+///
+///
+///
+/// Sequential composition enables building sophisticated animations from simple
+/// building blocks. Each effect in the sequence runs independently, and overflow
+/// time from one effect is automatically passed to the next.
+///
+///
+///
+/// **Behavior:**
+///
+/// - Effects run in the order they are provided
+/// - Each effect must complete before the next begins
+/// - Overflow time from completed effects is passed to the next effect
+/// - The sequence completes when all effects have completed
+///
+///
+///
+///
+/// **Usage Pattern:**
+/// ```java
+/// // Chain fade-in followed by dissolve
+/// Effect sequence = Fx.sequence(
+///     Fx.fadeFromFg(Color.BLACK, 500, Interpolation.QuadOut),
+///     Fx.dissolve(800, Interpolation.Linear)
+/// );
+/// }
+/// ```
+///
+///
+///
+/// This shader is typically created through {@link dev.tamboui.tfx.Fx#sequence(Effect...)}
+/// rather than directly.
 public final class SequentialEffect implements Shader {
     
     private final List<Effect> effects;
     private int current;
     
-    /**
-     * Creates a sequential effect that runs the given effects one after another.
-     */
+    /// Creates a sequential effect that runs the given effects one after another.
     public static SequentialEffect of(List<Effect> effects) {
         return new SequentialEffect(effects);
     }
     
-    /**
-     * Creates a sequential effect that runs the given effects one after another.
-     */
+    /// Creates a sequential effect that runs the given effects one after another.
     public static SequentialEffect of(Effect... effects) {
         List<Effect> effectList = new ArrayList<>();
         for (Effect effect : effects) {
@@ -162,4 +169,5 @@ public final class SequentialEffect implements Shader {
         return copy;
     }
 }
+
 

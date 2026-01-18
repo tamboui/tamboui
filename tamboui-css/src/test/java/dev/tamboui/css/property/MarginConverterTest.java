@@ -61,3 +61,4 @@ class MarginConverterTest {
         assertThat(converter.convert("1 2 3 4 5", Collections.emptyMap())).isEmpty(); // 5 values not supported
     }
 }
+

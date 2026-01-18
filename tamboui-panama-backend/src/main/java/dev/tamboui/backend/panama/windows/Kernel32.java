@@ -14,12 +14,12 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
-/**
- * Panama FFI bindings to Windows Kernel32 functions for console operations.
- * <p>
- * This class provides low-level access to Windows console control functions
- * including console mode manipulation, screen buffer operations, and input handling.
- */
+/// Panama FFI bindings to Windows Kernel32 functions for console operations.
+///
+///
+///
+/// This class provides low-level access to Windows console control functions
+/// including console mode manipulation, screen buffer operations, and input handling.
 public final class Kernel32 {
 
     // Standard handles
@@ -121,12 +121,10 @@ public final class Kernel32 {
     private Kernel32() {
     }
 
-    /**
-     * Gets a handle to the specified standard device.
-     *
-     * @param stdHandle STD_INPUT_HANDLE or STD_OUTPUT_HANDLE
-     * @return the handle, or INVALID_HANDLE_VALUE on error
-     */
+    /// Gets a handle to the specified standard device.
+    ///
+    /// @param stdHandle STD_INPUT_HANDLE or STD_OUTPUT_HANDLE
+    /// @return the handle, or INVALID_HANDLE_VALUE on error
     public static MemorySegment getStdHandle(int stdHandle) {
         try {
             return (MemorySegment) GET_STD_HANDLE.invokeExact(stdHandle);
@@ -135,13 +133,11 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Gets the current input mode of a console's input buffer or output mode of a screen buffer.
-     *
-     * @param handle  console handle
-     * @param modePtr pointer to receive the mode
-     * @return non-zero on success
-     */
+    /// Gets the current input mode of a console's input buffer or output mode of a screen buffer.
+    ///
+    /// @param handle  console handle
+    /// @param modePtr pointer to receive the mode
+    /// @return non-zero on success
     public static int getConsoleMode(MemorySegment handle, MemorySegment modePtr) {
         try {
             return (int) GET_CONSOLE_MODE.invokeExact(handle, modePtr);
@@ -150,13 +146,11 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Sets the input mode of a console's input buffer or output mode of a screen buffer.
-     *
-     * @param handle console handle
-     * @param mode   the mode to set
-     * @return non-zero on success
-     */
+    /// Sets the input mode of a console's input buffer or output mode of a screen buffer.
+    ///
+    /// @param handle console handle
+    /// @param mode   the mode to set
+    /// @return non-zero on success
     public static int setConsoleMode(MemorySegment handle, int mode) {
         try {
             return (int) SET_CONSOLE_MODE.invokeExact(handle, mode);
@@ -165,13 +159,11 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Gets information about the specified console screen buffer.
-     *
-     * @param handle  console output handle
-     * @param infoPtr pointer to CONSOLE_SCREEN_BUFFER_INFO structure
-     * @return non-zero on success
-     */
+    /// Gets information about the specified console screen buffer.
+    ///
+    /// @param handle  console output handle
+    /// @param infoPtr pointer to CONSOLE_SCREEN_BUFFER_INFO structure
+    /// @return non-zero on success
     public static int getConsoleScreenBufferInfo(MemorySegment handle, MemorySegment infoPtr) {
         try {
             return (int) GET_CONSOLE_SCREEN_BUFFER_INFO.invokeExact(handle, infoPtr);
@@ -180,16 +172,14 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Writes a character string to a console screen buffer.
-     *
-     * @param handle     console output handle
-     * @param buffer     buffer containing characters to write (UTF-16)
-     * @param numChars   number of characters to write
-     * @param numWritten pointer to receive count of characters written
-     * @param reserved   reserved, must be null
-     * @return non-zero on success
-     */
+    /// Writes a character string to a console screen buffer.
+    ///
+    /// @param handle     console output handle
+    /// @param buffer     buffer containing characters to write (UTF-16)
+    /// @param numChars   number of characters to write
+    /// @param numWritten pointer to receive count of characters written
+    /// @param reserved   reserved, must be null
+    /// @return non-zero on success
     public static int writeConsole(MemorySegment handle, MemorySegment buffer,
                                    int numChars, MemorySegment numWritten, MemorySegment reserved) {
         try {
@@ -199,15 +189,13 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Reads data from a console input buffer.
-     *
-     * @param handle  console input handle
-     * @param buffer  pointer to INPUT_RECORD array
-     * @param length  size of the array
-     * @param numRead pointer to receive count of records read
-     * @return non-zero on success
-     */
+    /// Reads data from a console input buffer.
+    ///
+    /// @param handle  console input handle
+    /// @param buffer  pointer to INPUT_RECORD array
+    /// @param length  size of the array
+    /// @param numRead pointer to receive count of records read
+    /// @return non-zero on success
     public static int readConsoleInput(MemorySegment handle, MemorySegment buffer,
                                        int length, MemorySegment numRead) {
         try {
@@ -217,13 +205,11 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Gets the number of unread input records in the console's input buffer.
-     *
-     * @param handle    console input handle
-     * @param numEvents pointer to receive the count
-     * @return non-zero on success
-     */
+    /// Gets the number of unread input records in the console's input buffer.
+    ///
+    /// @param handle    console input handle
+    /// @param numEvents pointer to receive the count
+    /// @return non-zero on success
     public static int getNumberOfConsoleInputEvents(MemorySegment handle, MemorySegment numEvents) {
         try {
             return (int) GET_NUMBER_OF_CONSOLE_INPUT_EVENTS.invokeExact(handle, numEvents);
@@ -232,11 +218,9 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Gets the last error code.
-     *
-     * @return the last error code
-     */
+    /// Gets the last error code.
+    ///
+    /// @return the last error code
     public static int getLastError() {
         try {
             return (int) GET_LAST_ERROR.invokeExact();
@@ -245,14 +229,12 @@ public final class Kernel32 {
         }
     }
 
-    /**
-     * Waits until the specified object is in the signaled state or the timeout interval elapses.
-     *
-     * @param handle    handle to the object
-     * @param timeoutMs timeout interval in milliseconds, or -1 (INFINITE) for no timeout
-     * @return WAIT_OBJECT_0 if the object is signaled, WAIT_TIMEOUT if timeout elapsed,
-     *         or WAIT_FAILED on error
-     */
+    /// Waits until the specified object is in the signaled state or the timeout interval elapses.
+    ///
+    /// @param handle    handle to the object
+    /// @param timeoutMs timeout interval in milliseconds, or -1 (INFINITE) for no timeout
+    /// @return WAIT_OBJECT_0 if the object is signaled, WAIT_TIMEOUT if timeout elapsed,
+    /// or WAIT_FAILED on error
     public static int waitForSingleObject(MemorySegment handle, int timeoutMs) {
         try {
             return (int) WAIT_FOR_SINGLE_OBJECT.invokeExact(handle, timeoutMs);
@@ -275,9 +257,7 @@ public final class Kernel32 {
             ValueLayout.JAVA_SHORT.withName("Bottom")
     );
 
-    /**
-     * Layout for CONSOLE_SCREEN_BUFFER_INFO structure.
-     */
+    /// Layout for CONSOLE_SCREEN_BUFFER_INFO structure.
     public static final MemoryLayout CONSOLE_SCREEN_BUFFER_INFO_LAYOUT = MemoryLayout.structLayout(
             COORD_LAYOUT.withName("dwSize"),
             COORD_LAYOUT.withName("dwCursorPosition"),
@@ -295,9 +275,7 @@ public final class Kernel32 {
             ValueLayout.JAVA_INT.withName("dwControlKeyState")
     );
 
-    /**
-     * Layout for INPUT_RECORD structure.
-     */
+    /// Layout for INPUT_RECORD structure.
     public static final MemoryLayout INPUT_RECORD_LAYOUT = MemoryLayout.structLayout(
             ValueLayout.JAVA_SHORT.withName("EventType"),
             MemoryLayout.paddingLayout(2),
@@ -328,23 +306,20 @@ public final class Kernel32 {
             MemoryLayout.PathElement.groupElement("Event"),
             MemoryLayout.PathElement.groupElement("uChar"));
 
-    /**
-     * Allocates a CONSOLE_SCREEN_BUFFER_INFO structure.
-     *
-     * @param arena the arena to allocate in
-     * @return the allocated memory segment
-     */
+    /// Allocates a CONSOLE_SCREEN_BUFFER_INFO structure.
+    ///
+    /// @param arena the arena to allocate in
+    /// @return the allocated memory segment
     public static MemorySegment allocateConsoleScreenBufferInfo(Arena arena) {
         return arena.allocate(CONSOLE_SCREEN_BUFFER_INFO_LAYOUT);
     }
 
-    /**
-     * Allocates an INPUT_RECORD structure.
-     *
-     * @param arena the arena to allocate in
-     * @return the allocated memory segment
-     */
+    /// Allocates an INPUT_RECORD structure.
+    ///
+    /// @param arena the arena to allocate in
+    /// @return the allocated memory segment
     public static MemorySegment allocateInputRecord(Arena arena) {
         return arena.allocate(INPUT_RECORD_LAYOUT);
     }
 }
+

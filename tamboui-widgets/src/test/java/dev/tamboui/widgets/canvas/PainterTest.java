@@ -135,3 +135,4 @@ class PainterTest {
         assertThat(point).isEmpty();
     }
 }
+

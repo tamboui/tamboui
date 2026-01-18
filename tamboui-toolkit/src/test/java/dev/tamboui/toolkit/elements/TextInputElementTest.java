@@ -16,9 +16,7 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for TextInputElement.
- */
+/// Tests for TextInputElement.
 class TextInputElementTest {
 
     @Test
@@ -78,3 +76,4 @@ class TextInputElementTest {
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.YELLOW);
     }
 }
+

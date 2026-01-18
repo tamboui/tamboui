@@ -30,10 +30,8 @@ import java.util.List;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Main view implementing Element directly for proper event handling.
- * This follows the pattern used by FloatingPanelsArea in toolkit-demo.
- */
+/// Main view implementing Element directly for proper event handling.
+/// This follows the pattern used by FloatingPanelsArea in toolkit-demo.
 public class FileManagerView implements Element {
 
     private final FileManagerController manager;
@@ -467,3 +465,4 @@ public class FileManagerView implements Element {
         return String.format("%.1f G", size / (1024.0 * 1024 * 1024));
     }
 }
+

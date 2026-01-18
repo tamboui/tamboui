@@ -23,9 +23,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/**
- * Tests for SelectorParser.
- */
+/// Tests for SelectorParser.
 class SelectorParserTest {
 
     @Nested
@@ -460,9 +458,7 @@ class SelectorParserTest {
         return new HashSet<>(Arrays.asList(values));
     }
 
-    /**
-     * Test implementation of Styleable for testing selectors.
-     */
+    /// Test implementation of Styleable for testing selectors.
     private static class TestElement implements Styleable {
         private final String type;
         private final String id;
@@ -510,3 +506,4 @@ class SelectorParserTest {
         }
     }
 }
+

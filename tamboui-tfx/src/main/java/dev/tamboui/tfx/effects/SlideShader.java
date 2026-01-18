@@ -20,10 +20,8 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
-/**
- * A slide effect that uses block characters to create a "shutter" animation.
- * Cells gradually fill with block characters (█, ▇, ▆, etc.) based on the direction.
- */
+/// A slide effect that uses block characters to create a "shutter" animation.
+/// Cells gradually fill with block characters (█, ▇, ▆, etc.) based on the direction.
 public final class SlideShader implements Shader {
     
     // Block characters for vertical sliding (from full to empty)
@@ -41,9 +39,7 @@ public final class SlideShader implements Shader {
     private CellFilter cellFilter;
     private SimpleRng rng;
     
-    /**
-     * Creates a slide shader that slides out in the specified direction.
-     */
+    /// Creates a slide shader that slides out in the specified direction.
     public static SlideShader slideOut(Motion direction, int gradientLength, int randomness,
                                       Color colorBehindCell, EffectTimer timer) {
         return new SlideShader(direction, gradientLength, randomness, colorBehindCell, timer);
@@ -234,4 +230,5 @@ public final class SlideShader implements Shader {
         return copy;
     }
 }
+
 

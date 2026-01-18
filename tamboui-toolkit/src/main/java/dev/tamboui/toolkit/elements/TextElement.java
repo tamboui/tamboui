@@ -18,12 +18,12 @@ import dev.tamboui.text.Text;
 import dev.tamboui.widgets.text.Overflow;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-/**
- * A simple text element that displays styled text.
- * <p>
- * CSS properties {@code text-overflow} and {@code text-align} are automatically
- * resolved through the underlying {@link Paragraph} widget.
- */
+/// A simple text element that displays styled text.
+///
+///
+///
+/// CSS properties {@code text-overflow} and {@code text-align} are automatically
+/// resolved through the underlying {@link Paragraph} widget.
 public final class TextElement extends StyledElement<TextElement> {
 
     private final String content;
@@ -38,99 +38,83 @@ public final class TextElement extends StyledElement<TextElement> {
         this.content = value != null ? String.valueOf(value) : "";
     }
 
-    /**
-     * Returns the text content.
-     */
+    /// Returns the text content.
     public String content() {
         return content;
     }
 
-    /**
-     * Sets the overflow mode for text that doesn't fit.
-     *
-     * @param overflow the overflow mode
-     * @return this element for chaining
-     */
+    /// Sets the overflow mode for text that doesn't fit.
+    ///
+    /// @param overflow the overflow mode
+    /// @return this element for chaining
     public TextElement overflow(Overflow overflow) {
         this.overflow = overflow;
         return this;
     }
 
-    /**
-     * Convenience method to truncate with ellipsis at the end: "Long text..."
-     *
-     * @return this element for chaining
-     */
+    /// Convenience method to truncate with ellipsis at the end: "Long text..."
+    ///
+    /// @return this element for chaining
     public TextElement ellipsis() {
         this.overflow = Overflow.ELLIPSIS;
         return this;
     }
 
-    /**
-     * Convenience method to truncate with ellipsis at the start: "...ong text"
-     *
-     * @return this element for chaining
-     */
+    /// Convenience method to truncate with ellipsis at the start: "...ong text"
+    ///
+    /// @return this element for chaining
     public TextElement ellipsisStart() {
         this.overflow = Overflow.ELLIPSIS_START;
         return this;
     }
 
-    /**
-     * Convenience method to truncate with ellipsis in the middle: "Long...text"
-     *
-     * @return this element for chaining
-     */
+    /// Convenience method to truncate with ellipsis in the middle: "Long...text"
+    ///
+    /// @return this element for chaining
     public TextElement ellipsisMiddle() {
         this.overflow = Overflow.ELLIPSIS_MIDDLE;
         return this;
     }
 
-    /**
-     * Sets the text alignment.
-     *
-     * @param alignment the alignment
-     * @return this element for chaining
-     */
+    /// Sets the text alignment.
+    ///
+    /// @param alignment the alignment
+    /// @return this element for chaining
     public TextElement alignment(Alignment alignment) {
         this.alignment = alignment;
         return this;
     }
 
-    /**
-     * Centers the text horizontally.
-     *
-     * @return this element for chaining
-     */
+    /// Centers the text horizontally.
+    ///
+    /// @return this element for chaining
     public TextElement centered() {
         this.alignment = Alignment.CENTER;
         return this;
     }
 
-    /**
-     * Aligns text to the right.
-     *
-     * @return this element for chaining
-     */
+    /// Aligns text to the right.
+    ///
+    /// @return this element for chaining
     public TextElement right() {
         this.alignment = Alignment.RIGHT;
         return this;
     }
 
-    /**
-     * Returns the layout constraint for this text element.
-     * <p>
-     * If no explicit constraint is set, a sensible default is calculated based on
-     * the content and overflow mode:
-     * <ul>
-     *   <li>For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses {@code min(lineCount)}
-     *       to ensure at least minimum height while allowing growth for wrapped content.</li>
-     *   <li>For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to let
-     *       the container decide (typically using {@code fill()}).</li>
-     * </ul>
-     *
-     * @return the constraint for this element
-     */
+    /// Returns the layout constraint for this text element.
+    ///
+    ///
+    ///
+    /// If no explicit constraint is set, a sensible default is calculated based on
+    /// the content and overflow mode:
+    ///
+    /// <li>For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses {@code min(lineCount)}
+    /// to ensure at least minimum height while allowing growth for wrapped content.
+    /// <li>For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to let
+    /// the container decide (typically using {@code fill()}).
+    ///
+    ///
+    /// @return the constraint for this element
     @Override
     public Constraint constraint() {
         if (layoutConstraint != null) {
@@ -147,12 +131,10 @@ public final class TextElement extends StyledElement<TextElement> {
         return null;
     }
 
-    /**
-     * Calculates a height constraint based on content line count and overflow mode.
-     * Used by vertical containers (Column) to determine the height for this text element.
-     *
-     * @return height constraint based on line count
-     */
+    /// Calculates a height constraint based on content line count and overflow mode.
+    /// Used by vertical containers (Column) to determine the height for this text element.
+    ///
+    /// @return height constraint based on line count
     Constraint calculateHeightConstraint() {
         int lineCount = countLines();
         Overflow currentOverflow = overflow != null ? overflow : Overflow.CLIP;
@@ -172,16 +154,16 @@ public final class TextElement extends StyledElement<TextElement> {
         return lineCount;
     }
 
-    /**
-     * Calculates the height needed for this text when rendered with wrapping at the given width.
-     * <p>
-     * For non-wrapping modes, returns the natural line count.
-     * For wrapping modes, calculates how many lines will be produced after wrapping.
-     *
-     * @param width the available width for rendering
-     * @param effectiveOverflow the overflow mode to use
-     * @return the number of lines needed
-     */
+    /// Calculates the height needed for this text when rendered with wrapping at the given width.
+    ///
+    ///
+    ///
+    /// For non-wrapping modes, returns the natural line count.
+    /// For wrapping modes, calculates how many lines will be produced after wrapping.
+    ///
+    /// @param width the available width for rendering
+    /// @param effectiveOverflow the overflow mode to use
+    /// @return the number of lines needed
     private int calculateWrappedHeight(int width, Overflow effectiveOverflow) {
         if (width <= 0 || content.isEmpty()) {
             return 1;
@@ -237,9 +219,7 @@ public final class TextElement extends StyledElement<TextElement> {
         return calculateWrappedHeight(availableWidth, effectiveOverflow);
     }
 
-    /**
-     * Resolves the overflow mode: programmatic value takes precedence, then CSS, then default.
-     */
+    /// Resolves the overflow mode: programmatic value takes precedence, then CSS, then default.
     private Overflow resolveOverflow(RenderContext context) {
         if (overflow != null) {
             return overflow;
@@ -285,3 +265,4 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
 }
+

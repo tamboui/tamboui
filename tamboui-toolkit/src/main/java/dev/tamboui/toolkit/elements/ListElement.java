@@ -34,51 +34,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * A scrollable container that displays a list of selectable items.
- * <p>
- * Unlike {@code ListWidget} (which only displays text), {@code ListElement}
- * can display any {@link StyledElement} as list items, including complex
- * layouts like rows with multiple styled children.
- * <p>
- * Example usage:
- * <pre>{@code
- * list("Item 1", "Item 2", "Item 3")
- *     .state(listState)
- *     .highlightColor(Color.YELLOW)
- *     .title("My List")
- *     .rounded()
- *
- * // With complex items:
- * list(
- *     row(text("Name: ").bold(), text("John").green()),
- *     row(text("Age: ").bold(), text("25").cyan())
- * ).state(listState)
- * }</pre>
- * <p>
- * CSS selectors:
- * <ul>
- *   <li>{@code ListElement} - styles the container (border, background)</li>
- *   <li>{@code ListElement-item} - styles each list item</li>
- *   <li>{@code ListElement-item:selected} - styles the selected item</li>
- *   <li>{@code ListElement-item:nth-child(odd/even)} - zebra striping</li>
- *   <li>{@code ListElement-scrollbar-thumb} - styles the scrollbar thumb</li>
- *   <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
- * </ul>
- *
- * @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
- */
+/// A scrollable container that displays a list of selectable items.
+///
+///
+///
+/// Unlike {@code ListWidget} (which only displays text), {@code ListElement}
+/// can display any {@link StyledElement} as list items, including complex
+/// layouts like rows with multiple styled children.
+///
+///
+///
+/// Example usage:
+/// ```java
+/// list("Item 1", "Item 2", "Item 3")
+///     .state(listState)
+///     .highlightColor(Color.YELLOW)
+///     .title("My List")
+///     .rounded()
+///
+/// // With complex items:
+/// list(
+///     row(text("Name: ").bold(), text("John").green()),
+///     row(text("Age: ").bold(), text("25").cyan())
+/// ).state(listState)
+/// }
+/// ```
+///
+///
+///
+/// CSS selectors:
+///
+/// - {@code ListElement} - styles the container (border, background)
+/// - {@code ListElement-item} - styles each list item
+/// - {@code ListElement-item:selected} - styles the selected item
+/// - {@code ListElement-item:nth-child(odd/even)} - zebra striping
+/// - {@code ListElement-scrollbar-thumb} - styles the scrollbar thumb
+/// - {@code ListElement-scrollbar-track} - styles the scrollbar track
+///
+///
+/// @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
 public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
-    /**
-     * Policy for displaying the scrollbar.
-     */
+    /// Policy for displaying the scrollbar.
     public enum ScrollBarPolicy {
-        /** Never show the scrollbar. */
+        /// Never show the scrollbar.
         NONE,
-        /** Always show the scrollbar. */
+        /// Always show the scrollbar.
         ALWAYS,
-        /** Show the scrollbar only when content exceeds the viewport. */
+        /// Show the scrollbar only when content exceeds the viewport.
         AS_NEEDED
     }
 
@@ -123,21 +126,17 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         }
     }
 
-    /**
-     * Creates a list container with styled element items.
-     *
-     * @param items the list items as styled elements
-     */
+    /// Creates a list container with styled element items.
+    ///
+    /// @param items the list items as styled elements
     public ListElement(StyledElement<?>... items) {
         this.items.addAll(Arrays.asList(items));
     }
 
-    /**
-     * Sets the list items from strings.
-     *
-     * @param items the text items
-     * @return this element
-     */
+    /// Sets the list items from strings.
+    ///
+    /// @param items the text items
+    /// @return this element
     public ListElement<T> items(String... items) {
         this.items.clear();
         for (String item : items) {
@@ -146,12 +145,10 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return this;
     }
 
-    /**
-     * Sets the list items from a collection of strings.
-     *
-     * @param items the text items
-     * @return this element
-     */
+    /// Sets the list items from a collection of strings.
+    ///
+    /// @param items the text items
+    /// @return this element
     public ListElement<T> items(List<String> items) {
         this.items.clear();
         for (String item : items) {
@@ -160,119 +157,97 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return this;
     }
 
-    /**
-     * Sets the list items from styled elements.
-     *
-     * @param elements the styled element items
-     * @return this element
-     */
+    /// Sets the list items from styled elements.
+    ///
+    /// @param elements the styled element items
+    /// @return this element
     public ListElement<T> elements(StyledElement<?>... elements) {
         this.items.clear();
         this.items.addAll(Arrays.asList(elements));
         return this;
     }
 
-    /**
-     * Adds a text item to the list.
-     *
-     * @param item the text to add
-     * @return this element
-     */
+    /// Adds a text item to the list.
+    ///
+    /// @param item the text to add
+    /// @return this element
     public ListElement<T> add(String item) {
         this.items.add(new TextElement(item));
         return this;
     }
 
-    /**
-     * Adds a styled element item to the list.
-     *
-     * @param element the element to add
-     * @return this element
-     */
+    /// Adds a styled element item to the list.
+    ///
+    /// @param element the element to add
+    /// @return this element
     public ListElement<T> add(StyledElement<?> element) {
         this.items.add(element);
         return this;
     }
 
-    /**
-     * Sets the selected index.
-     *
-     * @param index the index to select
-     * @return this element
-     */
+    /// Sets the selected index.
+    ///
+    /// @param index the index to select
+    /// @return this element
     public ListElement<T> selected(int index) {
         this.selectedIndex = Math.max(0, index);
         return this;
     }
 
-    /**
-     * Returns the currently selected index.
-     *
-     * @return the selected index
-     */
+    /// Returns the currently selected index.
+    ///
+    /// @return the selected index
     public int selected() {
         return selectedIndex;
     }
 
-    /**
-     * Sets the highlight style for selected items.
-     */
+    /// Sets the highlight style for selected items.
     public ListElement<T> highlightStyle(Style style) {
         this.highlightStyle = style;
         return this;
     }
 
-    /**
-     * Sets the highlight color for selected items.
-     */
+    /// Sets the highlight color for selected items.
     public ListElement<T> highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
         return this;
     }
 
-    /**
-     * Sets the symbol displayed before the selected item.
-     */
+    /// Sets the symbol displayed before the selected item.
     public ListElement<T> highlightSymbol(String symbol) {
         this.highlightSymbol = symbol;
         return this;
     }
 
-    /**
-     * Sets the title.
-     */
+    /// Sets the title.
     public ListElement<T> title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public ListElement<T> rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public ListElement<T> borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
 
-    /**
-     * Sets the data items and a renderer function.
-     * <p>
-     * The renderer function is called at render time to convert each data item
-     * to a styled element. This allows the list to reflect the current state of your data.
-     *
-     * @param data the list of data items
-     * @param renderer function to convert each item to a styled element
-     * @param <U> the data item type
-     * @return this element
-     */
+    /// Sets the data items and a renderer function.
+    ///
+    ///
+    ///
+    /// The renderer function is called at render time to convert each data item
+    /// to a styled element. This allows the list to reflect the current state of your data.
+    ///
+    /// @param data the list of data items
+    /// @param renderer function to convert each item to a styled element
+    /// @param <U> the data item type
+    /// @return this element
     public <U> ListElement<U> data(List<U> data, Function<U, StyledElement<?>> renderer) {
         @SuppressWarnings("unchecked")
         ListElement<U> self = (ListElement<U>) this;
@@ -282,43 +257,43 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return self;
     }
 
-    /**
-     * Sets the renderer function for converting data items to styled elements.
-     * <p>
-     * The renderer is called at render time for each data item.
-     *
-     * @param renderer function to convert each item to a styled element
-     * @return this element
-     */
+    /// Sets the renderer function for converting data items to styled elements.
+    ///
+    ///
+    ///
+    /// The renderer is called at render time for each data item.
+    ///
+    /// @param renderer function to convert each item to a styled element
+    /// @return this element
     public ListElement<T> itemRenderer(Function<T, StyledElement<?>> renderer) {
         this.itemRenderer = renderer;
         return this;
     }
 
-    /**
-     * Enables auto-scroll to keep the selected item visible.
-     * <p>
-     * When enabled, the list automatically scrolls to show the selected item
-     * before rendering.
-     * <p>
-     * Note: Cannot be combined with {@link #scrollToEnd()} or {@link #stickyScroll()}.
-     *
-     * @return this element
-     * @throws IllegalStateException if another scroll mode is already enabled
-     */
+    /// Enables auto-scroll to keep the selected item visible.
+    ///
+    ///
+    ///
+    /// When enabled, the list automatically scrolls to show the selected item
+    /// before rendering.
+    ///
+    ///
+    ///
+    /// Note: Cannot be combined with {@link #scrollToEnd()} or {@link #stickyScroll()}.
+    ///
+    /// @return this element
+    /// @throws IllegalStateException if another scroll mode is already enabled
     public ListElement<T> autoScroll() {
         checkScrollModeNotSet("autoScroll");
         this.autoScroll = true;
         return this;
     }
 
-    /**
-     * Sets whether auto-scroll is enabled.
-     *
-     * @param enabled true to enable auto-scroll
-     * @return this element
-     * @throws IllegalStateException if enabled and another scroll mode is already enabled
-     */
+    /// Sets whether auto-scroll is enabled.
+    ///
+    /// @param enabled true to enable auto-scroll
+    /// @return this element
+    /// @throws IllegalStateException if enabled and another scroll mode is already enabled
     public ListElement<T> autoScroll(boolean enabled) {
         if (enabled) {
             checkScrollModeNotSet("autoScroll");
@@ -327,43 +302,51 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return this;
     }
 
-    /**
-     * Scrolls the list to show the last items.
-     * <p>
-     * Unlike {@link #autoScroll()}, this scrolls to the end immediately
-     * without requiring a selection. Useful for chat messages, logs, or
-     * other content where you want to always show the most recent items.
-     * <p>
-     * Note: This always forces scroll to end, overriding any user scrolling.
-     * For logs or chat where you want auto-scroll that pauses when the user
-     * scrolls up, use {@link #stickyScroll()} instead.
-     * <p>
-     * Note: Cannot be combined with {@link #autoScroll()} or {@link #stickyScroll()}.
-     *
-     * @return this element
-     * @throws IllegalStateException if another scroll mode is already enabled
-     */
+    /// Scrolls the list to show the last items.
+    ///
+    ///
+    ///
+    /// Unlike {@link #autoScroll()}, this scrolls to the end immediately
+    /// without requiring a selection. Useful for chat messages, logs, or
+    /// other content where you want to always show the most recent items.
+    ///
+    ///
+    ///
+    /// Note: This always forces scroll to end, overriding any user scrolling.
+    /// For logs or chat where you want auto-scroll that pauses when the user
+    /// scrolls up, use {@link #stickyScroll()} instead.
+    ///
+    ///
+    ///
+    /// Note: Cannot be combined with {@link #autoScroll()} or {@link #stickyScroll()}.
+    ///
+    /// @return this element
+    /// @throws IllegalStateException if another scroll mode is already enabled
     public ListElement<T> scrollToEnd() {
         checkScrollModeNotSet("scrollToEnd");
         this.autoScrollToEnd = true;
         return this;
     }
 
-    /**
-     * Enables sticky scroll behavior for the list.
-     * <p>
-     * With sticky scroll, the list automatically scrolls to show new items
-     * at the bottom, but pauses auto-scrolling when the user scrolls up.
-     * Auto-scrolling resumes when the user scrolls back to the bottom.
-     * <p>
-     * This is ideal for logs, chat messages, or activity feeds where you want
-     * to show the latest content but allow users to scroll back through history.
-     * <p>
-     * Note: Cannot be combined with {@link #autoScroll()} or {@link #scrollToEnd()}.
-     *
-     * @return this element
-     * @throws IllegalStateException if another scroll mode is already enabled
-     */
+    /// Enables sticky scroll behavior for the list.
+    ///
+    ///
+    ///
+    /// With sticky scroll, the list automatically scrolls to show new items
+    /// at the bottom, but pauses auto-scrolling when the user scrolls up.
+    /// Auto-scrolling resumes when the user scrolls back to the bottom.
+    ///
+    ///
+    ///
+    /// This is ideal for logs, chat messages, or activity feeds where you want
+    /// to show the latest content but allow users to scroll back through history.
+    ///
+    ///
+    ///
+    /// Note: Cannot be combined with {@link #autoScroll()} or {@link #scrollToEnd()}.
+    ///
+    /// @return this element
+    /// @throws IllegalStateException if another scroll mode is already enabled
     public ListElement<T> stickyScroll() {
         checkScrollModeNotSet("stickyScroll");
         this.stickyScroll = true;
@@ -388,59 +371,51 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         }
     }
 
-    /**
-     * Enables showing a scrollbar on the right side of the list (always visible).
-     *
-     * @return this element
-     */
+    /// Enables showing a scrollbar on the right side of the list (always visible).
+    ///
+    /// @return this element
     public ListElement<T> scrollbar() {
         this.scrollBarPolicy = ScrollBarPolicy.ALWAYS;
         return this;
     }
 
-    /**
-     * Sets the scrollbar policy.
-     *
-     * @param policy the scrollbar display policy
-     * @return this element
-     */
+    /// Sets the scrollbar policy.
+    ///
+    /// @param policy the scrollbar display policy
+    /// @return this element
     public ListElement<T> scrollbar(ScrollBarPolicy policy) {
         this.scrollBarPolicy = policy != null ? policy : ScrollBarPolicy.NONE;
         return this;
     }
 
-    /**
-     * Configures the list for display-only mode (non-interactive scrolling).
-     * <p>
-     * This disables visual selection feedback by setting an empty highlight symbol
-     * and empty highlight style. Useful for displaying chat messages, logs, or
-     * other content where selection is not meaningful.
-     *
-     * @return this element
-     */
+    /// Configures the list for display-only mode (non-interactive scrolling).
+    ///
+    ///
+    ///
+    /// This disables visual selection feedback by setting an empty highlight symbol
+    /// and empty highlight style. Useful for displaying chat messages, logs, or
+    /// other content where selection is not meaningful.
+    ///
+    /// @return this element
     public ListElement<T> displayOnly() {
         this.highlightSymbol = "";
         this.highlightStyle = Style.EMPTY;
         return this;
     }
 
-    /**
-     * Sets the scrollbar thumb color.
-     *
-     * @param color the thumb color
-     * @return this element
-     */
+    /// Sets the scrollbar thumb color.
+    ///
+    /// @param color the thumb color
+    /// @return this element
     public ListElement<T> scrollbarThumbColor(Color color) {
         this.scrollbarThumbColor = color;
         return this;
     }
 
-    /**
-     * Sets the scrollbar track color.
-     *
-     * @param color the track color
-     * @return this element
-     */
+    /// Sets the scrollbar track color.
+    ///
+    /// @param color the track color
+    /// @return this element
     public ListElement<T> scrollbarTrackColor(Color color) {
         this.scrollbarTrackColor = color;
         return this;
@@ -448,39 +423,31 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     // Navigation methods
 
-    /**
-     * Selects the previous item.
-     */
+    /// Selects the previous item.
     public void selectPrevious() {
         if (selectedIndex > 0) {
             selectedIndex--;
         }
     }
 
-    /**
-     * Selects the next item.
-     *
-     * @param itemCount the total number of items
-     */
+    /// Selects the next item.
+    ///
+    /// @param itemCount the total number of items
     public void selectNext(int itemCount) {
         if (selectedIndex < itemCount - 1) {
             selectedIndex++;
         }
     }
 
-    /**
-     * Selects the first item.
-     */
+    /// Selects the first item.
     public void selectFirst() {
         selectedIndex = 0;
         scrollOffset = 0;
     }
 
-    /**
-     * Selects the last item.
-     *
-     * @param itemCount the total number of items
-     */
+    /// Selects the last item.
+    ///
+    /// @param itemCount the total number of items
     public void selectLast(int itemCount) {
         selectedIndex = Math.max(0, itemCount - 1);
     }
@@ -717,17 +684,17 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         }
     }
 
-    /**
-     * Returns the height of an item (in rows) given the available content width.
-     * <p>
-     * Uses {@link dev.tamboui.toolkit.element.Element#preferredHeight(int, RenderContext)} to allow
-     * elements like text to calculate wrapped height based on available width and CSS properties.
-     *
-     * @param item the item element
-     * @param contentWidth the available width for content
-     * @param context the render context for CSS resolution
-     * @return the height in rows
-     */
+    /// Returns the height of an item (in rows) given the available content width.
+    ///
+    ///
+    ///
+    /// Uses {@link dev.tamboui.toolkit.element.Element#preferredHeight(int, RenderContext)} to allow
+    /// elements like text to calculate wrapped height based on available width and CSS properties.
+    ///
+    /// @param item the item element
+    /// @param contentWidth the available width for content
+    /// @param context the render context for CSS resolution
+    /// @return the height in rows
     private int itemHeightOf(StyledElement<?> item, int contentWidth, RenderContext context) {
         // First check for explicit length constraint
         Constraint c = item.constraint();
@@ -739,9 +706,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return preferred > 0 ? preferred : 1;
     }
 
-    /**
-     * Scrolls to keep the selected item visible.
-     */
+    /// Scrolls to keep the selected item visible.
     private void scrollToSelected(int visibleHeight, int[] itemHeights) {
         // Calculate the top position of the selected item
         int selectedTop = 0;
@@ -883,3 +848,4 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return EventResult.UNHANDLED;
     }
 }
+

@@ -31,19 +31,19 @@ import dev.tamboui.widgets.text.Overflow;
 
 import java.io.IOException;
 
-/**
- * Demo TUI application showcasing the Paragraph widget.
- * <p>
- * Demonstrates various Paragraph features:
- * - Text alignment (left, center, right)
- * - Text wrapping (word, character)
- * - Multiple lines with different styles
- * - Bold, italic, underlined text
- * - Colored text
- * - Scroll support
- * - Block integration
- * - Hyperlinks (OSC8)
- */
+/// Demo TUI application showcasing the Paragraph widget.
+///
+///
+///
+/// Demonstrates various Paragraph features:
+/// - Text alignment (left, center, right)
+/// - Text wrapping (word, character)
+/// - Multiple lines with different styles
+/// - Bold, italic, underlined text
+/// - Colored text
+/// - Scroll support
+/// - Block integration
+/// - Hyperlinks (OSC8)
 public class ParagraphDemo {
 
     private boolean running = true;
@@ -135,9 +135,7 @@ public class ParagraphDemo {
         renderWrappedParagraph(frame, cols.get(1));
     }
 
-    /**
-     * Render a paragraph with centered text alignment.
-     */
+    /// Render a paragraph with centered text alignment.
     private void renderCenteredParagraph(Frame frame, Rect area) {
         Text text = Text.from(
             Line.from("Centered text"),
@@ -164,9 +162,7 @@ public class ParagraphDemo {
         frame.renderWidget(paragraph, area);
     }
 
-    /**
-     * Render a long paragraph that wraps text with various styles.
-     */
+    /// Render a long paragraph that wraps text with various styles.
     private void renderWrappedParagraph(Frame frame, Rect area) {
         // Create a long line that will wrap
         String shortLine = "Slice, layer, and bake the vegetables. ";
@@ -236,4 +232,5 @@ public class ParagraphDemo {
         frame.renderWidget(footer, area);
     }
 }
+
 

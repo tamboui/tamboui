@@ -180,3 +180,4 @@ class ActionHandlerTest {
         assertThat(receivedActions).containsExactly(Actions.MOVE_UP, Actions.MOVE_DOWN);
     }
 }
+

@@ -13,51 +13,57 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-/**
- * Factory for creating {@link Backend} instances using the {@link ServiceLoader} mechanism.
- * <p>
- * This factory discovers {@link BackendProvider} implementations on the classpath
- * and uses them to create backend instances. When multiple providers are available,
- * they are tried in order until one successfully creates a backend.
- * <p>
- * The provider order can be explicitly controlled via a comma-separated list
- * (e.g., "panama,jline") in the system property or environment variable.
- *
- * @see BackendProvider
- * @see Backend
- */
+/// Factory for creating {@link Backend} instances using the {@link ServiceLoader} mechanism.
+///
+///
+///
+/// This factory discovers {@link BackendProvider} implementations on the classpath
+/// and uses them to create backend instances. When multiple providers are available,
+/// they are tried in order until one successfully creates a backend.
+///
+///
+///
+/// The provider order can be explicitly controlled via a comma-separated list
+/// (e.g., "panama,jline") in the system property or environment variable.
+///
+/// @see BackendProvider
+/// @see Backend
 public final class BackendFactory {
 
     private BackendFactory() {
         // Utility class
     }
 
-    /**
-     * Creates a new backend instance using the discovered provider.
-     * <p>
-     * This method discovers {@link BackendProvider} implementations on the classpath
-     * and selects one based on the following priority:
-     * <ol>
-     *   <li>System property {@code tamboui.backend} (if set)</li>
-     *   <li>Environment variable {@code TAMBOUI_BACKEND} (if set)</li>
-     *   <li>Auto-discovery via ServiceLoader</li>
-     * </ol>
-     * <p>
-     * The provider can be specified by:
-     * <ul>
-     *   <li>Simple name (e.g., "jline", "panama") - matches the provider's {@link BackendProvider#name()}</li>
-     *   <li>Fully qualified class name (e.g., "dev.tamboui.backend.jline.JLineBackendProvider")</li>
-     *   <li>Comma-separated list (e.g., "panama,jline") - tries each in order until one succeeds</li>
-     * </ul>
-     * <p>
-     * Providers are tried in order until one successfully creates a backend. If a provider
-     * fails (throws an exception), the next provider is attempted. This applies both to
-     * explicitly specified providers and auto-discovered ones.
-     *
-     * @return a new backend instance
-     * @throws IOException if backend creation fails
-     * @throws IllegalStateException if no provider is found or all providers fail
-     */
+    /// Creates a new backend instance using the discovered provider.
+    ///
+    ///
+    ///
+    /// This method discovers {@link BackendProvider} implementations on the classpath
+    /// and selects one based on the following priority:
+    ///
+    /// 1. System property {@code tamboui.backend} (if set)
+    /// 1. Environment variable {@code TAMBOUI_BACKEND} (if set)
+    /// 1. Auto-discovery via ServiceLoader
+    ///
+    ///
+    ///
+    ///
+    /// The provider can be specified by:
+    ///
+    /// - Simple name (e.g., "jline", "panama") - matches the provider's {@link BackendProvider#name()}
+    /// - Fully qualified class name (e.g., "dev.tamboui.backend.jline.JLineBackendProvider")
+    /// - Comma-separated list (e.g., "panama,jline") - tries each in order until one succeeds
+    ///
+    ///
+    ///
+    ///
+    /// Providers are tried in order until one successfully creates a backend. If a provider
+    /// fails (throws an exception), the next provider is attempted. This applies both to
+    /// explicitly specified providers and auto-discovered ones.
+    ///
+    /// @return a new backend instance
+    /// @throws IOException if backend creation fails
+    /// @throws IllegalStateException if no provider is found or all providers fail
     public static Backend create() throws IOException {
         // Check system property first, then environment variable
         String userSelectedProvider = System.getProperty("tamboui.backend");
@@ -85,14 +91,12 @@ public final class BackendFactory {
         return backend;
     }
 
-    /**
-     * Resolves providers from a user specification, returning them in the specified order.
-     *
-     * @param providerSpec the provider specification (may be comma-separated)
-     * @param allProviders all available providers from ServiceLoader
-     * @return list of matching providers in the specified order
-     * @throws IllegalStateException if a specified provider is not found
-     */
+    /// Resolves providers from a user specification, returning them in the specified order.
+    ///
+    /// @param providerSpec the provider specification (may be comma-separated)
+    /// @param allProviders all available providers from ServiceLoader
+    /// @return list of matching providers in the specified order
+    /// @throws IllegalStateException if a specified provider is not found
     private static List<BackendProvider> resolveProviders(String providerSpec, List<BackendProvider> allProviders) {
         List<BackendProvider> resolved = new java.util.ArrayList<>();
         for (String spec : providerSpec.split(",")) {
@@ -113,13 +117,11 @@ public final class BackendFactory {
         return resolved;
     }
 
-    /**
-     * Tries each provider in order until one successfully creates a backend.
-     *
-     * @param providers the providers to try
-     * @return a new backend instance
-     * @throws IllegalStateException if no provider succeeds
-     */
+    /// Tries each provider in order until one successfully creates a backend.
+    ///
+    /// @param providers the providers to try
+    /// @return a new backend instance
+    /// @throws IllegalStateException if no provider succeeds
     private static Backend tryProviders(List<BackendProvider> providers) {
         if (providers.isEmpty()) {
             throw new IllegalStateException(
@@ -147,15 +149,14 @@ public final class BackendFactory {
         );
     }
 
-    /**
-     * Formats a list of providers into a user-friendly string showing both names and class names.
-     *
-     * @param providers the list of providers
-     * @return a formatted string listing available providers
-     */
+    /// Formats a list of providers into a user-friendly string showing both names and class names.
+    ///
+    /// @param providers the list of providers
+    /// @return a formatted string listing available providers
     private static String formatAvailableProviders(List<BackendProvider> providers) {
         return providers.stream()
             .map(p -> p.name() + " (" + p.getClass().getName() + ")")
             .collect(Collectors.joining("\n"));
     }
 }
+

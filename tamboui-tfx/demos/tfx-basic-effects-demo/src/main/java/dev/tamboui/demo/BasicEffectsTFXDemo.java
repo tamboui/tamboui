@@ -48,18 +48,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * Interactive demo showcasing TamboUI TFX effects.
- * <p>
- * Left panel: List of available effects (navigate with Up/Down arrows)
- * Center panel: Content area showing various text and widgets
- * <p>
- * Controls:
- * - Up/Down arrows: Navigate effect list
- * - Enter/Space: Trigger selected effect
- * - 't': Toggle between text and colored blocks view
- * - 'q': Quit
- */
+/// Interactive demo showcasing TamboUI TFX effects.
+///
+///
+///
+/// Left panel: List of available effects (navigate with Up/Down arrows)
+/// Center panel: Content area showing various text and widgets
+///
+///
+///
+/// Controls:
+/// - Up/Down arrows: Navigate effect list
+/// - Enter/Space: Trigger selected effect
+/// - 't': Toggle between text and colored blocks view
+/// - 'q': Quit
 public class BasicEffectsTFXDemo {
     
     private Instant lastFrame = Instant.now();
@@ -164,14 +166,12 @@ public class BasicEffectsTFXDemo {
     }
     
     
-    /**
-     * Finds the next selectable index in the given direction.
-     * 
-     * @param startIdx The starting index
-     * @param itemToDemoIndex The mapping from item index to demo index
-     * @param direction True for forward (down), false for backward (up)
-     * @return The next selectable index, or -1 if none found
-     */
+    /// Finds the next selectable index in the given direction.
+    ///
+    /// @param startIdx The starting index
+    /// @param itemToDemoIndex The mapping from item index to demo index
+    /// @param direction True for forward (down), false for backward (up)
+    /// @return The next selectable index, or -1 if none found
     private void navigateUp() {
         if (itemToDemoIndex == null || itemToDemoIndex.isEmpty()) {
             listState.selectPrevious();
@@ -243,10 +243,8 @@ public class BasicEffectsTFXDemo {
         return -1;
     }
     
-    /**
-     * Finds the next selectable index (searches forward first, then backward).
-     * This is used as a fallback when we don't know the direction.
-     */
+    /// Finds the next selectable index (searches forward first, then backward).
+    /// This is used as a fallback when we don't know the direction.
     private int findNextSelectableIndex(int startIdx, List<Integer> itemToDemoIndex) {
         // Search forward first
         int forward = findNextSelectableIndex(startIdx, itemToDemoIndex, true);
@@ -570,3 +568,4 @@ public class BasicEffectsTFXDemo {
         }
     }
 }
+

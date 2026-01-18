@@ -6,27 +6,22 @@ package dev.tamboui.style;
 
 import java.util.Objects;
 
-/**
- * Represents the width of an element.
- * <p>
- * Supports the following values:
- * <ul>
- *   <li>{@code fill} - element fills the available container width</li>
- *   <li>{@code fit} - element width fits its content</li>
- *   <li>Percentage values like {@code 50%} or {@code 0.5}</li>
- *   <li>Fixed character counts like {@code 20}</li>
- * </ul>
- */
+/// Represents the width of an element.
+///
+///
+///
+/// Supports the following values:
+///
+/// - {@code fill} - element fills the available container width
+/// - {@code fit} - element width fits its content
+/// - Percentage values like {@code 50%} or {@code 0.5}
+/// - Fixed character counts like {@code 20}
 public final class Width {
 
-    /**
-     * Width that fills the available container space.
-     */
+    /// Width that fills the available container space.
     public static final Width FILL = new Width(Type.FILL, 0);
 
-    /**
-     * Width that fits the content.
-     */
+    /// Width that fits the content.
     public static final Width FIT = new Width(Type.FIT, 0);
 
     private final Type type;
@@ -37,79 +32,61 @@ public final class Width {
         this.value = value;
     }
 
-    /**
-     * Creates a percentage-based width.
-     *
-     * @param percent the percentage (0.0 to 1.0, or 0 to 100)
-     * @return a percentage width
-     */
+    /// Creates a percentage-based width.
+    ///
+    /// @param percent the percentage (0.0 to 1.0, or 0 to 100)
+    /// @return a percentage width
     public static Width percent(double percent) {
         // Normalize: if > 1, assume it's 0-100 scale
         double normalized = percent > 1 ? percent / 100.0 : percent;
         return new Width(Type.PERCENT, normalized);
     }
 
-    /**
-     * Creates a fixed character width.
-     *
-     * @param chars the number of characters
-     * @return a fixed width
-     */
+    /// Creates a fixed character width.
+    ///
+    /// @param chars the number of characters
+    /// @return a fixed width
     public static Width fixed(int chars) {
         return new Width(Type.FIXED, chars);
     }
 
-    /**
-     * Returns true if this width fills the container.
-     */
+    /// Returns true if this width fills the container.
     public boolean isFill() {
         return type == Type.FILL;
     }
 
-    /**
-     * Returns true if this width fits the content.
-     */
+    /// Returns true if this width fits the content.
     public boolean isFit() {
         return type == Type.FIT;
     }
 
-    /**
-     * Returns true if this width is a percentage.
-     */
+    /// Returns true if this width is a percentage.
     public boolean isPercent() {
         return type == Type.PERCENT;
     }
 
-    /**
-     * Returns true if this width is a fixed character count.
-     */
+    /// Returns true if this width is a fixed character count.
     public boolean isFixed() {
         return type == Type.FIXED;
     }
 
-    /**
-     * Returns the percentage value (0.0 to 1.0).
-     * Only meaningful if {@link #isPercent()} returns true.
-     */
+    /// Returns the percentage value (0.0 to 1.0).
+    /// Only meaningful if {@link #isPercent()} returns true.
     public double percent() {
         return value;
     }
 
-    /**
-     * Returns the fixed character count.
-     * Only meaningful if {@link #isFixed()} returns true.
-     */
+    /// Returns the fixed character count.
+    /// Only meaningful if {@link #isFixed()} returns true.
     public int chars() {
         return (int) value;
     }
 
-    /**
-     * Computes the actual width in characters given a container width.
-     *
-     * @param containerWidth the available container width
-     * @param contentWidth the content width (used for FIT)
-     * @return the computed width in characters
-     */
+    /// Computes the actual width in characters given a container width.
+    ///
+    /// @param containerWidth the available container width
+    /// @param contentWidth the content width (used for FIT)
+    /// @return the computed width in characters
     public int compute(int containerWidth, int contentWidth) {
         switch (type) {
             case FILL:
@@ -161,3 +138,4 @@ public final class Width {
         FIXED
     }
 }
+

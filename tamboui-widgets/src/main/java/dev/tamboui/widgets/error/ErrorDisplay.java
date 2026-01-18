@@ -20,28 +20,29 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A widget that displays error information with a stack trace.
- * <p>
- * Used to show exceptions that occur during rendering. The widget displays:
- * <ul>
- *   <li>Exception type in red</li>
- *   <li>Error message</li>
- *   <li>Scrollable stack trace</li>
- *   <li>Footer with instructions</li>
- * </ul>
- *
- * <pre>{@code
- * ErrorDisplay display = ErrorDisplay.builder()
- *     .error(exception)
- *     .scroll(scrollOffset)
- *     .title(" ERROR ")
- *     .footer(" Press 'q' to quit, arrows to scroll ")
- *     .build();
- *
- * display.render(area, buffer);
- * }</pre>
- */
+/// A widget that displays error information with a stack trace.
+///
+///
+///
+/// Used to show exceptions that occur during rendering. The widget displays:
+///
+/// - Exception type in red
+/// - Error message
+/// - Scrollable stack trace
+/// - Footer with instructions
+///
+///
+/// ```java
+/// ErrorDisplay display = ErrorDisplay.builder()
+///     .error(exception)
+///     .scroll(scrollOffset)
+///     .title(" ERROR ")
+///     .footer(" Press 'q' to quit, arrows to scroll ")
+///     .build();
+///
+/// display.render(area, buffer);
+/// }
+/// ```
 public final class ErrorDisplay implements Widget {
 
     private final Throwable error;
@@ -58,21 +59,17 @@ public final class ErrorDisplay implements Widget {
         this.borderColor = builder.borderColor;
     }
 
-    /**
-     * Creates a new builder.
-     *
-     * @return a new builder
-     */
+    /// Creates a new builder.
+    ///
+    /// @return a new builder
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Creates an ErrorDisplay for the given exception with default settings.
-     *
-     * @param error the exception to display
-     * @return a new ErrorDisplay
-     */
+    /// Creates an ErrorDisplay for the given exception with default settings.
+    ///
+    /// @param error the exception to display
+    /// @return a new ErrorDisplay
     public static ErrorDisplay from(Throwable error) {
         return builder().error(error).build();
     }
@@ -149,20 +146,18 @@ public final class ErrorDisplay implements Widget {
         return sw.toString();
     }
 
-    /**
-     * Returns the total number of content lines.
-     * <p>
-     * Useful for calculating scroll bounds.
-     *
-     * @return the number of lines
-     */
+    /// Returns the total number of content lines.
+    ///
+    ///
+    ///
+    /// Useful for calculating scroll bounds.
+    ///
+    /// @return the number of lines
     public int lineCount() {
         return buildContentLines().size();
     }
 
-    /**
-     * Builder for {@link ErrorDisplay}.
-     */
+    /// Builder for {@link ErrorDisplay}.
     public static final class Builder {
         private Throwable error;
         private String title = " ERROR ";
@@ -173,68 +168,57 @@ public final class ErrorDisplay implements Widget {
         private Builder() {
         }
 
-        /**
-         * Sets the error to display.
-         *
-         * @param error the exception
-         * @return this builder
-         */
+        /// Sets the error to display.
+        ///
+        /// @param error the exception
+        /// @return this builder
         public Builder error(Throwable error) {
             this.error = error;
             return this;
         }
 
-        /**
-         * Sets the title shown at the top of the border.
-         *
-         * @param title the title
-         * @return this builder
-         */
+        /// Sets the title shown at the top of the border.
+        ///
+        /// @param title the title
+        /// @return this builder
         public Builder title(String title) {
             this.title = title;
             return this;
         }
 
-        /**
-         * Sets the footer shown at the bottom of the border.
-         *
-         * @param footer the footer
-         * @return this builder
-         */
+        /// Sets the footer shown at the bottom of the border.
+        ///
+        /// @param footer the footer
+        /// @return this builder
         public Builder footer(String footer) {
             this.footer = footer;
             return this;
         }
 
-        /**
-         * Sets the scroll offset.
-         *
-         * @param scroll the number of lines to scroll
-         * @return this builder
-         */
+        /// Sets the scroll offset.
+        ///
+        /// @param scroll the number of lines to scroll
+        /// @return this builder
         public Builder scroll(int scroll) {
             this.scroll = Math.max(0, scroll);
             return this;
         }
 
-        /**
-         * Sets the border color.
-         *
-         * @param color the border color
-         * @return this builder
-         */
+        /// Sets the border color.
+        ///
+        /// @param color the border color
+        /// @return this builder
         public Builder borderColor(Color color) {
             this.borderColor = color;
             return this;
         }
 
-        /**
-         * Builds the ErrorDisplay.
-         *
-         * @return a new ErrorDisplay
-         */
+        /// Builds the ErrorDisplay.
+        ///
+        /// @return a new ErrorDisplay
         public ErrorDisplay build() {
             return new ErrorDisplay(this);
         }
     }
 }
+

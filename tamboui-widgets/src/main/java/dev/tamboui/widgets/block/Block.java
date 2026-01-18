@@ -22,17 +22,15 @@ import dev.tamboui.widgets.text.Overflow;
 import java.util.EnumSet;
 import java.util.List;
 
-/**
- * A block is a container widget with optional borders and titles.
- * <p>
- * Supports style-aware properties: {@code border-type}, {@code border-color},
- * {@code background}, and {@code color}.
- */
+/// A block is a container widget with optional borders and titles.
+///
+///
+///
+/// Supports style-aware properties: {@code border-type}, {@code border-color},
+/// {@code background}, and {@code color}.
 public final class Block implements Widget {
 
-    /**
-     * Property key for border-type property.
-     */
+    /// Property key for border-type property.
     public static final PropertyKey<BorderType> BORDER_TYPE =
             PropertyKey.of("border-type", BorderTypeConverter.INSTANCE);
 
@@ -84,9 +82,7 @@ public final class Block implements Widget {
         return builder().build();
     }
 
-    /**
-     * Returns the inner area after accounting for borders, titles, and padding.
-     */
+    /// Returns the inner area after accounting for borders, titles, and padding.
     public Rect inner(Rect area) {
         int x = area.x();
         int y = area.y();
@@ -492,34 +488,28 @@ public final class Block implements Widget {
             return this;
         }
 
-        /**
-         * Sets the border color.
-         *
-         * @param color the border color
-         * @return this builder
-         */
+        /// Sets the border color.
+        ///
+        /// @param color the border color
+        /// @return this builder
         public Builder borderColor(Color color) {
             this.borderColor.set(color);
             return this;
         }
 
-        /**
-         * Sets the background color.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the foreground (text) color.
-         *
-         * @param color the foreground color
-         * @return this builder
-         */
+        /// Sets the foreground (text) color.
+        ///
+        /// @param color the foreground color
+        /// @return this builder
         public Builder foreground(Color color) {
             this.foreground.set(color);
             return this;
@@ -530,15 +520,15 @@ public final class Block implements Widget {
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code border-type} and {@code border-color}
-         * will fall back to resolved values if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code border-type} and {@code border-color}
+        /// will fall back to resolved values if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
@@ -559,15 +549,15 @@ public final class Block implements Widget {
             return this;
         }
 
-        /**
-         * Sets the merge strategy for borders.
-         * <p>
-         * When blocks are rendered with overlapping borders, this strategy determines
-         * how the borders are merged. See {@link MergeStrategy} for details.
-         *
-         * @param mergeStrategy the merge strategy to use
-         * @return this builder
-         */
+        /// Sets the merge strategy for borders.
+        ///
+        ///
+        ///
+        /// When blocks are rendered with overlapping borders, this strategy determines
+        /// how the borders are merged. See {@link MergeStrategy} for details.
+        ///
+        /// @param mergeStrategy the merge strategy to use
+        /// @return this builder
         public Builder mergeBorders(MergeStrategy mergeStrategy) {
             this.mergeStrategy = mergeStrategy;
             return this;
@@ -578,3 +568,4 @@ public final class Block implements Widget {
         }
     }
 }
+

@@ -17,28 +17,29 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 
-/**
- * Base class for stateful components with event handling.
- * <p>
- * Components handle key and mouse events when focused using
- * {@code @OnAction} annotations:
- *
- * <pre>{@code
- * public class CounterComponent extends Component<CounterComponent> {
- *     private int count = 0;
- *
- *     @OnAction(Actions.MOVE_UP)
- *     void increment(Event event) {
- *         count++;
- *     }
- *
- *     @Override
- *     protected Element render() {
- *         return text("Count: " + count);
- *     }
- * }
- * }</pre>
- */
+/// Base class for stateful components with event handling.
+///
+///
+///
+/// Components handle key and mouse events when focused using
+/// {@code @OnAction} annotations:
+///
+/// ```java
+/// public class CounterComponent extends Component<CounterComponent> {
+///     private int count = 0;
+///
+///     @OnAction(Actions.MOVE_UP)
+///     void increment(Event event) {
+///         count++;
+///     }
+///
+///     @Override
+///     protected Element render() {
+///         return text("Count: " + count);
+///     }
+/// }
+/// }
+/// ```
 public abstract class Component<T extends Component<T>> extends StyledElement<T> implements Focusable {
 
     private ActionHandler actionHandler;
@@ -49,21 +50,17 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
         return true;
     }
 
-    /**
-     * Returns whether this component is currently focused.
-     *
-     * @return true if focused
-     */
+    /// Returns whether this component is currently focused.
+    ///
+    /// @return true if focused
     protected boolean isFocused() {
         return currentRenderContext != null && currentRenderContext.isFocused(elementId);
     }
 
-    /**
-     * Renders the component's content.
-     * Subclasses must implement this to define the component's appearance.
-     *
-     * @return the element tree to render
-     */
+    /// Renders the component's content.
+    /// Subclasses must implement this to define the component's appearance.
+    ///
+    /// @return the element tree to render
     protected abstract Element render();
 
     @Override
@@ -92,10 +89,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
         }
     }
 
-    /**
-     * Called internally to handle key events.
-     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
-     */
+    /// Called internally to handle key events.
+    /// Dispatches to {@code @OnAction} annotated methods via ActionHandler.
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (focused && actionHandler != null && actionHandler.dispatch(event)) {
             return EventResult.HANDLED;
@@ -103,10 +98,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
         return EventResult.UNHANDLED;
     }
 
-    /**
-     * Called internally to handle mouse events.
-     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
-     */
+    /// Called internally to handle mouse events.
+    /// Dispatches to {@code @OnAction} annotated methods via ActionHandler.
     public EventResult handleMouseEvent(MouseEvent event) {
         if (actionHandler != null && actionHandler.dispatch(event)) {
             return EventResult.HANDLED;
@@ -114,3 +107,4 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
         return EventResult.UNHANDLED;
     }
 }
+

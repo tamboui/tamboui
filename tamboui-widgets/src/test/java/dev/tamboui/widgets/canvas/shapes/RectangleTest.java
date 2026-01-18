@@ -78,3 +78,4 @@ class RectangleTest {
         // Should clip and not throw
     }
 }
+

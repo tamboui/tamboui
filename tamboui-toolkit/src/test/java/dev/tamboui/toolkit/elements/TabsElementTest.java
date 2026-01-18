@@ -22,9 +22,7 @@ import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for TabsElement.
- */
+/// Tests for TabsElement.
 class TabsElementTest {
 
     @Test
@@ -271,3 +269,4 @@ class TabsElementTest {
         assertThat(tabs("A", "B").title("Nav").styleAttributes()).containsEntry("title", "Nav");
     }
 }
+

@@ -10,22 +10,26 @@ import dev.tamboui.layout.Fraction;
 
 import java.util.List;
 
-/**
- * Bridge between TamboUI layout constraints and the Cassowary solver.
- *
- * <p>This class translates TamboUI's constraint types and Flex modes into
- * Cassowary constraints and solves them using the simplex method.
- *
- * <p>The solver creates variables for each segment's position and size,
- * then adds constraints based on the TamboUI constraint types and the
- * selected Flex distribution mode.
- *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
- *
- * @see Solver
- * @see dev.tamboui.layout.Layout
- */
+/// Bridge between TamboUI layout constraints and the Cassowary solver.
+///
+///
+///
+/// This class translates TamboUI's constraint types and Flex modes into
+/// Cassowary constraints and solves them using the simplex method.
+///
+///
+///
+/// The solver creates variables for each segment's position and size,
+/// then adds constraints based on the TamboUI constraint types and the
+/// selected Flex distribution mode.
+///
+///
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
+/// avoiding the cumulative rounding errors that occur with floating-point.
+///
+/// @see Solver
+/// @see dev.tamboui.layout.Layout
 public final class LayoutSolver {
 
     // Constraint strengths matching ratatui's hierarchy (higher = more important)
@@ -40,22 +44,18 @@ public final class LayoutSolver {
 
     private final Solver solver;
 
-    /**
-     * Creates a new layout solver.
-     */
+    /// Creates a new layout solver.
     public LayoutSolver() {
         this.solver = new Solver();
     }
 
-    /**
-     * Solves layout constraints and returns the computed sizes.
-     *
-     * @param constraints TamboUI constraints for each segment
-     * @param available   total available space
-     * @param spacing     space between elements
-     * @param flex        flex distribution mode
-     * @return array of computed sizes for each constraint
-     */
+    /// Solves layout constraints and returns the computed sizes.
+    ///
+    /// @param constraints TamboUI constraints for each segment
+    /// @param available   total available space
+    /// @param spacing     space between elements
+    /// @param flex        flex distribution mode
+    /// @return array of computed sizes for each constraint
     public int[] solve(List<Constraint> constraints, int available, int spacing, Flex flex) {
         solver.reset();
 
@@ -102,9 +102,7 @@ public final class LayoutSolver {
         return roundWithConstraint(fractionSizes, available);
     }
 
-    /**
-     * Adds structural constraints that define the relationship between positions and sizes.
-     */
+    /// Adds structural constraints that define the relationship between positions and sizes.
     private void addStructuralConstraints(Variable[] positions, Variable[] sizes,
                                           int n, int spacing, int available) {
         // All sizes must be non-negative
@@ -135,9 +133,7 @@ public final class LayoutSolver {
                         .lessThanOrEqual(available, Strength.REQUIRED));
     }
 
-    /**
-     * Converts a TamboUI constraint to Cassowary constraints.
-     */
+    /// Converts a TamboUI constraint to Cassowary constraints.
     private void addConstraintFor(Constraint c, Variable size, int available) {
         if (c instanceof Constraint.Length) {
             // Fixed size: size == value (strong)
@@ -194,10 +190,8 @@ public final class LayoutSolver {
         }
     }
 
-    /**
-     * Adds proportionality constraints between Fill segments.
-     * Makes Fill(2) twice as large as Fill(1), etc.
-     */
+    /// Adds proportionality constraints between Fill segments.
+    /// Makes Fill(2) twice as large as Fill(1), etc.
     private void addFillProportionalityConstraints(List<Constraint> constraints, Variable[] sizes) {
         int n = constraints.size();
 
@@ -218,9 +212,7 @@ public final class LayoutSolver {
         }
     }
 
-    /**
-     * Returns the fill scale for a constraint, or 0 if it's not a fill-like constraint.
-     */
+    /// Returns the fill scale for a constraint, or 0 if it's not a fill-like constraint.
     private Fraction getFillScale(Constraint c) {
         if (c instanceof Constraint.Fill) {
             int weight = ((Constraint.Fill) c).weight();
@@ -233,10 +225,8 @@ public final class LayoutSolver {
         return Fraction.ZERO;
     }
 
-    /**
-     * Adds weak constraints that make all segments tend toward equal size.
-     * This serves as a tiebreaker when other constraints don't fully determine sizes.
-     */
+    /// Adds weak constraints that make all segments tend toward equal size.
+    /// This serves as a tiebreaker when other constraints don't fully determine sizes.
     private void addEqualSizeTendency(Variable[] sizes) {
         int n = sizes.length;
         for (int i = 0; i < n - 1; i++) {
@@ -247,21 +237,23 @@ public final class LayoutSolver {
         }
     }
 
-    /**
-     * Converts Fraction sizes to integers using the largest remainder method.
-     *
-     * <p>This method is necessary because simple rounding (Math.round on each value)
-     * can produce totals that don't match the available space. For example, with
-     * constraints [1/3, 2/3] of 100, naive rounding gives [33, 67] = 100, but
-     * [0.333..., 0.666...] might round to [33, 66] = 99, losing a pixel.
-     *
-     * <p>The largest remainder method (also known as Hamilton's method) ensures fair
-     * distribution: floor all values, then give +1 to those with the largest remainders.
-     *
-     * @param fractionSizes the exact Fraction sizes from the solver
-     * @param target        the maximum sum (available space)
-     * @return integer sizes that sum to at most target
-     */
+    /// Converts Fraction sizes to integers using the largest remainder method.
+    ///
+    ///
+    ///
+    /// This method is necessary because simple rounding (Math.round on each value)
+    /// can produce totals that don't match the available space. For example, with
+    /// constraints [1/3, 2/3] of 100, naive rounding gives [33, 67] = 100, but
+    /// [0.333..., 0.666...] might round to [33, 66] = 99, losing a pixel.
+    ///
+    ///
+    ///
+    /// The largest remainder method (also known as Hamilton's method) ensures fair
+    /// distribution: floor all values, then give +1 to those with the largest remainders.
+    ///
+    /// @param fractionSizes the exact Fraction sizes from the solver
+    /// @param target        the maximum sum (available space)
+    /// @return integer sizes that sum to at most target
     private int[] roundWithConstraint(Fraction[] fractionSizes, int target) {
         int n = fractionSizes.length;
         int[] result = new int[n];
@@ -297,3 +289,4 @@ public final class LayoutSolver {
         return result;
     }
 }
+

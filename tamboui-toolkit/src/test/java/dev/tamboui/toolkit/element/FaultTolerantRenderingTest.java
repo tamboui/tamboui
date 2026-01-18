@@ -18,9 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for fault-tolerant rendering in DefaultRenderContext.
- */
+/// Tests for fault-tolerant rendering in DefaultRenderContext.
 class FaultTolerantRenderingTest {
 
     private DefaultRenderContext context;
@@ -163,3 +161,4 @@ class FaultTolerantRenderingTest {
         };
     }
 }
+

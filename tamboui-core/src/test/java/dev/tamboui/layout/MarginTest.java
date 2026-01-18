@@ -66,3 +66,4 @@ class MarginTest {
         assertThat(Margin.NONE.verticalTotal()).isEqualTo(0);
     }
 }
+

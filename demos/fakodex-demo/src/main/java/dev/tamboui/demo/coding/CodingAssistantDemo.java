@@ -31,19 +31,18 @@ import java.util.Random;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A Codex/Claude Code-like AI coding assistant demo with linear conversation flow.
- * <p>
- * This demo showcases a terminal UI similar to modern AI coding assistants with:
- * <ul>
- *   <li>Linear conversation flow with inline tool calls</li>
- *   <li>Animated spinners for active operations</li>
- *   <li>Code blocks and diffs displayed inline</li>
- *   <li>CSS styling with the toolkit module</li>
- *   <li>Key bindings for navigation</li>
- *   <li>Modern Java constructs (records, var, switch expressions)</li>
- * </ul>
- */
+/// A Codex/Claude Code-like AI coding assistant demo with linear conversation flow.
+///
+///
+///
+/// This demo showcases a terminal UI similar to modern AI coding assistants with:
+///
+/// - Linear conversation flow with inline tool calls
+/// - Animated spinners for active operations
+/// - Code blocks and diffs displayed inline
+/// - CSS styling with the toolkit module
+/// - Key bindings for navigation
+/// - Modern Java constructs (records, var, switch expressions)
 public class CodingAssistantDemo {
 
     // Theme colors - muted, professional palette
@@ -91,9 +90,7 @@ public class CodingAssistantDemo {
     // Pending action to run after typing completes
     private Runnable afterTypingAction = null;
 
-    /**
-     * A styled line with text and color.
-     */
+    /// A styled line with text and color.
     private record StyledLine(String content, Color color, boolean bold) {
         StyledElement<?> toElement() {
             var style = Style.EMPTY.fg(color);
@@ -116,16 +113,12 @@ public class CodingAssistantDemo {
         }
     }
 
-    /**
-     * Tool call types.
-     */
+    /// Tool call types.
     private enum ToolType {
         READ_FILE, WRITE_FILE, EDIT_FILE, BASH, SEARCH
     }
 
-    /**
-     * An active tool call being animated.
-     */
+    /// An active tool call being animated.
     private static class ActiveToolCall {
         final int lineIndex;
         final int startTick;
@@ -148,9 +141,7 @@ public class CodingAssistantDemo {
         }
     }
 
-    /**
-     * Pending AI response typing animation.
-     */
+    /// Pending AI response typing animation.
     private static class PendingTyping {
         final String fullText;
         int currentIndex;
@@ -176,21 +167,17 @@ public class CodingAssistantDemo {
     }
 
 
-    /**
-     * Main entry point.
-     *
-     * @param args command line arguments
-     * @throws Exception if an error occurs
-     */
+    /// Main entry point.
+    ///
+    /// @param args command line arguments
+    /// @throws Exception if an error occurs
     public static void main(String[] args) throws Exception {
         new CodingAssistantDemo().run();
     }
 
-    /**
-     * Runs the demo application.
-     *
-     * @throws Exception if an error occurs
-     */
+    /// Runs the demo application.
+    ///
+    /// @throws Exception if an error occurs
     public void run() throws Exception {
         var styleEngine = createStyleEngine();
         var config = TuiConfig.builder()
@@ -210,9 +197,7 @@ public class CodingAssistantDemo {
         }
     }
 
-    /**
-     * Adds the welcome message to the conversation.
-     */
+    /// Adds the welcome message to the conversation.
     private void addWelcomeMessage() {
         lines.add(StyledLine.of(""));
         lines.add(StyledLine.bold("  Welcome to Fakodex!", CYAN));
@@ -224,23 +209,19 @@ public class CodingAssistantDemo {
         lines.add(StyledLine.of(""));
     }
 
-    /**
-     * Creates and configures the style engine.
-     *
-     * @return the configured style engine
-     * @throws IOException if stylesheet loading fails
-     */
+    /// Creates and configures the style engine.
+    ///
+    /// @return the configured style engine
+    /// @throws IOException if stylesheet loading fails
     private StyleEngine createStyleEngine() throws IOException {
         var engine = StyleEngine.create();
         engine.loadStylesheet("/styles/codex.tcss");
         return engine;
     }
 
-    /**
-     * Renders the main UI.
-     *
-     * @return the root element
-     */
+    /// Renders the main UI.
+    ///
+    /// @return the root element
     private Element render() {
         tickCount++;
         var spinner = getSpinner();
@@ -324,12 +305,10 @@ public class CodingAssistantDemo {
     }
 
 
-    /**
-     * Handles key events.
-     *
-     * @param event the key event
-     * @return the event result
-     */
+    /// Handles key events.
+    ///
+    /// @param event the key event
+    /// @return the event result
     private EventResult handleKey(KeyEvent event) {
         // Don't process input while working
         if (isProcessing) {
@@ -379,9 +358,7 @@ public class CodingAssistantDemo {
         return EventResult.UNHANDLED;
     }
 
-    /**
-     * Submits the current input.
-     */
+    /// Submits the current input.
     private void submitInput() {
         var text = inputState.text().trim();
         if (text.isEmpty()) {
@@ -396,11 +373,9 @@ public class CodingAssistantDemo {
         processUserInput(text);
     }
 
-    /**
-     * Processes user input and generates a response.
-     *
-     * @param input the user's input
-     */
+    /// Processes user input and generates a response.
+    ///
+    /// @param input the user's input
     private void processUserInput(String input) {
         var lowerInput = input.toLowerCase();
 
@@ -419,20 +394,16 @@ public class CodingAssistantDemo {
         }
     }
 
-    /**
-     * Sets the thinking indicator with wave effect.
-     *
-     * @param text the thinking text (e.g., "Thinking...", "Analyzing...")
-     */
+    /// Sets the thinking indicator with wave effect.
+    ///
+    /// @param text the thinking text (e.g., "Thinking...", "Analyzing...")
     private void setThinkingIndicator(String text) {
         lines.add(StyledLine.of(""));
         activeThinkingText = "  " + text;
         thinkingWaveState.reset();
     }
 
-    /**
-     * Handles a create/write code request.
-     */
+    /// Handles a create/write code request.
     private void handleCreateRequest() {
         isProcessing = true;
 
@@ -447,9 +418,7 @@ public class CodingAssistantDemo {
         afterTypingAction = this::showCodeBlock;
     }
 
-    /**
-     * Handles a fix/debug request.
-     */
+    /// Handles a fix/debug request.
     private void handleFixRequest() {
         isProcessing = true;
 
@@ -462,9 +431,7 @@ public class CodingAssistantDemo {
         afterTypingAction = this::showDiffBlock;
     }
 
-    /**
-     * Handles an explain request.
-     */
+    /// Handles an explain request.
     private void handleExplainRequest() {
         isProcessing = true;
 
@@ -484,9 +451,7 @@ public class CodingAssistantDemo {
         scheduleResponse(explanation);
     }
 
-    /**
-     * Handles a search request.
-     */
+    /// Handles a search request.
     private void handleSearchRequest() {
         isProcessing = true;
 
@@ -505,9 +470,7 @@ public class CodingAssistantDemo {
         scheduleResponse(response);
     }
 
-    /**
-     * Handles a run/test request.
-     */
+    /// Handles a run/test request.
     private void handleRunRequest() {
         isProcessing = true;
 
@@ -525,9 +488,7 @@ public class CodingAssistantDemo {
         scheduleResponse(response);
     }
 
-    /**
-     * Handles a generic request.
-     */
+    /// Handles a generic request.
     private void handleGenericRequest() {
         isProcessing = true;
 
@@ -547,14 +508,12 @@ public class CodingAssistantDemo {
         scheduleResponse(response);
     }
 
-    /**
-     * Adds a tool call with animation.
-     *
-     * @param type        the tool type
-     * @param description the tool description
-     * @param duration    the animation duration in ticks
-     * @param result      the result to show when complete
-     */
+    /// Adds a tool call with animation.
+    ///
+    /// @param type        the tool type
+    /// @param description the tool description
+    /// @param duration    the animation duration in ticks
+    /// @param result      the result to show when complete
     private void addToolCall(ToolType type, String description, int duration, String result) {
         var label = switch (type) {
             case READ_FILE -> "Read";
@@ -568,11 +527,9 @@ public class CodingAssistantDemo {
                 "  [+] " + label + " " + description + " - " + result, type, description));
     }
 
-    /**
-     * Schedules an AI response to start typing after a delay.
-     *
-     * @param response the response text
-     */
+    /// Schedules an AI response to start typing after a delay.
+    ///
+    /// @param response the response text
     private void scheduleResponse(String response) {
         // Start typing after tool calls have had time to show
         runner.schedule(() -> {
@@ -582,9 +539,7 @@ public class CodingAssistantDemo {
         }, Duration.ofMillis(RESPONSE_DELAY_MS));
     }
 
-    /**
-     * Shows the code block after typing completes.
-     */
+    /// Shows the code block after typing completes.
     private void showCodeBlock() {
         lines.add(StyledLine.of(""));
         lines.add(StyledLine.bold("  Greeter.java", MAGENTA));
@@ -597,9 +552,7 @@ public class CodingAssistantDemo {
         addToolCall(ToolType.WRITE_FILE, "src/main/java/Greeter.java", 15, "Created file");
     }
 
-    /**
-     * Shows a diff block after typing completes.
-     */
+    /// Shows a diff block after typing completes.
     private void showDiffBlock() {
         lines.add(StyledLine.of(""));
         lines.add(StyledLine.bold("  Service.java (diff)", MAGENTA));
@@ -609,9 +562,7 @@ public class CodingAssistantDemo {
         addToolCall(ToolType.EDIT_FILE, "src/main/java/Service.java", 15, "Applied fix");
     }
 
-    /**
-     * Runs the demo sequence.
-     */
+    /// Runs the demo sequence.
     private void runDemo() {
         lines.clear();
         addWelcomeMessage();
@@ -619,9 +570,7 @@ public class CodingAssistantDemo {
         submitInput();
     }
 
-    /**
-     * Shows help information.
-     */
+    /// Shows help information.
     private void showHelp() {
         lines.add(StyledLine.of(""));
         lines.add(StyledLine.bold("  Keyboard Shortcuts", CYAN));
@@ -637,11 +586,9 @@ public class CodingAssistantDemo {
         lines.add(StyledLine.of(""));
     }
 
-    /**
-     * Updates tool call animations.
-     *
-     * @param spinner the current spinner (unused, kept for compatibility)
-     */
+    /// Updates tool call animations.
+    ///
+    /// @param spinner the current spinner (unused, kept for compatibility)
     private void updateToolCalls(String spinner) {
         var completed = new ArrayList<ActiveToolCall>();
 
@@ -661,9 +608,7 @@ public class CodingAssistantDemo {
         }
     }
 
-    /**
-     * Updates typing animation.
-     */
+    /// Updates typing animation.
     private void updateTyping() {
         if (pendingTyping == null) {
             return;
@@ -697,13 +642,12 @@ public class CodingAssistantDemo {
         }
     }
 
-    /**
-     * Gets the current spinner character.
-     *
-     * @return the spinner character
-     */
+    /// Gets the current spinner character.
+    ///
+    /// @return the spinner character
     private String getSpinner() {
         return SPINNER_FRAMES[(int) ((tickCount / SPINNER_FRAME_DIVISOR) % SPINNER_FRAMES.length)];
     }
 
 }
+

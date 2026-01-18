@@ -17,22 +17,20 @@ import java.time.format.DateTimeFormatter;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A demo application that runs on the Java module path using JPMS.
- * <p>
- * This demo showcases that TamboUI works correctly when running
- * as a modular application with explicit module dependencies.
- */
+/// A demo application that runs on the Java module path using JPMS.
+///
+///
+///
+/// This demo showcases that TamboUI works correctly when running
+/// as a modular application with explicit module dependencies.
 public class ModularDemo {
 
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    /**
-     * Entry point for the modular demo application.
-     *
-     * @param args command line arguments (not used)
-     * @throws Exception if an error occurs during execution
-     */
+    /// Entry point for the modular demo application.
+    ///
+    /// @param args command line arguments (not used)
+    /// @throws Exception if an error occurs during execution
     public static void main(String[] args) throws Exception {
         var config = TuiConfig.builder()
                 .mouseCapture(true)
@@ -76,3 +74,4 @@ public class ModularDemo {
         }
     }
 }
+

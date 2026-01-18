@@ -11,9 +11,7 @@ import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A panel displaying inspirational quotes.
- */
+/// A panel displaying inspirational quotes.
 final class QuotePanel extends PanelContent {
     private static final String[] QUOTES = {
         "The only way to do great work is to love what you do. - Steve Jobs",
@@ -51,3 +49,4 @@ final class QuotePanel extends PanelContent {
         return EventResult.UNHANDLED;
     }
 }
+

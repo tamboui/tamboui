@@ -219,9 +219,7 @@ class ImageDataTest {
         assertThat(loaded.height()).isEqualTo(5);
     }
 
-    /**
-     * Creates a test image filled with a single color.
-     */
+    /// Creates a test image filled with a single color.
     private BufferedImage createTestImage(int width, int height, int argb) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < height; y++) {
@@ -232,3 +230,4 @@ class ImageDataTest {
         return image;
     }
 }
+

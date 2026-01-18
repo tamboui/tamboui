@@ -18,24 +18,25 @@ import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * JTop - A "top" alternative built with TamboUI DSL.
- * <p>
- * Displays system metrics including:
- * <ul>
- *   <li>CPU usage with toggleable views: bars, sparklines (all CPUs), or history chart</li>
- *   <li>Memory usage with sparkline chart showing history</li>
- *   <li>Top processes by CPU/memory/PID (sortable)</li>
- *   <li>System information</li>
- * </ul>
- * <p>
- * Controls:
- * <ul>
- *   <li>[c] - Toggle CPU view (bars → sparklines → chart → bars)</li>
- *   <li>[s] - Toggle sort mode (CPU → Memory → PID → CPU)</li>
- *   <li>[q] - Quit</li>
- * </ul>
- */
+/// JTop - A "top" alternative built with TamboUI DSL.
+///
+///
+///
+/// Displays system metrics including:
+///
+/// - CPU usage with toggleable views: bars, sparklines (all CPUs), or history chart
+/// - Memory usage with sparkline chart showing history
+/// - Top processes by CPU/memory/PID (sortable)
+/// - System information
+///
+///
+///
+///
+/// Controls:
+///
+/// - `c` - Toggle CPU view (bars → sparklines → chart → bars)
+/// - `s` - Toggle sort mode (CPU → Memory → PID → CPU)
+/// - `q` - Quit
 public class JTopDemo {
 
     public static void main(String[] args) throws Exception {
@@ -60,3 +61,4 @@ public class JTopDemo {
         }
     }
 }
+

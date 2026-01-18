@@ -527,3 +527,4 @@ class CssParserTest {
         assertThat(attrSelector.toCss()).isEqualTo("[title]");
     }
 }
+

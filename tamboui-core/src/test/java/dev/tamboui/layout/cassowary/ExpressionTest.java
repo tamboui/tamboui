@@ -180,3 +180,4 @@ class ExpressionTest {
         assertThat(expr.terms()).hasSize(2);
     }
 }
+

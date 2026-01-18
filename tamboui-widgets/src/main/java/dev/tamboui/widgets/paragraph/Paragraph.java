@@ -29,17 +29,15 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.text.Overflow;
 import dev.tamboui.widgets.text.OverflowConverter;
 
-/**
- * A paragraph widget for displaying styled text.
- * <p>
- * Supports style-aware properties: {@code text-overflow}, {@code text-align},
- * {@code background}, and {@code color}.
- */
+/// A paragraph widget for displaying styled text.
+///
+///
+///
+/// Supports style-aware properties: {@code text-overflow}, {@code text-align},
+/// {@code background}, and {@code color}.
 public final class Paragraph implements Widget {
 
-    /**
-     * Property key for text-overflow property.
-     */
+    /// Property key for text-overflow property.
     public static final PropertyKey<Overflow> TEXT_OVERFLOW =
             PropertyKey.of("text-overflow", OverflowConverter.INSTANCE);
 
@@ -406,15 +404,13 @@ public final class Paragraph implements Widget {
         return wrapped;
     }
 
-    /**
-     * Finds the next word break point for word wrapping.
-     * Tries to break at word boundaries, but breaks by character if word is too long.
-     *
-     * @param text the full text
-     * @param startPos the starting position
-     * @param maxWidth the maximum width for the line
-     * @return the position to break at (exclusive)
-     */
+    /// Finds the next word break point for word wrapping.
+    /// Tries to break at word boundaries, but breaks by character if word is too long.
+    ///
+    /// @param text the full text
+    /// @param startPos the starting position
+    /// @param maxWidth the maximum width for the line
+    /// @return the position to break at (exclusive)
     private int findNextWordBreak(String text, int startPos, int maxWidth) {
         int textLength = text.length();
         int maxEnd = Math.min(startPos + maxWidth, textLength);
@@ -443,14 +439,12 @@ public final class Paragraph implements Widget {
         return maxEnd;
     }
 
-    /**
-     * Ensures that a hyperlink has an ID when it will wrap across multiple lines.
-     * This allows all wrapped chunks to share the same ID and form one continuous link.
-     *
-     * @param style the style that may contain a hyperlink
-     * @param hyperlinkIds a map to track and reuse IDs for the same URL
-     * @return a style with an ID-assigned hyperlink if needed
-     */
+    /// Ensures that a hyperlink has an ID when it will wrap across multiple lines.
+    /// This allows all wrapped chunks to share the same ID and form one continuous link.
+    ///
+    /// @param style the style that may contain a hyperlink
+    /// @param hyperlinkIds a map to track and reuse IDs for the same URL
+    /// @return a style with an ID-assigned hyperlink if needed
     private Style ensureHyperlinkIdForWrapping(Style style, java.util.Map<String, String> hyperlinkIds) {
         Optional<Hyperlink> hyperlinkOpt = style.hyperlink();
         if (!hyperlinkOpt.isPresent()) {
@@ -571,23 +565,19 @@ public final class Paragraph implements Widget {
             return this;
         }
 
-        /**
-         * Sets the background color.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the foreground (text) color.
-         *
-         * @param color the foreground color
-         * @return this builder
-         */
+        /// Sets the foreground (text) color.
+        ///
+        /// @param color the foreground color
+        /// @return this builder
         public Builder foreground(Color color) {
             this.foreground.set(color);
             return this;
@@ -598,15 +588,15 @@ public final class Paragraph implements Widget {
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code text-overflow} and {@code text-align}
-         * will fall back to resolved values if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code text-overflow} and {@code text-align}
+        /// will fall back to resolved values if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
@@ -617,3 +607,4 @@ public final class Paragraph implements Widget {
         }
     }
 }
+

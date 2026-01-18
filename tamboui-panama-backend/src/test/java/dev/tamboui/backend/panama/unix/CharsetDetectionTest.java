@@ -15,9 +15,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/**
- * Tests for charset detection in UnixTerminal.
- */
+/// Tests for charset detection in UnixTerminal.
 @EnabledOnOs({OS.LINUX, OS.MAC})
 class CharsetDetectionTest {
 
@@ -50,10 +48,8 @@ class CharsetDetectionTest {
         }
     }
 
-    /**
-     * Assumes a terminal is available for the test.
-     * Skips the test if /dev/tty cannot be opened.
-     */
+    /// Assumes a terminal is available for the test.
+    /// Skips the test if /dev/tty cannot be opened.
     private void assumeTerminalAvailable() {
         int fd = LibC.open("/dev/tty", LibC.O_RDWR);
         if (fd >= 0) {
@@ -64,3 +60,4 @@ class CharsetDetectionTest {
         }
     }
 }
+

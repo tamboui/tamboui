@@ -14,12 +14,12 @@ import dev.tamboui.tfx.Shader;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 
-/**
- * A shader that applies bidirectional expansion effects using two opposing stretch shaders.
- * <p>
- * Creates expansion animations that grow outward from the center in both directions
- * simultaneously, either horizontally or vertically.
- */
+/// A shader that applies bidirectional expansion effects using two opposing stretch shaders.
+///
+///
+///
+/// Creates expansion animations that grow outward from the center in both directions
+/// simultaneously, either horizontally or vertically.
 public final class ExpandShader implements Shader {
     
     private final ExpandDirection direction;
@@ -28,9 +28,7 @@ public final class ExpandShader implements Shader {
     private final StretchShader stretchB;
     private Rect area;
     
-    /**
-     * Creates a new expand effect with the specified direction, style, and timing.
-     */
+    /// Creates a new expand effect with the specified direction, style, and timing.
     public ExpandShader(ExpandDirection direction, Style style, EffectTimer timer) {
         this.direction = direction;
         this.style = style;
@@ -155,4 +153,5 @@ public final class ExpandShader implements Shader {
         return copy;
     }
 }
+
 

@@ -91,3 +91,4 @@ class LineTest {
         // Should clip and not throw
     }
 }
+

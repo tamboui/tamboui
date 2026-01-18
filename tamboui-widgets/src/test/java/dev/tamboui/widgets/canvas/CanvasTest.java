@@ -331,3 +331,4 @@ class CanvasTest {
         assertThat(canvas).isNotNull();
     }
 }
+

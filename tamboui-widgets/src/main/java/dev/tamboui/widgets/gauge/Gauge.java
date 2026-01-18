@@ -19,23 +19,26 @@ import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
-/**
- * A progress bar widget that renders a bar filled according to the progress value.
- * <p>
- * Progress can be set as a percentage (0-100) or as a ratio (0.0-1.0).
- * The gauge can optionally display a label centered in the bar.
- * <p>
- * When unicode mode is enabled, the widget uses block characters for smoother
- * visual progression with 8 extra fractional parts per cell.
- *
- * <pre>{@code
- * Gauge gauge = Gauge.builder()
- *     .percent(75)
- *     .label("75%")
- *     .gaugeStyle(Style.EMPTY.fg(Color.GREEN))
- *     .build();
- * }</pre>
- */
+/// A progress bar widget that renders a bar filled according to the progress value.
+///
+///
+///
+/// Progress can be set as a percentage (0-100) or as a ratio (0.0-1.0).
+/// The gauge can optionally display a label centered in the bar.
+///
+///
+///
+/// When unicode mode is enabled, the widget uses block characters for smoother
+/// visual progression with 8 extra fractional parts per cell.
+///
+/// ```java
+/// Gauge gauge = Gauge.builder()
+///     .percent(75)
+///     .label("75%")
+///     .gaugeStyle(Style.EMPTY.fg(Color.GREEN))
+///     .build();
+/// }
+/// ```
 public final class Gauge implements Widget {
 
     // Unicode block characters for sub-cell precision (1/8 increments)
@@ -51,11 +54,11 @@ public final class Gauge implements Widget {
         "█"   // 8/8 - full
     };
 
-    /**
-     * Property key for the gauge (filled portion) color.
-     * <p>
-     * CSS property name: {@code gauge-color}
-     */
+    /// Property key for the gauge (filled portion) color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code gauge-color}
     public static final PropertyKey<Color> GAUGE_COLOR =
             PropertyKey.of("gauge-color", ColorConverter.INSTANCE);
 
@@ -93,16 +96,12 @@ public final class Gauge implements Widget {
         return new Builder();
     }
 
-    /**
-     * Creates a gauge with the given percentage (0-100).
-     */
+    /// Creates a gauge with the given percentage (0-100).
     public static Gauge percent(int percent) {
         return builder().percent(percent).build();
     }
 
-    /**
-     * Creates a gauge with the given ratio (0.0-1.0).
-     */
+    /// Creates a gauge with the given ratio (0.0-1.0).
     public static Gauge ratio(double ratio) {
         return builder().ratio(ratio).build();
     }
@@ -203,11 +202,9 @@ public final class Gauge implements Widget {
 
         private Builder() {}
 
-        /**
-         * Sets the progress as a percentage (0-100).
-         *
-         * @throws IllegalArgumentException if percent is not in range 0-100
-         */
+        /// Sets the progress as a percentage (0-100).
+        ///
+        /// @throws IllegalArgumentException if percent is not in range 0-100
         public Builder percent(int percent) {
             if (percent < 0 || percent > 100) {
                 throw new IllegalArgumentException("Percent must be between 0 and 100, got: " + percent);
@@ -216,11 +213,9 @@ public final class Gauge implements Widget {
             return this;
         }
 
-        /**
-         * Sets the progress as a ratio (0.0-1.0).
-         *
-         * @throws IllegalArgumentException if ratio is not in range 0.0-1.0
-         */
+        /// Sets the progress as a ratio (0.0-1.0).
+        ///
+        /// @throws IllegalArgumentException if ratio is not in range 0.0-1.0
         public Builder ratio(double ratio) {
             if (ratio < 0.0 || ratio > 1.0) {
                 throw new IllegalArgumentException("Ratio must be between 0.0 and 1.0, got: " + ratio);
@@ -229,99 +224,85 @@ public final class Gauge implements Widget {
             return this;
         }
 
-        /**
-         * Sets the label displayed centered in the gauge.
-         * If not set, defaults to showing the percentage.
-         */
+        /// Sets the label displayed centered in the gauge.
+        /// If not set, defaults to showing the percentage.
         public Builder label(String label) {
             this.label = Line.from(label);
             return this;
         }
 
-        /**
-         * Sets the label displayed centered in the gauge.
-         */
+        /// Sets the label displayed centered in the gauge.
         public Builder label(Line label) {
             this.label = label;
             return this;
         }
 
-        /**
-         * Sets the label displayed centered in the gauge.
-         */
+        /// Sets the label displayed centered in the gauge.
         public Builder label(Span span) {
             this.label = Line.from(span);
             return this;
         }
 
-        /**
-         * Wraps the gauge in a block container.
-         */
+        /// Wraps the gauge in a block container.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the style for the widget background (not the filled bar).
-         */
+        /// Sets the style for the widget background (not the filled bar).
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
-        /**
-         * Sets the style for the filled portion of the gauge.
-         */
+        /// Sets the style for the filled portion of the gauge.
         public Builder gaugeStyle(Style gaugeStyle) {
             this.gaugeStyle = gaugeStyle;
             return this;
         }
 
-        /**
-         * Enables or disables unicode block characters for smoother rendering.
-         * When enabled (default), uses 8 fractional parts per cell.
-         */
+        /// Enables or disables unicode block characters for smoother rendering.
+        /// When enabled (default), uses 8 fractional parts per cell.
         public Builder useUnicode(boolean useUnicode) {
             this.useUnicode = useUnicode;
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code gauge-color} and {@code background}
-         * will be resolved if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code gauge-color} and {@code background}
+        /// will be resolved if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the background color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the gauge (filled portion) color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the gauge color
-         * @return this builder
-         */
+        /// Sets the gauge (filled portion) color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the gauge color
+        /// @return this builder
         public Builder gaugeColor(Color color) {
             this.gaugeColor.set(color);
             return this;
@@ -332,3 +313,4 @@ public final class Gauge implements Widget {
         }
     }
 }
+

@@ -60,3 +60,4 @@ class PaddingTest {
         assertThat(padding.right()).isEqualTo(0);
     }
 }
+

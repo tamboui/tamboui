@@ -157,3 +157,4 @@ class ClearTest {
         assertThat(buffer.get(8, 5).symbol()).isEqualTo("X");
     }
 }
+

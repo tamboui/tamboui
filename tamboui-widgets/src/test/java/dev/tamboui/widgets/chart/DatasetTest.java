@@ -278,3 +278,4 @@ class DatasetTest {
         assertThat(Dataset.Marker.BRAILLE.symbol()).isEqualTo("⣿");
     }
 }
+

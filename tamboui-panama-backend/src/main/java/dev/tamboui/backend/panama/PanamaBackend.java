@@ -23,16 +23,18 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Objects;
 
-/**
- * Terminal backend implementation using Panama FFI.
- * <p>
- * This backend provides direct native access to terminal operations
- * without requiring external dependencies like JLine. It uses the
- * Java Foreign Function and Memory API (Panama FFI) to call native
- * platform functions directly.
- * <p>
- * Supports Unix-like systems (Linux and macOS) and Windows.
- */
+/// Terminal backend implementation using Panama FFI.
+///
+///
+///
+/// This backend provides direct native access to terminal operations
+/// without requiring external dependencies like JLine. It uses the
+/// Java Foreign Function and Memory API (Panama FFI) to call native
+/// platform functions directly.
+///
+///
+///
+/// Supports Unix-like systems (Linux and macOS) and Windows.
 public class PanamaBackend implements Backend {
 
     private static final int INITIAL_BUFFER_SIZE = 8192;
@@ -42,14 +44,14 @@ public class PanamaBackend implements Backend {
     private boolean inAlternateScreen;
     private boolean mouseEnabled;
 
-    /**
-     * Creates a new Panama backend.
-     * <p>
-     * Automatically detects the platform and creates the appropriate
-     * terminal implementation.
-     *
-     * @throws IOException if the terminal cannot be initialized
-     */
+    /// Creates a new Panama backend.
+    ///
+    ///
+    ///
+    /// Automatically detects the platform and creates the appropriate
+    /// terminal implementation.
+    ///
+    /// @throws IOException if the terminal cannot be initialized
     public PanamaBackend() throws IOException {
         this.terminal = createPlatformTerminal();
         this.outputBuffer = new ByteArrayBuilder(INITIAL_BUFFER_SIZE);
@@ -331,13 +333,13 @@ public class PanamaBackend implements Backend {
         }
     }
 
-    /**
-     * Returns the underlying Unix terminal for advanced operations.
-     * <p>
-     * This method is only available when running on Unix-like systems.
-     *
-     * @return the Unix terminal instance, or null if running on Windows
-     */
+    /// Returns the underlying Unix terminal for advanced operations.
+    ///
+    ///
+    ///
+    /// This method is only available when running on Unix-like systems.
+    ///
+    /// @return the Unix terminal instance, or null if running on Windows
     public UnixTerminal unixTerminal() {
         if (terminal instanceof UnixTerminal unixTerminal) {
             return unixTerminal;
@@ -345,13 +347,13 @@ public class PanamaBackend implements Backend {
         return null;
     }
 
-    /**
-     * Returns the underlying Windows terminal for advanced operations.
-     * <p>
-     * This method is only available when running on Windows.
-     *
-     * @return the Windows terminal instance, or null if running on Unix
-     */
+    /// Returns the underlying Windows terminal for advanced operations.
+    ///
+    ///
+    ///
+    /// This method is only available when running on Windows.
+    ///
+    /// @return the Windows terminal instance, or null if running on Unix
     public WindowsTerminal windowsTerminal() {
         if (terminal instanceof WindowsTerminal windowsTerminal) {
             return windowsTerminal;
@@ -359,12 +361,11 @@ public class PanamaBackend implements Backend {
         return null;
     }
 
-    /**
-     * Returns the underlying platform terminal.
-     *
-     * @return the platform terminal instance
-     */
+    /// Returns the underlying platform terminal.
+    ///
+    /// @return the platform terminal instance
     public PlatformTerminal platformTerminal() {
         return terminal;
     }
 }
+

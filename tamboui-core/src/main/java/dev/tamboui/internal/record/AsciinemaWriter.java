@@ -8,32 +8,30 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Locale;
 
-/**
- * Writes Asciinema v2 cast format (newline-delimited JSON).
- * This is an internal API and not part of the public contract.
- *
- * <p>The asciicast v2 format consists of:
- * <ul>
- *   <li>Line 1: JSON header with version, width, height, and optional metadata</li>
- *   <li>Following lines: Event arrays [time, event_type, data]</li>
- * </ul>
- *
- * @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
- */
+/// Writes Asciinema v2 cast format (newline-delimited JSON).
+/// This is an internal API and not part of the public contract.
+///
+///
+///
+/// The asciicast v2 format consists of:
+///
+/// - Line 1: JSON header with version, width, height, and optional metadata
+/// - Following lines: Event arrays [time, event_type, data]
+///
+///
+/// @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
 final class AsciinemaWriter {
 
     private AsciinemaWriter() {
         // Utility class
     }
 
-    /**
-     * Writes the cast file header.
-     *
-     * @param out the writer to write to
-     * @param width terminal width in columns
-     * @param height terminal height in rows
-     * @throws IOException if an I/O error occurs
-     */
+    /// Writes the cast file header.
+    ///
+    /// @param out the writer to write to
+    /// @param width terminal width in columns
+    /// @param height terminal height in rows
+    /// @throws IOException if an I/O error occurs
     static void writeHeader(Writer out, int width, int height) throws IOException {
         long timestamp = System.currentTimeMillis() / 1000;
         out.write(String.format(
@@ -41,25 +39,21 @@ final class AsciinemaWriter {
                 width, height, timestamp));
     }
 
-    /**
-     * Writes an output event to the cast file.
-     *
-     * @param out the writer to write to
-     * @param timeSeconds time offset in seconds from the start of the recording
-     * @param data the terminal output data (may contain ANSI escape sequences)
-     * @throws IOException if an I/O error occurs
-     */
+    /// Writes an output event to the cast file.
+    ///
+    /// @param out the writer to write to
+    /// @param timeSeconds time offset in seconds from the start of the recording
+    /// @param data the terminal output data (may contain ANSI escape sequences)
+    /// @throws IOException if an I/O error occurs
     static void writeOutputEvent(Writer out, double timeSeconds, String data) throws IOException {
         out.write(String.format(Locale.US, "[%.6f, \"o\", \"%s\"]%n", timeSeconds, escapeJsonString(data)));
     }
 
-    /**
-     * Escapes a string for use in JSON.
-     * Handles special characters, control codes, and Unicode.
-     *
-     * @param s the string to escape
-     * @return the escaped string (without surrounding quotes)
-     */
+    /// Escapes a string for use in JSON.
+    /// Handles special characters, control codes, and Unicode.
+    ///
+    /// @param s the string to escape
+    /// @return the escaped string (without surrounding quotes)
     static String escapeJsonString(String s) {
         StringBuilder sb = new StringBuilder(s.length() * 2);
         for (int i = 0; i < s.length(); i++) {
@@ -98,3 +92,4 @@ final class AsciinemaWriter {
         return sb.toString();
     }
 }
+

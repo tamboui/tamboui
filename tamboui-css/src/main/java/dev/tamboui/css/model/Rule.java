@@ -11,24 +11,22 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Represents a CSS rule consisting of a selector and declarations.
- * <p>
- * Example: {@code .error { color: red; text-style: bold; }}
- */
+/// Represents a CSS rule consisting of a selector and declarations.
+///
+///
+///
+/// Example: {@code .error { color: red; text-style: bold; }}
 public final class Rule {
 
     private final Selector selector;
     private final Map<String, PropertyValue> declarations;
     private final int sourceOrder;
 
-    /**
-     * Creates a new rule.
-     *
-     * @param selector     the selector that determines which elements this rule applies to
-     * @param declarations the property declarations (property name -> value)
-     * @param sourceOrder  the order in which this rule appeared in the stylesheet
-     */
+    /// Creates a new rule.
+    ///
+    /// @param selector     the selector that determines which elements this rule applies to
+    /// @param declarations the property declarations (property name -> value)
+    /// @param sourceOrder  the order in which this rule appeared in the stylesheet
     public Rule(Selector selector, Map<String, PropertyValue> declarations, int sourceOrder) {
         this.selector = Objects.requireNonNull(selector);
         this.declarations = Collections.unmodifiableMap(new LinkedHashMap<>(declarations));
@@ -47,11 +45,9 @@ public final class Rule {
         return sourceOrder;
     }
 
-    /**
-     * Returns the specificity of this rule's selector.
-     *
-     * @return the specificity value
-     */
+    /// Returns the specificity of this rule's selector.
+    ///
+    /// @return the specificity value
     public int specificity() {
         return selector.specificity();
     }
@@ -86,3 +82,4 @@ public final class Rule {
         return sb.toString();
     }
 }
+

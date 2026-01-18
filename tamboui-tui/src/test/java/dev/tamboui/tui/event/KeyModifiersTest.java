@@ -75,3 +75,4 @@ class KeyModifiersTest {
         assertThat(KeyModifiers.SHIFT).isEqualTo(KeyModifiers.of(false, false, true));
     }
 }
+

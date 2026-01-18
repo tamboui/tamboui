@@ -9,59 +9,59 @@ import dev.tamboui.layout.Fraction;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Cassowary constraint solver using the dual simplex method.
- *
- * <p>The solver maintains a tableau of linear equations and supports:
- * <ul>
- *   <li>Adding and removing constraints dynamically</li>
- *   <li>Suggesting values for edit variables</li>
- *   <li>Hierarchical constraint priorities</li>
- * </ul>
- *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
- *
- * <p>Example usage:
- * <pre>
- * Solver solver = new Solver();
- * Variable left = new Variable("left");
- * Variable width = new Variable("width");
- * Variable right = new Variable("right");
- *
- * // right == left + width (required)
- * solver.addConstraint(
- *     Expression.variable(right)
- *         .equalTo(Expression.variable(left).plus(Expression.variable(width)),
- *                  Strength.REQUIRED));
- *
- * // width >= 100 (required)
- * solver.addConstraint(
- *     Expression.variable(width)
- *         .greaterThanOrEqual(100, Strength.REQUIRED));
- *
- * solver.updateVariables();
- * Fraction resolvedWidth = solver.valueOf(width);
- * </pre>
- *
- * @see Variable
- * @see CassowaryConstraint
- * @see Expression
- */
+/// Cassowary constraint solver using the dual simplex method.
+///
+///
+///
+/// The solver maintains a tableau of linear equations and supports:
+///
+/// - Adding and removing constraints dynamically
+/// - Suggesting values for edit variables
+/// - Hierarchical constraint priorities
+///
+///
+///
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
+/// avoiding the cumulative rounding errors that occur with floating-point.
+///
+///
+///
+/// Example usage:
+/// ```
+/// Solver solver = new Solver();
+/// Variable left = new Variable("left");
+/// Variable width = new Variable("width");
+/// Variable right = new Variable("right");
+///
+/// // right == left + width (required)
+/// solver.addConstraint(
+///     Expression.variable(right)
+///         .equalTo(Expression.variable(left).plus(Expression.variable(width)),
+///                  Strength.REQUIRED));
+///
+/// // width >= 100 (required)
+/// solver.addConstraint(
+///     Expression.variable(width)
+///         .greaterThanOrEqual(100, Strength.REQUIRED));
+///
+/// solver.updateVariables();
+/// Fraction resolvedWidth = solver.valueOf(width);
+/// ```
+///
+/// @see Variable
+/// @see CassowaryConstraint
+/// @see Expression
 public final class Solver {
 
-    /**
-     * Tag associated with a constraint in the solver.
-     * Contains marker and other symbols created for the constraint.
-     */
+    /// Tag associated with a constraint in the solver.
+    /// Contains marker and other symbols created for the constraint.
     private static final class Tag {
         Symbol marker;
         Symbol other;
     }
 
-    /**
-     * Information about an edit variable.
-     */
+    /// Information about an edit variable.
     private static final class EditInfo {
         Tag tag;
         CassowaryConstraint constraint;
@@ -83,9 +83,7 @@ public final class Solver {
     // Artificial objective for handling infeasibility
     private Row artificial;
 
-    /**
-     * Creates a new empty solver.
-     */
+    /// Creates a new empty solver.
     public Solver() {
         this.constraints = new LinkedHashMap<>();
         this.vars = new LinkedHashMap<>();
@@ -96,13 +94,11 @@ public final class Solver {
         this.artificial = null;
     }
 
-    /**
-     * Adds a constraint to the solver.
-     *
-     * @param constraint the constraint to add
-     * @throws DuplicateConstraintException     if the constraint already exists
-     * @throws UnsatisfiableConstraintException if required and unsatisfiable
-     */
+    /// Adds a constraint to the solver.
+    ///
+    /// @param constraint the constraint to add
+    /// @throws DuplicateConstraintException     if the constraint already exists
+    /// @throws UnsatisfiableConstraintException if required and unsatisfiable
     public void addConstraint(CassowaryConstraint constraint) {
         if (constraints.containsKey(constraint)) {
             throw new DuplicateConstraintException(constraint);
@@ -134,12 +130,10 @@ public final class Solver {
         optimize(objective);
     }
 
-    /**
-     * Removes a constraint from the solver.
-     *
-     * @param constraint the constraint to remove
-     * @throws UnknownConstraintException if the constraint is not present
-     */
+    /// Removes a constraint from the solver.
+    ///
+    /// @param constraint the constraint to remove
+    /// @throws UnknownConstraintException if the constraint is not present
     public void removeConstraint(CassowaryConstraint constraint) {
         Tag tag = constraints.remove(constraint);
         if (tag == null) {
@@ -166,23 +160,19 @@ public final class Solver {
         optimize(objective);
     }
 
-    /**
-     * Checks if the solver contains a constraint.
-     *
-     * @param constraint the constraint to check
-     * @return true if the constraint is in the solver
-     */
+    /// Checks if the solver contains a constraint.
+    ///
+    /// @param constraint the constraint to check
+    /// @return true if the constraint is in the solver
     public boolean hasConstraint(CassowaryConstraint constraint) {
         return constraints.containsKey(constraint);
     }
 
-    /**
-     * Adds an edit variable for interactive updates.
-     *
-     * @param variable the variable to make editable
-     * @param strength the strength of the edit constraint (must not be REQUIRED)
-     * @throws IllegalArgumentException if strength is REQUIRED
-     */
+    /// Adds an edit variable for interactive updates.
+    ///
+    /// @param variable the variable to make editable
+    /// @param strength the strength of the edit constraint (must not be REQUIRED)
+    /// @throws IllegalArgumentException if strength is REQUIRED
     public void addEditVariable(Variable variable, Strength strength) {
         if (edits.containsKey(variable)) {
             throw new SolverException("Edit variable already exists: " + variable);
@@ -205,12 +195,10 @@ public final class Solver {
         edits.put(variable, info);
     }
 
-    /**
-     * Removes an edit variable.
-     *
-     * @param variable the variable to remove
-     * @throws SolverException if the variable is not an edit variable
-     */
+    /// Removes an edit variable.
+    ///
+    /// @param variable the variable to remove
+    /// @throws SolverException if the variable is not an edit variable
     public void removeEditVariable(Variable variable) {
         EditInfo info = edits.remove(variable);
         if (info == null) {
@@ -219,25 +207,23 @@ public final class Solver {
         removeConstraint(info.constraint);
     }
 
-    /**
-     * Checks if a variable is an edit variable.
-     *
-     * @param variable the variable to check
-     * @return true if the variable is editable
-     */
+    /// Checks if a variable is an edit variable.
+    ///
+    /// @param variable the variable to check
+    /// @return true if the variable is editable
     public boolean hasEditVariable(Variable variable) {
         return edits.containsKey(variable);
     }
 
-    /**
-     * Suggests a new value for an edit variable.
-     *
-     * <p>Call {@link #updateVariables()} after suggesting values.
-     *
-     * @param variable the edit variable
-     * @param value    the suggested value
-     * @throws SolverException if the variable is not an edit variable
-     */
+    /// Suggests a new value for an edit variable.
+    ///
+    ///
+    ///
+    /// Call {@link #updateVariables()} after suggesting values.
+    ///
+    /// @param variable the edit variable
+    /// @param value    the suggested value
+    /// @throws SolverException if the variable is not an edit variable
     public void suggestValue(Variable variable, Fraction value) {
         EditInfo info = edits.get(variable);
         if (info == null) {
@@ -274,11 +260,11 @@ public final class Solver {
         dualOptimize();
     }
 
-    /**
-     * Updates all variable values after constraint changes.
-     *
-     * <p>Must be called before reading variable values.
-     */
+    /// Updates all variable values after constraint changes.
+    ///
+    ///
+    ///
+    /// Must be called before reading variable values.
     public void updateVariables() {
         for (Map.Entry<Variable, Symbol> entry : vars.entrySet()) {
             Variable variable = entry.getKey();
@@ -292,20 +278,16 @@ public final class Solver {
         }
     }
 
-    /**
-     * Returns the current value of a variable.
-     *
-     * @param variable the variable to query
-     * @return the computed value, or 0 if not in the system
-     */
+    /// Returns the current value of a variable.
+    ///
+    /// @param variable the variable to query
+    /// @return the computed value, or 0 if not in the system
     public Fraction valueOf(Variable variable) {
         Fraction value = values.get(variable);
         return value != null ? value : Fraction.ZERO;
     }
 
-    /**
-     * Resets the solver to an empty state.
-     */
+    /// Resets the solver to an empty state.
     public void reset() {
         constraints.clear();
         vars.clear();
@@ -318,9 +300,7 @@ public final class Solver {
 
     // --- Internal simplex operations ---
 
-    /**
-     * Creates a row from a constraint expression.
-     */
+    /// Creates a row from a constraint expression.
     private Row createRow(CassowaryConstraint constraint, Tag tag) {
         Expression expr = constraint.expression();
         Row row = new Row(expr.constant());
@@ -382,9 +362,7 @@ public final class Solver {
         return row;
     }
 
-    /**
-     * Chooses a subject symbol for a row.
-     */
+    /// Chooses a subject symbol for a row.
     private Symbol chooseSubject(Row row, Tag tag) {
         // First choice: an external variable
         for (Symbol symbol : row.cells().keySet()) {
@@ -412,9 +390,7 @@ public final class Solver {
         return null;
     }
 
-    /**
-     * Checks if all symbols in a row are dummies.
-     */
+    /// Checks if all symbols in a row are dummies.
     private boolean allDummies(Row row) {
         for (Symbol symbol : row.cells().keySet()) {
             if (symbol.type() != Symbol.Type.DUMMY) {
@@ -424,11 +400,9 @@ public final class Solver {
         return true;
     }
 
-    /**
-     * Adds a row using an artificial variable.
-     *
-     * @return true if the constraint can be satisfied
-     */
+    /// Adds a row using an artificial variable.
+    ///
+    /// @return true if the constraint can be satisfied
     private boolean addWithArtificialVariable(Row row) {
         // Create the artificial variable and add it to the row
         Symbol art = Symbol.slack();
@@ -479,9 +453,7 @@ public final class Solver {
         return success;
     }
 
-    /**
-     * Optimizes the objective function using the simplex method.
-     */
+    /// Optimizes the objective function using the simplex method.
     private void optimize(Row objective) {
         while (true) {
             Symbol entering = findEnteringSymbol(objective);
@@ -496,9 +468,7 @@ public final class Solver {
         }
     }
 
-    /**
-     * Performs dual optimization.
-     */
+    /// Performs dual optimization.
     private void dualOptimize() {
         while (true) {
             Symbol leaving = null;
@@ -534,9 +504,7 @@ public final class Solver {
         }
     }
 
-    /**
-     * Finds the entering symbol for the simplex method.
-     */
+    /// Finds the entering symbol for the simplex method.
     private Symbol findEnteringSymbol(Row objective) {
         for (Map.Entry<Symbol, Fraction> entry : objective.cells().entrySet()) {
             if (entry.getKey().type() != Symbol.Type.DUMMY && entry.getValue().isNegative()) {
@@ -546,9 +514,7 @@ public final class Solver {
         return null;
     }
 
-    /**
-     * Finds the leaving symbol for a pivot operation.
-     */
+    /// Finds the leaving symbol for a pivot operation.
     private Symbol findLeavingSymbol(Symbol entering) {
         Fraction minRatio = null;
         Symbol result = null;
@@ -567,9 +533,7 @@ public final class Solver {
         return result;
     }
 
-    /**
-     * Finds a leaving symbol for removing a marker.
-     */
+    /// Finds a leaving symbol for removing a marker.
     private Symbol findLeavingSymbolForMarker(Symbol marker) {
         Fraction minRatio = null;
         Symbol first = null;
@@ -604,9 +568,7 @@ public final class Solver {
         return third;
     }
 
-    /**
-     * Performs a pivot operation.
-     */
+    /// Performs a pivot operation.
     private void pivot(Symbol entering, Symbol leaving) {
         Row row = rows.remove(leaving);
         row.solveFor(leaving, entering);
@@ -614,9 +576,7 @@ public final class Solver {
         rows.put(entering, row);
     }
 
-    /**
-     * Substitutes a symbol with the given row in all rows.
-     */
+    /// Substitutes a symbol with the given row in all rows.
     private void substitute(Symbol symbol, Row row) {
         for (Row r : rows.values()) {
             r.substitute(symbol, row);
@@ -627,9 +587,7 @@ public final class Solver {
         }
     }
 
-    /**
-     * Gets or creates a symbol for a variable.
-     */
+    /// Gets or creates a symbol for a variable.
     private Symbol getVarSymbol(Variable variable) {
         Symbol symbol = vars.get(variable);
         if (symbol == null) {
@@ -639,9 +597,7 @@ public final class Solver {
         return symbol;
     }
 
-    /**
-     * Removes the effects of a constraint's error variables from the objective.
-     */
+    /// Removes the effects of a constraint's error variables from the objective.
     private void removeConstraintEffects(CassowaryConstraint constraint, Tag tag) {
         if (tag.marker != null && tag.marker.type() == Symbol.Type.ERROR) {
             removeMarkerEffects(tag.marker, constraint.strength());
@@ -651,9 +607,7 @@ public final class Solver {
         }
     }
 
-    /**
-     * Removes the effects of a marker from the objective.
-     */
+    /// Removes the effects of a marker from the objective.
     private void removeMarkerEffects(Symbol marker, Strength strength) {
         Row row = rows.get(marker);
         if (row != null) {
@@ -663,3 +617,4 @@ public final class Solver {
         }
     }
 }
+

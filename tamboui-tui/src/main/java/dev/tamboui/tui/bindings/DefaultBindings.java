@@ -16,11 +16,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 
-/**
- * Default implementation of {@link Bindings} using a HashMap of actions to triggers.
- * <p>
- * Instances are immutable; use {@link #toBuilder()} to create modified versions.
- */
+/// Default implementation of {@link Bindings} using a HashMap of actions to triggers.
+///
+///
+///
+/// Instances are immutable; use {@link #toBuilder()} to create modified versions.
 public final class DefaultBindings implements Bindings {
 
     private final Map<String, List<InputTrigger>> triggers;
@@ -82,20 +82,16 @@ public final class DefaultBindings implements Bindings {
         return new BuilderImpl(this);
     }
 
-    /**
-     * Returns all action names that have triggers defined.
-     *
-     * @return set of action names
-     */
+    /// Returns all action names that have triggers defined.
+    ///
+    /// @return set of action names
     public Set<String> actions() {
         return triggers.keySet();
     }
 
-    /**
-     * Creates a new builder for constructing bindings.
-     *
-     * @return a new empty builder
-     */
+    /// Creates a new builder for constructing bindings.
+    ///
+    /// @return a new empty builder
     public static Builder builder() {
         return new BuilderImpl();
     }
@@ -163,3 +159,4 @@ public final class DefaultBindings implements Bindings {
         }
     }
 }
+

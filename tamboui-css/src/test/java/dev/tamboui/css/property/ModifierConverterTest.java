@@ -72,3 +72,4 @@ class ModifierConverterTest {
                 .hasValueSatisfying(mods -> assertThat(mods).containsExactly(Modifier.BOLD));
     }
 }
+

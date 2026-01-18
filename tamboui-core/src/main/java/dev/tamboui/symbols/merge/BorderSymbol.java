@@ -4,11 +4,11 @@
  */
 package dev.tamboui.symbols.merge;
 
-/**
- * Represents a composite border symbol using individual line components.
- * <p>
- * This is an internal type specifically used to make the merge logic easier to implement.
- */
+/// Represents a composite border symbol using individual line components.
+///
+///
+///
+/// This is an internal type specifically used to make the merge logic easier to implement.
 final class BorderSymbol {
     private final LineStyle right;
     private final LineStyle up;
@@ -42,9 +42,7 @@ final class BorderSymbol {
         return down;
     }
 
-    /**
-     * Finds the closest representation of this BorderSymbol that has a corresponding unicode character.
-     */
+    /// Finds the closest representation of this BorderSymbol that has a corresponding unicode character.
     BorderSymbol fuzzy(BorderSymbol other) {
         BorderSymbol result = this;
 
@@ -87,17 +85,13 @@ final class BorderSymbol {
         return result;
     }
 
-    /**
-     * Returns true only if the symbol is a line and both parts have the same LineStyle.
-     */
+    /// Returns true only if the symbol is a line and both parts have the same LineStyle.
     boolean isStraight() {
         return (up == down && left == right)
             && (up == LineStyle.NOTHING || left == LineStyle.NOTHING);
     }
 
-    /**
-     * Returns true only if the symbol is a corner and both parts have the same LineStyle.
-     */
+    /// Returns true only if the symbol is a corner and both parts have the same LineStyle.
     boolean isCorner() {
         if (up != LineStyle.NOTHING && right != LineStyle.NOTHING && down == LineStyle.NOTHING && left == LineStyle.NOTHING) {
             return up == right;
@@ -114,16 +108,12 @@ final class BorderSymbol {
         return false;
     }
 
-    /**
-     * Checks if any of the line components matches the given style.
-     */
+    /// Checks if any of the line components matches the given style.
     boolean contains(LineStyle style) {
         return up == style || right == style || down == style || left == style;
     }
 
-    /**
-     * Replaces all line styles matching `from` by `to`.
-     */
+    /// Replaces all line styles matching `from` by `to`.
     BorderSymbol replace(LineStyle from, LineStyle to) {
         return new BorderSymbol(
             right == from ? to : right,
@@ -133,9 +123,7 @@ final class BorderSymbol {
         );
     }
 
-    /**
-     * Merges two border symbols into one.
-     */
+    /// Merges two border symbols into one.
     BorderSymbol merge(BorderSymbol other, MergeStrategy strategy) {
         BorderSymbol exactResult = BorderSymbol.of(
             right.merge(other.right),
@@ -181,4 +169,5 @@ final class BorderSymbol {
         return SymbolRegistry.toString(this);
     }
 }
+
 

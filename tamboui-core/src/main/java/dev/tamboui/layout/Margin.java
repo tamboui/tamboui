@@ -4,9 +4,7 @@
  */
 package dev.tamboui.layout;
 
-/**
- * Margin values for top, right, bottom, and left sides.
- */
+/// Margin values for top, right, bottom, and left sides.
 public final class Margin {
 
     public static final Margin NONE = new Margin(0, 0, 0, 0);
@@ -17,14 +15,12 @@ public final class Margin {
     private final int left;
     private final int cachedHashCode;
 
-    /**
-     * Creates a margin.
-     *
-     * @param top    top margin
-     * @param right  right margin
-     * @param bottom bottom margin
-     * @param left   left margin
-     */
+    /// Creates a margin.
+    ///
+    /// @param top    top margin
+    /// @param right  right margin
+    /// @param bottom bottom margin
+    /// @param left   left margin
     public Margin(int top, int right, int bottom, int left) {
         this.top = top;
         this.right = right;
@@ -41,110 +37,90 @@ public final class Margin {
         return result;
     }
 
-    /**
-     * Returns a uniform margin on all sides.
-     *
-     * @param value margin in cells
-     * @return a margin with equal values on all sides
-     */
+    /// Returns a uniform margin on all sides.
+    ///
+    /// @param value margin in cells
+    /// @return a margin with equal values on all sides
     public static Margin uniform(int value) {
         return new Margin(value, value, value, value);
     }
 
-    /**
-     * Returns a margin with vertical and horizontal values.
-     *
-     * @param vertical    top/bottom margin
-     * @param horizontal  left/right margin
-     * @return a margin with the given symmetric values
-     */
+    /// Returns a margin with vertical and horizontal values.
+    ///
+    /// @param vertical    top/bottom margin
+    /// @param horizontal  left/right margin
+    /// @return a margin with the given symmetric values
     public static Margin symmetric(int vertical, int horizontal) {
         return new Margin(vertical, horizontal, vertical, horizontal);
     }
 
-    /**
-     * Returns a margin applied horizontally only.
-     *
-     * @param value left/right margin
-     * @return a margin with horizontal values set
-     */
+    /// Returns a margin applied horizontally only.
+    ///
+    /// @param value left/right margin
+    /// @return a margin with horizontal values set
     public static Margin horizontal(int value) {
         return new Margin(0, value, 0, value);
     }
 
-    /**
-     * Returns a margin applied vertically only.
-     *
-     * @param value top/bottom margin
-     * @return a margin with vertical values set
-     */
+    /// Returns a margin applied vertically only.
+    ///
+    /// @param value top/bottom margin
+    /// @return a margin with vertical values set
     public static Margin vertical(int value) {
         return new Margin(value, 0, value, 0);
     }
 
-    /**
-     * Returns the top margin.
-     *
-     * @return top margin
-     */
+    /// Returns the top margin.
+    ///
+    /// @return top margin
     public int top() {
         return top;
     }
 
-    /**
-     * Returns the right margin.
-     *
-     * @return right margin
-     */
+    /// Returns the right margin.
+    ///
+    /// @return right margin
     public int right() {
         return right;
     }
 
-    /**
-     * Returns the bottom margin.
-     *
-     * @return bottom margin
-     */
+    /// Returns the bottom margin.
+    ///
+    /// @return bottom margin
     public int bottom() {
         return bottom;
     }
 
-    /**
-     * Returns the left margin.
-     *
-     * @return left margin
-     */
+    /// Returns the left margin.
+    ///
+    /// @return left margin
     public int left() {
         return left;
     }
 
-    /**
-     * Returns the sum of left and right margins.
-     *
-     * @return total horizontal margin
-     */
+    /// Returns the sum of left and right margins.
+    ///
+    /// @return total horizontal margin
     public int horizontalTotal() {
         return left + right;
     }
 
-    /**
-     * Returns the sum of top and bottom margins.
-     *
-     * @return total vertical margin
-     */
+    /// Returns the sum of top and bottom margins.
+    ///
+    /// @return total vertical margin
     public int verticalTotal() {
         return top + bottom;
     }
 
-    /**
-     * Returns the inner area after applying this margin.
-     * <p>
-     * The returned rect is inset by the margin values on each side.
-     * If the margin would result in negative dimensions, returns an empty rect.
-     *
-     * @param area the outer area
-     * @return the inner area with margin applied
-     */
+    /// Returns the inner area after applying this margin.
+    ///
+    ///
+    ///
+    /// The returned rect is inset by the margin values on each side.
+    /// If the margin would result in negative dimensions, returns an empty rect.
+    ///
+    /// @param area the outer area
+    /// @return the inner area with margin applied
     public Rect inner(Rect area) {
         int newX = area.x() + left;
         int newY = area.y() + top;
@@ -181,3 +157,4 @@ public final class Margin {
         return String.format("Margin[top=%d, right=%d, bottom=%d, left=%d]", top, right, bottom, left);
     }
 }
+

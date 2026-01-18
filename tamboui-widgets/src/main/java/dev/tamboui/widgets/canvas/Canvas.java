@@ -16,31 +16,32 @@ import dev.tamboui.widgets.block.Block;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * A widget for drawing arbitrary shapes on a terminal grid.
- * <p>
- * The Canvas widget provides a mathematical coordinate system where
- * shapes can be drawn using floating-point coordinates. The widget
- * handles the transformation from canvas space to terminal cells.
- *
- * <pre>{@code
- * Canvas canvas = Canvas.builder()
- *     .xBounds(-180, 180)
- *     .yBounds(-90, 90)
- *     .marker(Marker.BRAILLE)
- *     .block(Block.bordered().title(Title.from("World Map")))
- *     .paint(ctx -> {
- *         ctx.draw(new Circle(0, 0, 50, Color.RED));
- *         ctx.draw(new Line(-50, -50, 50, 50, Color.GREEN));
- *         ctx.print(0, 0, "Center");
- *     })
- *     .build();
- * }</pre>
- *
- * @see Shape
- * @see Context
- * @see Marker
- */
+/// A widget for drawing arbitrary shapes on a terminal grid.
+///
+///
+///
+/// The Canvas widget provides a mathematical coordinate system where
+/// shapes can be drawn using floating-point coordinates. The widget
+/// handles the transformation from canvas space to terminal cells.
+///
+/// ```java
+/// Canvas canvas = Canvas.builder()
+///     .xBounds(-180, 180)
+///     .yBounds(-90, 90)
+///     .marker(Marker.BRAILLE)
+///     .block(Block.bordered().title(Title.from("World Map")))
+///     .paint(ctx -> {
+///         ctx.draw(new Circle(0, 0, 50, Color.RED));
+///         ctx.draw(new Line(-50, -50, 50, 50, Color.GREEN));
+///         ctx.print(0, 0, "Center");
+///     })
+///     .build();
+/// }
+/// ```
+///
+/// @see Shape
+/// @see Context
+/// @see Marker
 public final class Canvas implements Widget {
 
     // Braille character base (Unicode 0x2800)
@@ -70,9 +71,7 @@ public final class Canvas implements Widget {
         this.paintCallback = builder.paintCallback;
     }
 
-    /**
-     * Creates a new canvas builder.
-     */
+    /// Creates a new canvas builder.
     public static Builder builder() {
         return new Builder();
     }
@@ -262,9 +261,7 @@ public final class Canvas implements Widget {
         }
     }
 
-    /**
-     * Builder for {@link Canvas}.
-     */
+    /// Builder for {@link Canvas}.
     public static final class Builder {
         private double[] xBounds = {0.0, 1.0};
         private double[] yBounds = {0.0, 1.0};
@@ -275,68 +272,57 @@ public final class Canvas implements Widget {
 
         private Builder() {}
 
-        /**
-         * Sets the x-axis bounds.
-         *
-         * @param min the minimum x value
-         * @param max the maximum x value
-         */
+        /// Sets the x-axis bounds.
+        ///
+        /// @param min the minimum x value
+        /// @param max the maximum x value
         public Builder xBounds(double min, double max) {
             this.xBounds = new double[] {min, max};
             return this;
         }
 
-        /**
-         * Sets the y-axis bounds.
-         *
-         * @param min the minimum y value
-         * @param max the maximum y value
-         */
+        /// Sets the y-axis bounds.
+        ///
+        /// @param min the minimum y value
+        /// @param max the maximum y value
         public Builder yBounds(double min, double max) {
             this.yBounds = new double[] {min, max};
             return this;
         }
 
-        /**
-         * Sets the marker type for rendering points.
-         */
+        /// Sets the marker type for rendering points.
         public Builder marker(Marker marker) {
             this.marker = marker != null ? marker : Marker.BRAILLE;
             return this;
         }
 
-        /**
-         * Wraps the canvas in a block.
-         */
+        /// Wraps the canvas in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the background color.
-         */
+        /// Sets the background color.
         public Builder backgroundColor(Color color) {
             this.backgroundColor = color;
             return this;
         }
 
-        /**
-         * Sets the paint callback for drawing shapes.
-         * <p>
-         * The callback receives a {@link Context} that can be used to
-         * draw shapes and print text.
-         */
+        /// Sets the paint callback for drawing shapes.
+        ///
+        ///
+        ///
+        /// The callback receives a {@link Context} that can be used to
+        /// draw shapes and print text.
         public Builder paint(Consumer<Context> callback) {
             this.paintCallback = callback;
             return this;
         }
 
-        /**
-         * Builds the canvas.
-         */
+        /// Builds the canvas.
         public Canvas build() {
             return new Canvas(this);
         }
     }
 }
+

@@ -22,9 +22,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for ElementRegistry CSS selector support.
- */
+/// Tests for ElementRegistry CSS selector support.
 class ElementRegistryTest {
 
     private ElementRegistry registry;
@@ -449,3 +447,4 @@ class ElementRegistryTest {
         return registry.query("#" + id).orElseThrow(() -> new AssertionError("Element not found: " + id));
     }
 }
+

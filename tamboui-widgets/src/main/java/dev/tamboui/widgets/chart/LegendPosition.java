@@ -4,24 +4,23 @@
  */
 package dev.tamboui.widgets.chart;
 
-/**
- * Position of the legend in a {@link Chart}.
- */
+/// Position of the legend in a {@link Chart}.
 public enum LegendPosition {
-    /** Top center */
+    /// Top center
     TOP,
-    /** Top left corner */
+    /// Top left corner
     TOP_LEFT,
-    /** Top right corner (default) */
+    /// Top right corner (default)
     TOP_RIGHT,
-    /** Left side, vertically centered */
+    /// Left side, vertically centered
     LEFT,
-    /** Right side, vertically centered */
+    /// Right side, vertically centered
     RIGHT,
-    /** Bottom center */
+    /// Bottom center
     BOTTOM,
-    /** Bottom left corner */
+    /// Bottom left corner
     BOTTOM_LEFT,
-    /** Bottom right corner */
+    /// Bottom right corner
     BOTTOM_RIGHT
 }
+

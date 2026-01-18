@@ -6,12 +6,12 @@ package dev.tamboui.css.parser;
 
 import java.util.Objects;
 
-/**
- * Represents a token in the CSS lexer output.
- * <p>
- * Tokens are the building blocks produced by the lexer that the parser
- * uses to construct the CSS AST.
- */
+/// Represents a token in the CSS lexer output.
+///
+///
+///
+/// Tokens are the building blocks produced by the lexer that the parser
+/// uses to construct the CSS AST.
 public abstract class Token {
 
     private final Position position;
@@ -22,32 +22,24 @@ public abstract class Token {
         this.precededByWhitespace = false;
     }
 
-    /**
-     * Returns the position of this token in the source.
-     */
+    /// Returns the position of this token in the source.
     public Position position() {
         return position;
     }
 
-    /**
-     * Returns whether this token was preceded by whitespace in the source.
-     * This is used to distinguish between compound selectors (Panel.class)
-     * and descendant selectors (Panel Button).
-     */
+    /// Returns whether this token was preceded by whitespace in the source.
+    /// This is used to distinguish between compound selectors (Panel.class)
+    /// and descendant selectors (Panel Button).
     public boolean precededByWhitespace() {
         return precededByWhitespace;
     }
 
-    /**
-     * Sets whether this token was preceded by whitespace.
-     */
+    /// Sets whether this token was preceded by whitespace.
     void setPrecededByWhitespace(boolean value) {
         this.precededByWhitespace = value;
     }
 
-    /**
-     * Position in source code (line and column, 1-based).
-     */
+    /// Position in source code (line and column, 1-based).
     public static final class Position {
         public static final Position UNKNOWN = new Position(0, 0);
 
@@ -90,9 +82,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * An identifier token (e.g., "color", "Panel", "bold").
-     */
+    /// An identifier token (e.g., "color", "Panel", "bold").
     public static final class Ident extends Token {
         private final String value;
 
@@ -111,9 +101,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A string token (e.g., "hello world" or 'hello world').
-     */
+    /// A string token (e.g., "hello world" or 'hello world').
     public static final class StringToken extends Token {
         private final String value;
 
@@ -132,9 +120,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A number token (e.g., "42", "3.14", "50%").
-     */
+    /// A number token (e.g., "42", "3.14", "50%").
     public static final class Number extends Token {
         private final String value;
         private final boolean isPercentage;
@@ -159,9 +145,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A hash token for colors or IDs (e.g., "#ff0000", "#sidebar").
-     */
+    /// A hash token for colors or IDs (e.g., "#ff0000", "#sidebar").
     public static final class Hash extends Token {
         private final String value;
 
@@ -180,9 +164,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A variable reference (e.g., "$primary").
-     */
+    /// A variable reference (e.g., "$primary").
     public static final class Variable extends Token {
         private final String name;
 
@@ -201,9 +183,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A delimiter character (e.g., ".", "&gt;", "*", "&amp;").
-     */
+    /// A delimiter character (e.g., ".", "&gt;", "*", "&amp;").
     public static final class Delim extends Token {
         private final char value;
 
@@ -222,9 +202,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A colon token ":".
-     */
+    /// A colon token ":".
     public static final class Colon extends Token {
         public Colon(Position position) {
             super(position);
@@ -236,9 +214,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A semicolon token ";".
-     */
+    /// A semicolon token ";".
     public static final class Semicolon extends Token {
         public Semicolon(Position position) {
             super(position);
@@ -250,9 +226,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * An opening brace "{".
-     */
+    /// An opening brace "{".
     public static final class OpenBrace extends Token {
         public OpenBrace(Position position) {
             super(position);
@@ -264,9 +238,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A closing brace "}".
-     */
+    /// A closing brace "}".
     public static final class CloseBrace extends Token {
         public CloseBrace(Position position) {
             super(position);
@@ -278,9 +250,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * An opening parenthesis "(".
-     */
+    /// An opening parenthesis "(".
     public static final class OpenParen extends Token {
         public OpenParen(Position position) {
             super(position);
@@ -292,9 +262,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A closing parenthesis ")".
-     */
+    /// A closing parenthesis ")".
     public static final class CloseParen extends Token {
         public CloseParen(Position position) {
             super(position);
@@ -306,9 +274,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A comma ",".
-     */
+    /// A comma ",".
     public static final class Comma extends Token {
         public Comma(Position position) {
             super(position);
@@ -320,9 +286,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * An opening bracket "[".
-     */
+    /// An opening bracket "[".
     public static final class OpenBracket extends Token {
         public OpenBracket(Position position) {
             super(position);
@@ -334,9 +298,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * A closing bracket "]".
-     */
+    /// A closing bracket "]".
     public static final class CloseBracket extends Token {
         public CloseBracket(Position position) {
             super(position);
@@ -348,10 +310,8 @@ public abstract class Token {
         }
     }
 
-    /**
-     * Whitespace (spaces, tabs, newlines).
-     * Usually filtered out before parsing but useful for preserving formatting.
-     */
+    /// Whitespace (spaces, tabs, newlines).
+    /// Usually filtered out before parsing but useful for preserving formatting.
     public static final class Whitespace extends Token {
         private final String value;
 
@@ -370,9 +330,7 @@ public abstract class Token {
         }
     }
 
-    /**
-     * End of file marker.
-     */
+    /// End of file marker.
     public static final class EOF extends Token {
         public EOF(Position position) {
             super(position);
@@ -384,3 +342,4 @@ public abstract class Token {
         }
     }
 }
+

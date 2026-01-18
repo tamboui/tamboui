@@ -545,3 +545,4 @@ class BindingsTest {
         assertThat(trigger.matches(mouseEvent)).isFalse();
     }
 }
+

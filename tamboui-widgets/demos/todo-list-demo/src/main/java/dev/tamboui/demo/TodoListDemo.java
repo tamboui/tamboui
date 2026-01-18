@@ -35,17 +35,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing a Todo List with selectable items.
- * <p>
- * Demonstrates:
- * - Todo items with status (Todo/Completed)
- * - List widget with selection and navigation
- * - Toggle status with Enter/Right arrow
- * - Show item info below the list
- * - Different styling for completed vs todo items
- * - Alternating row background colors
- */
+/// Demo TUI application showcasing a Todo List with selectable items.
+///
+///
+///
+/// Demonstrates:
+/// - Todo items with status (Todo/Completed)
+/// - List widget with selection and navigation
+/// - Toggle status with Enter/Right arrow
+/// - Show item info below the list
+/// - Different styling for completed vs todo items
+/// - Alternating row background colors
 public class TodoListDemo {
 
     private enum Status {
@@ -313,4 +313,5 @@ public class TodoListDemo {
         frame.renderWidget(footer, area);
     }
 }
+
 

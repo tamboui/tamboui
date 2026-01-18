@@ -4,11 +4,9 @@
  */
 package dev.tamboui.widgets.block;
 
-/**
- * Characters used to draw a border.
- * Supports asymmetric borders where top/bottom horizontal and left/right vertical
- * characters can differ (e.g., for QUADRANT border types).
- */
+/// Characters used to draw a border.
+/// Supports asymmetric borders where top/bottom horizontal and left/right vertical
+/// characters can differ (e.g., for QUADRANT border types).
 public final class BorderSet {
     private final String topHorizontal;
     private final String bottomHorizontal;
@@ -19,9 +17,7 @@ public final class BorderSet {
     private final String bottomLeft;
     private final String bottomRight;
 
-    /**
-     * Creates a border set with separate characters for each side.
-     */
+    /// Creates a border set with separate characters for each side.
     public BorderSet(
         String topHorizontal,
         String bottomHorizontal,
@@ -113,3 +109,4 @@ public final class BorderSet {
             topHorizontal, bottomHorizontal, leftVertical, rightVertical, topLeft, topRight, bottomLeft, bottomRight);
     }
 }
+

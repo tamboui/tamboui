@@ -7,9 +7,7 @@ package dev.tamboui.symbols.merge;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Registry for mapping between Unicode box drawing characters and their BorderSymbol representations.
- */
+/// Registry for mapping between Unicode box drawing characters and their BorderSymbol representations.
 final class SymbolRegistry {
     private static final Map<String, BorderSymbol> STRING_TO_SYMBOL = new HashMap<>();
     private static final Map<BorderSymbol, String> SYMBOL_TO_STRING = new HashMap<>();
@@ -163,4 +161,5 @@ final class SymbolRegistry {
         return SYMBOL_TO_STRING.containsKey(symbol);
     }
 }
+
 

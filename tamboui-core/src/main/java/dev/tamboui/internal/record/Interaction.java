@@ -4,18 +4,14 @@
  */
 package dev.tamboui.internal.record;
 
-/**
- * Represents a scripted interaction for demo recording.
- * This is an internal API and not part of the public contract.
- */
+/// Represents a scripted interaction for demo recording.
+/// This is an internal API and not part of the public contract.
 abstract class Interaction {
 
     private Interaction() {
     }
 
-    /**
-     * Wait for a specified number of milliseconds.
-     */
+    /// Wait for a specified number of milliseconds.
     static final class Wait extends Interaction {
         private final int millis;
 
@@ -28,9 +24,7 @@ abstract class Interaction {
         }
     }
 
-    /**
-     * Simulate a key press.
-     */
+    /// Simulate a key press.
     static final class KeyPress extends Interaction {
         private final String key;
 
@@ -43,3 +37,4 @@ abstract class Interaction {
         }
     }
 }
+

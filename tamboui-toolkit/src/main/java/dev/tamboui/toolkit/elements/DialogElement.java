@@ -35,32 +35,37 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A dialog element that auto-centers in its parent area.
- * <p>
- * DialogElement simplifies creating modal dialogs by automatically:
- * <ul>
- *   <li>Centering the dialog in the parent area</li>
- *   <li>Clearing the background before rendering</li>
- *   <li>Calculating dimensions from content (or using fixed dimensions)</li>
- * </ul>
- * <p>
- * Layout properties for dialog content can be set via CSS or programmatically:
- * <ul>
- *   <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
- *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
- *   <li>{@code spacing} - Gap between children in cells</li>
- * </ul>
- * <p>
- * Programmatic values override CSS values when both are set.
- *
- * <pre>{@code
- * dialog("Confirm Delete",
- *     text("Delete 3 files?"),
- *     text("[y] Yes  [n] No").dim()
- * ).rounded().borderColor(Color.YELLOW)
- * }</pre>
- */
+/// A dialog element that auto-centers in its parent area.
+///
+///
+///
+/// DialogElement simplifies creating modal dialogs by automatically:
+///
+/// - Centering the dialog in the parent area
+/// - Clearing the background before rendering
+/// - Calculating dimensions from content (or using fixed dimensions)
+///
+///
+///
+///
+/// Layout properties for dialog content can be set via CSS or programmatically:
+///
+/// - {@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code spacing} - Gap between children in cells
+///
+///
+///
+///
+/// Programmatic values override CSS values when both are set.
+///
+/// ```java
+/// dialog("Confirm Delete",
+///     text("Delete 3 files?"),
+///     text("[y] Yes  [n] No").dim()
+/// ).rounded().borderColor(Color.YELLOW)
+/// }
+/// ```
 public final class DialogElement extends ContainerElement<DialogElement> {
 
     private String title;
@@ -88,166 +93,140 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         this.children.addAll(Arrays.asList(children));
     }
 
-    /**
-     * Sets the dialog title.
-     */
+    /// Sets the dialog title.
     public DialogElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Sets the border type to rounded.
-     */
+    /// Sets the border type to rounded.
     public DialogElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border type to double.
-     */
+    /// Sets the border type to double.
     public DialogElement doubleBorder() {
         this.borderType = BorderType.DOUBLE;
         return this;
     }
 
-    /**
-     * Sets the border type.
-     */
+    /// Sets the border type.
     public DialogElement borderType(BorderType type) {
         this.borderType = type;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public DialogElement borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
 
-    /**
-     * Sets a fixed width for the dialog.
-     */
+    /// Sets a fixed width for the dialog.
     public DialogElement width(int width) {
         this.fixedWidth = width;
         return this;
     }
 
-    /**
-     * Sets a fixed height for the dialog.
-     */
+    /// Sets a fixed height for the dialog.
     public DialogElement height(int height) {
         this.fixedHeight = height;
         return this;
     }
 
-    /**
-     * Sets the minimum width for the dialog.
-     */
+    /// Sets the minimum width for the dialog.
     public DialogElement minWidth(int minWidth) {
         this.minWidth = minWidth;
         return this;
     }
 
-    /**
-     * Sets the padding around content for width calculation.
-     */
+    /// Sets the padding around content for width calculation.
     public DialogElement padding(int padding) {
         this.padding = padding;
         return this;
     }
 
-    /**
-     * Sets the layout direction for children.
-     * <p>
-     * Can also be set via CSS {@code direction} property.
-     *
-     * @param direction the layout direction
-     * @return this dialog for chaining
-     */
+    /// Sets the layout direction for children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code direction} property.
+    ///
+    /// @param direction the layout direction
+    /// @return this dialog for chaining
     public DialogElement direction(Direction direction) {
         this.direction = direction;
         return this;
     }
 
-    /**
-     * Sets the layout direction to horizontal.
-     *
-     * @return this dialog for chaining
-     */
+    /// Sets the layout direction to horizontal.
+    ///
+    /// @return this dialog for chaining
     public DialogElement horizontal() {
         this.direction = Direction.HORIZONTAL;
         return this;
     }
 
-    /**
-     * Sets the layout direction to vertical.
-     *
-     * @return this dialog for chaining
-     */
+    /// Sets the layout direction to vertical.
+    ///
+    /// @return this dialog for chaining
     public DialogElement vertical() {
         this.direction = Direction.VERTICAL;
         return this;
     }
 
-    /**
-     * Sets the flex layout mode for positioning children.
-     * <p>
-     * Can also be set via CSS {@code flex} property.
-     *
-     * @param flex the flex mode
-     * @return this dialog for chaining
-     */
+    /// Sets the flex layout mode for positioning children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code flex} property.
+    ///
+    /// @param flex the flex mode
+    /// @return this dialog for chaining
     public DialogElement flex(Flex flex) {
         this.flex = flex;
         return this;
     }
 
-    /**
-     * Sets the spacing (gap) between children.
-     * <p>
-     * Can also be set via CSS {@code spacing} property.
-     *
-     * @param spacing the spacing in cells
-     * @return this dialog for chaining
-     */
+    /// Sets the spacing (gap) between children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code spacing} property.
+    ///
+    /// @param spacing the spacing in cells
+    /// @return this dialog for chaining
     public DialogElement spacing(int spacing) {
         this.spacing = spacing;
         return this;
     }
 
-    /**
-     * Sets the callback to run when the dialog is confirmed (Enter key).
-     *
-     * @param callback the callback to run on confirmation
-     * @return this element
-     */
+    /// Sets the callback to run when the dialog is confirmed (Enter key).
+    ///
+    /// @param callback the callback to run on confirmation
+    /// @return this element
     public DialogElement onConfirm(Runnable callback) {
         this.onConfirm = callback;
         return this;
     }
 
-    /**
-     * Sets the callback to run when the dialog is cancelled (Escape key).
-     *
-     * @param callback the callback to run on cancellation
-     * @return this element
-     */
+    /// Sets the callback to run when the dialog is cancelled (Escape key).
+    ///
+    /// @param callback the callback to run on cancellation
+    /// @return this element
     public DialogElement onCancel(Runnable callback) {
         this.onCancel = callback;
         return this;
     }
 
-    /**
-     * Handles key events for the dialog.
-     * <p>
-     * Routes events to children first (via ContainerElement).
-     * Then handles Enter for confirm and Escape for cancel.
-     * Being modal, the dialog consumes all key events.
-     */
+    /// Handles key events for the dialog.
+    ///
+    ///
+    ///
+    /// Routes events to children first (via ContainerElement).
+    /// Then handles Enter for confirm and Escape for cancel.
+    /// Being modal, the dialog consumes all key events.
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Route to children first (via ContainerElement)
@@ -418,3 +397,4 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         return 2 + children.size();
     }
 }
+

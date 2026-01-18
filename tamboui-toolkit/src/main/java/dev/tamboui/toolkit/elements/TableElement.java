@@ -27,21 +27,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A DSL wrapper for the Table widget.
- * <p>
- * Displays data in rows and columns.
- * <pre>{@code
- * table()
- *     .header("Name", "Age", "City")
- *     .row("Alice", "30", "NYC")
- *     .row("Bob", "25", "LA")
- *     .widths(percent(40), length(10), fill())
- *     .state(tableState)
- *     .title("Users")
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the Table widget.
+///
+///
+///
+/// Displays data in rows and columns.
+/// ```java
+/// table()
+///     .header("Name", "Age", "City")
+///     .row("Alice", "30", "NYC")
+///     .row("Bob", "25", "LA")
+///     .widths(percent(40), length(10), fill())
+///     .state(tableState)
+///     .title("Users")
+///     .rounded()
+/// }
+/// ```
 public final class TableElement extends StyledElement<TableElement> {
 
     private static final Style DEFAULT_HIGHLIGHT_STYLE = Style.EMPTY.reversed();
@@ -63,150 +64,114 @@ public final class TableElement extends StyledElement<TableElement> {
     public TableElement() {
     }
 
-    /**
-     * Sets the header row from strings.
-     * The header style will be resolved from CSS (TableElement-header) or use default bold.
-     */
+    /// Sets the header row from strings.
+    /// The header style will be resolved from CSS (TableElement-header) or use default bold.
     public TableElement header(String... cells) {
         this.header = Row.from(cells);  // Style applied in renderContent from CSS
         return this;
     }
 
-    /**
-     * Sets the header row.
-     */
+    /// Sets the header row.
     public TableElement header(Row header) {
         this.header = header;
         return this;
     }
 
-    /**
-     * Sets the footer row from strings.
-     */
+    /// Sets the footer row from strings.
     public TableElement footer(String... cells) {
         this.footer = Row.from(cells);
         return this;
     }
 
-    /**
-     * Sets the footer row.
-     */
+    /// Sets the footer row.
     public TableElement footer(Row footer) {
         this.footer = footer;
         return this;
     }
 
-    /**
-     * Adds a row from strings.
-     */
+    /// Adds a row from strings.
     public TableElement row(String... cells) {
         this.rows.add(Row.from(cells));
         return this;
     }
 
-    /**
-     * Adds a row.
-     */
+    /// Adds a row.
     public TableElement row(Row row) {
         this.rows.add(row);
         return this;
     }
 
-    /**
-     * Sets all rows.
-     */
+    /// Sets all rows.
     public TableElement rows(Row... rows) {
         this.rows.clear();
         this.rows.addAll(Arrays.asList(rows));
         return this;
     }
 
-    /**
-     * Sets all rows from a list.
-     */
+    /// Sets all rows from a list.
     public TableElement rows(List<Row> rows) {
         this.rows.clear();
         this.rows.addAll(rows);
         return this;
     }
 
-    /**
-     * Sets the column width constraints.
-     */
+    /// Sets the column width constraints.
     public TableElement widths(Constraint... widths) {
         this.widths.clear();
         this.widths.addAll(Arrays.asList(widths));
         return this;
     }
 
-    /**
-     * Sets the column width constraints from a list.
-     */
+    /// Sets the column width constraints from a list.
     public TableElement widths(List<Constraint> widths) {
         this.widths.clear();
         this.widths.addAll(widths);
         return this;
     }
 
-    /**
-     * Sets the table state for selection tracking.
-     */
+    /// Sets the table state for selection tracking.
     public TableElement state(TableState state) {
         this.state = state;
         return this;
     }
 
-    /**
-     * Sets the highlight style for selected rows.
-     */
+    /// Sets the highlight style for selected rows.
     public TableElement highlightStyle(Style style) {
         this.highlightStyle = style;
         return this;
     }
 
-    /**
-     * Sets the highlight color for selected rows.
-     */
+    /// Sets the highlight color for selected rows.
     public TableElement highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
         return this;
     }
 
-    /**
-     * Sets the symbol displayed before the selected row.
-     */
+    /// Sets the symbol displayed before the selected row.
     public TableElement highlightSymbol(String symbol) {
         this.highlightSymbol = symbol;
         return this;
     }
 
-    /**
-     * Sets the spacing between columns.
-     */
+    /// Sets the spacing between columns.
     public TableElement columnSpacing(int spacing) {
         this.columnSpacing = spacing;
         return this;
     }
 
-    /**
-     * Sets the title.
-     */
+    /// Sets the title.
     public TableElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public TableElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public TableElement borderColor(Color color) {
         this.borderColor = color;
         return this;
@@ -280,3 +245,4 @@ public final class TableElement extends StyledElement<TableElement> {
         frame.renderStatefulWidget(widget, area, effectiveState);
     }
 }
+

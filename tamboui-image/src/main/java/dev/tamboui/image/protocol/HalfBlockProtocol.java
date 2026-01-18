@@ -13,31 +13,31 @@ import dev.tamboui.style.Style;
 
 import java.io.OutputStream;
 
-/**
- * Renders images using Unicode half-block characters.
- * <p>
- * Each terminal cell can display two vertical half-blocks (▀▄█),
- * providing 1x2 virtual pixel resolution per cell.
- * <p>
- * The top half uses the foreground color and the bottom half uses the background color,
- * allowing two independent colors per cell.
- */
+/// Renders images using Unicode half-block characters.
+///
+///
+///
+/// Each terminal cell can display two vertical half-blocks (▀▄█),
+/// providing 1x2 virtual pixel resolution per cell.
+///
+///
+///
+/// The top half uses the foreground color and the bottom half uses the background color,
+/// allowing two independent colors per cell.
 public final class HalfBlockProtocol implements ImageProtocol {
 
-    /** Upper half block character. */
+    /// Upper half block character.
     private static final String UPPER_HALF = "▀";
 
-    /** Lower half block character. */
+    /// Lower half block character.
     private static final String LOWER_HALF = "▄";
 
-    /** Full block character. */
+    /// Full block character.
     private static final String FULL_BLOCK = "█";
 
     private static final Resolution RESOLUTION = new Resolution(1, 2);
 
-    /**
-     * Creates a new half-block protocol instance.
-     */
+    /// Creates a new half-block protocol instance.
     public HalfBlockProtocol() {
     }
 
@@ -113,9 +113,7 @@ public final class HalfBlockProtocol implements ImageProtocol {
         return TerminalImageProtocol.HALF_BLOCK;
     }
 
-    /**
-     * Converts an ARGB pixel to a TamboUI Color.
-     */
+    /// Converts an ARGB pixel to a TamboUI Color.
     private static Color argbToColor(int argb) {
         int r = ImageData.red(argb);
         int g = ImageData.green(argb);
@@ -123,3 +121,4 @@ public final class HalfBlockProtocol implements ImageProtocol {
         return Color.rgb(r, g, b);
     }
 }
+

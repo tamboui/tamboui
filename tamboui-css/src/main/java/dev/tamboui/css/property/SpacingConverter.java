@@ -9,16 +9,15 @@ import dev.tamboui.widgets.block.Padding;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS padding/margin values to Padding objects.
- * <p>
- * Supports the following formats:
- * <ul>
- *   <li>{@code "1"} - uniform padding on all sides</li>
- *   <li>{@code "1 2"} - vertical (top/bottom) and horizontal (left/right)</li>
- *   <li>{@code "1 2 3 4"} - top, right, bottom, left (CSS order)</li>
- * </ul>
- */
+/// Converts CSS padding/margin values to Padding objects.
+///
+///
+///
+/// Supports the following formats:
+///
+/// - {@code "1"} - uniform padding on all sides
+/// - {@code "1 2"} - vertical (top/bottom) and horizontal (left/right)
+/// - {@code "1 2 3 4"} - top, right, bottom, left (CSS order)
 public final class SpacingConverter implements PropertyConverter<Padding> {
 
     @Override
@@ -56,3 +55,4 @@ public final class SpacingConverter implements PropertyConverter<Padding> {
         }
     }
 }
+

@@ -130,3 +130,4 @@ class RectTest {
         assertThat(rect.size()).isEqualTo(new Size(15, 20));
     }
 }
+

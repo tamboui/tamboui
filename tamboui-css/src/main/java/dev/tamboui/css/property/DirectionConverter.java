@@ -9,15 +9,14 @@ import dev.tamboui.layout.Direction;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS direction values to Direction enum.
- * <p>
- * Supports the following values:
- * <ul>
- *   <li>{@code "horizontal"} or {@code "row"} - horizontal layout</li>
- *   <li>{@code "vertical"} or {@code "column"} - vertical layout</li>
- * </ul>
- */
+/// Converts CSS direction values to Direction enum.
+///
+///
+///
+/// Supports the following values:
+///
+/// - {@code "horizontal"} or {@code "row"} - horizontal layout
+/// - {@code "vertical"} or {@code "column"} - vertical layout
 public final class DirectionConverter implements PropertyConverter<Direction> {
 
     @Override
@@ -40,3 +39,4 @@ public final class DirectionConverter implements PropertyConverter<Direction> {
         }
     }
 }
+

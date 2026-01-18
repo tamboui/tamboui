@@ -8,16 +8,15 @@ import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Painter;
 import dev.tamboui.widgets.canvas.Shape;
 
-/**
- * A circle defined by center and radius.
- *
- * <pre>{@code
- * // Circle centered at (50, 50) with radius 20
- * context.draw(new Circle(50, 50, 20, Color.GREEN));
- * }</pre>
- *
- * @see Shape
- */
+/// A circle defined by center and radius.
+///
+/// ```java
+/// // Circle centered at (50, 50) with radius 20
+/// context.draw(new Circle(50, 50, 20, Color.GREEN));
+/// }
+/// ```
+///
+/// @see Shape
 public final class Circle implements Shape {
 
     private final double x;
@@ -32,9 +31,7 @@ public final class Circle implements Shape {
         this.color = color;
     }
 
-    /**
-     * Creates a circle centered at (x, y) with the given radius and color.
-     */
+    /// Creates a circle centered at (x, y) with the given radius and color.
     public static Circle of(double x, double y, double radius, Color color) {
         return new Circle(x, y, radius, color);
     }
@@ -105,3 +102,4 @@ public final class Circle implements Shape {
         return String.format("Circle[x=%s, y=%s, radius=%s, color=%s]", x, y, radius, color);
     }
 }
+

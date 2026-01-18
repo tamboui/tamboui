@@ -84,3 +84,4 @@ class FlexConverterTest {
         assertThat(converter.convert("stretch", Collections.emptyMap())).isEmpty();
     }
 }
+

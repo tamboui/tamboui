@@ -18,35 +18,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Registry for effects that target specific elements by ID.
- * <p>
- * ElementEffectRegistry manages effects that are associated with element IDs.
- * When an element is rendered and its area becomes available via the EventRouter,
- * pending effects are resolved to their target areas and begin running.
- * <p>
- * <b>Design Philosophy:</b>
- * <ul>
- *   <li><b>Deferred Resolution:</b> Effects are added by element ID and resolved
- *       to areas when the element is actually rendered</li>
- *   <li><b>Thread-Safe:</b> Uses locking for safe access from multiple threads</li>
- *   <li><b>No Coupling:</b> Does not require Element interface changes</li>
- * </ul>
- * <p>
- * <b>Usage:</b>
- * <pre>{@code
- * ElementEffectRegistry registry = new ElementEffectRegistry();
- *
- * // Add effect targeting an element
- * registry.addEffect("header", Fx.fadeFromFg(Color.BLACK, 800, Interpolation.QuadOut));
- *
- * // In render loop, resolve and process
- * registry.resolvePendingEffects(eventRouter);
- * registry.processEffects(delta, buffer, fullArea);
- * }</pre>
- *
- * @see ToolkitEffects
- */
+/// Registry for effects that target specific elements by ID.
+///
+///
+///
+/// ElementEffectRegistry manages effects that are associated with element IDs.
+/// When an element is rendered and its area becomes available via the EventRouter,
+/// pending effects are resolved to their target areas and begin running.
+///
+///
+///
+/// **Design Philosophy:**
+///
+/// <li>**Deferred Resolution:** Effects are added by element ID and resolved
+/// to areas when the element is actually rendered
+/// - **Thread-Safe:** Uses locking for safe access from multiple threads
+/// - **No Coupling:** Does not require Element interface changes
+///
+///
+///
+///
+/// **Usage:**
+/// ```java
+/// ElementEffectRegistry registry = new ElementEffectRegistry();
+///
+/// // Add effect targeting an element
+/// registry.addEffect("header", Fx.fadeFromFg(Color.BLACK, 800, Interpolation.QuadOut));
+///
+/// // In render loop, resolve and process
+/// registry.resolvePendingEffects(eventRouter);
+/// registry.processEffects(delta, buffer, fullArea);
+/// }
+/// ```
+///
+/// @see ToolkitEffects
 public final class ElementEffectRegistry {
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -55,9 +60,7 @@ public final class ElementEffectRegistry {
     private final EffectManager globalEffects = new EffectManager();
     private final EffectManager runningEffects = new EffectManager();
 
-    /**
-     * A pending effect targeting elements matching a CSS selector.
-     */
+    /// A pending effect targeting elements matching a CSS selector.
     private static final class SelectorEffect {
         final String selector;
         final Effect effect;
@@ -68,21 +71,19 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Creates a new ElementEffectRegistry.
-     */
+    /// Creates a new ElementEffectRegistry.
     public ElementEffectRegistry() {
     }
 
-    /**
-     * Adds an effect that targets a specific element by ID.
-     * <p>
-     * The effect will be resolved to the element's rendered area when
-     * {@link #resolvePendingEffects(EventRouter)} is called.
-     *
-     * @param elementId the ID of the target element
-     * @param effect    the effect to add
-     */
+    /// Adds an effect that targets a specific element by ID.
+    ///
+    ///
+    ///
+    /// The effect will be resolved to the element's rendered area when
+    /// {@link #resolvePendingEffects(EventRouter)} is called.
+    ///
+    /// @param elementId the ID of the target element
+    /// @param effect    the effect to add
     public void addEffect(String elementId, Effect effect) {
         lock.lock();
         try {
@@ -92,15 +93,15 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Adds an effect that targets a specific element.
-     * <p>
-     * Convenience method that extracts the element's ID.
-     *
-     * @param element the target element
-     * @param effect  the effect to add
-     * @throws IllegalArgumentException if the element has no ID
-     */
+    /// Adds an effect that targets a specific element.
+    ///
+    ///
+    ///
+    /// Convenience method that extracts the element's ID.
+    ///
+    /// @param element the target element
+    /// @param effect  the effect to add
+    /// @throws IllegalArgumentException if the element has no ID
     public void addEffect(Element element, Effect effect) {
         String id = element.id();
         if (id == null) {
@@ -109,26 +110,28 @@ public final class ElementEffectRegistry {
         addEffect(id, effect);
     }
 
-    /**
-     * Adds an effect that targets elements matching a CSS-like selector.
-     * <p>
-     * The effect will be applied to all elements matching the selector when
-     * {@link #resolvePendingEffects(ElementRegistry)} is called. Each matching
-     * element receives a copy of the effect.
-     * <p>
-     * Supported selectors:
-     * <ul>
-     *   <li>{@code #id} - matches element by ID</li>
-     *   <li>{@code .class} - matches elements by CSS class</li>
-     *   <li>{@code Type} - matches elements by type name</li>
-     *   <li>{@code Type.class} - combined type and class</li>
-     *   <li>{@code .class1.class2} - multiple classes</li>
-     * </ul>
-     *
-     * @param selector the CSS-like selector
-     * @param effect   the effect to add (copied for each matching element)
-     * @return the number of elements that matched (0 if selector is deferred)
-     */
+    /// Adds an effect that targets elements matching a CSS-like selector.
+    ///
+    ///
+    ///
+    /// The effect will be applied to all elements matching the selector when
+    /// {@link #resolvePendingEffects(ElementRegistry)} is called. Each matching
+    /// element receives a copy of the effect.
+    ///
+    ///
+    ///
+    /// Supported selectors:
+    ///
+    /// - {@code #id} - matches element by ID
+    /// - {@code .class} - matches elements by CSS class
+    /// - {@code Type} - matches elements by type name
+    /// - {@code Type.class} - combined type and class
+    /// - {@code .class1.class2} - multiple classes
+    ///
+    ///
+    /// @param selector the CSS-like selector
+    /// @param effect   the effect to add (copied for each matching element)
+    /// @return the number of elements that matched (0 if selector is deferred)
     public int addEffectBySelector(String selector, Effect effect) {
         lock.lock();
         try {
@@ -139,13 +142,13 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Adds a global effect that applies to the entire frame area.
-     * <p>
-     * Global effects are processed without targeting a specific element.
-     *
-     * @param effect the effect to add
-     */
+    /// Adds a global effect that applies to the entire frame area.
+    ///
+    ///
+    ///
+    /// Global effects are processed without targeting a specific element.
+    ///
+    /// @param effect the effect to add
     public void addGlobalEffect(Effect effect) {
         lock.lock();
         try {
@@ -155,21 +158,25 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Resolves pending effects to their target element areas.
-     * <p>
-     * This method queries the ElementRegistry for element areas and moves
-     * pending effects to the running effects list. Effects targeting
-     * elements that are not currently rendered remain pending.
-     * <p>
-     * Selector-based effects are resolved using the registry's query methods
-     * and apply to all matching elements.
-     * <p>
-     * This should be called after rendering completes but before
-     * {@link #processEffects(TFxDuration, Buffer, Rect)}.
-     *
-     * @param registry the element registry containing element areas
-     */
+    /// Resolves pending effects to their target element areas.
+    ///
+    ///
+    ///
+    /// This method queries the ElementRegistry for element areas and moves
+    /// pending effects to the running effects list. Effects targeting
+    /// elements that are not currently rendered remain pending.
+    ///
+    ///
+    ///
+    /// Selector-based effects are resolved using the registry's query methods
+    /// and apply to all matching elements.
+    ///
+    ///
+    ///
+    /// This should be called after rendering completes but before
+    /// {@link #processEffects(TFxDuration, Buffer, Rect)}.
+    ///
+    /// @param registry the element registry containing element areas
     public void resolvePendingEffects(ElementRegistry registry) {
         lock.lock();
         try {
@@ -208,16 +215,16 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Processes all active effects.
-     * <p>
-     * This processes both global effects and element-targeted effects
-     * that have been resolved. Effects are automatically removed when complete.
-     *
-     * @param delta  the time elapsed since the last frame
-     * @param buffer the buffer to apply effects to
-     * @param area   the default area for global effects
-     */
+    /// Processes all active effects.
+    ///
+    ///
+    ///
+    /// This processes both global effects and element-targeted effects
+    /// that have been resolved. Effects are automatically removed when complete.
+    ///
+    /// @param delta  the time elapsed since the last frame
+    /// @param buffer the buffer to apply effects to
+    /// @param area   the default area for global effects
     public void processEffects(TFxDuration delta, Buffer buffer, Rect area) {
         lock.lock();
         try {
@@ -228,11 +235,9 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Returns whether any effects are currently running.
-     *
-     * @return true if effects are active
-     */
+    /// Returns whether any effects are currently running.
+    ///
+    /// @return true if effects are active
     public boolean isRunning() {
         lock.lock();
         try {
@@ -245,9 +250,7 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Clears all effects (pending, running, and global).
-     */
+    /// Clears all effects (pending, running, and global).
     public void clear() {
         lock.lock();
         try {
@@ -260,11 +263,9 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Returns the total number of pending effects.
-     *
-     * @return pending effect count
-     */
+    /// Returns the total number of pending effects.
+    ///
+    /// @return pending effect count
     public int pendingCount() {
         lock.lock();
         try {
@@ -278,11 +279,9 @@ public final class ElementEffectRegistry {
         }
     }
 
-    /**
-     * Returns the number of running effects (global + element-targeted).
-     *
-     * @return running effect count
-     */
+    /// Returns the number of running effects (global + element-targeted).
+    ///
+    /// @return running effect count
     public int runningCount() {
         lock.lock();
         try {
@@ -292,3 +291,4 @@ public final class ElementEffectRegistry {
         }
     }
 }
+

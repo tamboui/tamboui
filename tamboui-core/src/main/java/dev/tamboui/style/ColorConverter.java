@@ -10,31 +10,32 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Converts string color values to TamboUI Color objects.
- * <p>
- * Supported formats:
- * <ul>
- *   <li>Named colors: red, green, blue, etc.</li>
- *   <li>Hex colors: #RGB, #RRGGBB</li>
- *   <li>RGB function: rgb(r, g, b)</li>
- *   <li>Indexed colors: indexed(0-255)</li>
- * </ul>
- * <p>
- * Example usage:
- * <pre>{@code
- * // Standalone usage
- * Optional<Color> color = ColorConverter.INSTANCE.convert("#FF0000");
- *
- * // With PropertyKey
- * PropertyKey<Color> BORDER_COLOR = PropertyKey.of("border-color", ColorConverter.INSTANCE);
- * }</pre>
- */
+/// Converts string color values to TamboUI Color objects.
+///
+///
+///
+/// Supported formats:
+///
+/// - Named colors: red, green, blue, etc.
+/// - Hex colors: #RGB, #RRGGBB
+/// - RGB function: rgb(r, g, b)
+/// - Indexed colors: indexed(0-255)
+///
+///
+///
+///
+/// Example usage:
+/// ```java
+/// // Standalone usage
+/// Optional<Color> color = ColorConverter.INSTANCE.convert("#FF0000");
+///
+/// // With PropertyKey
+/// PropertyKey<Color> BORDER_COLOR = PropertyKey.of("border-color", ColorConverter.INSTANCE);
+/// }
+/// ```
 public final class ColorConverter implements PropertyConverter<Color> {
 
-    /**
-     * Singleton instance of the color converter.
-     */
+    /// Singleton instance of the color converter.
     public static final ColorConverter INSTANCE = new ColorConverter();
 
     private static final Map<String, Color> NAMED_COLORS = new HashMap<>();
@@ -138,3 +139,4 @@ public final class ColorConverter implements PropertyConverter<Color> {
         return Color.rgb(r, g, b);
     }
 }
+

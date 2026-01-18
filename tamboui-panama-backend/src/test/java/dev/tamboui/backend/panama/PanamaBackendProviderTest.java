@@ -14,9 +14,7 @@ import java.util.ServiceLoader;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Tests for PanamaBackendProvider.
- */
+/// Tests for PanamaBackendProvider.
 @EnabledOnOs({OS.LINUX, OS.MAC})
 class PanamaBackendProviderTest {
 
@@ -39,3 +37,4 @@ class PanamaBackendProviderTest {
         assertTrue(found, "PanamaBackendProvider should be discoverable via ServiceLoader");
     }
 }
+

@@ -11,9 +11,7 @@ import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A panel with an incrementable/decrementable counter.
- */
+/// A panel with an incrementable/decrementable counter.
 final class CounterPanel extends PanelContent {
     private int counter = 0;
 
@@ -44,3 +42,4 @@ final class CounterPanel extends PanelContent {
         return EventResult.UNHANDLED;
     }
 }
+

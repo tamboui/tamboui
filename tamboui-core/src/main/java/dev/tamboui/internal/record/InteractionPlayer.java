@@ -13,11 +13,9 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Plays back scripted interactions for demo recording.
- * Supports VHS tape format (charmbracelet/vhs).
- * This is an internal API and not part of the public contract.
- */
+/// Plays back scripted interactions for demo recording.
+/// Supports VHS tape format (charmbracelet/vhs).
+/// This is an internal API and not part of the public contract.
 final class InteractionPlayer {
 
     private static final int ESC = 27;
@@ -31,12 +29,10 @@ final class InteractionPlayer {
         this.interactions = interactions;
     }
 
-    /**
-     * Loads interactions from a VHS tape file.
-     *
-     * @param path the tape file path
-     * @return list of interactions, empty if file doesn't exist or has no interactions
-     */
+    /// Loads interactions from a VHS tape file.
+    ///
+    /// @param path the tape file path
+    /// @return list of interactions, empty if file doesn't exist or has no interactions
     static List<Interaction> loadFromFile(Path path) {
         List<Interaction> interactions = new ArrayList<>();
         if (path == null || !Files.exists(path)) {
@@ -53,10 +49,8 @@ final class InteractionPlayer {
         return collapseEscapeSequences(interactions);
     }
 
-    /**
-     * Collapses escape sequences like ESC + [ + C into single arrow key presses.
-     * This handles tape files that use "Escape" + "Type [C" instead of "Right".
-     */
+    /// Collapses escape sequences like ESC + [ + C into single arrow key presses.
+    /// This handles tape files that use "Escape" + "Type [C" instead of "Right".
     private static List<Interaction> collapseEscapeSequences(List<Interaction> interactions) {
         List<Interaction> result = new ArrayList<>();
         int i = 0;
@@ -355,16 +349,12 @@ final class InteractionPlayer {
         return result.toString();
     }
 
-    /**
-     * Returns true if there are no interactions defined.
-     */
+    /// Returns true if there are no interactions defined.
     boolean hasNoInteractions() {
         return interactions.isEmpty();
     }
 
-    /**
-     * Returns true if all interactions have been played.
-     */
+    /// Returns true if all interactions have been played.
     boolean isFinished() {
         // Not finished if there's an active wait
         if (waitUntil > 0 && System.currentTimeMillis() < waitUntil) {
@@ -373,11 +363,9 @@ final class InteractionPlayer {
         return currentIndex >= interactions.size() && pendingBytes.isEmpty();
     }
 
-    /**
-     * Peeks at the next byte without consuming it.
-     *
-     * @return the next byte, or -1 if no byte available
-     */
+    /// Peeks at the next byte without consuming it.
+    ///
+    /// @return the next byte, or -1 if no byte available
     int peekByte() {
         if (!pendingBytes.isEmpty()) {
             return pendingBytes.peek();
@@ -385,13 +373,11 @@ final class InteractionPlayer {
         return -1;
     }
 
-    /**
-     * Gets the next byte to return from read(), or -2 for timeout.
-     * This method handles wait commands by sleeping.
-     *
-     * @param maxWaitMs maximum time to wait
-     * @return the next byte, or -2 for timeout, or 'q' if finished
-     */
+    /// Gets the next byte to return from read(), or -2 for timeout.
+    /// This method handles wait commands by sleeping.
+    ///
+    /// @param maxWaitMs maximum time to wait
+    /// @return the next byte, or -2 for timeout, or 'q' if finished
     int nextByte(int maxWaitMs) {
         // Return pending bytes first
         if (!pendingBytes.isEmpty()) {
@@ -550,3 +536,4 @@ final class InteractionPlayer {
         }
     }
 }
+

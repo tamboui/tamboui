@@ -68,3 +68,4 @@ class AlignmentConverterTest {
         assertThat(converter.convert("justify", Collections.emptyMap())).isEmpty();
     }
 }
+

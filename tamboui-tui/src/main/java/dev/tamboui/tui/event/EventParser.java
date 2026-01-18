@@ -10,12 +10,12 @@ import dev.tamboui.tui.bindings.BindingSets;
 
 import java.io.IOException;
 
-/**
- * Parses raw terminal input into typed {@link Event} objects.
- * <p>
- * Handles escape sequences for arrow keys, function keys, navigation keys,
- * and mouse events (SGR extended mode).
- */
+/// Parses raw terminal input into typed {@link Event} objects.
+///
+///
+///
+/// Handles escape sequences for arrow keys, function keys, navigation keys,
+/// and mouse events (SGR extended mode).
 public final class EventParser {
 
     private static final int ESC = 27;
@@ -23,27 +23,23 @@ public final class EventParser {
 
     private EventParser() {}
 
-    /**
-     * Reads and parses the next event from the backend using the default bindings.
-     *
-     * @param backend the terminal backend
-     * @param timeout timeout in milliseconds for the initial read
-     * @return the parsed event, or null if no event was available
-     * @throws IOException if an I/O error occurs
-     */
+    /// Reads and parses the next event from the backend using the default bindings.
+    ///
+    /// @param backend the terminal backend
+    /// @param timeout timeout in milliseconds for the initial read
+    /// @return the parsed event, or null if no event was available
+    /// @throws IOException if an I/O error occurs
     public static Event readEvent(Backend backend, int timeout) throws IOException {
         return readEvent(backend, timeout, BindingSets.defaults());
     }
 
-    /**
-     * Reads and parses the next event from the backend.
-     *
-     * @param backend  the terminal backend
-     * @param timeout  timeout in milliseconds for the initial read
-     * @param bindings the bindings for event semantic action matching
-     * @return the parsed event, or null if no event was available
-     * @throws IOException if an I/O error occurs
-     */
+    /// Reads and parses the next event from the backend.
+    ///
+    /// @param backend  the terminal backend
+    /// @param timeout  timeout in milliseconds for the initial read
+    /// @param bindings the bindings for event semantic action matching
+    /// @return the parsed event, or null if no event was available
+    /// @throws IOException if an I/O error occurs
     public static Event readEvent(Backend backend, int timeout, Bindings bindings) throws IOException {
         int c = backend.read(timeout);
 
@@ -415,3 +411,4 @@ public final class EventParser {
         return new MouseEvent(kind, mouseButton, x, y, mods, bindings);
     }
 }
+

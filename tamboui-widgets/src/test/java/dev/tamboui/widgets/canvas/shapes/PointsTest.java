@@ -119,3 +119,4 @@ class PointsTest {
         // Should skip null entries and not throw
     }
 }
+

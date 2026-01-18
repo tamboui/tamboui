@@ -11,21 +11,18 @@ import dev.tamboui.tui.event.Event;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A custom component demonstrating @OnAction annotations for keyboard handling.
- * Displays a task card with title, description, and progress bar.
- * <p>
- * Uses the Component base class which automatically:
- * <ul>
- *   <li>Registers @OnAction annotated methods for event handling</li>
- *   <li>Manages focus state via isFocused()</li>
- * </ul>
- */
+/// A custom component demonstrating @OnAction annotations for keyboard handling.
+/// Displays a task card with title, description, and progress bar.
+///
+///
+///
+/// Uses the Component base class which automatically:
+///
+/// - Registers @OnAction annotated methods for event handling
+/// - Manages focus state via isFocused()
 public final class ProgressCard extends Component<ProgressCard> {
 
-    /**
-     * Status of the task shown in the card.
-     */
+    /// Status of the task shown in the card.
     public enum Status {
         PENDING("pending"),
         IN_PROGRESS("in-progress"),
@@ -47,47 +44,35 @@ public final class ProgressCard extends Component<ProgressCard> {
     private double progress = 0.0;
     private Status status = Status.PENDING;
 
-    /**
-     * Creates a new ProgressCard.
-     */
+    /// Creates a new ProgressCard.
     public ProgressCard() {
     }
 
-    /**
-     * Sets the card title.
-     */
+    /// Sets the card title.
     public ProgressCard title(String title) {
         this.title = title != null ? title : "";
         return this;
     }
 
-    /**
-     * Sets the card description.
-     */
+    /// Sets the card description.
     public ProgressCard description(String description) {
         this.description = description != null ? description : "";
         return this;
     }
 
-    /**
-     * Sets the progress value (0.0 to 1.0).
-     */
+    /// Sets the progress value (0.0 to 1.0).
     public ProgressCard progress(double progress) {
         this.progress = Math.max(0.0, Math.min(1.0, progress));
         updateStatus();
         return this;
     }
 
-    /**
-     * Returns the current progress value.
-     */
+    /// Returns the current progress value.
     public double progress() {
         return progress;
     }
 
-    /**
-     * Returns the current status.
-     */
+    /// Returns the current status.
     public Status status() {
         return status;
     }
@@ -144,3 +129,4 @@ public final class ProgressCard extends Component<ProgressCard> {
         }
     }
 }
+

@@ -7,12 +7,12 @@ package dev.tamboui.css.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Lexer for Textual-style CSS.
- * <p>
- * Tokenizes CSS input into a stream of tokens for the parser.
- * Supports standard CSS syntax plus Textual extensions like variables ($name).
- */
+/// Lexer for Textual-style CSS.
+///
+///
+///
+/// Tokenizes CSS input into a stream of tokens for the parser.
+/// Supports standard CSS syntax plus Textual extensions like variables ($name).
 public final class CssLexer {
 
     private final String input;
@@ -20,11 +20,9 @@ public final class CssLexer {
     private int line;
     private int column;
 
-    /**
-     * Creates a new lexer for the given CSS input.
-     *
-     * @param input the CSS source code
-     */
+    /// Creates a new lexer for the given CSS input.
+    ///
+    /// @param input the CSS source code
     public CssLexer(String input) {
         this.input = input;
         this.pos = 0;
@@ -32,15 +30,15 @@ public final class CssLexer {
         this.column = 1;
     }
 
-    /**
-     * Tokenizes the entire input and returns a list of tokens.
-     * <p>
-     * Whitespace tokens are included in the output. The list always
-     * ends with an EOF token.
-     *
-     * @return the list of tokens
-     * @throws CssParseException if the input contains invalid syntax
-     */
+    /// Tokenizes the entire input and returns a list of tokens.
+    ///
+    ///
+    ///
+    /// Whitespace tokens are included in the output. The list always
+    /// ends with an EOF token.
+    ///
+    /// @return the list of tokens
+    /// @throws CssParseException if the input contains invalid syntax
     public List<Token> tokenize() {
         List<Token> tokens = new ArrayList<>();
 
@@ -52,13 +50,11 @@ public final class CssLexer {
         return tokens;
     }
 
-    /**
-     * Tokenizes the input, filtering out whitespace tokens.
-     * Each token has its {@code precededByWhitespace} flag set appropriately.
-     *
-     * @return the list of non-whitespace tokens
-     * @throws CssParseException if the input contains invalid syntax
-     */
+    /// Tokenizes the input, filtering out whitespace tokens.
+    /// Each token has its {@code precededByWhitespace} flag set appropriately.
+    ///
+    /// @return the list of non-whitespace tokens
+    /// @throws CssParseException if the input contains invalid syntax
     public List<Token> tokenizeFiltered() {
         List<Token> tokens = new ArrayList<>();
         boolean lastWasWhitespace = false;
@@ -292,3 +288,4 @@ public final class CssLexer {
         return new Token.Position(line, column);
     }
 }
+

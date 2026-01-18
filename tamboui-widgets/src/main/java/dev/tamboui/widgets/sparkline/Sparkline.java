@@ -17,60 +17,58 @@ import dev.tamboui.widgets.block.Block;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A sparkline widget for displaying data trends in a compact form.
- * <p>
- * Sparklines are small, word-sized graphics that show data trends.
- * Each data point is rendered as a bar using Unicode block characters
- * with varying heights based on the value.
- *
- * <pre>{@code
- * // Simple sparkline with data
- * Sparkline sparkline = Sparkline.builder()
- *     .data(1, 2, 3, 4, 5, 4, 3, 2, 1)
- *     .style(Style.EMPTY.fg(Color.CYAN))
- *     .build();
- *
- * // With block wrapper and custom max
- * Sparkline sparkline2 = Sparkline.builder()
- *     .data(dataArray)
- *     .max(100)
- *     .block(Block.bordered().title(Title.from("CPU Usage")))
- *     .barSet(Sparkline.BarSet.THREE_LEVELS)
- *     .build();
- * }</pre>
- *
- * @see RenderDirection
- * @see BarSet
- */
+/// A sparkline widget for displaying data trends in a compact form.
+///
+///
+///
+/// Sparklines are small, word-sized graphics that show data trends.
+/// Each data point is rendered as a bar using Unicode block characters
+/// with varying heights based on the value.
+///
+/// ```java
+/// // Simple sparkline with data
+/// Sparkline sparkline = Sparkline.builder()
+///     .data(1, 2, 3, 4, 5, 4, 3, 2, 1)
+///     .style(Style.EMPTY.fg(Color.CYAN))
+///     .build();
+///
+/// // With block wrapper and custom max
+/// Sparkline sparkline2 = Sparkline.builder()
+///     .data(dataArray)
+///     .max(100)
+///     .block(Block.bordered().title(Title.from("CPU Usage")))
+///     .barSet(Sparkline.BarSet.THREE_LEVELS)
+///     .build();
+/// }
+/// ```
+///
+/// @see RenderDirection
+/// @see BarSet
 public final class Sparkline implements Widget {
 
-    /**
-     * Direction for rendering sparkline data.
-     */
+    /// Direction for rendering sparkline data.
     public enum RenderDirection {
-        /** Render data from left to right (default). */
+        /// Render data from left to right (default).
         LEFT_TO_RIGHT,
-        /** Render data from right to left. */
+        /// Render data from right to left.
         RIGHT_TO_LEFT
     }
 
-    /**
-     * Symbol set for rendering bar heights.
-     * <p>
-     * Contains Unicode block characters for different fill levels:
-     * <ul>
-     *   <li><b>empty</b> - symbol for zero/empty value</li>
-     *   <li><b>oneEighth</b> - symbol for 1/8 fill</li>
-     *   <li><b>oneQuarter</b> - symbol for 1/4 fill</li>
-     *   <li><b>threeEighths</b> - symbol for 3/8 fill</li>
-     *   <li><b>half</b> - symbol for 1/2 fill</li>
-     *   <li><b>fiveEighths</b> - symbol for 5/8 fill</li>
-     *   <li><b>threeQuarters</b> - symbol for 3/4 fill</li>
-     *   <li><b>sevenEighths</b> - symbol for 7/8 fill</li>
-     *   <li><b>full</b> - symbol for full fill</li>
-     * </ul>
-     */
+    /// Symbol set for rendering bar heights.
+    ///
+    ///
+    ///
+    /// Contains Unicode block characters for different fill levels:
+    ///
+    /// - **empty** - symbol for zero/empty value
+    /// - **oneEighth** - symbol for 1/8 fill
+    /// - **oneQuarter** - symbol for 1/4 fill
+    /// - **threeEighths** - symbol for 3/8 fill
+    /// - **half** - symbol for 1/2 fill
+    /// - **fiveEighths** - symbol for 5/8 fill
+    /// - **threeQuarters** - symbol for 3/4 fill
+    /// - **sevenEighths** - symbol for 7/8 fill
+    /// - **full** - symbol for full fill
     public static final class BarSet {
         private final String empty;
         private final String oneEighth;
@@ -103,25 +101,19 @@ public final class Sparkline implements Widget {
             this.sevenEighths = sevenEighths;
             this.full = full;
         }
-        /**
-         * Nine-level bar set with fine-grained fill levels.
-         * Uses: ▁▂▃▄▅▆▇█
-         */
+        /// Nine-level bar set with fine-grained fill levels.
+        /// Uses: ▁▂▃▄▅▆▇█
         public static final BarSet NINE_LEVELS = new BarSet(
             " ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"
         );
 
-        /**
-         * Three-level bar set with coarse fill levels.
-         * Uses: ▄█ (empty, half, full)
-         */
+        /// Three-level bar set with coarse fill levels.
+        /// Uses: ▄█ (empty, half, full)
         public static final BarSet THREE_LEVELS = new BarSet(
             " ", "▄", "▄", "▄", "▄", "█", "█", "█", "█"
         );
 
-        /**
-         * Returns the symbol for the given fill level (0.0 to 1.0).
-         */
+        /// Returns the symbol for the given fill level (0.0 to 1.0).
         public String symbolForLevel(double level) {
             if (level <= 0.0) {
                 return empty;
@@ -252,23 +244,17 @@ public final class Sparkline implements Widget {
         this.style = baseStyle;
     }
 
-    /**
-     * Creates a new sparkline builder.
-     */
+    /// Creates a new sparkline builder.
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Creates a sparkline with the given data values.
-     */
+    /// Creates a sparkline with the given data values.
     public static Sparkline from(long... data) {
         return builder().data(data).build();
     }
 
-    /**
-     * Creates a sparkline with the given data values.
-     */
+    /// Creates a sparkline with the given data values.
     public static Sparkline from(List<Long> data) {
         return builder().data(data).build();
     }
@@ -336,9 +322,7 @@ public final class Sparkline implements Widget {
         return Arrays.stream(data).max().orElse(0);
     }
 
-    /**
-     * Builder for {@link Sparkline}.
-     */
+    /// Builder for {@link Sparkline}.
     public static final class Builder {
         private long[] data = new long[0];
         private Long max;
@@ -354,17 +338,13 @@ public final class Sparkline implements Widget {
 
         private Builder() {}
 
-        /**
-         * Sets the data values to display.
-         */
+        /// Sets the data values to display.
         public Builder data(long... data) {
             this.data = data != null ? data.clone() : new long[0];
             return this;
         }
 
-        /**
-         * Sets the data values from a list.
-         */
+        /// Sets the data values from a list.
         public Builder data(List<Long> data) {
             if (data == null || data.isEmpty()) {
                 this.data = new long[0];
@@ -374,9 +354,7 @@ public final class Sparkline implements Widget {
             return this;
         }
 
-        /**
-         * Sets the data values from an int array.
-         */
+        /// Sets the data values from an int array.
         public Builder data(int... data) {
             if (data == null) {
                 this.data = new long[0];
@@ -389,88 +367,77 @@ public final class Sparkline implements Widget {
             return this;
         }
 
-        /**
-         * Sets the maximum value for scaling.
-         * <p>
-         * If not set, the maximum value in the data is used.
-         */
+        /// Sets the maximum value for scaling.
+        ///
+        ///
+        ///
+        /// If not set, the maximum value in the data is used.
         public Builder max(long max) {
             this.max = max;
             return this;
         }
 
-        /**
-         * Clears the explicit maximum value, using data maximum instead.
-         */
+        /// Clears the explicit maximum value, using data maximum instead.
         public Builder autoMax() {
             this.max = null;
             return this;
         }
 
-        /**
-         * Wraps the sparkline in a block.
-         */
+        /// Wraps the sparkline in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the bar symbol set.
-         */
+        /// Sets the bar symbol set.
         public Builder barSet(BarSet barSet) {
             this.barSet = barSet != null ? barSet : BarSet.NINE_LEVELS;
             return this;
         }
 
-        /**
-         * Sets the render direction.
-         */
+        /// Sets the render direction.
         public Builder direction(RenderDirection direction) {
             this.direction = direction != null ? direction : RenderDirection.LEFT_TO_RIGHT;
             return this;
         }
 
-        /**
-         * Sets the style for the sparkline bars.
-         */
+        /// Sets the style for the sparkline bars.
         public Builder style(Style style) {
             this.style = style != null ? style : Style.EMPTY;
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code color} will be resolved
-         * if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code color} will be resolved
+        /// if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the foreground (bar) color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the foreground color
-         * @return this builder
-         */
+        /// Sets the foreground (bar) color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the foreground color
+        /// @return this builder
         public Builder foreground(Color color) {
             this.foreground.set(color);
             return this;
         }
 
-        /**
-         * Builds the sparkline.
-         */
+        /// Builds the sparkline.
         public Sparkline build() {
             return new Sparkline(this);
         }
     }
 }
+

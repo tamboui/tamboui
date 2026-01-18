@@ -19,9 +19,7 @@ import java.io.IOException;
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Tests that Row and Column correctly consume CSS constraint properties.
- */
+/// Tests that Row and Column correctly consume CSS constraint properties.
 class ConstraintCssTest {
 
     private StyleEngine styleEngine;
@@ -195,3 +193,4 @@ class ConstraintCssTest {
         }
     }
 }
+

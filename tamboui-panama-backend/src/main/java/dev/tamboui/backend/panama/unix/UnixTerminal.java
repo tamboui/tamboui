@@ -19,12 +19,12 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Unix terminal operations using Panama FFI.
- * <p>
- * This class provides higher-level terminal operations built on top of
- * the low-level libc bindings in {@link LibC}.
- */
+/// Unix terminal operations using Panama FFI.
+///
+///
+///
+/// This class provides higher-level terminal operations built on top of
+/// the low-level libc bindings in {@link LibC}.
 public final class UnixTerminal implements PlatformTerminal {
 
     private static final VarHandle WS_ROW = LibC.WINSIZE_LAYOUT.varHandle(
@@ -77,11 +77,9 @@ public final class UnixTerminal implements PlatformTerminal {
     private MemorySegment previousSigaction;  // Previous sigaction struct (for restoration)
     private Arena signalArena;
 
-    /**
-     * Creates a new Unix terminal instance.
-     *
-     * @throws IOException if the terminal cannot be initialized
-     */
+    /// Creates a new Unix terminal instance.
+    ///
+    /// @throws IOException if the terminal cannot be initialized
     public UnixTerminal() throws IOException {
         // On macOS, use stdin directly for input (poll doesn't work well with /dev/tty)
         // On Linux, open /dev/tty to bypass any stdin/stdout redirection
@@ -118,15 +116,15 @@ public final class UnixTerminal implements PlatformTerminal {
         MemorySegment.copy(savedTermios, 0, currentTermios, 0, LibC.TERMIOS_LAYOUT.byteSize());
     }
 
-    /**
-     * Detects the terminal charset from environment variables.
-     * <p>
-     * Checks LC_ALL, LC_CTYPE, and LANG in order of precedence.
-     * Falls back to UTF-8 if no encoding is detected or if the
-     * detected encoding is not supported.
-     *
-     * @return the detected charset, or UTF-8 as default
-     */
+    /// Detects the terminal charset from environment variables.
+    ///
+    ///
+    ///
+    /// Checks LC_ALL, LC_CTYPE, and LANG in order of precedence.
+    /// Falls back to UTF-8 if no encoding is detected or if the
+    /// detected encoding is not supported.
+    ///
+    /// @return the detected charset, or UTF-8 as default
     private static Charset detectCharset() {
         // Check environment variables in order of precedence
         for (var envVar : LOCALE_ENV_VARS) {
@@ -142,12 +140,10 @@ public final class UnixTerminal implements PlatformTerminal {
         return StandardCharsets.UTF_8;
     }
 
-    /**
-     * Parses a charset from a locale string like "en_US.UTF-8" or "C.UTF-8".
-     *
-     * @param locale the locale string
-     * @return the parsed charset, or null if not found or not supported
-     */
+    /// Parses a charset from a locale string like "en_US.UTF-8" or "C.UTF-8".
+    ///
+    /// @param locale the locale string
+    /// @return the parsed charset, or null if not found or not supported
     private static Charset parseCharsetFromLocale(String locale) {
         var upper = locale.toUpperCase(Locale.ROOT);
 
@@ -180,14 +176,14 @@ public final class UnixTerminal implements PlatformTerminal {
         return null;
     }
 
-    /**
-     * Enables raw mode on the terminal.
-     * <p>
-     * Raw mode disables line buffering, echo, and signal processing,
-     * allowing direct character-by-character input.
-     *
-     * @throws IOException if raw mode cannot be enabled
-     */
+    /// Enables raw mode on the terminal.
+    ///
+    ///
+    ///
+    /// Raw mode disables line buffering, echo, and signal processing,
+    /// allowing direct character-by-character input.
+    ///
+    /// @throws IOException if raw mode cannot be enabled
     public void enableRawMode() throws IOException {
         if (rawModeEnabled) {
             return;
@@ -233,11 +229,9 @@ public final class UnixTerminal implements PlatformTerminal {
         rawModeEnabled = true;
     }
 
-    /**
-     * Disables raw mode and restores original terminal attributes.
-     *
-     * @throws IOException if raw mode cannot be disabled
-     */
+    /// Disables raw mode and restores original terminal attributes.
+    ///
+    /// @throws IOException if raw mode cannot be disabled
     public void disableRawMode() throws IOException {
         if (!rawModeEnabled) {
             return;
@@ -250,12 +244,10 @@ public final class UnixTerminal implements PlatformTerminal {
         rawModeEnabled = false;
     }
 
-    /**
-     * Gets the current terminal size.
-     *
-     * @return the terminal size
-     * @throws IOException if the size cannot be determined
-     */
+    /// Gets the current terminal size.
+    ///
+    /// @return the terminal size
+    /// @throws IOException if the size cannot be determined
     public Size getSize() throws IOException {
         int ioctlResult = LibC.ioctl(ttyFd, LibC.TIOCGWINSZ, winsize);
         if (ioctlResult == 0) {
@@ -268,17 +260,17 @@ public final class UnixTerminal implements PlatformTerminal {
         throw new IOException("Failed to get terminal size (errno=" + LibC.getLastErrno() + ")");
     }
 
-    /**
-     * Reads a single character from the terminal with timeout.
-     * <p>
-     * This method also checks for and dispatches pending resize events,
-     * ensuring resize handlers are called from the main event loop context
-     * rather than from signal handler context.
-     *
-     * @param timeoutMs timeout in milliseconds (-1 for infinite, 0 for non-blocking)
-     * @return the character read, -1 for EOF, or -2 for timeout
-     * @throws IOException if reading fails
-     */
+    /// Reads a single character from the terminal with timeout.
+    ///
+    ///
+    ///
+    /// This method also checks for and dispatches pending resize events,
+    /// ensuring resize handlers are called from the main event loop context
+    /// rather than from signal handler context.
+    ///
+    /// @param timeoutMs timeout in milliseconds (-1 for infinite, 0 for non-blocking)
+    /// @return the character read, -1 for EOF, or -2 for timeout
+    /// @throws IOException if reading fails
     public int read(int timeoutMs) throws IOException {
         // Check for pending resize events (set by signal handler)
         checkResizePending();
@@ -293,13 +285,11 @@ public final class UnixTerminal implements PlatformTerminal {
         return readInternal(timeoutMs);
     }
 
-    /**
-     * Peeks at the next character without consuming it.
-     *
-     * @param timeoutMs timeout in milliseconds
-     * @return the character peeked, -1 for EOF, or -2 for timeout
-     * @throws IOException if reading fails
-     */
+    /// Peeks at the next character without consuming it.
+    ///
+    /// @param timeoutMs timeout in milliseconds
+    /// @return the character peeked, -1 for EOF, or -2 for timeout
+    /// @throws IOException if reading fails
     public int peek(int timeoutMs) throws IOException {
         if (peekedChar != -2) {
             return peekedChar;
@@ -309,27 +299,25 @@ public final class UnixTerminal implements PlatformTerminal {
         return peekedChar;
     }
 
-    /**
-     * Writes data to the terminal.
-     *
-     * @param data the data to write
-     * @throws IOException if writing fails
-     */
+    /// Writes data to the terminal.
+    ///
+    /// @param data the data to write
+    /// @throws IOException if writing fails
     public void write(byte[] data) throws IOException {
         write(data, 0, data.length);
     }
 
-    /**
-     * Writes a portion of a byte array to the terminal.
-     * <p>
-     * This method uses a reusable buffer to avoid per-call memory allocation.
-     * For large writes exceeding the buffer size, data is written in chunks.
-     *
-     * @param buffer the byte array containing data
-     * @param offset the start offset in the buffer
-     * @param length the number of bytes to write
-     * @throws IOException if writing fails
-     */
+    /// Writes a portion of a byte array to the terminal.
+    ///
+    ///
+    ///
+    /// This method uses a reusable buffer to avoid per-call memory allocation.
+    /// For large writes exceeding the buffer size, data is written in chunks.
+    ///
+    /// @param buffer the byte array containing data
+    /// @param offset the start offset in the buffer
+    /// @param length the number of bytes to write
+    /// @throws IOException if writing fails
     public void write(byte[] buffer, int offset, int length) throws IOException {
         if (length == 0) {
             return;
@@ -356,46 +344,42 @@ public final class UnixTerminal implements PlatformTerminal {
         }
     }
 
-    /**
-     * Writes a string to the terminal.
-     *
-     * @param s the string to write
-     * @throws IOException if writing fails
-     */
+    /// Writes a string to the terminal.
+    ///
+    /// @param s the string to write
+    /// @throws IOException if writing fails
     public void write(String s) throws IOException {
         write(s.getBytes(charset));
     }
 
-    /**
-     * Returns the charset used for terminal I/O.
-     *
-     * @return the terminal charset
-     */
+    /// Returns the charset used for terminal I/O.
+    ///
+    /// @return the terminal charset
     public Charset getCharset() {
         return charset;
     }
 
-    /**
-     * Checks if raw mode is currently enabled.
-     *
-     * @return true if raw mode is enabled
-     */
+    /// Checks if raw mode is currently enabled.
+    ///
+    /// @return true if raw mode is enabled
     public boolean isRawModeEnabled() {
         return rawModeEnabled;
     }
 
-    /**
-     * Registers a handler to be called when the terminal is resized.
-     * <p>
-     * On Unix systems, this installs a SIGWINCH signal handler using Panama FFI.
-     * The signal handler sets a flag which is checked from the main event loop
-     * (via {@link #read(int)}), ensuring the handler is called from a safe context.
-     * <p>
-     * Only one handler can be registered at a time; subsequent calls
-     * will replace the previous handler.
-     *
-     * @param handler the handler to call on resize, or null to remove
-     */
+    /// Registers a handler to be called when the terminal is resized.
+    ///
+    ///
+    ///
+    /// On Unix systems, this installs a SIGWINCH signal handler using Panama FFI.
+    /// The signal handler sets a flag which is checked from the main event loop
+    /// (via {@link #read(int)}), ensuring the handler is called from a safe context.
+    ///
+    ///
+    ///
+    /// Only one handler can be registered at a time; subsequent calls
+    /// will replace the previous handler.
+    ///
+    /// @param handler the handler to call on resize, or null to remove
     public void onResize(Runnable handler) {
         resizeLock.lock();
         try {
@@ -442,11 +426,11 @@ public final class UnixTerminal implements PlatformTerminal {
         }
     }
 
-    /**
-     * Checks if a resize event is pending and dispatches it.
-     * <p>
-     * This should be called from the main event loop, not from signal context.
-     */
+    /// Checks if a resize event is pending and dispatches it.
+    ///
+    ///
+    ///
+    /// This should be called from the main event loop, not from signal context.
     private void checkResizePending() {
         Runnable handler = null;
         resizeLock.lock();
@@ -554,3 +538,4 @@ public final class UnixTerminal implements PlatformTerminal {
         }
     }
 }
+

@@ -15,9 +15,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for the core ColorConverter.
- */
+/// Tests for the core ColorConverter.
 class ColorConverterTest {
 
     private final ColorConverter converter = ColorConverter.INSTANCE;
@@ -102,3 +100,4 @@ class ColorConverterTest {
         assertThat(converter.convert("bright-blue")).hasValue(Color.LIGHT_BLUE);
     }
 }
+

@@ -10,12 +10,12 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A child combinator selector that matches direct children.
- * <p>
- * Example: {@code Panel > Button { ... }} matches a Button that is
- * a direct child of a Panel (not a grandchild or deeper).
- */
+/// A child combinator selector that matches direct children.
+///
+///
+///
+/// Example: {@code Panel > Button { ... }} matches a Button that is
+/// a direct child of a Panel (not a grandchild or deeper).
 public final class ChildSelector implements Selector {
 
     private final Selector parent;
@@ -83,3 +83,4 @@ public final class ChildSelector implements Selector {
         return "ChildSelector{" + toCss() + "}";
     }
 }
+

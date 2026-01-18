@@ -18,9 +18,7 @@ import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for DialogElement.
- */
+/// Tests for DialogElement.
 class DialogElementTest {
 
     @Test
@@ -61,3 +59,4 @@ class DialogElementTest {
         assertThat(buffer).at(borderX, borderY).hasSymbol("╭").hasForeground(Color.CYAN);
     }
 }
+

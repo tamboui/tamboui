@@ -17,63 +17,74 @@ import dev.tamboui.layout.Rect;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Shader implementation that runs multiple effects in parallel, simultaneously.
- * <p>
- * ParallelEffect composes multiple effects to run concurrently, allowing them
- * to overlap and combine visually. All effects start at the same time and run
- * independently until completion.
- * <p>
- * <b>Design Philosophy:</b>
- * <p>
- * Parallel composition enables layering effects to create rich, multi-layered
- * animations. Each effect operates independently on the same buffer, allowing
- * them to combine visually (e.g., a fade effect combined with a dissolve effect).
- * <p>
- * <b>Behavior:</b>
- * <ul>
- *   <li>All effects start simultaneously</li>
- *   <li>Effects run independently and can have different durations</li>
- *   <li>Effects are applied to the same buffer in order (later effects may
- *       overwrite earlier ones)</li>
- *   <li>The parallel effect completes when all constituent effects have completed</li>
- * </ul>
- * <p>
- * <b>Visual Layering:</b>
- * <p>
- * When multiple effects are applied in parallel, they are processed in the order
- * they were provided. Later effects may visually overwrite earlier effects depending
- * on their cell filters and rendering logic. Use cell filters to control which
- * cells each effect affects.
- * <p>
- * <b>Usage Pattern:</b>
- * <pre>{@code
- * // Run fade and dissolve simultaneously
- * Effect parallel = Fx.parallel(
- *     Fx.fadeToFg(Color.CYAN, 2000, Interpolation.SineInOut)
- *         .withFilter(CellFilter.text()),
- *     Fx.dissolve(2500, Interpolation.QuadOut)
- *         .withFilter(CellFilter.text())
- * );
- * }</pre>
- * <p>
- * This shader is typically created through {@link dev.tamboui.tfx.Fx#parallel(Effect...)}
- * rather than directly.
- */
+/// Shader implementation that runs multiple effects in parallel, simultaneously.
+///
+///
+///
+/// ParallelEffect composes multiple effects to run concurrently, allowing them
+/// to overlap and combine visually. All effects start at the same time and run
+/// independently until completion.
+///
+///
+///
+/// **Design Philosophy:**
+///
+///
+///
+/// Parallel composition enables layering effects to create rich, multi-layered
+/// animations. Each effect operates independently on the same buffer, allowing
+/// them to combine visually (e.g., a fade effect combined with a dissolve effect).
+///
+///
+///
+/// **Behavior:**
+///
+/// - All effects start simultaneously
+/// - Effects run independently and can have different durations
+/// <li>Effects are applied to the same buffer in order (later effects may
+/// overwrite earlier ones)
+/// - The parallel effect completes when all constituent effects have completed
+///
+///
+///
+///
+/// **Visual Layering:**
+///
+///
+///
+/// When multiple effects are applied in parallel, they are processed in the order
+/// they were provided. Later effects may visually overwrite earlier effects depending
+/// on their cell filters and rendering logic. Use cell filters to control which
+/// cells each effect affects.
+///
+///
+///
+/// **Usage Pattern:**
+/// ```java
+/// // Run fade and dissolve simultaneously
+/// Effect parallel = Fx.parallel(
+///     Fx.fadeToFg(Color.CYAN, 2000, Interpolation.SineInOut)
+///         .withFilter(CellFilter.text()),
+///     Fx.dissolve(2500, Interpolation.QuadOut)
+///         .withFilter(CellFilter.text())
+/// );
+/// }
+/// ```
+///
+///
+///
+/// This shader is typically created through {@link dev.tamboui.tfx.Fx#parallel(Effect...)}
+/// rather than directly.
 public final class ParallelEffect implements Shader {
     
     private final List<Effect> effects;
     
-    /**
-     * Creates a parallel effect that runs the given effects simultaneously.
-     */
+    /// Creates a parallel effect that runs the given effects simultaneously.
     public static ParallelEffect of(List<Effect> effects) {
         return new ParallelEffect(effects);
     }
     
-    /**
-     * Creates a parallel effect that runs the given effects simultaneously.
-     */
+    /// Creates a parallel effect that runs the given effects simultaneously.
     public static ParallelEffect of(Effect... effects) {
         List<Effect> effectList = new ArrayList<>();
         for (Effect effect : effects) {
@@ -180,4 +191,5 @@ public final class ParallelEffect implements Shader {
         return new ParallelEffect(copiedEffects);
     }
 }
+
 

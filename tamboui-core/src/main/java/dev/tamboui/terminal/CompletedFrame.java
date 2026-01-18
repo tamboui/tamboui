@@ -7,9 +7,7 @@ package dev.tamboui.terminal;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 
-/**
- * Represents a completed frame after rendering.
- */
+/// Represents a completed frame after rendering.
 public final class CompletedFrame {
     private final Buffer buffer;
     private final Rect area;
@@ -51,3 +49,4 @@ public final class CompletedFrame {
         return String.format("CompletedFrame[buffer=%s, area=%s]", buffer, area);
     }
 }
+

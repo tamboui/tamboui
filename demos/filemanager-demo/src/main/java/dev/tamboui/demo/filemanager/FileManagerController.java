@@ -18,10 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Main application state coordinating two directory browsers and file operations.
- * Manages which browser is active and handles copy/move/delete operations.
- */
+/// Main application state coordinating two directory browsers and file operations.
+/// Manages which browser is active and handles copy/move/delete operations.
 public class FileManagerController {
 
     public enum Side { LEFT, RIGHT }
@@ -119,9 +117,7 @@ public class FileManagerController {
         textScrollPosition = Math.max(0, textScrollPosition + pageSize);
     }
 
-    /**
-     * Returns files to operate on: marked files if any, otherwise the selected file.
-     */
+    /// Returns files to operate on: marked files if any, otherwise the selected file.
     public List<Path> filesToOperate() {
         DirectoryBrowserController browser = activeBrowser();
         if (browser.hasMarkedFiles()) {
@@ -366,3 +362,4 @@ public class FileManagerController {
         });
     }
 }
+

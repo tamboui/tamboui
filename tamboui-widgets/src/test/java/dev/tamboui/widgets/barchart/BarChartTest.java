@@ -348,3 +348,4 @@ class BarChartTest {
         assertThat(bar.value()).isEqualTo(0);
     }
 }
+

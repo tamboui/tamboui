@@ -160,3 +160,4 @@ class TableStateTest {
         assertThat(state.offset()).isGreaterThanOrEqualTo(2);
     }
 }
+

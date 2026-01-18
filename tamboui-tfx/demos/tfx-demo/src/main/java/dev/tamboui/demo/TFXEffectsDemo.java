@@ -41,18 +41,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-/**
- * Basic effects demo ported from Rust tachyonfx basic-effects example.
- * <p>
- * This demo showcases various effects that can be applied to terminal content.
- * <p>
- * Controls:
- * - Enter: Next transition
- * - Backspace: Previous transition
- * - Space: Restart transition
- * - r: Random transition
- * - ESC: Quit
- */
+/// Basic effects demo ported from Rust tachyonfx basic-effects example.
+///
+///
+///
+/// This demo showcases various effects that can be applied to terminal content.
+///
+///
+///
+/// Controls:
+/// - Enter: Next transition
+/// - Backspace: Previous transition
+/// - Space: Restart transition
+/// - r: Random transition
+/// - ESC: Quit
 public class TFXEffectsDemo {
 
     private Instant lastFrame;
@@ -412,4 +414,5 @@ public class TFXEffectsDemo {
         }
     }
 }
+
 

@@ -23,36 +23,44 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * A DSL wrapper for the TextArea widget.
- * <p>
- * A multi-line text input field with scrolling support.
- * <pre>{@code
- * textArea(textState)
- *     .placeholder("Enter text...")
- *     .title("Description")
- *     .showLineNumbers()
- *     .rounded()
- * }</pre>
- *
- * <h2>CSS Child Selectors</h2>
- * <p>
- * The following child selectors can be used to style sub-components:
- * <ul>
- *   <li>{@code TextAreaElement-cursor} - The cursor style (default: reversed)</li>
- *   <li>{@code TextAreaElement-placeholder} - The placeholder text style (default: dim)</li>
- *   <li>{@code TextAreaElement-line-number} - The line number style (default: dim)</li>
- * </ul>
- * <p>
- * Example CSS:
- * <pre>{@code
- * TextAreaElement-cursor { text-style: reversed; background: cyan; }
- * TextAreaElement-placeholder { color: gray; text-style: italic; }
- * TextAreaElement-line-number { color: #666666; }
- * }</pre>
- * <p>
- * Note: Programmatic styles set via the corresponding setter methods take precedence over CSS styles.
- */
+/// A DSL wrapper for the TextArea widget.
+///
+///
+///
+/// A multi-line text input field with scrolling support.
+/// ```java
+/// textArea(textState)
+///     .placeholder("Enter text...")
+///     .title("Description")
+///     .showLineNumbers()
+///     .rounded()
+/// }
+/// ```
+///
+/// ## CSS Child Selectors
+///
+///
+///
+/// The following child selectors can be used to style sub-components:
+///
+/// - {@code TextAreaElement-cursor} - The cursor style (default: reversed)
+/// - {@code TextAreaElement-placeholder} - The placeholder text style (default: dim)
+/// - {@code TextAreaElement-line-number} - The line number style (default: dim)
+///
+///
+///
+///
+/// Example CSS:
+/// ```java
+/// TextAreaElement-cursor { text-style: reversed; background: cyan; }
+/// TextAreaElement-placeholder { color: gray; text-style: italic; }
+/// TextAreaElement-line-number { color: #666666; }
+/// }
+/// ```
+///
+///
+///
+/// Note: Programmatic styles set via the corresponding setter methods take precedence over CSS styles.
 public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     private static final Style DEFAULT_CURSOR_STYLE = Style.EMPTY.reversed();
@@ -80,24 +88,18 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         this.state = state != null ? state : new TextAreaState();
     }
 
-    /**
-     * Sets the text area state.
-     */
+    /// Sets the text area state.
     public TextAreaElement state(TextAreaState state) {
         this.state = state != null ? state : new TextAreaState();
         return this;
     }
 
-    /**
-     * Returns the current state.
-     */
+    /// Returns the current state.
     public TextAreaState getState() {
         return state;
     }
 
-    /**
-     * Sets the initial text.
-     */
+    /// Sets the initial text.
     public TextAreaElement text(String text) {
         if (state != null && text != null) {
             state.setText(text);
@@ -105,99 +107,75 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return this;
     }
 
-    /**
-     * Sets the placeholder text.
-     */
+    /// Sets the placeholder text.
     public TextAreaElement placeholder(String placeholder) {
         this.placeholder = placeholder != null ? placeholder : "";
         return this;
     }
 
-    /**
-     * Sets the placeholder style.
-     */
+    /// Sets the placeholder style.
     public TextAreaElement placeholderStyle(Style style) {
         this.placeholderStyle = style;
         return this;
     }
 
-    /**
-     * Sets the placeholder color.
-     */
+    /// Sets the placeholder color.
     public TextAreaElement placeholderColor(Color color) {
         this.placeholderStyle = Style.EMPTY.fg(color);
         return this;
     }
 
-    /**
-     * Sets the cursor style.
-     */
+    /// Sets the cursor style.
     public TextAreaElement cursorStyle(Style style) {
         this.cursorStyle = style;
         return this;
     }
 
-    /**
-     * Sets whether to show the cursor.
-     */
+    /// Sets whether to show the cursor.
     public TextAreaElement showCursor(boolean show) {
         this.showCursor = show;
         return this;
     }
 
-    /**
-     * Enables line number display.
-     */
+    /// Enables line number display.
     public TextAreaElement showLineNumbers() {
         this.showLineNumbers = true;
         return this;
     }
 
-    /**
-     * Sets the line number style.
-     */
+    /// Sets the line number style.
     public TextAreaElement lineNumberStyle(Style style) {
         this.lineNumberStyle = style;
         return this;
     }
 
-    /**
-     * Sets the title for the border.
-     */
+    /// Sets the title for the border.
     public TextAreaElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public TextAreaElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public TextAreaElement borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
 
-    /**
-     * Sets the border color to use when focused.
-     * If not set, no special focused border styling is applied
-     * (CSS :focused pseudo-class can be used instead).
-     */
+    /// Sets the border color to use when focused.
+    /// If not set, no special focused border styling is applied
+    /// (CSS :focused pseudo-class can be used instead).
     public TextAreaElement focusedBorderColor(Color color) {
         this.focusedBorderColor = color;
         return this;
     }
 
-    /**
-     * Sets a listener for text changes.
-     */
+    /// Sets a listener for text changes.
     public TextAreaElement onTextChange(TextChangeListener listener) {
         this.changeListener = listener;
         return this;
@@ -220,12 +198,12 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return Collections.unmodifiableMap(attrs);
     }
 
-    /**
-     * Handles a key event for text area input.
-     * <p>
-     * Note: The {@code focused} parameter is informational only.
-     * If the event reached this element, it should be processed.
-     */
+    /// Handles a key event for text area input.
+    ///
+    ///
+    ///
+    /// Note: The {@code focused} parameter is informational only.
+    /// If the event reached this element, it should be processed.
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Text input requires focus - only handle events when focused
@@ -240,9 +218,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
     }
 
-    /**
-     * Handles common key events for text area input.
-     */
+    /// Handles common key events for text area input.
     private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event) {
         switch (event.code()) {
             case BACKSPACE:
@@ -341,11 +317,10 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         }
     }
 
-    /**
-     * Listener for text changes in the text area.
-     */
+    /// Listener for text changes in the text area.
     @FunctionalInterface
     public interface TextChangeListener {
         void onTextChange(String newText);
     }
 }
+

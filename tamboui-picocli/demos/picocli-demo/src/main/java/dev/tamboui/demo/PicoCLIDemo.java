@@ -36,26 +36,28 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 
-/**
- * Demo showcasing PicoCLI integration with TamboUI.
- * <p>
- * This demo shows how to:
- * <ul>
- *   <li>Use TuiCommand as a base class</li>
- *   <li>Parse CLI arguments with PicoCLI</li>
- *   <li>Pass CLI options into the TUI</li>
- *   <li>Use the built-in TUI options mixin</li>
- * </ul>
- *
- * <p>Try running with different options:
- * <pre>
- * ./gradlew :demos:picocli-demo:run
- * ./gradlew :demos:picocli-demo:run --args="--title 'Custom Title'"
- * ./gradlew :demos:picocli-demo:run --args="--items Apple,Banana,Cherry"
- * ./gradlew :demos:picocli-demo:run --args="--help"
- * ./gradlew :demos:picocli-demo:run --args="--mouse --tick-rate 100"
- * </pre>
- */
+/// Demo showcasing PicoCLI integration with TamboUI.
+///
+///
+///
+/// This demo shows how to:
+///
+/// - Use TuiCommand as a base class
+/// - Parse CLI arguments with PicoCLI
+/// - Pass CLI options into the TUI
+/// - Use the built-in TUI options mixin
+///
+///
+///
+///
+/// Try running with different options:
+/// ```
+/// ./gradlew :demos:picocli-demo:run
+/// ./gradlew :demos:picocli-demo:run --args="--title 'Custom Title'"
+/// ./gradlew :demos:picocli-demo:run --args="--items Apple,Banana,Cherry"
+/// ./gradlew :demos:picocli-demo:run --args="--help"
+/// ./gradlew :demos:picocli-demo:run --args="--mouse --tick-rate 100"
+/// ```
 @Command(
     name = "picocli-demo",
     description = "Demo TUI application with PicoCLI integration",
@@ -283,3 +285,4 @@ public class PicoCLIDemo extends TuiCommand {
         frame.renderWidget(footer, area);
     }
 }
+

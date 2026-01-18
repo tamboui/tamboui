@@ -32,19 +32,21 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Demo TUI application showcasing collapsed borders with Block widgets.
- * <p>
- * Demonstrates:
- * - Multiple blocks with overlapping borders
- * - Selected pane with thick border
- * - Border style changes on selection
- * - Interactive selection (arrow keys)
- * - Rendering order (selected last)
- * <p>
- * This demo uses Spacing.overlap() and MergeStrategy.EXACT to achieve
- * collapsed borders, where adjacent blocks share border pixels.
- */
+/// Demo TUI application showcasing collapsed borders with Block widgets.
+///
+///
+///
+/// Demonstrates:
+/// - Multiple blocks with overlapping borders
+/// - Selected pane with thick border
+/// - Border style changes on selection
+/// - Interactive selection (arrow keys)
+/// - Rendering order (selected last)
+///
+///
+///
+/// This demo uses Spacing.overlap() and MergeStrategy.EXACT to achieve
+/// collapsed borders, where adjacent blocks share border pixels.
 public class CollapsedBordersDemo {
 
     private enum Pane {
@@ -241,4 +243,5 @@ public class CollapsedBordersDemo {
         };
     }
 }
+
 

@@ -371,3 +371,4 @@ class ListWidgetTest {
         assertThat(buffer).isEqualTo(expected);
     }
 }
+

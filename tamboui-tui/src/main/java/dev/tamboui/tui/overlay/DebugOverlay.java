@@ -20,13 +20,13 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 
 import java.time.Duration;
 
-/**
- * Debug overlay that displays performance metrics and system information.
- * <p>
- * Shows the backend name, actual frame rate (computed from render timing),
- * configured poll timeout, and tick rate.
- * Toggle visibility with CTRL+SHIFT+F12.
- */
+/// Debug overlay that displays performance metrics and system information.
+///
+///
+///
+/// Shows the backend name, actual frame rate (computed from render timing),
+/// configured poll timeout, and tick rate.
+/// Toggle visibility with CTRL+SHIFT+F12.
 public final class DebugOverlay {
 
     private static final int OVERLAY_HEIGHT = 7;
@@ -40,13 +40,11 @@ public final class DebugOverlay {
     private final long startTimeNanos;
     private long renderCount;
 
-    /**
-     * Creates a new debug overlay.
-     *
-     * @param backendName the name of the backend being used
-     * @param pollTimeout the configured poll timeout
-     * @param tickRate the configured tick rate (may be null if ticks disabled)
-     */
+    /// Creates a new debug overlay.
+    ///
+    /// @param backendName the name of the backend being used
+    /// @param pollTimeout the configured poll timeout
+    /// @param tickRate the configured tick rate (may be null if ticks disabled)
     public DebugOverlay(String backendName, Duration pollTimeout, Duration tickRate) {
         this.backendName = backendName;
         this.pollTimeout = pollTimeout;
@@ -57,53 +55,45 @@ public final class DebugOverlay {
         this.overlayWidth = Math.max(MIN_OVERLAY_WIDTH, 9 + backendName.length() + 2);
     }
 
-    /**
-     * Toggles the visibility of the debug overlay.
-     */
+    /// Toggles the visibility of the debug overlay.
     public void toggle() {
         this.visible = !this.visible;
     }
 
-    /**
-     * Returns whether the overlay is currently visible.
-     *
-     * @return true if visible
-     */
+    /// Returns whether the overlay is currently visible.
+    ///
+    /// @return true if visible
     public boolean isVisible() {
         return visible;
     }
 
-    /**
-     * Records a frame render for FPS calculation.
-     * <p>
-     * This should be called once per actual frame render to compute
-     * the true frame rate.
-     */
+    /// Records a frame render for FPS calculation.
+    ///
+    ///
+    ///
+    /// This should be called once per actual frame render to compute
+    /// the true frame rate.
     public void recordFrame() {
         renderCount++;
     }
 
-    /**
-     * Computes runtime in seconds.
-     */
+    /// Computes runtime in seconds.
     private double computeRuntimeSeconds() {
         return (System.nanoTime() - startTimeNanos) / 1_000_000_000.0;
     }
 
-    /**
-     * Computes actual average FPS over the entire runtime.
-     */
+    /// Computes actual average FPS over the entire runtime.
     private double computeFps() {
         double runtime = computeRuntimeSeconds();
         return runtime > 0 ? renderCount / runtime : 0;
     }
 
-    /**
-     * Computes the color for the FPS display based on performance ratio.
-     * <p>
-     * Returns RED if FPS is less than 50% of theoretical,
-     * YELLOW (orange) if less than 90%, GREEN otherwise.
-     */
+    /// Computes the color for the FPS display based on performance ratio.
+    ///
+    ///
+    ///
+    /// Returns RED if FPS is less than 50% of theoretical,
+    /// YELLOW (orange) if less than 90%, GREEN otherwise.
     private Color computeFpsColor(double actualFps, double theoreticalFps) {
         if (theoreticalFps <= 0) {
             return Color.GREEN;
@@ -117,12 +107,10 @@ public final class DebugOverlay {
         return Color.GREEN;
     }
 
-    /**
-     * Renders the debug overlay in the top-right corner.
-     *
-     * @param frame the frame to render to
-     * @param area the total available area
-     */
+    /// Renders the debug overlay in the top-right corner.
+    ///
+    /// @param frame the frame to render to
+    /// @param area the total available area
     public void render(Frame frame, Rect area) {
         if (!visible || area.isEmpty()) {
             return;
@@ -193,3 +181,4 @@ public final class DebugOverlay {
         frame.renderWidget(paragraph, innerArea);
     }
 }
+

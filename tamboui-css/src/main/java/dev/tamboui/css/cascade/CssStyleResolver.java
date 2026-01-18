@@ -25,20 +25,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Represents the computed style for an element after CSS cascade resolution.
- * <p>
- * Implements {@link StylePropertyResolver} to allow typed property access using
- * {@link PropertyKey}s. Properties can be retrieved either through the legacy
- * typed getters (e.g., {@link #foreground()}) or through the generic
- * {@link #get(PropertyKey)} method.
- * <p>
- * Example usage with PropertyKey:
- * <pre>{@code
- * CssStyleResolver style = cascadeResolver.resolve(element, rules);
- * Color borderColor = style.get(StandardPropertyKeys.BORDER_COLOR).orElse(Color.WHITE);
- * }</pre>
- */
+/// Represents the computed style for an element after CSS cascade resolution.
+///
+///
+///
+/// Implements {@link StylePropertyResolver} to allow typed property access using
+/// {@link PropertyKey}s. Properties can be retrieved either through the legacy
+/// typed getters (e.g., {@link #foreground()}) or through the generic
+/// {@link #get(PropertyKey)} method.
+///
+///
+///
+/// Example usage with PropertyKey:
+/// ```java
+/// CssStyleResolver style = cascadeResolver.resolve(element, rules);
+/// Color borderColor = style.get(StandardPropertyKeys.BORDER_COLOR).orElse(Color.WHITE);
+/// }
+/// ```
 public final class CssStyleResolver implements StylePropertyResolver {
 
     private final Color foreground;
@@ -88,11 +91,9 @@ public final class CssStyleResolver implements StylePropertyResolver {
         this.additionalProperties = Collections.unmodifiableMap(new HashMap<>(additionalProperties));
     }
 
-    /**
-     * Creates an empty resolved style.
-     *
-     * @return an empty CssStyleResolver
-     */
+    /// Creates an empty resolved style.
+    ///
+    /// @return an empty CssStyleResolver
     public static CssStyleResolver empty() {
         return new CssStyleResolver(null, null, null, null, null, null, null, null,
                 null, null, null, null, null, Collections.<String, String>emptyMap());
@@ -102,17 +103,17 @@ public final class CssStyleResolver implements StylePropertyResolver {
     // PropertyResolver implementation
     // ═══════════════════════════════════════════════════════════════
 
-    /**
-     * Retrieves a typed property value using the given property key.
-     * <p>
-     * Standard properties (color, background, border-color, text-align, border-type)
-     * are retrieved from dedicated fields. Other properties are looked up in
-     * {@link #additionalProperties} and converted using the key's converter.
-     *
-     * @param key the property key
-     * @param <T> the type of the property value
-     * @return the converted property value, or empty if not found or conversion fails
-     */
+    /// Retrieves a typed property value using the given property key.
+    ///
+    ///
+    ///
+    /// Standard properties (color, background, border-color, text-align, border-type)
+    /// are retrieved from dedicated fields. Other properties are looked up in
+    /// {@link #additionalProperties} and converted using the key's converter.
+    ///
+    /// @param key the property key
+    /// @param <T> the type of the property value
+    /// @return the converted property value, or empty if not found or conversion fails
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> get(PropertyKey<T> key) {
@@ -156,151 +157,121 @@ public final class CssStyleResolver implements StylePropertyResolver {
     // Legacy typed property accessors
     // ═══════════════════════════════════════════════════════════════
 
-    /**
-     * Returns the foreground color, if set.
-     *
-     * @return the foreground color
-     */
+    /// Returns the foreground color, if set.
+    ///
+    /// @return the foreground color
     public Optional<Color> foreground() {
         return Optional.ofNullable(foreground);
     }
 
-    /**
-     * Returns the background color, if set.
-     *
-     * @return the background color
-     */
+    /// Returns the background color, if set.
+    ///
+    /// @return the background color
     public Optional<Color> background() {
         return Optional.ofNullable(background);
     }
 
-    /**
-     * Returns the text modifiers.
-     *
-     * @return the set of modifiers
-     */
+    /// Returns the text modifiers.
+    ///
+    /// @return the set of modifiers
     public Set<Modifier> modifiers() {
         return modifiers;
     }
 
-    /**
-     * Returns the padding, if set.
-     *
-     * @return the padding
-     */
+    /// Returns the padding, if set.
+    ///
+    /// @return the padding
     public Optional<Padding> padding() {
         return Optional.ofNullable(padding);
     }
 
-    /**
-     * Returns the text alignment, if set.
-     *
-     * @return the alignment
-     */
+    /// Returns the text alignment, if set.
+    ///
+    /// @return the alignment
     public Optional<Alignment> alignment() {
         return Optional.ofNullable(alignment);
     }
 
-    /**
-     * Returns the border type, if set.
-     *
-     * @return the border type
-     */
+    /// Returns the border type, if set.
+    ///
+    /// @return the border type
     public Optional<BorderType> borderType() {
         return Optional.ofNullable(borderType);
     }
 
-    /**
-     * Returns the width behavior.
-     * Defaults to {@link Width#FILL} if not explicitly set.
-     *
-     * @return the width
-     */
+    /// Returns the width behavior.
+    /// Defaults to {@link Width#FILL} if not explicitly set.
+    ///
+    /// @return the width
     public Width width() {
         return width != null ? width : Width.FILL;
     }
 
-    /**
-     * Returns the flex layout mode, if set.
-     *
-     * @return the flex mode
-     */
+    /// Returns the flex layout mode, if set.
+    ///
+    /// @return the flex mode
     public Optional<Flex> flex() {
         return Optional.ofNullable(flex);
     }
 
-    /**
-     * Returns the layout direction, if set.
-     *
-     * @return the direction
-     */
+    /// Returns the layout direction, if set.
+    ///
+    /// @return the direction
     public Optional<Direction> direction() {
         return Optional.ofNullable(direction);
     }
 
-    /**
-     * Returns the margin, if set.
-     *
-     * @return the margin
-     */
+    /// Returns the margin, if set.
+    ///
+    /// @return the margin
     public Optional<Margin> margin() {
         return Optional.ofNullable(margin);
     }
 
-    /**
-     * Returns the spacing (gap between elements), if set.
-     *
-     * @return the spacing
-     */
+    /// Returns the spacing (gap between elements), if set.
+    ///
+    /// @return the spacing
     public Optional<Integer> spacing() {
         return Optional.ofNullable(spacing);
     }
 
-    /**
-     * Returns the height constraint (for vertical layouts), if set.
-     *
-     * @return the height constraint
-     */
+    /// Returns the height constraint (for vertical layouts), if set.
+    ///
+    /// @return the height constraint
     public Optional<Constraint> heightConstraint() {
         return Optional.ofNullable(heightConstraint);
     }
 
-    /**
-     * Returns the width constraint (for horizontal layouts), if set.
-     *
-     * @return the width constraint
-     */
+    /// Returns the width constraint (for horizontal layouts), if set.
+    ///
+    /// @return the width constraint
     public Optional<Constraint> widthConstraint() {
         return Optional.ofNullable(widthConstraint);
     }
 
-    /**
-     * Returns additional properties not mapped to specific fields.
-     *
-     * @return the additional properties map
-     */
+    /// Returns additional properties not mapped to specific fields.
+    ///
+    /// @return the additional properties map
     public Map<String, String> additionalProperties() {
         return additionalProperties;
     }
 
-    /**
-     * Gets an additional property value by name.
-     *
-     * @param name the property name
-     * @return the property value, or empty if not found
-     */
+    /// Gets an additional property value by name.
+    ///
+    /// @param name the property name
+    /// @return the property value, or empty if not found
     public Optional<String> getProperty(String name) {
         return Optional.ofNullable(additionalProperties.get(name));
     }
 
-    /**
-     * Converts this resolved style to a TamboUI Style object.
-     * <p>
-     * The {@link Width} property is stored as a Style extension and can be
-     * retrieved via {@code style.extension(Width.class, Width.FILL)}.
-     *
-     * @return the Style object
-     */
+    /// Converts this resolved style to a TamboUI Style object.
+    ///
+    ///
+    ///
+    /// The {@link Width} property is stored as a Style extension and can be
+    /// retrieved via {@code style.extension(Width.class, Width.FILL)}.
+    ///
+    /// @return the Style object
     public Style toStyle() {
         Style style = Style.EMPTY;
 
@@ -320,11 +291,9 @@ public final class CssStyleResolver implements StylePropertyResolver {
         return style;
     }
 
-    /**
-     * Returns true if this style has any properties set.
-     *
-     * @return true if any properties are set
-     */
+    /// Returns true if this style has any properties set.
+    ///
+    /// @return true if any properties are set
     public boolean hasProperties() {
         return foreground != null || background != null ||
                 !modifiers.isEmpty() || padding != null || alignment != null ||
@@ -334,19 +303,19 @@ public final class CssStyleResolver implements StylePropertyResolver {
                 !additionalProperties.isEmpty();
     }
 
-    /**
-     * Creates a new resolver that uses this resolver's properties but falls back
-     * to the given resolver for CSS-inheritable properties not set in this resolver.
-     * <p>
-     * Per CSS semantics, only certain properties inherit from parent to child:
-     * <ul>
-     *   <li>Inheritable: color (foreground), text-style (modifiers), border-type</li>
-     *   <li>Non-inheritable: spacing, flex, direction, margin, padding, alignment, width, background</li>
-     * </ul>
-     *
-     * @param fallback the fallback resolver for missing inheritable properties
-     * @return a new resolver with fallback behavior for inheritable properties only
-     */
+    /// Creates a new resolver that uses this resolver's properties but falls back
+    /// to the given resolver for CSS-inheritable properties not set in this resolver.
+    ///
+    ///
+    ///
+    /// Per CSS semantics, only certain properties inherit from parent to child:
+    ///
+    /// - Inheritable: color (foreground), text-style (modifiers), border-type
+    /// - Non-inheritable: spacing, flex, direction, margin, padding, alignment, width, background
+    ///
+    ///
+    /// @param fallback the fallback resolver for missing inheritable properties
+    /// @return a new resolver with fallback behavior for inheritable properties only
     public CssStyleResolver withFallback(CssStyleResolver fallback) {
         if (fallback == null) {
             return this;
@@ -387,18 +356,14 @@ public final class CssStyleResolver implements StylePropertyResolver {
         return merged;
     }
 
-    /**
-     * Creates a new builder.
-     *
-     * @return a new builder
-     */
+    /// Creates a new builder.
+    ///
+    /// @return a new builder
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Builder for CssStyleResolver.
-     */
+    /// Builder for CssStyleResolver.
     public static final class Builder {
         private Color foreground;
         private Color background;
@@ -418,177 +383,145 @@ public final class CssStyleResolver implements StylePropertyResolver {
         private Builder() {
         }
 
-        /**
-         * Sets the foreground color.
-         *
-         * @param color the foreground color
-         * @return this builder
-         */
+        /// Sets the foreground color.
+        ///
+        /// @param color the foreground color
+        /// @return this builder
         public Builder foreground(Color color) {
             this.foreground = color;
             return this;
         }
 
-        /**
-         * Sets the background color.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background = color;
             return this;
         }
 
-        /**
-         * Adds a text modifier.
-         *
-         * @param modifier the modifier to add
-         * @return this builder
-         */
+        /// Adds a text modifier.
+        ///
+        /// @param modifier the modifier to add
+        /// @return this builder
         public Builder addModifier(Modifier modifier) {
             this.modifiers.add(modifier);
             return this;
         }
 
-        /**
-         * Adds multiple text modifiers.
-         *
-         * @param modifiers the modifiers to add
-         * @return this builder
-         */
+        /// Adds multiple text modifiers.
+        ///
+        /// @param modifiers the modifiers to add
+        /// @return this builder
         public Builder addModifiers(Set<Modifier> modifiers) {
             this.modifiers.addAll(modifiers);
             return this;
         }
 
-        /**
-         * Sets the padding.
-         *
-         * @param padding the padding
-         * @return this builder
-         */
+        /// Sets the padding.
+        ///
+        /// @param padding the padding
+        /// @return this builder
         public Builder padding(Padding padding) {
             this.padding = padding;
             return this;
         }
 
-        /**
-         * Sets the text alignment.
-         *
-         * @param alignment the alignment
-         * @return this builder
-         */
+        /// Sets the text alignment.
+        ///
+        /// @param alignment the alignment
+        /// @return this builder
         public Builder alignment(Alignment alignment) {
             this.alignment = alignment;
             return this;
         }
 
-        /**
-         * Sets the border type.
-         *
-         * @param borderType the border type
-         * @return this builder
-         */
+        /// Sets the border type.
+        ///
+        /// @param borderType the border type
+        /// @return this builder
         public Builder borderType(BorderType borderType) {
             this.borderType = borderType;
             return this;
         }
 
-        /**
-         * Sets the width behavior.
-         *
-         * @param width the width
-         * @return this builder
-         */
+        /// Sets the width behavior.
+        ///
+        /// @param width the width
+        /// @return this builder
         public Builder width(Width width) {
             this.width = width;
             return this;
         }
 
-        /**
-         * Sets the flex layout mode.
-         *
-         * @param flex the flex mode
-         * @return this builder
-         */
+        /// Sets the flex layout mode.
+        ///
+        /// @param flex the flex mode
+        /// @return this builder
         public Builder flex(Flex flex) {
             this.flex = flex;
             return this;
         }
 
-        /**
-         * Sets the layout direction.
-         *
-         * @param direction the direction
-         * @return this builder
-         */
+        /// Sets the layout direction.
+        ///
+        /// @param direction the direction
+        /// @return this builder
         public Builder direction(Direction direction) {
             this.direction = direction;
             return this;
         }
 
-        /**
-         * Sets the margin.
-         *
-         * @param margin the margin
-         * @return this builder
-         */
+        /// Sets the margin.
+        ///
+        /// @param margin the margin
+        /// @return this builder
         public Builder margin(Margin margin) {
             this.margin = margin;
             return this;
         }
 
-        /**
-         * Sets the spacing (gap between elements).
-         *
-         * @param spacing the spacing
-         * @return this builder
-         */
+        /// Sets the spacing (gap between elements).
+        ///
+        /// @param spacing the spacing
+        /// @return this builder
         public Builder spacing(Integer spacing) {
             this.spacing = spacing;
             return this;
         }
 
-        /**
-         * Sets the height constraint (for vertical layouts).
-         *
-         * @param constraint the height constraint
-         * @return this builder
-         */
+        /// Sets the height constraint (for vertical layouts).
+        ///
+        /// @param constraint the height constraint
+        /// @return this builder
         public Builder heightConstraint(Constraint constraint) {
             this.heightConstraint = constraint;
             return this;
         }
 
-        /**
-         * Sets the width constraint (for horizontal layouts).
-         *
-         * @param constraint the width constraint
-         * @return this builder
-         */
+        /// Sets the width constraint (for horizontal layouts).
+        ///
+        /// @param constraint the width constraint
+        /// @return this builder
         public Builder widthConstraint(Constraint constraint) {
             this.widthConstraint = constraint;
             return this;
         }
 
-        /**
-         * Adds an additional property.
-         *
-         * @param name  the property name
-         * @param value the property value
-         * @return this builder
-         */
+        /// Adds an additional property.
+        ///
+        /// @param name  the property name
+        /// @param value the property value
+        /// @return this builder
         public Builder property(String name, String value) {
             this.additionalProperties.put(name, value);
             return this;
         }
 
-        /**
-         * Builds the CssStyleResolver.
-         *
-         * @return the built resolver
-         */
+        /// Builds the CssStyleResolver.
+        ///
+        /// @return the built resolver
         public CssStyleResolver build() {
             return new CssStyleResolver(foreground, background, modifiers, padding,
                     alignment, borderType, width, flex, direction, margin, spacing,
@@ -642,3 +575,4 @@ public final class CssStyleResolver implements StylePropertyResolver {
         return sb.toString();
     }
 }
+

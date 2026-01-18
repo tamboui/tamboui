@@ -15,9 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Tests for LibC bindings.
- */
+/// Tests for LibC bindings.
 @EnabledOnOs({OS.LINUX, OS.MAC})
 class LibCTest {
 
@@ -122,3 +120,4 @@ class LibCTest {
         }
     }
 }
+

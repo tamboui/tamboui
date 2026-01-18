@@ -6,54 +6,67 @@ package dev.tamboui.tfx;
 
 import java.util.Objects;
 
-/**
- * Manages the timing and interpolation of effects.
- * <p>
- * The EffectTimer is responsible for:
- * <ul>
- *   <li><b>Duration Tracking:</b> Tracking total duration and remaining time</li>
- *   <li><b>Progress Calculation:</b> Computing alpha values (0.0 to 1.0) based on elapsed time</li>
- *   <li><b>Easing Application:</b> Applying interpolation functions for smooth animations</li>
- *   <li><b>Direction Control:</b> Supporting forward and reverse playback</li>
- * </ul>
- * <p>
- * <b>Design Philosophy:</b>
- * <p>
- * EffectTimer separates timing concerns from rendering logic. Effects use the timer's
- * {@link #alpha()} method to get a normalized progress value (0.0 to 1.0) that has
- * been transformed by the interpolation function. This allows effects to focus on
- * "what to render" rather than "when to render it."
- * <p>
- * <b>Key Concepts:</b>
- * <ul>
- *   <li><b>Alpha Value:</b> A normalized progress value (0.0 = start, 1.0 = end)
- *       that has been transformed by the interpolation function.</li>
- *   <li><b>Interpolation:</b> An easing function that transforms linear progress
- *       into smooth animation curves (e.g., ease-in, ease-out, bounce).</li>
- *   <li><b>Overflow:</b> When processing exceeds the timer's duration, the excess
- *       time is returned as overflow for use by subsequent effects in sequences.</li>
- * </ul>
- * <p>
- * <b>Usage Pattern:</b>
- * <pre>{@code
- * EffectTimer timer = EffectTimer.fromMs(2000, Interpolation.SineInOut);
- * 
- * // In render loop
- * TFxDuration delta = TFxDuration.fromMillis(frameTimeMs);
- * TFxDuration overflow = timer.process(delta);
- * 
- * if (timer.done()) {
- *     // Effect complete
- * } else {
- *     float alpha = timer.alpha(); // Use alpha to drive effect
- * }
- * }</pre>
- * <p>
- * <b>Reversing Effects:</b>
- * <p>
- * Use {@link #reversed()} to play an effect backwards, or {@link #mirrored()} to
- * reverse while preserving the visual curve shape (useful for ping-pong effects).
- */
+/// Manages the timing and interpolation of effects.
+///
+///
+///
+/// The EffectTimer is responsible for:
+///
+/// - **Duration Tracking:** Tracking total duration and remaining time
+/// - **Progress Calculation:** Computing alpha values (0.0 to 1.0) based on elapsed time
+/// - **Easing Application:** Applying interpolation functions for smooth animations
+/// - **Direction Control:** Supporting forward and reverse playback
+///
+///
+///
+///
+/// **Design Philosophy:**
+///
+///
+///
+/// EffectTimer separates timing concerns from rendering logic. Effects use the timer's
+/// {@link #alpha()} method to get a normalized progress value (0.0 to 1.0) that has
+/// been transformed by the interpolation function. This allows effects to focus on
+/// "what to render" rather than "when to render it."
+///
+///
+///
+/// **Key Concepts:**
+///
+/// <li>**Alpha Value:** A normalized progress value (0.0 = start, 1.0 = end)
+/// that has been transformed by the interpolation function.
+/// <li>**Interpolation:** An easing function that transforms linear progress
+/// into smooth animation curves (e.g., ease-in, ease-out, bounce).
+/// <li>**Overflow:** When processing exceeds the timer's duration, the excess
+/// time is returned as overflow for use by subsequent effects in sequences.
+///
+///
+///
+///
+/// **Usage Pattern:**
+/// ```java
+/// EffectTimer timer = EffectTimer.fromMs(2000, Interpolation.SineInOut);
+///
+/// // In render loop
+/// TFxDuration delta = TFxDuration.fromMillis(frameTimeMs);
+/// TFxDuration overflow = timer.process(delta);
+///
+/// if (timer.done()) {
+///     // Effect complete
+/// } else {
+///     float alpha = timer.alpha(); // Use alpha to drive effect
+/// }
+/// }
+/// ```
+///
+///
+///
+/// **Reversing Effects:**
+///
+///
+///
+/// Use {@link #reversed()} to play an effect backwards, or {@link #mirrored()} to
+/// reverse while preserving the visual curve shape (useful for ping-pong effects).
 public final class EffectTimer {
 
     private TFxDuration remaining;
@@ -62,23 +75,17 @@ public final class EffectTimer {
     private boolean reverse;
     private LoopMode loopMode;
     
-    /**
-     * Creates a new EffectTimer with the specified duration in milliseconds and interpolation.
-     */
+    /// Creates a new EffectTimer with the specified duration in milliseconds and interpolation.
     public static EffectTimer fromMs(long milliseconds, Interpolation interpolation) {
         return new EffectTimer(TFxDuration.fromMillis(milliseconds), interpolation);
     }
     
-    /**
-     * Creates a new EffectTimer with the specified duration and interpolation.
-     */
+    /// Creates a new EffectTimer with the specified duration and interpolation.
     public static EffectTimer of(TFxDuration duration, Interpolation interpolation) {
         return new EffectTimer(duration, interpolation);
     }
     
-    /**
-     * Creates a new EffectTimer with the specified duration and Linear interpolation.
-     */
+    /// Creates a new EffectTimer with the specified duration and Linear interpolation.
     public static EffectTimer of(TFxDuration duration) {
         return new EffectTimer(duration, Interpolation.Linear);
     }
@@ -91,36 +98,32 @@ public final class EffectTimer {
         this.loopMode = LoopMode.ONCE;
     }
 
-    /**
-     * Sets the loop mode for this timer.
-     * <p>
-     * Loop mode controls what happens when the timer completes:
-     * <ul>
-     *   <li>{@link LoopMode#ONCE}: Timer completes and stays done (default)</li>
-     *   <li>{@link LoopMode#LOOP}: Timer resets to start and continues</li>
-     *   <li>{@link LoopMode#PING_PONG}: Timer reverses direction and continues</li>
-     * </ul>
-     *
-     * @param mode the loop mode
-     * @return this timer for chaining
-     */
+    /// Sets the loop mode for this timer.
+    ///
+    ///
+    ///
+    /// Loop mode controls what happens when the timer completes:
+    ///
+    /// - {@link LoopMode#ONCE}: Timer completes and stays done (default)
+    /// - {@link LoopMode#LOOP}: Timer resets to start and continues
+    /// - {@link LoopMode#PING_PONG}: Timer reverses direction and continues
+    ///
+    ///
+    /// @param mode the loop mode
+    /// @return this timer for chaining
     public EffectTimer loopMode(LoopMode mode) {
         this.loopMode = Objects.requireNonNull(mode);
         return this;
     }
 
-    /**
-     * Returns the current loop mode.
-     *
-     * @return the loop mode
-     */
+    /// Returns the current loop mode.
+    ///
+    /// @return the loop mode
     public LoopMode loopMode() {
         return loopMode;
     }
     
-    /**
-     * Returns a new timer with reversed direction.
-     */
+    /// Returns a new timer with reversed direction.
     public EffectTimer reversed() {
         EffectTimer timer = new EffectTimer(total, interpolation);
         timer.remaining = remaining;
@@ -129,20 +132,18 @@ public final class EffectTimer {
         return timer;
     }
     
-    /**
-     * Returns true if the timer is reversed.
-     */
+    /// Returns true if the timer is reversed.
     public boolean isReversed() {
         return reverse;
     }
     
-    /**
-     * Returns a mirrored timer that runs in reverse direction with flipped interpolation.
-     * <p>
-     * This preserves the visual curve shape when used with effects that reverse at
-     * construction time. Unlike reversed(), which flips both direction and interpolation
-     * type, mirrored() flips the interpolation to compensate for the reversed direction.
-     */
+    /// Returns a mirrored timer that runs in reverse direction with flipped interpolation.
+    ///
+    ///
+    ///
+    /// This preserves the visual curve shape when used with effects that reverse at
+    /// construction time. Unlike reversed(), which flips both direction and interpolation
+    /// type, mirrored() flips the interpolation to compensate for the reversed direction.
     public EffectTimer mirrored() {
         EffectTimer timer = new EffectTimer(total, interpolation.flipped());
         timer.remaining = remaining;
@@ -151,25 +152,19 @@ public final class EffectTimer {
         return timer;
     }
     
-    /**
-     * Returns true if the timer has started (i.e., remaining != total).
-     */
+    /// Returns true if the timer has started (i.e., remaining != total).
     public boolean started() {
         return !total.equals(remaining);
     }
     
-    /**
-     * Resets the timer to its initial duration.
-     */
+    /// Resets the timer to its initial duration.
     public void reset() {
         this.remaining = total;
     }
     
-    /**
-     * Computes the current alpha value based on the elapsed time and interpolation method.
-     * 
-     * @return The current alpha value (0.0 to 1.0)
-     */
+    /// Computes the current alpha value based on the elapsed time and interpolation method.
+    ///
+    /// @return The current alpha value (0.0 to 1.0)
     public float alpha() {
         float totalMs = total.asMillis();
         if (totalMs == 0.0f) {
@@ -183,34 +178,30 @@ public final class EffectTimer {
         return interpolation.alpha(a);
     }
     
-    /**
-     * Returns the remaining duration.
-     */
+    /// Returns the remaining duration.
     public TFxDuration remaining() {
         return remaining;
     }
     
-    /**
-     * Returns the total duration.
-     */
+    /// Returns the total duration.
     public TFxDuration duration() {
         return total;
     }
     
-    /**
-     * Processes the timer by reducing the remaining duration by the specified amount.
-     * <p>
-     * For looping timers, this method handles resetting or reversing the timer
-     * when it completes:
-     * <ul>
-     *   <li>{@link LoopMode#ONCE}: Returns overflow when complete</li>
-     *   <li>{@link LoopMode#LOOP}: Resets to start, returns null</li>
-     *   <li>{@link LoopMode#PING_PONG}: Reverses direction, returns null</li>
-     * </ul>
-     *
-     * @param duration The amount of time to process
-     * @return The overflow duration if the timer has completed (ONCE mode only), or null if still running
-     */
+    /// Processes the timer by reducing the remaining duration by the specified amount.
+    ///
+    ///
+    ///
+    /// For looping timers, this method handles resetting or reversing the timer
+    /// when it completes:
+    ///
+    /// - {@link LoopMode#ONCE}: Returns overflow when complete
+    /// - {@link LoopMode#LOOP}: Resets to start, returns null
+    /// - {@link LoopMode#PING_PONG}: Reverses direction, returns null
+    ///
+    ///
+    /// @param duration The amount of time to process
+    /// @return The overflow duration if the timer has completed (ONCE mode only), or null if still running
     public TFxDuration process(TFxDuration duration) {
         if (remaining.asMillis() >= duration.asMillis()) {
             remaining = remaining.sub(duration);
@@ -246,12 +237,12 @@ public final class EffectTimer {
         }
     }
 
-    /**
-     * Returns true if the timer has completed.
-     * <p>
-     * For looping timers ({@link LoopMode#LOOP} and {@link LoopMode#PING_PONG}),
-     * this method always returns false since looping timers never complete on their own.
-     */
+    /// Returns true if the timer has completed.
+    ///
+    ///
+    ///
+    /// For looping timers ({@link LoopMode#LOOP} and {@link LoopMode#PING_PONG}),
+    /// this method always returns false since looping timers never complete on their own.
     public boolean done() {
         if (loopMode != LoopMode.ONCE) {
             return false;
@@ -259,9 +250,7 @@ public final class EffectTimer {
         return remaining.isZero();
     }
     
-    /**
-     * Returns the interpolation method.
-     */
+    /// Returns the interpolation method.
     public Interpolation interpolation() {
         return interpolation;
     }
@@ -294,4 +283,5 @@ public final class EffectTimer {
                ", loopMode=" + loopMode + "}";
     }
 }
+
 

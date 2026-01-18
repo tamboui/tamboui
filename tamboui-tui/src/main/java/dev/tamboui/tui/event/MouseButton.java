@@ -4,19 +4,18 @@
  */
 package dev.tamboui.tui.event;
 
-/**
- * Represents mouse buttons.
- */
+/// Represents mouse buttons.
 public enum MouseButton {
-    /** Left mouse button (button 1). */
+    /// Left mouse button (button 1).
     LEFT,
 
-    /** Middle mouse button (button 2, scroll wheel click). */
+    /// Middle mouse button (button 2, scroll wheel click).
     MIDDLE,
 
-    /** Right mouse button (button 3). */
+    /// Right mouse button (button 3).
     RIGHT,
 
-    /** No button (for move events). */
+    /// No button (for move events).
     NONE
 }
+

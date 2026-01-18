@@ -9,18 +9,17 @@ import dev.tamboui.style.Width;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS width values to Width.
- * <p>
- * Supports the following values:
- * <ul>
- *   <li>{@code fill} - element fills container width (default)</li>
- *   <li>{@code fit} - element width fits its content</li>
- *   <li>Percentage values: {@code 50%}, {@code 100%}</li>
- *   <li>Decimal percentages: {@code 0.5}, {@code 0.25}</li>
- *   <li>Fixed character counts: {@code 20}, {@code 20ch}</li>
- * </ul>
- */
+/// Converts CSS width values to Width.
+///
+///
+///
+/// Supports the following values:
+///
+/// - {@code fill} - element fills container width (default)
+/// - {@code fit} - element width fits its content
+/// - Percentage values: {@code 50%}, {@code 100%}
+/// - Decimal percentages: {@code 0.5}, {@code 0.25}
+/// - Fixed character counts: {@code 20}, {@code 20ch}
 public final class WidthConverter implements PropertyConverter<Width> {
 
     @Override
@@ -74,3 +73,4 @@ public final class WidthConverter implements PropertyConverter<Width> {
         }
     }
 }
+

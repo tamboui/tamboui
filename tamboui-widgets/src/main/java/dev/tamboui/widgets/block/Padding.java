@@ -4,9 +4,7 @@
  */
 package dev.tamboui.widgets.block;
 
-/**
- * Padding inside a block.
- */
+/// Padding inside a block.
 public final class Padding {
 
     public static final Padding NONE = new Padding(0, 0, 0, 0);
@@ -92,3 +90,4 @@ public final class Padding {
         return String.format("Padding[top=%d, right=%d, bottom=%d, left=%d]", top, right, bottom, left);
     }
 }
+

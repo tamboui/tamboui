@@ -18,36 +18,41 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.function.BiConsumer;
 
-/**
- * Manages a fixed-height inline display area for Gradle/NPM-style progress UX.
- * <p>
- * InlineDisplay reserves a number of lines at the current cursor position and
- * allows rendering widgets to that area. Content can be printed above the display
- * area using {@link #println(String)}, which scrolls output while the status area
- * stays in place.
- *
- * <p>Unlike full TUI runners, InlineDisplay does NOT:
- * <ul>
- *   <li>Enter alternate screen mode</li>
- *   <li>Hide the cursor</li>
- *   <li>Capture the entire terminal</li>
- * </ul>
- *
- * <p>Example usage:
- * <pre>{@code
- * try (InlineDisplay display = InlineDisplay.create(3)) {
- *     for (int i = 0; i <= 100; i += 10) {
- *         display.render((area, buffer) -> {
- *             myProgressWidget.render(area, buffer);
- *         });
- *         display.println("Step " + i + " completed");
- *         Thread.sleep(100);
- *     }
- * }
- * }</pre>
- *
- * @see Buffer#toAnsiString()
- */
+/// Manages a fixed-height inline display area for Gradle/NPM-style progress UX.
+///
+///
+///
+/// InlineDisplay reserves a number of lines at the current cursor position and
+/// allows rendering widgets to that area. Content can be printed above the display
+/// area using {@link #println(String)}, which scrolls output while the status area
+/// stays in place.
+///
+///
+///
+/// Unlike full TUI runners, InlineDisplay does NOT:
+///
+/// - Enter alternate screen mode
+/// - Hide the cursor
+/// - Capture the entire terminal
+///
+///
+///
+///
+/// Example usage:
+/// ```java
+/// try (InlineDisplay display = InlineDisplay.create(3)) {
+///     for (int i = 0; i <= 100; i += 10) {
+///         display.render((area, buffer) -> {
+///             myProgressWidget.render(area, buffer);
+///         });
+///         display.println("Step " + i + " completed");
+///         Thread.sleep(100);
+///     }
+/// }
+/// }
+/// ```
+///
+/// @see Buffer#toAnsiString()
 public final class InlineDisplay implements AutoCloseable {
 
     private static final String ESC = "\u001b";
@@ -73,14 +78,12 @@ public final class InlineDisplay implements AutoCloseable {
         this.shouldClearOnClose = false;
     }
 
-    /**
-     * Creates an InlineDisplay with the specified height.
-     * The width is automatically set to the terminal width.
-     *
-     * @param height the number of lines to reserve for the display area
-     * @return a new InlineDisplay
-     * @throws IOException if terminal initialization fails
-     */
+    /// Creates an InlineDisplay with the specified height.
+    /// The width is automatically set to the terminal width.
+    ///
+    /// @param height the number of lines to reserve for the display area
+    /// @return a new InlineDisplay
+    /// @throws IOException if terminal initialization fails
     public static InlineDisplay create(int height) throws IOException {
         Backend backend = BackendFactory.create();
         Size size = backend.size();
@@ -88,37 +91,31 @@ public final class InlineDisplay implements AutoCloseable {
         return new InlineDisplay(height, size.width(), backend, out);
     }
 
-    /**
-     * Creates an InlineDisplay with the specified height and width.
-     *
-     * @param height the number of lines to reserve for the display area
-     * @param width  the width of the display area in characters
-     * @return a new InlineDisplay
-     * @throws IOException if terminal initialization fails
-     */
+    /// Creates an InlineDisplay with the specified height and width.
+    ///
+    /// @param height the number of lines to reserve for the display area
+    /// @param width  the width of the display area in characters
+    /// @return a new InlineDisplay
+    /// @throws IOException if terminal initialization fails
     public static InlineDisplay create(int height, int width) throws IOException {
         Backend backend = BackendFactory.create();
         PrintWriter out = new PrintWriter(System.out, true);
         return new InlineDisplay(height, width, backend, out);
     }
 
-    /**
-     * Configures the display to clear the status area when closed.
-     * By default, the status area content remains visible after close.
-     *
-     * @return this display for chaining
-     */
+    /// Configures the display to clear the status area when closed.
+    /// By default, the status area content remains visible after close.
+    ///
+    /// @return this display for chaining
     public InlineDisplay clearOnClose() {
         this.shouldClearOnClose = true;
         return this;
     }
 
-    /**
-     * Renders widgets to the status area.
-     * The provided consumer receives the display area and buffer to render into.
-     *
-     * @param renderer the rendering function that populates the buffer
-     */
+    /// Renders widgets to the status area.
+    /// The provided consumer receives the display area and buffer to render into.
+    ///
+    /// @param renderer the rendering function that populates the buffer
     public void render(BiConsumer<Rect, Buffer> renderer) {
         ensureInitialized();
         buffer.clear();
@@ -126,13 +123,11 @@ public final class InlineDisplay implements AutoCloseable {
         redrawStatusArea();
     }
 
-    /**
-     * Sets a single line of text in the status area.
-     * This is a convenience method for simple text updates without widgets.
-     *
-     * @param line    the line index (0-based, must be less than height)
-     * @param content the text content to display
-     */
+    /// Sets a single line of text in the status area.
+    /// This is a convenience method for simple text updates without widgets.
+    ///
+    /// @param line    the line index (0-based, must be less than height)
+    /// @param content the text content to display
     public void setLine(int line, String content) {
         if (line < 0 || line >= height) {
             return;
@@ -148,12 +143,10 @@ public final class InlineDisplay implements AutoCloseable {
         redrawStatusArea();
     }
 
-    /**
-     * Sets a single line of styled text in the status area.
-     *
-     * @param line the line index (0-based, must be less than height)
-     * @param text the styled text to display
-     */
+    /// Sets a single line of styled text in the status area.
+    ///
+    /// @param line the line index (0-based, must be less than height)
+    /// @param text the styled text to display
     public void setLine(int line, Text text) {
         if (line < 0 || line >= height) {
             return;
@@ -173,13 +166,11 @@ public final class InlineDisplay implements AutoCloseable {
         redrawStatusArea();
     }
 
-    /**
-     * Prints a line of text above the status area.
-     * The text scrolls up as new lines are added, while the status area
-     * stays in place at the bottom.
-     *
-     * @param message the message to print
-     */
+    /// Prints a line of text above the status area.
+    /// The text scrolls up as new lines are added, while the status area
+    /// stays in place at the bottom.
+    ///
+    /// @param message the message to print
     public void println(String message) {
         ensureInitialized();
 
@@ -204,11 +195,9 @@ public final class InlineDisplay implements AutoCloseable {
         redrawStatusArea();
     }
 
-    /**
-     * Prints styled text above the status area.
-     *
-     * @param text the styled text to print
-     */
+    /// Prints styled text above the status area.
+    ///
+    /// @param text the styled text to print
     public void println(Text text) {
         // Render text to a temporary buffer for ANSI conversion
         if (text.lines().isEmpty()) {
@@ -221,10 +210,8 @@ public final class InlineDisplay implements AutoCloseable {
         println(tempBuffer.toAnsiStringTrimmed());
     }
 
-    /**
-     * Explicitly releases the display before close().
-     * Moves the cursor below the status area and optionally clears it.
-     */
+    /// Explicitly releases the display before close().
+    /// Moves the cursor below the status area and optionally clears it.
     public void release() {
         if (released) {
             return;
@@ -243,20 +230,16 @@ public final class InlineDisplay implements AutoCloseable {
         released = true;
     }
 
-    /**
-     * Returns the height of this display in lines.
-     *
-     * @return the display height
-     */
+    /// Returns the height of this display in lines.
+    ///
+    /// @return the display height
     public int height() {
         return height;
     }
 
-    /**
-     * Returns the width of this display in characters.
-     *
-     * @return the display width
-     */
+    /// Returns the width of this display in characters.
+    ///
+    /// @return the display width
     public int width() {
         return width;
     }
@@ -340,3 +323,4 @@ public final class InlineDisplay implements AutoCloseable {
         out.flush();
     }
 }
+

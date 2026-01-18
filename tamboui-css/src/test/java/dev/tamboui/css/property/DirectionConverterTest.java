@@ -74,3 +74,4 @@ class DirectionConverterTest {
         assertThat(converter.convert("diagonal", Collections.emptyMap())).isEmpty();
     }
 }
+

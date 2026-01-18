@@ -17,20 +17,22 @@ import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demonstrates ListElement's ability to display rich content.
- * <p>
- * Unlike the low-level ListWidget (which only accepts ListItem with text + style),
- * ListElement accepts any StyledElement as items:
- * <ul>
- *   <li>Styled text with icons</li>
- *   <li>Rows combining multiple elements</li>
- *   <li>Nested panels and complex layouts</li>
- * </ul>
- * <p>
- * ListElement also manages its own internal state for selection and scrolling,
- * so no external ListState is needed.
- */
+/// Demonstrates ListElement's ability to display rich content.
+///
+///
+///
+/// Unlike the low-level ListWidget (which only accepts ListItem with text + style),
+/// ListElement accepts any StyledElement as items:
+///
+/// - Styled text with icons
+/// - Rows combining multiple elements
+/// - Nested panels and complex layouts
+///
+///
+///
+///
+/// ListElement also manages its own internal state for selection and scrolling,
+/// so no external ListState is needed.
 public class ListElementDemo extends ToolkitApp {
 
     private final ListElement<?> listElement;
@@ -125,3 +127,4 @@ public class ListElementDemo extends ToolkitApp {
         return EventResult.UNHANDLED;
     }
 }
+

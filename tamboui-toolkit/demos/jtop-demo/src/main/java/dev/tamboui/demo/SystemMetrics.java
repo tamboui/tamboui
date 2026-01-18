@@ -18,10 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Reads system metrics using OSHI (cross-platform).
- * Separates system monitoring logic from UI rendering.
- */
+/// Reads system metrics using OSHI (cross-platform).
+/// Separates system monitoring logic from UI rendering.
 final class SystemMetrics {
 
     private static final int HISTORY_SIZE = 60;
@@ -55,9 +53,7 @@ final class SystemMetrics {
     private List<ProcessInfo> processes = new ArrayList<>();
     private final Map<Integer, OSProcess> lastProcessesByPid = new HashMap<>();
 
-    /**
-     * Information about a running process.
-     */
+    /// Information about a running process.
     record ProcessInfo(
         int pid,
         String name,
@@ -67,9 +63,7 @@ final class SystemMetrics {
         String user
     ) {}
 
-    /**
-     * Sort modes for the process list.
-     */
+    /// Sort modes for the process list.
     enum SortMode {
         CPU, MEMORY, PID
     }
@@ -92,9 +86,7 @@ final class SystemMetrics {
         }
     }
 
-    /**
-     * Updates all metrics by reading from /proc.
-     */
+    /// Updates all metrics by reading from /proc.
     void update(SortMode sortMode) {
         updateCpuUsage();
         updateMemoryInfo();
@@ -310,3 +302,4 @@ final class SystemMetrics {
         };
     }
 }
+

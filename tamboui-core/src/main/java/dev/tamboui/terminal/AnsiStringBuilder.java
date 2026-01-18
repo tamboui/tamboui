@@ -12,47 +12,40 @@ import dev.tamboui.style.Style;
 
 import java.util.EnumSet;
 
-/**
- * Utility class for building ANSI-escaped strings from styled content.
- * This class provides methods to convert TamboUI styles to ANSI escape sequences
- * that can be used for direct terminal output without requiring the full TUI system.
- *
- * <p>Example usage:
- * <pre>{@code
- * Style style = Style.create().fg(Color.GREEN).bold();
- * String ansi = AnsiStringBuilder.styleToAnsi(style);
- * System.out.print(ansi + "Hello, World!" + AnsiStringBuilder.RESET);
- * }</pre>
- */
+/// Utility class for building ANSI-escaped strings from styled content.
+/// This class provides methods to convert TamboUI styles to ANSI escape sequences
+/// that can be used for direct terminal output without requiring the full TUI system.
+///
+///
+///
+/// Example usage:
+/// ```java
+/// Style style = Style.create().fg(Color.GREEN).bold();
+/// String ansi = AnsiStringBuilder.styleToAnsi(style);
+/// System.out.print(ansi + "Hello, World!" + AnsiStringBuilder.RESET);
+/// }
+/// ```
 public final class AnsiStringBuilder {
 
-    /**
-     * The escape character.
-     */
+    /// The escape character.
     private static final String ESC = "\u001b";
 
-    /**
-     * Control Sequence Introducer (CSI) prefix for ANSI escape codes.
-     */
+    /// Control Sequence Introducer (CSI) prefix for ANSI escape codes.
     private static final String CSI = ESC + "[";
 
-    /**
-     * ANSI reset sequence that clears all formatting.
-     */
+    /// ANSI reset sequence that clears all formatting.
     public static final String RESET = CSI + "0m";
 
     private AnsiStringBuilder() {
         // Utility class
     }
 
-    /**
-     * Converts a {@link Style} to an ANSI SGR (Select Graphic Rendition) escape sequence.
-     * The returned string includes the complete escape sequence including the reset prefix
-     * and the 'm' terminator.
-     *
-     * @param style the style to convert
-     * @return an ANSI escape sequence representing the style
-     */
+    /// Converts a {@link Style} to an ANSI SGR (Select Graphic Rendition) escape sequence.
+    /// The returned string includes the complete escape sequence including the reset prefix
+    /// and the 'm' terminator.
+    ///
+    /// @param style the style to convert
+    /// @return an ANSI escape sequence representing the style
     public static String styleToAnsi(Style style) {
         StringBuilder sb = new StringBuilder();
         sb.append(CSI).append("0");  // Reset first
@@ -87,12 +80,10 @@ public final class AnsiStringBuilder {
         return sb.toString();
     }
 
-    /**
-     * Converts a {@link Color} to an ANSI foreground color code.
-     *
-     * @param color the color to convert
-     * @return the ANSI code string (without CSI prefix or 'm' suffix)
-     */
+    /// Converts a {@link Color} to an ANSI foreground color code.
+    ///
+    /// @param color the color to convert
+    /// @return the ANSI code string (without CSI prefix or 'm' suffix)
     public static String colorToAnsiForeground(Color color) {
         if (color instanceof Color.Reset) {
             return "39";
@@ -109,12 +100,10 @@ public final class AnsiStringBuilder {
         return "";
     }
 
-    /**
-     * Converts a {@link Color} to an ANSI background color code.
-     *
-     * @param color the color to convert
-     * @return the ANSI code string (without CSI prefix or 'm' suffix)
-     */
+    /// Converts a {@link Color} to an ANSI background color code.
+    ///
+    /// @param color the color to convert
+    /// @return the ANSI code string (without CSI prefix or 'm' suffix)
     public static String colorToAnsiBackground(Color color) {
         if (color instanceof Color.Reset) {
             return "49";
@@ -131,14 +120,12 @@ public final class AnsiStringBuilder {
         return "";
     }
 
-    /**
-     * Converts a {@link Color} to an ANSI underline color code.
-     * Note that underline colors are only supported by some terminal emulators.
-     *
-     * @param color the color to convert
-     * @return the ANSI code string (without CSI prefix or 'm' suffix),
-     *         or empty string if the color type doesn't support underline coloring
-     */
+    /// Converts a {@link Color} to an ANSI underline color code.
+    /// Note that underline colors are only supported by some terminal emulators.
+    ///
+    /// @param color the color to convert
+    /// @return the ANSI code string (without CSI prefix or 'm' suffix),
+    /// or empty string if the color type doesn't support underline coloring
     public static String underlineColorToAnsi(Color color) {
         if (color instanceof Color.Indexed) {
             int idx = ((Color.Indexed) color).index();
@@ -150,15 +137,15 @@ public final class AnsiStringBuilder {
         return "";
     }
 
-    /**
-     * Generates an OSC8 hyperlink escape sequence to start a hyperlink.
-     * <p>
-     * OSC8 format: {@code \033]8;id=<id>;<url>\033\\}
-     * If no ID is provided, the format is: {@code \033]8;;<url>\033\\}
-     *
-     * @param hyperlink the hyperlink to generate a sequence for
-     * @return the OSC8 escape sequence to start the hyperlink
-     */
+    /// Generates an OSC8 hyperlink escape sequence to start a hyperlink.
+    ///
+    ///
+    ///
+    /// OSC8 format: {@code \033]8;id=<id>;<url>\033\\}
+    /// If no ID is provided, the format is: {@code \033]8;;<url>\033\\}
+    ///
+    /// @param hyperlink the hyperlink to generate a sequence for
+    /// @return the OSC8 escape sequence to start the hyperlink
     public static String hyperlinkStart(Hyperlink hyperlink) {
         StringBuilder sb = new StringBuilder();
         sb.append(ESC).append("]8;");
@@ -171,27 +158,28 @@ public final class AnsiStringBuilder {
         return sb.toString();
     }
 
-    /**
-     * Generates an OSC8 escape sequence to end a hyperlink.
-     * <p>
-     * Format: {@code \033]8;;\033\\}
-     *
-     * @return the OSC8 escape sequence to end the hyperlink
-     */
+    /// Generates an OSC8 escape sequence to end a hyperlink.
+    ///
+    ///
+    ///
+    /// Format: {@code \033]8;;\033\\}
+    ///
+    /// @return the OSC8 escape sequence to end the hyperlink
     public static String hyperlinkEnd() {
         return ESC + "]8;;" + ESC + "\\";
     }
 
-    /**
-     * Escapes special characters in OSC parameter values.
-     * <p>
-     * According to the OSC8 specification, semicolons and backslashes need to be escaped.
-     *
-     * @param param the parameter value to escape
-     * @return the escaped parameter value
-     */
+    /// Escapes special characters in OSC parameter values.
+    ///
+    ///
+    ///
+    /// According to the OSC8 specification, semicolons and backslashes need to be escaped.
+    ///
+    /// @param param the parameter value to escape
+    /// @return the escaped parameter value
     private static String escapeOscParam(String param) {
         // Escape backslashes and semicolons
         return param.replace("\\", "\\\\").replace(";", "\\;");
     }
 }
+

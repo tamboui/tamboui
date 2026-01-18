@@ -69,3 +69,4 @@ class CellTest {
         assertThat(cell.style()).isEqualTo(Style.EMPTY);
     }
 }
+

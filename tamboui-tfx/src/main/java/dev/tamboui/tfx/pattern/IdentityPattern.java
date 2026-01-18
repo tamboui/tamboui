@@ -7,11 +7,11 @@ package dev.tamboui.tfx.pattern;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 
-/**
- * Identity pattern that returns the global alpha unchanged.
- * <p>
- * This is the default pattern - it allows effects to work without spatial patterns.
- */
+/// Identity pattern that returns the global alpha unchanged.
+///
+///
+///
+/// This is the default pattern - it allows effects to work without spatial patterns.
 public final class IdentityPattern implements Pattern {
     
     public static final IdentityPattern INSTANCE = new IdentityPattern();
@@ -34,5 +34,6 @@ public final class IdentityPattern implements Pattern {
         return "identity";
     }
 }
+
 
 

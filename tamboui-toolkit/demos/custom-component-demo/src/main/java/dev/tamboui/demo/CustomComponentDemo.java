@@ -31,17 +31,16 @@ import java.util.List;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo showcasing live CSS editing with custom components.
- * <p>
- * Features demonstrated:
- * <ul>
- *   <li>Live CSS editing in a text area</li>
- *   <li>Real-time CSS application to ProgressCard components</li>
- *   <li>CSS parse error display</li>
- *   <li>Custom ProgressCard component with @OnAction for keyboard control</li>
- * </ul>
- */
+/// Demo showcasing live CSS editing with custom components.
+///
+///
+///
+/// Features demonstrated:
+///
+/// - Live CSS editing in a text area
+/// - Real-time CSS application to ProgressCard components
+/// - CSS parse error display
+/// - Custom ProgressCard component with @OnAction for keyboard control
 public class CustomComponentDemo implements Element {
 
     private boolean showHelp = false;
@@ -390,3 +389,4 @@ public class CustomComponentDemo implements Element {
         return EventResult.UNHANDLED;
     }
 }
+

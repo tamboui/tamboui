@@ -7,9 +7,7 @@ package dev.tamboui.text;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
-/**
- * A string with a single style applied. The smallest styled text unit.
- */
+/// A string with a single style applied. The smallest styled text unit.
 public final class Span {
 
     private final String content;
@@ -36,26 +34,20 @@ public final class Span {
         return new Span(content, style);
     }
 
-    /**
-     * Creates a span from a masked string.
-     * The masked value will be used as the content.
-     */
+    /// Creates a span from a masked string.
+    /// The masked value will be used as the content.
     public static Span from(Masked masked) {
         return new Span(masked.value(), Style.EMPTY);
     }
 
-    /**
-     * Creates a styled span from a masked string.
-     * The masked value will be used as the content.
-     */
+    /// Creates a styled span from a masked string.
+    /// The masked value will be used as the content.
     public static Span styled(Masked masked, Style style) {
         return new Span(masked.value(), style);
     }
 
-    /**
-     * Returns the display width of this span (simplified - counts code points).
-     * For proper Unicode width handling, a library like ICU4J would be needed.
-     */
+    /// Returns the display width of this span (simplified - counts code points).
+    /// For proper Unicode width handling, a library like ICU4J would be needed.
     public int width() {
         return content.codePointCount(0, content.length());
     }
@@ -185,3 +177,4 @@ public final class Span {
         return String.format("Span[content=%s, style=%s]", content, style);
     }
 }
+

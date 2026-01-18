@@ -17,20 +17,21 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
-/**
- * An element that displays an error placeholder when another element fails to render.
- * <p>
- * Used by fault-tolerant rendering to show a visual indication that an element
- * encountered an error during rendering, while allowing the rest of the UI to continue.
- *
- * <pre>{@code
- * // Typically created automatically during fault-tolerant rendering
- * ErrorPlaceholder placeholder = ErrorPlaceholder.from(
- *     new RuntimeException("Widget failed"),
- *     "my-widget"
- * );
- * }</pre>
- */
+/// An element that displays an error placeholder when another element fails to render.
+///
+///
+///
+/// Used by fault-tolerant rendering to show a visual indication that an element
+/// encountered an error during rendering, while allowing the rest of the UI to continue.
+///
+/// ```java
+/// // Typically created automatically during fault-tolerant rendering
+/// ErrorPlaceholder placeholder = ErrorPlaceholder.from(
+///     new RuntimeException("Widget failed"),
+///     "my-widget"
+/// );
+/// }
+/// ```
 public final class ErrorPlaceholder implements Element {
 
     private final Throwable cause;
@@ -41,23 +42,19 @@ public final class ErrorPlaceholder implements Element {
         this.elementId = elementId;
     }
 
-    /**
-     * Creates an ErrorPlaceholder for the given exception.
-     *
-     * @param cause the exception that occurred
-     * @param elementId the ID of the element that failed, may be null
-     * @return a new ErrorPlaceholder
-     */
+    /// Creates an ErrorPlaceholder for the given exception.
+    ///
+    /// @param cause the exception that occurred
+    /// @param elementId the ID of the element that failed, may be null
+    /// @return a new ErrorPlaceholder
     public static ErrorPlaceholder from(Throwable cause, String elementId) {
         return new ErrorPlaceholder(cause, elementId);
     }
 
-    /**
-     * Creates an ErrorPlaceholder for the given exception.
-     *
-     * @param cause the exception that occurred
-     * @return a new ErrorPlaceholder
-     */
+    /// Creates an ErrorPlaceholder for the given exception.
+    ///
+    /// @param cause the exception that occurred
+    /// @return a new ErrorPlaceholder
     public static ErrorPlaceholder from(Throwable cause) {
         return from(cause, null);
     }
@@ -106,21 +103,18 @@ public final class ErrorPlaceholder implements Element {
         }
     }
 
-    /**
-     * Returns the exception that caused this placeholder.
-     *
-     * @return the cause
-     */
+    /// Returns the exception that caused this placeholder.
+    ///
+    /// @return the cause
     public Throwable cause() {
         return cause;
     }
 
-    /**
-     * Returns the ID of the element that failed, if available.
-     *
-     * @return the element ID, or null
-     */
+    /// Returns the ID of the element that failed, if available.
+    ///
+    /// @return the element ID, or null
     public String elementId() {
         return elementId;
     }
 }
+

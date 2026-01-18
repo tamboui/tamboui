@@ -18,9 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Multi-line styled text, composed of Lines.
- */
+/// Multi-line styled text, composed of Lines.
 public final class Text {
 
     private final List<Line> lines;
@@ -71,16 +69,12 @@ public final class Text {
         return new Text(linesList, null);
     }
 
-    /**
-     * Returns the height (number of lines).
-     */
+    /// Returns the height (number of lines).
     public int height() {
         return lines.size();
     }
 
-    /**
-     * Returns the maximum width of any line.
-     */
+    /// Returns the maximum width of any line.
     public int width() {
         return lines.stream()
             .mapToInt(Line::width)
@@ -108,9 +102,7 @@ public final class Text {
         return alignment(Alignment.RIGHT);
     }
 
-    /**
-     * Applies a style patch to all lines.
-     */
+    /// Applies a style patch to all lines.
     public Text patchStyle(Style style) {
         List<Line> newLines = lines.stream()
             .map(line -> line.patchStyle(style))
@@ -146,9 +138,7 @@ public final class Text {
         return patchStyle(Style.EMPTY.hyperlink(url, id));
     }
 
-    /**
-     * Returns the raw text content without styling.
-     */
+    /// Returns the raw text content without styling.
     public String rawContent() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < lines.size(); i++) {
@@ -160,27 +150,21 @@ public final class Text {
         return sb.toString();
     }
 
-    /**
-     * Appends another text's lines to this text.
-     */
+    /// Appends another text's lines to this text.
     public Text append(Text other) {
         List<Line> newLines = new ArrayList<>(lines);
         newLines.addAll(other.lines);
         return new Text(newLines, alignment);
     }
 
-    /**
-     * Appends a line to this text.
-     */
+    /// Appends a line to this text.
     public Text append(Line line) {
         List<Line> newLines = new ArrayList<>(lines);
         newLines.add(line);
         return new Text(newLines, alignment);
     }
 
-    /**
-     * Extends the last line with the given span, or adds a new line if empty.
-     */
+    /// Extends the last line with the given span, or adds a new line if empty.
     public Text push(Span span) {
         if (lines.isEmpty()) {
             return append(Line.from(span));
@@ -221,3 +205,4 @@ public final class Text {
         return String.format("Text[lines=%s, alignment=%s]", lines, alignment);
     }
 }
+

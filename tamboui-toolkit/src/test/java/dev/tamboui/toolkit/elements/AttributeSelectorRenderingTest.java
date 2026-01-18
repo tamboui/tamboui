@@ -17,12 +17,12 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests that CSS attribute selectors correctly affect rendering.
- * <p>
- * These tests verify end-to-end that attribute selectors like
- * {@code Panel[title="Test"]} match elements and apply styles.
- */
+/// Tests that CSS attribute selectors correctly affect rendering.
+///
+///
+///
+/// These tests verify end-to-end that attribute selectors like
+/// {@code Panel[title="Test"]} match elements and apply styles.
 class AttributeSelectorRenderingTest {
 
     private StyleEngine styleEngine;
@@ -271,3 +271,4 @@ class AttributeSelectorRenderingTest {
         assertThat(buffer.get(0, 0).style().fg()).isNotEqualTo(java.util.Optional.of(Color.RED));
     }
 }
+

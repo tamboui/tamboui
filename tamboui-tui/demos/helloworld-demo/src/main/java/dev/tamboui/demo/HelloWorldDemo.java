@@ -10,9 +10,7 @@ import dev.tamboui.terminal.Terminal;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.text.Text;
 
-/**
- * Minimal Hello World demo using immediate mode rendering.
- */
+/// Minimal Hello World demo using immediate mode rendering.
 public class HelloWorldDemo {
     public static void main(String[] args) throws Exception {
         try (Backend backend = BackendFactory.create()) {
@@ -55,4 +53,5 @@ public class HelloWorldDemo {
         frame.renderWidget(paragraph, frame.area());
     }
 }
+
 

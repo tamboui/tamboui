@@ -10,27 +10,27 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import org.assertj.core.api.AbstractAssert;
 
-/**
- * AssertJ custom assertion for {@link Buffer}.
- * <p>
- * Provides buffer-specific assertions with detailed diff output similar to ratatui.rs.
- */
+/// AssertJ custom assertion for {@link Buffer}.
+///
+///
+///
+/// Provides buffer-specific assertions with detailed diff output similar to ratatui.rs.
 public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
 
     public BufferAssert(Buffer actual) {
         super(actual, BufferAssert.class);
     }
 
-    /**
-     * Asserts that the actual buffer is equal to the expected buffer.
-     * <p>
-     * If the buffers differ, a detailed diff is shown in the error message,
-     * displaying both buffers side-by-side with their content formatted as strings.
-     *
-     * @param expected the expected buffer
-     * @return this assertion object
-     * @throws AssertionError if the buffers are not equal
-     */
+    /// Asserts that the actual buffer is equal to the expected buffer.
+    ///
+    ///
+    ///
+    /// If the buffers differ, a detailed diff is shown in the error message,
+    /// displaying both buffers side-by-side with their content formatted as strings.
+    ///
+    /// @param expected the expected buffer
+    /// @return this assertion object
+    /// @throws AssertionError if the buffers are not equal
     public BufferAssert isEqualTo(Buffer expected) {
         isNotNull();
 
@@ -47,13 +47,11 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the actual buffer is not equal to the expected buffer.
-     *
-     * @param expected the buffer that should not equal the actual buffer
-     * @return this assertion object
-     * @throws AssertionError if the buffers are equal
-     */
+    /// Asserts that the actual buffer is not equal to the expected buffer.
+    ///
+    /// @param expected the buffer that should not equal the actual buffer
+    /// @return this assertion object
+    /// @throws AssertionError if the buffers are equal
     public BufferAssert isNotEqualTo(Buffer expected) {
         isNotNull();
 
@@ -64,12 +62,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the buffer has the given area.
-     *
-     * @param expectedArea the expected area
-     * @return this assertion object
-     */
+    /// Asserts that the buffer has the given area.
+    ///
+    /// @param expectedArea the expected area
+    /// @return this assertion object
     public BufferAssert hasArea(dev.tamboui.layout.Rect expectedArea) {
         isNotNull();
 
@@ -80,12 +76,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the buffer has the given width.
-     *
-     * @param expectedWidth the expected width
-     * @return this assertion object
-     */
+    /// Asserts that the buffer has the given width.
+    ///
+    /// @param expectedWidth the expected width
+    /// @return this assertion object
     public BufferAssert hasWidth(int expectedWidth) {
         isNotNull();
 
@@ -96,12 +90,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the buffer has the given height.
-     *
-     * @param expectedHeight the expected height
-     * @return this assertion object
-     */
+    /// Asserts that the buffer has the given height.
+    ///
+    /// @param expectedHeight the expected height
+    /// @return this assertion object
     public BufferAssert hasHeight(int expectedHeight) {
         isNotNull();
 
@@ -112,14 +104,12 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the cell at the given position equals the expected cell.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param expectedCell the expected cell
-     * @return this assertion object
-     */
+    /// Asserts that the cell at the given position equals the expected cell.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @param expectedCell the expected cell
+    /// @return this assertion object
     public BufferAssert hasCellAt(int x, int y, Cell expectedCell) {
         isNotNull();
 
@@ -131,14 +121,12 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the symbol at the given position equals the expected symbol.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param expectedSymbol the expected symbol
-     * @return this assertion object
-     */
+    /// Asserts that the symbol at the given position equals the expected symbol.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @param expectedSymbol the expected symbol
+    /// @return this assertion object
     public BufferAssert hasSymbolAt(int x, int y, String expectedSymbol) {
         isNotNull();
 
@@ -151,14 +139,12 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the style at the given position equals the expected style.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param expectedStyle the expected style
-     * @return this assertion object
-     */
+    /// Asserts that the style at the given position equals the expected style.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @param expectedStyle the expected style
+    /// @return this assertion object
     public BufferAssert hasStyleAt(int x, int y, Style expectedStyle) {
         isNotNull();
 
@@ -171,14 +157,12 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the foreground color at the given position equals the expected color.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param expectedFg the expected foreground color
-     * @return this assertion object
-     */
+    /// Asserts that the foreground color at the given position equals the expected color.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @param expectedFg the expected foreground color
+    /// @return this assertion object
     public BufferAssert hasForegroundAt(int x, int y, Color expectedFg) {
         isNotNull();
 
@@ -192,14 +176,12 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Asserts that the background color at the given position equals the expected color.
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param expectedBg the expected background color
-     * @return this assertion object
-     */
+    /// Asserts that the background color at the given position equals the expected color.
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @param expectedBg the expected background color
+    /// @return this assertion object
     public BufferAssert hasBackgroundAt(int x, int y, Color expectedBg) {
         isNotNull();
 
@@ -213,28 +195,27 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return this;
     }
 
-    /**
-     * Returns a cell assertion for the cell at the given position.
-     * <p>
-     * Allows fluent assertions on a specific cell:
-     * <pre>{@code
-     * assertThat(buffer).at(2, 0)
-     *     .hasSymbol("|")
-     *     .hasBackground(Color.BLUE);
-     * }</pre>
-     *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @return a cell assertion object
-     */
+    /// Returns a cell assertion for the cell at the given position.
+    ///
+    ///
+    ///
+    /// Allows fluent assertions on a specific cell:
+    /// ```java
+    /// assertThat(buffer).at(2, 0)
+    ///     .hasSymbol("|")
+    ///     .hasBackground(Color.BLUE);
+    /// }
+    /// ```
+    ///
+    /// @param x the x coordinate
+    /// @param y the y coordinate
+    /// @return a cell assertion object
     public CellAssert at(int x, int y) {
         isNotNull();
         return new CellAssert(this, actual.get(x, y), x, y);
     }
 
-    /**
-     * Fluent assertion for a cell at a specific position.
-     */
+    /// Fluent assertion for a cell at a specific position.
     public static final class CellAssert {
         private final BufferAssert bufferAssert;
         private final Cell cell;
@@ -248,12 +229,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
             this.y = y;
         }
 
-        /**
-         * Asserts that the cell has the expected symbol.
-         *
-         * @param expectedSymbol the expected symbol
-         * @return this assertion object for chaining
-         */
+        /// Asserts that the cell has the expected symbol.
+        ///
+        /// @param expectedSymbol the expected symbol
+        /// @return this assertion object for chaining
         public CellAssert hasSymbol(String expectedSymbol) {
             String actualSymbol = cell.symbol();
             if (!actualSymbol.equals(expectedSymbol)) {
@@ -264,12 +243,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
             return this;
         }
 
-        /**
-         * Asserts that the cell has the expected style.
-         *
-         * @param expectedStyle the expected style
-         * @return this assertion object for chaining
-         */
+        /// Asserts that the cell has the expected style.
+        ///
+        /// @param expectedStyle the expected style
+        /// @return this assertion object for chaining
         public CellAssert hasStyle(Style expectedStyle) {
             Style actualStyle = cell.style();
             if (!actualStyle.equals(expectedStyle)) {
@@ -280,12 +257,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
             return this;
         }
 
-        /**
-         * Asserts that the cell has the expected foreground color.
-         *
-         * @param expectedFg the expected foreground color
-         * @return this assertion object for chaining
-         */
+        /// Asserts that the cell has the expected foreground color.
+        ///
+        /// @param expectedFg the expected foreground color
+        /// @return this assertion object for chaining
         public CellAssert hasForeground(Color expectedFg) {
             Color actualFg = cell.style().fg().orElse(null);
             if (expectedFg == null ? actualFg != null : !expectedFg.equals(actualFg)) {
@@ -296,12 +271,10 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
             return this;
         }
 
-        /**
-         * Asserts that the cell has the expected background color.
-         *
-         * @param expectedBg the expected background color
-         * @return this assertion object for chaining
-         */
+        /// Asserts that the cell has the expected background color.
+        ///
+        /// @param expectedBg the expected background color
+        /// @return this assertion object for chaining
         public CellAssert hasBackground(Color expectedBg) {
             Color actualBg = cell.style().bg().orElse(null);
             if (expectedBg == null ? actualBg != null : !expectedBg.equals(actualBg)) {
@@ -312,11 +285,9 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
             return this;
         }
 
-        /**
-         * Returns to the buffer assertion for further buffer-level assertions.
-         *
-         * @return the parent buffer assertion
-         */
+        /// Returns to the buffer assertion for further buffer-level assertions.
+        ///
+        /// @return the parent buffer assertion
         public BufferAssert and() {
             return bufferAssert;
         }
@@ -326,5 +297,6 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return BufferDiffFormatter.formatBuffer(buffer);
     }
 }
+
 
 

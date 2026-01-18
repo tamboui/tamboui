@@ -130,3 +130,4 @@ class KeyEventTest {
         assertThat(event.isCharIgnoreCase('a')).isFalse();
     }
 }
+

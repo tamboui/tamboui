@@ -48,23 +48,27 @@ class PropertyConverterTest {
         assertThat(result).isEqualTo("plain text");
     }
 
-    /**
-     * This test demonstrates deterministic behavior when variable values
-     * contain references to other variables.
-     * <p>
-     * Given:
-     * - variables: {accent: "bold $primary", primary: "blue"}
-     * - input: "style: $accent; color: $primary;"
-     * <p>
-     * The EXPECTED deterministic result should be: "style: bold $primary; color: blue;"
-     * (each $var in the INPUT is replaced with its value, but $primary inside accent's value
-     * should NOT be expanded - we're only resolving variables in the original input)
-     * <p>
-     * The old implementation iterated over the map and did sequential replacements,
-     * which would produce different results depending on HashMap iteration order.
-     * The new implementation extracts variable patterns from the input first,
-     * ensuring deterministic behavior.
-     */
+    /// This test demonstrates deterministic behavior when variable values
+    /// contain references to other variables.
+    ///
+    ///
+    ///
+    /// Given:
+    /// - variables: {accent: "bold $primary", primary: "blue"}
+    /// - input: "style: $accent; color: $primary;"
+    ///
+    ///
+    ///
+    /// The EXPECTED deterministic result should be: "style: bold $primary; color: blue;"
+    /// (each $var in the INPUT is replaced with its value, but $primary inside accent's value
+    /// should NOT be expanded - we're only resolving variables in the original input)
+    ///
+    ///
+    ///
+    /// The old implementation iterated over the map and did sequential replacements,
+    /// which would produce different results depending on HashMap iteration order.
+    /// The new implementation extracts variable patterns from the input first,
+    /// ensuring deterministic behavior.
     @Test
     void resolveVariables_shouldBeDeterministicWhenVariableValuesContainOtherVariables() {
         // Use LinkedHashMap to control iteration order
@@ -95,9 +99,7 @@ class PropertyConverterTest {
         assertThat(resultPA).isEqualTo(expected);
     }
 
-    /**
-     * Additional test showing the issue with a more realistic CSS scenario.
-     */
+    /// Additional test showing the issue with a more realistic CSS scenario.
     @Test
     void resolveVariables_cssVariableReferencingAnotherVariable() {
         // Simulate a theme where accent-color is derived from primary-color
@@ -120,3 +122,4 @@ class PropertyConverterTest {
                 .isEqualTo(result2);
     }
 }
+

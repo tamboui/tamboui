@@ -21,64 +21,63 @@ import static dev.tamboui.util.CollectionUtil.listCopyOf;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A bar chart widget for displaying grouped data.
- * <p>
- * Supports both vertical (default) and horizontal bar orientations,
- * with customizable bar widths, gaps, and styling.
- *
- * <pre>{@code
- * // Simple bar chart with values
- * BarChart chart = BarChart.builder()
- *     .data(BarGroup.of(10, 20, 30, 40))
- *     .build();
- *
- * // Grouped bar chart with labels
- * BarChart chart2 = BarChart.builder()
- *     .data(
- *         BarGroup.of("Q1", Bar.of(100, "Jan"), Bar.of(150, "Feb")),
- *         BarGroup.of("Q2", Bar.of(120, "Mar"), Bar.of(180, "Apr"))
- *     )
- *     .barWidth(3)
- *     .barGap(1)
- *     .groupGap(2)
- *     .barStyle(Style.EMPTY.fg(Color.CYAN))
- *     .block(Block.bordered().title(Title.from("Sales")))
- *     .build();
- * }</pre>
- *
- * @see Bar
- * @see BarGroup
- */
+/// A bar chart widget for displaying grouped data.
+///
+///
+///
+/// Supports both vertical (default) and horizontal bar orientations,
+/// with customizable bar widths, gaps, and styling.
+///
+/// ```java
+/// // Simple bar chart with values
+/// BarChart chart = BarChart.builder()
+///     .data(BarGroup.of(10, 20, 30, 40))
+///     .build();
+///
+/// // Grouped bar chart with labels
+/// BarChart chart2 = BarChart.builder()
+///     .data(
+///         BarGroup.of("Q1", Bar.of(100, "Jan"), Bar.of(150, "Feb")),
+///         BarGroup.of("Q2", Bar.of(120, "Mar"), Bar.of(180, "Apr"))
+///     )
+///     .barWidth(3)
+///     .barGap(1)
+///     .groupGap(2)
+///     .barStyle(Style.EMPTY.fg(Color.CYAN))
+///     .block(Block.bordered().title(Title.from("Sales")))
+///     .build();
+/// }
+/// ```
+///
+/// @see Bar
+/// @see BarGroup
 public final class BarChart implements Widget {
 
-    /**
-     * Property key for the default bar color.
-     * <p>
-     * CSS property name: {@code bar-color}
-     */
+    /// Property key for the default bar color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code bar-color}
     public static final PropertyKey<Color> BAR_COLOR =
             PropertyKey.of("bar-color", ColorConverter.INSTANCE);
 
-    /**
-     * Property key for the value label color.
-     * <p>
-     * CSS property name: {@code value-color}
-     */
+    /// Property key for the value label color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code value-color}
     public static final PropertyKey<Color> VALUE_COLOR =
             PropertyKey.of("value-color", ColorConverter.INSTANCE);
 
-    /**
-     * Property key for the bar label color.
-     * <p>
-     * CSS property name: {@code label-color}
-     */
+    /// Property key for the bar label color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code label-color}
     public static final PropertyKey<Color> LABEL_COLOR =
             PropertyKey.of("label-color", ColorConverter.INSTANCE);
 
-    /**
-     * Symbol set for rendering bar fills.
-     */
+    /// Symbol set for rendering bar fills.
     public static final class BarSet {
         private final String empty;
         private final String oneEighth;
@@ -112,30 +111,22 @@ public final class BarChart implements Widget {
             this.full = full;
         }
 
-        /**
-         * Nine-level vertical bar set.
-         */
+        /// Nine-level vertical bar set.
         public static final BarSet NINE_LEVELS = new BarSet(
             " ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"
         );
 
-        /**
-         * Three-level vertical bar set.
-         */
+        /// Three-level vertical bar set.
         public static final BarSet THREE_LEVELS = new BarSet(
             " ", "▄", "▄", "▄", "▄", "█", "█", "█", "█"
         );
 
-        /**
-         * Horizontal bar set (left to right).
-         */
+        /// Horizontal bar set (left to right).
         public static final BarSet HORIZONTAL = new BarSet(
             " ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"
         );
 
-        /**
-         * Returns the symbols as an array for indexed access.
-         */
+        /// Returns the symbols as an array for indexed access.
         public String[] symbols() {
             return new String[] {
                 empty, oneEighth, oneQuarter, threeEighths,
@@ -283,9 +274,7 @@ public final class BarChart implements Widget {
         this.labelStyle = baseLabelStyle;
     }
 
-    /**
-     * Creates a new bar chart builder.
-     */
+    /// Creates a new bar chart builder.
     public static Builder builder() {
         return new Builder();
     }
@@ -516,9 +505,7 @@ public final class BarChart implements Widget {
         return str.substring(0, maxLen);
     }
 
-    /**
-     * Builder for {@link BarChart}.
-     */
+    /// Builder for {@link BarChart}.
     public static final class Builder {
         private final List<BarGroup> data = new ArrayList<>();
         private Long max;
@@ -546,9 +533,7 @@ public final class BarChart implements Widget {
 
         private Builder() {}
 
-        /**
-         * Adds bar groups to the chart.
-         */
+        /// Adds bar groups to the chart.
         public Builder data(BarGroup... groups) {
             if (groups != null) {
                 this.data.addAll(listCopyOf(groups));
@@ -556,9 +541,7 @@ public final class BarChart implements Widget {
             return this;
         }
 
-        /**
-         * Adds bar groups to the chart.
-         */
+        /// Adds bar groups to the chart.
         public Builder data(List<BarGroup> groups) {
             if (groups != null) {
                 this.data.addAll(groups);
@@ -566,9 +549,7 @@ public final class BarChart implements Widget {
             return this;
         }
 
-        /**
-         * Adds a single bar group.
-         */
+        /// Adds a single bar group.
         public Builder addGroup(BarGroup group) {
             if (group != null) {
                 this.data.add(group);
@@ -576,174 +557,149 @@ public final class BarChart implements Widget {
             return this;
         }
 
-        /**
-         * Sets the maximum value for scaling.
-         */
+        /// Sets the maximum value for scaling.
         public Builder max(long max) {
             this.max = max;
             return this;
         }
 
-        /**
-         * Clears the explicit max, using data maximum instead.
-         */
+        /// Clears the explicit max, using data maximum instead.
         public Builder autoMax() {
             this.max = null;
             return this;
         }
 
-        /**
-         * Sets the bar width (default: 1).
-         */
+        /// Sets the bar width (default: 1).
         public Builder barWidth(int barWidth) {
             this.barWidth = Math.max(1, barWidth);
             return this;
         }
 
-        /**
-         * Sets the gap between bars in a group (default: 1).
-         */
+        /// Sets the gap between bars in a group (default: 1).
         public Builder barGap(int barGap) {
             this.barGap = Math.max(0, barGap);
             return this;
         }
 
-        /**
-         * Sets the gap between groups (default: 1).
-         */
+        /// Sets the gap between groups (default: 1).
         public Builder groupGap(int groupGap) {
             this.groupGap = Math.max(0, groupGap);
             return this;
         }
 
-        /**
-         * Sets the chart direction (default: VERTICAL).
-         */
+        /// Sets the chart direction (default: VERTICAL).
         public Builder direction(Direction direction) {
             this.direction = direction != null ? direction : Direction.VERTICAL;
             return this;
         }
 
-        /**
-         * Sets the overall chart style.
-         */
+        /// Sets the overall chart style.
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
-        /**
-         * Sets the default bar style.
-         */
+        /// Sets the default bar style.
         public Builder barStyle(Style barStyle) {
             this.barStyle = barStyle;
             return this;
         }
 
-        /**
-         * Sets the value display style.
-         */
+        /// Sets the value display style.
         public Builder valueStyle(Style valueStyle) {
             this.valueStyle = valueStyle;
             return this;
         }
 
-        /**
-         * Sets the label style.
-         */
+        /// Sets the label style.
         public Builder labelStyle(Style labelStyle) {
             this.labelStyle = labelStyle;
             return this;
         }
 
-        /**
-         * Wraps the chart in a block.
-         */
+        /// Wraps the chart in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the bar symbol set.
-         */
+        /// Sets the bar symbol set.
         public Builder barSet(BarSet barSet) {
             this.barSet = barSet != null ? barSet : BarSet.NINE_LEVELS;
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code background}, {@code bar-color},
-         * {@code value-color}, and {@code label-color} will be resolved
-         * if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code background}, {@code bar-color},
+        /// {@code value-color}, and {@code label-color} will be resolved
+        /// if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the background color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the default bar color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the bar color
-         * @return this builder
-         */
+        /// Sets the default bar color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the bar color
+        /// @return this builder
         public Builder barColor(Color color) {
             this.barColor.set(color);
             return this;
         }
 
-        /**
-         * Sets the value label color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the value color
-         * @return this builder
-         */
+        /// Sets the value label color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the value color
+        /// @return this builder
         public Builder valueColor(Color color) {
             this.valueColor.set(color);
             return this;
         }
 
-        /**
-         * Sets the bar label color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the label color
-         * @return this builder
-         */
+        /// Sets the bar label color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the label color
+        /// @return this builder
         public Builder labelColor(Color color) {
             this.labelColor.set(color);
             return this;
         }
 
-        /**
-         * Builds the bar chart.
-         */
+        /// Builds the bar chart.
         public BarChart build() {
             return new BarChart(this);
         }
     }
 }
+

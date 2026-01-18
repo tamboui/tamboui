@@ -1,9 +1,9 @@
-/**
- * Fluent DSL for building TUI applications with TamboUI.
- * <p>
- * This module provides a declarative, retained-mode API for building
- * terminal user interfaces with focus management and event routing.
- */
+/// Fluent DSL for building TUI applications with TamboUI.
+///
+///
+///
+/// This module provides a declarative, retained-mode API for building
+/// terminal user interfaces with focus management and event routing.
 module dev.tamboui.toolkit {
     requires transitive dev.tamboui.core;
     requires transitive dev.tamboui.widgets;
@@ -18,3 +18,4 @@ module dev.tamboui.toolkit {
     exports dev.tamboui.toolkit.event;
     exports dev.tamboui.toolkit.focus;
 }
+

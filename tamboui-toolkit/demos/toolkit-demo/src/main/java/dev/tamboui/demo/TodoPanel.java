@@ -15,9 +15,7 @@ import java.util.List;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A panel with a TODO list and input field.
- */
+/// A panel with a TODO list and input field.
 final class TodoPanel extends PanelContent {
     private final List<String> items = new ArrayList<>();
     private final StringBuilder inputBuffer = new StringBuilder();
@@ -179,3 +177,4 @@ final class TodoPanel extends PanelContent {
         return EventResult.UNHANDLED;
     }
 }
+

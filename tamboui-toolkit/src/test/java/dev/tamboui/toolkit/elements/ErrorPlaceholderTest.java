@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for ErrorPlaceholder element.
- */
+/// Tests for ErrorPlaceholder element.
 class ErrorPlaceholderTest {
 
     @Test
@@ -102,3 +100,4 @@ class ErrorPlaceholderTest {
         assertThat(placeholder.id()).isNull();
     }
 }
+

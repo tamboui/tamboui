@@ -58,3 +58,4 @@ class IntegerConverterTest {
         assertThat(converter.convert("10px", Collections.emptyMap())).isEmpty();
     }
 }
+

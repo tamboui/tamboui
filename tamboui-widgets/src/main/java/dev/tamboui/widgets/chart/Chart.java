@@ -17,40 +17,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * A chart widget for plotting datasets in a cartesian coordinate system.
- * <p>
- * Supports scatter plots, line charts, and bar charts with configurable
- * axes, legends, and styling.
- *
- * <pre>{@code
- * Chart chart = Chart.builder()
- *     .datasets(
- *         Dataset.builder()
- *             .name("Series 1")
- *             .data(new double[][] {{0, 1}, {1, 3}, {2, 2}, {3, 4}})
- *             .graphType(GraphType.LINE)
- *             .style(Style.EMPTY.fg(Color.CYAN))
- *             .build()
- *     )
- *     .xAxis(Axis.builder()
- *         .title("X")
- *         .bounds(0, 4)
- *         .labels("0", "1", "2", "3", "4")
- *         .build())
- *     .yAxis(Axis.builder()
- *         .title("Y")
- *         .bounds(0, 5)
- *         .labels("0", "1", "2", "3", "4", "5")
- *         .build())
- *     .block(Block.bordered().title(Title.from("My Chart")))
- *     .build();
- * }</pre>
- *
- * @see Dataset
- * @see Axis
- * @see GraphType
- */
+/// A chart widget for plotting datasets in a cartesian coordinate system.
+///
+///
+///
+/// Supports scatter plots, line charts, and bar charts with configurable
+/// axes, legends, and styling.
+///
+/// ```java
+/// Chart chart = Chart.builder()
+///     .datasets(
+///         Dataset.builder()
+///             .name("Series 1")
+///             .data(new double[][] {{0, 1}, {1, 3}, {2, 2}, {3, 4}})
+///             .graphType(GraphType.LINE)
+///             .style(Style.EMPTY.fg(Color.CYAN))
+///             .build()
+///     )
+///     .xAxis(Axis.builder()
+///         .title("X")
+///         .bounds(0, 4)
+///         .labels("0", "1", "2", "3", "4")
+///         .build())
+///     .yAxis(Axis.builder()
+///         .title("Y")
+///         .bounds(0, 5)
+///         .labels("0", "1", "2", "3", "4", "5")
+///         .build())
+///     .block(Block.bordered().title(Title.from("My Chart")))
+///     .build();
+/// }
+/// ```
+///
+/// @see Dataset
+/// @see Axis
+/// @see GraphType
 public final class Chart implements Widget {
 
     private final List<Dataset> datasets;
@@ -69,16 +70,12 @@ public final class Chart implements Widget {
         this.legendPosition = builder.legendPosition;
     }
 
-    /**
-     * Creates a new chart builder.
-     */
+    /// Creates a new chart builder.
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Creates a chart with the given datasets.
-     */
+    /// Creates a chart with the given datasets.
     public static Chart of(Dataset... datasets) {
         return builder().datasets(datasets).build();
     }
@@ -439,9 +436,7 @@ public final class Chart implements Widget {
             .orElse(0) + 1;
     }
 
-    /**
-     * Builder for {@link Chart}.
-     */
+    /// Builder for {@link Chart}.
     public static final class Builder {
         private final List<Dataset> datasets = new ArrayList<>();
         private Axis xAxis = Axis.defaults();
@@ -452,9 +447,7 @@ public final class Chart implements Widget {
 
         private Builder() {}
 
-        /**
-         * Sets the datasets to plot.
-         */
+        /// Sets the datasets to plot.
         public Builder datasets(Dataset... datasets) {
             this.datasets.clear();
             if (datasets != null) {
@@ -463,9 +456,7 @@ public final class Chart implements Widget {
             return this;
         }
 
-        /**
-         * Sets the datasets to plot.
-         */
+        /// Sets the datasets to plot.
         public Builder datasets(List<Dataset> datasets) {
             this.datasets.clear();
             if (datasets != null) {
@@ -474,9 +465,7 @@ public final class Chart implements Widget {
             return this;
         }
 
-        /**
-         * Adds a dataset.
-         */
+        /// Adds a dataset.
         public Builder addDataset(Dataset dataset) {
             if (dataset != null) {
                 this.datasets.add(dataset);
@@ -484,59 +473,46 @@ public final class Chart implements Widget {
             return this;
         }
 
-        /**
-         * Sets the X-axis configuration.
-         */
+        /// Sets the X-axis configuration.
         public Builder xAxis(Axis xAxis) {
             this.xAxis = xAxis != null ? xAxis : Axis.defaults();
             return this;
         }
 
-        /**
-         * Sets the Y-axis configuration.
-         */
+        /// Sets the Y-axis configuration.
         public Builder yAxis(Axis yAxis) {
             this.yAxis = yAxis != null ? yAxis : Axis.defaults();
             return this;
         }
 
-        /**
-         * Wraps the chart in a block.
-         */
+        /// Wraps the chart in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the chart style.
-         */
+        /// Sets the chart style.
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
-        /**
-         * Sets the legend position.
-         */
+        /// Sets the legend position.
         public Builder legendPosition(LegendPosition position) {
             this.legendPosition = position;
             return this;
         }
 
-        /**
-         * Hides the legend.
-         */
+        /// Hides the legend.
         public Builder hideLegend() {
             this.legendPosition = null;
             return this;
         }
 
-        /**
-         * Builds the chart.
-         */
+        /// Builds the chart.
         public Chart build() {
             return new Chart(this);
         }
     }
 }
+

@@ -45,3 +45,4 @@ class TickEventTest {
         assertThat(TickEvent.of(1, Duration.ofNanos(100)).elapsed()).isEqualTo(Duration.ofNanos(100));
     }
 }
+

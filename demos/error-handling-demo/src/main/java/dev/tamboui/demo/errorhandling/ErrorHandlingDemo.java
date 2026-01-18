@@ -20,13 +20,13 @@ import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo application showcasing TamboUI's error handling features.
- * <p>
- * This demo demonstrates fault-tolerant rendering where individual
- * widgets that fail to render are replaced with error placeholders
- * while the rest of the UI continues to work normally.
- */
+/// Demo application showcasing TamboUI's error handling features.
+///
+///
+///
+/// This demo demonstrates fault-tolerant rendering where individual
+/// widgets that fail to render are replaced with error placeholders
+/// while the rest of the UI continues to work normally.
 public class ErrorHandlingDemo {
 
     private static boolean faultyPanelEnabled = false;
@@ -104,9 +104,7 @@ public class ErrorHandlingDemo {
         return EventResult.UNHANDLED;
     }
 
-    /**
-     * Creates a panel that throws an exception during rendering.
-     */
+    /// Creates a panel that throws an exception during rendering.
     private static Element faultyPanel() {
         return new Element() {
             @Override
@@ -123,3 +121,4 @@ public class ErrorHandlingDemo {
         };
     }
 }
+

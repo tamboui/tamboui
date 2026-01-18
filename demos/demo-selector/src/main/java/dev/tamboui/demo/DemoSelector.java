@@ -32,9 +32,7 @@ import java.util.TreeMap;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Interactive TUI demo selector with collapsible module groups.
- */
+/// Interactive TUI demo selector with collapsible module groups.
 public class DemoSelector extends ToolkitApp {
 
     private static final String SELF_NAME = "demo-selector";
@@ -80,9 +78,7 @@ public class DemoSelector extends ToolkitApp {
         }
     }
 
-    /**
-     * Rebuilds the display list based on current filter and expanded state.
-     */
+    /// Rebuilds the display list based on current filter and expanded state.
     private void rebuildDisplayList() {
         displayItems.clear();
         var lowerFilter = filter.toLowerCase(Locale.ROOT);
@@ -117,9 +113,7 @@ public class DemoSelector extends ToolkitApp {
         }
     }
 
-    /**
-     * Returns the currently selected item.
-     */
+    /// Returns the currently selected item.
     private DisplayItem selectedItem() {
         var idx = demoList.selected();
         if (idx >= 0 && idx < displayItems.size()) {
@@ -128,9 +122,7 @@ public class DemoSelector extends ToolkitApp {
         return null;
     }
 
-    /**
-     * Returns the total demo count across all groups.
-     */
+    /// Returns the total demo count across all groups.
     private int totalDemoCount() {
         return demosByModule.values().stream().mapToInt(List::size).sum();
     }
@@ -321,9 +313,7 @@ public class DemoSelector extends ToolkitApp {
         return EventResult.UNHANDLED;
     }
 
-    /**
-     * Toggles the expanded state of a module.
-     */
+    /// Toggles the expanded state of a module.
     private void toggleModule(String module) {
         if (expandedModules.contains(module)) {
             expandedModules.remove(module);
@@ -419,9 +409,7 @@ public class DemoSelector extends ToolkitApp {
     private record DemoInfo(String name, String displayName, String description, String module, Set<String> tags) {
     }
 
-    /**
-     * Represents an item in the display list (either a module header or a demo).
-     */
+    /// Represents an item in the display list (either a module header or a demo).
     private record DisplayItem(String module, DemoInfo demo, boolean expanded, int demoCount) {
 
         String toDisplayString() {
@@ -436,3 +424,4 @@ public class DemoSelector extends ToolkitApp {
         }
     }
 }
+

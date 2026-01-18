@@ -23,31 +23,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A horizontal set of tabs with a single tab selected.
- * <p>
- * Each tab title is stored as a {@link Line} and can be individually styled.
- * The selected tab is highlighted using the highlight style.
- *
- * <pre>{@code
- * Tabs tabs = Tabs.builder()
- *     .titles("Home", "Settings", "About")
- *     .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
- *     .divider(" | ")
- *     .block(Block.bordered())
- *     .build();
- *
- * TabsState state = new TabsState(0); // Select first tab
- * frame.renderStatefulWidget(tabs, area, state);
- * }</pre>
- */
+/// A horizontal set of tabs with a single tab selected.
+///
+///
+///
+/// Each tab title is stored as a {@link Line} and can be individually styled.
+/// The selected tab is highlighted using the highlight style.
+///
+/// ```java
+/// Tabs tabs = Tabs.builder()
+///     .titles("Home", "Settings", "About")
+///     .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
+///     .divider(" | ")
+///     .block(Block.bordered())
+///     .build();
+///
+/// TabsState state = new TabsState(0); // Select first tab
+/// frame.renderStatefulWidget(tabs, area, state);
+/// }
+/// ```
 public final class Tabs implements StatefulWidget<TabsState> {
 
-    /**
-     * Property key for the selected tab highlight color.
-     * <p>
-     * CSS property name: {@code highlight-color}
-     */
+    /// Property key for the selected tab highlight color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code highlight-color}
     public static final PropertyKey<Color> HIGHLIGHT_COLOR =
             PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
 
@@ -87,30 +88,22 @@ public final class Tabs implements StatefulWidget<TabsState> {
         return new Builder();
     }
 
-    /**
-     * Creates tabs from string titles.
-     */
+    /// Creates tabs from string titles.
     public static Tabs from(String... titles) {
         return builder().titles(titles).build();
     }
 
-    /**
-     * Creates tabs from line titles.
-     */
+    /// Creates tabs from line titles.
     public static Tabs from(Line... titles) {
         return builder().titles(titles).build();
     }
 
-    /**
-     * Returns the number of tabs.
-     */
+    /// Returns the number of tabs.
     public int size() {
         return titles.size();
     }
 
-    /**
-     * Returns the tab titles.
-     */
+    /// Returns the tab titles.
     public List<Line> titles() {
         return titles;
     }
@@ -211,9 +204,7 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         private Builder() {}
 
-        /**
-         * Sets the tab titles from strings.
-         */
+        /// Sets the tab titles from strings.
         public Builder titles(String... titles) {
             this.titles = new ArrayList<>();
             for (String title : titles) {
@@ -222,138 +213,114 @@ public final class Tabs implements StatefulWidget<TabsState> {
             return this;
         }
 
-        /**
-         * Sets the tab titles from lines.
-         */
+        /// Sets the tab titles from lines.
         public Builder titles(Line... titles) {
             this.titles = new ArrayList<>(Arrays.asList(titles));
             return this;
         }
 
-        /**
-         * Sets the tab titles from a list.
-         */
+        /// Sets the tab titles from a list.
         public Builder titles(List<Line> titles) {
             this.titles = new ArrayList<>(titles);
             return this;
         }
 
-        /**
-         * Adds a tab title.
-         */
+        /// Adds a tab title.
         public Builder addTitle(String title) {
             this.titles.add(Line.from(title));
             return this;
         }
 
-        /**
-         * Adds a tab title.
-         */
+        /// Adds a tab title.
         public Builder addTitle(Line title) {
             this.titles.add(title);
             return this;
         }
 
-        /**
-         * Wraps the tabs in a block.
-         */
+        /// Wraps the tabs in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the base style for unselected tabs.
-         */
+        /// Sets the base style for unselected tabs.
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
-        /**
-         * Sets the style for the selected tab.
-         */
+        /// Sets the style for the selected tab.
         public Builder highlightStyle(Style style) {
             this.highlightStyle = style;
             return this;
         }
 
-        /**
-         * Sets the divider between tabs.
-         */
+        /// Sets the divider between tabs.
         public Builder divider(String divider) {
             this.divider = Span.raw(divider);
             return this;
         }
 
-        /**
-         * Sets the divider between tabs.
-         */
+        /// Sets the divider between tabs.
         public Builder divider(Span divider) {
             this.divider = divider;
             return this;
         }
 
-        /**
-         * Sets the padding on both sides of each tab title.
-         */
+        /// Sets the padding on both sides of each tab title.
         public Builder padding(String left, String right) {
             this.paddingLeft = left;
             this.paddingRight = right;
             return this;
         }
 
-        /**
-         * Sets the left padding for each tab title.
-         */
+        /// Sets the left padding for each tab title.
         public Builder paddingLeft(String padding) {
             this.paddingLeft = padding;
             return this;
         }
 
-        /**
-         * Sets the right padding for each tab title.
-         */
+        /// Sets the right padding for each tab title.
         public Builder paddingRight(String padding) {
             this.paddingRight = padding;
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code background} and {@code highlight-color}
-         * will be resolved if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code background} and {@code highlight-color}
+        /// will be resolved if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the background color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the selected tab highlight color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the highlight color
-         * @return this builder
-         */
+        /// Sets the selected tab highlight color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the highlight color
+        /// @return this builder
         public Builder highlightColor(Color color) {
             this.highlightColor.set(color);
             return this;
@@ -364,3 +331,4 @@ public final class Tabs implements StatefulWidget<TabsState> {
         }
     }
 }
+

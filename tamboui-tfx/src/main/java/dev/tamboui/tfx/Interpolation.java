@@ -4,139 +4,149 @@
  */
 package dev.tamboui.tfx;
 
-/**
- * Easing functions (interpolation curves) for smooth animations.
- * <p>
- * Interpolation transforms linear progress (0.0 to 1.0) into smooth animation curves.
- * Different interpolation types produce different visual effects, from linear motion
- * to bouncy, elastic, or overshooting animations.
- * <p>
- * <b>Design Philosophy:</b>
- * <p>
- * Interpolation functions separate timing concerns from rendering logic. Effects use
- * the interpolated alpha value to drive their visual transformations, allowing the
- * same effect to produce different feels with different interpolation types.
- * <p>
- * <b>Interpolation Categories:</b>
- * <ul>
- *   <li><b>Linear:</b> Constant speed (no easing)</li>
- *   <li><b>Polynomial:</b> Quad, Cubic, Quart, Quint - progressively stronger acceleration</li>
- *   <li><b>Trigonometric:</b> Sine, Circ - smooth sinusoidal curves</li>
- *   <li><b>Exponential:</b> Expo - rapid acceleration/deceleration</li>
- *   <li><b>Elastic:</b> Elastic - bouncy elastic effect</li>
- *   <li><b>Bounce:</b> Bounce - bouncing effect</li>
- *   <li><b>Back:</b> Back - overshoot effect</li>
- * </ul>
- * <p>
- * <b>Easing Variants:</b>
- * <ul>
- *   <li><b>In:</b> Ease-in (slow start, fast end)</li>
- *   <li><b>Out:</b> Ease-out (fast start, slow end)</li>
- *   <li><b>InOut:</b> Ease-in-out (slow start and end, fast middle)</li>
- * </ul>
- * <p>
- * <b>Usage Pattern:</b>
- * <pre>{@code
- * // Smooth ease-in-out (most common)
- * Effect smooth = Fx.fadeToFg(Color.CYAN, 2000, Interpolation.SineInOut);
- * 
- * // Bouncy effect
- * Effect bouncy = Fx.dissolve(2000, Interpolation.BounceOut);
- * 
- * // Elastic effect
- * Effect elastic = Fx.sweepIn(Motion.LEFT_TO_RIGHT, 10, 0, Color.BLUE, 
- *     2000, Interpolation.ElasticOut);
- * }</pre>
- * <p>
- * <b>Choosing an Interpolation:</b>
- * <ul>
- *   <li><b>SineInOut:</b> Most versatile, smooth and natural (recommended default)</li>
- *   <li><b>QuadOut:</b> Quick and responsive, good for UI transitions</li>
- *   <li><b>BounceOut:</b> Playful, attention-grabbing</li>
- *   <li><b>ElasticOut:</b> Dramatic, elastic feel</li>
- *   <li><b>Linear:</b> Mechanical, constant speed</li>
- * </ul>
- */
+/// Easing functions (interpolation curves) for smooth animations.
+///
+///
+///
+/// Interpolation transforms linear progress (0.0 to 1.0) into smooth animation curves.
+/// Different interpolation types produce different visual effects, from linear motion
+/// to bouncy, elastic, or overshooting animations.
+///
+///
+///
+/// **Design Philosophy:**
+///
+///
+///
+/// Interpolation functions separate timing concerns from rendering logic. Effects use
+/// the interpolated alpha value to drive their visual transformations, allowing the
+/// same effect to produce different feels with different interpolation types.
+///
+///
+///
+/// **Interpolation Categories:**
+///
+/// - **Linear:** Constant speed (no easing)
+/// - **Polynomial:** Quad, Cubic, Quart, Quint - progressively stronger acceleration
+/// - **Trigonometric:** Sine, Circ - smooth sinusoidal curves
+/// - **Exponential:** Expo - rapid acceleration/deceleration
+/// - **Elastic:** Elastic - bouncy elastic effect
+/// - **Bounce:** Bounce - bouncing effect
+/// - **Back:** Back - overshoot effect
+///
+///
+///
+///
+/// **Easing Variants:**
+///
+/// - **In:** Ease-in (slow start, fast end)
+/// - **Out:** Ease-out (fast start, slow end)
+/// - **InOut:** Ease-in-out (slow start and end, fast middle)
+///
+///
+///
+///
+/// **Usage Pattern:**
+/// ```java
+/// // Smooth ease-in-out (most common)
+/// Effect smooth = Fx.fadeToFg(Color.CYAN, 2000, Interpolation.SineInOut);
+///
+/// // Bouncy effect
+/// Effect bouncy = Fx.dissolve(2000, Interpolation.BounceOut);
+///
+/// // Elastic effect
+/// Effect elastic = Fx.sweepIn(Motion.LEFT_TO_RIGHT, 10, 0, Color.BLUE, 
+///     2000, Interpolation.ElasticOut);
+/// }
+/// ```
+///
+///
+///
+/// **Choosing an Interpolation:**
+///
+/// - **SineInOut:** Most versatile, smooth and natural (recommended default)
+/// - **QuadOut:** Quick and responsive, good for UI transitions
+/// - **BounceOut:** Playful, attention-grabbing
+/// - **ElasticOut:** Dramatic, elastic feel
+/// - **Linear:** Mechanical, constant speed
 public enum Interpolation {
-    /** Back easing - in */
+    /// Back easing - in
     BackIn,
-    /** Back easing - out */
+    /// Back easing - out
     BackOut,
-    /** Back easing - in-out */
+    /// Back easing - in-out
     BackInOut,
     
-    /** Bounce easing - in */
+    /// Bounce easing - in
     BounceIn,
-    /** Bounce easing - out */
+    /// Bounce easing - out
     BounceOut,
-    /** Bounce easing - in-out */
+    /// Bounce easing - in-out
     BounceInOut,
     
-    /** Circular easing - in */
+    /// Circular easing - in
     CircIn,
-    /** Circular easing - out */
+    /// Circular easing - out
     CircOut,
-    /** Circular easing - in-out */
+    /// Circular easing - in-out
     CircInOut,
     
-    /** Cubic easing - in */
+    /// Cubic easing - in
     CubicIn,
-    /** Cubic easing - out */
+    /// Cubic easing - out
     CubicOut,
-    /** Cubic easing - in-out */
+    /// Cubic easing - in-out
     CubicInOut,
     
-    /** Elastic easing - in */
+    /// Elastic easing - in
     ElasticIn,
-    /** Elastic easing - out */
+    /// Elastic easing - out
     ElasticOut,
-    /** Elastic easing - in-out */
+    /// Elastic easing - in-out
     ElasticInOut,
     
-    /** Exponential easing - in */
+    /// Exponential easing - in
     ExpoIn,
-    /** Exponential easing - out */
+    /// Exponential easing - out
     ExpoOut,
-    /** Exponential easing - in-out */
+    /// Exponential easing - in-out
     ExpoInOut,
     
-    /** Linear interpolation (no easing) */
+    /// Linear interpolation (no easing)
     Linear,
     
-    /** Quadratic easing - in */
+    /// Quadratic easing - in
     QuadIn,
-    /** Quadratic easing - out */
+    /// Quadratic easing - out
     QuadOut,
-    /** Quadratic easing - in-out */
+    /// Quadratic easing - in-out
     QuadInOut,
     
-    /** Quartic easing - in */
+    /// Quartic easing - in
     QuartIn,
-    /** Quartic easing - out */
+    /// Quartic easing - out
     QuartOut,
-    /** Quartic easing - in-out */
+    /// Quartic easing - in-out
     QuartInOut,
     
-    /** Quintic easing - in */
+    /// Quintic easing - in
     QuintIn,
-    /** Quintic easing - out */
+    /// Quintic easing - out
     QuintOut,
-    /** Quintic easing - in-out */
+    /// Quintic easing - in-out
     QuintInOut,
     
-    /** Reverse (1 - t) */
+    /// Reverse (1 - t)
     Reverse,
     
-    /** Sine easing - in */
+    /// Sine easing - in
     SineIn,
-    /** Sine easing - out */
+    /// Sine easing - out
     SineOut,
-    /** Sine easing - in-out */
+    /// Sine easing - in-out
     SineInOut;
     
-    /**
-     * Applies the interpolation function to the given alpha value (0.0 to 1.0).
-     */
+    /// Applies the interpolation function to the given alpha value (0.0 to 1.0).
     public float alpha(float a) {
         switch (this) {
             case BackIn:
@@ -208,9 +218,7 @@ public enum Interpolation {
         }
     }
     
-    /**
-     * Returns the flipped version of this interpolation (in ↔ out).
-     */
+    /// Returns the flipped version of this interpolation (in ↔ out).
     public Interpolation flipped() {
         switch (this) {
             case BackIn:
@@ -493,5 +501,6 @@ public enum Interpolation {
         return -TFxMath.cos(t * TFxMath.pi()) / 2.0f + 0.5f;
     }
 }
+
 
 

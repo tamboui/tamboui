@@ -11,34 +11,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * A dataset to be plotted in a {@link Chart}.
- * <p>
- * Contains data points (x, y coordinates) and rendering configuration.
- *
- * <pre>{@code
- * Dataset dataset = Dataset.builder()
- *     .name("Temperature")
- *     .data(new double[][] {{0, 20}, {1, 22}, {2, 25}, {3, 23}})
- *     .graphType(GraphType.LINE)
- *     .marker(Dataset.Marker.BRAILLE)
- *     .style(Style.EMPTY.fg(Color.RED))
- *     .build();
- * }</pre>
- */
+/// A dataset to be plotted in a {@link Chart}.
+///
+///
+///
+/// Contains data points (x, y coordinates) and rendering configuration.
+///
+/// ```java
+/// Dataset dataset = Dataset.builder()
+///     .name("Temperature")
+///     .data(new double[][] {{0, 20}, {1, 22}, {2, 25}, {3, 23}})
+///     .graphType(GraphType.LINE)
+///     .marker(Dataset.Marker.BRAILLE)
+///     .style(Style.EMPTY.fg(Color.RED))
+///     .build();
+/// }
+/// ```
 public final class Dataset {
 
-    /**
-     * Marker symbols for data points.
-     */
+    /// Marker symbols for data points.
     public enum Marker {
-        /** Dot marker: • */
+        /// Dot marker: •
         DOT("•"),
-        /** Block marker: █ */
+        /// Block marker: █
         BLOCK("█"),
-        /** Bar marker: ▄ */
+        /// Bar marker: ▄
         BAR("▄"),
-        /** Braille patterns for high-resolution plotting */
+        /// Braille patterns for high-resolution plotting
         BRAILLE("⣿");
 
         private final String symbol;
@@ -47,9 +46,7 @@ public final class Dataset {
             this.symbol = symbol;
         }
 
-        /**
-         * Returns the marker symbol.
-         */
+        /// Returns the marker symbol.
         public String symbol() {
             return symbol;
         }
@@ -69,79 +66,57 @@ public final class Dataset {
         this.style = builder.style;
     }
 
-    /**
-     * Creates a new dataset builder.
-     */
+    /// Creates a new dataset builder.
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Creates a dataset with just data points.
-     */
+    /// Creates a dataset with just data points.
     public static Dataset of(double[][] data) {
         return builder().data(data).build();
     }
 
-    /**
-     * Creates a named dataset with data points.
-     */
+    /// Creates a named dataset with data points.
     public static Dataset of(String name, double[][] data) {
         return builder().name(name).data(data).build();
     }
 
-    /**
-     * Returns the dataset name.
-     */
+    /// Returns the dataset name.
     public Optional<Line> name() {
         return Optional.ofNullable(name);
     }
 
-    /**
-     * Returns the data points as [x, y] pairs.
-     */
+    /// Returns the data points as [x, y] pairs.
     public double[][] data() {
         return data;
     }
 
-    /**
-     * Returns the number of data points.
-     */
+    /// Returns the number of data points.
     public int size() {
         return data.length;
     }
 
-    /**
-     * Returns the marker type.
-     */
+    /// Returns the marker type.
     public Marker marker() {
         return marker;
     }
 
-    /**
-     * Returns the graph type.
-     */
+    /// Returns the graph type.
     public GraphType graphType() {
         return graphType;
     }
 
-    /**
-     * Returns the style.
-     */
+    /// Returns the style.
     public Style style() {
         return style != null ? style : Style.EMPTY;
     }
 
-    /**
-     * Returns true if this dataset has a name.
-     */
+    /// Returns true if this dataset has a name.
     public boolean hasName() {
         return name != null;
     }
 
-    /**
-     * Builder for {@link Dataset}.
-     */
+    /// Builder for {@link Dataset}.
     public static final class Builder {
         private Line name;
         private double[][] data = new double[0][];
@@ -151,25 +126,19 @@ public final class Dataset {
 
         private Builder() {}
 
-        /**
-         * Sets the dataset name (for legend).
-         */
+        /// Sets the dataset name (for legend).
         public Builder name(String name) {
             this.name = name != null ? Line.from(name) : null;
             return this;
         }
 
-        /**
-         * Sets the dataset name.
-         */
+        /// Sets the dataset name.
         public Builder name(Line name) {
             this.name = name;
             return this;
         }
 
-        /**
-         * Sets the data points as [x, y] pairs.
-         */
+        /// Sets the data points as [x, y] pairs.
         public Builder data(double[][] data) {
             if (data == null) {
                 this.data = new double[0][];
@@ -182,9 +151,7 @@ public final class Dataset {
             return this;
         }
 
-        /**
-         * Sets the data points from a list of [x, y] pairs.
-         */
+        /// Sets the data points from a list of [x, y] pairs.
         public Builder data(List<double[]> data) {
             if (data == null || data.isEmpty()) {
                 this.data = new double[0][];
@@ -197,9 +164,7 @@ public final class Dataset {
             return this;
         }
 
-        /**
-         * Adds a single data point.
-         */
+        /// Adds a single data point.
         public Builder addPoint(double x, double y) {
             double[][] newData = Arrays.copyOf(this.data, this.data.length + 1);
             newData[this.data.length] = new double[] {x, y};
@@ -207,35 +172,28 @@ public final class Dataset {
             return this;
         }
 
-        /**
-         * Sets the marker type for data points.
-         */
+        /// Sets the marker type for data points.
         public Builder marker(Marker marker) {
             this.marker = marker != null ? marker : Marker.DOT;
             return this;
         }
 
-        /**
-         * Sets the graph type.
-         */
+        /// Sets the graph type.
         public Builder graphType(GraphType graphType) {
             this.graphType = graphType != null ? graphType : GraphType.SCATTER;
             return this;
         }
 
-        /**
-         * Sets the dataset style.
-         */
+        /// Sets the dataset style.
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
-        /**
-         * Builds the dataset.
-         */
+        /// Builds the dataset.
         public Dataset build() {
             return new Dataset(this);
         }
     }
 }
+

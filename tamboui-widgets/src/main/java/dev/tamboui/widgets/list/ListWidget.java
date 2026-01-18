@@ -27,14 +27,10 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.text.Overflow;
 import dev.tamboui.widgets.text.OverflowConverter;
 
-/**
- * A list widget for displaying selectable items.
- */
+/// A list widget for displaying selectable items.
 public final class ListWidget implements StatefulWidget<ListState> {
 
-    /**
-     * Property key for text-overflow property.
-     */
+    /// Property key for text-overflow property.
     public static final PropertyKey<Overflow> TEXT_OVERFLOW =
             PropertyKey.of("text-overflow", OverflowConverter.INSTANCE);
 
@@ -262,9 +258,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
     }
 
-    /**
-     * Processes a line according to the overflow mode.
-     */
+    /// Processes a line according to the overflow mode.
     private Line processLine(Line line, int maxWidth) {
         if (line.width() <= maxWidth) {
             return line;
@@ -425,114 +419,102 @@ public final class ListWidget implements StatefulWidget<ListState> {
             return this;
         }
 
-        /**
-         * Sets a function to resolve styles for each item based on position.
-         * <p>
-         * The function receives the item index (0-based) and total item count,
-         * and returns a Style to apply to that item. This enables positional
-         * styling like alternating row colors.
-         *
-         * @param resolver function that takes (index, totalCount) and returns a Style
-         * @return this builder
-         */
+        /// Sets a function to resolve styles for each item based on position.
+        ///
+        ///
+        ///
+        /// The function receives the item index (0-based) and total item count,
+        /// and returns a Style to apply to that item. This enables positional
+        /// styling like alternating row colors.
+        ///
+        /// @param resolver function that takes (index, totalCount) and returns a Style
+        /// @return this builder
         public Builder itemStyleResolver(BiFunction<Integer, Integer, Style> resolver) {
             this.itemStyleResolver = resolver;
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code color} and {@code background}
-         * will be resolved if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code color} and {@code background}
+        /// will be resolved if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the background color for items.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color for items.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the foreground (text) color for items.
-         *
-         * @param color the foreground color
-         * @return this builder
-         */
+        /// Sets the foreground (text) color for items.
+        ///
+        /// @param color the foreground color
+        /// @return this builder
         public Builder foreground(Color color) {
             this.foreground.set(color);
             return this;
         }
 
-        /**
-         * Sets the highlight symbol as a Line (which can include styling).
-         *
-         * @param highlightSymbol the line to use as the highlight symbol
-         * @return this builder
-         */
+        /// Sets the highlight symbol as a Line (which can include styling).
+        ///
+        /// @param highlightSymbol the line to use as the highlight symbol
+        /// @return this builder
         public Builder highlightSymbol(Line highlightSymbol) {
             this.highlightSymbol = highlightSymbol;
             return this;
         }
 
-        /**
-         * Sets the highlight symbol as a string (convenience method).
-         *
-         * @param highlightSymbol the string to use as the highlight symbol
-         * @return this builder
-         */
+        /// Sets the highlight symbol as a string (convenience method).
+        ///
+        /// @param highlightSymbol the string to use as the highlight symbol
+        /// @return this builder
         public Builder highlightSymbol(String highlightSymbol) {
             this.highlightSymbol = Line.from(highlightSymbol);
             return this;
         }
 
-        /**
-         * Sets the direction for rendering list items.
-         *
-         * @param direction the direction (default: TOP_TO_BOTTOM)
-         */
+        /// Sets the direction for rendering list items.
+        ///
+        /// @param direction the direction (default: TOP_TO_BOTTOM)
         public Builder direction(ListDirection direction) {
             this.direction = direction != null ? direction : ListDirection.TOP_TO_BOTTOM;
             return this;
         }
 
-        /**
-         * Sets whether to repeat the highlight symbol on all lines of multiline items.
-         *
-         * @param repeatHighlightSymbol if true, repeat symbol on all lines (default: false)
-         */
+        /// Sets whether to repeat the highlight symbol on all lines of multiline items.
+        ///
+        /// @param repeatHighlightSymbol if true, repeat symbol on all lines (default: false)
         public Builder repeatHighlightSymbol(boolean repeatHighlightSymbol) {
             this.repeatHighlightSymbol = repeatHighlightSymbol;
             return this;
         }
 
-        /**
-         * Sets the overflow mode for list item text.
-         * <p>
-         * Controls how text is handled when it exceeds the available width:
-         * <ul>
-         *   <li>{@code CLIP} - silently truncate at boundary (default)</li>
-         *   <li>{@code ELLIPSIS} - truncate with "..." at end</li>
-         *   <li>{@code ELLIPSIS_START} - truncate with "..." at start</li>
-         *   <li>{@code ELLIPSIS_MIDDLE} - truncate with "..." in middle</li>
-         * </ul>
-         * Note: WRAP_CHARACTER and WRAP_WORD are not supported for list items.
-         *
-         * @param overflow the overflow mode
-         * @return this builder
-         */
+        /// Sets the overflow mode for list item text.
+        ///
+        ///
+        ///
+        /// Controls how text is handled when it exceeds the available width:
+        ///
+        /// - {@code CLIP} - silently truncate at boundary (default)
+        /// - {@code ELLIPSIS} - truncate with "..." at end
+        /// - {@code ELLIPSIS_START} - truncate with "..." at start
+        /// - {@code ELLIPSIS_MIDDLE} - truncate with "..." in middle
+        ///
+        /// Note: WRAP_CHARACTER and WRAP_WORD are not supported for list items.
+        ///
+        /// @param overflow the overflow mode
+        /// @return this builder
         public Builder overflow(Overflow overflow) {
             this.overflow.set(overflow);
             return this;
@@ -543,3 +525,4 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
     }
 }
+

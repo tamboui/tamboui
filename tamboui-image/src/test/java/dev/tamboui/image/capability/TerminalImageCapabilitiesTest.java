@@ -150,3 +150,4 @@ class TerminalImageCapabilitiesTest {
         assertThat(caps2).isNotNull();
     }
 }
+

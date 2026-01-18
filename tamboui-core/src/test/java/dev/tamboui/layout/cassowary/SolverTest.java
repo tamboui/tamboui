@@ -265,3 +265,4 @@ class SolverTest {
         assertThat(solver.hasConstraint(c)).isFalse();
     }
 }
+

@@ -21,9 +21,7 @@ import java.util.Arrays;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for ListElement.
- */
+/// Tests for ListElement.
 class ListElementTest {
 
     @Test
@@ -485,3 +483,4 @@ class ListElementTest {
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }
 }
+

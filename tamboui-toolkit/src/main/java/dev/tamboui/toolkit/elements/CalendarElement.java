@@ -24,19 +24,20 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * A DSL wrapper for the Monthly calendar widget.
- * <p>
- * Displays a calendar grid for a month.
- * <pre>{@code
- * calendar(LocalDate.now())
- *     .showMonthHeader()
- *     .showWeekdaysHeader()
- *     .highlightToday(Color.RED)
- *     .title("Calendar")
- *     .rounded()
- * }</pre>
- */
+/// A DSL wrapper for the Monthly calendar widget.
+///
+///
+///
+/// Displays a calendar grid for a month.
+/// ```java
+/// calendar(LocalDate.now())
+///     .showMonthHeader()
+///     .showWeekdaysHeader()
+///     .highlightToday(Color.RED)
+///     .title("Calendar")
+///     .rounded()
+/// }
+/// ```
 public final class CalendarElement extends StyledElement<CalendarElement> {
 
     private LocalDate displayDate = LocalDate.now();
@@ -57,129 +58,97 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
         this.displayDate = date != null ? date : LocalDate.now();
     }
 
-    /**
-     * Sets the display date (determines which month to show).
-     */
+    /// Sets the display date (determines which month to show).
     public CalendarElement date(LocalDate date) {
         this.displayDate = date != null ? date : LocalDate.now();
         return this;
     }
 
-    /**
-     * Sets the date styler for customizing individual dates.
-     */
+    /// Sets the date styler for customizing individual dates.
     public CalendarElement dateStyler(DateStyler styler) {
         this.dateStyler = styler != null ? styler : date -> Style.EMPTY;
         return this;
     }
 
-    /**
-     * Highlights today with the given color.
-     */
+    /// Highlights today with the given color.
     public CalendarElement highlightToday(Color color) {
         this.dateStyler = CalendarEventStore.today(Style.EMPTY.fg(color).bold());
         return this;
     }
 
-    /**
-     * Highlights today with the given style.
-     */
+    /// Highlights today with the given style.
     public CalendarElement highlightToday(Style style) {
         this.dateStyler = CalendarEventStore.today(style);
         return this;
     }
 
-    /**
-     * Shows the month header with the given style.
-     */
+    /// Shows the month header with the given style.
     public CalendarElement showMonthHeader(Style style) {
         this.monthHeaderStyle = style;
         return this;
     }
 
-    /**
-     * Shows the month header with bold style.
-     */
+    /// Shows the month header with bold style.
     public CalendarElement showMonthHeader() {
         this.monthHeaderStyle = Style.EMPTY.bold();
         return this;
     }
 
-    /**
-     * Shows the weekdays header with the given style.
-     */
+    /// Shows the weekdays header with the given style.
     public CalendarElement showWeekdaysHeader(Style style) {
         this.weekdaysHeaderStyle = style;
         return this;
     }
 
-    /**
-     * Shows the weekdays header with cyan color.
-     */
+    /// Shows the weekdays header with cyan color.
     public CalendarElement showWeekdaysHeader() {
         this.weekdaysHeaderStyle = Style.EMPTY.fg(Color.CYAN);
         return this;
     }
 
-    /**
-     * Shows surrounding days (from previous/next month) with the given style.
-     */
+    /// Shows surrounding days (from previous/next month) with the given style.
     public CalendarElement showSurrounding(Style style) {
         this.surroundingStyle = style;
         return this;
     }
 
-    /**
-     * Shows surrounding days with dim style.
-     */
+    /// Shows surrounding days with dim style.
     public CalendarElement showSurrounding() {
         this.surroundingStyle = Style.EMPTY.dim();
         return this;
     }
 
-    /**
-     * Sets the default date style.
-     */
+    /// Sets the default date style.
     public CalendarElement defaultStyle(Style style) {
         this.defaultStyle = style;
         return this;
     }
 
-    /**
-     * Sets the first day of the week.
-     */
+    /// Sets the first day of the week.
     public CalendarElement firstDayOfWeek(DayOfWeek day) {
         this.firstDayOfWeek = day != null ? day : DayOfWeek.MONDAY;
         return this;
     }
 
-    /**
-     * Sets the first day of week to Sunday.
-     */
+    /// Sets the first day of week to Sunday.
     public CalendarElement sundayFirst() {
         this.firstDayOfWeek = DayOfWeek.SUNDAY;
         return this;
     }
 
-    /**
-     * Sets the title.
-     */
+    /// Sets the title.
     public CalendarElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public CalendarElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public CalendarElement borderColor(Color color) {
         this.borderColor = color;
         return this;
@@ -238,3 +207,4 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
         frame.renderWidget(builder.build(), area);
     }
 }
+

@@ -18,11 +18,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A backend wrapper that records frames to an Asciinema cast file.
- * This backend is headless - it does not output to the real terminal.
- * This is an internal API and not part of the public contract.
- */
+/// A backend wrapper that records frames to an Asciinema cast file.
+/// This backend is headless - it does not output to the real terminal.
+/// This is an internal API and not part of the public contract.
 public final class RecordingBackend implements Backend {
 
     // Shared state for System.out capture across all instances
@@ -139,9 +137,7 @@ public final class RecordingBackend implements Backend {
         }
     }
 
-    /**
-     * Returns true if recording is still active.
-     */
+    /// Returns true if recording is still active.
     public boolean isRecording() {
         if (!recording) {
             return false;
@@ -335,3 +331,4 @@ public final class RecordingBackend implements Backend {
         System.out.println("Frames captured: " + frames.size());
     }
 }
+

@@ -21,23 +21,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A vertical layout container that arranges children in a column.
- * <p>
- * Layout properties can be set via CSS or programmatically:
- * <ul>
- *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
- *   <li>{@code spacing} - Gap between children in cells</li>
- *   <li>{@code margin} - Margin around the column</li>
- * </ul>
- * <p>
- * Programmatic values override CSS values when both are set.
- * <p>
- * Example usage:
- * <pre>
- * column(child1, child2, child3).flex(Flex.CENTER).spacing(1)
- * </pre>
- */
+/// A vertical layout container that arranges children in a column.
+///
+///
+///
+/// Layout properties can be set via CSS or programmatically:
+///
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code spacing} - Gap between children in cells
+/// - {@code margin} - Margin around the column
+///
+///
+///
+///
+/// Programmatic values override CSS values when both are set.
+///
+///
+///
+/// Example usage:
+/// ```
+/// column(child1, child2, child3).flex(Flex.CENTER).spacing(1)
+/// ```
 public final class Column extends ContainerElement<Column> {
 
     private Integer spacing;
@@ -51,52 +55,50 @@ public final class Column extends ContainerElement<Column> {
         this.children.addAll(Arrays.asList(children));
     }
 
-    /**
-     * Sets the spacing between children.
-     * <p>
-     * Can also be set via CSS {@code spacing} property.
-     *
-     * @param spacing spacing in cells between adjacent children
-     * @return this column for method chaining
-     */
+    /// Sets the spacing between children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code spacing} property.
+    ///
+    /// @param spacing spacing in cells between adjacent children
+    /// @return this column for method chaining
     public Column spacing(int spacing) {
         this.spacing = Math.max(0, spacing);
         return this;
     }
 
-    /**
-     * Sets how remaining space is distributed among children.
-     * <p>
-     * Can also be set via CSS {@code flex} property.
-     *
-     * @param flex the flex mode for space distribution
-     * @return this column for method chaining
-     * @see Flex
-     */
+    /// Sets how remaining space is distributed among children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code flex} property.
+    ///
+    /// @param flex the flex mode for space distribution
+    /// @return this column for method chaining
+    /// @see Flex
     public Column flex(Flex flex) {
         this.flex = flex;
         return this;
     }
 
-    /**
-     * Sets the margin around the column.
-     * <p>
-     * Can also be set via CSS {@code margin} property.
-     *
-     * @param margin the margin
-     * @return this column for method chaining
-     */
+    /// Sets the margin around the column.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code margin} property.
+    ///
+    /// @param margin the margin
+    /// @return this column for method chaining
     public Column margin(Margin margin) {
         this.margin = margin;
         return this;
     }
 
-    /**
-     * Sets uniform margin around the column.
-     *
-     * @param value the margin value for all sides
-     * @return this column for method chaining
-     */
+    /// Sets uniform margin around the column.
+    ///
+    /// @param value the margin value for all sides
+    /// @return this column for method chaining
     public Column margin(int value) {
         this.margin = Margin.uniform(value);
         return this;
@@ -216,10 +218,8 @@ public final class Column extends ContainerElement<Column> {
         }
     }
 
-    /**
-     * Calculates a default height constraint for elements that return null.
-     * For text elements, this returns a constraint based on line count.
-     */
+    /// Calculates a default height constraint for elements that return null.
+    /// For text elements, this returns a constraint based on line count.
     private Constraint calculateDefaultConstraint(Element child) {
         if (child instanceof TextElement) {
             TextElement text = (TextElement) child;
@@ -228,3 +228,4 @@ public final class Column extends ContainerElement<Column> {
         return null;
     }
 }
+

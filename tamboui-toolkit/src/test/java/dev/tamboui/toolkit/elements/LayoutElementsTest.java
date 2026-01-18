@@ -21,9 +21,7 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for layout elements (Panel, Row, Column, Spacer).
- */
+/// Tests for layout elements (Panel, Row, Column, Spacer).
 class LayoutElementsTest {
 
     @Nested
@@ -714,3 +712,4 @@ class LayoutElementsTest {
         }
     }
 }
+

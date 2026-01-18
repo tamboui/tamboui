@@ -16,14 +16,14 @@ import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tfx.TFxMath;
 
-/**
- * A shader that applies a stretching effect to terminal cells, expanding or shrinking
- * rectangular areas using block characters.
- * <p>
- * The stretch effect fills areas with a style (including background color) and uses
- * partial block characters (▏▎▍▌▋▊▉█ for horizontal, ▁▂▃▄▅▆▇█ for vertical) to create
- * smooth transitions as the area expands or contracts.
- */
+/// A shader that applies a stretching effect to terminal cells, expanding or shrinking
+/// rectangular areas using block characters.
+///
+///
+///
+/// The stretch effect fills areas with a style (including background color) and uses
+/// partial block characters (▏▎▍▌▋▊▉█ for horizontal, ▁▂▃▄▅▆▇█ for vertical) to create
+/// smooth transitions as the area expands or contracts.
 public final class StretchShader implements Shader {
     
     private final Style style;
@@ -37,9 +37,7 @@ public final class StretchShader implements Shader {
     private static final String[] STRETCH_V = {"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"};
     private static final int LAST_IDX = STRETCH_H.length - 1;
     
-    /**
-     * Creates a new stretch shader.
-     */
+    /// Creates a new stretch shader.
     public StretchShader(Style style, Motion direction, EffectTimer timer) {
         this.style = style;
         this.direction = direction;
@@ -334,4 +332,5 @@ public final class StretchShader implements Shader {
         }
     }
 }
+
 

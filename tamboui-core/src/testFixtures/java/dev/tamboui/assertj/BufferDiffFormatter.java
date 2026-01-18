@@ -15,23 +15,19 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-/**
- * Utility class for formatting buffer differences in a readable way,
- * similar to ratatui.rs assertion output.
- */
+/// Utility class for formatting buffer differences in a readable way,
+/// similar to ratatui.rs assertion output.
 final class BufferDiffFormatter {
 
     private BufferDiffFormatter() {
         // Utility class
     }
 
-    /**
-     * Formats a diff between two buffers, showing both buffers side-by-side.
-     *
-     * @param actual the actual buffer
-     * @param expected the expected buffer
-     * @return a formatted string showing the difference
-     */
+    /// Formats a diff between two buffers, showing both buffers side-by-side.
+    ///
+    /// @param actual the actual buffer
+    /// @param expected the expected buffer
+    /// @return a formatted string showing the difference
     static String formatDiff(Buffer actual, Buffer expected) {
         StringBuilder sb = new StringBuilder();
 
@@ -42,12 +38,10 @@ final class BufferDiffFormatter {
         return sb.toString();
     }
 
-    /**
-     * Formats a buffer for display, similar to ratatui.rs format.
-     *
-     * @param buffer the buffer to format
-     * @return a formatted string representation
-     */
+    /// Formats a buffer for display, similar to ratatui.rs format.
+    ///
+    /// @param buffer the buffer to format
+    /// @return a formatted string representation
     static String formatBuffer(Buffer buffer) {
         if (buffer == null) {
             return "null";
@@ -189,5 +183,6 @@ final class BufferDiffFormatter {
         return String.join(" | ", modifierNames);
     }
 }
+
 
 

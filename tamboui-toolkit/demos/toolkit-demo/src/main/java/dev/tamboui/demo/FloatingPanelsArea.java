@@ -21,9 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static dev.tamboui.toolkit.Toolkit.panel;
 
-/**
- * Custom element that renders and manages floating panels.
- */
+/// Custom element that renders and manages floating panels.
 final class FloatingPanelsArea implements Element {
 
     private final AtomicLong tickCount = new AtomicLong(0);
@@ -159,3 +157,4 @@ final class FloatingPanelsArea implements Element {
         return String.format("%02d:%02d:%02d", hours, minutes % 60, seconds % 60);
     }
 }
+

@@ -215,3 +215,4 @@ class LineGaugeTest {
         assertThat(validSet.filled()).isEqualTo("#");
     }
 }
+

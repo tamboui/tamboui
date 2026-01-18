@@ -7,10 +7,8 @@ package dev.tamboui.internal.record;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Configuration for Asciinema (.cast) recording, loaded from system properties.
- * This is an internal API and not part of the public contract.
- */
+/// Configuration for Asciinema (.cast) recording, loaded from system properties.
+/// This is an internal API and not part of the public contract.
 public final class RecordingConfig {
 
     private static final String PREFIX = "tamboui.record";
@@ -31,11 +29,9 @@ public final class RecordingConfig {
         this.configFile = configFile;
     }
 
-    /**
-     * Loads recording configuration from system properties.
-     *
-     * @return configuration if recording is enabled, null otherwise
-     */
+    /// Loads recording configuration from system properties.
+    ///
+    /// @return configuration if recording is enabled, null otherwise
     public static RecordingConfig load() {
         String output = System.getProperty(PREFIX);
         if (output == null) {
@@ -54,9 +50,7 @@ public final class RecordingConfig {
         );
     }
 
-    /**
-     * Creates a config with explicit values (used by TuiRunner for config file support).
-     */
+    /// Creates a config with explicit values (used by TuiRunner for config file support).
     public static RecordingConfig of(Path outputPath, int fps, int maxDurationMs, int width, int height) {
         return new RecordingConfig(outputPath, fps, maxDurationMs, width, height, null);
     }
@@ -85,3 +79,4 @@ public final class RecordingConfig {
         return configFile;
     }
 }
+

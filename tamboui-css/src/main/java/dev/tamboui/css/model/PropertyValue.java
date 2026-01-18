@@ -6,12 +6,12 @@ package dev.tamboui.css.model;
 
 import java.util.Objects;
 
-/**
- * Represents a CSS property value as parsed from the stylesheet.
- * <p>
- * The raw value is stored as a string and converted to the appropriate
- * type when applied to elements.
- */
+/// Represents a CSS property value as parsed from the stylesheet.
+///
+///
+///
+/// The raw value is stored as a string and converted to the appropriate
+/// type when applied to elements.
 public final class PropertyValue {
 
     private final String raw;
@@ -22,22 +22,18 @@ public final class PropertyValue {
         this.important = important;
     }
 
-    /**
-     * Creates a regular (non-important) property value.
-     *
-     * @param raw the raw value string
-     * @return the property value
-     */
+    /// Creates a regular (non-important) property value.
+    ///
+    /// @param raw the raw value string
+    /// @return the property value
     public static PropertyValue of(String raw) {
         return new PropertyValue(raw, false);
     }
 
-    /**
-     * Creates an important (!important) property value.
-     *
-     * @param raw the raw value string
-     * @return the property value
-     */
+    /// Creates an important (!important) property value.
+    ///
+    /// @param raw the raw value string
+    /// @return the property value
     public static PropertyValue important(String raw) {
         return new PropertyValue(raw, true);
     }
@@ -72,3 +68,4 @@ public final class PropertyValue {
         return important ? raw + " !important" : raw;
     }
 }
+

@@ -17,19 +17,18 @@ import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Widget Playground Demo showcasing the TamboUI DSL.
- * <p>
- * Features demonstrated:
- * <ul>
- *   <li>Lambda-based DSL for dynamic content</li>
- *   <li>Stateful components (TODO list with input field)</li>
- *   <li>Event handlers on elements</li>
- *   <li>Draggable floating panels</li>
- *   <li>Focus navigation (Tab/Shift+Tab)</li>
- *   <li>Dynamic component creation</li>
- * </ul>
- */
+/// Widget Playground Demo showcasing the TamboUI DSL.
+///
+///
+///
+/// Features demonstrated:
+///
+/// - Lambda-based DSL for dynamic content
+/// - Stateful components (TODO list with input field)
+/// - Event handlers on elements
+/// - Draggable floating panels
+/// - Focus navigation (Tab/Shift+Tab)
+/// - Dynamic component creation
 public class ToolkitDemo {
 
     public ToolkitDemo() {
@@ -63,3 +62,4 @@ public class ToolkitDemo {
     }
 
 }
+

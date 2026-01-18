@@ -16,27 +16,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-/**
- * A widget for displaying images in the terminal.
- * <p>
- * The Image widget automatically detects terminal capabilities and uses the best
- * available rendering method: native protocols (Kitty, iTerm2, Sixel) when supported,
- * or character-based fallbacks (half-blocks, Braille) for universal compatibility.
- *
- * <pre>{@code
- * Image image = Image.builder()
- *     .data(ImageData.fromPath(Path.of("photo.png")))
- *     .scaling(ImageScaling.FIT)
- *     .block(Block.bordered().title(Title.from("Photo")))
- *     .build();
- *
- * frame.renderWidget(image, area);
- * }</pre>
- *
- * @see ImageData
- * @see ImageScaling
- * @see dev.tamboui.image.capability.TerminalImageCapabilities
- */
+/// A widget for displaying images in the terminal.
+///
+///
+///
+/// The Image widget automatically detects terminal capabilities and uses the best
+/// available rendering method: native protocols (Kitty, iTerm2, Sixel) when supported,
+/// or character-based fallbacks (half-blocks, Braille) for universal compatibility.
+///
+/// ```java
+/// Image image = Image.builder()
+///     .data(ImageData.fromPath(Path.of("photo.png")))
+///     .scaling(ImageScaling.FIT)
+///     .block(Block.bordered().title(Title.from("Photo")))
+///     .build();
+///
+/// frame.renderWidget(image, area);
+/// }
+/// ```
+///
+/// @see ImageData
+/// @see ImageScaling
+/// @see dev.tamboui.image.capability.TerminalImageCapabilities
 public final class Image implements Widget, RawOutputCapable {
 
     private final ImageData data;
@@ -53,43 +54,35 @@ public final class Image implements Widget, RawOutputCapable {
             : TerminalImageCapabilities.detect().bestProtocol();
     }
 
-    /**
-     * Creates a new image builder.
-     *
-     * @return a new builder
-     */
+    /// Creates a new image builder.
+    ///
+    /// @return a new builder
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Creates an image widget from the given image data.
-     *
-     * @param data the image data
-     * @return an image widget
-     */
+    /// Creates an image widget from the given image data.
+    ///
+    /// @param data the image data
+    /// @return an image widget
     public static Image of(ImageData data) {
         return builder().data(data).build();
     }
 
-    /**
-     * Creates an image widget from a file path.
-     *
-     * @param path the path to the image file
-     * @return an image widget
-     * @throws IOException if the file cannot be read
-     */
+    /// Creates an image widget from a file path.
+    ///
+    /// @param path the path to the image file
+    /// @return an image widget
+    /// @throws IOException if the file cannot be read
     public static Image fromPath(Path path) throws IOException {
         return builder().data(ImageData.fromPath(path)).build();
     }
 
-    /**
-     * Creates an image widget from a classpath resource.
-     *
-     * @param resourcePath the resource path
-     * @return an image widget
-     * @throws IOException if the resource cannot be read
-     */
+    /// Creates an image widget from a classpath resource.
+    ///
+    /// @param resourcePath the resource path
+    /// @return an image widget
+    /// @throws IOException if the resource cannot be read
     public static Image fromResource(String resourcePath) throws IOException {
         return builder().data(ImageData.fromResource(resourcePath)).build();
     }
@@ -99,16 +92,16 @@ public final class Image implements Widget, RawOutputCapable {
         render(area, buffer, null);
     }
 
-    /**
-     * Renders the image to the given area with optional raw output support.
-     * <p>
-     * For native protocols (Sixel, Kitty, iTerm2), the rawOutput stream must be provided.
-     * If rawOutput is null and the protocol requires it, the image will not be rendered.
-     *
-     * @param area      the area to render into
-     * @param buffer    the buffer for character-based rendering
-     * @param rawOutput the output stream for native protocols (may be null)
-     */
+    /// Renders the image to the given area with optional raw output support.
+    ///
+    ///
+    ///
+    /// For native protocols (Sixel, Kitty, iTerm2), the rawOutput stream must be provided.
+    /// If rawOutput is null and the protocol requires it, the image will not be rendered.
+    ///
+    /// @param area      the area to render into
+    /// @param buffer    the buffer for character-based rendering
+    /// @param rawOutput the output stream for native protocols (may be null)
     @Override
     public void render(Rect area, Buffer buffer, OutputStream rawOutput) {
         if (area.isEmpty() || data == null) {
@@ -147,9 +140,7 @@ public final class Image implements Widget, RawOutputCapable {
         }
     }
 
-    /**
-     * Scales the image according to the scaling mode.
-     */
+    /// Scales the image according to the scaling mode.
     private ImageData scaleImage(ImageData source, int targetWidth, int targetHeight) {
         switch (scaling) {
             case FIT: {
@@ -186,45 +177,35 @@ public final class Image implements Widget, RawOutputCapable {
         }
     }
 
-    /**
-     * Returns the image data.
-     *
-     * @return the image data
-     */
+    /// Returns the image data.
+    ///
+    /// @return the image data
     public ImageData data() {
         return data;
     }
 
-    /**
-     * Returns the scaling mode.
-     *
-     * @return the scaling mode
-     */
+    /// Returns the scaling mode.
+    ///
+    /// @return the scaling mode
     public ImageScaling scaling() {
         return scaling;
     }
 
-    /**
-     * Returns the block wrapper, if any.
-     *
-     * @return the block, or null
-     */
+    /// Returns the block wrapper, if any.
+    ///
+    /// @return the block, or null
     public Block block() {
         return block;
     }
 
-    /**
-     * Returns the protocol used for rendering.
-     *
-     * @return the protocol
-     */
+    /// Returns the protocol used for rendering.
+    ///
+    /// @return the protocol
     public ImageProtocol protocol() {
         return protocol;
     }
 
-    /**
-     * Builder for {@link Image}.
-     */
+    /// Builder for {@link Image}.
     public static final class Builder {
         private ImageData data;
         private ImageScaling scaling = ImageScaling.FIT;
@@ -234,59 +215,52 @@ public final class Image implements Widget, RawOutputCapable {
         private Builder() {
         }
 
-        /**
-         * Sets the image data.
-         *
-         * @param data the image data
-         * @return this builder
-         */
+        /// Sets the image data.
+        ///
+        /// @param data the image data
+        /// @return this builder
         public Builder data(ImageData data) {
             this.data = data;
             return this;
         }
 
-        /**
-         * Sets the scaling mode.
-         *
-         * @param scaling the scaling mode
-         * @return this builder
-         */
+        /// Sets the scaling mode.
+        ///
+        /// @param scaling the scaling mode
+        /// @return this builder
         public Builder scaling(ImageScaling scaling) {
             this.scaling = scaling != null ? scaling : ImageScaling.FIT;
             return this;
         }
 
-        /**
-         * Wraps the image in a block (for borders, titles, etc.).
-         *
-         * @param block the block wrapper
-         * @return this builder
-         */
+        /// Wraps the image in a block (for borders, titles, etc.).
+        ///
+        /// @param block the block wrapper
+        /// @return this builder
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets a specific protocol for rendering.
-         * <p>
-         * By default, the best available protocol is auto-detected.
-         *
-         * @param protocol the protocol to use
-         * @return this builder
-         */
+        /// Sets a specific protocol for rendering.
+        ///
+        ///
+        ///
+        /// By default, the best available protocol is auto-detected.
+        ///
+        /// @param protocol the protocol to use
+        /// @return this builder
         public Builder protocol(ImageProtocol protocol) {
             this.protocol = protocol;
             return this;
         }
 
-        /**
-         * Builds the image widget.
-         *
-         * @return the image widget
-         */
+        /// Builds the image widget.
+        ///
+        /// @return the image widget
         public Image build() {
             return new Image(this);
         }
     }
 }
+

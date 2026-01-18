@@ -8,16 +8,15 @@ import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Painter;
 import dev.tamboui.widgets.canvas.Shape;
 
-/**
- * A collection of points (scatter plot).
- *
- * <pre>{@code
- * double[][] coords = {{10, 20}, {30, 40}, {50, 60}};
- * context.draw(new Points(coords, Color.YELLOW));
- * }</pre>
- *
- * @see Shape
- */
+/// A collection of points (scatter plot).
+///
+/// ```java
+/// double[][] coords = {{10, 20}, {30, 40}, {50, 60}};
+/// context.draw(new Points(coords, Color.YELLOW));
+/// }
+/// ```
+///
+/// @see Shape
 public final class Points implements Shape {
 
     private final double[][] coords;
@@ -28,22 +27,18 @@ public final class Points implements Shape {
         this.color = color;
     }
 
-    /**
-     * Creates a points shape from coordinate pairs and a color.
-     */
+    /// Creates a points shape from coordinate pairs and a color.
     public static Points of(double[][] coords, Color color) {
         return new Points(coords, color);
     }
 
-    /**
-     * Creates a points shape from x and y arrays.
-     *
-     * @param x     array of x coordinates
-     * @param y     array of y coordinates
-     * @param color the color for all points
-     * @return a new Points shape
-     * @throws IllegalArgumentException if arrays have different lengths
-     */
+    /// Creates a points shape from x and y arrays.
+    ///
+    /// @param x     array of x coordinates
+    /// @param y     array of y coordinates
+    /// @param color the color for all points
+    /// @return a new Points shape
+    /// @throws IllegalArgumentException if arrays have different lengths
     public static Points of(double[] x, double[] y, Color color) {
         if (x.length != y.length) {
             throw new IllegalArgumentException("x and y arrays must have the same length");
@@ -134,3 +129,4 @@ public final class Points implements Shape {
         return String.format("Points[color=%s, count=%d]", color, coords != null ? coords.length : 0);
     }
 }
+

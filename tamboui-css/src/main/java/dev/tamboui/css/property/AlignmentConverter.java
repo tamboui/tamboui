@@ -9,16 +9,15 @@ import dev.tamboui.layout.Alignment;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS text-align values to Alignment enum.
- * <p>
- * Supports the following values:
- * <ul>
- *   <li>{@code "left"} - left alignment</li>
- *   <li>{@code "center"} - center alignment</li>
- *   <li>{@code "right"} - right alignment</li>
- * </ul>
- */
+/// Converts CSS text-align values to Alignment enum.
+///
+///
+///
+/// Supports the following values:
+///
+/// - {@code "left"} - left alignment
+/// - {@code "center"} - center alignment
+/// - {@code "right"} - right alignment
 public final class AlignmentConverter implements PropertyConverter<Alignment> {
 
     @Override
@@ -41,3 +40,4 @@ public final class AlignmentConverter implements PropertyConverter<Alignment> {
         }
     }
 }
+

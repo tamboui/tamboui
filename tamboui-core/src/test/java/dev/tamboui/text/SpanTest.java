@@ -68,3 +68,4 @@ class SpanTest {
         assertThat(span.style()).isEqualTo(style);
     }
 }
+

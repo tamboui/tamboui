@@ -21,22 +21,24 @@ import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo showcasing TFX effects integration with the Toolkit DSL.
- * <p>
- * This demo shows how to use ToolkitEffects to apply visual effects
- * to specific elements by ID or CSS selectors.
- * <p>
- * Controls:
- * - 1: Apply effect to header panel (by ID)
- * - 2: Apply effect to content panel (by ID)
- * - 3: Apply effect to footer panel (by ID)
- * - 4: Apply global effect
- * - 5: Apply effect to all panels (by CSS selector ".main-panel")
- * - 6: Apply effect to all Panel types (by type selector "Panel")
- * - Space: Clear all effects
- * - q/ESC: Quit
- */
+/// Demo showcasing TFX effects integration with the Toolkit DSL.
+///
+///
+///
+/// This demo shows how to use ToolkitEffects to apply visual effects
+/// to specific elements by ID or CSS selectors.
+///
+///
+///
+/// Controls:
+/// - 1: Apply effect to header panel (by ID)
+/// - 2: Apply effect to content panel (by ID)
+/// - 3: Apply effect to footer panel (by ID)
+/// - 4: Apply global effect
+/// - 5: Apply effect to all panels (by CSS selector ".main-panel")
+/// - 6: Apply effect to all Panel types (by type selector "Panel")
+/// - Space: Clear all effects
+/// - q/ESC: Quit
 public class TfxToolkitDemo {
 
     private static final Color HEADER_COLOR = Color.rgb(0x00, 0xd9, 0xff);
@@ -204,3 +206,4 @@ public class TfxToolkitDemo {
         return EventResult.UNHANDLED;
     }
 }
+

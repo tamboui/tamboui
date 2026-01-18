@@ -4,11 +4,11 @@
  */
 package dev.tamboui.tfx;
 
-/**
- * Math utilities for effects.
- * <p>
- * Provides fast math operations optimized for effect calculations.
- */
+/// Math utilities for effects.
+///
+///
+///
+/// Provides fast math operations optimized for effect calculations.
 public final class TFxMath {
     
     private static final float PI = (float) java.lang.Math.PI;
@@ -58,4 +58,5 @@ public final class TFxMath {
         return TAU;
     }
 }
+
 

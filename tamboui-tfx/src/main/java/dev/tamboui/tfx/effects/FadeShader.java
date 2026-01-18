@@ -18,36 +18,44 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 
-/**
- * Shader implementation for color fade effects.
- * <p>
- * FadeShader smoothly transitions between two colors over time. It supports:
- * <ul>
- *   <li><b>Color Interpolation:</b> Uses configurable color spaces (RGB, HSL, HSV)
- *       for perceptually smooth transitions</li>
- *   <li><b>Spatial Patterns:</b> Can apply fade patterns using {@link Pattern}
- *       implementations for directional or radial fades</li>
- *   <li><b>Cell Filtering:</b> Can target specific cells using {@link CellFilter}</li>
- * </ul>
- * <p>
- * <b>Implementation Details:</b>
- * <p>
- * The shader iterates through cells in the target area, applies the cell filter,
- * and interpolates colors based on the timer's alpha value. If a pattern is set,
- * the pattern transforms the global alpha into position-specific alpha values.
- * <p>
- * <b>Color Space Selection:</b>
- * <ul>
- *   <li><b>RGB:</b> Fastest, but produces perceptually non-uniform transitions
- *       (e.g., gray midpoints when fading between saturated colors)</li>
- *   <li><b>HSL:</b> Default - good balance of performance and perceptual quality,
- *       produces smooth hue transitions</li>
- *   <li><b>HSV:</b> Similar to HSL but with different perceptual model</li>
- * </ul>
- * <p>
- * This shader is typically created through {@link dev.tamboui.tfx.Fx} factory methods
- * rather than directly.
- */
+/// Shader implementation for color fade effects.
+///
+///
+///
+/// FadeShader smoothly transitions between two colors over time. It supports:
+///
+/// <li>**Color Interpolation:** Uses configurable color spaces (RGB, HSL, HSV)
+/// for perceptually smooth transitions
+/// <li>**Spatial Patterns:** Can apply fade patterns using {@link Pattern}
+/// implementations for directional or radial fades
+/// - **Cell Filtering:** Can target specific cells using {@link CellFilter}
+///
+///
+///
+///
+/// **Implementation Details:**
+///
+///
+///
+/// The shader iterates through cells in the target area, applies the cell filter,
+/// and interpolates colors based on the timer's alpha value. If a pattern is set,
+/// the pattern transforms the global alpha into position-specific alpha values.
+///
+///
+///
+/// **Color Space Selection:**
+///
+/// <li>**RGB:** Fastest, but produces perceptually non-uniform transitions
+/// (e.g., gray midpoints when fading between saturated colors)
+/// <li>**HSL:** Default - good balance of performance and perceptual quality,
+/// produces smooth hue transitions
+/// - **HSV:** Similar to HSL but with different perceptual model
+///
+///
+///
+///
+/// This shader is typically created through {@link dev.tamboui.tfx.Fx} factory methods
+/// rather than directly.
 public final class FadeShader implements Shader {
     
     private final Color fromColor;
@@ -58,9 +66,7 @@ public final class FadeShader implements Shader {
     private TFxColorSpace colorSpace;
     private Pattern pattern;
     
-    /**
-     * Creates a fade shader that transitions from one color to another.
-     */
+    /// Creates a fade shader that transitions from one color to another.
     public static FadeShader fadeTo(Color fromColor, Color toColor, EffectTimer timer) {
         return new FadeShader(fromColor, toColor, timer);
     }
@@ -182,4 +188,5 @@ public final class FadeShader implements Shader {
         return copy;
     }
 }
+
 

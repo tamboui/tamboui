@@ -14,12 +14,12 @@ import java.lang.foreign.ValueLayout;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Windows terminal operations using Panama FFI.
- * <p>
- * This class provides higher-level terminal operations built on top of
- * the low-level Kernel32 bindings.
- */
+/// Windows terminal operations using Panama FFI.
+///
+///
+///
+/// This class provides higher-level terminal operations built on top of
+/// the low-level Kernel32 bindings.
 public final class WindowsTerminal implements PlatformTerminal {
 
     private final Arena arena;
@@ -34,11 +34,9 @@ public final class WindowsTerminal implements PlatformTerminal {
     private boolean rawModeEnabled;
     private volatile Runnable resizeHandler;
 
-    /**
-     * Creates a new Windows terminal instance.
-     *
-     * @throws IOException if the terminal cannot be initialized
-     */
+    /// Creates a new Windows terminal instance.
+    ///
+    /// @throws IOException if the terminal cannot be initialized
     public WindowsTerminal() throws IOException {
         this.arena = Arena.ofShared();
 
@@ -251,3 +249,4 @@ public final class WindowsTerminal implements PlatformTerminal {
         }
     }
 }
+

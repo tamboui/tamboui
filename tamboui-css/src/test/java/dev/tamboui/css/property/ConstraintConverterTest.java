@@ -102,3 +102,4 @@ class ConstraintConverterTest {
         assertThat(result).contains(Constraint.fill());
     }
 }
+

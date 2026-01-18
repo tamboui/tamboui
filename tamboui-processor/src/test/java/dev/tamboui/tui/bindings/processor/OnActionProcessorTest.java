@@ -171,3 +171,4 @@ class OnActionProcessorTest {
                 .contains("handler.on(\"quit\", target::quit)");
     }
 }
+

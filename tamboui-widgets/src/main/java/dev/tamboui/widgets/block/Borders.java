@@ -6,9 +6,7 @@ package dev.tamboui.widgets.block;
 
 import java.util.EnumSet;
 
-/**
- * Which borders to draw on a block.
- */
+/// Which borders to draw on a block.
 public enum Borders {
     TOP,
     RIGHT,
@@ -22,3 +20,4 @@ public enum Borders {
     public static final EnumSet<Borders> BOTTOM_ONLY = EnumSet.of(BOTTOM);
     public static final EnumSet<Borders> LEFT_ONLY = EnumSet.of(LEFT);
 }
+

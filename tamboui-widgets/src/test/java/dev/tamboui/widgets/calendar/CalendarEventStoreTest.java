@@ -144,3 +144,4 @@ class CalendarEventStoreTest {
         assertThat(store.getStyle(date)).isEqualTo(magenta);
     }
 }
+

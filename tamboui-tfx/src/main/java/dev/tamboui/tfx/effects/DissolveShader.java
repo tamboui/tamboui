@@ -15,9 +15,7 @@ import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.SimpleRng;
 import dev.tamboui.tfx.TFxDuration;
 
-/**
- * A dissolve effect that randomly dissolves text characters over time.
- */
+/// A dissolve effect that randomly dissolves text characters over time.
 public final class DissolveShader implements Shader {
     
     private final EffectTimer timer;
@@ -26,16 +24,12 @@ public final class DissolveShader implements Shader {
     private CellFilter cellFilter;
     private SimpleRng rng;
     
-    /**
-     * Creates a dissolve shader that dissolves text over time.
-     */
+    /// Creates a dissolve shader that dissolves text over time.
     public static DissolveShader dissolve(EffectTimer timer) {
         return new DissolveShader(timer, null);
     }
     
-    /**
-     * Creates a dissolve shader that dissolves to a specific style.
-     */
+    /// Creates a dissolve shader that dissolves to a specific style.
     public static DissolveShader dissolveTo(Style style, EffectTimer timer) {
         return new DissolveShader(timer, style);
     }
@@ -139,5 +133,6 @@ public final class DissolveShader implements Shader {
         return copy;
     }
 }
+
 
 

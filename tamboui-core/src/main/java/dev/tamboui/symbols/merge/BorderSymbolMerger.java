@@ -4,26 +4,26 @@
  */
 package dev.tamboui.symbols.merge;
 
-/**
- * Helper class for merging border symbols according to merge strategies.
- * <p>
- * This implementation matches Ratatui's Rust implementation, using BorderSymbol
- * decomposition to handle all Unicode box drawing characters and their combinations.
- */
+/// Helper class for merging border symbols according to merge strategies.
+///
+///
+///
+/// This implementation matches Ratatui's Rust implementation, using BorderSymbol
+/// decomposition to handle all Unicode box drawing characters and their combinations.
 final class BorderSymbolMerger {
 
     private BorderSymbolMerger() {
         // Utility class
     }
 
-    /**
-     * Merges two border symbols according to the given strategy.
-     * <p>
-     * This method matches Ratatui's implementation:
-     * - If either symbol is not a border symbol, handles them according to Ratatui's rules
-     * - If both are border symbols, parses them into BorderSymbol components and merges them
-     * - Returns the merged result as a string
-     */
+    /// Merges two border symbols according to the given strategy.
+    ///
+    ///
+    ///
+    /// This method matches Ratatui's implementation:
+    /// - If either symbol is not a border symbol, handles them according to Ratatui's rules
+    /// - If both are border symbols, parses them into BorderSymbol components and merges them
+    /// - Returns the merged result as a string
     static String merge(String prev, String next, MergeStrategy strategy) {
         // Replace should always just return the last symbol
         if (strategy == MergeStrategy.REPLACE) {
@@ -59,4 +59,5 @@ final class BorderSymbolMerger {
         return result;
     }
 }
+
 

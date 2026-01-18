@@ -16,9 +16,7 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for LineGaugeElement.
- */
+/// Tests for LineGaugeElement.
 class LineGaugeElementTest {
 
     @Test
@@ -57,3 +55,4 @@ class LineGaugeElementTest {
         assertThat(buffer.get(10, 0).style().fg()).contains(Color.CYAN);
     }
 }
+

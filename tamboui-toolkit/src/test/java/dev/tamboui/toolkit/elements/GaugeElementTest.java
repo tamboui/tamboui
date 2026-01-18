@@ -17,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for GaugeElement.
- */
+/// Tests for GaugeElement.
 class GaugeElementTest {
 
     @Test
@@ -169,3 +167,4 @@ class GaugeElementTest {
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
     }
 }
+

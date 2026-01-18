@@ -27,40 +27,41 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 
-/**
- * A table widget for displaying data in rows and columns.
- * <p>
- * The table supports optional header and footer rows, column width constraints,
- * row selection with highlighting, and scrolling for large datasets.
- *
- * <pre>{@code
- * Table table = Table.builder()
- *     .header(Row.from("Name", "Age", "City").style(Style.EMPTY.bold()))
- *     .rows(List.of(
- *         Row.from("Alice", "30", "New York"),
- *         Row.from("Bob", "25", "Los Angeles"),
- *         Row.from("Charlie", "35", "Chicago")
- *     ))
- *     .widths(
- *         Constraint.percentage(40),
- *         Constraint.length(10),
- *         Constraint.fill()
- *     )
- *     .highlightStyle(Style.EMPTY.bg(Color.BLUE))
- *     .highlightSymbol(">> ")
- *     .block(Block.bordered().title("Users"))
- *     .build();
- *
- * frame.renderStatefulWidget(table, area, tableState);
- * }</pre>
- */
+/// A table widget for displaying data in rows and columns.
+///
+///
+///
+/// The table supports optional header and footer rows, column width constraints,
+/// row selection with highlighting, and scrolling for large datasets.
+///
+/// ```java
+/// Table table = Table.builder()
+///     .header(Row.from("Name", "Age", "City").style(Style.EMPTY.bold()))
+///     .rows(List.of(
+///         Row.from("Alice", "30", "New York"),
+///         Row.from("Bob", "25", "Los Angeles"),
+///         Row.from("Charlie", "35", "Chicago")
+///     ))
+///     .widths(
+///         Constraint.percentage(40),
+///         Constraint.length(10),
+///         Constraint.fill()
+///     )
+///     .highlightStyle(Style.EMPTY.bg(Color.BLUE))
+///     .highlightSymbol(">> ")
+///     .block(Block.bordered().title("Users"))
+///     .build();
+///
+/// frame.renderStatefulWidget(table, area, tableState);
+/// }
+/// ```
 public final class Table implements StatefulWidget<TableState> {
 
-    /**
-     * Property key for the row highlight (selection) color.
-     * <p>
-     * CSS property name: {@code highlight-color}
-     */
+    /// Property key for the row highlight (selection) color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code highlight-color}
     public static final PropertyKey<Color> HIGHLIGHT_COLOR =
             PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
 
@@ -123,9 +124,7 @@ public final class Table implements StatefulWidget<TableState> {
         return new Builder();
     }
 
-    /**
-     * Returns the rows in this table.
-     */
+    /// Returns the rows in this table.
     public List<Row> rows() {
         return rows;
     }
@@ -301,15 +300,13 @@ public final class Table implements StatefulWidget<TableState> {
         return y + rowHeight + row.bottomMargin();
     }
 
-    /**
-     * Controls when space is allocated for the highlight symbol.
-     */
+    /// Controls when space is allocated for the highlight symbol.
     public enum HighlightSpacing {
-        /** Always allocate space for the highlight symbol. */
+        /// Always allocate space for the highlight symbol.
         ALWAYS,
-        /** Only allocate space when a row is selected. */
+        /// Only allocate space when a row is selected.
         WHEN_SELECTED,
-        /** Never allocate space for the highlight symbol. */
+        /// Never allocate space for the highlight symbol.
         NEVER
     }
 
@@ -335,162 +332,138 @@ public final class Table implements StatefulWidget<TableState> {
 
         private Builder() {}
 
-        /**
-         * Sets the data rows.
-         */
+        /// Sets the data rows.
         public Builder rows(List<Row> rows) {
             this.rows = new ArrayList<>(rows);
             return this;
         }
 
-        /**
-         * Sets the data rows.
-         */
+        /// Sets the data rows.
         public Builder rows(Row... rows) {
             this.rows = new ArrayList<>(Arrays.asList(rows));
             return this;
         }
 
-        /**
-         * Adds a row.
-         */
+        /// Adds a row.
         public Builder addRow(Row row) {
             this.rows.add(row);
             return this;
         }
 
-        /**
-         * Sets the column width constraints.
-         * <p>
-         * This is required - columns will have 0 width without constraints.
-         */
+        /// Sets the column width constraints.
+        ///
+        ///
+        ///
+        /// This is required - columns will have 0 width without constraints.
         public Builder widths(List<Constraint> widths) {
             this.widths = new ArrayList<>(widths);
             return this;
         }
 
-        /**
-         * Sets the column width constraints.
-         */
+        /// Sets the column width constraints.
         public Builder widths(Constraint... widths) {
             this.widths = new ArrayList<>(Arrays.asList(widths));
             return this;
         }
 
-        /**
-         * Sets the header row.
-         */
+        /// Sets the header row.
         public Builder header(Row header) {
             this.header = header;
             return this;
         }
 
-        /**
-         * Sets the footer row.
-         */
+        /// Sets the footer row.
         public Builder footer(Row footer) {
             this.footer = footer;
             return this;
         }
 
-        /**
-         * Wraps the table in a block.
-         */
+        /// Wraps the table in a block.
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
-        /**
-         * Sets the base style.
-         */
+        /// Sets the base style.
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
-        /**
-         * Sets the style for the selected row.
-         */
+        /// Sets the style for the selected row.
         public Builder highlightStyle(Style style) {
             this.rowHighlightStyle = style;
             return this;
         }
 
-        /**
-         * Sets the symbol displayed before the selected row.
-         */
+        /// Sets the symbol displayed before the selected row.
         public Builder highlightSymbol(String symbol) {
             this.highlightSymbol = symbol != null ? symbol : "";
             return this;
         }
 
-        /**
-         * Sets the spacing between columns.
-         */
+        /// Sets the spacing between columns.
         public Builder columnSpacing(int spacing) {
             this.columnSpacing = Math.max(0, spacing);
             return this;
         }
 
-        /**
-         * Sets when to allocate space for the highlight symbol.
-         */
+        /// Sets when to allocate space for the highlight symbol.
         public Builder highlightSpacing(HighlightSpacing spacing) {
             this.highlightSpacing = spacing;
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code background} and {@code highlight-color}
-         * will be resolved if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code background} and {@code highlight-color}
+        /// will be resolved if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the background color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the row highlight (selection) color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the highlight color
-         * @return this builder
-         */
+        /// Sets the row highlight (selection) color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the highlight color
+        /// @return this builder
         public Builder highlightColor(Color color) {
             this.highlightColor.set(color);
             return this;
         }
 
-        /**
-         * Sets a function to resolve styles for each row based on position.
-         * <p>
-         * The function receives the row index (0-based) and total row count,
-         * and returns a Style to apply to that row. This enables positional
-         * styling like alternating row colors.
-         *
-         * @param resolver function that takes (index, totalCount) and returns a Style
-         * @return this builder
-         */
+        /// Sets a function to resolve styles for each row based on position.
+        ///
+        ///
+        ///
+        /// The function receives the row index (0-based) and total row count,
+        /// and returns a Style to apply to that row. This enables positional
+        /// styling like alternating row colors.
+        ///
+        /// @param resolver function that takes (index, totalCount) and returns a Style
+        /// @return this builder
         public Builder rowStyleResolver(BiFunction<Integer, Integer, Style> resolver) {
             this.rowStyleResolver = resolver;
             return this;
@@ -501,3 +474,4 @@ public final class Table implements StatefulWidget<TableState> {
         }
     }
 }
+

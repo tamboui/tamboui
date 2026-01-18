@@ -35,9 +35,7 @@ import java.util.Arrays;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for the Dsl factory methods.
- */
+/// Tests for the Dsl factory methods.
 class ToolkitTest {
 
     @Nested
@@ -461,3 +459,4 @@ class ToolkitTest {
         }
     }
 }
+

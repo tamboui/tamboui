@@ -30,12 +30,12 @@ import dev.tamboui.widgets.sparkline.Sparkline;
 import java.io.IOException;
 import java.util.Random;
 
-/**
- * Demo TUI application showcasing the Sparkline widget.
- * <p>
- * Demonstrates sparklines with different styles, bar sets,
- * and animated data updates.
- */
+/// Demo TUI application showcasing the Sparkline widget.
+///
+///
+///
+/// Demonstrates sparklines with different styles, bar sets,
+/// and animated data updates.
 public class SparklineDemo {
 
     private static final int DATA_SIZE = 60;
@@ -283,3 +283,4 @@ public class SparklineDemo {
         frame.renderWidget(footer, area);
     }
 }
+

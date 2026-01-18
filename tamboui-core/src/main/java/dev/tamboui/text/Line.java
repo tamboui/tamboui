@@ -16,9 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * A single line of text composed of styled spans.
- */
+/// A single line of text composed of styled spans.
 public final class Line {
 
     private final List<Span> spans;
@@ -53,9 +51,7 @@ public final class Line {
         return new Line(listCopyOf(Span.styled(text, style)), null);
     }
 
-    /**
-     * Returns the display width of this line (sum of span widths).
-     */
+    /// Returns the display width of this line (sum of span widths).
     public int width() {
         return spans.stream().mapToInt(Span::width).sum();
     }
@@ -80,9 +76,7 @@ public final class Line {
         return alignment(Alignment.RIGHT);
     }
 
-    /**
-     * Applies a style patch to all spans.
-     */
+    /// Applies a style patch to all spans.
     public Line patchStyle(Style style) {
         List<Span> newSpans = spans.stream()
             .map(span -> span.patchStyle(style))
@@ -118,9 +112,7 @@ public final class Line {
         return patchStyle(Style.EMPTY.hyperlink(url, id));
     }
 
-    /**
-     * Returns the raw text content without styling.
-     */
+    /// Returns the raw text content without styling.
     public String rawContent() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < spans.size(); i++) {
@@ -130,18 +122,14 @@ public final class Line {
         return sb.toString();
     }
 
-    /**
-     * Appends another line's spans to this line.
-     */
+    /// Appends another line's spans to this line.
     public Line append(Line other) {
         List<Span> newSpans = new ArrayList<>(spans);
         newSpans.addAll(other.spans);
         return new Line(newSpans, alignment);
     }
 
-    /**
-     * Appends a span to this line.
-     */
+    /// Appends a span to this line.
     public Line append(Span span) {
         List<Span> newSpans = new ArrayList<>(spans);
         newSpans.add(span);
@@ -178,3 +166,4 @@ public final class Line {
         return String.format("Line[spans=%s, alignment=%s]", spans, alignment);
     }
 }
+

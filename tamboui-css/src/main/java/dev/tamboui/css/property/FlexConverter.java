@@ -9,19 +9,18 @@ import dev.tamboui.layout.Flex;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Converts CSS flex values to Flex enum.
- * <p>
- * Supports the following values:
- * <ul>
- *   <li>{@code "start"} - items aligned at start</li>
- *   <li>{@code "center"} - items centered</li>
- *   <li>{@code "end"} - items aligned at end</li>
- *   <li>{@code "space-between"} - items distributed with space between</li>
- *   <li>{@code "space-around"} - items distributed with space around</li>
- *   <li>{@code "space-evenly"} - items distributed with equal space</li>
- * </ul>
- */
+/// Converts CSS flex values to Flex enum.
+///
+///
+///
+/// Supports the following values:
+///
+/// - {@code "start"} - items aligned at start
+/// - {@code "center"} - items centered
+/// - {@code "end"} - items aligned at end
+/// - {@code "space-between"} - items distributed with space between
+/// - {@code "space-around"} - items distributed with space around
+/// - {@code "space-evenly"} - items distributed with equal space
 public final class FlexConverter implements PropertyConverter<Flex> {
 
     @Override
@@ -50,3 +49,4 @@ public final class FlexConverter implements PropertyConverter<Flex> {
         }
     }
 }
+

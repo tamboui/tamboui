@@ -17,9 +17,7 @@ import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for ChartElement.
- */
+/// Tests for ChartElement.
 class ChartElementTest {
 
     @Test
@@ -47,3 +45,4 @@ class ChartElementTest {
         assertThat(buffer).at(0, 0).hasSymbol("╭").hasForeground(Color.CYAN);
     }
 }
+

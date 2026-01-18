@@ -22,51 +22,55 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
-/**
- * Main entry point for CSS styling.
- * <p>
- * The StyleEngine manages stylesheets, resolves styles for elements,
- * and supports live stylesheet switching for theming.
- *
- * <h2>Stylesheet Types</h2>
- * <p>
- * The engine supports two types of stylesheets:
- * <ul>
- *   <li><b>Inline stylesheets</b>: Added via {@link #addStylesheet(String)} or {@link #loadStylesheet(String)}.
- *       Multiple inline stylesheets can be registered and are <em>all always applied</em>,
- *       in the order they were added. Use these for base styles that should always be present.</li>
- *   <li><b>Named stylesheets</b>: Added via {@link #addStylesheet(String, String)} or
- *       {@link #loadStylesheet(String, String)}. Only <em>one named stylesheet is active</em> at a time,
- *       selectable via {@link #setActiveStylesheet(String)}. Use these for themes that can be switched
- *       at runtime.</li>
- * </ul>
- *
- * <h2>Cascade Order</h2>
- * <p>
- * When resolving styles, rules are collected in the following order:
- * <ol>
- *   <li>All inline stylesheets (in registration order)</li>
- *   <li>The active named stylesheet</li>
- * </ol>
- * Later rules override earlier ones following standard CSS cascade rules,
- * so the active named stylesheet can override inline styles.
- *
- * <h2>Usage Example</h2>
- * <pre>
- * StyleEngine engine = StyleEngine.create();
- *
- * // Add base styles (always applied)
- * engine.addStylesheet("* { padding: 1; }");
- *
- * // Load theme stylesheets (only one active at a time)
- * engine.loadStylesheet("dark", "/themes/dark.tcss");
- * engine.loadStylesheet("light", "/themes/light.tcss");
- * engine.setActiveStylesheet("dark");
- *
- * // Switch themes at runtime
- * engine.setActiveStylesheet("light");
- * </pre>
- */
+/// Main entry point for CSS styling.
+///
+///
+///
+/// The StyleEngine manages stylesheets, resolves styles for elements,
+/// and supports live stylesheet switching for theming.
+///
+/// ## Stylesheet Types
+///
+///
+///
+/// The engine supports two types of stylesheets:
+///
+/// <li>**Inline stylesheets**: Added via {@link #addStylesheet(String)} or {@link #loadStylesheet(String)}.
+/// Multiple inline stylesheets can be registered and are *all always applied*,
+/// in the order they were added. Use these for base styles that should always be present.
+/// <li>**Named stylesheets**: Added via {@link #addStylesheet(String, String)} or
+/// {@link #loadStylesheet(String, String)}. Only *one named stylesheet is active* at a time,
+/// selectable via {@link #setActiveStylesheet(String)}. Use these for themes that can be switched
+/// at runtime.
+///
+///
+/// ## Cascade Order
+///
+///
+///
+/// When resolving styles, rules are collected in the following order:
+///
+/// 1. All inline stylesheets (in registration order)
+/// 1. The active named stylesheet
+///
+/// Later rules override earlier ones following standard CSS cascade rules,
+/// so the active named stylesheet can override inline styles.
+///
+/// ## Usage Example
+/// ```
+/// StyleEngine engine = StyleEngine.create();
+///
+/// // Add base styles (always applied)
+/// engine.addStylesheet("* { padding: 1; }");
+///
+/// // Load theme stylesheets (only one active at a time)
+/// engine.loadStylesheet("dark", "/themes/dark.tcss");
+/// engine.loadStylesheet("light", "/themes/light.tcss");
+/// engine.setActiveStylesheet("dark");
+///
+/// // Switch themes at runtime
+/// engine.setActiveStylesheet("light");
+/// ```
 public final class StyleEngine {
 
     private final Map<String, StylesheetEntry> namedStylesheets;
@@ -86,48 +90,42 @@ public final class StyleEngine {
         this.activeStylesheetName = null;
     }
 
-    /**
-     * Creates a new StyleEngine with default configuration.
-     *
-     * @return a new StyleEngine
-     */
+    /// Creates a new StyleEngine with default configuration.
+    ///
+    /// @return a new StyleEngine
     public static StyleEngine create() {
         return new StyleEngine(PropertyRegistry.createDefault());
     }
 
-    /**
-     * Creates a StyleEngine with a custom property registry.
-     *
-     * @param propertyRegistry the property registry
-     * @return a new StyleEngine
-     */
+    /// Creates a StyleEngine with a custom property registry.
+    ///
+    /// @param propertyRegistry the property registry
+    /// @return a new StyleEngine
     public static StyleEngine create(PropertyRegistry propertyRegistry) {
         return new StyleEngine(propertyRegistry);
     }
 
     // --- Stylesheet Loading ---
 
-    /**
-     * Loads a stylesheet from the classpath.
-     *
-     * @param classpathResource the classpath resource path (e.g., "/styles/app.tcss")
-     * @throws IOException if the resource cannot be read
-     */
+    /// Loads a stylesheet from the classpath.
+    ///
+    /// @param classpathResource the classpath resource path (e.g., "/styles/app.tcss")
+    /// @throws IOException if the resource cannot be read
     public void loadStylesheet(String classpathResource) throws IOException {
         String css = readClasspathResource(classpathResource);
         Stylesheet stylesheet = CssParser.parse(css);
         inlineStylesheets.add(stylesheet);
     }
 
-    /**
-     * Loads a named stylesheet from the classpath.
-     * <p>
-     * Named stylesheets can be switched at runtime using {@link #setActiveStylesheet(String)}.
-     *
-     * @param name              the stylesheet name (e.g., "dark", "light")
-     * @param classpathResource the classpath resource path
-     * @throws IOException if the resource cannot be read
-     */
+    /// Loads a named stylesheet from the classpath.
+    ///
+    ///
+    ///
+    /// Named stylesheets can be switched at runtime using {@link #setActiveStylesheet(String)}.
+    ///
+    /// @param name              the stylesheet name (e.g., "dark", "light")
+    /// @param classpathResource the classpath resource path
+    /// @throws IOException if the resource cannot be read
     public void loadStylesheet(String name, String classpathResource) throws IOException {
         Supplier<String> source = () -> {
             try {
@@ -145,25 +143,21 @@ public final class StyleEngine {
         }
     }
 
-    /**
-     * Loads a stylesheet from a file path.
-     *
-     * @param path the file path
-     * @throws IOException if the file cannot be read
-     */
+    /// Loads a stylesheet from a file path.
+    ///
+    /// @param path the file path
+    /// @throws IOException if the file cannot be read
     public void loadStylesheet(Path path) throws IOException {
         String css = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         Stylesheet stylesheet = CssParser.parse(css);
         inlineStylesheets.add(stylesheet);
     }
 
-    /**
-     * Loads a named stylesheet from a file path.
-     *
-     * @param name the stylesheet name
-     * @param path the file path
-     * @throws IOException if the file cannot be read
-     */
+    /// Loads a named stylesheet from a file path.
+    ///
+    /// @param name the stylesheet name
+    /// @param path the file path
+    /// @throws IOException if the file cannot be read
     public void loadStylesheet(String name, Path path) throws IOException {
         Supplier<String> source = () -> {
             try {
@@ -180,22 +174,18 @@ public final class StyleEngine {
         }
     }
 
-    /**
-     * Adds an inline stylesheet from a CSS string.
-     *
-     * @param css the CSS source code
-     */
+    /// Adds an inline stylesheet from a CSS string.
+    ///
+    /// @param css the CSS source code
     public void addStylesheet(String css) {
         Stylesheet stylesheet = CssParser.parse(css);
         inlineStylesheets.add(stylesheet);
     }
 
-    /**
-     * Adds a named inline stylesheet.
-     *
-     * @param name the stylesheet name
-     * @param css  the CSS source code
-     */
+    /// Adds a named inline stylesheet.
+    ///
+    /// @param name the stylesheet name
+    /// @param css  the CSS source code
     public void addStylesheet(String name, String css) {
         Stylesheet stylesheet = CssParser.parse(css);
         namedStylesheets.put(name, new StylesheetEntry(stylesheet, null));
@@ -207,15 +197,15 @@ public final class StyleEngine {
 
     // --- Stylesheet Switching ---
 
-    /**
-     * Sets the active named stylesheet.
-     * <p>
-     * This enables live theme switching - the UI will use the new
-     * stylesheet on the next render cycle.
-     *
-     * @param name the stylesheet name
-     * @throws IllegalArgumentException if no stylesheet with that name exists
-     */
+    /// Sets the active named stylesheet.
+    ///
+    ///
+    ///
+    /// This enables live theme switching - the UI will use the new
+    /// stylesheet on the next render cycle.
+    ///
+    /// @param name the stylesheet name
+    /// @throws IllegalArgumentException if no stylesheet with that name exists
     public void setActiveStylesheet(String name) {
         if (!namedStylesheets.containsKey(name)) {
             throw new IllegalArgumentException("No stylesheet named: " + name);
@@ -228,31 +218,27 @@ public final class StyleEngine {
         }
     }
 
-    /**
-     * Returns the name of the active stylesheet.
-     *
-     * @return the active stylesheet name, or empty if none set
-     */
+    /// Returns the name of the active stylesheet.
+    ///
+    /// @return the active stylesheet name, or empty if none set
     public Optional<String> getActiveStylesheet() {
         return Optional.ofNullable(activeStylesheetName);
     }
 
-    /**
-     * Returns the names of all loaded named stylesheets.
-     *
-     * @return the stylesheet names
-     */
+    /// Returns the names of all loaded named stylesheets.
+    ///
+    /// @return the stylesheet names
     public Set<String> getStylesheetNames() {
         return Collections.unmodifiableSet(namedStylesheets.keySet());
     }
 
-    /**
-     * Reloads a named stylesheet from its original source.
-     * <p>
-     * Useful for hot-reload during development.
-     *
-     * @param name the stylesheet name
-     */
+    /// Reloads a named stylesheet from its original source.
+    ///
+    ///
+    ///
+    /// Useful for hot-reload during development.
+    ///
+    /// @param name the stylesheet name
     public void reloadStylesheet(String name) {
         StylesheetEntry entry = namedStylesheets.get(name);
         if (entry == null) {
@@ -275,14 +261,12 @@ public final class StyleEngine {
 
     // --- Style Resolution ---
 
-    /**
-     * Resolves the style for an element.
-     *
-     * @param element   the element to style
-     * @param state     the pseudo-class state
-     * @param ancestors the ancestor chain
-     * @return the resolved style
-     */
+    /// Resolves the style for an element.
+    ///
+    /// @param element   the element to style
+    /// @param state     the pseudo-class state
+    /// @param ancestors the ancestor chain
+    /// @return the resolved style
     public CssStyleResolver resolve(Styleable element,
                                      PseudoClassState state,
                                      List<Styleable> ancestors) {
@@ -292,25 +276,23 @@ public final class StyleEngine {
         return cascadeResolver.resolve(element, state, ancestors, allRules, allVariables);
     }
 
-    /**
-     * Resolves the style for an element with default state and no ancestors.
-     *
-     * @param element the element to style
-     * @return the resolved style
-     */
+    /// Resolves the style for an element with default state and no ancestors.
+    ///
+    /// @param element the element to style
+    /// @return the resolved style
     public CssStyleResolver resolve(Styleable element) {
         return resolve(element, PseudoClassState.NONE, Collections.<Styleable>emptyList());
     }
 
-    /**
-     * Parses a CSS color value string into a Color.
-     * <p>
-     * Supports named colors (e.g., "red", "blue"), hex colors (e.g., "#ff0000"),
-     * and RGB notation (e.g., "rgb(255,0,0)"), as well as CSS variables.
-     *
-     * @param colorValue the CSS color value string
-     * @return the parsed color, or empty if parsing fails
-     */
+    /// Parses a CSS color value string into a Color.
+    ///
+    ///
+    ///
+    /// Supports named colors (e.g., "red", "blue"), hex colors (e.g., "#ff0000"),
+    /// and RGB notation (e.g., "rgb(255,0,0)"), as well as CSS variables.
+    ///
+    /// @param colorValue the CSS color value string
+    /// @return the parsed color, or empty if parsing fails
     public Optional<Color> parseColor(String colorValue) {
         if (colorValue == null || colorValue.isEmpty()) {
             return Optional.empty();
@@ -321,20 +303,16 @@ public final class StyleEngine {
 
     // --- Change Listeners ---
 
-    /**
-     * Adds a listener to be notified when the active stylesheet changes.
-     *
-     * @param listener the listener
-     */
+    /// Adds a listener to be notified when the active stylesheet changes.
+    ///
+    /// @param listener the listener
     public void addChangeListener(StyleChangeListener listener) {
         listeners.add(listener);
     }
 
-    /**
-     * Removes a change listener.
-     *
-     * @param listener the listener
-     */
+    /// Removes a change listener.
+    ///
+    /// @param listener the listener
     public void removeChangeListener(StyleChangeListener listener) {
         listeners.remove(listener);
     }
@@ -407,27 +385,19 @@ public final class StyleEngine {
         }
     }
 
-    /**
-     * Listener for stylesheet changes.
-     */
+    /// Listener for stylesheet changes.
     public interface StyleChangeListener {
-        /**
-         * Called when the active stylesheet changes.
-         */
+        /// Called when the active stylesheet changes.
         void onStyleChange();
     }
 
-    /**
-     * Internal entry for named stylesheets.
-     */
+    /// Internal entry for named stylesheets.
     private static final class StylesheetEntry {
         private final Stylesheet stylesheet;
         private final Supplier<String> sourceProvider;
 
-        /**
-         * @param stylesheet the parsed stylesheet
-         * @param sourceProvider optional supplier that provides CSS content for reloading (null for inline stylesheets)
-         */
+        /// @param stylesheet the parsed stylesheet
+        /// @param sourceProvider optional supplier that provides CSS content for reloading (null for inline stylesheets)
         StylesheetEntry(Stylesheet stylesheet, Supplier<String> sourceProvider) {
             this.stylesheet = stylesheet;
             this.sourceProvider = sourceProvider;
@@ -442,3 +412,4 @@ public final class StyleEngine {
         }
     }
 }
+

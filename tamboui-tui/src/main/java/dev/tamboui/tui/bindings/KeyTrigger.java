@@ -9,35 +9,36 @@ import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
 
-/**
- * An {@link InputTrigger} that matches {@link KeyEvent}s.
- * <p>
- * Key triggers can match:
- * <ul>
- *   <li>A specific {@link KeyCode} (e.g., UP, ENTER)</li>
- *   <li>A character with optional modifiers (e.g., 'k', Ctrl+'u')</li>
- * </ul>
- *
- * <pre>{@code
- * // Match the UP arrow key
- * KeyTrigger.key(KeyCode.UP)
- *
- * // Match lowercase 'j'
- * KeyTrigger.ch('j')
- *
- * // Match 'j' or 'J' (case-insensitive)
- * KeyTrigger.chIgnoreCase('j')
- *
- * // Match Ctrl+U
- * KeyTrigger.ctrl('u')
- *
- * // Match Alt+V
- * KeyTrigger.alt('v')
- *
- * // Match Shift+Tab
- * KeyTrigger.key(KeyCode.TAB, false, false, true)
- * }</pre>
- */
+/// An {@link InputTrigger} that matches {@link KeyEvent}s.
+///
+///
+///
+/// Key triggers can match:
+///
+/// - A specific {@link KeyCode} (e.g., UP, ENTER)
+/// - A character with optional modifiers (e.g., 'k', Ctrl+'u')
+///
+///
+/// ```java
+/// // Match the UP arrow key
+/// KeyTrigger.key(KeyCode.UP)
+///
+/// // Match lowercase 'j'
+/// KeyTrigger.ch('j')
+///
+/// // Match 'j' or 'J' (case-insensitive)
+/// KeyTrigger.chIgnoreCase('j')
+///
+/// // Match Ctrl+U
+/// KeyTrigger.ctrl('u')
+///
+/// // Match Alt+V
+/// KeyTrigger.alt('v')
+///
+/// // Match Shift+Tab
+/// KeyTrigger.key(KeyCode.TAB, false, false, true)
+/// }
+/// ```
 public final class KeyTrigger implements InputTrigger {
 
     private final KeyCode keyCode;
@@ -57,65 +58,53 @@ public final class KeyTrigger implements InputTrigger {
         this.ignoreCase = ignoreCase;
     }
 
-    /**
-     * Creates a trigger for a special key code without modifiers.
-     *
-     * @param code the key code
-     * @return a trigger that matches the specified key
-     */
+    /// Creates a trigger for a special key code without modifiers.
+    ///
+    /// @param code the key code
+    /// @return a trigger that matches the specified key
     public static KeyTrigger key(KeyCode code) {
         return new KeyTrigger(code, null, false, false, false, false);
     }
 
-    /**
-     * Creates a trigger for a special key code with modifiers.
-     *
-     * @param code  the key code
-     * @param ctrl  true if Ctrl must be pressed
-     * @param alt   true if Alt must be pressed
-     * @param shift true if Shift must be pressed
-     * @return a trigger that matches the specified key with modifiers
-     */
+    /// Creates a trigger for a special key code with modifiers.
+    ///
+    /// @param code  the key code
+    /// @param ctrl  true if Ctrl must be pressed
+    /// @param alt   true if Alt must be pressed
+    /// @param shift true if Shift must be pressed
+    /// @return a trigger that matches the specified key with modifiers
     public static KeyTrigger key(KeyCode code, boolean ctrl, boolean alt, boolean shift) {
         return new KeyTrigger(code, null, ctrl, alt, shift, false);
     }
 
-    /**
-     * Creates a trigger for a character (case-sensitive).
-     *
-     * @param c the character to match
-     * @return a trigger that matches the exact character
-     */
+    /// Creates a trigger for a character (case-sensitive).
+    ///
+    /// @param c the character to match
+    /// @return a trigger that matches the exact character
     public static KeyTrigger ch(char c) {
         return new KeyTrigger(KeyCode.CHAR, c, false, false, false, false);
     }
 
-    /**
-     * Creates a trigger for a character (case-insensitive).
-     *
-     * @param c the character to match (case-insensitive)
-     * @return a trigger that matches the character regardless of case
-     */
+    /// Creates a trigger for a character (case-insensitive).
+    ///
+    /// @param c the character to match (case-insensitive)
+    /// @return a trigger that matches the character regardless of case
     public static KeyTrigger chIgnoreCase(char c) {
         return new KeyTrigger(KeyCode.CHAR, c, false, false, false, true);
     }
 
-    /**
-     * Creates a trigger for Ctrl+character.
-     *
-     * @param c the character
-     * @return a trigger that matches Ctrl+c
-     */
+    /// Creates a trigger for Ctrl+character.
+    ///
+    /// @param c the character
+    /// @return a trigger that matches Ctrl+c
     public static KeyTrigger ctrl(char c) {
         return new KeyTrigger(KeyCode.CHAR, c, true, false, false, false);
     }
 
-    /**
-     * Creates a trigger for Alt+character.
-     *
-     * @param c the character
-     * @return a trigger that matches Alt+c
-     */
+    /// Creates a trigger for Alt+character.
+    ///
+    /// @param c the character
+    /// @return a trigger that matches Alt+c
     public static KeyTrigger alt(char c) {
         return new KeyTrigger(KeyCode.CHAR, c, false, true, false, false);
     }
@@ -128,20 +117,20 @@ public final class KeyTrigger implements InputTrigger {
         return matchesKey((KeyEvent) event);
     }
 
-    /**
-     * Returns true if this trigger matches the given key event.
-     * <p>
-     * Matching rules:
-     * <ul>
-     *   <li>Key code must match</li>
-     *   <li>Ctrl and Alt modifiers must match exactly</li>
-     *   <li>Shift is only checked if explicitly required by the trigger</li>
-     *   <li>For character triggers, the character must match (respecting ignoreCase)</li>
-     * </ul>
-     *
-     * @param event the key event to match against
-     * @return true if this trigger matches the event
-     */
+    /// Returns true if this trigger matches the given key event.
+    ///
+    ///
+    ///
+    /// Matching rules:
+    ///
+    /// - Key code must match
+    /// - Ctrl and Alt modifiers must match exactly
+    /// - Shift is only checked if explicitly required by the trigger
+    /// - For character triggers, the character must match (respecting ignoreCase)
+    ///
+    ///
+    /// @param event the key event to match against
+    /// @return true if this trigger matches the event
     public boolean matchesKey(KeyEvent event) {
         // Check key code first
         if (event.code() != keyCode) {
@@ -262,3 +251,4 @@ public final class KeyTrigger implements InputTrigger {
         return result;
     }
 }
+

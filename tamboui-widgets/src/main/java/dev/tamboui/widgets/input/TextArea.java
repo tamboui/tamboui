@@ -19,32 +19,30 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
 
-/**
- * A text area widget for multi-line text entry.
- */
+/// A text area widget for multi-line text entry.
 public final class TextArea implements StatefulWidget<TextAreaState> {
 
-    /**
-     * Property key for the cursor color.
-     * <p>
-     * CSS property name: {@code cursor-color}
-     */
+    /// Property key for the cursor color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code cursor-color}
     public static final PropertyKey<Color> CURSOR_COLOR =
             PropertyKey.of("cursor-color", ColorConverter.INSTANCE);
 
-    /**
-     * Property key for the placeholder text color.
-     * <p>
-     * CSS property name: {@code placeholder-color}
-     */
+    /// Property key for the placeholder text color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code placeholder-color}
     public static final PropertyKey<Color> PLACEHOLDER_COLOR =
             PropertyKey.of("placeholder-color", ColorConverter.INSTANCE);
 
-    /**
-     * Property key for the line number gutter color.
-     * <p>
-     * CSS property name: {@code line-number-color}
-     */
+    /// Property key for the line number gutter color.
+    ///
+    ///
+    ///
+    /// CSS property name: {@code line-number-color}
     public static final PropertyKey<Color> LINE_NUMBER_COLOR =
             PropertyKey.of("line-number-color", ColorConverter.INSTANCE);
 
@@ -199,10 +197,8 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
     }
 
-    /**
-     * Renders the widget and sets the cursor position on the frame.
-     * Call this instead of render() when this input is focused.
-     */
+    /// Renders the widget and sets the cursor position on the frame.
+    /// Call this instead of render() when this input is focused.
     public void renderWithCursor(Rect area, Buffer buffer, TextAreaState state, Frame frame) {
         render(area, buffer, state);
 
@@ -309,81 +305,81 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
             return this;
         }
 
-        /**
-         * Sets the property resolver for style-aware properties.
-         * <p>
-         * When set, properties like {@code color}, {@code background},
-         * {@code cursor-color}, {@code placeholder-color}, and {@code line-number-color}
-         * will be resolved if not set programmatically.
-         *
-         * @param resolver the property resolver
-         * @return this builder
-         */
+        /// Sets the property resolver for style-aware properties.
+        ///
+        ///
+        ///
+        /// When set, properties like {@code color}, {@code background},
+        /// {@code cursor-color}, {@code placeholder-color}, and {@code line-number-color}
+        /// will be resolved if not set programmatically.
+        ///
+        /// @param resolver the property resolver
+        /// @return this builder
         public Builder styleResolver(StylePropertyResolver resolver) {
             this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
             return this;
         }
 
-        /**
-         * Sets the background color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the background color
-         * @return this builder
-         */
+        /// Sets the background color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the background color
+        /// @return this builder
         public Builder background(Color color) {
             this.background.set(color);
             return this;
         }
 
-        /**
-         * Sets the foreground (text) color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the foreground color
-         * @return this builder
-         */
+        /// Sets the foreground (text) color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the foreground color
+        /// @return this builder
         public Builder foreground(Color color) {
             this.foreground.set(color);
             return this;
         }
 
-        /**
-         * Sets the cursor color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the cursor color
-         * @return this builder
-         */
+        /// Sets the cursor color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the cursor color
+        /// @return this builder
         public Builder cursorColor(Color color) {
             this.cursorColor.set(color);
             return this;
         }
 
-        /**
-         * Sets the placeholder text color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the placeholder color
-         * @return this builder
-         */
+        /// Sets the placeholder text color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the placeholder color
+        /// @return this builder
         public Builder placeholderColor(Color color) {
             this.placeholderColor.set(color);
             return this;
         }
 
-        /**
-         * Sets the line number gutter color programmatically.
-         * <p>
-         * This takes precedence over values from the style resolver.
-         *
-         * @param color the line number color
-         * @return this builder
-         */
+        /// Sets the line number gutter color programmatically.
+        ///
+        ///
+        ///
+        /// This takes precedence over values from the style resolver.
+        ///
+        /// @param color the line number color
+        /// @return this builder
         public Builder lineNumberColor(Color color) {
             this.lineNumberColor.set(color);
             return this;
@@ -394,3 +390,4 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
     }
 }
+

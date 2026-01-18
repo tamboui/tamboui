@@ -18,30 +18,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * Factory for predefined binding sets.
- * <p>
- * Available binding sets:
- * <ul>
- *   <li>{@link #standard()} - Arrow keys only, no vim/emacs bindings (default)</li>
- *   <li>{@link #vim()} - Vim-style navigation (hjkl, g/G, Ctrl+u/d)</li>
- *   <li>{@link #emacs()} - Emacs-style navigation (Ctrl+n/p/f/b, etc.)</li>
- *   <li>{@link #intellij()} - IntelliJ IDEA-style bindings</li>
- *   <li>{@link #vscode()} - Visual Studio Code-style bindings</li>
- * </ul>
- *
- * <pre>{@code
- * // Use a predefined binding set
- * Bindings bindings = BindingSets.vim();
- *
- * // Customize a predefined set
- * Bindings custom = BindingSets.standard()
- *     .toBuilder()
- *     .bind(KeyTrigger.ch('x'), Actions.QUIT)
- *     .bind(MouseTrigger.rightClick(), "contextMenu")
- *     .build();
- * }</pre>
- */
+/// Factory for predefined binding sets.
+///
+///
+///
+/// Available binding sets:
+///
+/// - {@link #standard()} - Arrow keys only, no vim/emacs bindings (default)
+/// - {@link #vim()} - Vim-style navigation (hjkl, g/G, Ctrl+u/d)
+/// - {@link #emacs()} - Emacs-style navigation (Ctrl+n/p/f/b, etc.)
+/// - {@link #intellij()} - IntelliJ IDEA-style bindings
+/// - {@link #vscode()} - Visual Studio Code-style bindings
+///
+///
+/// ```java
+/// // Use a predefined binding set
+/// Bindings bindings = BindingSets.vim();
+///
+/// // Customize a predefined set
+/// Bindings custom = BindingSets.standard()
+///     .toBuilder()
+///     .bind(KeyTrigger.ch('x'), Actions.QUIT)
+///     .bind(MouseTrigger.rightClick(), "contextMenu")
+///     .build();
+/// }
+/// ```
 public final class BindingSets {
 
     private static final String BINDINGS_RESOURCE_PATH = "dev/tamboui/tui/bindings/";
@@ -73,80 +74,80 @@ public final class BindingSets {
         }
     }
 
-    /**
-     * Standard binding set using only arrow keys and standard keys.
-     * <p>
-     * No vim or emacs-style bindings. This is the default set,
-     * safe for use with text input (no letter keys bound to navigation).
-     *
-     * @return the standard bindings
-     */
+    /// Standard binding set using only arrow keys and standard keys.
+    ///
+    ///
+    ///
+    /// No vim or emacs-style bindings. This is the default set,
+    /// safe for use with text input (no letter keys bound to navigation).
+    ///
+    /// @return the standard bindings
     public static Bindings standard() {
         return STANDARD;
     }
 
-    /**
-     * Vim-style binding set with hjkl navigation.
-     * <p>
-     * Includes:
-     * <ul>
-     *   <li>hjkl for directional navigation</li>
-     *   <li>g/G for home/end</li>
-     *   <li>Ctrl+u/d for page up/down</li>
-     * </ul>
-     *
-     * @return the vim bindings
-     */
+    /// Vim-style binding set with hjkl navigation.
+    ///
+    ///
+    ///
+    /// Includes:
+    ///
+    /// - hjkl for directional navigation
+    /// - g/G for home/end
+    /// - Ctrl+u/d for page up/down
+    ///
+    ///
+    /// @return the vim bindings
     public static Bindings vim() {
         return VIM;
     }
 
-    /**
-     * Emacs-style binding set with Ctrl+n/p/f/b navigation.
-     * <p>
-     * Includes:
-     * <ul>
-     *   <li>Ctrl+n/p/f/b for directional navigation</li>
-     *   <li>Alt+v/Ctrl+v for page up/down</li>
-     *   <li>Ctrl+a/e for home/end (line-level)</li>
-     *   <li>Ctrl+g as cancel</li>
-     * </ul>
-     *
-     * @return the emacs bindings
-     */
+    /// Emacs-style binding set with Ctrl+n/p/f/b navigation.
+    ///
+    ///
+    ///
+    /// Includes:
+    ///
+    /// - Ctrl+n/p/f/b for directional navigation
+    /// - Alt+v/Ctrl+v for page up/down
+    /// - Ctrl+a/e for home/end (line-level)
+    /// - Ctrl+g as cancel
+    ///
+    ///
+    /// @return the emacs bindings
     public static Bindings emacs() {
         return EMACS;
     }
 
-    /**
-     * IntelliJ IDEA-style binding set.
-     * <p>
-     * Based on IntelliJ's default key bindings for navigation.
-     *
-     * @return the IntelliJ bindings
-     */
+    /// IntelliJ IDEA-style binding set.
+    ///
+    ///
+    ///
+    /// Based on IntelliJ's default key bindings for navigation.
+    ///
+    /// @return the IntelliJ bindings
     public static Bindings intellij() {
         return INTELLIJ;
     }
 
-    /**
-     * Visual Studio Code-style binding set.
-     * <p>
-     * Based on VS Code's default key bindings for navigation.
-     *
-     * @return the VS Code bindings
-     */
+    /// Visual Studio Code-style binding set.
+    ///
+    ///
+    ///
+    /// Based on VS Code's default key bindings for navigation.
+    ///
+    /// @return the VS Code bindings
     public static Bindings vscode() {
         return VSCODE;
     }
 
-    /**
-     * Returns the default bindings.
-     * <p>
-     * Currently returns {@link #standard()}.
-     *
-     * @return the default bindings
-     */
+    /// Returns the default bindings.
+    ///
+    ///
+    ///
+    /// Currently returns {@link #standard()}.
+    ///
+    /// @return the default bindings
     public static Bindings defaults() {
         return STANDARD;
     }
@@ -208,98 +209,97 @@ public final class BindingSets {
         return map;
     }
 
-    /**
-     * Loads bindings from a properties file.
-     * <p>
-     * The file format uses standard Java properties:
-     * <pre>{@code
-     * # Navigation
-     * moveUp = Up, k, K
-     * moveDown = Down, j, J
-     * confirm = Enter
-     * quit = q, Ctrl+c
-     *
-     * # Mouse bindings
-     * click = Mouse.Left.Press
-     * rightClick = Mouse.Right.Press
-     * ctrlClick = Ctrl+Mouse.Left.Press
-     * }</pre>
-     * <p>
-     * Key binding syntax:
-     * <ul>
-     *   <li>Key names: Up, Down, Enter, Tab, Escape, Backspace, Delete, Home, End, PageUp, PageDown, F1-F12</li>
-     *   <li>Characters: Single character like k, q</li>
-     *   <li>Modifiers: Ctrl+c, Alt+x, Shift+Tab</li>
-     *   <li>Space: Use the word "Space"</li>
-     * </ul>
-     * <p>
-     * Mouse binding syntax:
-     * <ul>
-     *   <li>Format: [Modifiers+]Mouse.Button.Kind</li>
-     *   <li>Buttons: Left, Right, Middle</li>
-     *   <li>Kinds: Press, Release, Drag, ScrollUp, ScrollDown</li>
-     *   <li>Example: Ctrl+Mouse.Left.Press</li>
-     * </ul>
-     *
-     * @param path the path to the properties file
-     * @return the loaded bindings
-     * @throws IOException if the file cannot be read or parsed
-     */
+    /// Loads bindings from a properties file.
+    ///
+    ///
+    ///
+    /// The file format uses standard Java properties:
+    /// ```java
+    /// # Navigation
+    /// moveUp = Up, k, K
+    /// moveDown = Down, j, J
+    /// confirm = Enter
+    /// quit = q, Ctrl+c
+    ///
+    /// # Mouse bindings
+    /// click = Mouse.Left.Press
+    /// rightClick = Mouse.Right.Press
+    /// ctrlClick = Ctrl+Mouse.Left.Press
+    /// }
+    /// ```
+    ///
+    ///
+    ///
+    /// Key binding syntax:
+    ///
+    /// - Key names: Up, Down, Enter, Tab, Escape, Backspace, Delete, Home, End, PageUp, PageDown, F1-F12
+    /// - Characters: Single character like k, q
+    /// - Modifiers: Ctrl+c, Alt+x, Shift+Tab
+    /// - Space: Use the word "Space"
+    ///
+    ///
+    ///
+    ///
+    /// Mouse binding syntax:
+    ///
+    /// - Format: [Modifiers+]Mouse.Button.Kind
+    /// - Buttons: Left, Right, Middle
+    /// - Kinds: Press, Release, Drag, ScrollUp, ScrollDown
+    /// - Example: Ctrl+Mouse.Left.Press
+    ///
+    ///
+    /// @param path the path to the properties file
+    /// @return the loaded bindings
+    /// @throws IOException if the file cannot be read or parsed
     public static Bindings load(Path path) throws IOException {
         try (InputStream in = Files.newInputStream(path)) {
             return load(in);
         }
     }
 
-    /**
-     * Loads bindings from an input stream containing properties.
-     * <p>
-     * The loaded bindings will be based on the standard bindings,
-     * with properties overriding/adding to them.
-     *
-     * @param input the input stream
-     * @return the loaded bindings
-     * @throws IOException if the stream cannot be read or parsed
-     * @see #load(Path)
-     */
+    /// Loads bindings from an input stream containing properties.
+    ///
+    ///
+    ///
+    /// The loaded bindings will be based on the standard bindings,
+    /// with properties overriding/adding to them.
+    ///
+    /// @param input the input stream
+    /// @return the loaded bindings
+    /// @throws IOException if the stream cannot be read or parsed
+    /// @see #load(Path)
     public static Bindings load(InputStream input) throws IOException {
         return load(input, STANDARD);
     }
 
-    /**
-     * Loads bindings from an input stream, starting with the given base bindings.
-     *
-     * @param input the input stream
-     * @param base  the base bindings to extend (null for empty)
-     * @return the loaded bindings
-     * @throws IOException if the stream cannot be read or parsed
-     */
+    /// Loads bindings from an input stream, starting with the given base bindings.
+    ///
+    /// @param input the input stream
+    /// @param base  the base bindings to extend (null for empty)
+    /// @return the loaded bindings
+    /// @throws IOException if the stream cannot be read or parsed
     public static Bindings load(InputStream input, Bindings base) throws IOException {
         Properties props = new Properties();
         props.load(input);
         return loadFromProperties(props, base);
     }
 
-    /**
-     * Loads bindings from a classpath resource.
-     *
-     * @param resourcePath the resource path (e.g., "/bindings/custom.properties")
-     * @return the loaded bindings
-     * @throws IOException if the resource cannot be found or parsed
-     * @see #load(Path)
-     */
+    /// Loads bindings from a classpath resource.
+    ///
+    /// @param resourcePath the resource path (e.g., "/bindings/custom.properties")
+    /// @return the loaded bindings
+    /// @throws IOException if the resource cannot be found or parsed
+    /// @see #load(Path)
     public static Bindings loadResource(String resourcePath) throws IOException {
         return loadResource(resourcePath, BindingSets.class.getClassLoader());
     }
 
-    /**
-     * Loads bindings from a classpath resource using the specified class loader.
-     *
-     * @param resourcePath the resource path
-     * @param classLoader  the class loader to use
-     * @return the loaded bindings
-     * @throws IOException if the resource cannot be found or parsed
-     */
+    /// Loads bindings from a classpath resource using the specified class loader.
+    ///
+    /// @param resourcePath the resource path
+    /// @param classLoader  the class loader to use
+    /// @return the loaded bindings
+    /// @throws IOException if the resource cannot be found or parsed
     public static Bindings loadResource(String resourcePath, ClassLoader classLoader) throws IOException {
         try (InputStream in = classLoader.getResourceAsStream(
                 resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath)) {
@@ -459,3 +459,4 @@ public final class BindingSets {
         return MouseTrigger.of(kind, button, ctrl, alt, shift);
     }
 }
+

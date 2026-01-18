@@ -4,18 +4,16 @@
  */
 package dev.tamboui.layout;
 
-/**
- * Represents the spacing between segments in a layout.
- * <p>
- * Can represent either positive spacing (space between segments) or negative spacing
- * (overlap between segments).
- */
+/// Represents the spacing between segments in a layout.
+///
+///
+///
+/// Can represent either positive spacing (space between segments) or negative spacing
+/// (overlap between segments).
 public abstract class Spacing {
 
-    /**
-     * Creates spacing from an integer value.
-     * Negative values create overlap, non-negative values create space.
-     */
+    /// Creates spacing from an integer value.
+    /// Negative values create overlap, non-negative values create space.
     public static Spacing from(int value) {
         if (value < 0) {
             return new Overlap(-value);
@@ -24,29 +22,21 @@ public abstract class Spacing {
         }
     }
 
-    /**
-     * Creates spacing with a fixed number of cells between segments.
-     */
+    /// Creates spacing with a fixed number of cells between segments.
     public static Spacing space(int value) {
         return new Space(value);
     }
 
-    /**
-     * Creates overlap with a fixed number of overlapping cells.
-     */
+    /// Creates overlap with a fixed number of overlapping cells.
     public static Spacing overlap(int value) {
         return new Overlap(value);
     }
 
-    /**
-     * Returns the spacing value as an integer.
-     * Positive for space, negative for overlap.
-     */
+    /// Returns the spacing value as an integer.
+    /// Positive for space, negative for overlap.
     public abstract int value();
 
-    /**
-     * Represents positive spacing between segments.
-     */
+    /// Represents positive spacing between segments.
     public static final class Space extends Spacing {
         private final int value;
 
@@ -85,9 +75,7 @@ public abstract class Spacing {
         }
     }
 
-    /**
-     * Represents negative spacing, causing overlap between segments.
-     */
+    /// Represents negative spacing, causing overlap between segments.
     public static final class Overlap extends Spacing {
         private final int value;
 
@@ -126,4 +114,5 @@ public abstract class Spacing {
         }
     }
 }
+
 

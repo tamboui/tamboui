@@ -26,11 +26,11 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-/**
- * Utility script to run TamboUI demos in a consistent way on Windows, Linux and macOS.
- * <p>
- * Uses the Gradle Tooling API to discover and run demo projects.
- */
+/// Utility script to run TamboUI demos in a consistent way on Windows, Linux and macOS.
+///
+///
+///
+/// Uses the Gradle Tooling API to discover and run demo projects.
 @Command(
     name = "tambouiDemos",
     description = "Utility script to run TamboUI demos in a consistent way on Windows, Linux and macOS",
@@ -54,11 +54,9 @@ public class tambouiDemos implements Callable<Integer> {
 
     private ProjectConnection connection;
 
-    /**
-     * Main entry point.
-     *
-     * @param args command line arguments
-     */
+    /// Main entry point.
+    ///
+    /// @param args command line arguments
     public static void main(String... args) {
         int exitCode = new CommandLine(new tambouiDemos()).execute(args);
         exit(exitCode);
@@ -147,12 +145,10 @@ public class tambouiDemos implements Callable<Integer> {
         }
     }
 
-    /**
-     * Extracts the module name from a Gradle project path.
-     *
-     * @param path the project path (e.g., ":tamboui-widgets:demos:basic-demo")
-     * @return the module name (e.g., "tamboui-widgets")
-     */
+    /// Extracts the module name from a Gradle project path.
+    ///
+    /// @param path the project path (e.g., ":tamboui-widgets:demos:basic-demo")
+    /// @return the module name (e.g., "tamboui-widgets")
     String extractModule(String path) {
         // Path format: :module:demos:demo-name or :demos:demo-name
         if (path.startsWith(":demos:")) {
@@ -242,11 +238,9 @@ public class tambouiDemos implements Callable<Integer> {
         return null;
     }
 
-    /**
-     * Run Gradle build tasks.
-     *
-     * @param taskNames the tasks to run
-     */
+    /// Run Gradle build tasks.
+    ///
+    /// @param taskNames the tasks to run
     void runBuildTasks(String... taskNames) {
         try {
             BuildLauncher build = connection.newBuild();
@@ -261,3 +255,4 @@ public class tambouiDemos implements Callable<Integer> {
         }
     }
 }
+

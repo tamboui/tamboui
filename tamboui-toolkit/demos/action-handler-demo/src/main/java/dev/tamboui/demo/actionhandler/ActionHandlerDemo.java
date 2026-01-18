@@ -21,18 +21,20 @@ import java.util.function.Consumer;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * Demo showcasing the ActionHandler API for handling input actions.
- * <p>
- * Demonstrates:
- * <ul>
- *   <li>Global actions via programmatic handler: quit (q), clear (c)</li>
- *   <li>Component actions via @OnAction on Component subclass: arrow keys</li>
- *   <li>Automatic registration - no manual wiring needed for components</li>
- * </ul>
- * <p>
- * Use Tab/Shift+Tab to switch focus between counters. Arrow keys modify the focused counter.
- */
+/// Demo showcasing the ActionHandler API for handling input actions.
+///
+///
+///
+/// Demonstrates:
+///
+/// - Global actions via programmatic handler: quit (q), clear (c)
+/// - Component actions via @OnAction on Component subclass: arrow keys
+/// - Automatic registration - no manual wiring needed for components
+///
+///
+///
+///
+/// Use Tab/Shift+Tab to switch focus between counters. Arrow keys modify the focused counter.
 public class ActionHandlerDemo {
 
     private static final int MAX_LOG_ENTRIES = 6;
@@ -41,11 +43,9 @@ public class ActionHandlerDemo {
         new ActionHandlerDemo().run();
     }
 
-    /**
-     * Runs the demo application.
-     *
-     * @throws Exception if terminal initialization fails
-     */
+    /// Runs the demo application.
+    ///
+    /// @throws Exception if terminal initialization fails
     public void run() throws Exception {
         var eventLog = new ArrayList<String>();
         Consumer<String> logger = msg -> {
@@ -114,3 +114,4 @@ public class ActionHandlerDemo {
         }
     }
 }
+

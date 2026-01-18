@@ -270,3 +270,4 @@ class FractionTest {
         assertThat(third.toInt()).isEqualTo(25);
     }
 }
+

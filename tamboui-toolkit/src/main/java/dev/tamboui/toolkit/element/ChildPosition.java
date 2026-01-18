@@ -4,22 +4,25 @@
  */
 package dev.tamboui.toolkit.element;
 
-/**
- * Represents the position of a child element within its parent.
- * <p>
- * This is used with {@link RenderContext#childStyle(String, ChildPosition)} to enable
- * CSS pseudo-class matching based on position, such as {@code :first-child},
- * {@code :last-child}, and {@code :nth-child(even/odd)}.
- * <p>
- * Example usage:
- * <pre>{@code
- * for (int i = 0; i < rows.size(); i++) {
- *     ChildPosition pos = ChildPosition.of(i, rows.size());
- *     Style rowStyle = context.childStyle("row", pos);
- *     // CSS can now match :first-child, :last-child, :nth-child(even), etc.
- * }
- * }</pre>
- */
+/// Represents the position of a child element within its parent.
+///
+///
+///
+/// This is used with {@link RenderContext#childStyle(String, ChildPosition)} to enable
+/// CSS pseudo-class matching based on position, such as {@code :first-child},
+/// {@code :last-child}, and {@code :nth-child(even/odd)}.
+///
+///
+///
+/// Example usage:
+/// ```java
+/// for (int i = 0; i < rows.size(); i++) {
+///     ChildPosition pos = ChildPosition.of(i, rows.size());
+///     Style rowStyle = context.childStyle("row", pos);
+///     // CSS can now match :first-child, :last-child, :nth-child(even), etc.
+/// }
+/// }
+/// ```
 public final class ChildPosition {
 
     private final int index;
@@ -39,63 +42,47 @@ public final class ChildPosition {
         this.total = total;
     }
 
-    /**
-     * Creates a ChildPosition for the given index within a collection of the given size.
-     *
-     * @param index the zero-based index of the child
-     * @param total the total number of children
-     * @return the child position
-     */
+    /// Creates a ChildPosition for the given index within a collection of the given size.
+    ///
+    /// @param index the zero-based index of the child
+    /// @param total the total number of children
+    /// @return the child position
     public static ChildPosition of(int index, int total) {
         return new ChildPosition(index, total);
     }
 
-    /**
-     * Returns the zero-based index of this child.
-     */
+    /// Returns the zero-based index of this child.
     public int index() {
         return index;
     }
 
-    /**
-     * Returns the total number of children.
-     */
+    /// Returns the total number of children.
     public int total() {
         return total;
     }
 
-    /**
-     * Returns true if this is the first child (index == 0).
-     */
+    /// Returns true if this is the first child (index == 0).
     public boolean isFirst() {
         return index == 0;
     }
 
-    /**
-     * Returns true if this is the last child (index == total - 1).
-     */
+    /// Returns true if this is the last child (index == total - 1).
     public boolean isLast() {
         return index == total - 1;
     }
 
-    /**
-     * Returns true if this child is at an even position (0, 2, 4, ...).
-     * Note: This uses zero-based indexing, so the first child is "even".
-     */
+    /// Returns true if this child is at an even position (0, 2, 4, ...).
+    /// Note: This uses zero-based indexing, so the first child is "even".
     public boolean isEven() {
         return index % 2 == 0;
     }
 
-    /**
-     * Returns true if this child is at an odd position (1, 3, 5, ...).
-     */
+    /// Returns true if this child is at an odd position (1, 3, 5, ...).
     public boolean isOdd() {
         return index % 2 == 1;
     }
 
-    /**
-     * Returns the 1-based position (CSS nth-child uses 1-based counting).
-     */
+    /// Returns the 1-based position (CSS nth-child uses 1-based counting).
     public int nthChild() {
         return index + 1;
     }
@@ -118,3 +105,4 @@ public final class ChildPosition {
         return "ChildPosition{index=" + index + ", total=" + total + "}";
     }
 }
+

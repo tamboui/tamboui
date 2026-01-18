@@ -157,3 +157,4 @@ class HalfBlockProtocolTest {
         return ImageData.fromBufferedImage(image);
     }
 }
+

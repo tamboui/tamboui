@@ -14,9 +14,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Tests for DebugOverlay.
- */
+/// Tests for DebugOverlay.
 class DebugOverlayTest {
 
     @Test
@@ -144,3 +142,4 @@ class DebugOverlayTest {
         overlay.render(frame, area);
     }
 }
+

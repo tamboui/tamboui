@@ -289,3 +289,4 @@ class SparklineTest {
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("█");
     }
 }
+

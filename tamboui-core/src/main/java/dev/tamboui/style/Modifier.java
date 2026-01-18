@@ -4,9 +4,7 @@
  */
 package dev.tamboui.style;
 
-/**
- * Text style modifiers (SGR attributes).
- */
+/// Text style modifiers (SGR attributes).
 public enum Modifier {
     BOLD(1),
     DIM(2),
@@ -24,16 +22,12 @@ public enum Modifier {
         this.code = code;
     }
 
-    /**
-     * Returns the ANSI SGR code to enable this modifier.
-     */
+    /// Returns the ANSI SGR code to enable this modifier.
     public int code() {
         return code;
     }
 
-    /**
-     * Returns the ANSI SGR code to disable this modifier.
-     */
+    /// Returns the ANSI SGR code to disable this modifier.
     public int resetCode() {
         switch (this) {
             case BOLD:
@@ -57,3 +51,4 @@ public enum Modifier {
         }
     }
 }
+

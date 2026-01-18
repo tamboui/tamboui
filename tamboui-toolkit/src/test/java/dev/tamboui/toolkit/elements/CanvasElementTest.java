@@ -17,9 +17,7 @@ import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for CanvasElement.
- */
+/// Tests for CanvasElement.
 class CanvasElementTest {
 
     @Test
@@ -47,3 +45,4 @@ class CanvasElementTest {
         assertThat(buffer).at(0, 0).hasSymbol("╭").hasForeground(Color.CYAN);
     }
 }
+

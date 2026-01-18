@@ -175,3 +175,4 @@ class CssLexerTest {
         assertThat(tokens.get(2).position().line()).isEqualTo(2);
     }
 }
+

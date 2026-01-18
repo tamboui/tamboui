@@ -27,17 +27,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A DSL wrapper for the Tabs widget.
- * <p>
- * Displays a horizontal set of tabs with one selected.
- * <pre>{@code
- * tabs("Home", "Settings", "About")
- *     .state(tabsState)
- *     .highlightColor(Color.YELLOW)
- *     .divider(" | ")
- * }</pre>
- */
+/// A DSL wrapper for the Tabs widget.
+///
+///
+///
+/// Displays a horizontal set of tabs with one selected.
+/// ```java
+/// tabs("Home", "Settings", "About")
+///     .state(tabsState)
+///     .highlightColor(Color.YELLOW)
+///     .divider(" | ")
+/// }
+/// ```
 public final class TabsElement extends StyledElement<TabsElement> {
 
     private static final Style DEFAULT_HIGHLIGHT_STYLE = Style.EMPTY.reversed();
@@ -63,100 +64,76 @@ public final class TabsElement extends StyledElement<TabsElement> {
         this.titles.addAll(titles);
     }
 
-    /**
-     * Sets the tab titles.
-     */
+    /// Sets the tab titles.
     public TabsElement titles(String... titles) {
         this.titles.clear();
         this.titles.addAll(Arrays.asList(titles));
         return this;
     }
 
-    /**
-     * Sets the tab titles from a list.
-     */
+    /// Sets the tab titles from a list.
     public TabsElement titles(List<String> titles) {
         this.titles.clear();
         this.titles.addAll(titles);
         return this;
     }
 
-    /**
-     * Adds a tab.
-     */
+    /// Adds a tab.
     public TabsElement add(String title) {
         this.titles.add(title);
         return this;
     }
 
-    /**
-     * Sets the tabs state for selection tracking.
-     */
+    /// Sets the tabs state for selection tracking.
     public TabsElement state(TabsState state) {
         this.state = state;
         return this;
     }
 
-    /**
-     * Sets the selected tab index.
-     */
+    /// Sets the selected tab index.
     public TabsElement selected(int index) {
         this.state = new TabsState(index);
         return this;
     }
 
-    /**
-     * Sets the highlight style for the selected tab.
-     */
+    /// Sets the highlight style for the selected tab.
     public TabsElement highlightStyle(Style style) {
         this.highlightStyle = style;
         return this;
     }
 
-    /**
-     * Sets the highlight color for the selected tab.
-     */
+    /// Sets the highlight color for the selected tab.
     public TabsElement highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
         return this;
     }
 
-    /**
-     * Sets the divider between tabs.
-     */
+    /// Sets the divider between tabs.
     public TabsElement divider(String divider) {
         this.divider = divider;
         return this;
     }
 
-    /**
-     * Sets the padding around tab titles.
-     */
+    /// Sets the padding around tab titles.
     public TabsElement padding(String left, String right) {
         this.paddingLeft = left;
         this.paddingRight = right;
         return this;
     }
 
-    /**
-     * Sets the title for the border.
-     */
+    /// Sets the title for the border.
     public TabsElement title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Uses rounded borders.
-     */
+    /// Uses rounded borders.
     public TabsElement rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public TabsElement borderColor(Color color) {
         this.borderColor = color;
         return this;
@@ -222,3 +199,4 @@ public final class TabsElement extends StyledElement<TabsElement> {
         frame.renderStatefulWidget(widget, area, effectiveState);
     }
 }
+

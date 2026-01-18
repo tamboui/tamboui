@@ -188,3 +188,4 @@ class TuiConfigTest {
         assertThat(config.errorOutput()).isSameAs(System.err);
     }
 }
+

@@ -6,25 +6,26 @@ package dev.tamboui.style;
 
 import java.util.Optional;
 
-/**
- * Converts string values to Integer objects.
- * <p>
- * Handles standard integer formats including negative values.
- * <p>
- * Example usage:
- * <pre>{@code
- * // Standalone usage
- * Optional<Integer> value = IntegerConverter.INSTANCE.convert("42");
- *
- * // With PropertyKey
- * PropertyKey<Integer> COUNT = PropertyKey.of("count", IntegerConverter.INSTANCE);
- * }</pre>
- */
+/// Converts string values to Integer objects.
+///
+///
+///
+/// Handles standard integer formats including negative values.
+///
+///
+///
+/// Example usage:
+/// ```java
+/// // Standalone usage
+/// Optional<Integer> value = IntegerConverter.INSTANCE.convert("42");
+///
+/// // With PropertyKey
+/// PropertyKey<Integer> COUNT = PropertyKey.of("count", IntegerConverter.INSTANCE);
+/// }
+/// ```
 public final class IntegerConverter implements PropertyConverter<Integer> {
 
-    /**
-     * Singleton instance of the integer converter.
-     */
+    /// Singleton instance of the integer converter.
     public static final IntegerConverter INSTANCE = new IntegerConverter();
 
     private IntegerConverter() {
@@ -43,3 +44,4 @@ public final class IntegerConverter implements PropertyConverter<Integer> {
         }
     }
 }
+

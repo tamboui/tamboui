@@ -4,9 +4,7 @@
  */
 package dev.tamboui.buffer;
 
-/**
- * Represents a cell update to be sent to the terminal backend.
- */
+/// Represents a cell update to be sent to the terminal backend.
 public final class CellUpdate {
     private final int x;
     private final int y;
@@ -55,3 +53,4 @@ public final class CellUpdate {
         return String.format("CellUpdate[x=%d, y=%d, cell=%s]", x, y, cell);
     }
 }
+

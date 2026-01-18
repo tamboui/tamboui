@@ -6,26 +6,26 @@ package dev.tamboui.layout.cassowary;
 
 import dev.tamboui.layout.Fraction;
 
-/**
- * A term in a linear expression, representing a coefficient multiplied by a variable.
- *
- * <p>Terms are the building blocks of linear expressions. A term consists of
- * a variable and a coefficient, representing the product {@code coefficient * variable}.
- *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
- */
+/// A term in a linear expression, representing a coefficient multiplied by a variable.
+///
+///
+///
+/// Terms are the building blocks of linear expressions. A term consists of
+/// a variable and a coefficient, representing the product {@code coefficient * variable}.
+///
+///
+///
+/// This implementation uses {@link Fraction} for exact arithmetic,
+/// avoiding the cumulative rounding errors that occur with floating-point.
 public final class Term {
 
     private final Variable variable;
     private final Fraction coefficient;
 
-    /**
-     * Creates a new term with the given variable and coefficient.
-     *
-     * @param variable    the variable
-     * @param coefficient the coefficient
-     */
+    /// Creates a new term with the given variable and coefficient.
+    ///
+    /// @param variable    the variable
+    /// @param coefficient the coefficient
     public Term(Variable variable, Fraction coefficient) {
         if (variable == null) {
             throw new IllegalArgumentException("Variable cannot be null");
@@ -37,57 +37,45 @@ public final class Term {
         this.coefficient = coefficient;
     }
 
-    /**
-     * Creates a new term with coefficient 1.
-     *
-     * @param variable the variable
-     */
+    /// Creates a new term with coefficient 1.
+    ///
+    /// @param variable the variable
     public Term(Variable variable) {
         this(variable, Fraction.ONE);
     }
 
-    /**
-     * Returns the variable of this term.
-     *
-     * @return the variable
-     */
+    /// Returns the variable of this term.
+    ///
+    /// @return the variable
     public Variable variable() {
         return variable;
     }
 
-    /**
-     * Returns the coefficient of this term.
-     *
-     * @return the coefficient
-     */
+    /// Returns the coefficient of this term.
+    ///
+    /// @return the coefficient
     public Fraction coefficient() {
         return coefficient;
     }
 
-    /**
-     * Returns a new term with the coefficient negated.
-     *
-     * @return a term with the negated coefficient
-     */
+    /// Returns a new term with the coefficient negated.
+    ///
+    /// @return a term with the negated coefficient
     public Term negate() {
         return new Term(variable, coefficient.negate());
     }
 
-    /**
-     * Returns a new term with the coefficient multiplied by the given factor.
-     *
-     * @param factor the factor to multiply by
-     * @return a new term with the scaled coefficient
-     */
+    /// Returns a new term with the coefficient multiplied by the given factor.
+    ///
+    /// @param factor the factor to multiply by
+    /// @return a new term with the scaled coefficient
     public Term times(Fraction factor) {
         return new Term(variable, coefficient.multiply(factor));
     }
 
-    /**
-     * Converts this term to an expression.
-     *
-     * @return an expression containing only this term
-     */
+    /// Converts this term to an expression.
+    ///
+    /// @return an expression containing only this term
     public Expression toExpression() {
         return Expression.term(this);
     }
@@ -123,3 +111,4 @@ public final class Term {
         return coefficient + "*" + variable;
     }
 }
+

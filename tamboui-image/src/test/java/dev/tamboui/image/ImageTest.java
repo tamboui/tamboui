@@ -256,3 +256,4 @@ class ImageTest {
         return ImageData.fromBufferedImage(image);
     }
 }
+

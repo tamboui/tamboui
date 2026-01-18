@@ -14,9 +14,7 @@ import dev.tamboui.tfx.EffectTimer;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.TFxDuration;
 
-/**
- * A paint effect that immediately applies colors to cells.
- */
+/// A paint effect that immediately applies colors to cells.
 public final class PaintShader implements Shader {
     
     private final Color fg;
@@ -25,23 +23,17 @@ public final class PaintShader implements Shader {
     private Rect area;
     private CellFilter cellFilter;
     
-    /**
-     * Creates a paint shader that paints foreground and/or background colors.
-     */
+    /// Creates a paint shader that paints foreground and/or background colors.
     public static PaintShader paint(Color fg, Color bg, EffectTimer timer) {
         return new PaintShader(fg, bg, timer);
     }
     
-    /**
-     * Creates a paint shader that paints only foreground color.
-     */
+    /// Creates a paint shader that paints only foreground color.
     public static PaintShader paintFg(Color fg, EffectTimer timer) {
         return new PaintShader(fg, null, timer);
     }
     
-    /**
-     * Creates a paint shader that paints only background color.
-     */
+    /// Creates a paint shader that paints only background color.
     public static PaintShader paintBg(Color bg, EffectTimer timer) {
         return new PaintShader(null, bg, timer);
     }
@@ -151,5 +143,6 @@ public final class PaintShader implements Shader {
         return copy;
     }
 }
+
 
 

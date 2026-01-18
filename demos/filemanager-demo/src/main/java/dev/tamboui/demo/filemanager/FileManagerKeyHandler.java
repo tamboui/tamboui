@@ -8,13 +8,13 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
-/**
- * Handles keyboard events and dispatches to the FileManager.
- * Translates key presses into controller commands.
- * <p>
- * Note: Input dialogs (mkdir, goto) are handled by DialogElement's modal behavior.
- * This handler only deals with confirmation dialogs and browser navigation.
- */
+/// Handles keyboard events and dispatches to the FileManager.
+/// Translates key presses into controller commands.
+///
+///
+///
+/// Note: Input dialogs (mkdir, goto) are handled by DialogElement's modal behavior.
+/// This handler only deals with confirmation dialogs and browser navigation.
 public class FileManagerKeyHandler {
 
     private final FileManagerController manager;
@@ -165,3 +165,4 @@ public class FileManagerKeyHandler {
         return EventResult.UNHANDLED;
     }
 }
+

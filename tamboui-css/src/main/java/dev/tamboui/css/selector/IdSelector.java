@@ -10,11 +10,11 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * An ID selector that matches elements by their unique identifier.
- * <p>
- * Example: {@code #sidebar { ... }} matches the element with id="sidebar".
- */
+/// An ID selector that matches elements by their unique identifier.
+///
+///
+///
+/// Example: {@code #sidebar { ... }} matches the element with id="sidebar".
 public final class IdSelector implements Selector {
 
     private final String id;
@@ -64,3 +64,4 @@ public final class IdSelector implements Selector {
         return "IdSelector{" + id + "}";
     }
 }
+

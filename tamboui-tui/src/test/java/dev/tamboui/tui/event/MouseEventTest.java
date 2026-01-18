@@ -80,3 +80,4 @@ class MouseEventTest {
         assertThat(MouseEvent.press(MouseButton.MIDDLE, 0, 0).button()).isEqualTo(MouseButton.MIDDLE);
     }
 }
+

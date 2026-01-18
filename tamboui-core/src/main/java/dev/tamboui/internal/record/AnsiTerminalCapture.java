@@ -20,13 +20,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Captures System.out output by parsing ANSI escape sequences and maintaining
- * a virtual terminal buffer. Used for recording inline demos that write directly
- * to System.out rather than using Backend.draw().
- * <p>
- * This is an internal API and not part of the public contract.
- */
+/// Captures System.out output by parsing ANSI escape sequences and maintaining
+/// a virtual terminal buffer. Used for recording inline demos that write directly
+/// to System.out rather than using Backend.draw().
+///
+///
+///
+/// This is an internal API and not part of the public contract.
 public final class AnsiTerminalCapture extends OutputStream {
 
     private static final char ESC = '\u001b';
@@ -68,12 +68,10 @@ public final class AnsiTerminalCapture extends OutputStream {
         this.startTime = System.currentTimeMillis();
     }
 
-    /**
-     * Installs the capture by replacing System.out.
-     * Does nothing if already installed or if config is null.
-     *
-     * @param config the recording configuration
-     */
+    /// Installs the capture by replacing System.out.
+    /// Does nothing if already installed or if config is null.
+    ///
+    /// @param config the recording configuration
     public static synchronized void install(RecordingConfig config) {
         if (instance != null || config == null) {
             return;
@@ -88,10 +86,8 @@ public final class AnsiTerminalCapture extends OutputStream {
         }
     }
 
-    /**
-     * Uninstalls the capture and restores original System.out.
-     * Returns the captured frames, or empty list if not installed.
-     */
+    /// Uninstalls the capture and restores original System.out.
+    /// Returns the captured frames, or empty list if not installed.
     public static synchronized List<Buffer> uninstall() {
         if (instance == null) {
             return new ArrayList<>();
@@ -108,9 +104,7 @@ public final class AnsiTerminalCapture extends OutputStream {
         return capturedFrames;
     }
 
-    /**
-     * Returns true if capture is currently installed.
-     */
+    /// Returns true if capture is currently installed.
     public static synchronized boolean isInstalled() {
         return instance != null;
     }
@@ -624,3 +618,4 @@ public final class AnsiTerminalCapture extends OutputStream {
         }
     }
 }
+

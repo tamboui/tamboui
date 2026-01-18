@@ -35,22 +35,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A container element with borders and title.
- * <p>
- * CSS properties {@code border-type} and {@code border-color} are automatically
- * resolved through the underlying {@link Block} widget.
- * <p>
- * Layout properties can be set via CSS or programmatically:
- * <ul>
- *   <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
- *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
- *   <li>{@code margin} - Margin around the panel: single value or CSS-style shorthand</li>
- *   <li>{@code spacing} - Gap between children in cells</li>
- * </ul>
- * <p>
- * Programmatic values override CSS values when both are set.
- */
+/// A container element with borders and title.
+///
+///
+///
+/// CSS properties {@code border-type} and {@code border-color} are automatically
+/// resolved through the underlying {@link Block} widget.
+///
+///
+///
+/// Layout properties can be set via CSS or programmatically:
+///
+/// - {@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"
+/// - {@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"
+/// - {@code margin} - Margin around the panel: single value or CSS-style shorthand
+/// - {@code spacing} - Gap between children in cells
+///
+///
+///
+///
+/// Programmatic values override CSS values when both are set.
 public final class Panel extends ContainerElement<Panel> {
 
     private String title;
@@ -78,41 +82,31 @@ public final class Panel extends ContainerElement<Panel> {
         this.children.addAll(Arrays.asList(children));
     }
 
-    /**
-     * Sets the panel title.
-     */
+    /// Sets the panel title.
     public Panel title(String title) {
         this.title = title;
         return this;
     }
 
-    /**
-     * Sets the bottom title.
-     */
+    /// Sets the bottom title.
     public Panel bottomTitle(String title) {
         this.bottomTitle = title;
         return this;
     }
 
-    /**
-     * Sets the title overflow mode.
-     */
+    /// Sets the title overflow mode.
     public Panel titleOverflow(Overflow overflow) {
         this.titleOverflow = overflow;
         return this;
     }
 
-    /**
-     * Truncate title with ellipsis at end if it doesn't fit: "Long title..."
-     */
+    /// Truncate title with ellipsis at end if it doesn't fit: "Long title..."
     public Panel titleEllipsis() {
         this.titleOverflow = Overflow.ELLIPSIS;
         return this;
     }
 
-    /**
-     * Truncate title with ellipsis at start if it doesn't fit: "...ong title"
-     */
+    /// Truncate title with ellipsis at start if it doesn't fit: "...ong title"
     public Panel titleEllipsisStart() {
         this.titleOverflow = Overflow.ELLIPSIS_START;
         return this;
@@ -130,180 +124,160 @@ public final class Panel extends ContainerElement<Panel> {
         return Collections.unmodifiableMap(attrs);
     }
 
-    /**
-     * Sets the border type to rounded.
-     */
+    /// Sets the border type to rounded.
     public Panel rounded() {
         this.borderType = BorderType.ROUNDED;
         return this;
     }
 
-    /**
-     * Sets the border type to double.
-     */
+    /// Sets the border type to double.
     public Panel doubleBorder() {
         this.borderType = BorderType.DOUBLE;
         return this;
     }
 
-    /**
-     * Sets the border type to thick.
-     */
+    /// Sets the border type to thick.
     public Panel thick() {
         this.borderType = BorderType.THICK;
         return this;
     }
 
-    /**
-     * Sets the border type.
-     */
+    /// Sets the border type.
     public Panel borderType(BorderType type) {
         this.borderType = type;
         return this;
     }
 
-    /**
-     * Makes this panel borderless.
-     * <p>
-     * This sets the border type to {@link BorderType#NONE}, which renders
-     * no borders but still reserves space for them if borders are enabled.
-     */
+    /// Makes this panel borderless.
+    ///
+    ///
+    ///
+    /// This sets the border type to {@link BorderType#NONE}, which renders
+    /// no borders but still reserves space for them if borders are enabled.
     public Panel borderless() {
         this.borderType = BorderType.NONE;
         return this;
     }
 
-    /**
-     * Sets the border color.
-     */
+    /// Sets the border color.
     public Panel borderColor(Color color) {
         this.borderColor = color;
         return this;
     }
 
-    /**
-     * Sets the border color when focused.
-     */
+    /// Sets the border color when focused.
     public Panel focusedBorderColor(Color color) {
         this.focusedBorderColor = color;
         return this;
     }
 
-    /**
-     * Sets uniform padding inside the panel.
-     */
+    /// Sets uniform padding inside the panel.
     public Panel padding(int value) {
         this.padding = Padding.uniform(value);
         return this;
     }
 
-    /**
-     * Sets the padding inside the panel.
-     */
+    /// Sets the padding inside the panel.
     public Panel padding(Padding padding) {
         this.padding = padding;
         return this;
     }
 
-    /**
-     * Sets the layout direction for children.
-     * <p>
-     * Can also be set via CSS {@code direction} property.
-     *
-     * @param direction the layout direction
-     * @return this panel for chaining
-     */
+    /// Sets the layout direction for children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code direction} property.
+    ///
+    /// @param direction the layout direction
+    /// @return this panel for chaining
     public Panel direction(Direction direction) {
         this.direction = direction;
         return this;
     }
 
-    /**
-     * Sets the layout direction to horizontal.
-     *
-     * @return this panel for chaining
-     */
+    /// Sets the layout direction to horizontal.
+    ///
+    /// @return this panel for chaining
     public Panel horizontal() {
         this.direction = Direction.HORIZONTAL;
         return this;
     }
 
-    /**
-     * Sets the layout direction to vertical.
-     *
-     * @return this panel for chaining
-     */
+    /// Sets the layout direction to vertical.
+    ///
+    /// @return this panel for chaining
     public Panel vertical() {
         this.direction = Direction.VERTICAL;
         return this;
     }
 
-    /**
-     * Sets the flex layout mode for positioning children.
-     * <p>
-     * Can also be set via CSS {@code flex} property.
-     *
-     * @param flex the flex mode
-     * @return this panel for chaining
-     */
+    /// Sets the flex layout mode for positioning children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code flex} property.
+    ///
+    /// @param flex the flex mode
+    /// @return this panel for chaining
     public Panel flex(Flex flex) {
         this.flex = flex;
         return this;
     }
 
-    /**
-     * Sets the margin around the panel.
-     * <p>
-     * Can also be set via CSS {@code margin} property.
-     *
-     * @param margin the margin
-     * @return this panel for chaining
-     */
+    /// Sets the margin around the panel.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code margin} property.
+    ///
+    /// @param margin the margin
+    /// @return this panel for chaining
     public Panel margin(Margin margin) {
         this.margin = margin;
         return this;
     }
 
-    /**
-     * Sets uniform margin around the panel.
-     *
-     * @param value the margin value for all sides
-     * @return this panel for chaining
-     */
+    /// Sets uniform margin around the panel.
+    ///
+    /// @param value the margin value for all sides
+    /// @return this panel for chaining
     public Panel margin(int value) {
         this.margin = Margin.uniform(value);
         return this;
     }
 
-    /**
-     * Sets the spacing (gap) between children.
-     * <p>
-     * Can also be set via CSS {@code spacing} property.
-     *
-     * @param spacing the spacing in cells
-     * @return this panel for chaining
-     */
+    /// Sets the spacing (gap) between children.
+    ///
+    ///
+    ///
+    /// Can also be set via CSS {@code spacing} property.
+    ///
+    /// @param spacing the spacing in cells
+    /// @return this panel for chaining
     public Panel spacing(int spacing) {
         this.spacing = spacing;
         return this;
     }
 
-    /**
-     * Enables automatic height calculation to fit the panel's content.
-     * <p>
-     * When enabled, the constraint is computed dynamically based on:
-     * <ul>
-     *   <li>Border overhead: 2 rows (top and bottom borders)</li>
-     *   <li>Padding overhead: vertical padding if set</li>
-     *   <li>Children height: sum of child heights (1 row each by default,
-     *       or the length from their constraint if specified)</li>
-     * </ul>
-     * <p>
-     * The height is computed when {@link #constraint()} is called, so children
-     * can be added before or after calling this method.
-     *
-     * @return this panel for chaining
-     */
+    /// Enables automatic height calculation to fit the panel's content.
+    ///
+    ///
+    ///
+    /// When enabled, the constraint is computed dynamically based on:
+    ///
+    /// - Border overhead: 2 rows (top and bottom borders)
+    /// - Padding overhead: vertical padding if set
+    /// <li>Children height: sum of child heights (1 row each by default,
+    /// or the length from their constraint if specified)
+    ///
+    ///
+    ///
+    ///
+    /// The height is computed when {@link #constraint()} is called, so children
+    /// can be added before or after calling this method.
+    ///
+    /// @return this panel for chaining
     public Panel fit() {
         this.fitToContent = true;
         return this;
@@ -364,11 +338,9 @@ public final class Panel extends ContainerElement<Panel> {
         return height;
     }
 
-    /**
-     * Computes the total height required to fit the panel's content.
-     *
-     * @return the computed height including borders, padding, and children
-     */
+    /// Computes the total height required to fit the panel's content.
+    ///
+    /// @return the computed height including borders, padding, and children
     private int computeContentHeight() {
         // Border overhead: 2 rows for top and bottom (Panel always uses Borders.ALL)
         int height = 2;
@@ -528,3 +500,4 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
 }
+

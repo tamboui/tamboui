@@ -33,12 +33,12 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.io.IOException;
 import java.util.Random;
 
-/**
- * Demo TUI application showcasing the Chart widget.
- * <p>
- * Demonstrates line charts, scatter plots, and bar charts
- * with animated data updates.
- */
+/// Demo TUI application showcasing the Chart widget.
+///
+///
+///
+/// Demonstrates line charts, scatter plots, and bar charts
+/// with animated data updates.
 public class ChartDemo {
 
     private static final int DATA_SIZE = 50;
@@ -329,3 +329,4 @@ public class ChartDemo {
         frame.renderWidget(footer, area);
     }
 }
+

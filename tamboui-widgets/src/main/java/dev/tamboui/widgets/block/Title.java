@@ -9,9 +9,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widgets.text.Overflow;
 
-/**
- * A title for a block, with optional alignment and overflow handling.
- */
+/// A title for a block, with optional alignment and overflow handling.
 public final class Title {
 
     private final Line content;
@@ -56,23 +54,17 @@ public final class Title {
         return new Title(content, alignment, overflow);
     }
 
-    /**
-     * Truncate with ellipsis at end if title doesn't fit: "Long title..."
-     */
+    /// Truncate with ellipsis at end if title doesn't fit: "Long title..."
     public Title ellipsis() {
         return overflow(Overflow.ELLIPSIS);
     }
 
-    /**
-     * Truncate with ellipsis at start if title doesn't fit: "...ong title"
-     */
+    /// Truncate with ellipsis at start if title doesn't fit: "...ong title"
     public Title ellipsisStart() {
         return overflow(Overflow.ELLIPSIS_START);
     }
 
-    /**
-     * Truncate with ellipsis in middle if title doesn't fit: "Long...itle"
-     */
+    /// Truncate with ellipsis in middle if title doesn't fit: "Long...itle"
     public Title ellipsisMiddle() {
         return overflow(Overflow.ELLIPSIS_MIDDLE);
     }
@@ -114,3 +106,4 @@ public final class Title {
         return String.format("Title[content=%s, alignment=%s, overflow=%s]", content, alignment, overflow);
     }
 }
+

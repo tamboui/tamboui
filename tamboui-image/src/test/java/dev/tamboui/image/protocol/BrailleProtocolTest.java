@@ -206,3 +206,4 @@ class BrailleProtocolTest {
         return ImageData.fromBufferedImage(image);
     }
 }
+

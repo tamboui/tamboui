@@ -201,3 +201,4 @@ class GaugeTest {
         assertThat(buffer.get(0, 2).symbol()).isEqualTo("█");
     }
 }
+

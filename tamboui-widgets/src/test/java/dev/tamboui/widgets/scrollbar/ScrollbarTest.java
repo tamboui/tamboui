@@ -318,3 +318,4 @@ class ScrollbarTest {
         assertThat(thumbCells).isBetween(4, 6);
     }
 }
+

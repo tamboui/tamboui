@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests CSS child styling for various elements.
- * <p>
- * These tests verify the "explicit > CSS > default" priority pattern
- * implemented via {@link dev.tamboui.toolkit.element.StyledElement#resolveEffectiveStyle}.
- */
+/// Tests CSS child styling for various elements.
+///
+///
+///
+/// These tests verify the "explicit > CSS > default" priority pattern
+/// implemented via {@link dev.tamboui.toolkit.element.StyledElement#resolveEffectiveStyle}.
 class ElementChildStyleCssTest {
 
     private DefaultRenderContext context;
@@ -339,3 +339,4 @@ class ElementChildStyleCssTest {
         }
     }
 }
+

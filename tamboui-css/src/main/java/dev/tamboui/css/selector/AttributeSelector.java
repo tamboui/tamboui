@@ -11,35 +11,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * An attribute selector that matches elements by their style attributes.
- * <p>
- * Supports the following operators:
- * <ul>
- *   <li>{@code [attr]} - attribute exists</li>
- *   <li>{@code [attr=value]} - exact match</li>
- *   <li>{@code [attr^=value]} - starts with</li>
- *   <li>{@code [attr$=value]} - ends with</li>
- *   <li>{@code [attr*=value]} - contains</li>
- * </ul>
- * <p>
- * Example: {@code Panel[title="Test Tree"]} matches Panels with title="Test Tree".
- */
+/// An attribute selector that matches elements by their style attributes.
+///
+///
+///
+/// Supports the following operators:
+///
+/// - {@code [attr]} - attribute exists
+/// - {@code [attr=value]} - exact match
+/// - {@code [attr^=value]} - starts with
+/// - {@code [attr$=value]} - ends with
+/// - {@code [attr*=value]} - contains
+///
+///
+///
+///
+/// Example: {@code Panel[title="Test Tree"]} matches Panels with title="Test Tree".
 public final class AttributeSelector implements Selector {
 
-    /**
-     * The operator for attribute matching.
-     */
+    /// The operator for attribute matching.
     public enum Operator {
-        /** Attribute exists */
+        /// Attribute exists
         EXISTS,
-        /** Exact match */
+        /// Exact match
         EQUALS,
-        /** Starts with */
+        /// Starts with
         STARTS_WITH,
-        /** Ends with */
+        /// Ends with
         ENDS_WITH,
-        /** Contains */
+        /// Contains
         CONTAINS
     }
 
@@ -47,47 +47,37 @@ public final class AttributeSelector implements Selector {
     private final Operator operator;
     private final String value;
 
-    /**
-     * Creates an attribute existence selector.
-     *
-     * @param attribute the attribute name
-     */
+    /// Creates an attribute existence selector.
+    ///
+    /// @param attribute the attribute name
     public AttributeSelector(String attribute) {
         this.attribute = Objects.requireNonNull(attribute);
         this.operator = Operator.EXISTS;
         this.value = null;
     }
 
-    /**
-     * Creates an attribute selector with an operator and value.
-     *
-     * @param attribute the attribute name
-     * @param operator the matching operator
-     * @param value the value to match against
-     */
+    /// Creates an attribute selector with an operator and value.
+    ///
+    /// @param attribute the attribute name
+    /// @param operator the matching operator
+    /// @param value the value to match against
     public AttributeSelector(String attribute, Operator operator, String value) {
         this.attribute = Objects.requireNonNull(attribute);
         this.operator = Objects.requireNonNull(operator);
         this.value = value;
     }
 
-    /**
-     * Returns the attribute name.
-     */
+    /// Returns the attribute name.
     public String attribute() {
         return attribute;
     }
 
-    /**
-     * Returns the matching operator.
-     */
+    /// Returns the matching operator.
     public Operator operator() {
         return operator;
     }
 
-    /**
-     * Returns the value to match against (null for EXISTS operator).
-     */
+    /// Returns the value to match against (null for EXISTS operator).
     public String value() {
         return value;
     }
@@ -166,3 +156,4 @@ public final class AttributeSelector implements Selector {
         return "AttributeSelector{" + toCss() + "}";
     }
 }
+

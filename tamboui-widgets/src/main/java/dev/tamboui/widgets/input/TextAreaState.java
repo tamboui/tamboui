@@ -7,9 +7,7 @@ package dev.tamboui.widgets.input;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
- */
+/// State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
 public final class TextAreaState {
 
     private final List<StringBuilder> lines;
@@ -232,3 +230,4 @@ public final class TextAreaState {
         scrollCol = 0;
     }
 }
+

@@ -16,12 +16,12 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
-/**
- * Panama FFI bindings to libc functions for terminal operations.
- * <p>
- * This class provides low-level access to Unix terminal control functions
- * including termios manipulation, terminal size queries, and non-blocking I/O.
- */
+/// Panama FFI bindings to libc functions for terminal operations.
+///
+///
+///
+/// This class provides low-level access to Unix terminal control functions
+/// including termios manipulation, terminal size queries, and non-blocking I/O.
 public final class LibC {
 
     // File descriptors
@@ -210,13 +210,11 @@ public final class LibC {
     private LibC() {
     }
 
-    /**
-     * Gets terminal attributes.
-     *
-     * @param fd      file descriptor
-     * @param termios memory segment for termios struct
-     * @return 0 on success, -1 on error
-     */
+    /// Gets terminal attributes.
+    ///
+    /// @param fd      file descriptor
+    /// @param termios memory segment for termios struct
+    /// @return 0 on success, -1 on error
     public static int tcgetattr(int fd, MemorySegment termios) {
         try {
             return (int) TCGETATTR.invokeExact(fd, termios);
@@ -225,14 +223,12 @@ public final class LibC {
         }
     }
 
-    /**
-     * Sets terminal attributes.
-     *
-     * @param fd              file descriptor
-     * @param optionalActions when to apply changes (TCSANOW, TCSADRAIN, TCSAFLUSH)
-     * @param termios         memory segment for termios struct
-     * @return 0 on success, -1 on error
-     */
+    /// Sets terminal attributes.
+    ///
+    /// @param fd              file descriptor
+    /// @param optionalActions when to apply changes (TCSANOW, TCSADRAIN, TCSAFLUSH)
+    /// @param termios         memory segment for termios struct
+    /// @return 0 on success, -1 on error
     public static int tcsetattr(int fd, int optionalActions, MemorySegment termios) {
         try {
             return (int) TCSETATTR.invokeExact(fd, optionalActions, termios);
@@ -241,16 +237,16 @@ public final class LibC {
         }
     }
 
-    /**
-     * Performs an I/O control operation.
-     * <p>
-     * Uses a thread-local call state segment to avoid per-call Arena allocation.
-     *
-     * @param fd      file descriptor
-     * @param request ioctl request code
-     * @param arg     argument (typically a memory segment)
-     * @return 0 on success, -1 on error
-     */
+    /// Performs an I/O control operation.
+    ///
+    ///
+    ///
+    /// Uses a thread-local call state segment to avoid per-call Arena allocation.
+    ///
+    /// @param fd      file descriptor
+    /// @param request ioctl request code
+    /// @param arg     argument (typically a memory segment)
+    /// @return 0 on success, -1 on error
     public static int ioctl(int fd, long request, MemorySegment arg) {
         try {
             MemorySegment callState = CALL_STATE_SEGMENT.get();
@@ -266,23 +262,19 @@ public final class LibC {
 
     private static volatile int lastErrno = 0;
 
-    /**
-     * Returns the errno from the last failed ioctl call.
-     *
-     * @return the errno value
-     */
+    /// Returns the errno from the last failed ioctl call.
+    ///
+    /// @return the errno value
     public static int getLastErrno() {
         return lastErrno;
     }
 
-    /**
-     * Reads from a file descriptor.
-     *
-     * @param fd    file descriptor
-     * @param buf   buffer to read into
-     * @param count maximum bytes to read
-     * @return number of bytes read, 0 for EOF, -1 on error
-     */
+    /// Reads from a file descriptor.
+    ///
+    /// @param fd    file descriptor
+    /// @param buf   buffer to read into
+    /// @param count maximum bytes to read
+    /// @return number of bytes read, 0 for EOF, -1 on error
     public static long read(int fd, MemorySegment buf, long count) {
         try {
             return (long) READ.invokeExact(fd, buf, count);
@@ -291,16 +283,16 @@ public final class LibC {
         }
     }
 
-    /**
-     * Writes to a file descriptor.
-     * <p>
-     * Uses a thread-local call state segment to avoid per-call Arena allocation.
-     *
-     * @param fd    file descriptor
-     * @param buf   buffer to write from
-     * @param count number of bytes to write
-     * @return number of bytes written, -1 on error
-     */
+    /// Writes to a file descriptor.
+    ///
+    ///
+    ///
+    /// Uses a thread-local call state segment to avoid per-call Arena allocation.
+    ///
+    /// @param fd    file descriptor
+    /// @param buf   buffer to write from
+    /// @param count number of bytes to write
+    /// @return number of bytes written, -1 on error
     public static long write(int fd, MemorySegment buf, long count) {
         try {
             MemorySegment callState = CALL_STATE_SEGMENT.get();
@@ -314,17 +306,17 @@ public final class LibC {
         }
     }
 
-    /**
-     * Waits for events on file descriptors.
-     * <p>
-     * Uses a thread-local call state segment to capture errno.
-     * Check {@link #getLastErrno()} after a -1 return to determine the cause.
-     *
-     * @param fds     array of pollfd structures
-     * @param nfds    number of file descriptors
-     * @param timeout timeout in milliseconds (-1 for infinite)
-     * @return number of descriptors with events, 0 for timeout, -1 on error
-     */
+    /// Waits for events on file descriptors.
+    ///
+    ///
+    ///
+    /// Uses a thread-local call state segment to capture errno.
+    /// Check {@link #getLastErrno()} after a -1 return to determine the cause.
+    ///
+    /// @param fds     array of pollfd structures
+    /// @param nfds    number of file descriptors
+    /// @param timeout timeout in milliseconds (-1 for infinite)
+    /// @return number of descriptors with events, 0 for timeout, -1 on error
     public static int poll(MemorySegment fds, int nfds, int timeout) {
         try {
             MemorySegment callState = CALL_STATE_SEGMENT.get();
@@ -343,12 +335,10 @@ public final class LibC {
         }
     }
 
-    /**
-     * Checks if a file descriptor refers to a terminal.
-     *
-     * @param fd file descriptor
-     * @return 1 if terminal, 0 otherwise
-     */
+    /// Checks if a file descriptor refers to a terminal.
+    ///
+    /// @param fd file descriptor
+    /// @return 1 if terminal, 0 otherwise
     public static int isatty(int fd) {
         try {
             return (int) ISATTY.invokeExact(fd);
@@ -357,13 +347,11 @@ public final class LibC {
         }
     }
 
-    /**
-     * Opens a file.
-     *
-     * @param pathname path to the file
-     * @param flags    open flags (O_RDWR, etc.)
-     * @return file descriptor on success, -1 on error
-     */
+    /// Opens a file.
+    ///
+    /// @param pathname path to the file
+    /// @param flags    open flags (O_RDWR, etc.)
+    /// @return file descriptor on success, -1 on error
     public static int open(String pathname, int flags) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment pathSegment = arena.allocateFrom(pathname);
@@ -378,12 +366,10 @@ public final class LibC {
         }
     }
 
-    /**
-     * Closes a file descriptor.
-     *
-     * @param fd file descriptor to close
-     * @return 0 on success, -1 on error
-     */
+    /// Closes a file descriptor.
+    ///
+    /// @param fd file descriptor to close
+    /// @return 0 on success, -1 on error
     public static int close(int fd) {
         try {
             return (int) CLOSE.invokeExact(fd);
@@ -392,15 +378,15 @@ public final class LibC {
         }
     }
 
-    /**
-     * Installs a signal handler using signal().
-     * <p>
-     * Note: This is deprecated on macOS. Use {@link #sigaction(int, MemorySegment, MemorySegment)} instead.
-     *
-     * @param signum  the signal number
-     * @param handler the handler function pointer (upcall stub)
-     * @return the previous handler
-     */
+    /// Installs a signal handler using signal().
+    ///
+    ///
+    ///
+    /// Note: This is deprecated on macOS. Use {@link #sigaction(int, MemorySegment, MemorySegment)} instead.
+    ///
+    /// @param signum  the signal number
+    /// @param handler the handler function pointer (upcall stub)
+    /// @return the previous handler
     public static MemorySegment signal(int signum, MemorySegment handler) {
         try {
             return (MemorySegment) SIGNAL.invokeExact(signum, handler);
@@ -409,16 +395,16 @@ public final class LibC {
         }
     }
     
-    /**
-     * Installs a signal handler using sigaction().
-     * <p>
-     * This is the preferred method on macOS as signal() is deprecated.
-     *
-     * @param signum the signal number
-     * @param act    the new sigaction structure (can be null)
-     * @param oldact the old sigaction structure to save previous handler (can be null)
-     * @return 0 on success, -1 on error
-     */
+    /// Installs a signal handler using sigaction().
+    ///
+    ///
+    ///
+    /// This is the preferred method on macOS as signal() is deprecated.
+    ///
+    /// @param signum the signal number
+    /// @param act    the new sigaction structure (can be null)
+    /// @param oldact the old sigaction structure to save previous handler (can be null)
+    /// @return 0 on success, -1 on error
     public static int sigaction(int signum, MemorySegment act, MemorySegment oldact) {
         try {
             return (int) SIGACTION.invokeExact(signum, act, oldact);
@@ -427,34 +413,30 @@ public final class LibC {
         }
     }
     
-    /**
-     * Allocates a sigaction structure in the given arena.
-     *
-     * @param arena the arena to allocate in
-     * @return a memory segment for the sigaction struct
-     */
+    /// Allocates a sigaction structure in the given arena.
+    ///
+    /// @param arena the arena to allocate in
+    /// @return a memory segment for the sigaction struct
     public static MemorySegment allocateSigaction(Arena arena) {
         return arena.allocate(SIGACTION_LAYOUT);
     }
     
-    /**
-     * Sets the handler pointer in a sigaction structure.
-     *
-     * @param sigactionStruct the sigaction structure
-     * @param handler         the handler function pointer (upcall stub)
-     */
+    /// Sets the handler pointer in a sigaction structure.
+    ///
+    /// @param sigactionStruct the sigaction structure
+    /// @param handler         the handler function pointer (upcall stub)
     public static void setSigactionHandler(MemorySegment sigactionStruct, MemorySegment handler) {
         SIGACTION_HANDLER.set(sigactionStruct, 0L, handler);
     }
 
-    /**
-     * Sets the flags in a sigaction structure.
-     * <p>
-     * Note: On Linux, sa_flags is a long (8 bytes), on macOS it's an int (4 bytes).
-     *
-     * @param sigactionStruct the sigaction structure
-     * @param flags           the flags (e.g., SA_RESTART)
-     */
+    /// Sets the flags in a sigaction structure.
+    ///
+    ///
+    ///
+    /// Note: On Linux, sa_flags is a long (8 bytes), on macOS it's an int (4 bytes).
+    ///
+    /// @param sigactionStruct the sigaction structure
+    /// @param flags           the flags (e.g., SA_RESTART)
     public static void setSigactionFlags(MemorySegment sigactionStruct, int flags) {
         if (PlatformConstants.isMacOS()) {
             SIGACTION_FLAGS.set(sigactionStruct, 0L, flags);
@@ -464,15 +446,15 @@ public final class LibC {
         }
     }
 
-    /**
-     * Sets the trampoline pointer in a sigaction structure.
-     * For simple signal handlers, this should be set to NULL.
-     * <p>
-     * Note: This is macOS-specific. On Linux, this method does nothing.
-     *
-     * @param sigactionStruct the sigaction structure
-     * @param tramp           the trampoline function pointer (or NULL)
-     */
+    /// Sets the trampoline pointer in a sigaction structure.
+    /// For simple signal handlers, this should be set to NULL.
+    ///
+    ///
+    ///
+    /// Note: This is macOS-specific. On Linux, this method does nothing.
+    ///
+    /// @param sigactionStruct the sigaction structure
+    /// @param tramp           the trampoline function pointer (or NULL)
     public static void setSigactionTramp(MemorySegment sigactionStruct, MemorySegment tramp) {
         if (SIGACTION_TRAMP != null) {
             SIGACTION_TRAMP.set(sigactionStruct, 0L, tramp);
@@ -480,15 +462,15 @@ public final class LibC {
         // On Linux, there's no trampoline field - do nothing
     }
 
-    /**
-     * Sets the signal mask in a sigaction structure.
-     * <p>
-     * Note: On macOS, sa_mask is a simple int. On Linux, it's a 128-byte sigset_t.
-     * This method only sets the mask on macOS. On Linux, the mask is zeroed by default.
-     *
-     * @param sigactionStruct the sigaction structure
-     * @param mask            the signal mask (only used on macOS)
-     */
+    /// Sets the signal mask in a sigaction structure.
+    ///
+    ///
+    ///
+    /// Note: On macOS, sa_mask is a simple int. On Linux, it's a 128-byte sigset_t.
+    /// This method only sets the mask on macOS. On Linux, the mask is zeroed by default.
+    ///
+    /// @param sigactionStruct the sigaction structure
+    /// @param mask            the signal mask (only used on macOS)
     public static void setSigactionMask(MemorySegment sigactionStruct, int mask) {
         if (SIGACTION_MASK_MACOS != null) {
             SIGACTION_MASK_MACOS.set(sigactionStruct, 0L, mask);
@@ -496,29 +478,29 @@ public final class LibC {
         // On Linux, sa_mask is a 128-byte sigset_t - leave it zeroed (empty mask)
     }
 
-    /**
-     * Gets the handler pointer from a sigaction structure.
-     *
-     * @param sigactionStruct the sigaction structure
-     * @return the handler function pointer
-     */
+    /// Gets the handler pointer from a sigaction structure.
+    ///
+    /// @param sigactionStruct the sigaction structure
+    /// @return the handler function pointer
     public static MemorySegment getSigactionHandler(MemorySegment sigactionStruct) {
         return (MemorySegment) SIGACTION_HANDLER.get(sigactionStruct, 0L);
     }
 
-    /**
-     * Creates an upcall stub for a signal handler.
-     * <p>
-     * The returned memory segment is valid for the lifetime of the provided arena.
-     * The handler will be called with the signal number as parameter.
-     * <p>
-     * This follows the jextract pattern: create unbound MethodHandle first,
-     * then bind when creating the upcall stub.
-     *
-     * @param arena   the arena to allocate the stub in
-     * @param handler the Java handler to call (receives signal number)
-     * @return a memory segment that can be passed to signal()
-     */
+    /// Creates an upcall stub for a signal handler.
+    ///
+    ///
+    ///
+    /// The returned memory segment is valid for the lifetime of the provided arena.
+    /// The handler will be called with the signal number as parameter.
+    ///
+    ///
+    ///
+    /// This follows the jextract pattern: create unbound MethodHandle first,
+    /// then bind when creating the upcall stub.
+    ///
+    /// @param arena   the arena to allocate the stub in
+    /// @param handler the Java handler to call (receives signal number)
+    /// @return a memory segment that can be passed to signal()
     public static MemorySegment createSignalHandler(Arena arena, java.util.function.IntConsumer handler) {
         try {
             // Create unbound MethodHandle first (like jextract does)
@@ -532,16 +514,14 @@ public final class LibC {
         }
     }
 
-    /**
-     * Layout for the termios structure.
-     * <p>
-     * Platform-specific: Linux uses 4-byte ints for flags, macOS uses 8-byte longs.
-     */
+    /// Layout for the termios structure.
+    ///
+    ///
+    ///
+    /// Platform-specific: Linux uses 4-byte ints for flags, macOS uses 8-byte longs.
     public static final MemoryLayout TERMIOS_LAYOUT = PlatformConstants.TERMIOS_LAYOUT;
 
-    /**
-     * Layout for the winsize structure.
-     */
+    /// Layout for the winsize structure.
     public static final MemoryLayout WINSIZE_LAYOUT = MemoryLayout.structLayout(
             ValueLayout.JAVA_SHORT.withName("ws_row"),
             ValueLayout.JAVA_SHORT.withName("ws_col"),
@@ -549,44 +529,42 @@ public final class LibC {
             ValueLayout.JAVA_SHORT.withName("ws_ypixel")
     );
 
-    /**
-     * Layout for the pollfd structure.
-     */
+    /// Layout for the pollfd structure.
     public static final MemoryLayout POLLFD_LAYOUT = MemoryLayout.structLayout(
             ValueLayout.JAVA_INT.withName("fd"),
             ValueLayout.JAVA_SHORT.withName("events"),
             ValueLayout.JAVA_SHORT.withName("revents")
     );
     
-    /**
-     * Layout for the __sigaction_u union (macOS).
-     * This union contains either __sa_handler or __sa_sigaction pointer.
-     * Both are at offset 0 since it's a union.
-     */
+    /// Layout for the __sigaction_u union (macOS).
+    /// This union contains either __sa_handler or __sa_sigaction pointer.
+    /// Both are at offset 0 since it's a union.
     private static final MemoryLayout SIGACTION_U_LAYOUT_MACOS = MemoryLayout.unionLayout(
             C_POINTER.withName("__sa_handler"),
             C_POINTER.withName("__sa_sigaction")
     );
 
-    /**
-     * Layout for the sigaction structure.
-     * <p>
-     * macOS struct __sigaction (24 bytes):
-     * <pre>
-     *     union __sigaction_u __sigaction_u;  // 8 bytes - handler pointer
-     *     void (*sa_tramp)(...);              // 8 bytes - trampoline pointer
-     *     int sa_mask;                        // 4 bytes - signal mask
-     *     int sa_flags;                       // 4 bytes - flags
-     * </pre>
-     * <p>
-     * Linux struct sigaction (152 bytes):
-     * <pre>
-     *     void (*sa_handler)(int);            // 8 bytes - handler pointer
-     *     unsigned long sa_flags;             // 8 bytes - flags
-     *     void (*sa_restorer)(void);          // 8 bytes - restorer (unused)
-     *     sigset_t sa_mask;                   // 128 bytes - signal mask (1024 bits)
-     * </pre>
-     */
+    /// Layout for the sigaction structure.
+    ///
+    ///
+    ///
+    /// macOS struct __sigaction (24 bytes):
+    /// ```
+    ///     union __sigaction_u __sigaction_u;  // 8 bytes - handler pointer
+    ///     void (*sa_tramp)(...);              // 8 bytes - trampoline pointer
+    ///     int sa_mask;                        // 4 bytes - signal mask
+    ///     int sa_flags;                       // 4 bytes - flags
+    /// ```
+    ///
+    ///
+    ///
+    /// Linux struct sigaction (152 bytes):
+    /// ```
+    ///     void (*sa_handler)(int);            // 8 bytes - handler pointer
+    ///     unsigned long sa_flags;             // 8 bytes - flags
+    ///     void (*sa_restorer)(void);          // 8 bytes - restorer (unused)
+    ///     sigset_t sa_mask;                   // 128 bytes - signal mask (1024 bits)
+    /// ```
     public static final MemoryLayout SIGACTION_LAYOUT = PlatformConstants.isMacOS()
             ? MemoryLayout.structLayout(
                     SIGACTION_U_LAYOUT_MACOS.withName("__sigaction_u"),
@@ -626,33 +604,28 @@ public final class LibC {
                     MemoryLayout.PathElement.groupElement("sa_mask"))
             : null;
 
-    /**
-     * Creates a new termios struct in the given arena.
-     *
-     * @param arena the arena to allocate in
-     * @return a memory segment for the termios struct
-     */
+    /// Creates a new termios struct in the given arena.
+    ///
+    /// @param arena the arena to allocate in
+    /// @return a memory segment for the termios struct
     public static MemorySegment allocateTermios(Arena arena) {
         return arena.allocate(TERMIOS_LAYOUT);
     }
 
-    /**
-     * Creates a new winsize struct in the given arena.
-     *
-     * @param arena the arena to allocate in
-     * @return a memory segment for the winsize struct
-     */
+    /// Creates a new winsize struct in the given arena.
+    ///
+    /// @param arena the arena to allocate in
+    /// @return a memory segment for the winsize struct
     public static MemorySegment allocateWinsize(Arena arena) {
         return arena.allocate(WINSIZE_LAYOUT);
     }
 
-    /**
-     * Creates a new pollfd struct in the given arena.
-     *
-     * @param arena the arena to allocate in
-     * @return a memory segment for the pollfd struct
-     */
+    /// Creates a new pollfd struct in the given arena.
+    ///
+    /// @param arena the arena to allocate in
+    /// @return a memory segment for the pollfd struct
     public static MemorySegment allocatePollfd(Arena arena) {
         return arena.allocate(POLLFD_LAYOUT);
     }
 }
+

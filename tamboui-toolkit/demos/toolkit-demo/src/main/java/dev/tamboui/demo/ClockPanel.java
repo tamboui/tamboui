@@ -13,9 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * A panel displaying the current time and date.
- */
+/// A panel displaying the current time and date.
 final class ClockPanel extends PanelContent {
 
     ClockPanel() {
@@ -32,3 +30,4 @@ final class ClockPanel extends PanelContent {
         );
     }
 }
+

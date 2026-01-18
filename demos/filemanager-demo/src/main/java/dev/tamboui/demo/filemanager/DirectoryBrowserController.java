@@ -16,10 +16,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Manages browsing a directory: navigation, selection, and marking files for operations.
- * This is a pure state holder with no UI dependencies.
- */
+/// Manages browsing a directory: navigation, selection, and marking files for operations.
+/// This is a pure state holder with no UI dependencies.
 public final class DirectoryBrowserController {
 
     public static final class FileEntry {
@@ -310,3 +308,4 @@ public final class DirectoryBrowserController {
         }
     }
 }
+

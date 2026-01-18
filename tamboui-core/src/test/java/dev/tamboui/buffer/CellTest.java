@@ -44,3 +44,4 @@ class CellTest {
         assertThat(cell.reset()).isEqualTo(Cell.EMPTY);
     }
 }
+

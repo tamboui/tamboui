@@ -7,38 +7,50 @@ package dev.tamboui.tfx;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 
-/**
- * Calculates alpha values for positions based on a sliding window gradient.
- * <p>
- * SlidingWindowAlpha is a helper class used by directional sweep effects (like
- * {@link dev.tamboui.tfx.effects.SweepShader}) to calculate position-specific alpha
- * values based on a "sliding window" that moves across the terminal area.
- * <p>
- * <b>Design Philosophy:</b>
- * <p>
- * The sliding window creates a gradient zone that moves across the area as the
- * animation progresses. Cells before the window are fully inactive (alpha = 0.0),
- * cells within the window have a gradient from 0.0 to 1.0, and cells after the
- * window are fully active (alpha = 1.0). This creates smooth directional transitions.
- * <p>
- * <b>Key Concepts:</b>
- * <ul>
- *   <li><b>Sliding Window:</b> A gradient zone that moves across the area based on
- *       animation progress</li>
- *   <li><b>Gradient Length:</b> The width of the transition zone in terminal cells</li>
- *   <li><b>Progress:</b> The global animation progress (0.0 to 1.0) that determines
- *       window position</li>
- * </ul>
- * <p>
- * <b>Usage:</b>
- * <p>
- * This class is primarily used internally by {@link dev.tamboui.tfx.effects.SweepShader}
- * to implement sweep effects. It's not typically used directly by application code.
- * <p>
- * <b>Note:</b> For pattern-based spatial effects (like {@link dev.tamboui.tfx.pattern.SweepPattern}),
- * use {@link dev.tamboui.tfx.pattern.TransitionProgress} instead, which provides a
- * different approach to spatial mapping that works better with the pattern system.
- */
+/// Calculates alpha values for positions based on a sliding window gradient.
+///
+///
+///
+/// SlidingWindowAlpha is a helper class used by directional sweep effects (like
+/// {@link dev.tamboui.tfx.effects.SweepShader}) to calculate position-specific alpha
+/// values based on a "sliding window" that moves across the terminal area.
+///
+///
+///
+/// **Design Philosophy:**
+///
+///
+///
+/// The sliding window creates a gradient zone that moves across the area as the
+/// animation progresses. Cells before the window are fully inactive (alpha = 0.0),
+/// cells within the window have a gradient from 0.0 to 1.0, and cells after the
+/// window are fully active (alpha = 1.0). This creates smooth directional transitions.
+///
+///
+///
+/// **Key Concepts:**
+///
+/// <li>**Sliding Window:** A gradient zone that moves across the area based on
+/// animation progress
+/// - **Gradient Length:** The width of the transition zone in terminal cells
+/// <li>**Progress:** The global animation progress (0.0 to 1.0) that determines
+/// window position
+///
+///
+///
+///
+/// **Usage:**
+///
+///
+///
+/// This class is primarily used internally by {@link dev.tamboui.tfx.effects.SweepShader}
+/// to implement sweep effects. It's not typically used directly by application code.
+///
+///
+///
+/// **Note:** For pattern-based spatial effects (like {@link dev.tamboui.tfx.pattern.SweepPattern}),
+/// use {@link dev.tamboui.tfx.pattern.TransitionProgress} instead, which provides a
+/// different approach to spatial mapping that works better with the pattern system.
 public final class SlidingWindowAlpha {
     
     private final Motion direction;
@@ -69,9 +81,7 @@ public final class SlidingWindowAlpha {
         return new SlidingWindowAlpha(direction, area, progress, gradientLength);
     }
     
-    /**
-     * Calculates the alpha value for a given position.
-     */
+    /// Calculates the alpha value for a given position.
     public float alpha(Position position) {
         switch (direction) {
             case LEFT_TO_RIGHT:
@@ -133,5 +143,6 @@ public final class SlidingWindowAlpha {
         }
     }
 }
+
 
 

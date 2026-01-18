@@ -22,9 +22,7 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Test that verifies CSS styles are actually applied during rendering.
- */
+/// Test that verifies CSS styles are actually applied during rendering.
 class CssRenderingTest {
 
     private StyleEngine styleEngine;
@@ -168,3 +166,4 @@ class CssRenderingTest {
         assertThat(borderFg.b()).isEqualTo(0x88);
     }
 }
+

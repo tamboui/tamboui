@@ -33,12 +33,12 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import java.io.IOException;
 import java.util.Random;
 
-/**
- * Demo TUI application showcasing the Canvas widget.
- * <p>
- * Demonstrates drawing shapes (lines, rectangles, circles, points)
- * with different markers (braille, half-block, dot, block).
- */
+/// Demo TUI application showcasing the Canvas widget.
+///
+///
+///
+/// Demonstrates drawing shapes (lines, rectangles, circles, points)
+/// with different markers (braille, half-block, dot, block).
 public class CanvasDemo {
 
     private boolean running = true;
@@ -344,3 +344,4 @@ public class CanvasDemo {
         frame.renderWidget(footer, area);
     }
 }
+

@@ -12,21 +12,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A compound selector that combines multiple simple selectors.
- * <p>
- * All parts must match for the compound selector to match.
- * Example: {@code Panel.primary#sidebar:focus { ... }}
- */
+/// A compound selector that combines multiple simple selectors.
+///
+///
+///
+/// All parts must match for the compound selector to match.
+/// Example: {@code Panel.primary#sidebar:focus { ... }}
 public final class CompoundSelector implements Selector {
 
     private final List<Selector> parts;
 
-    /**
-     * Creates a compound selector from the given parts.
-     *
-     * @param parts the selector parts (must not be empty)
-     */
+    /// Creates a compound selector from the given parts.
+    ///
+    /// @param parts the selector parts (must not be empty)
     public CompoundSelector(List<Selector> parts) {
         if (parts.isEmpty()) {
             throw new IllegalArgumentException("Compound selector must have at least one part");
@@ -88,3 +86,4 @@ public final class CompoundSelector implements Selector {
         return "CompoundSelector{" + toCss() + "}";
     }
 }
+

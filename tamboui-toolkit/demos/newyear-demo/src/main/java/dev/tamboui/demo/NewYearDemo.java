@@ -42,16 +42,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
-/**
- * New Year countdown demo inspired by https://github.com/willmcgugan/ny2026, adapted to TamboUI.
- *
- * - Big digital countdown clock to local New Year (Jan 1st 00:00 local time)
- * - Firework rockets + particle explosions (triggered at midnight or Space)
- * - 3D perspective projection with camera movement
- * - Procedural stereo audio system
- * - 60 FPS rendering
- * - Braille dot rendering for clock digits
- */
+/// New Year countdown demo inspired by https://github.com/willmcgugan/ny2026, adapted to TamboUI.
+///
+/// - Big digital countdown clock to local New Year (Jan 1st 00:00 local time)
+/// - Firework rockets + particle explosions (triggered at midnight or Space)
+/// - 3D perspective projection with camera movement
+/// - Procedural stereo audio system
+/// - 60 FPS rendering
+/// - Braille dot rendering for clock digits
 public final class NewYearDemo extends ToolkitApp {
 
     private static final Duration TICK = Duration.ofMillis(16); // ~60 fps
@@ -266,10 +264,8 @@ public final class NewYearDemo extends ToolkitApp {
         soundManager.stop();
     }
 
-    /**
-     * Manages sound generation and playback for fireworks explosions.
-     * Generates procedural explosion sounds with stereo panning.
-     */
+    /// Manages sound generation and playback for fireworks explosions.
+    /// Generates procedural explosion sounds with stereo panning.
     static final class SoundManager {
         private static final int SAMPLE_RATE = 22050;
         private static final double DURATION = 1.5; // seconds
@@ -535,10 +531,8 @@ public final class NewYearDemo extends ToolkitApp {
         }
     }
 
-    /**
-     * Simple fireworks show: rockets fly up, then explode into particles which fall and fade.
-     * Coordinates are in 3D space with perspective projection.
-     */
+    /// Simple fireworks show: rockets fly up, then explode into particles which fall and fade.
+    /// Coordinates are in 3D space with perspective projection.
     static final class FireworksShow {
         private static final double GRAVITY = -100.0; // units / s^2 (negative = downward, since y increases upward)
         private static final double DRAG = 0.97; // Air resistance (matching Python)
@@ -875,9 +869,7 @@ public final class NewYearDemo extends ToolkitApp {
         }
     }
 
-    /**
-     * Tiny 7-seg-ish font for "HH:MM:SS" (height 7).
-     */
+    /// Tiny 7-seg-ish font for "HH:MM:SS" (height 7).
     static final class SevenSegFont {
         static final SevenSegFont DEFAULT = new SevenSegFont();
 
@@ -1026,4 +1018,5 @@ public final class NewYearDemo extends ToolkitApp {
         }
     }
 }
+
 

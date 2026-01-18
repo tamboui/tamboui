@@ -1,9 +1,9 @@
-/**
- * Standard widgets for TamboUI TUI library.
- * <p>
- * This module provides a comprehensive set of widgets for building terminal user interfaces:
- * blocks, paragraphs, lists, tables, charts, canvas, gauges, and more.
- */
+/// Standard widgets for TamboUI TUI library.
+///
+///
+///
+/// This module provides a comprehensive set of widgets for building terminal user interfaces:
+/// blocks, paragraphs, lists, tables, charts, canvas, gauges, and more.
 module dev.tamboui.widgets {
     requires transitive dev.tamboui.core;
 
@@ -24,3 +24,4 @@ module dev.tamboui.widgets {
     exports dev.tamboui.widgets.tabs;
     exports dev.tamboui.widgets.text;
 }
+

@@ -15,10 +15,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Small helpers to provide Java 9+ style collection factories while staying
- * compatible with Java 8.
- */
+/// Small helpers to provide Java 9+ style collection factories while staying
+/// compatible with Java 8.
 public final class CollectionUtil {
 
     private CollectionUtil() {
@@ -70,3 +68,4 @@ public final class CollectionUtil {
         return Collections.unmodifiableMap(new HashMap<>(source));
     }
 }
+

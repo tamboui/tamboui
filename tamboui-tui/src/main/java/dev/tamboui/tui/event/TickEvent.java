@@ -8,12 +8,12 @@ import dev.tamboui.tui.TuiConfig;
 
 import java.time.Duration;
 
-/**
- * Represents an animation timer tick event.
- * <p>
- * Tick events are generated at regular intervals when animation mode is enabled
- * via {@link TuiConfig#tickRate()}.
- */
+/// Represents an animation timer tick event.
+///
+///
+///
+/// Tick events are generated at regular intervals when animation mode is enabled
+/// via {@link TuiConfig#tickRate()}.
 public final class TickEvent implements Event {
 
     private final long frameCount;
@@ -24,23 +24,17 @@ public final class TickEvent implements Event {
         this.elapsed = elapsed;
     }
 
-    /**
-     * Creates a tick event with the given frame count and elapsed time.
-     */
+    /// Creates a tick event with the given frame count and elapsed time.
     public static TickEvent of(long frameCount, Duration elapsed) {
         return new TickEvent(frameCount, elapsed);
     }
 
-    /**
-     * Returns the elapsed time in milliseconds.
-     */
+    /// Returns the elapsed time in milliseconds.
     public long elapsedMillis() {
         return elapsed.toMillis();
     }
 
-    /**
-     * Returns the elapsed time in seconds as a double.
-     */
+    /// Returns the elapsed time in seconds as a double.
     public double elapsedSeconds() {
         return elapsed.toNanos() / 1_000_000_000.0;
     }
@@ -77,3 +71,4 @@ public final class TickEvent implements Event {
         return String.format("TickEvent[frameCount=%d, elapsed=%s]", frameCount, elapsed);
     }
 }
+

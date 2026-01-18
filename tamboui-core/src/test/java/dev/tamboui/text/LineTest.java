@@ -71,3 +71,4 @@ class LineTest {
         assertThat(line.spans().get(0).style().bg()).contains(Color.BLUE);
     }
 }
+

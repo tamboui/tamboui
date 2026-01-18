@@ -35,9 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo TUI application showcasing TamboUI features.
- */
+/// Demo TUI application showcasing TamboUI features.
 public class Demo {
 
     private static final String[] DEFAULT_ITEMS = {
@@ -428,3 +426,4 @@ public class Demo {
         frame.renderWidget(footer, area);
     }
 }
+

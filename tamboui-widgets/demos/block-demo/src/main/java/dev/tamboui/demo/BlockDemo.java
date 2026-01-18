@@ -28,18 +28,18 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 
 import java.io.IOException;
 
-/**
- * Demo TUI application showcasing the Block widget.
- * <p>
- * Demonstrates various Block features:
- * - Different border types (plain, rounded, double, thick)
- * - Border styles (colors)
- * - Block styles (background colors, text styles)
- * - Titles (top and bottom)
- * - Padding
- * - Different border combinations
- * - Hyperlinks in titles
- */
+/// Demo TUI application showcasing the Block widget.
+///
+///
+///
+/// Demonstrates various Block features:
+/// - Different border types (plain, rounded, double, thick)
+/// - Border styles (colors)
+/// - Block styles (background colors, text styles)
+/// - Titles (top and bottom)
+/// - Padding
+/// - Different border combinations
+/// - Hyperlinks in titles
 public class BlockDemo {
 
     private boolean running = true;
@@ -145,9 +145,7 @@ public class BlockDemo {
         renderPaddingAndTitles(frame, bottomCols.get(1));
     }
 
-    /**
-     * Render a basic block with borders.
-     */
+    /// Render a basic block with borders.
     private void renderBorderedBlock(Frame frame, Rect area) {
         Block block = Block.builder()
             .borders(Borders.ALL)
@@ -165,9 +163,7 @@ public class BlockDemo {
         frame.renderWidget(content, block.inner(area));
     }
 
-    /**
-     * Render a styled block with colors and modifiers.
-     */
+    /// Render a styled block with colors and modifiers.
     private void renderStyledBlock(Frame frame, Rect area) {
         Block block = Block.builder()
             .borders(Borders.ALL)
@@ -192,9 +188,7 @@ public class BlockDemo {
         frame.renderWidget(content, block.inner(area));
     }
 
-    /**
-     * Render blocks with different border types.
-     */
+    /// Render blocks with different border types.
     private void renderCustomBorders(Frame frame, Rect area) {
         // Split into 4 sections
         var cols = Layout.horizontal()
@@ -243,9 +237,7 @@ public class BlockDemo {
         frame.renderWidget(quadrant, cols.get(3));
     }
 
-    /**
-     * Render blocks with padding and multiple titles.
-     */
+    /// Render blocks with padding and multiple titles.
     private void renderPaddingAndTitles(Frame frame, Rect area) {
         // Split vertically
         var rows = Layout.vertical()
@@ -323,4 +315,5 @@ public class BlockDemo {
         frame.renderWidget(footer, area);
     }
 }
+
 

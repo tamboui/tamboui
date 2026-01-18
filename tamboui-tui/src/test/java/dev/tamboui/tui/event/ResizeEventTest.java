@@ -35,3 +35,4 @@ class ResizeEventTest {
         assertThat(ResizeEvent.of(1, 1).height()).isEqualTo(1);
     }
 }
+

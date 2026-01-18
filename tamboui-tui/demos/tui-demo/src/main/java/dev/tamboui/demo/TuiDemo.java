@@ -37,20 +37,22 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Demo showcasing the TuiRunner framework.
- * <p>
- * This demo shows:
- * <ul>
- *   <li>Keyboard handling with vim-style keys and arrows</li>
- *   <li>Mouse event handling (clicks, scroll, drag)</li>
- *   <li>Animation with tick events</li>
- *   <li>Window resize handling</li>
- * </ul>
- * <p>
- * Note how much simpler this is compared to basic-demo - no manual
- * escape sequence parsing, no raw mode management, no event loop boilerplate.
- */
+/// Demo showcasing the TuiRunner framework.
+///
+///
+///
+/// This demo shows:
+///
+/// - Keyboard handling with vim-style keys and arrows
+/// - Mouse event handling (clicks, scroll, drag)
+/// - Animation with tick events
+/// - Window resize handling
+///
+///
+///
+///
+/// Note how much simpler this is compared to basic-demo - no manual
+/// escape sequence parsing, no raw mode management, no event loop boilerplate.
 public class TuiDemo {
 
     private int counter = 0;
@@ -387,3 +389,4 @@ public class TuiDemo {
         frame.renderWidget(footer, area);
     }
 }
+

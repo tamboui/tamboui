@@ -16,9 +16,7 @@ import org.junit.jupiter.api.Test;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Tests for Panel.
- */
+/// Tests for Panel.
 class PanelTest {
 
     @Test
@@ -66,3 +64,4 @@ class PanelTest {
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }
 }
+
