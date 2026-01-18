@@ -44,10 +44,10 @@
       "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     },
     "tfx-basic-effects-demo": {
-      "script-ref": "tamboui-tfx/demos/tfx-basic-effects-demo/src/main/java/dev/tamboui/demo/TFxDemo.java"
+      "script-ref": "tamboui-tfx/demos/tfx-basic-effects-demo/src/main/java/dev/tamboui/demo/BasicEffectsTFXDemo.java"
     },
     "tfx-demo": {
-      "script-ref": "tamboui-tfx/demos/tfx-demo/src/main/java/dev/tamboui/demo/TFxBasicEffectsDemo.java"
+      "script-ref": "tamboui-tfx/demos/tfx-demo/src/main/java/dev/tamboui/demo/TFXEffectsDemo.java"
     },
     "tfx-toolkit-demo": {
       "script-ref": "tamboui-tfx-toolkit/demos/tfx-toolkit-demo/src/main/java/dev/tamboui/demo/TfxToolkitDemo.java"
