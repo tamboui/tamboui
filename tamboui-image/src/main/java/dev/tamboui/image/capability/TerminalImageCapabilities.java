@@ -115,6 +115,15 @@ public final class TerminalImageCapabilities {
     }
 
     /**
+     * Returns all supported protocols.
+     * <p>
+     * The returned set is immutable.
+     */
+    public Set<TerminalImageProtocol> supportedProtocols() {
+        return supportedProtocols;
+    }
+
+    /**
      * Returns true if any native image protocol is supported.
      *
      * @return true if Kitty, iTerm2, or Sixel is available

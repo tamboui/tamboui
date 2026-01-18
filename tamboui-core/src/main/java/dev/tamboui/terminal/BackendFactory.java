@@ -6,15 +6,16 @@ package dev.tamboui.terminal;
 
 import dev.tamboui.internal.record.RecordingBackend;
 import dev.tamboui.internal.record.RecordingConfig;
+import dev.tamboui.util.SafeServiceLoader;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
- * Factory for creating {@link Backend} instances using the {@link ServiceLoader} mechanism.
+ * Factory for creating {@link Backend} instances using the {@link java.util.ServiceLoader} mechanism.
+ * 
+ * This uses the {@link SafeServiceLoader} to load the providers and skip providers that fails to load.
  * <p>
  * This factory discovers {@link BackendProvider} implementations on the classpath
  * and uses them to create backend instances. When multiple providers are available,
@@ -66,9 +67,7 @@ public final class BackendFactory {
         }
 
         // Load all available providers
-        ServiceLoader<BackendProvider> loader = ServiceLoader.load(BackendProvider.class);
-        List<BackendProvider> allProviders = StreamSupport.stream(loader.spliterator(), false)
-                .collect(Collectors.toList());
+        List<BackendProvider> allProviders = SafeServiceLoader.load(BackendProvider.class);
 
         List<BackendProvider> providers = (userSelectedProvider != null && !userSelectedProvider.isEmpty())
                 ? resolveProviders(userSelectedProvider, allProviders)
