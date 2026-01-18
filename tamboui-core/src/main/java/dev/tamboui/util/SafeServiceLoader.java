@@ -67,7 +67,7 @@ public final class SafeServiceLoader {
                 consecutiveErrors = 0;
 
                 loaded.add(provider);
-            } catch (ServiceConfigurationError | LinkageError e) {
+            } catch (ServiceConfigurationError | LinkageError  e) {
                 if (onError != null) {
                     onError.accept(e);
                 }
