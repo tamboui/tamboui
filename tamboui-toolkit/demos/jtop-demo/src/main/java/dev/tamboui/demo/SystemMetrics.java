@@ -17,10 +17,15 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 /**
  * Reads system metrics using OSHI (cross-platform).
  * Separates system monitoring logic from UI rendering.
+ * <p>
+ * Thread-safe: uses a ReentrantReadWriteLock for safe concurrent access
+ * between the update thread and render thread.
  */
 final class SystemMetrics {
 
@@ -31,6 +36,8 @@ final class SystemMetrics {
     private final CentralProcessor processor = systemInfo.getHardware().getProcessor();
     private final OperatingSystem operatingSystem = systemInfo.getOperatingSystem();
 
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
     // CPU tracking
     private final int numCpus;
     private final double[] coreUsage;
@@ -39,17 +46,17 @@ final class SystemMetrics {
 
     // Memory tracking
     private final Deque<Long> memoryHistory = new ArrayDeque<>(HISTORY_SIZE);
-    private long memTotal = 0;
-    private long memAvailable = 0;
-    private long memUsed = 0;
-    private long swapTotal = 0;
-    private long swapFree = 0;
+    private long memTotal;
+    private long memUsed;
+    private long memAvailable;
+    private long swapTotal;
+    private long swapFree;
 
     // System info
-    private double uptime = 0;
-    private double loadAvg1 = 0;
-    private double loadAvg5 = 0;
-    private double loadAvg15 = 0;
+    private double uptime;
+    private double loadAvg1;
+    private double loadAvg5;
+    private double loadAvg15;
 
     // Process list
     private List<ProcessInfo> processes = new ArrayList<>();
@@ -93,16 +100,40 @@ final class SystemMetrics {
     }
 
     /**
-     * Updates all metrics by reading from /proc.
+     * Updates all metrics.
+     * This method should be called from a background thread.
+     *
+     * @param sortMode the sort mode for the process list
      */
     void update(SortMode sortMode) {
-        updateCpuUsage();
-        updateMemoryInfo();
-        updateSystemInfo();
-        updateProcessList(sortMode);
+        lock.writeLock().lock();
+        try {
+            updateCpuUsage();
+            updateMemoryInfo();
+            updateSystemInfo();
+            updateProcessList(sortMode);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
-    // ==================== Accessors ====================
+    /**
+     * Executes a read operation under the read lock.
+     *
+     * @param reader the read operation to execute
+     * @param <T> the return type
+     * @return the result of the read operation
+     */
+    <T> T read(Supplier<T> reader) {
+        lock.readLock().lock();
+        try {
+            return reader.get();
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    // ==================== Accessors (must be called within read()) ====================
 
     int numCpus() {
         return numCpus;
@@ -120,8 +151,16 @@ final class SystemMetrics {
         return avg / numCpus;
     }
 
-    Deque<Long> coreHistory(int core) {
-        return core >= 0 && core < numCpus ? coreHistory.get(core) : new ArrayDeque<>();
+    List<Long> coreHistory(int core) {
+        return core >= 0 && core < numCpus ? List.copyOf(coreHistory.get(core)) : List.of();
+    }
+
+    List<List<Long>> allCoreHistories() {
+        var result = new ArrayList<List<Long>>(numCpus);
+        for (var history : coreHistory) {
+            result.add(List.copyOf(history));
+        }
+        return result;
     }
 
     long memTotal() {
@@ -152,8 +191,8 @@ final class SystemMetrics {
         return memTotal > 0 ? (double) memUsed / memTotal : 0;
     }
 
-    Deque<Long> memoryHistory() {
-        return memoryHistory;
+    List<Long> memoryHistory() {
+        return List.copyOf(memoryHistory);
     }
 
     double uptime() {
@@ -176,7 +215,7 @@ final class SystemMetrics {
         return processes;
     }
 
-    // ==================== Update Methods ====================
+    // ==================== Private Update Methods ====================
 
     private void updateCpuUsage() {
         if (lastCpuTicks == null) {
@@ -184,7 +223,7 @@ final class SystemMetrics {
             return;
         }
 
-        var load = processor.getProcessorCpuLoadBetweenTicks(lastCpuTicks); // 0..1 per logical CPU
+        var load = processor.getProcessorCpuLoadBetweenTicks(lastCpuTicks);
         lastCpuTicks = processor.getProcessorCpuLoadTicks();
 
         for (var coreId = 0; coreId < Math.min(numCpus, load.length); coreId++) {
@@ -209,8 +248,8 @@ final class SystemMetrics {
 
         var vm = memory.getVirtualMemory();
         swapTotal = vm.getSwapTotal() / 1024;
-        var swapUsed = vm.getSwapUsed() / 1024;
-        swapFree = Math.max(0, swapTotal - swapUsed);
+        var swapUsedVal = vm.getSwapUsed() / 1024;
+        swapFree = Math.max(0, swapTotal - swapUsedVal);
 
         var memPercent = memTotal > 0 ? (memUsed * 100) / memTotal : 0;
         if (memoryHistory.size() >= HISTORY_SIZE) {
@@ -237,12 +276,10 @@ final class SystemMetrics {
     private void updateProcessList(SortMode sortMode) {
         var newProcesses = new ArrayList<ProcessInfo>();
 
-        // Grab a snapshot of processes (limit later in rendering).
-        // Sorting will be applied after we compute CPU between ticks.
-        var snapshot = operatingSystem.getProcesses();
-        var newByPid = new HashMap<Integer, OSProcess>(snapshot.size());
+        var osProcesses = operatingSystem.getProcesses();
+        var newByPid = new HashMap<Integer, OSProcess>(osProcesses.size());
 
-        for (var p : snapshot) {
+        for (var p : osProcesses) {
             var pid = p.getProcessID();
             var prev = lastProcessesByPid.get(pid);
 

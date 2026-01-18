@@ -38,15 +38,19 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public class JTopDemo {
 
+    private static final Duration UPDATE_INTERVAL = Duration.ofMillis(500);
+
     public static void main(String[] args) throws Exception {
         var config = TuiConfig.builder()
-            .tickRate(Duration.ofMillis(500))
             .build();
 
         // Create stateful component outside the render supplier
         var systemMonitor = new SystemMonitor();
 
         try (var runner = ToolkitRunner.create(config)) {
+            // Schedule metrics updates on a background thread
+            runner.scheduleWithFixedDelay(systemMonitor::updateMetrics, UPDATE_INTERVAL);
+
             runner.run(() -> column(
                 panel(() -> row(
                     text(" JTop - System Monitor ").bold().cyan(),
