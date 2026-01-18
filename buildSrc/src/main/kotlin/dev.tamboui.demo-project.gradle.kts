@@ -22,7 +22,11 @@ tasks.withType<JavaExec>().configureEach {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 22
+    options.release = 25
+    options.compilerArgs.addAll(listOf(
+        "-Xmaxwarns", "10",
+        "-Xmaxerrs", "10"
+    ))
 }
 
 java {

@@ -71,9 +71,69 @@
     return parts.join('/');
   }
 
+  function computePackageNameFromUrl() {
+    var pkgPath = computePackagePathFromUrl();
+    return pkgPath ? pkgPath.replace(/\//g, '.') : null;
+  }
+
+  function computeOuterClassNameFromUrl() {
+    var path = window.location.pathname || '';
+    var fileName = path.substring(path.lastIndexOf('/') + 1);
+    if (!fileName || !fileName.endsWith('.html')) {
+      return null;
+    }
+    if (fileName === 'package-summary.html' || fileName === 'package-tree.html') {
+      return null;
+    }
+    var base = fileName.replace(/\.html$/, '');
+    return base.split('.')[0] || null; // Outer.Inner -> Outer
+  }
+
+  function computeFqcnFromUrl() {
+    var pkg = computePackageNameFromUrl();
+    var outer = computeOuterClassNameFromUrl();
+    if (!pkg || !outer) {
+      return null;
+    }
+    return pkg + '.' + outer;
+  }
+
+  function computeGitHubUrlFromInjectedMaps() {
+    var repo = getGitHubRepo();
+    var ref = getGitHubRef();
+    var pkgToDir = window.__TAMBOUI_GITHUB_PACKAGE_TO_DIR_PATH;
+
+    // Class page
+    var pkg = computePackageNameFromUrl();
+    var outer = computeOuterClassNameFromUrl();
+    if (pkg && outer && pkgToDir && pkgToDir[pkg]) {
+      return 'https://github.com/' + repo + '/blob/' + ref + '/' + pkgToDir[pkg] + '/' + outer + '.java';
+    }
+
+    // Package page
+    var path = window.location.pathname || '';
+    var fileName = path.substring(path.lastIndexOf('/') + 1);
+    if ((fileName === 'package-summary.html' || fileName === 'package-tree.html') && pkgToDir) {
+      var pkgPage = computePackageNameFromUrl();
+      if (pkgPage && pkgToDir[pkgPage]) {
+        return 'https://github.com/' + repo + '/tree/' + ref + '/' + pkgToDir[pkgPage] + '/';
+      }
+    }
+
+    return null;
+  }
+
   function computeGitHubUrl() {
     var repo = getGitHubRepo();
     var ref = getGitHubRef();
+
+    // Aggregate Javadoc can't reliably infer module name from document.title.
+    // Prefer the Gradle-injected mapping when available.
+    var mapped = computeGitHubUrlFromInjectedMaps();
+    if (mapped) {
+      return mapped;
+    }
+
     var moduleName = computeModuleNameFromTitle();
     if (!moduleName) {
       return 'https://github.com/' + repo;

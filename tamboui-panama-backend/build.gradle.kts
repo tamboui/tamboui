@@ -5,7 +5,7 @@ plugins {
 description = "Panama FFI backend for TamboUI TUI library"
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 22
+    options.release = 25
     // Suppress warnings for restricted Panama FFI methods
     options.compilerArgs.add("-Xlint:-restricted")
 }

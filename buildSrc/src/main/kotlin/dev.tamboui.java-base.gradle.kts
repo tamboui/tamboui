@@ -29,6 +29,8 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf(
         "-Xlint:all",
         "-Xlint:-serial",
+        "-Xmaxwarns", "10",
+        "-Xmaxerrs", "10",
         "-Werror",
         "-Xlint:-options"
     ))
@@ -87,6 +89,10 @@ tasks.withType<Javadoc>().configureEach {
     // -Ptamboui.githubRepo=tamboui/tamboui
     // -Ptamboui.githubRef=<branch-or-tag>
     (options as StandardJavadocDocletOptions).addFileOption("-add-script", combinedScript)
+
+    // Limit warning/error output volume (non-standard javadoc options).
+    (options as StandardJavadocDocletOptions).addStringOption("Xmaxwarns", "10")
+    (options as StandardJavadocDocletOptions).addStringOption("Xmaxerrs", "10")
 
     // Generate HTML with links to the source code for types and members.
     // (Javadoc option: -linksource)
