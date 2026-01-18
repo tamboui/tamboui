@@ -8,6 +8,7 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Fraction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,12 +58,12 @@ public final class LayoutSolver {
      * @return array of computed sizes for each constraint
      */
     public int[] solve(List<Constraint> constraints, int available, int spacing, Flex flex) {
-        solver.reset();
-
         int n = constraints.size();
         if (n == 0) {
             return new int[0];
         }
+
+        solver.reset();
 
         Variable[] sizes = new Variable[n];
         Variable[] positions = new Variable[n + 1];
@@ -74,19 +75,25 @@ public final class LayoutSolver {
         }
         positions[n] = new Variable("pos_end");
 
+        // Collect all constraints in a list for batch addition
+        List<CassowaryConstraint> allConstraints = new ArrayList<>();
+
         // Add position and size relationship constraints (always required)
-        addStructuralConstraints(positions, sizes, n, spacing, available);
+        collectStructuralConstraints(allConstraints, positions, sizes, n, spacing, available);
 
         // Convert TamboUI constraints to Cassowary constraints
         for (int i = 0; i < n; i++) {
-            addConstraintFor(constraints.get(i), sizes[i], available);
+            collectConstraintFor(allConstraints, constraints.get(i), sizes[i], available);
         }
 
         // Add fill proportionality constraints
-        addFillProportionalityConstraints(constraints, sizes);
+        collectFillProportionalityConstraints(allConstraints, constraints, sizes);
 
         // Add equal-size tiebreaker constraints (all segments weakly prefer to be equal)
-        addEqualSizeTendency(sizes);
+        collectEqualSizeTendency(allConstraints, sizes);
+
+        // Add all constraints in batch (single optimization pass)
+        solver.addConstraints(allConstraints);
 
         // Solve and extract results
         solver.updateVariables();
@@ -103,102 +110,92 @@ public final class LayoutSolver {
     }
 
     /**
-     * Adds structural constraints that define the relationship between positions and sizes.
+     * Collects structural constraints that define the relationship between positions and sizes.
      */
-    private void addStructuralConstraints(Variable[] positions, Variable[] sizes,
-                                          int n, int spacing, int available) {
+    private void collectStructuralConstraints(List<CassowaryConstraint> dest,
+                                              Variable[] positions, Variable[] sizes,
+                                              int n, int spacing, int available) {
         // All sizes must be non-negative
         for (int i = 0; i < n; i++) {
-            solver.addConstraint(
-                    Expression.variable(sizes[i])
-                            .greaterThanOrEqual(0, Strength.REQUIRED));
+            dest.add(Expression.variable(sizes[i])
+                    .greaterThanOrEqual(0, Strength.REQUIRED));
         }
 
-        solver.addConstraint(
-                Expression.variable(positions[0])
-                        .equalTo(0, Strength.REQUIRED));
+        dest.add(Expression.variable(positions[0])
+                .equalTo(0, Strength.REQUIRED));
 
         // Position relationships: pos[i+1] = pos[i] + size[i] + spacing
         for (int i = 0; i < n; i++) {
             int gap = (i < n - 1) ? spacing : 0;
-            solver.addConstraint(
-                    Expression.variable(positions[i + 1])
-                            .equalTo(Expression.variable(positions[i])
-                                            .plus(Expression.variable(sizes[i]))
-                                            .plus(gap),
-                                    Strength.REQUIRED));
+            dest.add(Expression.variable(positions[i + 1])
+                    .equalTo(Expression.variable(positions[i])
+                                    .plus(Expression.variable(sizes[i]))
+                                    .plus(gap),
+                            Strength.REQUIRED));
         }
 
         // Total space constraint: last position <= available
-        solver.addConstraint(
-                Expression.variable(positions[n])
-                        .lessThanOrEqual(available, Strength.REQUIRED));
+        dest.add(Expression.variable(positions[n])
+                .lessThanOrEqual(available, Strength.REQUIRED));
     }
 
     /**
-     * Converts a TamboUI constraint to Cassowary constraints.
+     * Collects Cassowary constraints for a TamboUI constraint.
      */
-    private void addConstraintFor(Constraint c, Variable size, int available) {
+    private void collectConstraintFor(List<CassowaryConstraint> dest, Constraint c, Variable size, int available) {
         if (c instanceof Constraint.Length) {
             // Fixed size: size == value (strong)
             int value = ((Constraint.Length) c).value();
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .equalTo(value, LENGTH_SIZE_EQ));
+            dest.add(Expression.variable(size)
+                    .equalTo(value, LENGTH_SIZE_EQ));
 
         } else if (c instanceof Constraint.Percentage) {
             // Percentage: size == available * percent / 100
             // Use exact Fraction arithmetic: available * percent / 100
             int percent = ((Constraint.Percentage) c).value();
             Fraction target = Fraction.of(available).multiply(Fraction.of(percent, 100));
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .equalTo(target, PERCENTAGE_SIZE_EQ));
+            dest.add(Expression.variable(size)
+                    .equalTo(target, PERCENTAGE_SIZE_EQ));
 
         } else if (c instanceof Constraint.Ratio) {
             // Ratio: size == available * ratio
             Constraint.Ratio ratio = (Constraint.Ratio) c;
             Fraction target = Fraction.of(available).multiply(ratio.toFraction());
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .equalTo(target, RATIO_SIZE_EQ));
+            dest.add(Expression.variable(size)
+                    .equalTo(target, RATIO_SIZE_EQ));
 
         } else if (c instanceof Constraint.Min) {
             // Minimum: size >= value (hard constraint)
             int value = ((Constraint.Min) c).value();
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .greaterThanOrEqual(value, Strength.REQUIRED));
+            dest.add(Expression.variable(size)
+                    .greaterThanOrEqual(value, Strength.REQUIRED));
             // Min tries to GROW to fill available space (like Fill)
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .equalTo(available, FILL_GROW));
+            dest.add(Expression.variable(size)
+                    .equalTo(available, FILL_GROW));
 
         } else if (c instanceof Constraint.Max) {
             // Maximum: size <= value (hard constraint)
             int value = ((Constraint.Max) c).value();
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .lessThanOrEqual(value, Strength.REQUIRED));
+            dest.add(Expression.variable(size)
+                    .lessThanOrEqual(value, Strength.REQUIRED));
             // Max tries to REACH its maximum value
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .equalTo(value, MAX_SIZE_EQ));
+            dest.add(Expression.variable(size)
+                    .equalTo(value, MAX_SIZE_EQ));
 
         } else if (c instanceof Constraint.Fill) {
             // Fill: try to grow to fill available space
-            // Proportionality is handled by addFillProportionalityConstraints
-            solver.addConstraint(
-                    Expression.variable(size)
-                            .equalTo(available, FILL_GROW));
+            // Proportionality is handled by collectFillProportionalityConstraints
+            dest.add(Expression.variable(size)
+                    .equalTo(available, FILL_GROW));
         }
     }
 
     /**
-     * Adds proportionality constraints between Fill segments.
+     * Collects proportionality constraints between Fill segments.
      * Makes Fill(2) twice as large as Fill(1), etc.
      */
-    private void addFillProportionalityConstraints(List<Constraint> constraints, Variable[] sizes) {
+    private void collectFillProportionalityConstraints(List<CassowaryConstraint> dest,
+                                                       List<Constraint> constraints, Variable[] sizes) {
         int n = constraints.size();
 
         // Find all Fill and Min constraints (Min behaves like Fill in non-legacy mode)
@@ -210,9 +207,8 @@ public final class LayoutSolver {
                 if (!leftScale.isZero() && !rightScale.isZero()) {
                     // rightScale * leftSize == leftScale * rightSize
                     // This ensures Fill(2) is twice as large as Fill(1)
-                    solver.addConstraint(
-                            Expression.variable(sizes[i]).times(rightScale)
-                                    .equalTo(Expression.variable(sizes[j]).times(leftScale), FILL_GROW));
+                    dest.add(Expression.variable(sizes[i]).times(rightScale)
+                            .equalTo(Expression.variable(sizes[j]).times(leftScale), FILL_GROW));
                 }
             }
         }
@@ -234,16 +230,15 @@ public final class LayoutSolver {
     }
 
     /**
-     * Adds weak constraints that make all segments tend toward equal size.
+     * Collects weak constraints that make all segments tend toward equal size.
      * This serves as a tiebreaker when other constraints don't fully determine sizes.
      */
-    private void addEqualSizeTendency(Variable[] sizes) {
+    private void collectEqualSizeTendency(List<CassowaryConstraint> dest, Variable[] sizes) {
         int n = sizes.length;
         for (int i = 0; i < n - 1; i++) {
             // Each segment weakly prefers to be equal to the next
-            solver.addConstraint(
-                    Expression.variable(sizes[i])
-                            .equalTo(Expression.variable(sizes[i + 1]), ALL_SEGMENT_GROW));
+            dest.add(Expression.variable(sizes[i])
+                    .equalTo(Expression.variable(sizes[i + 1]), ALL_SEGMENT_GROW));
         }
     }
 

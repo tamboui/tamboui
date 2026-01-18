@@ -6,6 +6,7 @@ package dev.tamboui.layout;
 
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
+import dev.tamboui.layout.cassowary.LayoutCache;
 import dev.tamboui.layout.cassowary.LayoutSolver;
 
 import java.util.ArrayList;
@@ -184,9 +185,10 @@ public final class Layout {
         int totalSpacing = spacing * (constraints.size() - 1);
         int distributable = Math.max(0, available - totalSpacing);
 
-        // Use Cassowary solver to compute sizes
-        LayoutSolver solver = new LayoutSolver();
-        int[] sizes = solver.solve(constraints, distributable, spacing, flex);
+        // Use cached solver results, computing on miss
+        int[] sizes = LayoutCache.instance().computeIfAbsent(
+            constraints, distributable, spacing, flex,
+            () -> new LayoutSolver().solve(constraints, distributable, spacing, flex));
 
         // Calculate total size used and remaining space for flex positioning
         int totalSize = 0;

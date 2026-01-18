@@ -104,6 +104,24 @@ public final class Solver {
      * @throws UnsatisfiableConstraintException if required and unsatisfiable
      */
     public void addConstraint(CassowaryConstraint constraint) {
+        addConstraintInternal(constraint);
+        optimize(objective);
+    }
+
+    /**
+     * Adds multiple constraints to the solver.
+     *
+     * @param constraintList the constraints to add
+     * @throws DuplicateConstraintException     if any constraint already exists
+     * @throws UnsatisfiableConstraintException if any required constraint is unsatisfiable
+     */
+    public void addConstraints(Iterable<CassowaryConstraint> constraintList) {
+        for (CassowaryConstraint constraint : constraintList) {
+            addConstraint(constraint);
+        }
+    }
+
+    private void addConstraintInternal(CassowaryConstraint constraint) {
         if (constraints.containsKey(constraint)) {
             throw new DuplicateConstraintException(constraint);
         }
@@ -131,7 +149,6 @@ public final class Solver {
         }
 
         constraints.put(constraint, tag);
-        optimize(objective);
     }
 
     /**

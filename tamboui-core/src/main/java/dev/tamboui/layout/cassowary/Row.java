@@ -101,14 +101,15 @@ final class Row {
      * @param coefficient the coefficient to add
      */
     void insertSymbol(Symbol symbol, Fraction coefficient) {
-        Fraction existing = cells.get(symbol);
-        Fraction newCoeff = (existing != null ? existing : Fraction.ZERO).add(coefficient);
-
-        if (newCoeff.isZero()) {
-            cells.remove(symbol);
-        } else {
-            cells.put(symbol, newCoeff);
+        // Fast path: adding zero has no effect
+        if (coefficient.isZero()) {
+            return;
         }
+        // Use compute() to perform lookup + update in a single hash operation
+        cells.compute(symbol, (k, existing) -> {
+            Fraction newCoeff = (existing != null ? existing : Fraction.ZERO).add(coefficient);
+            return newCoeff.isZero() ? null : newCoeff;  // null removes the entry
+        });
     }
 
     /**
