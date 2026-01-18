@@ -6,7 +6,7 @@ description = "Demo showcasing Flex layout modes (Ratatui's Flex demo)"
 
 dependencies {
     implementation(projects.tambouiToolkit)
-    runtimeOnly(projects.tambouiJline)
+    runtimeOnly(projects.tambouiJline3Backend)
 }
 
 application {

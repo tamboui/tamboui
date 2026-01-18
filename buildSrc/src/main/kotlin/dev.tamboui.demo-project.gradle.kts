@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":tamboui-widgets"))
     // Order of backend dependencies matters: first one has higher priority
     runtimeOnly(project(":tamboui-panama-backend"))
-    runtimeOnly(project(":tamboui-jline"))
+    runtimeOnly(project(":tamboui-jline3-backend"))
 }
 
 tasks.withType<JavaExec>().configureEach {

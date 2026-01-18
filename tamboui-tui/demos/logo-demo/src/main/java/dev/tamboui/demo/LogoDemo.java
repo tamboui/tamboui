@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-widgets:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
 package dev.tamboui.demo;
 

@@ -1,5 +1,5 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 //FILES styles/codex.tcss=../../../../../resources/styles/codex.tcss
 
 /*

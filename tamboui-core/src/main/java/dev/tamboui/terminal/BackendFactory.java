@@ -55,7 +55,7 @@ public final class BackendFactory {
      * explicitly specified providers and auto-discovered ones.
      *
      * @return a new backend instance
-     * @throws IOException if backend creation fails
+     * @throws IOException           if backend creation fails
      * @throws IllegalStateException if no provider is found or all providers fail
      */
     public static Backend create() throws IOException {
@@ -105,8 +105,8 @@ public final class BackendFactory {
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException(
                             "No BackendProvider found on classpath for provider name" +
-                            " '" + trimmedSpec + "'.\n" +
-                            "Add a backend dependency such as tamboui-jline."
+                                    " '" + trimmedSpec + "'.\n" +
+                                    "Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backend."
                     ));
             resolved.add(provider);
         }
@@ -123,8 +123,8 @@ public final class BackendFactory {
     private static Backend tryProviders(List<BackendProvider> providers) {
         if (providers.isEmpty()) {
             throw new IllegalStateException(
-                "No BackendProvider found on classpath.\n" +
-                "Add a backend dependency such as tamboui-jline."
+                    "No BackendProvider found on classpath.\n" +
+                            "Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backend."
             );
         }
 
@@ -141,9 +141,9 @@ public final class BackendFactory {
         }
 
         throw new IllegalStateException(
-            "All backend providers failed to create a backend.\n" +
-            "Tried: " + formatAvailableProviders(providers) + "\n" +
-            "Errors:\n" + errors
+                "All backend providers failed to create a backend.\n" +
+                        "Tried: " + formatAvailableProviders(providers) + "\n" +
+                        "Errors:\n" + errors
         );
     }
 
@@ -155,7 +155,7 @@ public final class BackendFactory {
      */
     private static String formatAvailableProviders(List<BackendProvider> providers) {
         return providers.stream()
-            .map(p -> p.name() + " (" + p.getClass().getName() + ")")
-            .collect(Collectors.joining("\n"));
+                .map(p -> p.name() + " (" + p.getClass().getName() + ")")
+                .collect(Collectors.joining("\n"));
     }
 }

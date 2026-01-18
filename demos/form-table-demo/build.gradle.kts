@@ -6,7 +6,7 @@ description = "Demo showcasing form and table layouts with flex constraints"
 
 dependencies {
     implementation(projects.tambouiToolkit)
-    runtimeOnly(projects.tambouiJline)
+    runtimeOnly(projects.tambouiJline3Backend)
 }
 
 application {

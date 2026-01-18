@@ -1,5 +1,5 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 //SOURCES ProgressCard.java
 /*
  * Copyright (c) 2025 TamboUI Contributors
