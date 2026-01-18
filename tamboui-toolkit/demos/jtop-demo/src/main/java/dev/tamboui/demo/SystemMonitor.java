@@ -14,6 +14,7 @@ import static dev.tamboui.toolkit.Toolkit.text;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
@@ -51,68 +52,118 @@ final class SystemMonitor implements Element {
         CHART      // Show history chart with average load
     }
 
+    /**
+     * Snapshot of metrics data for rendering.
+     */
+    private record RenderData(
+        int numCpus,
+        double[] coreUsage,
+        List<List<Long>> coreHistories,
+        long memTotal,
+        long memUsed,
+        double memoryRatio,
+        List<Long> memoryHistory,
+        double uptime,
+        double loadAvg1,
+        double loadAvg5,
+        double loadAvg15,
+        long swapUsed,
+        List<SystemMetrics.ProcessInfo> processes
+    ) {}
+
     private final SystemMetrics metrics = new SystemMetrics();
-    private SystemMetrics.SortMode sortMode = SystemMetrics.SortMode.CPU;
-    private CpuViewMode cpuViewMode = CpuViewMode.BARS;
+    private final AtomicReference<SystemMetrics.SortMode> sortMode =
+        new AtomicReference<>(SystemMetrics.SortMode.CPU);
+    private final AtomicReference<CpuViewMode> cpuViewMode =
+        new AtomicReference<>(CpuViewMode.BARS);
+
+    /**
+     * Updates the metrics. Should be called from a background thread.
+     */
+    void updateMetrics() {
+        metrics.update(sortMode.get());
+    }
 
     @Override
     public void render(Frame frame, Rect area, RenderContext context) {
-        metrics.update(sortMode);
+        // Read all metrics under the lock once
+        var data = metrics.read(() -> new RenderData(
+            metrics.numCpus(),
+            copyUsageArray(metrics.numCpus()),
+            metrics.allCoreHistories(),
+            metrics.memTotal(),
+            metrics.memUsed(),
+            metrics.memoryRatio(),
+            metrics.memoryHistory(),
+            metrics.uptime(),
+            metrics.loadAvg1(),
+            metrics.loadAvg5(),
+            metrics.loadAvg15(),
+            metrics.swapUsed(),
+            metrics.processes()
+        ));
+
+        var currentCpuViewMode = cpuViewMode.get();
 
         // Calculate charts height based on view mode
         int chartsHeight;
-        if (cpuViewMode == CpuViewMode.SPARKLINES) {
-            // In sparkline mode, show all CPUs (each needs 1 line + borders)
-            // Cap at 80% of available height to leave room for process list
+        if (currentCpuViewMode == CpuViewMode.SPARKLINES) {
             int maxHeight = (int) (area.height() * 0.8);
-            chartsHeight = Math.min(metrics.numCpus() + 4, maxHeight); // +4 for borders and spacing
-        } else if (cpuViewMode == CpuViewMode.CHART) {
-            // Chart mode needs reasonable height
+            chartsHeight = Math.min(data.numCpus() + 4, maxHeight);
+        } else if (currentCpuViewMode == CpuViewMode.CHART) {
             chartsHeight = Math.max(12, Math.min(area.height() / 3, 20));
         } else {
-            // Bars mode: cap at 25% of available height
             var maxChartsHeight = area.height() / 4;
-            chartsHeight = Math.min(maxChartsHeight, Math.max(8, metrics.numCpus() + 4));
+            chartsHeight = Math.min(maxChartsHeight, Math.max(8, data.numCpus() + 4));
         }
 
         var layout = Layout.vertical()
             .constraints(Constraint.length(chartsHeight), Constraint.fill())
             .split(area);
 
-        renderChartsSection(frame, layout.get(0), context);
-        renderProcessList(frame, layout.get(1), context);
+        renderChartsSection(frame, layout.get(0), context, data, currentCpuViewMode);
+        renderProcessList(frame, layout.get(1), context, data);
     }
 
-    private void renderChartsSection(Frame frame, Rect area, RenderContext context) {
+    private double[] copyUsageArray(int numCpus) {
+        var result = new double[numCpus];
+        for (int i = 0; i < numCpus; i++) {
+            result[i] = metrics.coreUsage(i);
+        }
+        return result;
+    }
+
+    private void renderChartsSection(Frame frame, Rect area, RenderContext context,
+                                     RenderData data, CpuViewMode viewMode) {
         var layout = Layout.horizontal()
             .constraints(Constraint.percentage(35), Constraint.percentage(35), Constraint.percentage(30))
             .split(area);
 
-        renderCpuChart(frame, layout.get(0), context);
-        renderMemoryChart(frame, layout.get(1), context);
-        renderSystemInfo(frame, layout.get(2), context);
+        renderCpuChart(frame, layout.get(0), context, data, viewMode);
+        renderMemoryChart(frame, layout.get(1), context, data);
+        renderSystemInfo(frame, layout.get(2), context, data);
     }
 
-    private void renderCpuChart(Frame frame, Rect area, RenderContext context) {
-        switch (cpuViewMode) {
-            case BARS -> renderCpuBars(frame, area, context);
-            case SPARKLINES -> renderCpuSparklines(frame, area, context);
-            case CHART -> renderCpuHistoryChart(frame, area, context);
+    private void renderCpuChart(Frame frame, Rect area, RenderContext context,
+                                RenderData data, CpuViewMode viewMode) {
+        switch (viewMode) {
+            case BARS -> renderCpuBars(frame, area, context, data);
+            case SPARKLINES -> renderCpuSparklines(frame, area, context, data);
+            case CHART -> renderCpuHistoryChart(frame, area, context, data);
         }
     }
 
-    private void renderCpuBars(Frame frame, Rect area, RenderContext context) {
-        var avgCpu = metrics.averageCpuUsage();
-        var numCpus = metrics.numCpus();
+    private void renderCpuBars(Frame frame, Rect area, RenderContext context, RenderData data) {
+        var avgCpu = computeAverageCpu(data);
+        var numCpus = data.numCpus();
 
-        // Calculate how many cores can fit (area height - 2 for borders)
         var maxCores = Math.max(1, area.height() - 2);
         var coresToShow = Math.min(numCpus, maxCores);
 
         var rows = new ArrayList<Element>();
 
         for (var i = 0; i < coresToShow; i++) {
-            var usage = metrics.coreUsage(i);
+            var usage = data.coreUsage()[i];
             var color = usage < 50 ? Color.GREEN : (usage < 80 ? Color.YELLOW : Color.RED);
 
             var barWidth = Math.max(10, area.width() - 16);
@@ -133,30 +184,27 @@ final class SystemMonitor implements Element {
         panel(title, content).rounded().render(frame, area, context);
     }
 
-    private void renderCpuSparklines(Frame frame, Rect area, RenderContext context) {
-        var avgCpu = metrics.averageCpuUsage();
-        var numCpus = metrics.numCpus();
+    private void renderCpuSparklines(Frame frame, Rect area, RenderContext context, RenderData data) {
+        var avgCpu = computeAverageCpu(data);
+        var numCpus = data.numCpus();
 
         var rows = new ArrayList<Element>();
 
-        // Show all CPUs with sparklines
         for (var i = 0; i < numCpus; i++) {
-            var usage = metrics.coreUsage(i);
-            var history = metrics.coreHistory(i);
+            var usage = data.coreUsage()[i];
+            var history = data.coreHistories().get(i);
             var color = usage < 50 ? Color.GREEN : (usage < 80 ? Color.YELLOW : Color.RED);
 
-            // Convert history to long array
             var historyArray = history.stream().mapToLong(Long::longValue).toArray();
 
-            // Create sparkline element - it will take available space in the row
-            var sparkline = sparkline(historyArray)
+            var sparklineElement = sparkline(historyArray)
                 .max(100)
                 .color(color)
                 .barSet(dev.tamboui.widgets.sparkline.Sparkline.BarSet.NINE_LEVELS);
 
             rows.add(row(
                 text(String.format("CPU%d ", i)).dim().length(6),
-                sparkline,
+                sparklineElement,
                 text(String.format(" %3.0f%%", usage)).length(6)
             ));
         }
@@ -166,19 +214,16 @@ final class SystemMonitor implements Element {
         panel(title, content).rounded().render(frame, area, context);
     }
 
-    private void renderCpuHistoryChart(Frame frame, Rect area, RenderContext context) {
-        var avgCpu = metrics.averageCpuUsage();
-        var numCpus = metrics.numCpus();
+    private void renderCpuHistoryChart(Frame frame, Rect area, RenderContext context, RenderData data) {
+        var avgCpu = computeAverageCpu(data);
+        var numCpus = data.numCpus();
 
-        // Compute average CPU history across all cores
-        var avgHistory = computeAverageCpuHistory();
+        var avgHistory = computeAverageCpuHistory(data);
         if (avgHistory.isEmpty()) {
-            // Fallback to bars if no history
-            renderCpuBars(frame, area, context);
+            renderCpuBars(frame, area, context, data);
             return;
         }
 
-        // Convert history to chart data points
         var chartData = new double[avgHistory.size()][2];
         int index = 0;
         for (var value : avgHistory) {
@@ -195,7 +240,6 @@ final class SystemMonitor implements Element {
             .style(Style.EMPTY.fg(Color.CYAN))
             .build();
 
-        // Create X-axis labels (show a few key points)
         int historySize = avgHistory.size();
         var xLabels = new ArrayList<String>();
         if (historySize > 0) {
@@ -234,27 +278,27 @@ final class SystemMonitor implements Element {
         frame.renderWidget(chart, area);
     }
 
-    private List<Double> computeAverageCpuHistory() {
-        var numCpus = metrics.numCpus();
+    private double computeAverageCpu(RenderData data) {
+        double avg = 0;
+        for (int i = 0; i < data.numCpus(); i++) {
+            avg += data.coreUsage()[i];
+        }
+        return data.numCpus() > 0 ? avg / data.numCpus() : 0;
+    }
+
+    private List<Double> computeAverageCpuHistory(RenderData data) {
+        var numCpus = data.numCpus();
         if (numCpus == 0) {
             return List.of();
         }
 
-        // Get history from first CPU to determine size
-        var firstHistory = metrics.coreHistory(0);
-        if (firstHistory.isEmpty()) {
+        var histories = data.coreHistories();
+        if (histories.isEmpty() || histories.get(0).isEmpty()) {
             return List.of();
         }
 
-        // Convert all histories to lists for indexed access
-        var histories = new ArrayList<List<Long>>(numCpus);
-        for (int i = 0; i < numCpus; i++) {
-            histories.add(new ArrayList<>(metrics.coreHistory(i)));
-        }
-
-        // Compute average for each time point
-        var result = new ArrayList<Double>(firstHistory.size());
-        int historySize = firstHistory.size();
+        int historySize = histories.get(0).size();
+        var result = new ArrayList<Double>(historySize);
 
         for (int timeIndex = 0; timeIndex < historySize; timeIndex++) {
             double sum = 0;
@@ -271,16 +315,14 @@ final class SystemMonitor implements Element {
         return result;
     }
 
-    private void renderMemoryChart(Frame frame, Rect area, RenderContext context) {
-        var ratio = metrics.memoryRatio();
+    private void renderMemoryChart(Frame frame, Rect area, RenderContext context, RenderData data) {
+        var ratio = data.memoryRatio();
         var memPercent = ratio * 100;
         var gaugeColor = ratio < 0.5 ? Color.GREEN : (ratio < 0.8 ? Color.YELLOW : Color.RED);
-        var label = String.format("%s / %s", formatKb(metrics.memUsed()), formatKb(metrics.memTotal()));
+        var label = String.format("%s / %s", formatKb(data.memUsed()), formatKb(data.memTotal()));
 
-        // Get memory history
-        var memHistory = metrics.memoryHistory();
+        var memHistory = data.memoryHistory();
         if (memHistory.isEmpty()) {
-            // Fallback to gauge if no history
             gauge(ratio)
                 .label(label)
                 .gaugeColor(gaugeColor)
@@ -290,7 +332,6 @@ final class SystemMonitor implements Element {
             return;
         }
 
-        // Convert history to chart data points
         var chartData = new double[memHistory.size()][2];
         int index = 0;
         for (var value : memHistory) {
@@ -307,7 +348,6 @@ final class SystemMonitor implements Element {
             .style(Style.EMPTY.fg(gaugeColor))
             .build();
 
-        // Create X-axis labels
         int historySize = memHistory.size();
         var xLabels = new ArrayList<String>();
         if (historySize > 0) {
@@ -346,26 +386,26 @@ final class SystemMonitor implements Element {
         frame.renderWidget(chart, area);
     }
 
-    private void renderSystemInfo(Frame frame, Rect area, RenderContext context) {
+    private void renderSystemInfo(Frame frame, Rect area, RenderContext context, RenderData data) {
         var availableLines = area.height() - 2;
         var rows = new ArrayList<Element>();
 
         if (availableLines >= 1) {
             rows.add(text(String.format(" Load: %.1f %.1f %.1f",
-                metrics.loadAvg1(), metrics.loadAvg5(), metrics.loadAvg15())));
+                data.loadAvg1(), data.loadAvg5(), data.loadAvg15())));
         }
         if (availableLines >= 2) {
-            rows.add(text(" Up: " + formatUptime((long) metrics.uptime())).dim());
+            rows.add(text(" Up: " + formatUptime((long) data.uptime())).dim());
         }
         if (availableLines >= 3) {
-            rows.add(text(" CPUs: " + metrics.numCpus() + " Swap: " + formatKb(metrics.swapUsed())).dim());
+            rows.add(text(" CPUs: " + data.numCpus() + " Swap: " + formatKb(data.swapUsed())).dim());
         }
 
         var content = column(rows.toArray(Element[]::new));
         panel("System", content).rounded().render(frame, area, context);
     }
 
-    private void renderProcessList(Frame frame, Rect area, RenderContext context) {
+    private void renderProcessList(Frame frame, Rect area, RenderContext context, RenderData data) {
         var header = row(
             text(" PID").fg(Color.DARK_GRAY).length(8),
             text("USER").fg(Color.DARK_GRAY).length(10),
@@ -378,13 +418,11 @@ final class SystemMonitor implements Element {
         rows.add(header);
         rows.add(text("-".repeat(Math.max(1, area.width() - 4))).dim());
 
-        var processes = metrics.processes();
+        var processes = data.processes();
         var maxRows = Math.max(0, area.height() - 4);
 
-        // Calculate available width for command column
-        // PID(8) + USER(10) + S(3) + MEM(10) = 31, plus some spacing
-        int fixedColumnsWidth = 8 + 10 + 3 + 10 + 2; // +2 for spacing
-        int commandMaxWidth = Math.max(20, area.width() - fixedColumnsWidth - 4); // -4 for panel borders
+        int fixedColumnsWidth = 8 + 10 + 3 + 10 + 2;
+        int commandMaxWidth = Math.max(20, area.width() - fixedColumnsWidth - 4);
 
         for (var i = 0; i < Math.min(processes.size(), maxRows); i++) {
             var p = processes.get(i);
@@ -398,7 +436,6 @@ final class SystemMonitor implements Element {
             };
 
             var name = p.name();
-            // Truncate only if it exceeds available space
             if (name.length() > commandMaxWidth) {
                 name = name.substring(0, commandMaxWidth - 3) + "...";
             }
@@ -408,14 +445,15 @@ final class SystemMonitor implements Element {
                 text(p.user().length() > 8 ? p.user().substring(0, 8) : p.user()).length(10),
                 text(String.valueOf(p.state())).fg(stateColor).length(3),
                 text(formatKb(p.memoryKb())).length(10),
-                text(name) // This will fill remaining space
+                text(name)
             ));
         }
 
         var content = column(rows.toArray(Element[]::new));
+        var currentSortMode = sortMode.get();
         var title = String.format("Processes (%d) - Press [s] to sort by %s",
             processes.size(),
-            switch (sortMode) {
+            switch (currentSortMode) {
                 case CPU -> "Memory";
                 case MEMORY -> "PID";
                 case PID -> "CPU";
@@ -431,19 +469,19 @@ final class SystemMonitor implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (event.isCharIgnoreCase('s')) {
-            sortMode = switch (sortMode) {
+            sortMode.updateAndGet(mode -> switch (mode) {
                 case CPU -> SystemMetrics.SortMode.MEMORY;
                 case MEMORY -> SystemMetrics.SortMode.PID;
                 case PID -> SystemMetrics.SortMode.CPU;
-            };
+            });
             return EventResult.HANDLED;
         }
         if (event.isCharIgnoreCase('c')) {
-            cpuViewMode = switch (cpuViewMode) {
+            cpuViewMode.updateAndGet(mode -> switch (mode) {
                 case BARS -> CpuViewMode.SPARKLINES;
                 case SPARKLINES -> CpuViewMode.CHART;
                 case CHART -> CpuViewMode.BARS;
-            };
+            });
             return EventResult.HANDLED;
         }
         return EventResult.UNHANDLED;
