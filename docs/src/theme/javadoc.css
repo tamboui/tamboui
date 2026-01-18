@@ -1,0 +1,331 @@
+/* ===== TamboUI Javadoc Theme ===== */
+/* Goal: make Javadoc HTML match the Asciidoctor theme used in docs/ as closely as practical.
+ *
+ * Javadoc ships its own stylesheet (`resource-files/stylesheet.css`) which is heavily driven by
+ * CSS custom properties. The most robust way to theme Javadoc is to override those variables.
+ *
+ * We still add a few small structural tweaks, but most of the work is variable mapping.
+ */
+
+:root {
+    --sl-color-white: #fff;
+    --sl-color-gray-1: #f5f6f8;
+    --sl-color-gray-2: #eceef2;
+    --sl-color-gray-3: #c2c6cf;
+    --sl-color-gray-4: #878d99;
+    --sl-color-gray-5: #545b68;
+    --sl-color-gray-6: #353a46;
+    --sl-color-black: #17191e;
+
+    --sl-color-accent: #0073e6;
+    --sl-color-accent-high: #0060bf;
+    --sl-color-accent-low: rgba(0, 115, 230, 0.1);
+
+    --sl-color-bg: var(--sl-color-white);
+    --sl-color-bg-nav: var(--sl-color-gray-1);
+    --sl-color-bg-sidebar: var(--sl-color-gray-1);
+    --sl-color-bg-inline-code: var(--sl-color-gray-2);
+    --sl-color-hairline: var(--sl-color-gray-2);
+    --sl-color-text: var(--sl-color-gray-6);
+    --sl-color-text-accent: var(--sl-color-accent-high);
+
+    --sl-color-bg-code: #1e1e2e;
+    --sl-color-text-code: #cdd6f4;
+
+    --sl-font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --sl-font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+
+    /* ---- Map Asciidoctor theme tokens to Javadoc theme variables ---- */
+    --body-font-family: var(--sl-font-system);
+    --block-font-family: var(--sl-font-system);
+    --code-font-family: var(--sl-font-mono);
+
+    --body-text-color: var(--sl-color-text);
+    --block-text-color: var(--sl-color-text);
+
+    --body-background-color: var(--sl-color-bg);
+    --section-background-color: var(--sl-color-bg);
+    --detail-background-color: var(--sl-color-bg);
+    --detail-block-color: var(--sl-color-gray-1);
+
+    --code-background-color: var(--sl-color-bg-inline-code);
+    --mark-background-color: var(--sl-color-gray-1);
+
+    --navbar-background-color: var(--sl-color-bg-nav);
+    --navbar-text-color: var(--sl-color-text);
+
+    --subnav-background-color: var(--sl-color-bg-nav);
+    --subnav-link-color: var(--sl-color-gray-5);
+    --member-heading-background-color: var(--sl-color-gray-1);
+
+    --selected-background-color: var(--sl-color-accent-low);
+    --selected-text-color: var(--sl-color-text-accent);
+    --selected-link-color: var(--sl-color-text-accent);
+
+    --table-header-color: var(--sl-color-gray-1);
+    --even-row-color: var(--sl-color-bg);
+    --odd-row-color: var(--sl-color-gray-1);
+
+    --title-color: var(--sl-color-text);
+
+    --link-color: var(--sl-color-text-accent);
+    --link-color-active: var(--sl-color-text-accent);
+
+    --toc-background-color: var(--sl-color-bg-sidebar);
+    --toc-highlight-color: var(--sl-color-accent-low);
+    --toc-hover-color: var(--sl-color-accent-low);
+
+    --snippet-background-color: var(--sl-color-bg-code);
+    --snippet-text-color: var(--sl-color-text-code);
+    --pre-background-color: var(--sl-color-bg-code);
+    --pre-text-color: var(--sl-color-text-code);
+
+    --border-color: var(--sl-color-hairline);
+    --button-border-color: var(--sl-color-hairline);
+
+    --search-input-background-color: var(--sl-color-bg);
+    --search-input-text-color: var(--sl-color-text);
+    --search-input-placeholder-color: var(--sl-color-gray-4);
+
+    --invalid-tag-background-color: rgba(239, 68, 68, 0.15);
+    --invalid-tag-text-color: var(--sl-color-text);
+
+    /* Make Javadoc nav sizing closer to docs */
+    --top-nav-height: 3.5rem;
+    --sub-nav-height: 2.5rem;
+    --nav-height: calc(var(--top-nav-height) + var(--sub-nav-height));
+}
+
+/* Explicit dark mode (set by JS / website toggle): <html data-theme="dark"> */
+:root[data-theme="dark"] {
+        --sl-color-bg: #17191e;
+        --sl-color-bg-nav: #1e2027;
+        --sl-color-bg-sidebar: #1e2027;
+        --sl-color-bg-inline-code: #282a36;
+        --sl-color-hairline: #2e3038;
+        --sl-color-text: #e0e2e7;
+        --sl-color-text-accent: #58a6ff;
+
+        --sl-color-gray-1: #252730;
+        --sl-color-gray-2: #2e3038;
+        --sl-color-gray-3: #454952;
+        --sl-color-gray-4: #7c8191;
+        --sl-color-gray-5: #a8aebb;
+}
+
+/* Auto dark mode (when user hasn't forced light): matches docs/src/theme/tamboui.css behavior */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --sl-color-bg: #17191e;
+        --sl-color-bg-nav: #1e2027;
+        --sl-color-bg-sidebar: #1e2027;
+        --sl-color-bg-inline-code: #282a36;
+        --sl-color-hairline: #2e3038;
+        --sl-color-text: #e0e2e7;
+        --sl-color-text-accent: #58a6ff;
+
+        --sl-color-gray-1: #252730;
+        --sl-color-gray-2: #2e3038;
+        --sl-color-gray-3: #454952;
+        --sl-color-gray-4: #7c8191;
+        --sl-color-gray-5: #a8aebb;
+    }
+}
+
+/* Small structural tweaks (keep these minimal; the variables above do most of the work). */
+header {
+    backdrop-filter: blur(8px);
+}
+
+/* Make “active” top-nav item look like our docs tabs */
+.nav-bar-cell1-rev {
+    border-radius: 0.375rem;
+}
+
+/* Sidebar buttons should match our neutral button styling */
+.main-grid nav.toc button {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+}
+
+/* Right-side actions in the top nav (theme toggle + GitHub link) */
+.nav-actions {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Theme toggle button (mirrors docs/src/theme/tamboui.css) */
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navbar-text-color);
+}
+
+.theme-toggle:hover {
+    background: var(--selected-background-color);
+    border-color: var(--link-color);
+    color: var(--selected-text-color);
+}
+
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+}
+
+/* Reserve room so the right-aligned toggle doesn't overlap nav items. */
+.top-nav ul.nav-list {
+    padding-right: 8.5rem !important;
+}
+
+/* GitHub link styled like a small button */
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--navbar-text-color) !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.1;
+}
+
+.github-link:hover {
+    background: var(--selected-background-color);
+    border-color: var(--link-color);
+    color: var(--selected-text-color) !important;
+    text-decoration: none !important;
+}
+
+/* --- Explicit overrides for Javadoc UI chrome (covers JDK21 + newer templates) --- */
+
+/* Top navigation */
+.top-nav {
+    background-color: var(--navbar-background-color) !important;
+    color: var(--navbar-text-color) !important;
+    position: relative; /* anchor for the absolute-positioned theme toggle */
+}
+
+/* Normalize the top-nav list into “tabs” (works for both <li>text and <a> links). */
+.top-nav ul.nav-list {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    margin: 0 !important;
+    padding: 0 0.75rem !important;
+    list-style: none !important;
+}
+
+.top-nav ul.nav-list li {
+    margin: 0 !important;
+    padding: 0 !important; /* we put padding on the inner element */
+    height: auto !important;
+    text-transform: none !important;
+}
+
+.top-nav ul.nav-list li a,
+.top-nav ul.nav-list li.nav-bar-cell1-rev {
+    display: block !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+}
+
+.top-nav ul.nav-list li a:hover {
+    background-color: var(--selected-background-color) !important;
+    text-decoration: none !important;
+}
+
+.top-nav a:link,
+.top-nav a:visited,
+.top-nav a:active {
+    color: var(--navbar-text-color) !important;
+}
+
+.top-nav a:hover {
+    color: var(--link-color-active) !important;
+}
+
+.nav-bar-cell1-rev {
+    background-color: var(--selected-background-color) !important;
+    color: var(--selected-text-color) !important;
+}
+
+/* Sub navigation bar */
+.sub-nav {
+    background-color: var(--subnav-background-color) !important;
+}
+
+.sub-nav a:link,
+.sub-nav a:visited,
+.sub-nav a:active {
+    color: var(--subnav-link-color, var(--link-color)) !important;
+}
+
+/* Search input in the nav bars */
+.nav-list-search input[type="text"],
+.nav-list-search input[type="search"],
+#search-input {
+    background-color: var(--search-input-background-color) !important;
+    color: var(--search-input-text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.5rem !important;
+}
+
+/* Sidebar (newer Javadoc has a TOC sidebar) */
+nav.toc,
+.main-grid nav.toc {
+    background-color: var(--toc-background-color, var(--subnav-background-color)) !important;
+    border-right: 1px solid var(--border-color) !important;
+}
+
+nav.toc a:hover,
+.main-grid nav.toc a:hover {
+    background-color: var(--toc-hover-color, var(--selected-background-color)) !important;
+}
+
+/* Summary tables */
+.summary-table .table-header,
+.table-header {
+    background-color: var(--table-header-color, var(--subnav-background-color)) !important;
+    color: var(--body-text-color) !important;
+}
+
+.even-row-color {
+    background-color: var(--even-row-color) !important;
+}
+
+.odd-row-color {
+    background-color: var(--odd-row-color) !important;
+}
+
+.caption {
+    background-color: var(--navbar-background-color) !important;
+    color: var(--navbar-text-color) !important;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+
+
