@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 TamboUI Contributors
+ * SPDX-License-Identifier: MIT
+ */
 package dev.tamboui.build;
 
 import org.gradle.api.Plugin;
