@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 /*
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT

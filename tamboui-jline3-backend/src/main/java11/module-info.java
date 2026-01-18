@@ -1,4 +1,4 @@
-import dev.tamboui.backend.jline.JLineBackendProvider;
+import dev.tamboui.backend.jline3.JLineBackendProvider;
 import dev.tamboui.terminal.BackendProvider;
 
 /**
@@ -8,11 +8,11 @@ import dev.tamboui.terminal.BackendProvider;
  * enabling TamboUI applications to run in standard terminals.
  */
 @SuppressWarnings({"requires-transitive-automatic", "requires-automatic"})
-module dev.tamboui.jline {
+module dev.tamboui.jline_three.backend {
     requires transitive dev.tamboui.core;
     requires transitive org.jline;
 
-    exports dev.tamboui.backend.jline;
+    exports dev.tamboui.backend.jline3;
 
     provides BackendProvider with JLineBackendProvider;
 }

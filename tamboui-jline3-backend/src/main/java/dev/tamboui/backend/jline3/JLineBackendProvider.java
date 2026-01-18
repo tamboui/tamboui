@@ -2,7 +2,7 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.backend.jline;
+package dev.tamboui.backend.jline3;
 
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendProvider;
@@ -18,7 +18,7 @@ public class JLineBackendProvider implements BackendProvider {
 
     @Override
     public String name() {
-        return "jline";
+        return "jline3";
     }
 
     @Override

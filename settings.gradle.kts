@@ -5,7 +5,7 @@ val modules = listOf(
     "tamboui-css",
     "tamboui-widgets",
     "tamboui-image",
-    "tamboui-jline",
+    "tamboui-jline3-backend",
     "tamboui-panama-backend",
     "tamboui-tui",
     "tamboui-picocli",

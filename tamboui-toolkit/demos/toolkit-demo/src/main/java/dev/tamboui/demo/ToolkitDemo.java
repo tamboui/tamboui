@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 // These are listed explicitly to allow running the demo without cloning the repo locally
 //SOURCES FloatingPanelsArea.java ClockPanel.java CounterPanel.java ProgressPanel.java ProgressPanel.java QuotePanel.java SystemInfoPanel.java TodoPanel.java FloatingPanel.java PanelContent.java
 /*

@@ -1,5 +1,5 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 //DEPS dev.tamboui:tamboui-image:LATEST
 //SOURCES FileManagerController.java FileManagerView.java FileManagerKeyHandler.java DirectoryBrowserController.java
 // Prevents OSX from showing up in the terminal when running the demo

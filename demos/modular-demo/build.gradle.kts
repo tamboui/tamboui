@@ -6,7 +6,7 @@ description = "Demo showcasing the toolkit module using the Java module path"
 
 dependencies {
     implementation(projects.tambouiToolkit)
-    runtimeOnly(projects.tambouiJline)
+    runtimeOnly(projects.tambouiJline3Backend)
 }
 
 application {

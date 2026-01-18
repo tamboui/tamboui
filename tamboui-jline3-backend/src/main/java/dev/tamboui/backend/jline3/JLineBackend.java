@@ -2,7 +2,7 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.backend.jline;
+package dev.tamboui.backend.jline3;
 
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.buffer.CellUpdate;

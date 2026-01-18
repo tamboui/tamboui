@@ -6,7 +6,7 @@ description = "Demo showcasing error handling and fault-tolerant rendering"
 
 dependencies {
     implementation(projects.tambouiToolkit)
-    runtimeOnly(projects.tambouiJline)
+    runtimeOnly(projects.tambouiJline3Backend)
 }
 
 application {

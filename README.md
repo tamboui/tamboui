@@ -83,7 +83,7 @@ The `tamboui-tui` module provides a high-level framework that eliminates boilerp
 
 ```java
 //DEPS dev.tamboui:tamboui-tui:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
 package dev.tamboui.demo;
 
@@ -146,7 +146,7 @@ try (var tui = TuiRunner.create(config)) {
 
 ```java
 //DEPS dev.tamboui:tamboui-picocli:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
 import dev.tamboui.picocli.TuiCommand;
 import picocli.CommandLine;
@@ -176,7 +176,7 @@ The `tamboui-toolkit` module provides a fluent DSL giving you retained mode decl
 
 ```java
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import dev.tamboui.toolkit.app.ToolkitApp;
@@ -283,7 +283,7 @@ For more control, use the terminal directly:
 
 ```java
 //DEPS dev.tamboui:tamboui-widgets:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;

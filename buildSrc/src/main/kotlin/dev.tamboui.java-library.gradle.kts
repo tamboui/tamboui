@@ -1,4 +1,7 @@
 import dev.tamboui.build.AggregatedJavadocParticipantPlugin
+import kotlin.io.useLines
+import kotlin.sequences.find
+import kotlin.text.startsWith
 
 plugins {
     `java-library`
@@ -29,7 +32,7 @@ tasks.named<JavaCompile>("compileJava11Java") {
     // Configure module path for module-info.java compilation
     // The main classes and all dependencies need to be on the module path
     modularity.inferModulePath = true
-    val moduleName = project.name.replace("tamboui-", "dev.tamboui.")
+    val moduleName = readModuleName()
     doFirst {
         options.compilerArgs.addAll(
             listOf(
@@ -71,3 +74,15 @@ if (isIDEASync) {
         options.release = 11
     }
 }
+
+fun readModuleName() = file("src/main/java11/module-info.java")
+    .run {
+        if (exists()) {
+            useLines {
+                it.find { it.startsWith("module ") }?.substringAfter("module ")!!.substringBefore(" ")
+            }
+        } else {
+            "<none>"
+        }
+    }
+
