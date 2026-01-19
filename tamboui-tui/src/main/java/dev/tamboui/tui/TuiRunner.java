@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -94,6 +95,7 @@ public final class TuiRunner implements AutoCloseable {
     private final TerminalInputReader inputReader;
     private final DebugOverlay debugOverlay;
     private final List<PostRenderProcessor> postRenderProcessors;
+    private final ReentrantLock renderLock = new ReentrantLock();
     private volatile RenderError lastError;
     private volatile boolean inErrorState;
     private volatile int errorScroll;
@@ -278,10 +280,13 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     private void safeRender(Renderer renderer) {
+        renderLock.lock();
         try {
             terminal.draw(renderer::render);
         } catch (Throwable t) {
             handleRenderError(t);
+        } finally {
+            renderLock.unlock();
         }
     }
 
@@ -361,6 +366,7 @@ public final class TuiRunner implements AutoCloseable {
             return;
         }
 
+        renderLock.lock();
         try {
             terminal.draw(frame -> {
                 Rect area = frame.area();
@@ -414,6 +420,8 @@ public final class TuiRunner implements AutoCloseable {
             errorOutput.println("Failed to render error display: " + e.getMessage());
             lastError.cause().printStackTrace(errorOutput);
             quit();
+        } finally {
+            renderLock.unlock();
         }
     }
 
@@ -559,10 +567,13 @@ public final class TuiRunner implements AutoCloseable {
         if (resizePending.getAndSet(false)) {
             Renderer renderer = activeRenderer.get();
             if (renderer != null) {
+                renderLock.lock();
                 try {
                     terminal.draw(renderer::render);
                 } catch (IOException e) {
                     // Ignore redraw errors during resize
+                } finally {
+                    renderLock.unlock();
                 }
             }
         }
