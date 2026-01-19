@@ -145,6 +145,7 @@ public final class ToolkitRunner implements AutoCloseable {
         tuiRunner.run(
             (event, runner) -> handleEvent(event),
             frame -> {
+                // All rendering now happens on UI thread - no lock needed
                 // Clear state before each render
                 focusManager.clearFocusables();
                 eventRouter.clear();
@@ -222,13 +223,14 @@ public final class ToolkitRunner implements AutoCloseable {
     /**
      * Schedules an action to run after a delay.
      * <p>
-     * The action runs on a background thread. If the action modifies shared state,
-     * ensure proper synchronization. The UI will automatically redraw on the next
-     * tick event after the action completes.
+     * The action runs on the scheduler thread. If the action modifies UI state,
+     * use {@link #runOnUiThread(Runnable)} to ensure thread safety:
      *
      * <pre>{@code
      * runner.schedule(() -> {
-     *     message = "Delayed message!";
+     *     runner.runOnUiThread(() -> {
+     *         message = "Delayed message!";
+     *     });
      * }, Duration.ofSeconds(2));
      * }</pre>
      *
@@ -244,13 +246,12 @@ public final class ToolkitRunner implements AutoCloseable {
     /**
      * Schedules an action to run repeatedly at a fixed interval.
      * <p>
-     * The action runs on a background thread. If the action modifies shared state,
-     * ensure proper synchronization. The UI will automatically redraw on each
-     * tick event.
+     * The action runs on the scheduler thread. If the action modifies UI state,
+     * use {@link #runOnUiThread(Runnable)} to ensure thread safety.
      *
      * <pre>{@code
      * var repeating = runner.scheduleRepeating(() -> {
-     *     counter++;
+     *     runner.runOnUiThread(() -> counter++);
      * }, Duration.ofMillis(100));
      *
      * // Later, to stop:
@@ -273,6 +274,9 @@ public final class ToolkitRunner implements AutoCloseable {
      * Unlike {@link #scheduleRepeating}, this waits for each execution to complete
      * before scheduling the next one. This is useful when the action's duration
      * is unpredictable and you want consistent spacing between runs.
+     * <p>
+     * The action runs on the scheduler thread. If the action modifies UI state,
+     * use {@link #runOnUiThread(Runnable)} to ensure thread safety.
      *
      * @param action the action to run
      * @param delay the delay between the end of one run and the start of the next
@@ -334,6 +338,26 @@ public final class ToolkitRunner implements AutoCloseable {
      */
     public EventRouter eventRouter() {
         return eventRouter;
+    }
+
+    /**
+     * Executes an action on the UI thread.
+     * <p>
+     * Delegates to {@link TuiRunner#runOnUiThread(Runnable)}.
+     *
+     * @param action the action to execute on the UI thread
+     */
+    public void runOnUiThread(Runnable action) {
+        tuiRunner.runOnUiThread(action);
+    }
+
+    /**
+     * Returns whether the current thread is the UI thread.
+     *
+     * @return true if called from the UI thread
+     */
+    public boolean isUiThread() {
+        return tuiRunner.isUiThread();
     }
 
     /**

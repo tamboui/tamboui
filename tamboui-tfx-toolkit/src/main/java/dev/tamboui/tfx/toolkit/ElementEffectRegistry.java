@@ -11,25 +11,27 @@ import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
+import dev.tamboui.tui.UiThread;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Registry for effects that target specific elements by ID.
  * <p>
  * ElementEffectRegistry manages effects that are associated with element IDs.
- * When an element is rendered and its area becomes available via the EventRouter,
- * pending effects are resolved to their target areas and begin running.
+ * Effects are stored with their element ID associations, and areas are looked up
+ * dynamically each frame from the ElementRegistry. This ensures effects automatically
+ * follow their target elements when the terminal resizes.
  * <p>
  * <b>Design Philosophy:</b>
  * <ul>
- *   <li><b>Deferred Resolution:</b> Effects are added by element ID and resolved
- *       to areas when the element is actually rendered</li>
- *   <li><b>Thread-Safe:</b> Uses locking for safe access from multiple threads</li>
+ *   <li><b>Dynamic Area Lookup:</b> Effect areas are looked up each frame, so effects
+ *       automatically follow elements when they move or resize</li>
+ *   <li><b>UI Thread:</b> All mutating operations must be called from the UI thread</li>
  *   <li><b>No Coupling:</b> Does not require Element interface changes</li>
  * </ul>
  * <p>
@@ -40,20 +42,25 @@ import java.util.concurrent.locks.ReentrantLock;
  * // Add effect targeting an element
  * registry.addEffect("header", Fx.fadeFromFg(Color.BLACK, 800, Interpolation.QuadOut));
  *
- * // In render loop, resolve and process
- * registry.resolvePendingEffects(eventRouter);
- * registry.processEffects(delta, buffer, fullArea);
+ * // In render loop, expand selectors and process
+ * registry.expandSelectors(elementRegistry);
+ * registry.processEffects(delta, buffer, fullArea, elementRegistry);
  * }</pre>
  *
  * @see ToolkitEffects
  */
 public final class ElementEffectRegistry {
 
-    private final ReentrantLock lock = new ReentrantLock();
-    private final Map<String, List<Effect>> pendingEffects = new LinkedHashMap<>();
+    // ID-based effects: keep ID→effect mapping for dynamic lookup
+    private final Map<String, List<Effect>> idEffects = new LinkedHashMap<>();
+
+    // Selector effects: keep selector→instances mapping
+    // (selectors are expanded once, then instances tracked)
     private final List<SelectorEffect> pendingSelectors = new ArrayList<>();
+    private final Map<SelectorEffect, List<Effect>> selectorEffects = new LinkedHashMap<>();
+
+    // Global effects don't need element lookup
     private final EffectManager globalEffects = new EffectManager();
-    private final EffectManager runningEffects = new EffectManager();
 
     /**
      * A pending effect targeting elements matching a CSS selector.
@@ -77,19 +84,18 @@ public final class ElementEffectRegistry {
     /**
      * Adds an effect that targets a specific element by ID.
      * <p>
-     * The effect will be resolved to the element's rendered area when
-     * {@link #resolvePendingEffects(EventRouter)} is called.
+     * The effect will be applied to the element's current rendered area each frame.
+     * The area is looked up dynamically, so effects automatically follow elements
+     * when the terminal resizes.
+     * <p>
+     * Must be called from the UI thread.
      *
      * @param elementId the ID of the target element
      * @param effect    the effect to add
      */
     public void addEffect(String elementId, Effect effect) {
-        lock.lock();
-        try {
-            pendingEffects.computeIfAbsent(elementId, k -> new ArrayList<>()).add(effect);
-        } finally {
-            lock.unlock();
-        }
+        UiThread.checkUiThread();
+        idEffects.computeIfAbsent(elementId, k -> new ArrayList<>()).add(effect);
     }
 
     /**
@@ -113,8 +119,10 @@ public final class ElementEffectRegistry {
      * Adds an effect that targets elements matching a CSS-like selector.
      * <p>
      * The effect will be applied to all elements matching the selector when
-     * {@link #resolvePendingEffects(ElementRegistry)} is called. Each matching
+     * {@link #expandSelectors(ElementRegistry)} is called. Each matching
      * element receives a copy of the effect.
+     * <p>
+     * Must be called from the UI thread.
      * <p>
      * Supported selectors:
      * <ul>
@@ -130,101 +138,116 @@ public final class ElementEffectRegistry {
      * @return the number of elements that matched (0 if selector is deferred)
      */
     public int addEffectBySelector(String selector, Effect effect) {
-        lock.lock();
-        try {
-            pendingSelectors.add(new SelectorEffect(selector, effect));
-            return 0; // Matches counted during resolution
-        } finally {
-            lock.unlock();
-        }
+        UiThread.checkUiThread();
+        pendingSelectors.add(new SelectorEffect(selector, effect));
+        return 0; // Matches counted during resolution
     }
 
     /**
      * Adds a global effect that applies to the entire frame area.
      * <p>
      * Global effects are processed without targeting a specific element.
+     * <p>
+     * Must be called from the UI thread.
      *
      * @param effect the effect to add
      */
     public void addGlobalEffect(Effect effect) {
-        lock.lock();
-        try {
-            globalEffects.addEffect(effect);
-        } finally {
-            lock.unlock();
-        }
+        UiThread.checkUiThread();
+        globalEffects.addEffect(effect);
     }
 
     /**
-     * Resolves pending effects to their target element areas.
+     * Expands pending selector-based effects to individual effect instances.
      * <p>
-     * This method queries the ElementRegistry for element areas and moves
-     * pending effects to the running effects list. Effects targeting
-     * elements that are not currently rendered remain pending.
-     * <p>
-     * Selector-based effects are resolved using the registry's query methods
-     * and apply to all matching elements.
+     * This method queries the ElementRegistry to find elements matching each
+     * pending selector and creates effect copies for each match. The selector
+     * and its effect instances are then tracked for dynamic area lookup.
      * <p>
      * This should be called after rendering completes but before
-     * {@link #processEffects(TFxDuration, Buffer, Rect)}.
+     * {@link #processEffects(TFxDuration, Buffer, Rect, ElementRegistry)}.
      *
      * @param registry the element registry containing element areas
      */
-    public void resolvePendingEffects(ElementRegistry registry) {
-        lock.lock();
-        try {
-            // Resolve ID-based effects
-            List<String> resolved = new ArrayList<>();
-
-            for (Map.Entry<String, List<Effect>> entry : pendingEffects.entrySet()) {
-                String elementId = entry.getKey();
-                Rect area = registry.getArea(elementId);
-
-                if (area != null) {
-                    // Element is rendered, resolve effects to its area
-                    for (Effect effect : entry.getValue()) {
-                        runningEffects.addEffect(effect.withArea(area));
-                    }
-                    resolved.add(elementId);
-                }
+    public void expandSelectors(ElementRegistry registry) {
+        UiThread.checkUiThread();
+        for (SelectorEffect se : pendingSelectors) {
+            List<ElementRegistry.ElementInfo> matches = registry.queryAll(se.selector);
+            List<Effect> effects = new ArrayList<>();
+            for (int i = 0; i < matches.size(); i++) {
+                effects.add(se.effect.copy());  // No area baked in!
             }
+            selectorEffects.put(se, effects);
+        }
+        pendingSelectors.clear();
+    }
 
-            // Remove resolved entries
-            for (String id : resolved) {
-                pendingEffects.remove(id);
-            }
+    /**
+     * Processes all active effects with dynamic area lookup.
+     * <p>
+     * This processes global effects, ID-based effects, and selector-based effects.
+     * For ID-based and selector-based effects, the element areas are looked up
+     * each frame from the registry, so effects automatically follow elements
+     * when the terminal resizes.
+     * <p>
+     * Effects are automatically removed when complete.
+     *
+     * @param delta    the time elapsed since the last frame
+     * @param buffer   the buffer to apply effects to
+     * @param area     the default area for global effects
+     * @param registry the element registry for area lookup
+     */
+    public void processEffects(TFxDuration delta, Buffer buffer, Rect area, ElementRegistry registry) {
+        // Global effects (no element lookup needed)
+        globalEffects.processEffects(delta, buffer, area);
 
-            // Resolve selector-based effects
-            for (SelectorEffect se : pendingSelectors) {
-                List<ElementRegistry.ElementInfo> matches = registry.queryAll(se.selector);
-                for (ElementRegistry.ElementInfo info : matches) {
-                    // Each match gets a copy of the effect
-                    runningEffects.addEffect(se.effect.copy().withArea(info.area()));
-                }
+        // ID-based effects: look up current area, then process
+        Iterator<Map.Entry<String, List<Effect>>> idIter = idEffects.entrySet().iterator();
+        while (idIter.hasNext()) {
+            Map.Entry<String, List<Effect>> entry = idIter.next();
+            Rect elementArea = registry.getArea(entry.getKey());
+            if (elementArea == null) continue;  // Element not rendered yet
+
+            processEffectList(entry.getValue(), delta, buffer, elementArea);
+            if (entry.getValue().isEmpty()) {
+                idIter.remove();
             }
-            pendingSelectors.clear();
-        } finally {
-            lock.unlock();
+        }
+
+        // Selector-based effects: look up current areas for each instance
+        Iterator<Map.Entry<SelectorEffect, List<Effect>>> selectorIter = selectorEffects.entrySet().iterator();
+        while (selectorIter.hasNext()) {
+            Map.Entry<SelectorEffect, List<Effect>> entry = selectorIter.next();
+            List<ElementRegistry.ElementInfo> matches = registry.queryAll(entry.getKey().selector);
+            List<Effect> effects = entry.getValue();
+
+            int count = Math.min(matches.size(), effects.size());
+            for (int i = 0; i < count; i++) {
+                Effect effect = effects.get(i);
+                Rect elementArea = matches.get(i).area();
+                effect.process(delta, buffer, elementArea);
+            }
+            // Remove completed effects
+            effects.removeIf(Effect::done);
+
+            // Remove empty selector entries
+            if (effects.isEmpty()) {
+                selectorIter.remove();
+            }
         }
     }
 
     /**
-     * Processes all active effects.
-     * <p>
-     * This processes both global effects and element-targeted effects
-     * that have been resolved. Effects are automatically removed when complete.
-     *
-     * @param delta  the time elapsed since the last frame
-     * @param buffer the buffer to apply effects to
-     * @param area   the default area for global effects
+     * Processes a list of effects, removing completed ones.
      */
-    public void processEffects(TFxDuration delta, Buffer buffer, Rect area) {
-        lock.lock();
-        try {
-            globalEffects.processEffects(delta, buffer, area);
-            runningEffects.processEffects(delta, buffer, area);
-        } finally {
-            lock.unlock();
+    private void processEffectList(List<Effect> effects, TFxDuration delta, Buffer buffer, Rect area) {
+        Iterator<Effect> iter = effects.iterator();
+        while (iter.hasNext()) {
+            Effect effect = iter.next();
+            effect.process(delta, buffer, area);
+            if (effect.done()) {
+                iter.remove();
+            }
         }
     }
 
@@ -234,30 +257,23 @@ public final class ElementEffectRegistry {
      * @return true if effects are active
      */
     public boolean isRunning() {
-        lock.lock();
-        try {
-            return globalEffects.isRunning() ||
-                   runningEffects.isRunning() ||
-                   !pendingEffects.isEmpty() ||
-                   !pendingSelectors.isEmpty();
-        } finally {
-            lock.unlock();
-        }
+        return globalEffects.isRunning() ||
+               !idEffects.isEmpty() ||
+               !pendingSelectors.isEmpty() ||
+               !selectorEffects.isEmpty();
     }
 
     /**
      * Clears all effects (pending, running, and global).
+     * <p>
+     * Must be called from the UI thread.
      */
     public void clear() {
-        lock.lock();
-        try {
-            pendingEffects.clear();
-            pendingSelectors.clear();
-            globalEffects.clear();
-            runningEffects.clear();
-        } finally {
-            lock.unlock();
-        }
+        UiThread.checkUiThread();
+        idEffects.clear();
+        pendingSelectors.clear();
+        selectorEffects.clear();
+        globalEffects.clear();
     }
 
     /**
@@ -266,16 +282,7 @@ public final class ElementEffectRegistry {
      * @return pending effect count
      */
     public int pendingCount() {
-        lock.lock();
-        try {
-            int count = 0;
-            for (List<Effect> effects : pendingEffects.values()) {
-                count += effects.size();
-            }
-            return count;
-        } finally {
-            lock.unlock();
-        }
+        return pendingSelectors.size();
     }
 
     /**
@@ -284,11 +291,13 @@ public final class ElementEffectRegistry {
      * @return running effect count
      */
     public int runningCount() {
-        lock.lock();
-        try {
-            return globalEffects.size() + runningEffects.size();
-        } finally {
-            lock.unlock();
+        int count = globalEffects.size();
+        for (List<Effect> effects : idEffects.values()) {
+            count += effects.size();
         }
+        for (List<Effect> effects : selectorEffects.values()) {
+            count += effects.size();
+        }
+        return count;
     }
 }

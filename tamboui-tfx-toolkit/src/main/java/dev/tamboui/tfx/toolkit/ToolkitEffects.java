@@ -20,12 +20,15 @@ import java.time.Duration;
  * <p>
  * ToolkitEffects provides a simple interface for adding effects to elements
  * by ID, with automatic resolution of element areas during rendering.
+ * Effects automatically follow their target elements when the terminal resizes
+ * because areas are looked up dynamically each frame.
  * <p>
  * <b>Design Philosophy:</b>
  * <ul>
  *   <li><b>Element-targeted:</b> Effects can target specific elements by ID</li>
  *   <li><b>Non-invasive:</b> Uses wrapper pattern like FpsOverlay</li>
  *   <li><b>Automatic timing:</b> Uses TickEvent elapsed time for consistency</li>
+ *   <li><b>Resize-safe:</b> Effects follow elements automatically on resize</li>
  * </ul>
  * <p>
  * <b>Usage with ToolkitRunner:</b>
@@ -192,8 +195,8 @@ public final class ToolkitEffects {
      * The wrapper:
      * <ul>
      *   <li>Calls the wrapped renderer first</li>
-     *   <li>Resolves pending effects to element areas</li>
-     *   <li>Processes all active effects on the buffer</li>
+     *   <li>Expands pending selector effects to element instances</li>
+     *   <li>Processes all active effects on the buffer with dynamic area lookup</li>
      * </ul>
      *
      * @param renderer        the renderer to wrap
@@ -205,13 +208,13 @@ public final class ToolkitEffects {
             // Render the UI first
             renderer.render(frame);
 
-            // Resolve pending effects to element areas
-            registry.resolvePendingEffects(elementRegistry);
+            // Expand pending selector effects
+            registry.expandSelectors(elementRegistry);
 
-            // Process effects on the buffer
+            // Process effects on the buffer with dynamic area lookup
             if (registry.isRunning()) {
                 TFxDuration delta = TFxDuration.fromJavaDuration(lastElapsed);
-                registry.processEffects(delta, frame.buffer(), frame.area());
+                registry.processEffects(delta, frame.buffer(), frame.area(), elementRegistry);
             }
         };
     }
@@ -219,9 +222,10 @@ public final class ToolkitEffects {
     /**
      * Creates a post-render processor for use with ToolkitRunner.Builder.
      * <p>
-     * This returns a processor that resolves pending effects to element areas
-     * and processes all active effects on the buffer. The processor receives
-     * elapsed time from ToolkitRunner, so no event handler wrapping is needed.
+     * This returns a processor that expands pending selector effects and
+     * processes all active effects on the buffer. Areas are looked up dynamically
+     * from the element registry each frame, so effects automatically follow
+     * elements when the terminal resizes.
      * <p>
      * <b>Usage:</b>
      * <pre>{@code
@@ -239,13 +243,13 @@ public final class ToolkitEffects {
      */
     public ToolkitPostRenderProcessor asPostRenderProcessor() {
         return (frame, elementRegistry, elapsed) -> {
-            // Resolve pending effects to element areas
-            registry.resolvePendingEffects(elementRegistry);
+            // Expand pending selector effects
+            registry.expandSelectors(elementRegistry);
 
-            // Process effects on the buffer
+            // Process effects on the buffer with dynamic area lookup
             if (registry.isRunning()) {
                 TFxDuration delta = TFxDuration.fromJavaDuration(elapsed);
-                registry.processEffects(delta, frame.buffer(), frame.area());
+                registry.processEffects(delta, frame.buffer(), frame.area(), elementRegistry);
             }
         };
     }

@@ -15,6 +15,7 @@ import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.TickEvent;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Integrates TFX effects with the TuiRunner event loop.
@@ -47,14 +48,17 @@ import java.time.Duration;
 public final class TfxIntegration {
 
     private final EffectManager effectManager;
-    private Duration lastElapsed;
+    /**
+     * Last elapsed duration from tick events. Uses AtomicReference for
+     * safe visibility between event handler and renderer.
+     */
+    private final AtomicReference<Duration> lastElapsed = new AtomicReference<>(Duration.ZERO);
 
     /**
      * Creates a new TfxIntegration instance.
      */
     public TfxIntegration() {
         this.effectManager = new EffectManager();
-        this.lastElapsed = Duration.ZERO;
     }
 
     /**
@@ -125,7 +129,7 @@ public final class TfxIntegration {
         return (event, runner) -> {
             // Capture elapsed time from tick events
             if (event instanceof TickEvent) {
-                lastElapsed = ((TickEvent) event).elapsed();
+                lastElapsed.set(((TickEvent) event).elapsed());
             }
 
             // Delegate to wrapped handler
@@ -160,7 +164,7 @@ public final class TfxIntegration {
 
             // Process effects on the buffer
             if (effectManager.isRunning()) {
-                TFxDuration delta = TFxDuration.fromJavaDuration(lastElapsed);
+                TFxDuration delta = TFxDuration.fromJavaDuration(lastElapsed.get());
                 effectManager.processEffects(delta, frame.buffer(), frame.area());
             }
         };
