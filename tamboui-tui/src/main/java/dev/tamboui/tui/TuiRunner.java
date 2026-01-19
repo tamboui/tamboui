@@ -636,14 +636,17 @@ public final class TuiRunner implements AutoCloseable {
             }
         }
 
-        // Generate tick event if ticks are enabled
-        if (config.ticksEnabled()) {
+        // Generate tick event if ticks are enabled AND tick rate has elapsed
+        if (config.ticksEnabled() && config.tickRate() != null) {
             Instant now = Instant.now();
-            Instant previous = lastTick.getAndSet(now);
+            Instant previous = lastTick.get();
             Duration elapsed = Duration.between(previous, now);
 
-            long frame = frameCount.incrementAndGet();
-            eventQueue.offer(TickEvent.of(frame, elapsed));
+            if (elapsed.compareTo(config.tickRate()) >= 0) {
+                lastTick.set(now);
+                long frame = frameCount.incrementAndGet();
+                eventQueue.offer(TickEvent.of(frame, elapsed));
+            }
         }
     }
 

@@ -15,6 +15,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.tui.TuiConfig;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
