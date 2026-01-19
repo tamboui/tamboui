@@ -145,7 +145,7 @@ public final class ToolkitRunner implements AutoCloseable {
         tuiRunner.run(
             (event, runner) -> handleEvent(event),
             frame -> {
-                // All rendering now happens on UI thread - no lock needed
+                // All rendering now happens on render thread - no lock needed
                 // Clear state before each render
                 focusManager.clearFocusables();
                 eventRouter.clear();
@@ -224,11 +224,11 @@ public final class ToolkitRunner implements AutoCloseable {
      * Schedules an action to run after a delay.
      * <p>
      * The action runs on the scheduler thread. If the action modifies UI state,
-     * use {@link #runOnUiThread(Runnable)} to ensure thread safety:
+     * use {@link #runOnRenderThread(Runnable)} to ensure thread safety:
      *
      * <pre>{@code
      * runner.schedule(() -> {
-     *     runner.runOnUiThread(() -> {
+     *     runner.runOnRenderThread(() -> {
      *         message = "Delayed message!";
      *     });
      * }, Duration.ofSeconds(2));
@@ -247,11 +247,11 @@ public final class ToolkitRunner implements AutoCloseable {
      * Schedules an action to run repeatedly at a fixed interval.
      * <p>
      * The action runs on the scheduler thread. If the action modifies UI state,
-     * use {@link #runOnUiThread(Runnable)} to ensure thread safety.
+     * use {@link #runOnRenderThread(Runnable)} to ensure thread safety.
      *
      * <pre>{@code
      * var repeating = runner.scheduleRepeating(() -> {
-     *     runner.runOnUiThread(() -> counter++);
+     *     runner.runOnRenderThread(() -> counter++);
      * }, Duration.ofMillis(100));
      *
      * // Later, to stop:
@@ -276,7 +276,7 @@ public final class ToolkitRunner implements AutoCloseable {
      * is unpredictable and you want consistent spacing between runs.
      * <p>
      * The action runs on the scheduler thread. If the action modifies UI state,
-     * use {@link #runOnUiThread(Runnable)} to ensure thread safety.
+     * use {@link #runOnRenderThread(Runnable)} to ensure thread safety.
      *
      * @param action the action to run
      * @param delay the delay between the end of one run and the start of the next
@@ -341,23 +341,23 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     /**
-     * Executes an action on the UI thread.
+     * Executes an action on the render thread.
      * <p>
-     * Delegates to {@link TuiRunner#runOnUiThread(Runnable)}.
+     * Delegates to {@link TuiRunner#runOnRenderThread(Runnable)}.
      *
-     * @param action the action to execute on the UI thread
+     * @param action the action to execute on the render thread
      */
-    public void runOnUiThread(Runnable action) {
-        tuiRunner.runOnUiThread(action);
+    public void runOnRenderThread(Runnable action) {
+        tuiRunner.runOnRenderThread(action);
     }
 
     /**
-     * Returns whether the current thread is the UI thread.
+     * Returns whether the current thread is the render thread.
      *
-     * @return true if called from the UI thread
+     * @return true if called from the render thread
      */
-    public boolean isUiThread() {
-        return tuiRunner.isUiThread();
+    public boolean isRenderThread() {
+        return tuiRunner.isRenderThread();
     }
 
     /**

@@ -5,16 +5,16 @@
 package dev.tamboui.tui.event;
 
 /**
- * An event that encapsulates a {@link Runnable} to be executed on the UI thread.
+ * An event that encapsulates a {@link Runnable} to be executed on the render thread.
  * <p>
- * UiRunnable events are used internally by {@link dev.tamboui.tui.TuiRunner#runOnUiThread(Runnable)}
- * and {@link dev.tamboui.tui.TuiRunner#runLater(Runnable)} to schedule work on the UI thread
+ * UiRunnable events are used internally by {@link dev.tamboui.tui.TuiRunner#runOnRenderThread(Runnable)}
+ * and {@link dev.tamboui.tui.TuiRunner#runLater(Runnable)} to schedule work on the render thread
  * from other threads.
  * <p>
  * When the TuiRunner event loop processes a UiRunnable event, it executes the
- * enclosed action directly on the UI thread.
+ * enclosed action directly on the render thread.
  *
- * @see dev.tamboui.tui.TuiRunner#runOnUiThread(Runnable)
+ * @see dev.tamboui.tui.TuiRunner#runOnRenderThread(Runnable)
  * @see dev.tamboui.tui.TuiRunner#runLater(Runnable)
  */
 public final class UiRunnable implements Event {
@@ -24,7 +24,7 @@ public final class UiRunnable implements Event {
     /**
      * Creates a new UiRunnable with the given action.
      *
-     * @param action the action to execute on the UI thread
+     * @param action the action to execute on the render thread
      */
     public UiRunnable(Runnable action) {
         this.action = action;

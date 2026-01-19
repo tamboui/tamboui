@@ -225,8 +225,8 @@ public final class TuiRunner implements AutoCloseable {
      * @throws Exception if an error occurs during execution that cannot be handled
      */
     public void run(EventHandler handler, Renderer renderer) throws Exception {
-        // Mark this thread as the UI thread
-        UiThread.setUiThread(Thread.currentThread());
+        // Mark this thread as the render thread
+        RenderThread.setRenderThread(Thread.currentThread());
 
         try {
             // Wrap renderer to add post-render processors and FPS overlay
@@ -295,13 +295,13 @@ public final class TuiRunner implements AutoCloseable {
                 }
             }
         } finally {
-            // Clear UI thread reference
-            UiThread.clearUiThread();
+            // Clear render thread reference
+            RenderThread.clearRenderThread();
         }
     }
 
     private void safeRender(Renderer renderer) {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         try {
             terminal.draw(renderer::render);
         } catch (Throwable t) {
@@ -385,7 +385,7 @@ public final class TuiRunner implements AutoCloseable {
             return;
         }
 
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         try {
             terminal.draw(frame -> {
                 Rect area = frame.area();
@@ -533,25 +533,25 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
-     * Executes an action on the UI thread.
+     * Executes an action on the render thread.
      * <p>
-     * If called from the UI thread, the action is executed immediately.
+     * If called from the render thread, the action is executed immediately.
      * If called from another thread, the action is queued for execution
-     * on the UI thread.
+     * on the render thread.
      * <p>
      * This is the primary API for safely updating UI state from background threads:
      * <pre>{@code
      * // From a background thread:
-     * runner.runOnUiThread(() -> {
+     * runner.runOnRenderThread(() -> {
      *     updateState();
      *     // UI will redraw on next event
      * });
      * }</pre>
      *
-     * @param action the action to execute on the UI thread
+     * @param action the action to execute on the render thread
      */
-    public void runOnUiThread(Runnable action) {
-        if (UiThread.isUiThread()) {
+    public void runOnRenderThread(Runnable action) {
+        if (RenderThread.isRenderThread()) {
             action.run();
         } else {
             eventQueue.offer(new UiRunnable(action));
@@ -559,26 +559,26 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
-     * Queues an action to be executed on the UI thread.
+     * Queues an action to be executed on the render thread.
      * <p>
-     * Unlike {@link #runOnUiThread(Runnable)}, this method always queues
-     * the action even if called from the UI thread. This is useful when
+     * Unlike {@link #runOnRenderThread(Runnable)}, this method always queues
+     * the action even if called from the render thread. This is useful when
      * you want to defer execution until after the current event handling
      * completes.
      *
-     * @param action the action to execute on the UI thread
+     * @param action the action to execute on the render thread
      */
     public void runLater(Runnable action) {
         eventQueue.offer(new UiRunnable(action));
     }
 
     /**
-     * Returns whether the current thread is the UI thread.
+     * Returns whether the current thread is the render thread.
      *
-     * @return true if called from the UI thread
+     * @return true if called from the render thread
      */
-    public boolean isUiThread() {
-        return UiThread.isUiThread();
+    public boolean isRenderThread() {
+        return RenderThread.isRenderThread();
     }
 
     /**
@@ -622,14 +622,14 @@ public final class TuiRunner implements AutoCloseable {
      * Scheduler callback that handles both tick events and resize-triggered redraws.
      * <p>
      * When a resize is detected, this posts a ResizeEvent to the event queue
-     * to be processed on the UI thread.
+     * to be processed on the render thread.
      */
     private void schedulerCallback() {
         if (!running.get()) {
             return;
         }
 
-        // Check for pending resize and post event to trigger redraw on UI thread
+        // Check for pending resize and post event to trigger redraw on render thread
         if (resizePending.getAndSet(false)) {
             try {
                 Size newSize = backend.size();

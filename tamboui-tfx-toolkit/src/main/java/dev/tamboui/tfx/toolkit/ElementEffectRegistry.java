@@ -11,7 +11,7 @@ import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
-import dev.tamboui.tui.UiThread;
+import dev.tamboui.tui.RenderThread;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,7 +31,7 @@ import java.util.Map;
  * <ul>
  *   <li><b>Dynamic Area Lookup:</b> Effect areas are looked up each frame, so effects
  *       automatically follow elements when they move or resize</li>
- *   <li><b>UI Thread:</b> All mutating operations must be called from the UI thread</li>
+ *   <li><b>render thread:</b> All mutating operations must be called from the render thread</li>
  *   <li><b>No Coupling:</b> Does not require Element interface changes</li>
  * </ul>
  * <p>
@@ -88,13 +88,13 @@ public final class ElementEffectRegistry {
      * The area is looked up dynamically, so effects automatically follow elements
      * when the terminal resizes.
      * <p>
-     * Must be called from the UI thread.
+     * Must be called from the render thread.
      *
      * @param elementId the ID of the target element
      * @param effect    the effect to add
      */
     public void addEffect(String elementId, Effect effect) {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         idEffects.computeIfAbsent(elementId, k -> new ArrayList<>()).add(effect);
     }
 
@@ -122,7 +122,7 @@ public final class ElementEffectRegistry {
      * {@link #expandSelectors(ElementRegistry)} is called. Each matching
      * element receives a copy of the effect.
      * <p>
-     * Must be called from the UI thread.
+     * Must be called from the render thread.
      * <p>
      * Supported selectors:
      * <ul>
@@ -138,7 +138,7 @@ public final class ElementEffectRegistry {
      * @return the number of elements that matched (0 if selector is deferred)
      */
     public int addEffectBySelector(String selector, Effect effect) {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         pendingSelectors.add(new SelectorEffect(selector, effect));
         return 0; // Matches counted during resolution
     }
@@ -148,12 +148,12 @@ public final class ElementEffectRegistry {
      * <p>
      * Global effects are processed without targeting a specific element.
      * <p>
-     * Must be called from the UI thread.
+     * Must be called from the render thread.
      *
      * @param effect the effect to add
      */
     public void addGlobalEffect(Effect effect) {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         globalEffects.addEffect(effect);
     }
 
@@ -170,7 +170,7 @@ public final class ElementEffectRegistry {
      * @param registry the element registry containing element areas
      */
     public void expandSelectors(ElementRegistry registry) {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         for (SelectorEffect se : pendingSelectors) {
             List<ElementRegistry.ElementInfo> matches = registry.queryAll(se.selector);
             List<Effect> effects = new ArrayList<>();
@@ -266,10 +266,10 @@ public final class ElementEffectRegistry {
     /**
      * Clears all effects (pending, running, and global).
      * <p>
-     * Must be called from the UI thread.
+     * Must be called from the render thread.
      */
     public void clear() {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         idEffects.clear();
         pendingSelectors.clear();
         selectorEffects.clear();

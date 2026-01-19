@@ -44,7 +44,7 @@ import java.util.List;
  * <b>Thread Safety:</b>
  * <p>
  * EffectManager is not thread-safe. All operations should be performed on the
- * same thread that handles rendering (typically the main UI thread).
+ * same thread that handles rendering (typically the main render thread).
  */
 public final class EffectManager {
     

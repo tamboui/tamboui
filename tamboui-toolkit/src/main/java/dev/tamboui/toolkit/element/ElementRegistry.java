@@ -10,7 +10,7 @@ import dev.tamboui.css.selector.Selector;
 import dev.tamboui.css.selector.SelectorParser;
 import dev.tamboui.layout.Rect;
 
-import dev.tamboui.tui.UiThread;
+import dev.tamboui.tui.RenderThread;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -178,7 +178,7 @@ public final class ElementRegistry {
     /**
      * Registers an element with full information including parent.
      * <p>
-     * Must be called from the UI thread.
+     * Must be called from the render thread.
      *
      * @param elementId  the element ID (may be null)
      * @param type       the element type name
@@ -189,7 +189,7 @@ public final class ElementRegistry {
      */
     public void register(String elementId, String type, Set<String> cssClasses,
                          Map<String, String> attributes, Rect area, ElementInfo parent) {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         if (area == null) {
             return;
         }
@@ -335,10 +335,10 @@ public final class ElementRegistry {
      * Clears all registered elements.
      * <p>
      * Should be called at the start of each render cycle.
-     * Must be called from the UI thread.
+     * Must be called from the render thread.
      */
     public void clear() {
-        UiThread.checkUiThread();
+        RenderThread.checkRenderThread();
         elementsById.clear();
         allElements.clear();
     }

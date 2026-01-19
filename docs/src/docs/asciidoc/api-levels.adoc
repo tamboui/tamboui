@@ -304,8 +304,8 @@ var config = TuiConfig.builder()
 
 === Threading Model
 
-{project-name} uses a dedicated *UI thread model* similar to other UI frameworks.
-All rendering and UI state modifications must happen on the UI thread - the thread running `TuiRunner.run()`.
+{project-name} uses a dedicated *render thread model* similar to other UI frameworks.
+All rendering and UI state modifications must happen on the render thread - the thread running `TuiRunner.run()`.
 
 This model provides:
 
@@ -313,43 +313,43 @@ This model provides:
 * **Predictable behavior**: UI updates happen in a well-defined order
 * **Clear error reporting**: Wrong-thread access throws `IllegalStateException` with diagnostic info
 
-==== The UI Thread
+==== The render thread
 
-When `TuiRunner.run()` starts, it marks the current thread as the UI thread.
+When `TuiRunner.run()` starts, it marks the current thread as the render thread.
 All event handling and rendering callbacks execute on this thread.
-When `run()` exits, the UI thread is cleared.
+When `run()` exits, the render thread is cleared.
 
 [source,java]
 ----
-// Check if on UI thread
-if (runner.isUiThread()) {
+// Check if on render thread
+if (runner.isRenderThread()) {
     // Safe to modify UI state
 }
 
 // Or use the static utility
-if (UiThread.isUiThread()) {
+if (RenderThread.isRenderThread()) {
     // ...
 }
 ----
 
 ==== Updating UI from Background Threads
 
-To safely update UI state from background threads (network callbacks, timers, async tasks), use `runOnUiThread()`:
+To safely update UI state from background threads (network callbacks, timers, async tasks), use `runOnRenderThread()`:
 
 [source,java]
 ----
 // From a background thread:
-runner.runOnUiThread(() -> {
-    // This runs on the UI thread
+runner.runOnRenderThread(() -> {
+    // This runs on the render thread
     status = "Download complete";
     // UI will redraw on next event
 });
 ----
 
-If called from the UI thread, the action executes immediately.
+If called from the render thread, the action executes immediately.
 If called from another thread, it's queued and runs during the next event loop iteration.
 
-For actions that should always be deferred (even when on UI thread), use `runLater()`:
+For actions that should always be deferred (even when on render thread), use `runLater()`:
 
 [source,java]
 ----
@@ -363,24 +363,24 @@ runner.runLater(() -> {
 ==== Scheduled Actions
 
 Scheduled actions via `ToolkitRunner.schedule()`, `scheduleRepeating()`, and `scheduleWithFixedDelay()` run on the scheduler thread.
-If they modify UI state, use `runOnUiThread()`:
+If they modify UI state, use `runOnRenderThread()`:
 
 [source,java]
 ----
-// Action runs on scheduler thread - use runOnUiThread for UI state
+// Action runs on scheduler thread - use runOnRenderThread for UI state
 runner.schedule(() -> {
-    runner.runOnUiThread(() -> {
+    runner.runOnRenderThread(() -> {
         countdown--;
     });
 }, Duration.ofSeconds(1));
 
 // Same pattern for repeating actions
 runner.scheduleRepeating(() -> {
-    runner.runOnUiThread(() -> animationFrame++);
+    runner.runOnRenderThread(() -> animationFrame++);
 }, Duration.ofMillis(16));
 ----
 
-This explicit approach gives you control - you can do background work in the scheduled action and only post the UI update portion to the UI thread.
+This explicit approach gives you control - you can do background work in the scheduled action and only post the UI update portion to the render thread.
 
 === Semantic Key Checks
 
