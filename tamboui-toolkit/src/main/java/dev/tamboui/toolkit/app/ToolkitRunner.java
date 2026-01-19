@@ -230,8 +230,8 @@ public final class ToolkitRunner implements AutoCloseable {
     /**
      * Schedules an action to run after a delay.
      * <p>
-     * The action runs on a background thread. If the action modifies shared state,
-     * ensure proper synchronization. The UI will automatically redraw on the next
+     * The action is synchronized with the render loop to prevent concurrent
+     * modification of shared state. The UI will automatically redraw on the next
      * tick event after the action completes.
      *
      * <pre>{@code
@@ -245,15 +245,23 @@ public final class ToolkitRunner implements AutoCloseable {
      * @return a handle that can be used to cancel the scheduled action
      */
     public ScheduledAction schedule(Runnable action, Duration delay) {
-        ScheduledFuture<?> future = scheduler.schedule(action, delay.toMillis(), TimeUnit.MILLISECONDS);
+        Runnable synchronizedAction = () -> {
+            renderLock.lock();
+            try {
+                action.run();
+            } finally {
+                renderLock.unlock();
+            }
+        };
+        ScheduledFuture<?> future = scheduler.schedule(synchronizedAction, delay.toMillis(), TimeUnit.MILLISECONDS);
         return new ScheduledAction(future);
     }
 
     /**
      * Schedules an action to run repeatedly at a fixed interval.
      * <p>
-     * The action runs on a background thread. If the action modifies shared state,
-     * ensure proper synchronization. The UI will automatically redraw on each
+     * The action is synchronized with the render loop to prevent concurrent
+     * modification of shared state. The UI will automatically redraw on each
      * tick event.
      *
      * <pre>{@code
@@ -270,8 +278,16 @@ public final class ToolkitRunner implements AutoCloseable {
      * @return a handle that can be used to cancel the scheduled action
      */
     public ScheduledAction scheduleRepeating(Runnable action, Duration interval) {
+        Runnable synchronizedAction = () -> {
+            renderLock.lock();
+            try {
+                action.run();
+            } finally {
+                renderLock.unlock();
+            }
+        };
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
-                action, interval.toMillis(), interval.toMillis(), TimeUnit.MILLISECONDS);
+                synchronizedAction, interval.toMillis(), interval.toMillis(), TimeUnit.MILLISECONDS);
         return new ScheduledAction(future);
     }
 
@@ -281,14 +297,25 @@ public final class ToolkitRunner implements AutoCloseable {
      * Unlike {@link #scheduleRepeating}, this waits for each execution to complete
      * before scheduling the next one. This is useful when the action's duration
      * is unpredictable and you want consistent spacing between runs.
+     * <p>
+     * The action is synchronized with the render loop to prevent concurrent
+     * modification of shared state.
      *
      * @param action the action to run
      * @param delay the delay between the end of one run and the start of the next
      * @return a handle that can be used to cancel the scheduled action
      */
     public ScheduledAction scheduleWithFixedDelay(Runnable action, Duration delay) {
+        Runnable synchronizedAction = () -> {
+            renderLock.lock();
+            try {
+                action.run();
+            } finally {
+                renderLock.unlock();
+            }
+        };
         ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(
-                action, delay.toMillis(), delay.toMillis(), TimeUnit.MILLISECONDS);
+                synchronizedAction, delay.toMillis(), delay.toMillis(), TimeUnit.MILLISECONDS);
         return new ScheduledAction(future);
     }
 
