@@ -6,6 +6,7 @@ package dev.tamboui.text;
 
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.Tags;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
@@ -155,14 +156,18 @@ class MarkupParserTest {
     }
 
     @Test
-    @DisplayName("parse unknown tag as plain text")
-    void parseUnknownTagAsPlainText() {
+    @DisplayName("parse unknown tag tracks it for CSS class targeting")
+    void parseUnknownTagTracksForCssClass() {
         Text text = MarkupParser.parse("[unknown]text[/unknown]");
 
         assertThat(text.lines()).hasSize(1);
-        // Unknown tags are rendered as plain text
-        String rawContent = text.lines().get(0).rawContent();
-        assertThat(rawContent).contains("unknown");
+        assertThat(text.lines().get(0).spans()).hasSize(1);
+        Span span = text.lines().get(0).spans().get(0);
+        // Unknown tags are parsed and content is extracted (no visible tag brackets)
+        assertThat(span.content()).isEqualTo("text");
+        // Unknown tags are tracked via Tags extension for CSS class targeting
+        Tags tags = span.style().extension(Tags.class, Tags.empty());
+        assertThat(tags.contains("unknown")).isTrue();
     }
 
     @Test

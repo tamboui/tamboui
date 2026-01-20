@@ -4,24 +4,22 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.Tags;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.toolkit.text.MarkupSegmentParser;
-import dev.tamboui.toolkit.text.MarkupSegmentParser.ParsedLine;
-import dev.tamboui.toolkit.text.MarkupSegmentParser.Segment;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
@@ -38,7 +36,6 @@ import dev.tamboui.widgets.text.RichTextState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -78,7 +75,6 @@ import java.util.Set;
  * }</pre>
  *
  * @see MarkupParser for markup syntax details
- * @see MarkupSegmentParser for parsing with tag metadata preservation
  */
 public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaElement> {
 
@@ -499,11 +495,11 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
 
         // Parse markup with the combined resolver (including context for TCSS)
         MarkupParser.StyleResolver combinedResolver = createCombinedResolver(context);
-        List<ParsedLine> parsedLines = MarkupSegmentParser.parse(markup, combinedResolver);
-
-        // Also update parsedText for backwards compatibility (preferredHeight, parsedText())
         parsedText = MarkupParser.parse(markup, combinedResolver);
         textDirty = false;
+
+        // Get lines from parsed text
+        List<Line> parsedLines = parsedText.lines();
 
         // Render border/block if needed
         Rect contentArea = area;
@@ -642,10 +638,14 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
 
     /**
      * Renders the parsed content as Element-based rendering.
-     * Each segment becomes a TextElement with CSS classes for TFX targeting.
+     * Each span becomes a TextElement with CSS classes for TFX targeting.
      */
-    private void renderElementBasedContent(Frame frame, Rect area, RenderContext context,
-                                           List<ParsedLine> parsedLines, int startLine, int endLine) {
+    private void renderElementBasedContent(Frame frame,
+                                           Rect area,
+                                           RenderContext context,
+                                           List<Line> parsedLines,
+                                           int startLine,
+                                           int endLine) {
         if (area.isEmpty()) {
             return;
         }
@@ -675,7 +675,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         // Render each visible line
         for (int i = 0; i < lineAreas.size() && (startLine + i) < endLine; i++) {
             int lineIndex = startLine + i;
-            ParsedLine line = parsedLines.get(lineIndex);
+            Line line = parsedLines.get(lineIndex);
             Rect lineArea = lineAreas.get(i);
 
             renderLine(frame, lineArea, context, line);
@@ -685,8 +685,12 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     /**
      * Renders content with word wrapping support.
      */
-    private void renderWrappedContent(Frame frame, Rect area, RenderContext context,
-                                      List<ParsedLine> parsedLines, int startLine, int endLine) {
+    private void renderWrappedContent(Frame frame,
+                                      Rect area,
+                                      RenderContext context,
+                                      List<Line> parsedLines,
+                                      int startLine,
+                                      int endLine) {
         if (area.isEmpty()) {
             return;
         }
@@ -697,13 +701,13 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
 
         // Process each visible source line
         for (int lineIndex = startLine; lineIndex < endLine && currentY < maxY; lineIndex++) {
-            ParsedLine line = parsedLines.get(lineIndex);
+            Line line = parsedLines.get(lineIndex);
 
-            // Break the line into wrapped segments
-            List<List<WrappedSegment>> wrappedRows = wrapLine(line, availableWidth);
+            // Break the line into wrapped spans
+            List<List<WrappedSpan>> wrappedRows = wrapLine(line, availableWidth);
 
             // Render each wrapped row
-            for (List<WrappedSegment> row : wrappedRows) {
+            for (List<WrappedSpan> row : wrappedRows) {
                 if (currentY >= maxY) {
                     break;
                 }
@@ -716,16 +720,17 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     }
 
     /**
-     * Wraps a line's segments to fit within the given width.
-     * Returns a list of rows, each row being a list of wrapped segments.
+     * Wraps a line's spans to fit within the given width.
+     * Returns a list of rows, each row being a list of wrapped spans.
      */
-    private List<List<WrappedSegment>> wrapLine(ParsedLine line, int maxWidth) {
-        List<List<WrappedSegment>> rows = new ArrayList<>();
-        List<WrappedSegment> currentRow = new ArrayList<>();
+    private List<List<WrappedSpan>> wrapLine(Line line, int maxWidth) {
+        List<List<WrappedSpan>> rows = new ArrayList<>();
+        List<WrappedSpan> currentRow = new ArrayList<>();
         int currentWidth = 0;
 
-        for (Segment segment : line.segments()) {
-            String text = segment.text();
+        for (Span span : line.spans()) {
+            String text = span.content();
+            Tags tags = span.style().extension(Tags.class, Tags.empty());
 
             if (overflow == Overflow.WRAP_WORD) {
                 // Word wrapping: break at word boundaries
@@ -738,12 +743,12 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
                     }
 
                     // Include trailing whitespace with the word
-                    int segmentEnd = wordEnd;
-                    while (segmentEnd < text.length() && Character.isWhitespace(text.charAt(segmentEnd))) {
-                        segmentEnd++;
+                    int spanEnd = wordEnd;
+                    while (spanEnd < text.length() && Character.isWhitespace(text.charAt(spanEnd))) {
+                        spanEnd++;
                     }
 
-                    String wordWithSpace = text.substring(start, segmentEnd);
+                    String wordWithSpace = text.substring(start, spanEnd);
                     int wordWidth = wordWithSpace.length();
 
                     // Check if we need to wrap
@@ -762,11 +767,11 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
                     }
 
                     if (!wordWithSpace.isEmpty()) {
-                        currentRow.add(new WrappedSegment(wordWithSpace, segment.tags(), segment.style()));
+                        currentRow.add(new WrappedSpan(wordWithSpace, tags, span.style()));
                         currentWidth += wordWidth;
                     }
 
-                    start = segmentEnd;
+                    start = spanEnd;
                 }
             } else {
                 // Character wrapping: break at character boundaries
@@ -782,7 +787,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
 
                     int chunkEnd = Math.min(start + remaining, text.length());
                     String chunk = text.substring(start, chunkEnd);
-                    currentRow.add(new WrappedSegment(chunk, segment.tags(), segment.style()));
+                    currentRow.add(new WrappedSpan(chunk, tags, span.style()));
                     currentWidth += chunk.length();
                     start = chunkEnd;
                 }
@@ -811,12 +816,12 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         return s.substring(i);
     }
 
-    private void trimTrailingSpaces(List<WrappedSegment> row) {
+    private void trimTrailingSpaces(List<WrappedSpan> row) {
         if (row.isEmpty()) {
             return;
         }
-        // Trim trailing spaces from the last segment
-        WrappedSegment last = row.get(row.size() - 1);
+        // Trim trailing spaces from the last span
+        WrappedSpan last = row.get(row.size() - 1);
         String text = last.text;
         int end = text.length();
         while (end > 0 && Character.isWhitespace(text.charAt(end - 1))) {
@@ -825,60 +830,60 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         if (end < text.length()) {
             if (end == 0) {
                 row.remove(row.size() - 1);
-                trimTrailingSpaces(row); // Recurse to trim next segment
+                trimTrailingSpaces(row); // Recurse to trim next span
             } else {
-                row.set(row.size() - 1, new WrappedSegment(text.substring(0, end), last.tags, last.style));
+                row.set(row.size() - 1, new WrappedSpan(text.substring(0, end), last.tags, last.style));
             }
         }
     }
 
     /**
-     * Renders a wrapped row of segments.
+     * Renders a wrapped row of spans.
      */
-    private void renderWrappedRow(Frame frame, Rect area, RenderContext context, List<WrappedSegment> row) {
+    private void renderWrappedRow(Frame frame, Rect area, RenderContext context, List<WrappedSpan> row) {
         if (area.isEmpty()) {
             return;
         }
 
         int currentX = area.left();
-        for (WrappedSegment segment : row) {
-            int segmentWidth = segment.text.length();
+        for (WrappedSpan wrappedSpan : row) {
+            int spanWidth = wrappedSpan.text.length();
             int availableWidth = area.right() - currentX;
             if (availableWidth <= 0) {
                 break;
             }
 
-            String text = segment.text;
-            if (segmentWidth > availableWidth) {
+            String text = wrappedSpan.text;
+            if (spanWidth > availableWidth) {
                 text = text.substring(0, availableWidth);
-                segmentWidth = text.length();
+                spanWidth = text.length();
             }
 
-            Rect segmentArea = new Rect(currentX, area.top(), segmentWidth, 1);
+            Rect spanArea = new Rect(currentX, area.top(), spanWidth, 1);
 
             TextElement textElement = new TextElement(text);
-            textElement.style(segment.style);
+            textElement.style(wrappedSpan.style);
 
-            for (String tag : segment.tags) {
+            for (String tag : wrappedSpan.tags.values()) {
                 textElement.addClass(tag);
             }
 
             textElement.fit();
-            context.renderChild(textElement, frame, segmentArea);
+            context.renderChild(textElement, frame, spanArea);
 
-            currentX += segmentWidth;
+            currentX += spanWidth;
         }
     }
 
     /**
-     * Helper class to represent a wrapped segment with its metadata.
+     * Helper class to represent a wrapped span with its metadata.
      */
-    private static class WrappedSegment {
+    private static class WrappedSpan {
         final String text;
-        final Set<String> tags;
+        final Tags tags;
         final Style style;
 
-        WrappedSegment(String text, Set<String> tags, Style style) {
+        WrappedSpan(String text, Tags tags, Style style) {
             this.text = text;
             this.tags = tags;
             this.style = style;
@@ -888,15 +893,15 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     /**
      * Renders a single parsed line as a row of TextElements.
      */
-    private void renderLine(Frame frame, Rect area, RenderContext context, ParsedLine line) {
-        if (area.isEmpty() || line.segments().isEmpty()) {
+    private void renderLine(Frame frame, Rect area, RenderContext context, Line line) {
+        if (area.isEmpty() || line.spans().isEmpty()) {
             return;
         }
 
         // For alignment support, calculate total line width
         int totalWidth = 0;
-        for (Segment segment : line.segments()) {
-            totalWidth += segment.text().length();
+        for (Span span : line.spans()) {
+            totalWidth += span.content().length();
         }
 
         // Calculate starting x position based on alignment
@@ -907,20 +912,20 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
             startX = area.left() + area.width() - totalWidth;
         }
 
-        // Render each segment as a TextElement
+        // Render each span as a TextElement
         int currentX = startX;
-        for (Segment segment : line.segments()) {
-            String text = segment.text();
-            int segmentWidth = text.length();
+        for (Span span : line.spans()) {
+            String text = span.content();
+            int spanWidth = text.length();
 
-            // Check if segment fits in remaining space
+            // Check if span fits in remaining space
             int availableWidth = area.right() - currentX;
             if (availableWidth <= 0) {
                 break;
             }
 
             // Handle overflow/truncation
-            if (segmentWidth > availableWidth) {
+            if (spanWidth > availableWidth) {
                 if (overflow == Overflow.ELLIPSIS) {
                     if (availableWidth >= 3) {
                         text = text.substring(0, availableWidth - 3) + "...";
@@ -930,18 +935,19 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
                 } else {
                     text = text.substring(0, availableWidth);
                 }
-                segmentWidth = text.length();
+                spanWidth = text.length();
             }
 
-            // Create area for this segment
-            Rect segmentArea = new Rect(currentX, area.top(), segmentWidth, 1);
+            // Create area for this span
+            Rect spanArea = new Rect(currentX, area.top(), spanWidth, 1);
 
             // Create TextElement with CSS classes from tags
             TextElement textElement = new TextElement(text);
-            textElement.style(segment.style());
+            textElement.style(span.style());
 
             // Add tag names as CSS classes
-            for (String tag : segment.tags()) {
+            Tags tags = span.style().extension(Tags.class, Tags.empty());
+            for (String tag : tags.values()) {
                 textElement.addClass(tag);
             }
 
@@ -949,23 +955,19 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
             textElement.fit();
 
             // Render the element
-            context.renderChild(textElement, frame, segmentArea);
+            context.renderChild(textElement, frame, spanArea);
 
-            currentX += segmentWidth;
+            currentX += spanWidth;
         }
     }
 
     /**
      * Returns the maximum width of any line in the parsed content.
      */
-    private int maxLineWidth(List<ParsedLine> lines) {
+    private int maxLineWidth(List<Line> lines) {
         int max = 0;
-        for (ParsedLine line : lines) {
-            int lineWidth = 0;
-            for (Segment segment : line.segments()) {
-                lineWidth += segment.text().length();
-            }
-            max = Math.max(max, lineWidth);
+        for (Line line : lines) {
+            max = Math.max(max, line.width());
         }
         return max;
     }
@@ -1000,7 +1002,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
             // 2. Check TCSS via context (unknown tags are treated as CSS class names)
             // Use resolveStyle with the tag name as a CSS class
             return context.resolveStyle(null, tagName)
-                    .map(resolver -> resolver.toStyle())
+                    .map(CssStyleResolver::toStyle)
                     .orElse(null);
         };
     }

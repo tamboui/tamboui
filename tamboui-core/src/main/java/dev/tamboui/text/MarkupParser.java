@@ -6,6 +6,7 @@ package dev.tamboui.text;
 
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.Tags;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -277,9 +278,12 @@ public final class MarkupParser {
             // Flush current text with current style
             flushCurrentText();
 
+            // Create a Tags extension for this tag name
+            Style tagStyle = Style.EMPTY.withExtension(Tags.class, Tags.of(tagName));
+
             // Check for link tag
             if ("link".equals(tagName) && attribute != null) {
-                Style linkStyle = currentStyle.hyperlink(attribute);
+                Style linkStyle = currentStyle.hyperlink(attribute).patch(tagStyle);
                 styleStack.push(new StyleEntry(tagName, linkStyle));
                 currentStyle = linkStyle;
                 return;
@@ -288,7 +292,8 @@ public final class MarkupParser {
             // Check built-in styles
             Style builtInStyle = BUILT_IN_STYLES.get(tagName);
             if (builtInStyle != null) {
-                Style newStyle = currentStyle.patch(builtInStyle);
+                Style withTags = builtInStyle.patch(tagStyle);
+                Style newStyle = currentStyle.patch(withTags);
                 styleStack.push(new StyleEntry(tagName, newStyle));
                 currentStyle = newStyle;
                 return;
@@ -298,15 +303,18 @@ public final class MarkupParser {
             if (resolver != null) {
                 Style customStyle = resolver.resolve(tagName);
                 if (customStyle != null) {
-                    Style newStyle = currentStyle.patch(customStyle);
+                    Style withTags = customStyle.patch(tagStyle);
+                    Style newStyle = currentStyle.patch(withTags);
                     styleStack.push(new StyleEntry(tagName, newStyle));
                     currentStyle = newStyle;
                     return;
                 }
             }
 
-            // Unknown tag, render as text
-            currentText.append(input.substring(tagStart, pos));
+            // Unknown tag - still track it for CSS class targeting, but with no visual style
+            Style newStyle = currentStyle.patch(tagStyle);
+            styleStack.push(new StyleEntry(tagName, newStyle));
+            currentStyle = newStyle;
         }
 
         private void handleClosingTag(String tagName) {
@@ -372,20 +380,24 @@ public final class MarkupParser {
         }
 
         private Style getBaseStyle(String tagName) {
+            // Create a Tags extension for this tag name
+            Style tagStyle = Style.EMPTY.withExtension(Tags.class, Tags.of(tagName));
+
             if ("link".equals(tagName)) {
-                return Style.EMPTY; // Link style is handled specially
+                return tagStyle; // Link style is handled specially but we still track the tag
             }
             Style builtIn = BUILT_IN_STYLES.get(tagName);
             if (builtIn != null) {
-                return builtIn;
+                return builtIn.patch(tagStyle);
             }
             if (resolver != null) {
                 Style custom = resolver.resolve(tagName);
                 if (custom != null) {
-                    return custom;
+                    return custom.patch(tagStyle);
                 }
             }
-            return Style.EMPTY;
+            // Unknown tag - just the tag tracking
+            return tagStyle;
         }
 
         private void flushCurrentText() {

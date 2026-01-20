@@ -126,4 +126,53 @@ class StyleTest {
         assertThat(style.hyperlink()).contains(Hyperlink.of("https://example.com"));
     }
 
+    @Test
+    @DisplayName("Style patch with Tags extension merges tags via Patchable")
+    void patchMergesTagsViaPatchable() {
+        Style style1 = Style.EMPTY.withExtension(Tags.class, Tags.of("bold", "red"));
+        Style style2 = Style.EMPTY.withExtension(Tags.class, Tags.of("italic", "green"));
+
+        Style merged = style1.patch(style2);
+
+        Tags tags = merged.extension(Tags.class, Tags.empty());
+        assertThat(tags.values()).containsExactlyInAnyOrder("bold", "red", "italic", "green");
+    }
+
+    @Test
+    @DisplayName("Style patch with non-Patchable extension replaces value")
+    void patchReplacesNonPatchableExtension() {
+        Style style1 = Style.EMPTY.hyperlink("https://first.com");
+        Style style2 = Style.EMPTY.hyperlink("https://second.com");
+
+        Style merged = style1.patch(style2);
+
+        assertThat(merged.hyperlink()).contains(Hyperlink.of("https://second.com"));
+    }
+
+    @Test
+    @DisplayName("Style patch with Tags on only one side preserves Tags")
+    void patchWithTagsOnOneSide() {
+        Style style1 = Style.EMPTY.withExtension(Tags.class, Tags.of("bold"));
+        Style style2 = Style.EMPTY.fg(Color.RED);
+
+        Style merged = style1.patch(style2);
+
+        Tags tags = merged.extension(Tags.class, Tags.empty());
+        assertThat(tags.values()).containsExactly("bold");
+        assertThat(merged.fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("Style patch accumulates Tags through multiple patches")
+    void patchAccumulatesTagsThroughMultiplePatches() {
+        Style style1 = Style.EMPTY.withExtension(Tags.class, Tags.of("outer"));
+        Style style2 = Style.EMPTY.withExtension(Tags.class, Tags.of("middle"));
+        Style style3 = Style.EMPTY.withExtension(Tags.class, Tags.of("inner"));
+
+        Style merged = style1.patch(style2).patch(style3);
+
+        Tags tags = merged.extension(Tags.class, Tags.empty());
+        assertThat(tags.values()).containsExactlyInAnyOrder("outer", "middle", "inner");
+    }
+
 }

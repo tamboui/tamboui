@@ -464,9 +464,24 @@ public final class Style {
             newExtensions = Collections.emptyMap();
         } else if (other.extensions.isEmpty()) {
             newExtensions = this.extensions;
+        } else if (this.extensions.isEmpty()) {
+            newExtensions = other.extensions;
         } else {
+            // Merge extensions, using Patchable.patch() when applicable
             newExtensions = new HashMap<>(this.extensions);
-            newExtensions.putAll(other.extensions);
+            for (Map.Entry<Class<?>, Object> entry : other.extensions.entrySet()) {
+                Class<?> type = entry.getKey();
+                Object otherValue = entry.getValue();
+                Object thisValue = this.extensions.get(type);
+
+                if (thisValue instanceof Patchable && otherValue != null) {
+                    @SuppressWarnings("unchecked")
+                    Patchable<Object> patchable = (Patchable<Object>) thisValue;
+                    newExtensions.put(type, patchable.patch(otherValue));
+                } else {
+                    newExtensions.put(type, otherValue);
+                }
+            }
         }
 
         // Use private constructor to avoid redundant defensive copies
