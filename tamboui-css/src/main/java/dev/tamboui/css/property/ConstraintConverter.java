@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
  */
 public final class ConstraintConverter implements PropertyConverter<Constraint> {
 
+    public static final ConstraintConverter INSTANCE = new ConstraintConverter();
+
     private static final Pattern FILL_PATTERN = Pattern.compile("fill(?:\\((\\d+)\\))?");
     private static final Pattern PERCENT_PATTERN = Pattern.compile("(\\d+)%");
     private static final Pattern MIN_PATTERN = Pattern.compile("min\\((\\d+)\\)");

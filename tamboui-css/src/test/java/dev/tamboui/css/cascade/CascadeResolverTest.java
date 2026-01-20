@@ -130,6 +130,175 @@ class CascadeResolverTest {
         assertThat(style.bg()).isPresent();
     }
 
+    @Test
+    void borderCharsPropertyIsStoredInAdditionalProperties() {
+        String css = ".custom-border { border-chars: \"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"; }";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("custom-border")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        assertThat(resolved.getProperty("border-chars")).isPresent();
+        assertThat(resolved.getProperty("border-chars").get())
+            .isEqualTo("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"");
+    }
+
+    @Test
+    void cornersOnlyBorderCharsWithEmptyStrings() {
+        String css = ".corners-only { border-chars: \"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"; }";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("corners-only")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        assertThat(resolved.getProperty("border-chars")).isPresent();
+        assertThat(resolved.getProperty("border-chars").get())
+            .isEqualTo("\"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"");
+    }
+
+    @Test
+    void individualBorderPropertiesAreStored() {
+        String css = ".custom {\n" +
+                     "  border-top: 'x';\n" +
+                     "  border-bottom: 'y';\n" +
+                     "  border-left: '|';\n" +
+                     "  border-right: '|';\n" +
+                     "  border-top-left: '+';\n" +
+                     "  border-top-right: '+';\n" +
+                     "  border-bottom-left: '+';\n" +
+                     "  border-bottom-right: '+';\n" +
+                     "}";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("custom")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        // Individual border properties are stored with quotes stripped
+        assertThat(resolved.getProperty("border-top")).hasValue("x");
+        assertThat(resolved.getProperty("border-bottom")).hasValue("y");
+        assertThat(resolved.getProperty("border-left")).hasValue("|");
+        assertThat(resolved.getProperty("border-right")).hasValue("|");
+        assertThat(resolved.getProperty("border-top-left")).hasValue("+");
+        assertThat(resolved.getProperty("border-top-right")).hasValue("+");
+        assertThat(resolved.getProperty("border-bottom-left")).hasValue("+");
+        assertThat(resolved.getProperty("border-bottom-right")).hasValue("+");
+    }
+
+    @Test
+    void borderTypeWithBorderCharsOverride() {
+        // Verify both border-type and border-chars can be used together
+        String css = ".panel {\n" +
+                     "  border-type: plain;\n" +
+                     "  border-chars: \"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\";\n" +
+                     "}";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("panel")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        // border-type is a dedicated field
+        assertThat(resolved.borderType()).hasValue(dev.tamboui.widgets.block.BorderType.PLAIN);
+        // border-chars is in additional properties
+        assertThat(resolved.getProperty("border-chars")).isPresent();
+    }
+
+    @Test
+    void borderLeftWithEmptyValueIsNotStored() {
+        // When CSS has "border-left:" with no value (e.g., while typing),
+        // the property should NOT be stored as an empty string, which would
+        // cause the left border to disappear.
+        String css = ".panel {\n" +
+                     "  border-left:\n" +  // Empty value - user is still typing
+                     "}";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("panel")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        // Empty values should NOT be stored - they would cause borders to disappear
+        assertThat(resolved.getProperty("border-left")).isEmpty();
+    }
+
+    @Test
+    void borderLeftWithEmptyQuotedValueIsStoredAsEmpty() {
+        // When CSS has explicit empty quotes, it IS intentional
+        String css = ".panel {\n" +
+                     "  border-left: \"\";\n" +  // Explicit empty - intentional
+                     "}";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("panel")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        // Explicit empty quotes ARE stored - user intentionally wants no border
+        assertThat(resolved.getProperty("border-left")).hasValue("");
+    }
+
+    @Test
+    void borderLeftWithParserErrorValueIsNotStored() {
+        // When CSS has "border-left:" without semicolon, the parser may consume
+        // the next property as the value (e.g., "height: 3"). This should NOT
+        // be stored as a border character since it's clearly a parser error.
+        String css = ".panel {\n" +
+                     "  border-left:\n" +  // Missing value and semicolon
+                     "  height: 3;\n" +    // Parser consumes this as border-left's value
+                     "}";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("panel")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        // "height: 3" should NOT be stored as border-left - it contains ':'
+        // and is too long to be a valid border character
+        assertThat(resolved.getProperty("border-left")).isEmpty();
+    }
+
+    @Test
+    void borderLeftWithSingleUnquotedCharIsStored() {
+        // Single unquoted character should be valid
+        String css = ".panel {\n" +
+                     "  border-left: *;\n" +
+                     "}";
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("test", css);
+        engine.setActiveStylesheet("test");
+
+        Styleable element = createStyleable("Panel", null,
+            new HashSet<>(Collections.singletonList("panel")));
+
+        CssStyleResolver resolved = engine.resolve(element);
+
+        assertThat(resolved.getProperty("border-left")).hasValue("*");
+    }
+
     private Styleable createStyleable(String type, String id, Set<String> classes) {
         return new TestStyleable(type, id, classes);
     }

@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class IntegerConverterTest {
 
-    private final IntegerConverter converter = new IntegerConverter();
+    private final IntegerConverter converter = IntegerConverter.INSTANCE;
 
     @Test
     void convertsPositiveInteger() {

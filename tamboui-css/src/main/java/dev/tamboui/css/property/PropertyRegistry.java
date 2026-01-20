@@ -10,8 +10,10 @@ import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Width;
+import dev.tamboui.widgets.block.BorderSet;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Padding;
 
@@ -29,51 +31,30 @@ import java.util.Set;
 public final class PropertyRegistry {
 
     private final Map<String, PropertyConverter<?>> converters;
-    private final dev.tamboui.style.ColorConverter coreColorConverter;
-    private final ModifierConverter modifierConverter;
-    private final SpacingConverter spacingConverter;
-    private final AlignmentConverter alignmentConverter;
-    private final BorderTypeConverter borderTypeConverter;
-    private final WidthConverter widthConverter;
-    private final FlexConverter flexConverter;
-    private final DirectionConverter directionConverter;
-    private final MarginConverter marginConverter;
-    private final IntegerConverter integerConverter;
-    private final ConstraintConverter constraintConverter;
 
     private PropertyRegistry() {
         this.converters = new HashMap<>();
-        this.coreColorConverter = dev.tamboui.style.ColorConverter.INSTANCE;
-        this.modifierConverter = new ModifierConverter();
-        this.spacingConverter = new SpacingConverter();
-        this.alignmentConverter = new AlignmentConverter();
-        this.borderTypeConverter = new BorderTypeConverter();
-        this.widthConverter = new WidthConverter();
-        this.flexConverter = new FlexConverter();
-        this.directionConverter = new DirectionConverter();
-        this.marginConverter = new MarginConverter();
-        this.integerConverter = new IntegerConverter();
-        this.constraintConverter = new ConstraintConverter();
 
         // Register default converters - create adapter for core color converter
         PropertyConverter<Color> colorAdapter = (value, variables) -> {
             String resolved = PropertyConverter.resolveVariables(value, variables);
-            return coreColorConverter.convert(resolved);
+            return ColorConverter.INSTANCE.convert(resolved);
         };
         converters.put("color", colorAdapter);
         converters.put("background", colorAdapter);
         converters.put("background-color", colorAdapter);
         converters.put("border-color", colorAdapter);
-        converters.put("text-style", modifierConverter);
-        converters.put("padding", spacingConverter);
-        converters.put("text-align", alignmentConverter);
-        converters.put("border-type", borderTypeConverter);
-        converters.put("width", constraintConverter);
-        converters.put("flex", flexConverter);
-        converters.put("direction", directionConverter);
-        converters.put("margin", marginConverter);
-        converters.put("spacing", integerConverter);
-        converters.put("height", constraintConverter);
+        converters.put("text-style", ModifierConverter.INSTANCE);
+        converters.put("padding", SpacingConverter.INSTANCE);
+        converters.put("text-align", AlignmentConverter.INSTANCE);
+        converters.put("border-type", BorderTypeConverter.INSTANCE);
+        converters.put("width", ConstraintConverter.INSTANCE);
+        converters.put("flex", FlexConverter.INSTANCE);
+        converters.put("direction", DirectionConverter.INSTANCE);
+        converters.put("margin", MarginConverter.INSTANCE);
+        converters.put("spacing", IntegerConverter.INSTANCE);
+        converters.put("height", ConstraintConverter.INSTANCE);
+        converters.put("border-chars", BorderSetConverter.INSTANCE);
     }
 
     /**
@@ -94,7 +75,7 @@ public final class PropertyRegistry {
      */
     public Optional<Color> convertColor(String value, Map<String, String> variables) {
         String resolved = PropertyConverter.resolveVariables(value, variables);
-        return coreColorConverter.convert(resolved);
+        return ColorConverter.INSTANCE.convert(resolved);
     }
 
     /**
@@ -105,7 +86,7 @@ public final class PropertyRegistry {
      * @return the converted modifiers, or empty if conversion fails
      */
     public Optional<Set<Modifier>> convertModifiers(String value, Map<String, String> variables) {
-        return modifierConverter.convert(value, variables);
+        return ModifierConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -116,7 +97,7 @@ public final class PropertyRegistry {
      * @return the converted padding, or empty if conversion fails
      */
     public Optional<Padding> convertPadding(String value, Map<String, String> variables) {
-        return spacingConverter.convert(value, variables);
+        return SpacingConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -127,7 +108,7 @@ public final class PropertyRegistry {
      * @return the converted alignment, or empty if conversion fails
      */
     public Optional<Alignment> convertAlignment(String value, Map<String, String> variables) {
-        return alignmentConverter.convert(value, variables);
+        return AlignmentConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -138,7 +119,18 @@ public final class PropertyRegistry {
      * @return the converted border type, or empty if conversion fails
      */
     public Optional<BorderType> convertBorderType(String value, Map<String, String> variables) {
-        return borderTypeConverter.convert(value, variables);
+        return BorderTypeConverter.INSTANCE.convert(value, variables);
+    }
+
+    /**
+     * Converts CSS border-chars value to a BorderSet.
+     *
+     * @param value     the CSS value (8 quoted strings)
+     * @param variables the CSS variables
+     * @return the converted border set, or empty if conversion fails
+     */
+    public Optional<BorderSet> convertBorderSet(String value, Map<String, String> variables) {
+        return BorderSetConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -149,7 +141,7 @@ public final class PropertyRegistry {
      * @return the converted width, or empty if conversion fails
      */
     public Optional<Width> convertWidth(String value, Map<String, String> variables) {
-        return widthConverter.convert(value, variables);
+        return WidthConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -160,7 +152,7 @@ public final class PropertyRegistry {
      * @return the converted flex, or empty if conversion fails
      */
     public Optional<Flex> convertFlex(String value, Map<String, String> variables) {
-        return flexConverter.convert(value, variables);
+        return FlexConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -171,7 +163,7 @@ public final class PropertyRegistry {
      * @return the converted direction, or empty if conversion fails
      */
     public Optional<Direction> convertDirection(String value, Map<String, String> variables) {
-        return directionConverter.convert(value, variables);
+        return DirectionConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -182,7 +174,7 @@ public final class PropertyRegistry {
      * @return the converted margin, or empty if conversion fails
      */
     public Optional<Margin> convertMargin(String value, Map<String, String> variables) {
-        return marginConverter.convert(value, variables);
+        return MarginConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -193,7 +185,7 @@ public final class PropertyRegistry {
      * @return the converted spacing, or empty if conversion fails
      */
     public Optional<Integer> convertSpacing(String value, Map<String, String> variables) {
-        return integerConverter.convert(value, variables);
+        return IntegerConverter.INSTANCE.convert(value, variables);
     }
 
     /**
@@ -204,7 +196,7 @@ public final class PropertyRegistry {
      * @return the converted constraint, or empty if conversion fails
      */
     public Optional<Constraint> convertConstraint(String value, Map<String, String> variables) {
-        return constraintConverter.convert(value, variables);
+        return ConstraintConverter.INSTANCE.convert(value, variables);
     }
 
     /**

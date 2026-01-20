@@ -131,6 +131,29 @@ public final class CascadeResolver {
                     propertyRegistry.convertBorderType(value, variables)
                             .ifPresent(builder::borderType);
                     break;
+                case "border-chars":
+                    // Store as additional property - Panel will parse it
+                    builder.property(prop, PropertyConverter.resolveVariables(value, variables));
+                    break;
+                case "border-top":
+                case "border-bottom":
+                case "border-left":
+                case "border-right":
+                case "border-top-left":
+                case "border-top-right":
+                case "border-bottom-left":
+                case "border-bottom-right":
+                    // Store individual border character overrides in additionalProperties
+                    // Only store if it's a valid border character:
+                    // - Quoted string (any content, including empty)
+                    // - Single character or short string (for unicode)
+                    // Skip values that look like parser errors (e.g., "height: 3" when
+                    // the parser consumed the next property due to missing semicolon)
+                    String resolvedBorderValue = PropertyConverter.resolveVariables(value, variables);
+                    if (isValidBorderChar(resolvedBorderValue)) {
+                        builder.property(prop, parseQuotedChar(resolvedBorderValue));
+                    }
+                    break;
                 case "width":
                     propertyRegistry.convertConstraint(value, variables)
                             .ifPresent(builder::widthConstraint);
@@ -163,6 +186,60 @@ public final class CascadeResolver {
         }
 
         return builder.build();
+    }
+
+    /**
+     * Checks if a value is quoted (starts and ends with matching quotes).
+     */
+    private boolean isQuoted(String value) {
+        if (value == null || value.length() < 2) {
+            return false;
+        }
+        char first = value.charAt(0);
+        char last = value.charAt(value.length() - 1);
+        return (first == '"' || first == '\'') && first == last;
+    }
+
+    /**
+     * Checks if a value is a valid border character.
+     * Valid border characters are:
+     * - Quoted strings (any content, including empty - explicit intent)
+     * - Single characters or short unicode sequences (up to 4 chars)
+     * - NOT empty unquoted strings
+     * - NOT long strings that look like parser errors (e.g., "height: 3")
+     */
+    private boolean isValidBorderChar(String value) {
+        if (value == null) {
+            return false;
+        }
+        // Quoted strings are always valid (explicit user intent)
+        if (isQuoted(value)) {
+            return true;
+        }
+        // Unquoted: must be non-empty and short (single char or unicode grapheme)
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return false;
+        }
+        // Allow short strings (single char, or unicode that might be multiple code units)
+        // Reject anything longer than 4 characters - likely a parser error
+        return trimmed.length() <= 4 && !trimmed.contains(":");
+    }
+
+    /**
+     * Parses a quoted character value like {@code 'x'} or {@code "─"}.
+     * Returns the content without quotes, or the original value if not quoted.
+     */
+    private String parseQuotedChar(String value) {
+        if (value == null || value.length() < 2) {
+            return value;
+        }
+        char first = value.charAt(0);
+        char last = value.charAt(value.length() - 1);
+        if ((first == '"' || first == '\'') && first == last) {
+            return value.substring(1, value.length() - 1);
+        }
+        return value;
     }
 
     /**

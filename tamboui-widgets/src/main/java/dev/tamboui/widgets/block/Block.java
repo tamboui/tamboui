@@ -40,6 +40,7 @@ public final class Block implements Widget {
     private final Title titleBottom;
     private final EnumSet<Borders> borders;
     private final BorderType borderType;
+    private final BorderSet customBorderSet;
     private final Style borderStyle;
     private final Style style;
     private final Padding padding;
@@ -50,6 +51,7 @@ public final class Block implements Widget {
         this.titleBottom = builder.titleBottom;
         this.borders = builder.borders;
         this.borderType = builder.borderType.resolve();
+        this.customBorderSet = builder.customBorderSet;
         this.padding = builder.padding;
         this.mergeStrategy = builder.mergeStrategy;
 
@@ -134,8 +136,8 @@ public final class Block implements Widget {
         // Fill background
         buffer.setStyle(area, style);
 
-        // Draw borders
-        if (!borders.isEmpty()) {
+        // Draw borders (also when customBorderSet is provided, even with borders=NONE)
+        if (!borders.isEmpty() || customBorderSet != null) {
             renderBorders(area, buffer);
         }
 
@@ -149,7 +151,8 @@ public final class Block implements Widget {
     }
 
     private void renderBorders(Rect area, Buffer buffer) {
-        BorderSet set = borderType.set();
+        // Use custom border set if provided, otherwise use borderType's set
+        BorderSet set = customBorderSet != null ? customBorderSet : borderType.set();
         if (set == null) {
             // BorderType.NONE - skip border rendering
             return;
@@ -163,51 +166,61 @@ public final class Block implements Widget {
         int rightInset = area.right() - 1 - (isReplace || !borders.contains(Borders.RIGHT) ? 0 : 1);
         int bottomInset = area.bottom() - 1 - (isReplace || !borders.contains(Borders.BOTTOM) ? 0 : 1);
 
-        // Top border (skip corners if not REPLACE)
-        if (borders.contains(Borders.TOP) && area.height() > 0) {
+        // Top border (skip corners if not REPLACE, skip if character is empty)
+        String topChar = set.topHorizontal();
+        if (borders.contains(Borders.TOP) && area.height() > 0 && !topChar.isEmpty()) {
             for (int x = leftInset; x <= rightInset; x++) {
-                setBorderCell(buffer, x, area.top(), set.topHorizontal(), borderStyle);
+                setBorderCell(buffer, x, area.top(), topChar, borderStyle);
             }
         }
 
-        // Bottom border (skip corners if not REPLACE)
-        if (borders.contains(Borders.BOTTOM) && area.height() > 1) {
+        // Bottom border (skip corners if not REPLACE, skip if character is empty)
+        String bottomChar = set.bottomHorizontal();
+        if (borders.contains(Borders.BOTTOM) && area.height() > 1 && !bottomChar.isEmpty()) {
             for (int x = leftInset; x <= rightInset; x++) {
-                setBorderCell(buffer, x, area.bottom() - 1, set.bottomHorizontal(), borderStyle);
+                setBorderCell(buffer, x, area.bottom() - 1, bottomChar, borderStyle);
             }
         }
 
-        // Left border (skip corners if not REPLACE)
-        if (borders.contains(Borders.LEFT) && area.width() > 0) {
+        // Left border (skip corners if not REPLACE, skip if character is empty)
+        String leftChar = set.leftVertical();
+        if (borders.contains(Borders.LEFT) && area.width() > 0 && !leftChar.isEmpty()) {
             for (int y = topInset; y <= bottomInset; y++) {
-                setBorderCell(buffer, area.left(), y, set.leftVertical(), borderStyle);
+                setBorderCell(buffer, area.left(), y, leftChar, borderStyle);
             }
         }
 
-        // Right border (skip corners if not REPLACE)
-        if (borders.contains(Borders.RIGHT) && area.width() > 1) {
+        // Right border (skip corners if not REPLACE, skip if character is empty)
+        String rightChar = set.rightVertical();
+        if (borders.contains(Borders.RIGHT) && area.width() > 1 && !rightChar.isEmpty()) {
             for (int y = topInset; y <= bottomInset; y++) {
-                setBorderCell(buffer, area.right() - 1, y, set.rightVertical(), borderStyle);
+                setBorderCell(buffer, area.right() - 1, y, rightChar, borderStyle);
             }
         }
 
-        // Corners
+        // Corners - with customBorderSet, render if character is not empty (allows corners-only).
+        // Without customBorderSet, require both adjacent sides to be enabled (original behavior).
         boolean hasTop = borders.contains(Borders.TOP);
         boolean hasBottom = borders.contains(Borders.BOTTOM);
         boolean hasLeft = borders.contains(Borders.LEFT);
         boolean hasRight = borders.contains(Borders.RIGHT);
+        boolean hasCustomSet = customBorderSet != null;
 
-        if (hasTop && hasLeft) {
-            setBorderCell(buffer, area.left(), area.top(), set.topLeft(), borderStyle);
+        String topLeftChar = set.topLeft();
+        if (!topLeftChar.isEmpty() && (hasCustomSet || (hasTop && hasLeft))) {
+            setBorderCell(buffer, area.left(), area.top(), topLeftChar, borderStyle);
         }
-        if (hasTop && hasRight && area.width() > 1) {
-            setBorderCell(buffer, area.right() - 1, area.top(), set.topRight(), borderStyle);
+        String topRightChar = set.topRight();
+        if (!topRightChar.isEmpty() && area.width() > 1 && (hasCustomSet || (hasTop && hasRight))) {
+            setBorderCell(buffer, area.right() - 1, area.top(), topRightChar, borderStyle);
         }
-        if (hasBottom && hasLeft && area.height() > 1) {
-            setBorderCell(buffer, area.left(), area.bottom() - 1, set.bottomLeft(), borderStyle);
+        String bottomLeftChar = set.bottomLeft();
+        if (!bottomLeftChar.isEmpty() && area.height() > 1 && (hasCustomSet || (hasBottom && hasLeft))) {
+            setBorderCell(buffer, area.left(), area.bottom() - 1, bottomLeftChar, borderStyle);
         }
-        if (hasBottom && hasRight && area.width() > 1 && area.height() > 1) {
-            setBorderCell(buffer, area.right() - 1, area.bottom() - 1, set.bottomRight(), borderStyle);
+        String bottomRightChar = set.bottomRight();
+        if (!bottomRightChar.isEmpty() && area.width() > 1 && area.height() > 1 && (hasCustomSet || (hasBottom && hasRight))) {
+            setBorderCell(buffer, area.right() - 1, area.bottom() - 1, bottomRightChar, borderStyle);
         }
     }
     
@@ -444,6 +457,7 @@ public final class Block implements Widget {
         private Title title;
         private Title titleBottom;
         private EnumSet<Borders> borders = Borders.NONE;
+        private BorderSet customBorderSet;
         private Style borderStyle = Style.EMPTY;
         private Style style = Style.EMPTY;
         private Padding padding = Padding.NONE;
@@ -489,6 +503,25 @@ public final class Block implements Widget {
 
         public Builder borderType(BorderType borderType) {
             this.borderType.set(borderType);
+            return this;
+        }
+
+        /**
+         * Sets a custom border set with specific characters for each border element.
+         * <p>
+         * When set, this overrides the characters from {@link #borderType(BorderType)}.
+         * Characters can be empty strings ({@code ""}) to skip rendering that element.
+         * <p>
+         * Example for corners-only rendering:
+         * <pre>{@code
+         * customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
+         * }</pre>
+         *
+         * @param borderSet the custom border set, or null to use borderType
+         * @return this builder
+         */
+        public Builder customBorderSet(BorderSet borderSet) {
+            this.customBorderSet = borderSet;
             return this;
         }
 

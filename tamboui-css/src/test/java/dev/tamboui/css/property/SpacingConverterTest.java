@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SpacingConverterTest {
 
-    private final SpacingConverter converter = new SpacingConverter();
+    private final SpacingConverter converter = SpacingConverter.INSTANCE;
 
     @Test
     void convertsUniformPadding() {

@@ -21,6 +21,8 @@ import java.util.Optional;
  */
 public final class MarginConverter implements PropertyConverter<Margin> {
 
+    public static final MarginConverter INSTANCE = new MarginConverter();
+
     @Override
     public Optional<Margin> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

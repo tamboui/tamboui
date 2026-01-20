@@ -21,6 +21,8 @@ import java.util.Optional;
  */
 public final class SpacingConverter implements PropertyConverter<Padding> {
 
+    public static final SpacingConverter INSTANCE = new SpacingConverter();
+
     @Override
     public Optional<Padding> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

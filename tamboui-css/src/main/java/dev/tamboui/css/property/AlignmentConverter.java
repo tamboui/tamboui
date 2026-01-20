@@ -21,6 +21,8 @@ import java.util.Optional;
  */
 public final class AlignmentConverter implements PropertyConverter<Alignment> {
 
+    public static final AlignmentConverter INSTANCE = new AlignmentConverter();
+
     @Override
     public Optional<Alignment> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

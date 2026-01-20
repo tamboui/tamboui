@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DirectionConverterTest {
 
-    private final DirectionConverter converter = new DirectionConverter();
+    private final DirectionConverter converter = DirectionConverter.INSTANCE;
 
     @Test
     void convertsHorizontal() {

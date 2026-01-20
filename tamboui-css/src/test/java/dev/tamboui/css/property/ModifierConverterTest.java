@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ModifierConverterTest {
 
-    private final ModifierConverter converter = new ModifierConverter();
+    private final ModifierConverter converter = ModifierConverter.INSTANCE;
 
     @Test
     void convertsSingleModifier() {

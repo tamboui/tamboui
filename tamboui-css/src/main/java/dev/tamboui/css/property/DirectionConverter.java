@@ -20,6 +20,8 @@ import java.util.Optional;
  */
 public final class DirectionConverter implements PropertyConverter<Direction> {
 
+    public static final DirectionConverter INSTANCE = new DirectionConverter();
+
     @Override
     public Optional<Direction> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

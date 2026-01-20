@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class FlexConverterTest {
 
-    private final FlexConverter converter = new FlexConverter();
+    private final FlexConverter converter = FlexConverter.INSTANCE;
 
     @Test
     void convertsStart() {

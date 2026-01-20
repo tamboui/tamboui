@@ -24,6 +24,8 @@ import java.util.Optional;
  */
 public final class FlexConverter implements PropertyConverter<Flex> {
 
+    public static final FlexConverter INSTANCE = new FlexConverter();
+
     @Override
     public Optional<Flex> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

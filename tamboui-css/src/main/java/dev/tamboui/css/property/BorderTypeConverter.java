@@ -22,6 +22,8 @@ import java.util.Optional;
  */
 public final class BorderTypeConverter implements PropertyConverter<BorderType> {
 
+    public static final BorderTypeConverter INSTANCE = new BorderTypeConverter();
+
     @Override
     public Optional<BorderType> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

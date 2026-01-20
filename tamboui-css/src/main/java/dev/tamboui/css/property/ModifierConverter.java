@@ -25,6 +25,8 @@ import java.util.*;
  */
 public final class ModifierConverter implements PropertyConverter<Set<Modifier>> {
 
+    public static final ModifierConverter INSTANCE = new ModifierConverter();
+
     private static final Map<String, Modifier> MODIFIER_MAP = new HashMap<>();
 
     static {

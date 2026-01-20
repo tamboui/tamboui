@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MarginConverterTest {
 
-    private final MarginConverter converter = new MarginConverter();
+    private final MarginConverter converter = MarginConverter.INSTANCE;
 
     @Test
     void convertsUniformMargin() {

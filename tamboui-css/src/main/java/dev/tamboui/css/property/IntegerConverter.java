@@ -14,6 +14,8 @@ import java.util.Optional;
  */
 public final class IntegerConverter implements PropertyConverter<Integer> {
 
+    public static final IntegerConverter INSTANCE = new IntegerConverter();
+
     @Override
     public Optional<Integer> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

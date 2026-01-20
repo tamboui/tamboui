@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AlignmentConverterTest {
 
-    private final AlignmentConverter converter = new AlignmentConverter();
+    private final AlignmentConverter converter = AlignmentConverter.INSTANCE;
 
     @Test
     void convertsLeftAlignment() {

@@ -749,4 +749,268 @@ class BlockTest {
         return buffer;
     }
 
+    // ========== Custom Border Set Tests ==========
+
+    @Test
+    @DisplayName("Custom border set with corners only")
+    void customBorderSetCornersOnly() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
+            .build()
+            .render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.withLines(
+            "┌   ┐",
+            "     ",
+            "└   ┘"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Custom border set with horizontal only")
+    void customBorderSetHorizontalOnly() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("─", "─", "", "", "", "", "", ""))
+            .build()
+            .render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.withLines(
+            "─────",
+            "     ",
+            "─────"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Custom border set overrides borderType")
+    void customBorderSetOverridesBorderType() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.ALL)
+            .borderType(BorderType.ROUNDED)
+            .customBorderSet(new BorderSet("~", "~", "|", "|", "+", "+", "+", "+"))
+            .build()
+            .render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.withLines(
+            "+~~~+",
+            "|   |",
+            "+~~~+"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Custom border set with diagonal corners only")
+    void customBorderSetDiagonalCorners() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("", "", "", "", "┌", "", "", "┘"))
+            .build()
+            .render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.withLines(
+            "┌    ",
+            "     ",
+            "    ┘"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Custom border set inner area still reserves space")
+    void customBorderSetInnerArea() {
+        Block block = Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
+            .build();
+
+        Rect inner = block.inner(new Rect(0, 0, 10, 10));
+
+        // Inner area is still calculated based on Borders enum
+        assertThat(inner).isEqualTo(new Rect(1, 1, 8, 8));
+    }
+
+    @Test
+    @DisplayName("Custom border set works without borders enum")
+    void customBorderSetWithoutBordersEnum() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.NONE)
+            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
+            .build()
+            .render(buffer.area(), buffer);
+
+        // Corners rendered because customBorderSet overrides corner logic
+        Buffer expected = Buffer.withLines(
+            "┌   ┐",
+            "     ",
+            "└   ┘"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Custom border set with vertical only")
+    void customBorderSetVerticalOnly() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("", "", "│", "│", "", "", "", ""))
+            .build()
+            .render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.withLines(
+            "│   │",
+            "│   │",
+            "│   │"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Custom border set with horizontal and corners")
+    void customBorderSetHorizontalWithCorners() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("─", "─", "", "", "┌", "┐", "└", "┘"))
+            .build()
+            .render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.withLines(
+            "┌───┐",
+            "     ",
+            "└───┘"
+        );
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Transition from regular borders to custom borders clears old characters")
+    void transitionFromRegularToCustomBordersClears() {
+        Rect area = new Rect(0, 0, 5, 3);
+
+        // First render: regular PLAIN borders
+        Buffer buffer1 = Buffer.empty(area);
+        Block.builder()
+            .borders(Borders.ALL)
+            .borderType(BorderType.PLAIN)
+            .build()
+            .render(area, buffer1);
+
+        // Verify initial state has full borders
+        Buffer expectedBefore = Buffer.withLines(
+            "┌───┐",
+            "│   │",
+            "└───┘"
+        );
+        assertThat(buffer1).isEqualTo(expectedBefore);
+
+        // Second render: custom borders with only left changed to "*"
+        // Simulates what happens when CSS adds: border-left: "*"
+        Buffer buffer2 = Buffer.empty(area);
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("─", "─", "*", "│", "┌", "┐", "└", "┘"))
+            .build()
+            .render(area, buffer2);
+
+        // Verify custom state has left border as "*"
+        Buffer expectedAfter = Buffer.withLines(
+            "┌───┐",
+            "*   │",
+            "└───┘"
+        );
+        assertThat(buffer2).isEqualTo(expectedAfter);
+
+        // Now simulate what the Terminal does: diff the two buffers
+        // The diff should detect that position (0,1) changed from "│" to "*"
+        java.util.List<dev.tamboui.buffer.CellUpdate> updates = buffer1.diff(buffer2);
+
+        // Should have exactly 1 update at position (0,1)
+        assertThat(updates).hasSize(1);
+        assertThat(updates.get(0).x()).isEqualTo(0);
+        assertThat(updates.get(0).y()).isEqualTo(1);
+        assertThat(updates.get(0).cell().symbol()).isEqualTo("*");
+    }
+
+    @Test
+    @DisplayName("BorderSet sanitizes multi-character values to single character")
+    void borderSetSanitizesMultiCharValues() {
+        // Multi-char values like "<<" should be truncated to single char "<"
+        BorderSet set = new BorderSet("<<", ">>", "||", "!!", "TL", "TR", "BL", "BR");
+
+        assertThat(set.topHorizontal()).isEqualTo("<");
+        assertThat(set.bottomHorizontal()).isEqualTo(">");
+        assertThat(set.leftVertical()).isEqualTo("|");
+        assertThat(set.rightVertical()).isEqualTo("!");
+        assertThat(set.topLeft()).isEqualTo("T");
+        assertThat(set.topRight()).isEqualTo("T");
+        assertThat(set.bottomLeft()).isEqualTo("B");
+        assertThat(set.bottomRight()).isEqualTo("B");
+    }
+
+    @Test
+    @DisplayName("BorderSet preserves empty strings")
+    void borderSetPreservesEmptyStrings() {
+        BorderSet set = new BorderSet("", "", "", "", "", "", "", "");
+
+        assertThat(set.topHorizontal()).isEqualTo("");
+        assertThat(set.bottomHorizontal()).isEqualTo("");
+        assertThat(set.leftVertical()).isEqualTo("");
+        assertThat(set.rightVertical()).isEqualTo("");
+    }
+
+    @Test
+    @DisplayName("Transition from custom borders with empty chars back to regular clears correctly")
+    void transitionFromCustomWithEmptyToRegularClears() {
+        Rect area = new Rect(0, 0, 5, 3);
+
+        // First render: custom borders with corners only (empty sides)
+        Buffer buffer1 = Buffer.empty(area);
+        Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
+            .build()
+            .render(area, buffer1);
+
+        Buffer expectedBefore = Buffer.withLines(
+            "┌   ┐",
+            "     ",
+            "└   ┘"
+        );
+        assertThat(buffer1).isEqualTo(expectedBefore);
+
+        // Second render: regular PLAIN borders (all sides)
+        Buffer buffer2 = Buffer.empty(area);
+        Block.builder()
+            .borders(Borders.ALL)
+            .borderType(BorderType.PLAIN)
+            .build()
+            .render(area, buffer2);
+
+        Buffer expectedAfter = Buffer.withLines(
+            "┌───┐",
+            "│   │",
+            "└───┘"
+        );
+        assertThat(buffer2).isEqualTo(expectedAfter);
+
+        // Diff should show changes for top border (minus corners), left/right sides, bottom border
+        java.util.List<dev.tamboui.buffer.CellUpdate> updates = buffer1.diff(buffer2);
+
+        // Top row: positions 1,2,3 change from " " to "─"
+        // Middle row: positions 0 and 4 change from " " to "│"
+        // Bottom row: positions 1,2,3 change from " " to "─"
+        assertThat(updates).hasSize(8);
+    }
+
 }
