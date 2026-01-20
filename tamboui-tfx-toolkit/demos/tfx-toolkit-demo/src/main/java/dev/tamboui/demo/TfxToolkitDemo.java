@@ -136,6 +136,7 @@ public class TfxToolkitDemo {
                                 .focusedBorderColor(Color.LIGHT_YELLOW)
                                 .id("looping-panel")
                                 .focusable()
+                                .wrapWord()
                                 .length(30)
                 ).fill(),
 
