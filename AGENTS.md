@@ -104,7 +104,7 @@ class MyApp extends ToolkitApp {
 
 ### Threading Model
 
-- TamboUI uses a dedicated **render thread model** similar to JavaFX
+- TamboUI TUI framework uses a dedicated **render thread model** similar to JavaFX or Swing
 - All rendering and UI state modifications must happen on the render thread (the thread running `TuiRunner.run()`)
 - `RenderThread.isRenderThread()` checks if current thread is render thread; `RenderThread.checkRenderThread()` asserts it
 - `TuiRunner.runOnRenderThread(Runnable)` executes on render thread (immediately if already on it, queued otherwise)
