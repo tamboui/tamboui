@@ -2,7 +2,7 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.widgets.block;
+package dev.tamboui.layout;
 
 import dev.tamboui.style.PropertyConverter;
 
@@ -15,6 +15,7 @@ import java.util.Optional;
  * <p>
  * Supported values (case-insensitive, hyphens or underscores):
  * <ul>
+ *   <li>{@code none} - no border</li>
  *   <li>{@code plain} - standard box drawing characters</li>
  *   <li>{@code rounded} - rounded corners</li>
  *   <li>{@code double} - double-line borders</li>

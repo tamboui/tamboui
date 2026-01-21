@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * A functional interface for converting string values to typed property values.
  * <p>
- * Converters are used by {@link PropertyKey} to parse string representations
+ * Converters are used by {@link PropertyDefinition} to parse string representations
  * into strongly-typed values.
  *
  * @param <T> the type of value this converter produces

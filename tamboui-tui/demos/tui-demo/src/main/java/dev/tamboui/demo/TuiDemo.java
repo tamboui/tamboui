@@ -28,7 +28,7 @@ import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.tui.event.*;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;

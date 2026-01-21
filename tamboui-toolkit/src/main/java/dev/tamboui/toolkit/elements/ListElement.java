@@ -19,7 +19,7 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.scrollbar.Scrollbar;

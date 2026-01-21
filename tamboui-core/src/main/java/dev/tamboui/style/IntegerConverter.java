@@ -16,8 +16,8 @@ import java.util.Optional;
  * // Standalone usage
  * Optional<Integer> value = IntegerConverter.INSTANCE.convert("42");
  *
- * // With PropertyKey
- * PropertyKey<Integer> COUNT = PropertyKey.of("count", IntegerConverter.INSTANCE);
+ * // With PropertyDefinition
+ * PropertyDefinition<Integer> COUNT = PropertyDefinition.of("count", IntegerConverter.INSTANCE);
  * }</pre>
  */
 public final class IntegerConverter implements PropertyConverter<Integer> {

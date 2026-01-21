@@ -21,10 +21,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DetailedCssRenderingTest {
+
+    // Path to the demo's theme resources (single source of truth)
+    private static final Path THEMES_DIR = Paths.get("../tamboui-css/demos/css-demo/src/main/resources/themes");
 
     private StyleEngine styleEngine;
     private DefaultRenderContext context;
@@ -35,8 +40,8 @@ class DetailedCssRenderingTest {
     @BeforeEach
     void setUp() throws IOException {
         styleEngine = StyleEngine.create();
-        styleEngine.loadStylesheet("dark", "/themes/dark.tcss");
-        styleEngine.loadStylesheet("light", "/themes/light.tcss");
+        styleEngine.loadStylesheet("dark", THEMES_DIR.resolve("dark.tcss"));
+        styleEngine.loadStylesheet("light", THEMES_DIR.resolve("light.tcss"));
 
         context = DefaultRenderContext.createEmpty();
         context.setStyleEngine(styleEngine);
@@ -65,15 +70,16 @@ class DetailedCssRenderingTest {
         }
 
         @Test
-        @DisplayName("TextElement renders with white foreground on black background")
-        void textElement_rendersWhiteOnBlack() {
+        @DisplayName("TextElement renders with white foreground (no background from *)")
+        void textElement_rendersWhiteForeground() {
             TextElement text = new TextElement("Hello");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
             assertThat(cell.symbol()).isEqualTo("H");
             assertThat(cell.style().fg()).hasValue(Color.WHITE);
-            assertThat(cell.style().bg()).hasValue(Color.BLACK);
+            // Background is NOT set on * selector - TextElement is transparent
+            assertThat(cell.style().bg()).isEmpty();
         }
 
         @Test
@@ -207,39 +213,38 @@ class DetailedCssRenderingTest {
         }
 
         @Test
-        @DisplayName("Panel.status background renders with #333333")
-        void panel_status_background_rendersDarkGray() {
+        @DisplayName("Panel.status background renders with BLACK (from $bg-primary)")
+        void panel_status_background_rendersBlack() {
             Panel panel = new Panel(new TextElement("Status"));
             panel.addClass("status");
             panel.render(frame, new Rect(0, 0, 20, 3), context);
 
             Cell borderCell = buffer.get(0, 0);
             assertThat(borderCell.style().bg()).isPresent();
-            // #333333 = RGB(51, 51, 51)
-            Color.Rgb bgColor = (Color.Rgb) borderCell.style().bg().get();
-            assertThat(bgColor.r()).isEqualTo(0x33);
+            // Dark theme: .status { background: $bg-primary } which is BLACK
+            assertThat(borderCell.style().bg().get()).isEqualTo(Color.BLACK);
         }
 
         @Test
-        @DisplayName("Row fills area with black background")
-        void row_fillsWithBlackBackground() {
+        @DisplayName("Row does not fill area (no background from *)")
+        void row_noBackgroundFromUniversalSelector() {
             Row row = new Row(new TextElement("Hello"));
             row.render(frame, new Rect(0, 0, 20, 1), context);
 
-            // Check cell beyond text content
+            // Check cell beyond text content - Row doesn't fill since * doesn't set background
             Cell emptyCell = buffer.get(15, 0);
-            assertThat(emptyCell.style().bg()).hasValue(Color.BLACK);
+            assertThat(emptyCell.style().bg()).isEmpty();
         }
 
         @Test
-        @DisplayName("Column fills area with black background")
-        void column_fillsWithBlackBackground() {
+        @DisplayName("Column does not fill area (no background from *)")
+        void column_noBackgroundFromUniversalSelector() {
             Column column = new Column(new TextElement("Hello"));
             column.render(frame, new Rect(0, 0, 20, 5), context);
 
-            // Check cell below text content
+            // Check cell below text content - Column doesn't fill since * doesn't set background
             Cell emptyCell = buffer.get(0, 3);
-            assertThat(emptyCell.style().bg()).hasValue(Color.BLACK);
+            assertThat(emptyCell.style().bg()).isEmpty();
         }
     }
 
@@ -257,109 +262,149 @@ class DetailedCssRenderingTest {
         }
 
         @Test
-        @DisplayName("TextElement renders with black foreground on #eeeeee background")
-        void textElement_rendersBlackOnLightGray() {
+        @DisplayName("TextElement renders with #1a1a1a foreground (no background from *)")
+        void textElement_rendersBlackForeground() {
             TextElement text = new TextElement("Hello");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
             assertThat(cell.symbol()).isEqualTo("H");
-            assertThat(cell.style().fg()).hasValue(Color.BLACK);
-            assertThat(cell.style().bg()).isPresent();
-            Color.Rgb bg = (Color.Rgb) cell.style().bg().get();
-            assertThat(bg.r()).isEqualTo(0xee);
+            // Foreground from * selector: #1a1a1a
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x1a);
+            // Background is NOT set on * selector - TextElement is transparent
+            assertThat(cell.style().bg()).isEmpty();
         }
 
         @Test
-        @DisplayName("TextElement.primary renders with blue foreground")
+        @DisplayName("TextElement.primary renders with #0055aa foreground")
         void textElement_primary_rendersBlue() {
             TextElement text = new TextElement("Primary");
             text.addClass("primary");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.BLUE);
+            // Demo CSS: .primary { color: #0055aa }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x55);
+            assertThat(fg.b()).isEqualTo(0xaa);
         }
 
         @Test
-        @DisplayName("TextElement.secondary renders with gray foreground")
+        @DisplayName("TextElement.secondary renders with #555555 foreground")
         void textElement_secondary_rendersGray() {
             TextElement text = new TextElement("Secondary");
             text.addClass("secondary");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.GRAY);
+            // Demo CSS: .secondary { color: #555555 }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x55);
         }
 
         @Test
-        @DisplayName("TextElement.warning renders with yellow foreground")
+        @DisplayName("TextElement.warning renders with #996600 foreground")
         void textElement_warning_rendersYellow() {
             TextElement text = new TextElement("Warning");
             text.addClass("warning");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.YELLOW);
+            // Demo CSS: .warning { color: #996600 }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x99);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0x00);
         }
 
         @Test
-        @DisplayName("TextElement.error renders with red foreground")
+        @DisplayName("TextElement.error renders with #cc0000 foreground")
         void textElement_error_rendersRed() {
             TextElement text = new TextElement("Error");
             text.addClass("error");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.RED);
+            // Demo CSS: .error { color: #cc0000 }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0xcc);
+            assertThat(fg.g()).isEqualTo(0x00);
+            assertThat(fg.b()).isEqualTo(0x00);
         }
 
         @Test
-        @DisplayName("TextElement.success renders with green foreground")
+        @DisplayName("TextElement.success renders with #007700 foreground")
         void textElement_success_rendersGreen() {
             TextElement text = new TextElement("Success");
             text.addClass("success");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.GREEN);
+            // Demo CSS: .success { color: #007700 }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x77);
+            assertThat(fg.b()).isEqualTo(0x00);
         }
 
         @Test
-        @DisplayName("TextElement.info renders with cyan foreground")
+        @DisplayName("TextElement.info renders with #006688 foreground")
         void textElement_info_rendersCyan() {
             TextElement text = new TextElement("Info");
             text.addClass("info");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.CYAN);
+            // Demo CSS: .info { color: #006688 }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName("TextElement.header renders with blue foreground")
+        @DisplayName("TextElement.header renders with #0066cc foreground")
         void textElement_header_rendersBlue() {
             TextElement text = new TextElement("Header");
             text.addClass("header");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.BLUE);
+            // Demo CSS: .header { color: $accent } where $accent: #0066cc
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0xcc);
         }
 
         @Test
-        @DisplayName("TextElement#theme-indicator renders with blue foreground")
+        @DisplayName("TextElement#theme-indicator renders with #0066cc foreground")
         void textElement_themeIndicator_rendersBlue() {
             TextElement text = new TextElement("LIGHT");
             text.id("theme-indicator");
             text.render(frame, new Rect(0, 0, 10, 1), context);
 
             Cell cell = buffer.get(0, 0);
-            assertThat(cell.style().fg()).hasValue(Color.BLUE);
+            // Demo CSS: #theme-indicator { color: #0066cc }
+            assertThat(cell.style().fg()).isPresent();
+            Color.Rgb fg = (Color.Rgb) cell.style().fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0xcc);
         }
 
         @Test
-        @DisplayName("Panel border renders with #666666 foreground")
+        @DisplayName("Panel border renders with #888888 foreground")
         void panel_border_rendersGray() {
             Panel panel = new Panel(new TextElement("Content"));
             panel.render(frame, new Rect(0, 0, 20, 5), context);
@@ -368,13 +413,13 @@ class DetailedCssRenderingTest {
             Cell borderCell = buffer.get(0, 0);
             System.out.println("Light Panel border: " + borderCell.style());
             assertThat(borderCell.style().fg()).isPresent();
-            // #666666 = RGB(102, 102, 102)
+            // Demo CSS: Panel { border-color: $border-color } where $border-color: #888888
             Color.Rgb borderColor = (Color.Rgb) borderCell.style().fg().get();
-            assertThat(borderColor.r()).isEqualTo(0x66);
+            assertThat(borderColor.r()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName("Panel with title renders title with #666666 foreground")
+        @DisplayName("Panel with title renders title with #888888 foreground")
         void panel_title_rendersGray() {
             Panel panel = new Panel(new TextElement("Content"));
             panel.title("Style Classes");
@@ -385,9 +430,9 @@ class DetailedCssRenderingTest {
             System.out.println("Light Panel title cell: symbol='" + titleCell.symbol() + "' style=" + titleCell.style());
             assertThat(titleCell.symbol()).isEqualTo("S");
             assertThat(titleCell.style().fg()).isPresent();
-            // #666666 = RGB(102, 102, 102)
+            // Title inherits foreground from border-color: #888888
             Color.Rgb titleColor = (Color.Rgb) titleCell.style().fg().get();
-            assertThat(titleColor.r()).isEqualTo(0x66);
+            assertThat(titleColor.r()).isEqualTo(0x88);
         }
 
         @Test
@@ -400,13 +445,13 @@ class DetailedCssRenderingTest {
             Cell borderCell = buffer.get(0, 0);
             System.out.println("Light Status border: " + borderCell.style());
             assertThat(borderCell.style().fg()).isPresent();
-            // #888888 = RGB(136, 136, 136)
+            // Demo CSS: .status { border-color: #888888 }
             Color.Rgb expectedColor = (Color.Rgb) borderCell.style().fg().get();
             assertThat(expectedColor.r()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName("Panel.status background renders with #cccccc")
+        @DisplayName("Panel.status background renders with #eeeeee (from $bg-primary)")
         void panel_status_background_rendersLightGray() {
             Panel panel = new Panel(new TextElement("Status"));
             panel.addClass("status");
@@ -414,35 +459,31 @@ class DetailedCssRenderingTest {
 
             Cell borderCell = buffer.get(0, 0);
             assertThat(borderCell.style().bg()).isPresent();
-            // #cccccc = RGB(204, 204, 204)
+            // Demo CSS: .status { background: $bg-primary } which is #eeeeee in light theme
             Color.Rgb bgColor = (Color.Rgb) borderCell.style().bg().get();
-            assertThat(bgColor.r()).isEqualTo(0xcc);
+            assertThat(bgColor.r()).isEqualTo(0xee);
         }
 
         @Test
-        @DisplayName("Row fills area with #eeeeee background")
-        void row_fillsWithLightGrayBackground() {
+        @DisplayName("Row does not fill area (no background from *)")
+        void row_noBackgroundFromUniversalSelector() {
             Row row = new Row(new TextElement("Hello"));
             row.render(frame, new Rect(0, 0, 20, 1), context);
 
-            // Check cell beyond text content
+            // Check cell beyond text content - Row doesn't fill since * doesn't set background
             Cell emptyCell = buffer.get(15, 0);
-            assertThat(emptyCell.style().bg()).isPresent();
-            Color.Rgb bg = (Color.Rgb) emptyCell.style().bg().get();
-            assertThat(bg.r()).isEqualTo(0xee);
+            assertThat(emptyCell.style().bg()).isEmpty();
         }
 
         @Test
-        @DisplayName("Column fills area with #eeeeee background")
-        void column_fillsWithLightGrayBackground() {
+        @DisplayName("Column does not fill area (no background from *)")
+        void column_noBackgroundFromUniversalSelector() {
             Column column = new Column(new TextElement("Hello"));
             column.render(frame, new Rect(0, 0, 20, 5), context);
 
-            // Check cell below text content
+            // Check cell below text content - Column doesn't fill since * doesn't set background
             Cell emptyCell = buffer.get(0, 3);
-            assertThat(emptyCell.style().bg()).isPresent();
-            Color.Rgb bg = (Color.Rgb) emptyCell.style().bg().get();
-            assertThat(bg.r()).isEqualTo(0xee);
+            assertThat(emptyCell.style().bg()).isEmpty();
         }
     }
 
@@ -455,7 +496,7 @@ class DetailedCssRenderingTest {
     class NestedStructureRendering {
 
         @Test
-        @DisplayName("LIGHT: Panel inside Row inside Column renders border with #666666 foreground")
+        @DisplayName("LIGHT: Panel inside Row inside Column renders border with #888888 foreground")
         void light_nestedPanel_borderRendersGray() {
             styleEngine.setActiveStylesheet("light");
 
@@ -473,16 +514,16 @@ class DetailedCssRenderingTest {
             Cell borderCell = buffer.get(0, 0);
             System.out.println("LIGHT nested panel border: " + borderCell.style());
 
-            // Border should be #666666 (CSS: border-color: #666666)
+            // Border should be #888888 (CSS: Panel { border-color: $border-color } where $border-color: #888888)
             assertThat(borderCell.style().fg()).isPresent();
             Color.Rgb borderColor = (Color.Rgb) borderCell.style().fg().get();
             assertThat(borderColor.r())
-                .describedAs("Light theme panel border should be #666666")
-                .isEqualTo(0x66);
+                .describedAs("Light theme panel border should be #888888")
+                .isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName("LIGHT: Panel title inside Row inside Column renders with #666666 foreground")
+        @DisplayName("LIGHT: Panel title inside Row inside Column renders with #888888 foreground")
         void light_nestedPanel_titleRendersGray() {
             styleEngine.setActiveStylesheet("light");
 
@@ -502,8 +543,8 @@ class DetailedCssRenderingTest {
             assertThat(titleCell.style().fg()).isPresent();
             Color.Rgb titleColor = (Color.Rgb) titleCell.style().fg().get();
             assertThat(titleColor.r())
-                .describedAs("Light theme panel title should be #666666")
-                .isEqualTo(0x66);
+                .describedAs("Light theme panel title should be #888888")
+                .isEqualTo(0x88);
         }
 
         @Test
@@ -528,7 +569,7 @@ class DetailedCssRenderingTest {
         }
 
         @Test
-        @DisplayName("LIGHT: Exact CssDemo structure - Panel border should be #666666")
+        @DisplayName("LIGHT: Exact CssDemo structure - Panel border should be #888888")
         void light_exactDemoStructure_borderRendersGray() {
             styleEngine.setActiveStylesheet("light");
 
@@ -549,11 +590,11 @@ class DetailedCssRenderingTest {
             System.out.println("LIGHT exact demo border: " + borderCell.style());
 
             assertThat(borderCell.style().fg()).isPresent();
-            // #666666 = RGB(102, 102, 102)
+            // Demo CSS: Panel { border-color: $border-color } where $border-color: #888888
             Color.Rgb borderColor = (Color.Rgb) borderCell.style().fg().get();
             assertThat(borderColor.r())
-                .describedAs("Light theme border should be #666666")
-                .isEqualTo(0x66);
+                .describedAs("Light theme border should be #888888")
+                .isEqualTo(0x88);
         }
 
         @Test
@@ -581,12 +622,12 @@ class DetailedCssRenderingTest {
 
             assertThat(titleCell.symbol()).isEqualTo("S");
 
-            // Title foreground should be #666666 (border-color)
+            // Title foreground should be #888888 (border-color)
             assertThat(titleCell.style().fg()).isPresent();
             Color.Rgb titleColor = (Color.Rgb) titleCell.style().fg().get();
             assertThat(titleColor.r())
-                .describedAs("Title fg should be #666666")
-                .isEqualTo(0x66);
+                .describedAs("Title fg should be #888888")
+                .isEqualTo(0x88);
 
             // Title background should be #eeeeee (Panel background) - NOT null/absent!
             assertThat(titleCell.style().bg())
@@ -689,8 +730,8 @@ class DetailedCssRenderingTest {
         }
 
         @Test
-        @DisplayName("TextElement colors change when theme switches")
-        void textElement_colorsChange() {
+        @DisplayName("TextElement foreground color changes when theme switches")
+        void textElement_foregroundChanges() {
             TextElement text = new TextElement("Test");
 
             // Dark theme
@@ -704,11 +745,15 @@ class DetailedCssRenderingTest {
             text.render(frame, new Rect(0, 0, 10, 1), context);
             Cell lightCell = buffer.get(0, 0);
 
-            // Both fg and bg should change
+            // Foreground should change (dark = white, light = #1a1a1a)
             assertThat(darkCell.style().fg()).hasValue(Color.WHITE);
-            assertThat(lightCell.style().fg()).hasValue(Color.BLACK);
-            assertThat(darkCell.style().bg()).hasValue(Color.BLACK);
-            assertThat(lightCell.style().bg().get()).isInstanceOf(Color.Rgb.class);
+            assertThat(lightCell.style().fg()).isPresent();
+            Color.Rgb lightFg = (Color.Rgb) lightCell.style().fg().get();
+            assertThat(lightFg.r()).isEqualTo(0x1a);
+
+            // Background should be empty in both (no background from * selector)
+            assertThat(darkCell.style().bg()).isEmpty();
+            assertThat(lightCell.style().bg()).isEmpty();
         }
 
         @Test
@@ -723,12 +768,16 @@ class DetailedCssRenderingTest {
             Cell darkCell = buffer.get(0, 0);
             assertThat(darkCell.style().fg()).hasValue(Color.CYAN);
 
-            // Reset and switch to light - blue
+            // Reset and switch to light - #0055aa
             resetBuffer();
             styleEngine.setActiveStylesheet("light");
             text.render(frame, new Rect(0, 0, 10, 1), context);
             Cell lightCell = buffer.get(0, 0);
-            assertThat(lightCell.style().fg()).hasValue(Color.BLUE);
+            assertThat(lightCell.style().fg()).isPresent();
+            Color.Rgb lightFg = (Color.Rgb) lightCell.style().fg().get();
+            assertThat(lightFg.r()).isEqualTo(0x00);
+            assertThat(lightFg.g()).isEqualTo(0x55);
+            assertThat(lightFg.b()).isEqualTo(0xaa);
         }
     }
 }

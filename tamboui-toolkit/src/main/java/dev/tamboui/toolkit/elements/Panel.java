@@ -22,12 +22,12 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderSet;
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderSet;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.widgets.block.Borders;
-import dev.tamboui.widgets.block.Padding;
+import dev.tamboui.layout.Padding;
 import dev.tamboui.widgets.block.Title;
-import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.style.Overflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A container element with borders and title.
@@ -549,20 +550,18 @@ public final class Panel extends ContainerElement<Panel> {
             return null;
         }
 
-        Map<String, String> props = cssResolver.additionalProperties();
-
         // Check if any border customization is present
-        String borderChars = props.get("border-chars");
-        boolean hasIndividualOverrides = props.containsKey("border-top") ||
-                props.containsKey("border-bottom") ||
-                props.containsKey("border-left") ||
-                props.containsKey("border-right") ||
-                props.containsKey("border-top-left") ||
-                props.containsKey("border-top-right") ||
-                props.containsKey("border-bottom-left") ||
-                props.containsKey("border-bottom-right");
+        Optional<String> borderChars = cssResolver.borderChars();
+        boolean hasIndividualOverrides = cssResolver.borderTop().isPresent() ||
+                cssResolver.borderBottom().isPresent() ||
+                cssResolver.borderLeft().isPresent() ||
+                cssResolver.borderRight().isPresent() ||
+                cssResolver.borderTopLeft().isPresent() ||
+                cssResolver.borderTopRight().isPresent() ||
+                cssResolver.borderBottomLeft().isPresent() ||
+                cssResolver.borderBottomRight().isPresent();
 
-        if (borderChars == null && !hasIndividualOverrides) {
+        if (!borderChars.isPresent() && !hasIndividualOverrides) {
             return null;
         }
 
@@ -574,22 +573,22 @@ public final class Panel extends ContainerElement<Panel> {
         }
 
         // Parse border-chars if present (overrides border-type)
-        if (borderChars != null) {
-            BorderSet parsed = parseBorderChars(borderChars);
+        if (borderChars.isPresent()) {
+            BorderSet parsed = parseBorderChars(borderChars.get());
             if (parsed != null) {
                 baseSet = parsed;
             }
         }
 
         // Apply individual property overrides
-        String top = props.getOrDefault("border-top", baseSet.topHorizontal());
-        String bottom = props.getOrDefault("border-bottom", baseSet.bottomHorizontal());
-        String left = props.getOrDefault("border-left", baseSet.leftVertical());
-        String right = props.getOrDefault("border-right", baseSet.rightVertical());
-        String topLeft = props.getOrDefault("border-top-left", baseSet.topLeft());
-        String topRight = props.getOrDefault("border-top-right", baseSet.topRight());
-        String bottomLeft = props.getOrDefault("border-bottom-left", baseSet.bottomLeft());
-        String bottomRight = props.getOrDefault("border-bottom-right", baseSet.bottomRight());
+        String top = cssResolver.borderTop().orElse(baseSet.topHorizontal());
+        String bottom = cssResolver.borderBottom().orElse(baseSet.bottomHorizontal());
+        String left = cssResolver.borderLeft().orElse(baseSet.leftVertical());
+        String right = cssResolver.borderRight().orElse(baseSet.rightVertical());
+        String topLeft = cssResolver.borderTopLeft().orElse(baseSet.topLeft());
+        String topRight = cssResolver.borderTopRight().orElse(baseSet.topRight());
+        String bottomLeft = cssResolver.borderBottomLeft().orElse(baseSet.bottomLeft());
+        String bottomRight = cssResolver.borderBottomRight().orElse(baseSet.bottomRight());
 
         return new BorderSet(top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight);
     }

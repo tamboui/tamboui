@@ -12,7 +12,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
 import java.io.PrintWriter;

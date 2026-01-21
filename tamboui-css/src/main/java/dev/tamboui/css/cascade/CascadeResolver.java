@@ -9,8 +9,12 @@ import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.property.PropertyConverter;
 import dev.tamboui.css.property.PropertyRegistry;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.StandardProperties;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Resolves CSS cascade and specificity to produce final computed styles.
@@ -23,23 +27,44 @@ import java.util.*;
  *   <li>!important declarations override all non-important</li>
  *   <li>Merge all matching declarations into a final style</li>
  * </ol>
+ * <p>
+ * Unknown properties (those not registered in {@link StandardProperties}) are handled
+ * according to the configured {@link UnknownPropertyBehavior}.
  */
 public final class CascadeResolver {
 
-    private final PropertyRegistry propertyRegistry;
+    private static final Logger LOGGER = Logger.getLogger(CascadeResolver.class.getName());
+
+    private final UnknownPropertyBehavior unknownPropertyBehavior;
 
     /**
-     * Creates a new cascade resolver with the default property registry.
+     * Creates a new cascade resolver with default behavior (IGNORE unknown properties).
      */
     public CascadeResolver() {
-        this.propertyRegistry = PropertyRegistry.createDefault();
+        this(UnknownPropertyBehavior.IGNORE);
+    }
+
+    /**
+     * Creates a new cascade resolver with the specified unknown property behavior.
+     *
+     * @param unknownPropertyBehavior how to handle unknown CSS properties
+     */
+    public CascadeResolver(UnknownPropertyBehavior unknownPropertyBehavior) {
+        this.unknownPropertyBehavior = unknownPropertyBehavior != null
+                ? unknownPropertyBehavior
+                : UnknownPropertyBehavior.IGNORE;
     }
 
     /**
      * Creates a cascade resolver with a custom property registry.
+     *
+     * @param propertyRegistry the property registry (currently unused but kept for API compatibility)
+     * @deprecated The propertyRegistry parameter is no longer used.
+     *             Use {@link #CascadeResolver()} instead.
      */
+    @Deprecated
     public CascadeResolver(PropertyRegistry propertyRegistry) {
-        this.propertyRegistry = propertyRegistry;
+        this(UnknownPropertyBehavior.IGNORE);
     }
 
     /**
@@ -105,83 +130,15 @@ public final class CascadeResolver {
             String prop = entry.getKey();
             String value = entry.getValue().raw();
 
-            switch (prop) {
-                case "color":
-                    propertyRegistry.convertColor(value, variables)
-                            .ifPresent(builder::foreground);
-                    break;
-                case "background":
-                case "background-color":
-                    propertyRegistry.convertColor(value, variables)
-                            .ifPresent(builder::background);
-                    break;
-                case "text-style":
-                    propertyRegistry.convertModifiers(value, variables)
-                            .ifPresent(builder::addModifiers);
-                    break;
-                case "padding":
-                    propertyRegistry.convertPadding(value, variables)
-                            .ifPresent(builder::padding);
-                    break;
-                case "text-align":
-                    propertyRegistry.convertAlignment(value, variables)
-                            .ifPresent(builder::alignment);
-                    break;
-                case "border-type":
-                    propertyRegistry.convertBorderType(value, variables)
-                            .ifPresent(builder::borderType);
-                    break;
-                case "border-chars":
-                    // Store as additional property - Panel will parse it
-                    builder.property(prop, PropertyConverter.resolveVariables(value, variables));
-                    break;
-                case "border-top":
-                case "border-bottom":
-                case "border-left":
-                case "border-right":
-                case "border-top-left":
-                case "border-top-right":
-                case "border-bottom-left":
-                case "border-bottom-right":
-                    // Store individual border character overrides in additionalProperties
-                    // Only store if it's a valid border character:
-                    // - Quoted string (any content, including empty)
-                    // - Single character or short string (for unicode)
-                    // Skip values that look like parser errors (e.g., "height: 3" when
-                    // the parser consumed the next property due to missing semicolon)
-                    String resolvedBorderValue = PropertyConverter.resolveVariables(value, variables);
-                    if (isValidBorderChar(resolvedBorderValue)) {
-                        builder.property(prop, parseQuotedChar(resolvedBorderValue));
-                    }
-                    break;
-                case "width":
-                    propertyRegistry.convertConstraint(value, variables)
-                            .ifPresent(builder::widthConstraint);
-                    break;
-                case "flex":
-                    propertyRegistry.convertFlex(value, variables)
-                            .ifPresent(builder::flex);
-                    break;
-                case "direction":
-                    propertyRegistry.convertDirection(value, variables)
-                            .ifPresent(builder::direction);
-                    break;
-                case "margin":
-                    propertyRegistry.convertMargin(value, variables)
-                            .ifPresent(builder::margin);
-                    break;
-                case "spacing":
-                    propertyRegistry.convertSpacing(value, variables)
-                            .ifPresent(builder::spacing);
-                    break;
-                case "height":
-                    propertyRegistry.convertConstraint(value, variables)
-                            .ifPresent(builder::heightConstraint);
-                    break;
-                default:
-                    // Store as additional property for later use
-                    builder.property(prop, PropertyConverter.resolveVariables(value, variables));
-                    break;
+            // Try to look up the property in the registry
+            Optional<PropertyDefinition<?>> propDef = StandardProperties.byName(prop);
+
+            if (propDef.isPresent()) {
+                // Handle known properties through the registry
+                convertAndSet(builder, propDef.get(), value, variables);
+            } else {
+                // Handle unknown properties according to configured behavior
+                handleUnknownProperty(prop, value);
             }
         }
 
@@ -189,57 +146,33 @@ public final class CascadeResolver {
     }
 
     /**
-     * Checks if a value is quoted (starts and ends with matching quotes).
+     * Converts and sets a property value using the PropertyDefinition.
      */
-    private boolean isQuoted(String value) {
-        if (value == null || value.length() < 2) {
-            return false;
-        }
-        char first = value.charAt(0);
-        char last = value.charAt(value.length() - 1);
-        return (first == '"' || first == '\'') && first == last;
+    @SuppressWarnings("unchecked")
+    private <T> void convertAndSet(CssStyleResolver.Builder builder,
+                                   PropertyDefinition<T> property,
+                                   String value,
+                                   Map<String, String> variables) {
+        String resolvedValue = PropertyConverter.resolveVariables(value, variables);
+        Optional<T> converted = property.convert(resolvedValue);
+        converted.ifPresent(v -> builder.set(property, v));
     }
 
     /**
-     * Checks if a value is a valid border character.
-     * Valid border characters are:
-     * - Quoted strings (any content, including empty - explicit intent)
-     * - Single characters or short unicode sequences (up to 4 chars)
-     * - NOT empty unquoted strings
-     * - NOT long strings that look like parser errors (e.g., "height: 3")
+     * Handles unknown properties according to the configured behavior.
      */
-    private boolean isValidBorderChar(String value) {
-        if (value == null) {
-            return false;
+    private void handleUnknownProperty(String prop, String value) {
+        switch (unknownPropertyBehavior) {
+            case IGNORE:
+                // Do nothing
+                break;
+            case WARN:
+                LOGGER.log(Level.WARNING, "Unknown CSS property: {0}", prop);
+                break;
+            case FAIL:
+                throw new UnknownCssPropertyException(prop, value);
+                // no default needed - all enum values covered
         }
-        // Quoted strings are always valid (explicit user intent)
-        if (isQuoted(value)) {
-            return true;
-        }
-        // Unquoted: must be non-empty and short (single char or unicode grapheme)
-        String trimmed = value.trim();
-        if (trimmed.isEmpty()) {
-            return false;
-        }
-        // Allow short strings (single char, or unicode that might be multiple code units)
-        // Reject anything longer than 4 characters - likely a parser error
-        return trimmed.length() <= 4 && !trimmed.contains(":");
-    }
-
-    /**
-     * Parses a quoted character value like {@code 'x'} or {@code "─"}.
-     * Returns the content without quotes, or the original value if not quoted.
-     */
-    private String parseQuotedChar(String value) {
-        if (value == null || value.length() < 2) {
-            return value;
-        }
-        char first = value.charAt(0);
-        char last = value.charAt(value.length() - 1);
-        if ((first == '"' || first == '\'') && first == last) {
-            return value.substring(1, value.length() - 1);
-        }
-        return value;
     }
 
     /**

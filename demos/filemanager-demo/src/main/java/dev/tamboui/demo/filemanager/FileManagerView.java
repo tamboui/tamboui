@@ -20,7 +20,7 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.style.Overflow;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -14,7 +14,7 @@ import dev.tamboui.text.Span;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
 /**

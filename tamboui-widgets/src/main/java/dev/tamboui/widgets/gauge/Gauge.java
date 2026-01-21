@@ -9,11 +9,10 @@ import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardPropertyKeys;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
@@ -56,8 +55,8 @@ public final class Gauge implements Widget {
      * <p>
      * CSS property name: {@code gauge-color}
      */
-    public static final PropertyKey<Color> GAUGE_COLOR =
-            PropertyKey.of("gauge-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> GAUGE_COLOR =
+            PropertyDefinition.of("gauge-color", ColorConverter.INSTANCE);
 
     private final double ratio;
     private final Line label;
@@ -73,8 +72,8 @@ public final class Gauge implements Widget {
         this.useUnicode = builder.useUnicode;
 
         // Resolve style-aware properties
-        Color resolvedBg = builder.background.resolve();
-        Color resolvedGaugeColor = builder.gaugeColor.resolve();
+        Color resolvedBg = builder.resolveBackground();
+        Color resolvedGaugeColor = builder.resolveGaugeColor();
 
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
@@ -195,11 +194,9 @@ public final class Gauge implements Widget {
         private boolean useUnicode = true;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties bound to this builder's resolver
-        private final StyledProperty<Color> background =
-                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
-        private final StyledProperty<Color> gaugeColor =
-                StyledProperty.of(GAUGE_COLOR, null, () -> styleResolver);
+        // Style-aware properties (resolved via styleResolver in build())
+        private Color background;
+        private Color gaugeColor;
 
         private Builder() {}
 
@@ -310,7 +307,7 @@ public final class Gauge implements Widget {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background.set(color);
+            this.background = color;
             return this;
         }
 
@@ -323,12 +320,21 @@ public final class Gauge implements Widget {
          * @return this builder
          */
         public Builder gaugeColor(Color color) {
-            this.gaugeColor.set(color);
+            this.gaugeColor = color;
             return this;
         }
 
         public Gauge build() {
             return new Gauge(this);
+        }
+
+        // Resolution helpers
+        private Color resolveBackground() {
+            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
+        }
+
+        private Color resolveGaugeColor() {
+            return styleResolver.resolve(GAUGE_COLOR, gaugeColor);
         }
     }
 }

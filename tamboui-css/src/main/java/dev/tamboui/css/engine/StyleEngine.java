@@ -80,7 +80,7 @@ public final class StyleEngine {
     private StyleEngine(PropertyRegistry propertyRegistry) {
         this.namedStylesheets = new LinkedHashMap<>();
         this.inlineStylesheets = new ArrayList<>();
-        this.cascadeResolver = new CascadeResolver(propertyRegistry);
+        this.cascadeResolver = new CascadeResolver();
         this.propertyRegistry = propertyRegistry;
         this.listeners = new CopyOnWriteArrayList<>();
         this.activeStylesheetName = null;

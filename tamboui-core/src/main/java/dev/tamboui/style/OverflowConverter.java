@@ -2,9 +2,7 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.widgets.text;
-
-import dev.tamboui.style.PropertyConverter;
+package dev.tamboui.style;
 
 import java.util.HashMap;
 import java.util.Map;

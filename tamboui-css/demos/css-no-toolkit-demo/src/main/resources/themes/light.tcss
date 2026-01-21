@@ -7,10 +7,9 @@ $border-color: #888888;
 $focus-color: #0066cc;
 $highlight-bg: #d0d0d0;
 
-/* Base styles */
+/* Base styles - color is inheritable, background is not */
 * {
     color: $fg-primary;
-    background: $bg-primary;
 }
 
 /* Panel styling */
@@ -65,7 +64,7 @@ ListElement-item:nth-child(odd) {
 
 /* Status bar */
 .status {
-    background: #c8c8c8;
+    background: $bg-primary;
     color: #1a1a1a;
     border-color: #888888;
 }

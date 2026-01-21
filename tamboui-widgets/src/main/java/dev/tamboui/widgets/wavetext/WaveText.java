@@ -9,10 +9,9 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.DoubleConverter;
 import dev.tamboui.style.IntegerConverter;
-import dev.tamboui.style.PropertyKey;
-import dev.tamboui.style.StandardPropertyKeys;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledProperty;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.widget.StatefulWidget;
 
@@ -74,26 +73,26 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
     /**
      * The {@code wave-dim-factor} property for the dim factor (0.0-1.0).
      */
-    public static final PropertyKey<Double> DIM_FACTOR =
-            PropertyKey.of("wave-dim-factor", DoubleConverter.INSTANCE);
+    public static final PropertyDefinition<Double> DIM_FACTOR =
+            PropertyDefinition.of("wave-dim-factor", DoubleConverter.INSTANCE);
 
     /**
      * The {@code wave-peak-width} property for the peak width in characters.
      */
-    public static final PropertyKey<Integer> PEAK_WIDTH =
-            PropertyKey.of("wave-peak-width", IntegerConverter.INSTANCE);
+    public static final PropertyDefinition<Integer> PEAK_WIDTH =
+            PropertyDefinition.of("wave-peak-width", IntegerConverter.INSTANCE);
 
     /**
      * The {@code wave-peak-count} property for the number of peaks.
      */
-    public static final PropertyKey<Integer> PEAK_COUNT =
-            PropertyKey.of("wave-peak-count", IntegerConverter.INSTANCE);
+    public static final PropertyDefinition<Integer> PEAK_COUNT =
+            PropertyDefinition.of("wave-peak-count", IntegerConverter.INSTANCE);
 
     /**
      * The {@code wave-speed} property for animation speed multiplier.
      */
-    public static final PropertyKey<Double> SPEED =
-            PropertyKey.of("wave-speed", DoubleConverter.INSTANCE);
+    public static final PropertyDefinition<Double> SPEED =
+            PropertyDefinition.of("wave-speed", DoubleConverter.INSTANCE);
 
     private final String text;
     private final Color color;
@@ -107,11 +106,11 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
 
     private WaveText(Builder builder) {
         this.text = builder.text;
-        this.color = builder.colorProp.resolve();
-        this.dimFactor = builder.dimFactorProp.resolve();
-        this.peakWidth = builder.peakWidthProp.resolve();
-        this.peakCount = builder.peakCountProp.resolve();
-        this.speed = builder.speedProp.resolve();
+        this.color = builder.resolveColor();
+        this.dimFactor = builder.resolveDimFactor();
+        this.peakWidth = builder.resolvePeakWidth();
+        this.peakCount = builder.resolvePeakCount();
+        this.speed = builder.resolveSpeed();
         this.mode = builder.mode;
         this.inverted = builder.inverted;
         this.baseStyle = builder.baseStyle;
@@ -270,17 +269,12 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
         private Style baseStyle = Style.EMPTY;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties bound to this builder's resolver
-        private final StyledProperty<Color> colorProp =
-                StyledProperty.of(StandardPropertyKeys.COLOR, Color.WHITE, () -> styleResolver);
-        private final StyledProperty<Double> dimFactorProp =
-                StyledProperty.of(DIM_FACTOR, 0.3, () -> styleResolver);
-        private final StyledProperty<Integer> peakWidthProp =
-                StyledProperty.of(PEAK_WIDTH, 3, () -> styleResolver);
-        private final StyledProperty<Integer> peakCountProp =
-                StyledProperty.of(PEAK_COUNT, 1, () -> styleResolver);
-        private final StyledProperty<Double> speedProp =
-                StyledProperty.of(SPEED, 1.0, () -> styleResolver);
+        // Style-aware properties (resolved via styleResolver in build())
+        private Color color;
+        private Double dimFactor;
+        private Integer peakWidth;
+        private Integer peakCount;
+        private Double speed;
 
         private Builder() {}
 
@@ -302,7 +296,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
          * @return this builder
          */
         public Builder color(Color color) {
-            this.colorProp.set(color);
+            this.color = color;
             return this;
         }
 
@@ -316,7 +310,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
          * @return this builder
          */
         public Builder dimFactor(double dimFactor) {
-            this.dimFactorProp.set(Math.max(0.0, Math.min(1.0, dimFactor)));
+            this.dimFactor = Math.max(0.0, Math.min(1.0, dimFactor));
             return this;
         }
 
@@ -329,7 +323,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
          * @return this builder
          */
         public Builder peakWidth(int peakWidth) {
-            this.peakWidthProp.set(Math.max(1, peakWidth));
+            this.peakWidth = Math.max(1, peakWidth);
             return this;
         }
 
@@ -342,7 +336,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
          * @return this builder
          */
         public Builder peakCount(int peakCount) {
-            this.peakCountProp.set(Math.max(1, peakCount));
+            this.peakCount = Math.max(1, peakCount);
             return this;
         }
 
@@ -356,7 +350,7 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
          * @return this builder
          */
         public Builder speed(double speed) {
-            this.speedProp.set(Math.max(0.1, speed));
+            this.speed = Math.max(0.1, speed);
             return this;
         }
 
@@ -436,6 +430,32 @@ public final class WaveText implements StatefulWidget<WaveTextState> {
          */
         public WaveText build() {
             return new WaveText(this);
+        }
+
+        // Resolution helpers
+        private Color resolveColor() {
+            Color resolved = styleResolver.resolve(StandardProperties.COLOR, color);
+            return resolved != null ? resolved : Color.WHITE;
+        }
+
+        private double resolveDimFactor() {
+            Double resolved = styleResolver.resolve(DIM_FACTOR, dimFactor);
+            return resolved != null ? resolved : 0.3;
+        }
+
+        private int resolvePeakWidth() {
+            Integer resolved = styleResolver.resolve(PEAK_WIDTH, peakWidth);
+            return resolved != null ? resolved : 3;
+        }
+
+        private int resolvePeakCount() {
+            Integer resolved = styleResolver.resolve(PEAK_COUNT, peakCount);
+            return resolved != null ? resolved : 1;
+        }
+
+        private double resolveSpeed() {
+            Double resolved = styleResolver.resolve(SPEED, speed);
+            return resolved != null ? resolved : 1.0;
         }
     }
 }

@@ -209,6 +209,128 @@ try (var runner = ToolkitRunner.builder()
 }
 ----
 
+== CSS Property Support
+
+Widgets can support CSS styling by accepting a `StylePropertyResolver` and using `PropertyDefinition` to define custom properties.
+
+=== Defining Custom Properties
+
+Define custom properties as static constants using `PropertyDefinition`:
+
+[source,java]
+----
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.Color;
+
+public class MyGauge implements Widget {
+    // Define a custom property for the filled bar color
+    public static final PropertyDefinition<Color> BAR_COLOR =
+        PropertyDefinition.of("bar-color", ColorConverter.INSTANCE);
+
+    // ...
+}
+----
+
+This allows users to style your widget with CSS:
+
+[source,css]
+----
+MyGauge {
+    bar-color: green;
+}
+----
+
+=== Using StylePropertyResolver
+
+Widgets accept a `StylePropertyResolver` through their builder to resolve CSS values:
+
+[source,java]
+----
+public class MyGauge implements Widget {
+    public static final PropertyDefinition<Color> BAR_COLOR =
+        PropertyDefinition.of("bar-color", ColorConverter.INSTANCE);
+
+    private final Color barColor;
+
+    private MyGauge(Builder builder) {
+        // Resolve: programmatic value → CSS value → property default
+        this.barColor = builder.resolveBarColor();
+    }
+
+    public static final class Builder {
+        private Color barColor;  // Programmatic value
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+
+        public Builder barColor(Color color) {
+            this.barColor = color;
+            return this;
+        }
+
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        private Color resolveBarColor() {
+            return styleResolver.resolve(BAR_COLOR, barColor);
+        }
+
+        public MyGauge build() {
+            return new MyGauge(this);
+        }
+    }
+}
+----
+
+The resolution order is:
+
+1. **Programmatic value** - value set via builder method (e.g., `.barColor(Color.GREEN)`)
+2. **CSS value** - value from the style resolver
+3. **Property default** - value from `PropertyDefinition.defaultValue()`
+
+=== Using Standard Properties
+
+For common properties like `color` and `background`, use `StandardProperties`:
+
+[source,java]
+----
+import dev.tamboui.style.StandardProperties;
+
+// In your resolution method:
+Color bg = styleResolver.resolve(StandardProperties.BACKGROUND, this.background);
+Color fg = styleResolver.resolve(StandardProperties.COLOR, this.foreground);
+----
+
+=== Inheritable vs Non-Inheritable
+
+Inheritance controls whether a property value flows from parent elements to children in the element tree.
+
+**Inheritable properties** (like `color`) propagate down automatically:
+
+[source,css]
+----
+Panel {
+    color: cyan;  /* All Text elements inside Panel inherit this */
+}
+----
+
+**Non-inheritable properties** (like `background`) apply only to the target element:
+
+[source,css]
+----
+Panel {
+    background: gray;  /* Only Panel gets this, not its children */
+}
+----
+
+When defining your own properties:
+
+* Use `PropertyDefinition.of(...)` for properties that should NOT inherit (most widget-specific properties like `bar-color`, `cursor-color`)
+* Use `PropertyDefinition.builder(...).inheritable().build()` for properties that SHOULD inherit (rare - typically only text-related properties)
+
+Most widget-specific properties should be non-inheritable because they control aspects unique to that widget type.
+
 == Best Practices
 
 === Widget Design

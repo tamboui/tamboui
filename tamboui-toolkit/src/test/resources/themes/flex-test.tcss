@@ -1,4 +1,9 @@
-/* Flex Layout Test Theme */
+/* CSS for flex layout tests - minimal rules for testing flex properties */
+
+/* Base styles (no background on * to allow transparency) */
+* {
+    color: white;
+}
 
 /* Horizontal panel with spacing */
 .horizontal-panel {
@@ -6,23 +11,17 @@
     spacing: 2;
 }
 
-/* Vertical panel with flex center */
-.centered-panel {
-    direction: vertical;
-    flex: center;
-}
-
 /* Panel with margin */
 .margined-panel {
     margin: 2;
 }
 
-/* Panel with symmetric margin */
-.symmetric-margin-panel {
-    margin: 1 3;
+/* Panel with centered content */
+.centered-panel {
+    flex: center;
 }
 
-/* Panel with all layout properties */
+/* Panel with full flex properties */
 .full-flex-panel {
     direction: horizontal;
     flex: space-between;

@@ -15,7 +15,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.style.Overflow;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 

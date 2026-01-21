@@ -12,13 +12,15 @@ import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
-import dev.tamboui.widgets.block.Padding;
+import dev.tamboui.layout.Padding;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,11 +33,15 @@ class CssDemoIntegrationTest {
 
     private StyleEngine styleEngine;
 
+    // Path to the demo's theme resources (single source of truth)
+    private static final Path THEMES_DIR = Paths.get("demos/css-demo/src/main/resources/themes");
+
     @BeforeEach
     void setUp() throws IOException {
         styleEngine = StyleEngine.create();
-        styleEngine.loadStylesheet("dark", "/themes/dark.tcss");
-        styleEngine.loadStylesheet("light", "/themes/light.tcss");
+        // Load from the demo's production CSS files
+        styleEngine.loadStylesheet("dark", THEMES_DIR.resolve("dark.tcss"));
+        styleEngine.loadStylesheet("light", THEMES_DIR.resolve("light.tcss"));
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -52,18 +58,18 @@ class CssDemoIntegrationTest {
         }
 
         @Test
-        @DisplayName("Universal selector (*) - provides white foreground on black background")
-        void universalSelector_providesWhiteOnBlack() {
+        @DisplayName("Universal selector (*) - provides white foreground (background NOT set on *)")
+        void universalSelector_providesWhiteForeground() {
             Styleable element = createStyleable("TextElement", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: white, background: black
+            // Expected: color: white (background is NOT set on * to allow children to be transparent)
             assertThat(style.fg()).isPresent();
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
 
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isEqualTo(Color.BLACK);
+            // Background should NOT be set - children should be transparent over parent backgrounds
+            assertThat(style.bg()).isEmpty();
         }
 
         @Test
@@ -82,19 +88,18 @@ class CssDemoIntegrationTest {
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
 
             // Expected: border-color: dark-gray (from Panel rule via $border-color variable)
-            assertThat(resolved.getProperty("border-color")).isPresent();
-            assertThat(resolved.getProperty("border-color").get()).isEqualTo("dark-gray");
+            assertThat(resolved.borderColor()).isPresent();
+            assertThat(resolved.borderColor().get()).isEqualTo(Color.DARK_GRAY);
         }
 
         @Test
-        @DisplayName("Panel - has padding: 1")
-        void panel_hasPadding() {
+        @DisplayName("Panel - no padding in demo CSS")
+        void panel_hasNoPadding() {
             Styleable panel = createStyleable("Panel", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(panel);
 
-            // Expected: padding: 1
-            assertThat(resolved.padding()).isPresent();
-            assertThat(resolved.padding().get()).isEqualTo(Padding.uniform(1));
+            // Demo CSS doesn't set padding for Panel
+            assertThat(resolved.padding()).isEmpty();
         }
 
         @Test
@@ -119,27 +124,27 @@ class CssDemoIntegrationTest {
         }
 
         @Test
-        @DisplayName(".status - dark gray background (#333333) with gray border (#666666)")
-        void statusClass_hasDarkGrayBackgroundAndBorder() {
+        @DisplayName(".status - black background (from $bg-primary) with gray border (#666666)")
+        void statusClass_hasBlackBackgroundAndBorder() {
             Styleable element = createStyleable("Panel", null, setOf("status"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: background: #333333
+            // Expected: background: black (from $bg-primary)
             assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isInstanceOf(Color.Rgb.class);
-            Color.Rgb bg = (Color.Rgb) style.bg().get();
-            assertThat(bg.r()).isEqualTo(0x33);
-            assertThat(bg.g()).isEqualTo(0x33);
-            assertThat(bg.b()).isEqualTo(0x33);
+            assertThat(style.bg().get()).isEqualTo(Color.BLACK);
 
             // Expected: color: white
             assertThat(style.fg()).isPresent();
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
 
-            // Expected: border-color: #666666 (in additionalProperties)
-            assertThat(resolved.getProperty("border-color")).isPresent();
-            assertThat(resolved.getProperty("border-color").get()).isEqualTo("#666666");
+            // Expected: border-color: #666666
+            assertThat(resolved.borderColor()).isPresent();
+            assertThat(resolved.borderColor().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb borderColor = (Color.Rgb) resolved.borderColor().get();
+            assertThat(borderColor.r()).isEqualTo(0x66);
+            assertThat(borderColor.g()).isEqualTo(0x66);
+            assertThat(borderColor.b()).isEqualTo(0x66);
         }
 
         @Test
@@ -156,9 +161,8 @@ class CssDemoIntegrationTest {
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
 
-            // Background from * rule
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isEqualTo(Color.BLACK);
+            // No background - .header class doesn't set background
+            assertThat(style.bg()).isEmpty();
         }
 
         @Test
@@ -261,29 +265,31 @@ class CssDemoIntegrationTest {
         }
 
         @Test
-        @DisplayName("Row - inherits white on black from *")
+        @DisplayName("Row - gets white foreground from * (no background)")
         void row_inheritsFromUniversal() {
             Styleable row = createStyleable("Row", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(row);
             Style style = resolved.toStyle();
 
+            // Gets foreground from * selector
             assertThat(style.fg()).isPresent();
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isEqualTo(Color.BLACK);
+            // No background - Row should be transparent over parent backgrounds
+            assertThat(style.bg()).isEmpty();
         }
 
         @Test
-        @DisplayName("Column - inherits white on black from *")
+        @DisplayName("Column - gets white foreground from * (no background)")
         void column_inheritsFromUniversal() {
             Styleable column = createStyleable("Column", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(column);
             Style style = resolved.toStyle();
 
+            // Gets foreground from * selector
             assertThat(style.fg()).isPresent();
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isEqualTo(Color.BLACK);
+            // No background - Column should be transparent over parent backgrounds
+            assertThat(style.bg()).isEmpty();
         }
     }
 
@@ -301,23 +307,20 @@ class CssDemoIntegrationTest {
         }
 
         @Test
-        @DisplayName("Universal selector (*) - provides black foreground on #eeeeee background")
-        void universalSelector_providesBlackOnLightGray() {
+        @DisplayName("Universal selector (*) - provides #1a1a1a foreground (background NOT set on *)")
+        void universalSelector_providesBlackForeground() {
             Styleable element = createStyleable("TextElement", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: black
+            // Expected: color: #1a1a1a (from $fg-primary)
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLACK);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x1a);
 
-            // Expected: background: #eeeeee
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isInstanceOf(Color.Rgb.class);
-            Color.Rgb bg = (Color.Rgb) style.bg().get();
-            assertThat(bg.r()).isEqualTo(0xee);
-            assertThat(bg.g()).isEqualTo(0xee);
-            assertThat(bg.b()).isEqualTo(0xee);
+            // Background should NOT be set - children should be transparent over parent backgrounds
+            assertThat(style.bg()).isEmpty();
         }
 
         @Test
@@ -336,19 +339,22 @@ class CssDemoIntegrationTest {
             assertThat(bg.b()).isEqualTo(0xee);
 
             // Expected: border-color: #888888 (from Panel rule via $border-color variable)
-            assertThat(resolved.getProperty("border-color")).isPresent();
-            assertThat(resolved.getProperty("border-color").get()).isEqualTo("#888888");
+            assertThat(resolved.borderColor()).isPresent();
+            assertThat(resolved.borderColor().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb borderColor = (Color.Rgb) resolved.borderColor().get();
+            assertThat(borderColor.r()).isEqualTo(0x88);
+            assertThat(borderColor.g()).isEqualTo(0x88);
+            assertThat(borderColor.b()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName("Panel - has padding: 1")
-        void panel_hasPadding() {
+        @DisplayName("Panel - no padding in demo CSS")
+        void panel_hasNoPadding() {
             Styleable panel = createStyleable("Panel", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(panel);
 
-            // Expected: padding: 1
-            assertThat(resolved.padding()).isPresent();
-            assertThat(resolved.padding().get()).isEqualTo(Padding.uniform(1));
+            // Demo CSS doesn't set padding for Panel
+            assertThat(resolved.padding()).isEmpty();
         }
 
         @Test
@@ -373,167 +379,216 @@ class CssDemoIntegrationTest {
         }
 
         @Test
-        @DisplayName(".status - #c8c8c8 background with #888888 border")
+        @DisplayName(".status - #eeeeee background (from $bg-primary) with #888888 border")
         void statusClass_hasGrayBackgroundAndBorder() {
             Styleable element = createStyleable("Panel", null, setOf("status"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: background: #cccccc
+            // Expected: background: #eeeeee (from $bg-primary)
             assertThat(style.bg()).isPresent();
             assertThat(style.bg().get()).isInstanceOf(Color.Rgb.class);
             Color.Rgb bg = (Color.Rgb) style.bg().get();
-            assertThat(bg.r()).isEqualTo(0xcc);
-            assertThat(bg.g()).isEqualTo(0xcc);
-            assertThat(bg.b()).isEqualTo(0xcc);
+            assertThat(bg.r()).isEqualTo(0xee);
+            assertThat(bg.g()).isEqualTo(0xee);
+            assertThat(bg.b()).isEqualTo(0xee);
 
-            // Expected: color: black
+            // Expected: color: #1a1a1a
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLACK);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x1a);
 
-            // Expected: border-color: #888888 (in additionalProperties)
-            assertThat(resolved.getProperty("border-color")).isPresent();
-            assertThat(resolved.getProperty("border-color").get()).isEqualTo("#888888");
+            // Expected: border-color: #888888
+            assertThat(resolved.borderColor()).isPresent();
+            assertThat(resolved.borderColor().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb borderColor = (Color.Rgb) resolved.borderColor().get();
+            assertThat(borderColor.r()).isEqualTo(0x88);
+            assertThat(borderColor.g()).isEqualTo(0x88);
+            assertThat(borderColor.b()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName(".header - blue foreground with bold text-style")
+        @DisplayName(".header - #0066cc foreground with bold text-style")
         void headerClass_hasBlueBold() {
             Styleable element = createStyleable("TextElement", null, setOf("header"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: blue (from $accent variable)
+            // Expected: color: #0066cc (from $accent variable)
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLUE);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0xcc);
 
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
         }
 
         @Test
-        @DisplayName(".primary - blue foreground with bold")
+        @DisplayName(".primary - #0055aa foreground with bold")
         void primaryClass_hasBlueBold() {
             Styleable element = createStyleable("TextElement", null, setOf("primary"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: blue
+            // Expected: color: #0055aa
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLUE);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x55);
+            assertThat(fg.b()).isEqualTo(0xaa);
 
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
         }
 
         @Test
-        @DisplayName(".secondary - gray foreground")
+        @DisplayName(".secondary - #555555 foreground")
         void secondaryClass_hasGray() {
             Styleable element = createStyleable("TextElement", null, setOf("secondary"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: gray
+            // Expected: color: #555555
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.GRAY);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x55);
         }
 
         @Test
-        @DisplayName(".warning - yellow foreground")
+        @DisplayName(".warning - #996600 foreground with bold")
         void warningClass_hasYellow() {
             Styleable element = createStyleable("TextElement", null, setOf("warning"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: yellow
+            // Expected: color: #996600
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.YELLOW);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x99);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0x00);
+
+            // Expected: text-style: bold (demo CSS has this)
+            assertThat(resolved.modifiers()).contains(Modifier.BOLD);
         }
 
         @Test
-        @DisplayName(".error - red bold foreground")
+        @DisplayName(".error - #cc0000 bold foreground")
         void errorClass_hasRedBold() {
             Styleable element = createStyleable("TextElement", null, setOf("error"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: red, text-style: bold
+            // Expected: color: #cc0000, text-style: bold
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.RED);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0xcc);
+            assertThat(fg.g()).isEqualTo(0x00);
+            assertThat(fg.b()).isEqualTo(0x00);
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
         }
 
         @Test
-        @DisplayName(".success - green foreground")
+        @DisplayName(".success - #007700 foreground")
         void successClass_hasGreen() {
             Styleable element = createStyleable("TextElement", null, setOf("success"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: green
+            // Expected: color: #007700
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.GREEN);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x77);
+            assertThat(fg.b()).isEqualTo(0x00);
         }
 
         @Test
-        @DisplayName(".info - cyan foreground")
+        @DisplayName(".info - #006688 foreground")
         void infoClass_hasCyan() {
             Styleable element = createStyleable("TextElement", null, setOf("info"));
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: cyan
+            // Expected: color: #006688
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.CYAN);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName(".dim - has dim text-style")
-        void dimClass_hasDimModifier() {
+        @DisplayName(".dim - has #666666 color")
+        void dimClass_hasDimColor() {
             Styleable element = createStyleable("TextElement", null, setOf("dim"));
             CssStyleResolver resolved = styleEngine.resolve(element);
+            Style style = resolved.toStyle();
 
-            // Expected: text-style: dim
-            assertThat(resolved.modifiers()).contains(Modifier.DIM);
+            // Expected: color: #666666 (demo CSS uses color, not text-style: dim)
+            assertThat(style.fg()).isPresent();
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x66);
         }
 
         @Test
-        @DisplayName("#theme-indicator - blue bold")
+        @DisplayName("#theme-indicator - #0066cc bold")
         void themeIndicatorId_hasBlueBold() {
             Styleable element = createStyleable("TextElement", "theme-indicator", Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: blue, text-style: bold
+            // Expected: color: #0066cc, text-style: bold
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLUE);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x00);
+            assertThat(fg.g()).isEqualTo(0x66);
+            assertThat(fg.b()).isEqualTo(0xcc);
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
         }
 
         @Test
-        @DisplayName("Row - inherits black on #eeeeee from *")
+        @DisplayName("Row - gets #1a1a1a foreground from * (no background)")
         void row_inheritsFromUniversal() {
             Styleable row = createStyleable("Row", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(row);
             Style style = resolved.toStyle();
 
+            // Gets foreground from * selector
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLACK);
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isInstanceOf(Color.Rgb.class);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x1a);
+            // No background - Row should be transparent over parent backgrounds
+            assertThat(style.bg()).isEmpty();
         }
 
         @Test
-        @DisplayName("Column - inherits black on #eeeeee from *")
+        @DisplayName("Column - gets #1a1a1a foreground from * (no background)")
         void column_inheritsFromUniversal() {
             Styleable column = createStyleable("Column", null, Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(column);
             Style style = resolved.toStyle();
 
+            // Gets foreground from * selector
             assertThat(style.fg()).isPresent();
-            assertThat(style.fg().get()).isEqualTo(Color.BLACK);
-            assertThat(style.bg()).isPresent();
-            assertThat(style.bg().get()).isInstanceOf(Color.Rgb.class);
+            assertThat(style.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb fg = (Color.Rgb) style.fg().get();
+            assertThat(fg.r()).isEqualTo(0x1a);
+            // No background - Column should be transparent over parent backgrounds
+            assertThat(style.bg()).isEmpty();
         }
     }
 
@@ -546,8 +601,8 @@ class CssDemoIntegrationTest {
     class ThemeSwitchingTests {
 
         @Test
-        @DisplayName("Switching themes changes all colors correctly")
-        void switchingThemes_changesAllColors() {
+        @DisplayName("Switching themes changes foreground colors correctly")
+        void switchingThemes_changesForegroundColors() {
             Styleable textElement = createStyleable("TextElement", null, Collections.emptySet());
 
             // Dark theme
@@ -558,13 +613,15 @@ class CssDemoIntegrationTest {
             styleEngine.setActiveStylesheet("light");
             Style lightStyle = styleEngine.resolve(textElement).toStyle();
 
-            // Dark: white on black
+            // Dark: white foreground (no background on * selector)
             assertThat(darkStyle.fg().get()).isEqualTo(Color.WHITE);
-            assertThat(darkStyle.bg().get()).isEqualTo(Color.BLACK);
+            assertThat(darkStyle.bg()).isEmpty();
 
-            // Light: black on #eeeeee
-            assertThat(lightStyle.fg().get()).isEqualTo(Color.BLACK);
-            assertThat(lightStyle.bg().get()).isInstanceOf(Color.Rgb.class);
+            // Light: #1a1a1a foreground (no background on * selector)
+            assertThat(lightStyle.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb lightFg = (Color.Rgb) lightStyle.fg().get();
+            assertThat(lightFg.r()).isEqualTo(0x1a);
+            assertThat(lightStyle.bg()).isEmpty();
         }
 
         @Test
@@ -582,19 +639,20 @@ class CssDemoIntegrationTest {
             CssStyleResolver lightResolved = styleEngine.resolve(status);
             Style lightStyle = lightResolved.toStyle();
 
-            // Dark: #333333 background, #666666 border
-            Color.Rgb darkBg = (Color.Rgb) darkStyle.bg().get();
-            assertThat(darkBg.r()).isEqualTo(0x33);
-            assertThat(darkResolved.getProperty("border-color").get()).isEqualTo("#666666");
+            // Dark: BLACK background (from $bg-primary), #666666 border
+            assertThat(darkStyle.bg().get()).isEqualTo(Color.BLACK);
+            Color.Rgb darkBorder = (Color.Rgb) darkResolved.borderColor().get();
+            assertThat(darkBorder.r()).isEqualTo(0x66);
 
-            // Light: #cccccc background, #888888 border
+            // Light: #eeeeee background (from $bg-primary), #888888 border
             Color.Rgb lightBg = (Color.Rgb) lightStyle.bg().get();
-            assertThat(lightBg.r()).isEqualTo(0xcc);
-            assertThat(lightResolved.getProperty("border-color").get()).isEqualTo("#888888");
+            assertThat(lightBg.r()).isEqualTo(0xee);
+            Color.Rgb lightBorder = (Color.Rgb) lightResolved.borderColor().get();
+            assertThat(lightBorder.r()).isEqualTo(0x88);
         }
 
         @Test
-        @DisplayName("Accent colors change between themes (cyan vs blue)")
+        @DisplayName("Accent colors change between themes (cyan vs #0066cc)")
         void accentColors_changeBetweenThemes() {
             Styleable header = createStyleable("TextElement", null, setOf("header"));
 
@@ -603,10 +661,14 @@ class CssDemoIntegrationTest {
             Style darkStyle = styleEngine.resolve(header).toStyle();
             assertThat(darkStyle.fg().get()).isEqualTo(Color.CYAN);
 
-            // Light theme uses blue accent
+            // Light theme uses #0066cc accent
             styleEngine.setActiveStylesheet("light");
             Style lightStyle = styleEngine.resolve(header).toStyle();
-            assertThat(lightStyle.fg().get()).isEqualTo(Color.BLUE);
+            assertThat(lightStyle.fg().get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb lightFg = (Color.Rgb) lightStyle.fg().get();
+            assertThat(lightFg.r()).isEqualTo(0x00);
+            assertThat(lightFg.g()).isEqualTo(0x66);
+            assertThat(lightFg.b()).isEqualTo(0xcc);
         }
 
         @Test
@@ -617,14 +679,17 @@ class CssDemoIntegrationTest {
             // Dark theme: border-color should be dark-gray
             styleEngine.setActiveStylesheet("dark");
             CssStyleResolver darkResolved = styleEngine.resolve(panel);
-            assertThat(darkResolved.getProperty("border-color")).isPresent();
-            assertThat(darkResolved.getProperty("border-color").get()).isEqualTo("dark-gray");
+            assertThat(darkResolved.borderColor()).isPresent();
+            assertThat(darkResolved.borderColor().get()).isEqualTo(Color.DARK_GRAY);
 
             // Light theme: border-color should be #888888
             styleEngine.setActiveStylesheet("light");
             CssStyleResolver lightResolved = styleEngine.resolve(panel);
-            assertThat(lightResolved.getProperty("border-color")).isPresent();
-            assertThat(lightResolved.getProperty("border-color").get()).isEqualTo("#888888");
+            assertThat(lightResolved.borderColor()).isPresent();
+            Color.Rgb lightBorder = (Color.Rgb) lightResolved.borderColor().get();
+            assertThat(lightBorder.r()).isEqualTo(0x88);
+            assertThat(lightBorder.g()).isEqualTo(0x88);
+            assertThat(lightBorder.b()).isEqualTo(0x88);
         }
     }
 
@@ -674,8 +739,13 @@ class CssDemoIntegrationTest {
             assertThat(styleEngine.parseColor("$accent")).contains(Color.CYAN);
 
             styleEngine.setActiveStylesheet("light");
-            // Light theme has $accent: blue
-            assertThat(styleEngine.parseColor("$accent")).contains(Color.BLUE);
+            // Light theme has $accent: #0066cc
+            assertThat(styleEngine.parseColor("$accent")).isPresent();
+            assertThat(styleEngine.parseColor("$accent").get()).isInstanceOf(Color.Rgb.class);
+            Color.Rgb lightAccent = (Color.Rgb) styleEngine.parseColor("$accent").get();
+            assertThat(lightAccent.r()).isEqualTo(0x00);
+            assertThat(lightAccent.g()).isEqualTo(0x66);
+            assertThat(lightAccent.b()).isEqualTo(0xcc);
         }
     }
 

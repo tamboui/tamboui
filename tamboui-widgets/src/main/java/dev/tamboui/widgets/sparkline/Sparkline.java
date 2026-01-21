@@ -8,9 +8,8 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardPropertyKeys;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledProperty;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
@@ -243,7 +242,7 @@ public final class Sparkline implements Widget {
         this.direction = builder.direction;
 
         // Resolve style-aware properties
-        Color resolvedFg = builder.foreground.resolve();
+        Color resolvedFg = builder.resolveForeground();
 
         Style baseStyle = builder.style;
         if (resolvedFg != null) {
@@ -348,9 +347,8 @@ public final class Sparkline implements Widget {
         private Style style = Style.EMPTY;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties bound to this builder's resolver
-        private final StyledProperty<Color> foreground =
-                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
+        // Style-aware properties (resolved via styleResolver in build())
+        private Color foreground;
 
         private Builder() {}
 
@@ -462,7 +460,7 @@ public final class Sparkline implements Widget {
          * @return this builder
          */
         public Builder foreground(Color color) {
-            this.foreground.set(color);
+            this.foreground = color;
             return this;
         }
 
@@ -471,6 +469,11 @@ public final class Sparkline implements Widget {
          */
         public Sparkline build() {
             return new Sparkline(this);
+        }
+
+        // Resolution helpers
+        private Color resolveForeground() {
+            return styleResolver.resolve(StandardProperties.COLOR, foreground);
         }
     }
 }

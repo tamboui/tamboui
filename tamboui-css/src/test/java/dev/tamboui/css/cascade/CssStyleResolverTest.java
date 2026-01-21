@@ -9,9 +9,8 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.Width;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Padding;
+import dev.tamboui.layout.BorderType;
+import dev.tamboui.layout.Padding;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +57,7 @@ class CssStyleResolverTest {
                 .background(Color.WHITE)
                 .alignment(Alignment.CENTER)
                 .borderType(BorderType.PLAIN)
-                .width(Width.FILL)
+                .width(Constraint.fill())
                 .build();
 
         CssStyleResolver child = CssStyleResolver.builder()
@@ -66,7 +65,7 @@ class CssStyleResolverTest {
                 .background(Color.BLACK)
                 .alignment(Alignment.LEFT)
                 .borderType(BorderType.DOUBLE)
-                .width(Width.FIT)
+                .width(Constraint.fit())
                 .build();
 
         CssStyleResolver merged = child.withFallback(parent);
@@ -76,7 +75,7 @@ class CssStyleResolverTest {
         assertThat(merged.background()).contains(Color.BLACK);
         assertThat(merged.alignment()).contains(Alignment.LEFT);
         assertThat(merged.borderType()).contains(BorderType.DOUBLE);
-        assertThat(merged.width()).isEqualTo(Width.FIT);
+        assertThat(merged.widthConstraint()).contains(Constraint.fit());
     }
 
     @Test
@@ -126,60 +125,6 @@ class CssStyleResolverTest {
 
         // Both have empty modifiers - should not cause EnumSet.copyOf issue
         assertThat(merged.modifiers()).isEmpty();
-    }
-
-    @Test
-    void withFallbackMergesAdditionalProperties() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .property("border-color", "blue")
-                .property("parent-only", "value1")
-                .build();
-
-        CssStyleResolver child = CssStyleResolver.builder()
-                .property("border-color", "red")
-                .property("child-only", "value2")
-                .build();
-
-        CssStyleResolver merged = child.withFallback(parent);
-
-        // Child's border-color should override parent's
-        assertThat(merged.getProperty("border-color")).contains("red");
-        // Parent-only property should be inherited
-        assertThat(merged.getProperty("parent-only")).contains("value1");
-        // Child-only property should be present
-        assertThat(merged.getProperty("child-only")).contains("value2");
-    }
-
-    @Test
-    void withFallbackHandlesEmptyAdditionalPropertiesOnChild() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .property("key1", "value1")
-                .property("key2", "value2")
-                .build();
-
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
-
-        CssStyleResolver merged = child.withFallback(parent);
-
-        assertThat(merged.getProperty("key1")).contains("value1");
-        assertThat(merged.getProperty("key2")).contains("value2");
-    }
-
-    @Test
-    void withFallbackHandlesEmptyAdditionalPropertiesOnParent() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .foreground(Color.BLUE)
-                .build();
-
-        CssStyleResolver child = CssStyleResolver.builder()
-                .property("key1", "value1")
-                .build();
-
-        CssStyleResolver merged = child.withFallback(parent);
-
-        assertThat(merged.getProperty("key1")).contains("value1");
     }
 
     @Test
@@ -242,7 +187,7 @@ class CssStyleResolverTest {
     void withFallbackDoesNotInheritWidthConstraint() {
         // Width constraint is NOT inherited (element-specific layout property)
         CssStyleResolver parent = CssStyleResolver.builder()
-                .widthConstraint(Constraint.percentage(50))
+                .width(Constraint.percentage(50))
                 .build();
 
         CssStyleResolver child = CssStyleResolver.builder()
@@ -259,12 +204,12 @@ class CssStyleResolverTest {
     void childConstraintsOverrideParent() {
         CssStyleResolver parent = CssStyleResolver.builder()
                 .heightConstraint(Constraint.fill())
-                .widthConstraint(Constraint.fill())
+                .width(Constraint.fill())
                 .build();
 
         CssStyleResolver child = CssStyleResolver.builder()
                 .heightConstraint(Constraint.length(5))
-                .widthConstraint(Constraint.fit())
+                .width(Constraint.fit())
                 .build();
 
         CssStyleResolver merged = child.withFallback(parent);

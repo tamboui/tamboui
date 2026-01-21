@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
  * // Standalone usage
  * Optional<Color> color = ColorConverter.INSTANCE.convert("#FF0000");
  *
- * // With PropertyKey
- * PropertyKey<Color> BORDER_COLOR = PropertyKey.of("border-color", ColorConverter.INSTANCE);
+ * // With PropertyDefinition
+ * PropertyDefinition<Color> BORDER_COLOR = PropertyDefinition.of("border-color", ColorConverter.INSTANCE);
  * }</pre>
  */
 public final class ColorConverter implements PropertyConverter<Color> {

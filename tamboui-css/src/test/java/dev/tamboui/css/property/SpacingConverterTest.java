@@ -4,7 +4,7 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.Padding;
+import dev.tamboui.layout.Padding;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

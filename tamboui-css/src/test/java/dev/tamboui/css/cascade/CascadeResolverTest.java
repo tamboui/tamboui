@@ -8,6 +8,7 @@ import dev.tamboui.css.Styleable;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.css.model.Stylesheet;
 import dev.tamboui.css.parser.CssParser;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import org.junit.jupiter.api.Test;
@@ -131,7 +132,7 @@ class CascadeResolverTest {
     }
 
     @Test
-    void borderCharsPropertyIsStoredInAdditionalProperties() {
+    void borderCharsPropertyIsResolved() {
         String css = ".custom-border { border-chars: \"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"; }";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
@@ -142,8 +143,8 @@ class CascadeResolverTest {
 
         CssStyleResolver resolved = engine.resolve(element);
 
-        assertThat(resolved.getProperty("border-chars")).isPresent();
-        assertThat(resolved.getProperty("border-chars").get())
+        assertThat(resolved.borderChars()).isPresent();
+        assertThat(resolved.borderChars().get())
             .isEqualTo("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"");
     }
 
@@ -159,13 +160,13 @@ class CascadeResolverTest {
 
         CssStyleResolver resolved = engine.resolve(element);
 
-        assertThat(resolved.getProperty("border-chars")).isPresent();
-        assertThat(resolved.getProperty("border-chars").get())
+        assertThat(resolved.borderChars()).isPresent();
+        assertThat(resolved.borderChars().get())
             .isEqualTo("\"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"");
     }
 
     @Test
-    void individualBorderPropertiesAreStored() {
+    void individualBorderPropertiesAreResolved() {
         String css = ".custom {\n" +
                      "  border-top: 'x';\n" +
                      "  border-bottom: 'y';\n" +
@@ -186,14 +187,14 @@ class CascadeResolverTest {
         CssStyleResolver resolved = engine.resolve(element);
 
         // Individual border properties are stored with quotes stripped
-        assertThat(resolved.getProperty("border-top")).hasValue("x");
-        assertThat(resolved.getProperty("border-bottom")).hasValue("y");
-        assertThat(resolved.getProperty("border-left")).hasValue("|");
-        assertThat(resolved.getProperty("border-right")).hasValue("|");
-        assertThat(resolved.getProperty("border-top-left")).hasValue("+");
-        assertThat(resolved.getProperty("border-top-right")).hasValue("+");
-        assertThat(resolved.getProperty("border-bottom-left")).hasValue("+");
-        assertThat(resolved.getProperty("border-bottom-right")).hasValue("+");
+        assertThat(resolved.borderTop()).hasValue("x");
+        assertThat(resolved.borderBottom()).hasValue("y");
+        assertThat(resolved.borderLeft()).hasValue("|");
+        assertThat(resolved.borderRight()).hasValue("|");
+        assertThat(resolved.borderTopLeft()).hasValue("+");
+        assertThat(resolved.borderTopRight()).hasValue("+");
+        assertThat(resolved.borderBottomLeft()).hasValue("+");
+        assertThat(resolved.borderBottomRight()).hasValue("+");
     }
 
     @Test
@@ -212,14 +213,14 @@ class CascadeResolverTest {
 
         CssStyleResolver resolved = engine.resolve(element);
 
-        // border-type is a dedicated field
-        assertThat(resolved.borderType()).hasValue(dev.tamboui.widgets.block.BorderType.PLAIN);
-        // border-chars is in additional properties
-        assertThat(resolved.getProperty("border-chars")).isPresent();
+        // border-type is resolved
+        assertThat(resolved.borderType()).hasValue(BorderType.PLAIN);
+        // border-chars is also resolved
+        assertThat(resolved.borderChars()).isPresent();
     }
 
     @Test
-    void borderLeftWithEmptyValueIsNotStored() {
+    void borderLeftWithEmptyValueIsNotResolved() {
         // When CSS has "border-left:" with no value (e.g., while typing),
         // the property should NOT be stored as an empty string, which would
         // cause the left border to disappear.
@@ -236,11 +237,11 @@ class CascadeResolverTest {
         CssStyleResolver resolved = engine.resolve(element);
 
         // Empty values should NOT be stored - they would cause borders to disappear
-        assertThat(resolved.getProperty("border-left")).isEmpty();
+        assertThat(resolved.borderLeft()).isEmpty();
     }
 
     @Test
-    void borderLeftWithEmptyQuotedValueIsStoredAsEmpty() {
+    void borderLeftWithEmptyQuotedValueIsResolvedAsEmpty() {
         // When CSS has explicit empty quotes, it IS intentional
         String css = ".panel {\n" +
                      "  border-left: \"\";\n" +  // Explicit empty - intentional
@@ -255,11 +256,11 @@ class CascadeResolverTest {
         CssStyleResolver resolved = engine.resolve(element);
 
         // Explicit empty quotes ARE stored - user intentionally wants no border
-        assertThat(resolved.getProperty("border-left")).hasValue("");
+        assertThat(resolved.borderLeft()).hasValue("");
     }
 
     @Test
-    void borderLeftWithParserErrorValueIsNotStored() {
+    void borderLeftWithParserErrorValueIsNotResolved() {
         // When CSS has "border-left:" without semicolon, the parser may consume
         // the next property as the value (e.g., "height: 3"). This should NOT
         // be stored as a border character since it's clearly a parser error.
@@ -278,11 +279,11 @@ class CascadeResolverTest {
 
         // "height: 3" should NOT be stored as border-left - it contains ':'
         // and is too long to be a valid border character
-        assertThat(resolved.getProperty("border-left")).isEmpty();
+        assertThat(resolved.borderLeft()).isEmpty();
     }
 
     @Test
-    void borderLeftWithSingleUnquotedCharIsStored() {
+    void borderLeftWithSingleUnquotedCharIsResolved() {
         // Single unquoted character should be valid
         String css = ".panel {\n" +
                      "  border-left: *;\n" +
@@ -296,7 +297,7 @@ class CascadeResolverTest {
 
         CssStyleResolver resolved = engine.resolve(element);
 
-        assertThat(resolved.getProperty("border-left")).hasValue("*");
+        assertThat(resolved.borderLeft()).hasValue("*");
     }
 
     private Styleable createStyleable(String type, String id, Set<String> classes) {

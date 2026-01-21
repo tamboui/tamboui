@@ -10,11 +10,10 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardPropertyKeys;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledProperty;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
@@ -29,24 +28,24 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
      * <p>
      * CSS property name: {@code cursor-color}
      */
-    public static final PropertyKey<Color> CURSOR_COLOR =
-            PropertyKey.of("cursor-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> CURSOR_COLOR =
+            PropertyDefinition.of("cursor-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the placeholder text color.
      * <p>
      * CSS property name: {@code placeholder-color}
      */
-    public static final PropertyKey<Color> PLACEHOLDER_COLOR =
-            PropertyKey.of("placeholder-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> PLACEHOLDER_COLOR =
+            PropertyDefinition.of("placeholder-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the line number gutter color.
      * <p>
      * CSS property name: {@code line-number-color}
      */
-    public static final PropertyKey<Color> LINE_NUMBER_COLOR =
-            PropertyKey.of("line-number-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> LINE_NUMBER_COLOR =
+            PropertyDefinition.of("line-number-color", ColorConverter.INSTANCE);
 
     private final Block block;
     private final Style style;
@@ -62,11 +61,11 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         this.showLineNumbers = builder.showLineNumbers;
 
         // Resolve style-aware properties
-        Color resolvedBg = builder.background.resolve();
-        Color resolvedFg = builder.foreground.resolve();
-        Color resolvedCursorColor = builder.cursorColor.resolve();
-        Color resolvedPlaceholderColor = builder.placeholderColor.resolve();
-        Color resolvedLineNumberColor = builder.lineNumberColor.resolve();
+        Color resolvedBg = builder.resolveBackground();
+        Color resolvedFg = builder.resolveForeground();
+        Color resolvedCursorColor = builder.resolveCursorColor();
+        Color resolvedPlaceholderColor = builder.resolvePlaceholderColor();
+        Color resolvedLineNumberColor = builder.resolveLineNumberColor();
 
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
@@ -260,17 +259,12 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         private Style lineNumberStyle = Style.EMPTY.dim();
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties bound to this builder's resolver
-        private final StyledProperty<Color> background =
-                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
-        private final StyledProperty<Color> foreground =
-                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
-        private final StyledProperty<Color> cursorColor =
-                StyledProperty.of(CURSOR_COLOR, null, () -> styleResolver);
-        private final StyledProperty<Color> placeholderColor =
-                StyledProperty.of(PLACEHOLDER_COLOR, null, () -> styleResolver);
-        private final StyledProperty<Color> lineNumberColor =
-                StyledProperty.of(LINE_NUMBER_COLOR, null, () -> styleResolver);
+        // Style-aware properties (resolved via styleResolver in build())
+        private Color background;
+        private Color foreground;
+        private Color cursorColor;
+        private Color placeholderColor;
+        private Color lineNumberColor;
 
         private Builder() {}
 
@@ -333,7 +327,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background.set(color);
+            this.background = color;
             return this;
         }
 
@@ -346,7 +340,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * @return this builder
          */
         public Builder foreground(Color color) {
-            this.foreground.set(color);
+            this.foreground = color;
             return this;
         }
 
@@ -359,7 +353,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * @return this builder
          */
         public Builder cursorColor(Color color) {
-            this.cursorColor.set(color);
+            this.cursorColor = color;
             return this;
         }
 
@@ -372,7 +366,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * @return this builder
          */
         public Builder placeholderColor(Color color) {
-            this.placeholderColor.set(color);
+            this.placeholderColor = color;
             return this;
         }
 
@@ -385,12 +379,33 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * @return this builder
          */
         public Builder lineNumberColor(Color color) {
-            this.lineNumberColor.set(color);
+            this.lineNumberColor = color;
             return this;
         }
 
         public TextArea build() {
             return new TextArea(this);
+        }
+
+        // Resolution helpers
+        private Color resolveBackground() {
+            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
+        }
+
+        private Color resolveForeground() {
+            return styleResolver.resolve(StandardProperties.COLOR, foreground);
+        }
+
+        private Color resolveCursorColor() {
+            return styleResolver.resolve(CURSOR_COLOR, cursorColor);
+        }
+
+        private Color resolvePlaceholderColor() {
+            return styleResolver.resolve(PLACEHOLDER_COLOR, placeholderColor);
+        }
+
+        private Color resolveLineNumberColor() {
+            return styleResolver.resolve(LINE_NUMBER_COLOR, lineNumberColor);
         }
     }
 }

@@ -14,29 +14,20 @@ import java.util.function.BiFunction;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardPropertyKeys;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledProperty;
 import dev.tamboui.style.Width;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.style.PropertyKey;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.text.Overflow;
-import dev.tamboui.widgets.text.OverflowConverter;
 
 /**
  * A list widget for displaying selectable items.
  */
 public final class ListWidget implements StatefulWidget<ListState> {
-
-    /**
-     * Property key for text-overflow property.
-     */
-    public static final PropertyKey<Overflow> TEXT_OVERFLOW =
-            PropertyKey.of("text-overflow", OverflowConverter.INSTANCE);
 
     private static final String ELLIPSIS = "...";
 
@@ -55,10 +46,10 @@ public final class ListWidget implements StatefulWidget<ListState> {
         this.direction = builder.direction;
         this.repeatHighlightSymbol = builder.repeatHighlightSymbol;
         this.highlightStyle = builder.highlightStyle;
-        this.overflow = builder.overflow.resolve();
+        this.overflow = builder.resolveOverflow();
 
-        Color resolvedBg = builder.background.resolve();
-        Color resolvedFg = builder.foreground.resolve();
+        Color resolvedBg = builder.resolveBackground();
+        Color resolvedFg = builder.resolveForeground();
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
             baseStyle = baseStyle.bg(resolvedBg);
@@ -233,12 +224,21 @@ public final class ListWidget implements StatefulWidget<ListState> {
                     int contentX = listArea.left() + symbolWidth;
                     int availableWidth = contentWidth;
 
-                    // Fill the content area background based on width property (default: fill)
-                    // Only fill the content area, not the symbol area, so symbol keeps its own style
+                    // Fill the full row background based on width property (default: fill)
+                    // Apply ONLY the background to the full row (including symbol area)
+                    // Then apply the full style to the content area only
+                    // This matches ListElement behavior where background covers the whole row
                     Width width = itemStyle.extension(Width.class, Width.FILL);
                     if (width.isFill()) {
-                        Rect rowArea = new Rect(contentX, y, contentWidth, 1);
-                        buffer.setStyle(rowArea, itemStyle);
+                        // Apply background to full row (including symbol area)
+                        if (itemStyle.bg().isPresent()) {
+                            Style bgOnly = Style.EMPTY.bg(itemStyle.bg().get());
+                            Rect fullRowArea = new Rect(listArea.left(), y, listArea.width(), 1);
+                            buffer.setStyle(fullRowArea, bgOnly);
+                        }
+                        // Apply full style (including text attributes) to content area only
+                        Rect contentArea = new Rect(contentX, y, contentWidth, 1);
+                        buffer.setStyle(contentArea, itemStyle);
                     }
 
                     // Draw highlight symbol on each line if selected
@@ -380,13 +380,10 @@ public final class ListWidget implements StatefulWidget<ListState> {
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
         private BiFunction<Integer, Integer, Style> itemStyleResolver;
 
-        // Style-aware properties bound to this builder's resolver
-        private final StyledProperty<Overflow> overflow =
-                StyledProperty.of(TEXT_OVERFLOW, Overflow.CLIP, () -> styleResolver);
-        private final StyledProperty<Color> background =
-                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
-        private final StyledProperty<Color> foreground =
-                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
+        // Style-aware properties (resolved via styleResolver in build())
+        private Overflow overflow;
+        private Color background;
+        private Color foreground;
 
         private Builder() {}
 
@@ -461,7 +458,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background.set(color);
+            this.background = color;
             return this;
         }
 
@@ -472,7 +469,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
          * @return this builder
          */
         public Builder foreground(Color color) {
-            this.foreground.set(color);
+            this.foreground = color;
             return this;
         }
 
@@ -534,12 +531,25 @@ public final class ListWidget implements StatefulWidget<ListState> {
          * @return this builder
          */
         public Builder overflow(Overflow overflow) {
-            this.overflow.set(overflow);
+            this.overflow = overflow;
             return this;
         }
 
         public ListWidget build() {
             return new ListWidget(this);
+        }
+
+        // Resolution helpers
+        private Overflow resolveOverflow() {
+            return styleResolver.resolve(StandardProperties.TEXT_OVERFLOW, overflow);
+        }
+
+        private Color resolveBackground() {
+            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
+        }
+
+        private Color resolveForeground() {
+            return styleResolver.resolve(StandardProperties.COLOR, foreground);
         }
     }
 }

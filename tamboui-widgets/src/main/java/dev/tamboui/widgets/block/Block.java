@@ -6,18 +6,19 @@ package dev.tamboui.widgets.block;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
+import dev.tamboui.layout.BorderSet;
+import dev.tamboui.layout.BorderType;
+import dev.tamboui.layout.Padding;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-import dev.tamboui.style.PropertyKey;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardPropertyKeys;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledProperty;
 import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
-import dev.tamboui.widgets.text.Overflow;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -29,12 +30,6 @@ import java.util.List;
  * {@code background}, and {@code color}.
  */
 public final class Block implements Widget {
-
-    /**
-     * Property key for border-type property.
-     */
-    public static final PropertyKey<BorderType> BORDER_TYPE =
-            PropertyKey.of("border-type", BorderTypeConverter.INSTANCE);
 
     private final Title title;
     private final Title titleBottom;
@@ -50,20 +45,20 @@ public final class Block implements Widget {
         this.title = builder.title;
         this.titleBottom = builder.titleBottom;
         this.borders = builder.borders;
-        this.borderType = builder.borderType.resolve();
+        this.borderType = builder.resolveBorderType();
         this.customBorderSet = builder.customBorderSet;
         this.padding = builder.padding;
         this.mergeStrategy = builder.mergeStrategy;
 
-        Color resolvedBorderColor = builder.borderColor.resolve();
+        Style baseBorderStyle = builder.borderStyle;
+        Color resolvedBorderColor = builder.resolveBorderColor();
         if (resolvedBorderColor != null) {
-            this.borderStyle = builder.borderStyle.fg(resolvedBorderColor);
-        } else {
-            this.borderStyle = builder.borderStyle;
+            baseBorderStyle = baseBorderStyle.fg(resolvedBorderColor);
         }
+        this.borderStyle = baseBorderStyle;
 
-        Color resolvedBackground = builder.background.resolve();
-        Color resolvedForeground = builder.foreground.resolve();
+        Color resolvedBackground = builder.resolveBackground();
+        Color resolvedForeground = builder.resolveForeground();
         Style baseStyle = builder.style;
         if (resolvedBackground != null) {
             baseStyle = baseStyle.bg(resolvedBackground);
@@ -464,15 +459,11 @@ public final class Block implements Widget {
         private MergeStrategy mergeStrategy = MergeStrategy.REPLACE;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties bound to this builder's resolver
-        private final StyledProperty<BorderType> borderType =
-                StyledProperty.of(BORDER_TYPE, BorderType.PLAIN, () -> styleResolver);
-        private final StyledProperty<Color> borderColor =
-                StyledProperty.of(StandardPropertyKeys.BORDER_COLOR, null, () -> styleResolver);
-        private final StyledProperty<Color> background =
-                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
-        private final StyledProperty<Color> foreground =
-                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
+        // Style-aware properties (resolved via styleResolver in build())
+        private BorderType borderType;
+        private Color borderColor;
+        private Color background;
+        private Color foreground;
 
         private Builder() {}
 
@@ -502,7 +493,7 @@ public final class Block implements Widget {
         }
 
         public Builder borderType(BorderType borderType) {
-            this.borderType.set(borderType);
+            this.borderType = borderType;
             return this;
         }
 
@@ -532,7 +523,7 @@ public final class Block implements Widget {
          * @return this builder
          */
         public Builder borderColor(Color color) {
-            this.borderColor.set(color);
+            this.borderColor = color;
             return this;
         }
 
@@ -543,7 +534,7 @@ public final class Block implements Widget {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background.set(color);
+            this.background = color;
             return this;
         }
 
@@ -554,7 +545,7 @@ public final class Block implements Widget {
          * @return this builder
          */
         public Builder foreground(Color color) {
-            this.foreground.set(color);
+            this.foreground = color;
             return this;
         }
 
@@ -608,6 +599,23 @@ public final class Block implements Widget {
 
         public Block build() {
             return new Block(this);
+        }
+
+        // Resolution helpers
+        private BorderType resolveBorderType() {
+            return styleResolver.resolve(StandardProperties.BORDER_TYPE, borderType);
+        }
+
+        private Color resolveBorderColor() {
+            return styleResolver.resolve(StandardProperties.BORDER_COLOR, borderColor);
+        }
+
+        private Color resolveBackground() {
+            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
+        }
+
+        private Color resolveForeground() {
+            return styleResolver.resolve(StandardProperties.COLOR, foreground);
         }
     }
 }

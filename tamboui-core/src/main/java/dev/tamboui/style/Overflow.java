@@ -2,10 +2,10 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.widgets.text;
+package dev.tamboui.style;
 
 /**
- * Text overflow handling mode for paragraphs.
+ * Text overflow handling mode.
  * Determines what happens when text doesn't fit in the available space.
  */
 public enum Overflow {

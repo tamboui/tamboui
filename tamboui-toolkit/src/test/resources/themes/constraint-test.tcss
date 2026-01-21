@@ -1,48 +1,37 @@
-/* Constraint CSS Test Theme */
+/* CSS for constraint tests - minimal rules for testing constraint properties */
 
-/* Height constraints for Column children */
-.height-fill {
-    height: fill;
+/* Base styles (no background on * to allow transparency) */
+* {
+    color: white;
 }
 
+/* Height constraints */
 .height-fixed {
     height: 3;
-}
-
-.height-percent {
-    height: 50%;
 }
 
 .height-fit {
     height: fit;
 }
 
-/* Width constraints for Row children */
-.width-fill {
-    width: fill;
-}
-
+/* Width constraints */
 .width-fixed {
     width: 10;
-}
-
-.width-percent {
-    width: 25%;
 }
 
 .width-fit {
     width: fit;
 }
 
-/* Descendant selector test */
+.width-percent {
+    width: 25%;
+}
+
+/* Parent-child selector tests */
 .parent-row {
     flex: center;
 }
 
 .parent-row .child-text {
     width: fit;
-}
-
-.parent-column .child-text {
-    height: fit;
 }

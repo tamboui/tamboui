@@ -22,5 +22,4 @@ module dev.tamboui.widgets {
     exports dev.tamboui.widgets.sparkline;
     exports dev.tamboui.widgets.table;
     exports dev.tamboui.widgets.tabs;
-    exports dev.tamboui.widgets.text;
 }

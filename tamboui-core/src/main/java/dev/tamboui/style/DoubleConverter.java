@@ -17,8 +17,8 @@ import java.util.Optional;
  * // Standalone usage
  * Optional<Double> value = DoubleConverter.INSTANCE.convert("1.5");
  *
- * // With PropertyKey
- * PropertyKey<Double> SPEED = PropertyKey.of("speed", DoubleConverter.INSTANCE);
+ * // With PropertyDefinition
+ * PropertyDefinition<Double> SPEED = PropertyDefinition.of("speed", DoubleConverter.INSTANCE);
  * }</pre>
  */
 public final class DoubleConverter implements PropertyConverter<Double> {

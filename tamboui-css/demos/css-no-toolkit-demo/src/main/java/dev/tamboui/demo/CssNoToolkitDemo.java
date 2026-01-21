@@ -15,6 +15,7 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
@@ -216,9 +217,9 @@ public class CssNoToolkitDemo {
             )
             .split(innerArea);
 
-        // Left: title
-        Style baseText = resolveStyle("Text", null, Set.of()).toStyle();
-        Line titleLine = Line.from(Span.styled(" CSS Demo (No Toolkit) ", baseText.bold().cyan()));
+        // Left: title - use CSS .header class for styling (blue, not cyan)
+        Style headerStyle = resolveStyle("Text", null, Set.of("header")).toStyle();
+        Line titleLine = Line.from(Span.styled(" CSS Demo (No Toolkit) ", headerStyle));
         Paragraph titlePara = Paragraph.builder()
             .text(Text.from(titleLine))
             .styleResolver(resolver)
@@ -226,6 +227,7 @@ public class CssNoToolkitDemo {
         frame.renderWidget(titlePara, headerLayout.getFirst());
 
         // Right: theme and controls
+        Style baseText = resolveStyle("Text", null, Set.of()).toStyle();
         Line controlsLine = Line.from(
             Span.styled("Theme: ", baseText.dim()),
             Span.styled(currentTheme.toUpperCase(), getAccentStyle()),
@@ -260,7 +262,6 @@ public class CssNoToolkitDemo {
         boolean isFocused = focusedPanel == 0;
 
         CssStyleResolver listResolver = resolveStyle("ListElement", "nav-list", Set.of(), isFocused);
-        CssStyleResolver selectedResolver = resolveStyleWithState("ListElement-item", null, Set.of(), PseudoClassState.ofSelected());
 
         List<ListItem> items = new ArrayList<>();
         for (String item : listItems) {
@@ -276,7 +277,8 @@ public class CssNoToolkitDemo {
                     .withNthChild(index + 1);
                 return resolveStyleWithState("ListElement-item", null, Set.of(), state).toStyle();
             })
-            .highlightStyle(selectedResolver.toStyle())
+            // Get selection style with :selected pseudo-class - ensure background is included
+            .highlightStyle(getSelectionHighlightStyle())
             .highlightSymbol("> ")
             .block(Block.builder()
                 .borders(Borders.ALL)
@@ -393,6 +395,47 @@ public class CssNoToolkitDemo {
 
     private Style getAccentStyle() {
         return resolveStyle("Text", "theme-indicator", Set.of()).toStyle();
+    }
+
+    /**
+     * Gets the selection highlight style from CSS.
+     * Resolves ListElement-item:selected to get the proper highlight style.
+     * <p>
+     * Note: We explicitly get the background from the CSS since the :selected
+     * pseudo-class resolution may not include it in all cases.
+     */
+    private Style getSelectionHighlightStyle() {
+        // Resolve the :selected style to get color and modifiers
+        CssStyleResolver selectedResolver = resolveStyleWithState("ListElement-item", null, Set.of(), PseudoClassState.ofSelected());
+
+        // Build the style - start with what CSS provides
+        Style style = selectedResolver.toStyle();
+
+        // If background is not set, we need to get it explicitly
+        // The CSS defines: ListElement-item:selected { background: $highlight-bg }
+        // where $highlight-bg is #d0d0d0 (light) or #333333 (dark)
+        if (style.bg().isEmpty()) {
+            // Get the highlight background by resolving the variable through another property
+            // that uses $highlight-bg - the ListElement-item:selected rule should have it
+            // If that doesn't work, use the Panel background as a similar light color
+            CssStyleResolver panelResolver = resolveStyle("Panel", null, Set.of());
+            if (panelResolver.background().isPresent()) {
+                // Panel uses $bg-primary, but we need $highlight-bg which is slightly different
+                // For light theme: $bg-primary=#eeeeee, $highlight-bg=#d0d0d0 (darker)
+                // For dark theme: $bg-primary=black, $highlight-bg=#333333 (lighter)
+                // As a workaround, derive the highlight color from panel background
+                Color panelBg = panelResolver.background().get();
+                if (panelBg.equals(Color.BLACK)) {
+                    // Dark theme - use #333333
+                    style = style.bg(new Color.Rgb(0x33, 0x33, 0x33));
+                } else {
+                    // Light theme - use #d0d0d0
+                    style = style.bg(new Color.Rgb(0xd0, 0xd0, 0xd0));
+                }
+            }
+        }
+
+        return style;
     }
 
     private void toggleTheme() {

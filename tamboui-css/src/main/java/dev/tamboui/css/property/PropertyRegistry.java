@@ -12,10 +12,12 @@ import dev.tamboui.layout.Margin;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.Modifier;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Width;
-import dev.tamboui.widgets.block.BorderSet;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Padding;
+import dev.tamboui.layout.BorderSet;
+import dev.tamboui.layout.BorderType;
+import dev.tamboui.layout.Padding;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,11 @@ import java.util.Set;
  * <p>
  * Maps CSS property names to their converters and provides
  * convenience methods for converting property values.
+ * <p>
+ * <b>Note:</b> For new code, prefer using {@link StandardProperties} which
+ * provides type-safe property definitions with inheritance metadata.
+ *
+ * @see StandardProperties
  */
 public final class PropertyRegistry {
 
@@ -64,6 +71,18 @@ public final class PropertyRegistry {
      */
     public static PropertyRegistry createDefault() {
         return new PropertyRegistry();
+    }
+
+    /**
+     * Gets the property definition for the given property name.
+     * <p>
+     * This method delegates to {@link StandardProperties#byName(String)}.
+     *
+     * @param name the CSS property name
+     * @return the property definition, or empty if not registered
+     */
+    public Optional<PropertyDefinition<?>> getDefinition(String name) {
+        return StandardProperties.byName(name);
     }
 
     /**

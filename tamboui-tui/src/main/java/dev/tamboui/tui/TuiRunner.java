@@ -31,7 +31,7 @@ import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.tui.event.UiRunnable;
 import dev.tamboui.tui.overlay.DebugOverlay;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
 import java.io.IOException;

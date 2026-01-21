@@ -2,7 +2,7 @@
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.widgets.block;
+package dev.tamboui.layout;
 
 /**
  * Padding inside a block.

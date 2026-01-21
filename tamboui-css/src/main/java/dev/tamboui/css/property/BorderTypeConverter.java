@@ -4,7 +4,7 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.layout.BorderType;
 
 import java.util.Map;
 import java.util.Optional;
