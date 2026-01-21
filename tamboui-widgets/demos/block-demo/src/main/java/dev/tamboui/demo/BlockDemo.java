@@ -21,6 +21,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderSet;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
@@ -38,6 +39,7 @@ import java.io.IOException;
  * - Titles (top and bottom)
  * - Padding
  * - Different border combinations
+ * - Custom border character sets
  * - Hyperlinks in titles
  */
 public class BlockDemo {
@@ -193,18 +195,36 @@ public class BlockDemo {
     }
 
     /**
-     * Render blocks with different border types.
+     * Render blocks with different border types and custom border sets.
      */
     private void renderCustomBorders(Frame frame, Rect area) {
-        // Split into 4 sections
-        var cols = Layout.horizontal()
+        // Split into 2 rows:
+        // - Top: border types
+        // - Bottom: truly custom BorderSet examples
+        var rows = Layout.vertical()
+            .constraints(
+                Constraint.percentage(50),
+                Constraint.percentage(50)
+            )
+            .split(area);
+
+        var topCols = Layout.horizontal()
             .constraints(
                 Constraint.percentage(25),
                 Constraint.percentage(25),
                 Constraint.percentage(25),
                 Constraint.percentage(25)
             )
-            .split(area);
+            .split(rows.get(0));
+
+        var bottomCols = Layout.horizontal()
+            .constraints(
+                Constraint.percentage(25),
+                Constraint.percentage(25),
+                Constraint.percentage(25),
+                Constraint.percentage(25)
+            )
+            .split(rows.get(1));
 
         // Rounded borders
         Block rounded = Block.builder()
@@ -213,7 +233,7 @@ public class BlockDemo {
             .borderStyle(Style.EMPTY.fg(Color.RED))
             .title(Title.from("Rounded").centered())
             .build();
-        frame.renderWidget(rounded, cols.get(0));
+        frame.renderWidget(rounded, topCols.get(0));
 
         // Double borders
         Block doubled = Block.builder()
@@ -222,7 +242,7 @@ public class BlockDemo {
             .borderStyle(Style.EMPTY.fg(Color.GREEN))
             .title(Title.from("Double").centered())
             .build();
-        frame.renderWidget(doubled, cols.get(1));
+        frame.renderWidget(doubled, topCols.get(1));
 
         // Thick borders
         Block thick = Block.builder()
@@ -231,7 +251,7 @@ public class BlockDemo {
             .borderStyle(Style.EMPTY.fg(Color.YELLOW))
             .title(Title.from("Thick").centered())
             .build();
-        frame.renderWidget(thick, cols.get(2));
+        frame.renderWidget(thick, topCols.get(2));
 
         // Quadrant borders
         Block quadrant = Block.builder()
@@ -240,7 +260,52 @@ public class BlockDemo {
             .borderStyle(Style.EMPTY.fg(Color.MAGENTA))
             .title(Title.from("Quadrant").centered())
             .build();
-        frame.renderWidget(quadrant, cols.get(3));
+        frame.renderWidget(quadrant, topCols.get(3));
+
+        // Custom: corners-only (no sides) using BorderSet (demonstrates partial borders)
+        Block cornersOnly = Block.builder()
+            .borders(Borders.NONE)
+            .customBorderSet(new BorderSet("", "", "", "", "◜", "◝", "◟", "◞"))
+            .borderStyle(Style.EMPTY.fg(Color.CYAN))
+            .title(Title.from("Corners").centered())
+            .build();
+        frame.renderWidget(cornersOnly, bottomCols.get(0));
+
+        // Custom: classic ASCII borders
+        Block ascii = Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(new BorderSet("-", "-", "|", "|", "+", "+", "+", "+"))
+            .borderStyle(Style.EMPTY.fg(Color.WHITE))
+            .title(Title.from("ASCII").centered())
+            .build();
+        frame.renderWidget(ascii, bottomCols.get(1));
+
+        // Custom: asymmetric sides (different characters per edge)
+        Block asymmetric = Block.builder()
+            .borders(Borders.ALL)
+            .customBorderSet(BorderSet.builder()
+                .topHorizontal("═")
+                .bottomHorizontal("─")
+                .leftVertical("║")
+                .rightVertical("│")
+                .topLeft("╔")
+                .topRight("╗")
+                .bottomLeft("└")
+                .bottomRight("┘")
+                .build())
+            .borderStyle(Style.EMPTY.fg(Color.BLUE))
+            .title(Title.from("Mixed").centered())
+            .build();
+        frame.renderWidget(asymmetric, bottomCols.get(2));
+
+        // Custom: only a left marker bar (no other borders)
+        Block leftMarker = Block.builder()
+            .borders(Borders.LEFT_ONLY)
+            .customBorderSet(new BorderSet("", "", "▌", "", "", "", "", ""))
+            .borderStyle(Style.EMPTY.fg(Color.YELLOW))
+            .title(Title.from("Left").centered())
+            .build();
+        frame.renderWidget(leftMarker, bottomCols.get(3));
     }
 
     /**
