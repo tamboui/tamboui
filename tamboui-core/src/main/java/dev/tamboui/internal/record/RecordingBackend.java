@@ -25,11 +25,6 @@ import java.util.List;
  */
 public final class RecordingBackend implements Backend {
 
-    // Shared state for System.out capture across all instances
-    private static RecordingConfig sharedConfig = null;
-    private static volatile boolean shutdownHookRegistered = false;
-    private static final Object lock = new Object();
-
     private final Backend delegate;
     private final RecordingConfig config;
     private final Size overrideSize;
@@ -40,6 +35,7 @@ public final class RecordingBackend implements Backend {
     private long lastCaptureTime;
     private volatile boolean recording;
     private volatile boolean closed;
+    private volatile boolean hasDrawn;  // Track if draw() was ever called
 
     public RecordingBackend(Backend delegate, RecordingConfig config) {
         this.delegate = delegate;
@@ -53,53 +49,8 @@ public final class RecordingBackend implements Backend {
         this.lastCaptureTime = 0;
         this.recording = true;
         this.closed = false;
-
-        synchronized (lock) {
-            if (sharedConfig == null) {
-                sharedConfig = config;
-                // Install System.out capture only once
-                AnsiTerminalCapture.install(config);
-
-                // Register shutdown hook to write cast file at process exit
-                if (!shutdownHookRegistered) {
-                    shutdownHookRegistered = true;
-                    Runtime.getRuntime().addShutdownHook(new Thread(RecordingBackend::writeShutdownCast));
-                }
-            }
-        }
-    }
-
-    private static void writeShutdownCast() {
-        synchronized (lock) {
-            if (sharedConfig == null || !AnsiTerminalCapture.isInstalled()) {
-                return;
-            }
-
-            try {
-                List<Buffer> capturedFrames = AnsiTerminalCapture.uninstall();
-                if (capturedFrames.isEmpty()) {
-                    return;
-                }
-
-                AsciinemaAnimation animation = AsciinemaAnimation.fromBuffers(capturedFrames, sharedConfig.fps());
-                String cast = animation.toCast();
-
-                Path outputPath = sharedConfig.outputPath();
-                Path parent = outputPath.getParent();
-                if (parent != null) {
-                    Files.createDirectories(parent);
-                }
-
-                Files.write(outputPath, cast.getBytes(StandardCharsets.UTF_8));
-                // Use original System.out since we just uninstalled the capture
-                System.out.println("Recording saved to: " + outputPath);
-                System.out.println("Frames captured: " + capturedFrames.size());
-            } catch (IOException e) {
-                System.err.println("Failed to write recording: " + e.getMessage());
-            } finally {
-                sharedConfig = null;
-            }
-        }
+        // Note: AnsiTerminalCapture is installed by RecordingConfig.load()
+        // which is called before this constructor
     }
 
     @Override
@@ -113,6 +64,7 @@ public final class RecordingBackend implements Backend {
         for (CellUpdate update : updates) {
             buffer.set(update.x(), update.y(), update.cell());
         }
+        hasDrawn = true;
 
         // Capture frame if recording
         if (recording) {
@@ -156,7 +108,8 @@ public final class RecordingBackend implements Backend {
 
     @Override
     public void flush() throws IOException {
-        // Headless - no output
+        // Pass through to System.out for AnsiTerminalCapture to capture frames
+        System.out.flush();
     }
 
     @Override
@@ -226,12 +179,18 @@ public final class RecordingBackend implements Backend {
 
     @Override
     public void writeRaw(byte[] data) throws IOException {
-        // Headless - no output
+        // Pass through to System.out for AnsiTerminalCapture to process
+        // This allows InlineDisplay output to be captured
+        System.out.write(data);
+        System.out.flush();
     }
 
     @Override
     public void writeRaw(String data) throws IOException {
-        // Headless - no output
+        // Pass through to System.out for AnsiTerminalCapture to process
+        // This allows InlineDisplay output to be captured
+        System.out.print(data);
+        System.out.flush();
     }
 
     @Override
@@ -245,8 +204,9 @@ public final class RecordingBackend implements Backend {
         if (!interactionPlayer.isFinished()) {
             int b = interactionPlayer.nextByte(Math.min(timeoutMs, 100));
             // Capture frame during read to ensure we get frames during Sleep commands
-            // Static demos don't redraw on each loop iteration, so we capture here
-            if (recording) {
+            // Only capture if draw() has been called (TUI demos), not for inline demos
+            // which use System.out and AnsiTerminalCapture instead
+            if (recording && hasDrawn) {
                 captureFrame();
             }
             return b;
@@ -311,15 +271,15 @@ public final class RecordingBackend implements Backend {
 
     private void writeCastFromDrawFrames() throws IOException {
         // Write cast file from Backend.draw() captured frames (TUI demos)
+        // For inline demos (no draw() calls), frames will be empty and we let
+        // the shutdown hook write the System.out captured frames instead
         if (frames.isEmpty()) {
-            return;
+            return;  // Let shutdown hook handle AnsiTerminalCapture frames
         }
 
-        // Uninstall System.out capture since we're using draw() frames instead
+        // We have draw() frames - uninstall System.out capture and write draw frames
         AnsiTerminalCapture.uninstall();
-        synchronized (lock) {
-            sharedConfig = null;  // Prevent shutdown hook from also writing
-        }
+        RecordingConfig.clearActive();  // Prevent shutdown hook from also writing
 
         AsciinemaAnimation animation = new AsciinemaAnimation(frames, config.fps());
         String cast = animation.toCast();

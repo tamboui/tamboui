@@ -4,8 +4,12 @@
  */
 package dev.tamboui.internal.record;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Configuration for Asciinema (.cast) recording, loaded from system properties.
@@ -14,6 +18,8 @@ import java.nio.file.Paths;
 public final class RecordingConfig {
 
     private static final String PREFIX = "tamboui.record";
+    private static RecordingConfig activeConfig = null;
+    private static volatile boolean shutdownHookRegistered = false;
 
     private final Path outputPath;
     private final int fps;
@@ -32,11 +38,18 @@ public final class RecordingConfig {
     }
 
     /**
-     * Loads recording configuration from system properties.
+     * Loads recording configuration from system properties and installs capture.
+     * This method installs AnsiTerminalCapture immediately so that all System.out
+     * output is captured from the start, not just after the first Backend is created.
      *
      * @return configuration if recording is enabled, null otherwise
      */
-    public static RecordingConfig load() {
+    public static synchronized RecordingConfig load() {
+        // Return cached config if already loaded
+        if (activeConfig != null) {
+            return activeConfig;
+        }
+
         String output = System.getProperty(PREFIX);
         if (output == null) {
             return null; // Recording disabled
@@ -44,7 +57,7 @@ public final class RecordingConfig {
 
         String configPath = System.getProperty(PREFIX + ".config");
 
-        return new RecordingConfig(
+        RecordingConfig config = new RecordingConfig(
                 Paths.get(output),
                 Integer.getInteger(PREFIX + ".fps", 10),
                 Integer.getInteger(PREFIX + ".duration", 10000),
@@ -52,6 +65,82 @@ public final class RecordingConfig {
                 Integer.getInteger(PREFIX + ".height", 24),
                 configPath != null ? Paths.get(configPath) : null
         );
+
+        // Install System.out capture immediately so all output is captured
+        AnsiTerminalCapture.install(config);
+        activeConfig = config;
+
+        // Register shutdown hook to write cast file at process exit
+        if (!shutdownHookRegistered) {
+            shutdownHookRegistered = true;
+            Runtime.getRuntime().addShutdownHook(new Thread(RecordingConfig::writeShutdownCast));
+        }
+
+        return config;
+    }
+
+    /**
+     * Returns the active recording config, or null if not recording.
+     */
+    public static synchronized RecordingConfig active() {
+        return activeConfig;
+    }
+
+    /**
+     * Checks if recording is enabled via system properties.
+     * This does NOT install the capture - use {@link #load()} for that.
+     *
+     * @return true if recording is configured
+     */
+    public static boolean isEnabled() {
+        return System.getProperty(PREFIX) != null;
+    }
+
+    /**
+     * Clears the active config (called when RecordingBackend writes from draw frames).
+     */
+    static synchronized void clearActive() {
+        activeConfig = null;
+    }
+
+    /**
+     * Shutdown hook to write captured frames to cast file.
+     */
+    private static void writeShutdownCast() {
+        RecordingConfig config;
+        synchronized (RecordingConfig.class) {
+            config = activeConfig;
+            if (config == null || !AnsiTerminalCapture.isInstalled()) {
+                return;
+            }
+        }
+
+        try {
+            List<dev.tamboui.buffer.Buffer> capturedFrames = AnsiTerminalCapture.uninstall();
+            if (capturedFrames.isEmpty()) {
+                return;
+            }
+
+            AsciinemaAnimation animation = AsciinemaAnimation.fromBuffers(capturedFrames, config.fps());
+            String cast = animation.toCast();
+
+            Path outputPath = config.outputPath();
+            Path parent = outputPath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+
+            Files.write(outputPath, cast.getBytes(StandardCharsets.UTF_8));
+            // Use original System.out since we just uninstalled the capture
+            System.out.println("Recording saved to: " + outputPath);
+            System.out.println("Frames captured: " + capturedFrames.size());
+        } catch (IOException e) {
+            System.err.println("Failed to write recording: " + e.getMessage());
+        } finally {
+            synchronized (RecordingConfig.class) {
+                activeConfig = null;
+            }
+        }
     }
 
     /**

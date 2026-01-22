@@ -5,7 +5,7 @@ plugins {
 description = "Inline progress display demo (NPM/Gradle-style)"
 
 demo {
-    displayName = "Inline Progress Demo"
+    displayName = "Inline display mode using low level API demo"
 }
 
 dependencies {

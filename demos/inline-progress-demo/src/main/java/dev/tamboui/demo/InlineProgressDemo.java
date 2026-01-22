@@ -40,6 +40,9 @@ public class InlineProgressDemo {
     private static final String[] SPINNER = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
 
     public static void main(String[] args) throws Exception {
+        // Initialize recording early to capture all System.out output
+        BackendFactory.initRecording();
+
         boolean restart;
         do {
             runDemo();

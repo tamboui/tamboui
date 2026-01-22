@@ -34,6 +34,21 @@ public final class BackendFactory {
     }
 
     /**
+     * Initializes recording if enabled via system properties.
+     * <p>
+     * Call this method early in your application (before any System.out usage)
+     * to ensure all console output is captured when recording is enabled.
+     * This is especially important for inline demos that print to System.out
+     * before creating a Backend.
+     * <p>
+     * If recording is not enabled, this method does nothing.
+     * If recording is already initialized, this method does nothing.
+     */
+    public static void initRecording() {
+        RecordingConfig.load();
+    }
+
+    /**
      * Creates a new backend instance using the discovered provider.
      * <p>
      * This method discovers {@link BackendProvider} implementations on the classpath

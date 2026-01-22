@@ -32,7 +32,15 @@ You can use any layer directly, or mix them as needed.
 
 |<<inline-display-mode,Inline Display>>
 |Fixed status area that preserves terminal scroll history
-|CLI tools, build progress, package managers
+|Low-level inline control, custom rendering
+
+|<<inline-tui-runner,Inline TUI Runner>>
+|Managed event loop for inline displays with key/mouse handling
+|Inline apps needing event handling without full Toolkit
+
+|<<inline-toolkit,Inline Toolkit>>
+|Declarative element-based inline displays
+|Most inline applications - NPM/Gradle-style progress UIs
 |===
 
 == Immediate Mode
@@ -875,6 +883,273 @@ display.setLine(2, Text.from(Span.styled("No errors", Style.EMPTY.fg(Color.GREEN
 |Best for
 |Progress, logs, status
 |Interactive full-screen apps
+|===
+
+[[inline-tui-runner]]
+== Inline TUI Runner
+
+`InlineTuiRunner` adds a managed event loop to inline displays, similar to how `TuiRunner` works for full-screen apps.
+It handles keyboard and mouse events, tick-based animations, and thread-safe updates.
+
+=== Basic Usage
+
+[source,java]
+----
+try (var runner = InlineTuiRunner.create(4)) {
+    runner.run(
+        // Event handler
+        event -> {
+            if (event instanceof KeyEvent key && key.character() == 'q') {
+                runner.quit();
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        },
+        // Renderer
+        frame -> {
+            var gauge = Gauge.builder()
+                .ratio(progress / 100.0)
+                .build();
+            gauge.render(frame.area(), frame.buffer());
+        }
+    );
+}
+----
+
+=== Configuration
+
+[source,java]
+----
+var config = InlineTuiConfig.builder(4)  // 4 lines
+    .tickRate(Duration.ofMillis(50))     // For animations
+    .clearOnClose(true)                   // Clear viewport on exit
+    .build();
+
+try (var runner = InlineTuiRunner.create(config)) {
+    // ...
+}
+----
+
+=== Printing Above the Viewport
+
+[source,java]
+----
+// Plain text
+runner.println("Task completed!");
+
+// Styled text
+runner.println(Text.from(
+    Span.styled("✓ ", Style.EMPTY.fg(Color.GREEN)),
+    Span.raw("Build successful")
+));
+----
+
+=== Thread-Safe Updates
+
+[source,java]
+----
+// Run code on the render thread
+runner.runOnRenderThread(() -> {
+    progress = newValue;
+});
+
+// Schedule for later
+runner.runLater(() -> {
+    cleanup();
+});
+----
+
+[[inline-toolkit]]
+== Inline Toolkit
+
+The Inline Toolkit provides the same declarative, element-based API as the full Toolkit DSL, but for inline displays.
+This is the recommended approach for most inline applications.
+
+=== InlineApp Base Class
+
+The easiest way to create an inline application:
+
+[source,java]
+----
+public class MyProgressApp extends InlineApp {
+
+    private double progress = 0.0;
+
+    public static void main(String[] args) throws Exception {
+        new MyProgressApp().run();
+    }
+
+    @Override
+    protected int height() {
+        return 3;  // Reserve 3 lines
+    }
+
+    @Override
+    protected Element render() {
+        return column(
+            text("Installing packages...").bold(),
+            gauge(progress).green(),
+            text(String.format("%.0f%% complete", progress * 100)).dim()
+        );
+    }
+
+    @Override
+    protected void onStart() {
+        // Schedule periodic updates
+        runner().scheduleRepeating(() -> {
+            runner().runOnRenderThread(() -> {
+                progress += 0.01;
+                if (progress >= 1.0) quit();
+            });
+        }, Duration.ofMillis(50));
+    }
+}
+----
+
+=== Configuration
+
+Override `configure()` to customize behavior:
+
+[source,java]
+----
+@Override
+protected InlineTuiConfig configure(int height) {
+    return InlineTuiConfig.builder(height)
+        .tickRate(Duration.ofMillis(30))  // Faster for smooth animations
+        .clearOnClose(false)               // Keep output visible
+        .build();
+}
+----
+
+=== Printing Elements
+
+Print styled content above the viewport:
+
+[source,java]
+----
+// Print a styled element
+println(row(
+    text("✓ ").green().fit(),
+    text("lodash").fit(),
+    text("@4.17.21").dim().fit()
+).flex(Flex.START));
+
+// Print plain text
+println("Step completed");
+----
+
+=== Handling Key Events
+
+Use focusable elements or global key handlers:
+
+[source,java]
+----
+@Override
+protected Element render() {
+    return column(
+        text("Continue? [Y/n]").cyan(),
+        spacer()
+    )
+    .focusable()
+    .onKeyEvent(event -> {
+        if (event.character() == 'y' || event.character() == 'Y') {
+            startNextPhase();
+            return EventResult.HANDLED;
+        } else if (event.character() == 'n') {
+            quit();
+            return EventResult.HANDLED;
+        }
+        return EventResult.UNHANDLED;
+    });
+}
+----
+
+=== Text Input in Inline Mode
+
+Text inputs work with proper focus management:
+
+[source,java]
+----
+private final TextInputState nameState = new TextInputState();
+
+@Override
+protected Element render() {
+    return column(
+        row(
+            text("Name: ").bold().fit(),
+            textInput(nameState)
+                .id("name-input")
+                .placeholder("Enter name...")
+                .constraint(Constraint.length(20))
+                .onSubmit(this::handleSubmit)
+        ).flex(Flex.START),
+        text("[Enter] Submit  [Tab] Next field").dim()
+    );
+}
+----
+
+=== Using InlineToolkitRunner Directly
+
+For more control, use `InlineToolkitRunner` with a render function:
+
+[source,java]
+----
+try (var runner = InlineToolkitRunner.create(3)) {
+    runner.run(() -> column(
+        waveText("Processing...").cyan(),
+        gauge(progress),
+        text("Please wait").dim()
+    ));
+}
+----
+
+=== Scopes for Dynamic Regions
+
+Use `scope()` to create collapsible regions:
+
+[source,java]
+----
+private boolean downloading = true;
+
+@Override
+protected Element render() {
+    return column(
+        text("Package Installation").bold(),
+
+        // This section collapses when downloading becomes false
+        scope(downloading,
+            row(text("file1.zip: "), gauge(progress1)),
+            row(text("file2.zip: "), gauge(progress2))
+        ),
+
+        text(downloading ? "Downloading..." : "Complete!").dim()
+    );
+}
+----
+
+When `downloading` becomes `false`, the scope collapses to zero height and the layout adjusts automatically.
+
+=== Inline vs Full-Screen Toolkit
+
+[cols="1,2,2",options="header"]
+|===
+|Feature |InlineApp / InlineToolkitRunner |App / ToolkitRunner
+
+|Screen
+|Inline (preserves scroll)
+|Alternate screen (full takeover)
+
+|Height
+|Fixed (specified lines)
+|Dynamic (full terminal)
+
+|Output
+|`println()` scrolls above
+|No scrolling output
+
+|Use case
+|Progress, status, forms
+|Full interactive applications
 |===
 
 == Choosing a Level

@@ -159,6 +159,11 @@ public abstract class RecordDemoTask extends DefaultTask {
                 spec.systemProperty("tamboui.record.config", configFileObj.getAbsolutePath());
             }
 
+            // Ensure stdout/stderr go to real streams, not Gradle's logging
+            // This is needed for AnsiTerminalCapture to work properly
+            spec.setStandardOutput(System.out);
+            spec.setErrorOutput(System.err);
+
             // Don't fail if the process is killed due to timeout
             spec.setIgnoreExitValue(true);
         });

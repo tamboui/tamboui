@@ -163,6 +163,11 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         if (inputArea.contains(cursorX, cursorY)) {
             Cell currentCell = buffer.get(cursorX, cursorY);
             buffer.set(cursorX, cursorY, currentCell.patchStyle(cursorStyle));
+
+            // Also set terminal cursor position for inline displays
+            if (frame != null) {
+                frame.setCursorPosition(cursorX, cursorY);
+            }
         }
     }
 

@@ -141,8 +141,16 @@ public final class Frame {
      *
      * @return the cursor position, or empty if not set
      */
-    Optional<Position> cursorPosition() {
+    public Optional<Position> cursorPosition() {
         return Optional.ofNullable(cursorPosition);
+    }
+
+    /**
+     * Clears the cursor position, hiding the cursor.
+     */
+    public void clearCursor() {
+        this.cursorPosition = null;
+        this.cursorVisible = false;
     }
 
     /**

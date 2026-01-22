@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
  * <p>
  * InlineDisplay reserves a number of lines at the current cursor position and
  * allows rendering widgets to that area. Content can be printed above the display
- * area using {@link #println(String)}, which scrolls output while the status area
+ * area using {@link #println(String)}, which scrolls output while the display area
  * stays in place.
  *
  * <p>Unlike full TUI runners, InlineDisplay does NOT:
@@ -62,6 +62,7 @@ public final class InlineDisplay implements AutoCloseable {
     private boolean initialized;
     private boolean released;
     private boolean shouldClearOnClose;
+    private int lastCursorY;  // Track where cursor was left for next render
 
     InlineDisplay(int height, int width, Backend backend, PrintWriter out) {
         this.height = height;
@@ -144,8 +145,8 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Configures the display to clear the status area when closed.
-     * By default, the status area content remains visible after close.
+     * Configures the display to clear the display area when closed.
+     * By default, the display area content remains visible after close.
      *
      * @return this display for chaining
      */
@@ -155,20 +156,32 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Renders widgets to the status area.
-     * The provided consumer receives the display area and buffer to render into.
+     * Renders widgets to the display area.
+     * The provided consumer receives the area and buffer to render into.
      *
      * @param renderer the rendering function that populates the buffer
      */
     public void render(BiConsumer<Rect, Buffer> renderer) {
-        ensureInitialized();
-        buffer.clear();
-        renderer.accept(buffer.area(), buffer);
-        redrawStatusArea();
+        render(renderer, -1, -1);
     }
 
     /**
-     * Sets a single line of text in the status area.
+     * Renders widgets to the display area with explicit cursor positioning.
+     * The provided consumer receives the area and buffer to render into.
+     *
+     * @param renderer the rendering function that populates the buffer
+     * @param cursorX the x position for the cursor, or -1 to use default positioning
+     * @param cursorY the y position for the cursor, or -1 to use default positioning
+     */
+    public void render(BiConsumer<Rect, Buffer> renderer, int cursorX, int cursorY) {
+        ensureInitialized();
+        buffer.clear();
+        renderer.accept(buffer.area(), buffer);
+        redrawDisplayArea(cursorX, cursorY);
+    }
+
+    /**
+     * Sets a single line of text in the display area.
      * This is a convenience method for simple text updates without widgets.
      *
      * @param line    the line index (0-based, must be less than height)
@@ -186,11 +199,11 @@ public final class InlineDisplay implements AutoCloseable {
         }
         buffer.setString(0, line, content, Style.EMPTY);
 
-        redrawStatusArea();
+        redrawDisplayArea(-1, -1);
     }
 
     /**
-     * Sets a single line of styled text in the status area.
+     * Sets a single line of styled text in the display area.
      *
      * @param line the line index (0-based, must be less than height)
      * @param text the styled text to display
@@ -211,12 +224,12 @@ public final class InlineDisplay implements AutoCloseable {
             buffer.setLine(0, line, text.lines().get(0));
         }
 
-        redrawStatusArea();
+        redrawDisplayArea(-1, -1);
     }
 
     /**
-     * Prints a line of text above the status area.
-     * The text scrolls up as new lines are added, while the status area
+     * Prints a line of text above the display area.
+     * The text scrolls up as new lines are added, while the display area
      * stays in place at the bottom.
      *
      * @param message the message to print
@@ -224,29 +237,29 @@ public final class InlineDisplay implements AutoCloseable {
     public void println(String message) {
         ensureInitialized();
 
-        // Move cursor to top of status area
+        // Move cursor to top of display area
         out.print(CSI + height + "A");  // Move up
         out.print("\r");                 // Move to start of line
 
-        // Insert a new line (pushes status area down)
+        // Insert a new line (pushes display area down)
         out.print(CSI + "L");
 
         // Print the message
         out.print(message);
         out.print(CSI + "K");  // Clear to end of line
 
-        // Move back down to bottom of status area
+        // Move back down to bottom of display area
         out.print("\n");
         out.print(CSI + (height - 1) + "B");
 
         out.flush();
 
-        // Redraw the status area since it was pushed down
-        redrawStatusArea();
+        // Redraw the display area since it was pushed down
+        redrawDisplayArea(-1, -1);
     }
 
     /**
-     * Prints styled text above the status area.
+     * Prints styled text above the display area.
      *
      * @param text the styled text to print
      */
@@ -264,7 +277,7 @@ public final class InlineDisplay implements AutoCloseable {
 
     /**
      * Explicitly releases the display before close().
-     * Moves the cursor below the status area and optionally clears it.
+     * Moves the cursor below the display area and optionally clears it.
      */
     public void release() {
         if (released) {
@@ -272,12 +285,14 @@ public final class InlineDisplay implements AutoCloseable {
         }
 
         if (shouldClearOnClose) {
-            clearStatusArea();
+            clearDisplayArea();
         }
 
-        // Move cursor to after the status area
+        // Move cursor to after the display area and restore cursor visibility
         out.print("\r");
         out.print(CSI + "0m");  // Reset style
+        out.print(CSI + "?25h");  // Show cursor again
+        out.print(CSI + "0 q");  // Reset cursor to default style
         out.println();
         out.flush();
 
@@ -315,24 +330,33 @@ public final class InlineDisplay implements AutoCloseable {
             return;
         }
 
-        // Print blank lines to reserve space for the status area
+        // Hide cursor - we render cursor as a styled cell in the buffer instead.
+        // This avoids flicker from hide/show cycling during redraws.
+        out.print(CSI + "?25l");
+
+        // Print blank lines to reserve space for the display area
         for (int i = 0; i < height; i++) {
             out.println();
         }
 
-        // Move cursor back up to the start of the status area
+        // Move cursor back up to the start of the display area
         out.print(CSI + height + "A");
         out.flush();
 
         initialized = true;
     }
 
-    private void redrawStatusArea() {
-        // Save cursor position
-        out.print(CSI + "s");
+    private void redrawDisplayArea(int cursorX, int cursorY) {
+        // Cursor is hidden since initialization - no need to hide/show here.
+        // TextInput renders cursor as a styled cell (reversed) in the buffer.
 
-        // Move to start of status area
+        // Move to start of display area (line 0)
+        // First, go to start of current line
         out.print("\r");
+        // Then move up to line 0 if cursor was left on a different line
+        if (lastCursorY > 0) {
+            out.print(CSI + lastCursorY + "A");
+        }
 
         // Render each line
         for (int y = 0; y < height; y++) {
@@ -356,14 +380,56 @@ public final class InlineDisplay implements AutoCloseable {
             out.print(CSI + "K");
         }
 
-        // Reset style and restore cursor position
+        // Reset style
         out.print(AnsiStringBuilder.RESET);
-        out.print(CSI + "u");
+
+        // Position cursor
+        // First go back to start of display area
+        if (height > 1) {
+            out.print(CSI + (height - 1) + "A");  // Move up to first line
+        }
+        out.print("\r");
+
+        if (cursorX >= 0 && cursorY >= 0) {
+            // Use explicit cursor position
+            if (cursorY > 0) {
+                out.print(CSI + cursorY + "B");  // Move down to cursor line
+            }
+            if (cursorX > 0) {
+                out.print(CSI + cursorX + "C");  // Move right to cursor column
+            }
+            lastCursorY = cursorY;
+        } else {
+            // Default: move cursor to end of first line content (for prompt-style UX)
+            int endX = findLastContentPosition(0);
+            if (endX > 0) {
+                out.print(CSI + endX + "C");  // Move right to end of content
+            }
+            lastCursorY = 0;
+        }
+
+        // Keep terminal cursor hidden - TextInput renders cursor as a styled cell
+        // in the buffer (reversed style), so we don't need the terminal cursor.
+        // This eliminates flicker from hide/show cycling.
         out.flush();
     }
 
-    private void clearStatusArea() {
-        // Move to start of status area
+    /**
+     * Finds the position after the last non-empty cell on a line.
+     */
+    private int findLastContentPosition(int line) {
+        for (int x = width - 1; x >= 0; x--) {
+            Cell cell = buffer.get(x, line);
+            String symbol = cell.symbol();
+            if (!symbol.isEmpty() && !symbol.equals(" ")) {
+                return x + 1;
+            }
+        }
+        return 0;
+    }
+
+    private void clearDisplayArea() {
+        // Move to start of display area
         out.print("\r");
 
         // Clear each line

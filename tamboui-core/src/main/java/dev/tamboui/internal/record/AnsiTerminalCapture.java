@@ -119,6 +119,10 @@ public final class AnsiTerminalCapture extends OutputStream {
     public void write(int b) throws IOException {
         // Pass through to original output
         tee.write(b);
+        // Force flush on newlines to ensure timely output when piped
+        if (b == '\n') {
+            tee.flush();
+        }
 
         // Accumulate byte for later decoding
         pendingBytes.write(b);
@@ -128,6 +132,8 @@ public final class AnsiTerminalCapture extends OutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         // Pass through to original output
         tee.write(b, off, len);
+        // Force flush to ensure output appears when piped
+        tee.flush();
 
         // Accumulate bytes for later decoding
         pendingBytes.write(b, off, len);
@@ -610,9 +616,10 @@ public final class AnsiTerminalCapture extends OutputStream {
 
     private void captureFrame() {
         long now = System.currentTimeMillis();
+        long elapsed = now - startTime;
 
         // Check duration limit
-        if (now - startTime > maxDurationMs) {
+        if (elapsed > maxDurationMs) {
             return;
         }
 

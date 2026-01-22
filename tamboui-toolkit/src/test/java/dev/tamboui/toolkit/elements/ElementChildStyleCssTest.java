@@ -59,8 +59,12 @@ class ElementChildStyleCssTest {
             // Use constructor with text - this sets cursor at end (position 5)
             TextInputState state = new TextInputState("Hello");
 
+            // Focus the element so cursor is rendered
+            context.focusManager().setFocus("test-input");
+
             // Use explicit style
             textInput(state)
+                .id("test-input")
                 .cursorStyle(Style.EMPTY.bg(Color.RED))
                 .render(frame, area, context);
 
@@ -101,7 +105,11 @@ class ElementChildStyleCssTest {
             // Use constructor with text - this sets cursor at end (position 2)
             TextInputState state = new TextInputState("Hi");
 
+            // Focus the element so cursor is rendered
+            context.focusManager().setFocus("test-input");
+
             textInput(state)
+                .id("test-input")
                 .render(frame, area, context);
 
             // Default cursor style is reversed - cursor at position 2

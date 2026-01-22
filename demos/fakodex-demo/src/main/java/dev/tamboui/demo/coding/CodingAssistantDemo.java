@@ -314,6 +314,8 @@ public class CodingAssistantDemo {
                         textInput(inputState)
                                 .placeholder(isProcessing ? "" : "Ask anything...")
                                 .showCursor(!isProcessing)
+                                .cursorRequiresFocus(false)
+                                .onSubmit(this::submitInput)
                                 .constraint(Constraint.fill())
                 ).constraint(Constraint.length(1))
         );

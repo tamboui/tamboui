@@ -68,21 +68,15 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     private BorderType borderType;
     private Color borderColor;
     private boolean showCursor = true;
+    private boolean cursorRequiresFocus = true;
+    private Runnable onSubmit;
 
     public TextInputElement() {
         this.state = new TextInputState();
-        ensureId();
     }
 
     public TextInputElement(TextInputState state) {
         this.state = state != null ? state : new TextInputState();
-        ensureId();
-    }
-
-    private void ensureId() {
-        if (elementId == null) {
-            elementId = IdGenerator.newId(this);
-        }
     }
 
     /**
@@ -154,6 +148,22 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     }
 
     /**
+     * Sets whether the cursor requires focus to be displayed.
+     * <p>
+     * When {@code true} (default), the cursor is only shown when this element is focused.
+     * When {@code false}, the cursor is shown whenever {@link #showCursor(boolean)} is true,
+     * regardless of focus state. This is useful when the text input is inside a focusable
+     * container that handles key events manually.
+     *
+     * @param requiresFocus true to require focus for cursor display
+     * @return this element for chaining
+     */
+    public TextInputElement cursorRequiresFocus(boolean requiresFocus) {
+        this.cursorRequiresFocus = requiresFocus;
+        return this;
+    }
+
+    /**
      * Sets the title for the border.
      */
     public TextInputElement title(String title) {
@@ -190,9 +200,23 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     }
 
     /**
+     * Sets a callback to be invoked when Enter is pressed.
+     * <p>
+     * Use this for form submission or to move to the next field.
+     *
+     * @param onSubmit the callback to invoke on Enter
+     * @return this element for chaining
+     */
+    public TextInputElement onSubmit(Runnable onSubmit) {
+        this.onSubmit = onSubmit;
+        return this;
+    }
+
+    /**
      * Handles a key event for text input.
      * <p>
      * Handles: character input, backspace, delete, left/right arrows, home/end.
+     * Enter triggers the onSubmit callback if set.
      * Only processes events when focused.
      *
      * @param event the key event
@@ -203,6 +227,11 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (!focused) {
             return EventResult.UNHANDLED;
+        }
+        // Handle Enter key - call onSubmit callback if set
+        if (event.isConfirm() && onSubmit != null) {
+            onSubmit.run();
+            return EventResult.HANDLED;
         }
         return handleTextInputKey(state, event) ? EventResult.HANDLED : EventResult.UNHANDLED;
     }
@@ -241,7 +270,10 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
         TextInput widget = builder.build();
 
-        if (showCursor) {
+        // Determine if cursor should be shown
+        boolean isFocused = elementId != null && context.isFocused(elementId);
+        boolean shouldShowCursor = showCursor && (!cursorRequiresFocus || isFocused);
+        if (shouldShowCursor) {
             widget.renderWithCursor(area, frame.buffer(), state, frame);
         } else {
             frame.renderStatefulWidget(widget, area, state);

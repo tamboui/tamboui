@@ -61,6 +61,9 @@
     "custom-component-demo": {
       "script-ref": "tamboui-toolkit/demos/custom-component-demo/src/main/java/dev/tamboui/demo/CustomComponentDemo.java"
     },
+    "inline-toolkit-demo": {
+      "script-ref": "tamboui-toolkit/demos/inline-toolkit-demo/src/main/java/dev/tamboui/demo/InlineToolkitDemo.java"
+    },
     "jtop-demo": {
       "script-ref": "tamboui-toolkit/demos/jtop-demo/src/main/java/dev/tamboui/demo/JTopDemo.java"
     },

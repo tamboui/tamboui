@@ -60,16 +60,25 @@ public final class FocusManager {
     /**
      * Registers a focusable element with its rendered area.
      * Called during rendering to track focusable elements.
+     * <p>
+     * If nothing is currently focused, the first registered element
+     * will be auto-focused.
      *
      * @param elementId the element ID
      * @param area the rendered area
      */
     public void registerFocusable(String elementId, Rect area) {
         if (elementId != null) {
+            boolean isFirst = focusOrder.isEmpty();
             if (!focusOrder.contains(elementId)) {
                 focusOrder.add(elementId);
             }
             focusableAreas.put(elementId, area);
+
+            // Auto-focus first focusable element if nothing is focused
+            if (isFirst && focusedId == null) {
+                focusedId = elementId;
+            }
         }
     }
 
