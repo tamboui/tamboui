@@ -31,6 +31,7 @@ import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**

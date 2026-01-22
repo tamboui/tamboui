@@ -10,11 +10,11 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.PropertyKey;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardProperties;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
@@ -29,20 +29,16 @@ public final class TextInput implements StatefulWidget<TextInputState> {
      * <p>
      * CSS property name: {@code cursor-color}
      */
-    public static final PropertyDefinition<Color> CURSOR_COLOR =
-            PropertyDefinition.of("cursor-color", ColorConverter.INSTANCE);
+    public static final PropertyKey<Color> CURSOR_COLOR =
+            PropertyKey.of("cursor-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the placeholder text color.
      * <p>
      * CSS property name: {@code placeholder-color}
      */
-    public static final PropertyDefinition<Color> PLACEHOLDER_COLOR =
-            PropertyDefinition.of("placeholder-color", ColorConverter.INSTANCE);
-
-    static {
-        PropertyRegistry.registerAll(CURSOR_COLOR, PLACEHOLDER_COLOR);
-    }
+    public static final PropertyKey<Color> PLACEHOLDER_COLOR =
+            PropertyKey.of("placeholder-color", ColorConverter.INSTANCE);
 
     private final Block block;
     private final Style style;
@@ -55,10 +51,10 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         this.placeholder = builder.placeholder;
 
         // Resolve style-aware properties
-        Color resolvedBg = builder.resolveBackground();
-        Color resolvedFg = builder.resolveForeground();
-        Color resolvedCursorColor = builder.resolveCursorColor();
-        Color resolvedPlaceholderColor = builder.resolvePlaceholderColor();
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedFg = builder.foreground.resolve();
+        Color resolvedCursorColor = builder.cursorColor.resolve();
+        Color resolvedPlaceholderColor = builder.placeholderColor.resolve();
 
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
@@ -174,11 +170,15 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         private Style placeholderStyle = Style.EMPTY.dim();
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties (resolved via styleResolver in build())
-        private Color background;
-        private Color foreground;
-        private Color cursorColor;
-        private Color placeholderColor;
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> foreground =
+                StyledProperty.of(StandardPropertyKeys.COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> cursorColor =
+                StyledProperty.of(CURSOR_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> placeholderColor =
+                StyledProperty.of(PLACEHOLDER_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -231,7 +231,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background = color;
+            this.background.set(color);
             return this;
         }
 
@@ -244,7 +244,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * @return this builder
          */
         public Builder foreground(Color color) {
-            this.foreground = color;
+            this.foreground.set(color);
             return this;
         }
 
@@ -257,7 +257,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * @return this builder
          */
         public Builder cursorColor(Color color) {
-            this.cursorColor = color;
+            this.cursorColor.set(color);
             return this;
         }
 
@@ -270,29 +270,12 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * @return this builder
          */
         public Builder placeholderColor(Color color) {
-            this.placeholderColor = color;
+            this.placeholderColor.set(color);
             return this;
         }
 
         public TextInput build() {
             return new TextInput(this);
-        }
-
-        // Resolution helpers
-        private Color resolveBackground() {
-            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
-        }
-
-        private Color resolveForeground() {
-            return styleResolver.resolve(StandardProperties.COLOR, foreground);
-        }
-
-        private Color resolveCursorColor() {
-            return styleResolver.resolve(CURSOR_COLOR, cursorColor);
-        }
-
-        private Color resolvePlaceholderColor() {
-            return styleResolver.resolve(PLACEHOLDER_COLOR, placeholderColor);
         }
     }
 }

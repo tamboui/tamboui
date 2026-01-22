@@ -3,6 +3,7 @@ rootProject.name = "tamboui-parent"
 val modules = listOf(
     "tamboui-core",
     "tamboui-css",
+    "tamboui-pygments",
     "tamboui-widgets",
     "tamboui-image",
     "tamboui-jline3-backend",

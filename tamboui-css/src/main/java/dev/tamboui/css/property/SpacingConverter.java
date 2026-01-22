@@ -4,7 +4,7 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Padding;
+import dev.tamboui.widgets.block.Padding;
 
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +20,6 @@ import java.util.Optional;
  * </ul>
  */
 public final class SpacingConverter implements PropertyConverter<Padding> {
-
-    public static final SpacingConverter INSTANCE = new SpacingConverter();
 
     @Override
     public Optional<Padding> convert(String value, Map<String, String> variables) {

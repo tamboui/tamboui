@@ -27,7 +27,7 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.io.IOException;
 

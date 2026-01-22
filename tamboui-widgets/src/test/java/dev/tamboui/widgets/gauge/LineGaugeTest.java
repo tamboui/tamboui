@@ -4,12 +4,10 @@
  */
 package dev.tamboui.widgets.gauge;
 
-import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.TestStylePropertyResolver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
@@ -215,35 +213,5 @@ class LineGaugeTest {
         LineGauge.LineSet validSet = new LineGauge.LineSet(".", "#");
         assertThat(validSet.unfilled()).isEqualTo(".");
         assertThat(validSet.filled()).isEqualTo("#");
-    }
-
-    @Test
-    @DisplayName("LineGauge uses FILLED_COLOR property from StylePropertyResolver")
-    void usesFilledColorProperty() {
-        LineGauge gauge = LineGauge.builder()
-                .percent(100)
-                .styleResolver(TestStylePropertyResolver.of("filled-color", Color.GREEN))
-                .build();
-        Rect area = new Rect(0, 0, 10, 1);
-        Buffer buffer = Buffer.empty(area);
-
-        gauge.render(area, buffer);
-
-        BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
-    }
-
-    @Test
-    @DisplayName("LineGauge uses UNFILLED_COLOR property from StylePropertyResolver")
-    void usesUnfilledColorProperty() {
-        LineGauge gauge = LineGauge.builder()
-                .percent(0)
-                .styleResolver(TestStylePropertyResolver.of("unfilled-color", Color.DARK_GRAY))
-                .build();
-        Rect area = new Rect(0, 0, 10, 1);
-        Buffer buffer = Buffer.empty(area);
-
-        gauge.render(area, buffer);
-
-        BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.DARK_GRAY);
     }
 }

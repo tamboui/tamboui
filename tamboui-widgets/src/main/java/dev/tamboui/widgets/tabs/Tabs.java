@@ -8,11 +8,11 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.PropertyKey;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardProperties;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.StatefulWidget;
@@ -48,12 +48,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
      * <p>
      * CSS property name: {@code highlight-color}
      */
-    public static final PropertyDefinition<Color> HIGHLIGHT_COLOR =
-            PropertyDefinition.of("highlight-color", ColorConverter.INSTANCE);
-
-    static {
-        PropertyRegistry.register(HIGHLIGHT_COLOR);
-    }
+    public static final PropertyKey<Color> HIGHLIGHT_COLOR =
+            PropertyKey.of("highlight-color", ColorConverter.INSTANCE);
 
     private final List<Line> titles;
     private final Block block;
@@ -71,8 +67,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         this.paddingRight = builder.paddingRight;
 
         // Resolve style-aware properties
-        Color resolvedBg = builder.resolveBackground();
-        Color resolvedHighlightColor = builder.resolveHighlightColor();
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedHighlightColor = builder.highlightColor.resolve();
 
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
@@ -207,9 +203,11 @@ public final class Tabs implements StatefulWidget<TabsState> {
         private String paddingRight = "";
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties (resolved via styleResolver in build())
-        private Color background;
-        private Color highlightColor;
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> highlightColor =
+                StyledProperty.of(HIGHLIGHT_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -344,7 +342,7 @@ public final class Tabs implements StatefulWidget<TabsState> {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background = color;
+            this.background.set(color);
             return this;
         }
 
@@ -357,21 +355,12 @@ public final class Tabs implements StatefulWidget<TabsState> {
          * @return this builder
          */
         public Builder highlightColor(Color color) {
-            this.highlightColor = color;
+            this.highlightColor.set(color);
             return this;
         }
 
         public Tabs build() {
             return new Tabs(this);
-        }
-
-        // Resolution helpers
-        private Color resolveBackground() {
-            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
-        }
-
-        private Color resolveHighlightColor() {
-            return styleResolver.resolve(HIGHLIGHT_COLOR, highlightColor);
         }
     }
 }

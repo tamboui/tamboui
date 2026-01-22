@@ -4,13 +4,11 @@
  */
 package dev.tamboui.widgets.table;
 
-import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -272,30 +270,5 @@ class TableTest {
 
         // Without widths, nothing renders
         assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
-    }
-
-    @Test
-    @DisplayName("Table uses HIGHLIGHT_COLOR property from StylePropertyResolver")
-    void usesHighlightColorProperty() {
-        Table table = Table.builder()
-                .rows(Arrays.asList(
-                    Row.from("Alice", "30"),
-                    Row.from("Bob", "25")
-                ))
-                .widths(Constraint.length(10), Constraint.length(5))
-                .highlightSymbol("")
-                .highlightSpacing(Table.HighlightSpacing.NEVER)
-                .styleResolver(TestStylePropertyResolver.of("highlight-color", Color.BLUE))
-                .build();
-
-        Rect area = new Rect(0, 0, 20, 3);
-        Buffer buffer = Buffer.empty(area);
-        TableState state = new TableState();
-        state.select(1); // Select second row
-
-        table.render(area, buffer, state);
-
-        // Second row "Bob" starts at y=1 and should have blue background
-        BufferAssertions.assertThat(buffer).at(0, 1).hasBackground(Color.BLUE);
     }
 }

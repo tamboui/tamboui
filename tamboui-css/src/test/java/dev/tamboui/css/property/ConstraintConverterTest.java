@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ConstraintConverterTest {
 
-    private final ConstraintConverter converter = ConstraintConverter.INSTANCE;
+    private final ConstraintConverter converter = new ConstraintConverter();
 
     @Test
     void convertsFit() {

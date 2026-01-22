@@ -22,12 +22,11 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderSet;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
-import dev.tamboui.layout.Padding;
+import dev.tamboui.widgets.block.Padding;
 import dev.tamboui.widgets.block.Title;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +34,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * A container element with borders and title.
@@ -483,12 +481,6 @@ public final class Panel extends ContainerElement<Panel> {
             blockBuilder.borderColor(effectiveBorderColor);
         }
 
-        // Apply CSS border customization if present
-        BorderSet customBorderSet = resolveCustomBorderSet(cssResolver);
-        if (customBorderSet != null) {
-            blockBuilder.customBorderSet(customBorderSet);
-        }
-
         if (title != null) {
             blockBuilder.title(Title.from(title).overflow(titleOverflow));
         }
@@ -565,101 +557,6 @@ public final class Panel extends ContainerElement<Panel> {
             Rect childArea = areas.get(i);
             context.renderChild(child, frame, childArea);
         }
-    }
-
-    /**
-     * Resolves custom border characters from CSS properties.
-     * <p>
-     * Priority (most specific wins):
-     * <ol>
-     *   <li>Individual properties (border-top, border-left, border-top-left, etc.)</li>
-     *   <li>border-chars shorthand</li>
-     *   <li>border-type (defaults to PLAIN if not set)</li>
-     * </ol>
-     */
-    private BorderSet resolveCustomBorderSet(CssStyleResolver cssResolver) {
-        if (cssResolver == null) {
-            return null;
-        }
-
-        // Check if any border customization is present
-        Optional<String> borderChars = cssResolver.borderChars();
-        boolean hasIndividualOverrides = cssResolver.borderTop().isPresent() ||
-                cssResolver.borderBottom().isPresent() ||
-                cssResolver.borderLeft().isPresent() ||
-                cssResolver.borderRight().isPresent() ||
-                cssResolver.borderTopLeft().isPresent() ||
-                cssResolver.borderTopRight().isPresent() ||
-                cssResolver.borderBottomLeft().isPresent() ||
-                cssResolver.borderBottomRight().isPresent();
-
-        if (!borderChars.isPresent() && !hasIndividualOverrides) {
-            return null;
-        }
-
-        // Start with base set from border-type or PLAIN
-        BorderType baseType = cssResolver.borderType().orElse(BorderType.PLAIN);
-        BorderSet baseSet = baseType.set();
-        if (baseSet == null) {
-            baseSet = BorderType.PLAIN.set();
-        }
-
-        // Parse border-chars if present (overrides border-type)
-        if (borderChars.isPresent()) {
-            BorderSet parsed = parseBorderChars(borderChars.get());
-            if (parsed != null) {
-                baseSet = parsed;
-            }
-        }
-
-        // Apply individual property overrides
-        String top = cssResolver.borderTop().orElse(baseSet.topHorizontal());
-        String bottom = cssResolver.borderBottom().orElse(baseSet.bottomHorizontal());
-        String left = cssResolver.borderLeft().orElse(baseSet.leftVertical());
-        String right = cssResolver.borderRight().orElse(baseSet.rightVertical());
-        String topLeft = cssResolver.borderTopLeft().orElse(baseSet.topLeft());
-        String topRight = cssResolver.borderTopRight().orElse(baseSet.topRight());
-        String bottomLeft = cssResolver.borderBottomLeft().orElse(baseSet.bottomLeft());
-        String bottomRight = cssResolver.borderBottomRight().orElse(baseSet.bottomRight());
-
-        return new BorderSet(top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight);
-    }
-
-    /**
-     * Parses border-chars CSS value into a BorderSet.
-     * Format: 8 quoted strings (top-h, bottom-h, left-v, right-v, tl, tr, bl, br)
-     */
-    private BorderSet parseBorderChars(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return null;
-        }
-
-        List<String> chars = new ArrayList<>();
-        int i = 0;
-        while (i < value.length()) {
-            char c = value.charAt(i);
-            if (c == '"' || c == '\'') {
-                char quote = c;
-                int start = i + 1;
-                int end = value.indexOf(quote, start);
-                if (end == -1) {
-                    return null; // Unterminated quote
-                }
-                chars.add(value.substring(start, end));
-                i = end + 1;
-            } else {
-                i++;
-            }
-        }
-
-        if (chars.size() != 8) {
-            return null;
-        }
-
-        return new BorderSet(
-                chars.get(0), chars.get(1), chars.get(2), chars.get(3),
-                chars.get(4), chars.get(5), chars.get(6), chars.get(7)
-        );
     }
 
 }

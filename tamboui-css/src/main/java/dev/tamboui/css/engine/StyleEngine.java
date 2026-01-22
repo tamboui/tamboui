@@ -11,9 +11,8 @@ import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.model.Stylesheet;
 import dev.tamboui.css.parser.CssParser;
-import dev.tamboui.css.property.PropertyConverter;
+import dev.tamboui.css.property.PropertyRegistry;
 import dev.tamboui.style.Color;
-import dev.tamboui.style.ColorConverter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -73,14 +72,16 @@ public final class StyleEngine {
     private final Map<String, StylesheetEntry> namedStylesheets;
     private final List<Stylesheet> inlineStylesheets;
     private final CascadeResolver cascadeResolver;
+    private final PropertyRegistry propertyRegistry;
     private final List<StyleChangeListener> listeners;
 
     private String activeStylesheetName;
 
-    private StyleEngine() {
+    private StyleEngine(PropertyRegistry propertyRegistry) {
         this.namedStylesheets = new LinkedHashMap<>();
         this.inlineStylesheets = new ArrayList<>();
-        this.cascadeResolver = new CascadeResolver();
+        this.cascadeResolver = new CascadeResolver(propertyRegistry);
+        this.propertyRegistry = propertyRegistry;
         this.listeners = new CopyOnWriteArrayList<>();
         this.activeStylesheetName = null;
     }
@@ -91,7 +92,17 @@ public final class StyleEngine {
      * @return a new StyleEngine
      */
     public static StyleEngine create() {
-        return new StyleEngine();
+        return new StyleEngine(PropertyRegistry.createDefault());
+    }
+
+    /**
+     * Creates a StyleEngine with a custom property registry.
+     *
+     * @param propertyRegistry the property registry
+     * @return a new StyleEngine
+     */
+    public static StyleEngine create(PropertyRegistry propertyRegistry) {
+        return new StyleEngine(propertyRegistry);
     }
 
     // --- Stylesheet Loading ---
@@ -305,8 +316,7 @@ public final class StyleEngine {
             return Optional.empty();
         }
         Map<String, String> variables = collectVariables();
-        String resolvedValue = PropertyConverter.resolveVariables(colorValue, variables);
-        return ColorConverter.INSTANCE.convert(resolvedValue);
+        return propertyRegistry.convertColor(colorValue, variables);
     }
 
     // --- Change Listeners ---

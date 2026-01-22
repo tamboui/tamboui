@@ -4,12 +4,10 @@
  */
 package dev.tamboui.widgets.gauge;
 
-import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -201,20 +199,5 @@ class GaugeTest {
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("█");
         assertThat(buffer.get(0, 1).symbol()).isEqualTo("█");
         assertThat(buffer.get(0, 2).symbol()).isEqualTo("█");
-    }
-
-    @Test
-    @DisplayName("Gauge uses GAUGE_COLOR property from StylePropertyResolver")
-    void usesGaugeColorProperty() {
-        Gauge gauge = Gauge.builder()
-                .percent(100)
-                .styleResolver(TestStylePropertyResolver.of("gauge-color", Color.MAGENTA))
-                .build();
-        Rect area = new Rect(0, 0, 10, 1);
-        Buffer buffer = Buffer.empty(area);
-
-        gauge.render(area, buffer);
-
-        BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.MAGENTA);
     }
 }

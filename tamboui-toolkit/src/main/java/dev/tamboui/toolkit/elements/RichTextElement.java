@@ -16,7 +16,7 @@ import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 
 /**
  * A simple inline element for displaying styled {@link Text}.

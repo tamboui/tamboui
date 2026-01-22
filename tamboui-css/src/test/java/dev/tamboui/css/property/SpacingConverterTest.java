@@ -4,7 +4,7 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Padding;
+import dev.tamboui.widgets.block.Padding;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SpacingConverterTest {
 
-    private final SpacingConverter converter = SpacingConverter.INSTANCE;
+    private final SpacingConverter converter = new SpacingConverter();
 
     @Test
     void convertsUniformPadding() {

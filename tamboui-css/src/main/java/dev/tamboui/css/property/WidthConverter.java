@@ -23,8 +23,6 @@ import java.util.Optional;
  */
 public final class WidthConverter implements PropertyConverter<Width> {
 
-    public static final WidthConverter INSTANCE = new WidthConverter();
-
     @Override
     public Optional<Width> convert(String value, Map<String, String> variables) {
         if (value == null || value.trim().isEmpty()) {

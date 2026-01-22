@@ -25,7 +25,6 @@ import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderSet;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
@@ -184,10 +183,6 @@ public final class RFlexDemo {
             null
         )
     };
-    private static final BorderSet CORNERS_ONLY = BorderSet.builder()
-        .topLeft("┌").topRight("┐")
-        .bottomLeft("└").bottomRight("┘")
-        .build();
 
     private enum SelectedTab {
         START("Start", 0x38bdf8, Flex.START),
@@ -386,12 +381,7 @@ public final class RFlexDemo {
 
     private void renderDemo(Frame frame, Rect area) {
         int totalHeight = examplesTotalHeight();
-        int visibleHeight = area.height();
-        boolean needsScrollbar = totalHeight > visibleHeight;
-
-        // Account for scrollbar width when rendering content
-        int contentWidth = needsScrollbar ? Math.max(0, area.width() - 1) : area.width();
-        Rect demoArea = new Rect(0, 0, contentWidth, totalHeight);
+        Rect demoArea = new Rect(0, 0, area.width(), totalHeight);
         Buffer demoBuf = Buffer.empty(demoArea);
 
         int y = 0;
@@ -402,15 +392,28 @@ public final class RFlexDemo {
             y += h;
         }
 
+        int visibleHeight = area.height();
         int startY = Math.min(scrollOffset, Math.max(0, totalHeight - visibleHeight));
+        int maxX = area.width();
         for (int dy = 0; dy < visibleHeight && (startY + dy) < totalHeight; dy++) {
-            for (int x = 0; x < contentWidth; x++) {
+            for (int x = 0; x < maxX; x++) {
                 Cell cell = demoBuf.get(x, startY + dy);
                 frame.buffer().set(area.x() + x, area.y() + dy, cell);
             }
         }
 
-        if (needsScrollbar) {
+        if (totalHeight > visibleHeight) {
+            Rect scrollArea = area;
+            // Reserve the last column for the scrollbar (like ratatui's VerticalRight).
+            Rect content = new Rect(scrollArea.x(), scrollArea.y(), Math.max(0, scrollArea.width() - 1), scrollArea.height());
+            // Re-render content without clobbering scrollbar column.
+            for (int dy = 0; dy < visibleHeight && (startY + dy) < totalHeight; dy++) {
+                for (int x = 0; x < content.width(); x++) {
+                    Cell cell = demoBuf.get(x, startY + dy);
+                    frame.buffer().set(content.x() + x, content.y() + dy, cell);
+                }
+            }
+
             Scrollbar scrollbar = Scrollbar.builder()
                 .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
                 .thumbStyle(Style.EMPTY.fg(Color.DARK_GRAY))
@@ -419,7 +422,7 @@ public final class RFlexDemo {
             ScrollbarState state = new ScrollbarState(maxScrollOffset() + 1)
                 .viewportContentLength(visibleHeight)
                 .position(scrollOffset);
-            frame.renderStatefulWidget(scrollbar, area, state);
+            frame.renderStatefulWidget(scrollbar, scrollArea, state);
         }
     }
 
@@ -566,12 +569,8 @@ public final class RFlexDemo {
         int width = spacer.width();
 
         if (width > 1) {
-            // Corners-only border using custom BorderSet
-            Block.builder()
-                .customBorderSet(CORNERS_ONLY)
-                .borderStyle(style)
-                .build()
-                .render(spacer, buf);
+            // Corners-only border like ratatui's custom border set.
+            drawCornersOnly(spacer, buf, style);
 
             String label;
             if (width > 4) {
@@ -614,6 +613,20 @@ public final class RFlexDemo {
         }
     }
 
+    private static void drawCornersOnly(Rect r, Buffer buf, Style style) {
+        if (r.width() <= 0 || r.height() <= 0) {
+            return;
+        }
+        // Clear entire spacer.
+        buf.fill(r, Cell.EMPTY);
+        if (r.width() == 1 || r.height() == 1) {
+            return;
+        }
+        buf.set(r.left(), r.top(), new Cell("┌", style));
+        buf.set(r.right() - 1, r.top(), new Cell("┐", style));
+        buf.set(r.left(), r.bottom() - 1, new Cell("└", style));
+        buf.set(r.right() - 1, r.bottom() - 1, new Cell("┘", style));
+    }
 
     private static final class ExampleData {
         final String description;

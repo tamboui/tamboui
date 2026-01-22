@@ -29,8 +29,8 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.RichTextState;
+import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.widgets.text.RichTextState;
 
 import java.util.List;
 

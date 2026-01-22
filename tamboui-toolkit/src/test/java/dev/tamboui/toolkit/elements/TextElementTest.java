@@ -11,10 +11,9 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
-import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -383,7 +382,7 @@ class TextElementTest {
 
             // Create CSS resolver with text-overflow: wrap-character
             CssStyleResolver cssResolver = CssStyleResolver.builder()
-                    .set(StandardProperties.TEXT_OVERFLOW, Overflow.WRAP_CHARACTER)
+                    .property("text-overflow", "wrap-character")
                     .build();
 
             // Create mock RenderContext that returns the resolver for this element

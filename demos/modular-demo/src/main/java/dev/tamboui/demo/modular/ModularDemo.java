@@ -9,7 +9,7 @@ package dev.tamboui.demo.modular;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.time.Duration;
 import java.time.LocalTime;

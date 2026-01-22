@@ -8,10 +8,10 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.PropertyKey;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.widget.StatefulWidget;
 
 import java.util.Objects;
@@ -53,20 +53,16 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
      * <p>
      * CSS property name: {@code thumb-color}
      */
-    public static final PropertyDefinition<Color> THUMB_COLOR =
-            PropertyDefinition.of("thumb-color", ColorConverter.INSTANCE);
+    public static final PropertyKey<Color> THUMB_COLOR =
+            PropertyKey.of("thumb-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the track (background) color.
      * <p>
      * CSS property name: {@code track-color}
      */
-    public static final PropertyDefinition<Color> TRACK_COLOR =
-            PropertyDefinition.of("track-color", ColorConverter.INSTANCE);
-
-    static {
-        PropertyRegistry.registerAll(THUMB_COLOR, TRACK_COLOR);
-    }
+    public static final PropertyKey<Color> TRACK_COLOR =
+            PropertyKey.of("track-color", ColorConverter.INSTANCE);
 
     /**
      * Scrollbar symbol set for rendering.
@@ -202,8 +198,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         this.endStyle = builder.endStyle;
 
         // Resolve style-aware properties
-        Color resolvedThumbColor = builder.resolveThumbColor();
-        Color resolvedTrackColor = builder.resolveTrackColor();
+        Color resolvedThumbColor = builder.thumbColor.resolve();
+        Color resolvedTrackColor = builder.trackColor.resolve();
 
         Style baseThumbStyle = builder.thumbStyle;
         if (resolvedThumbColor != null) {
@@ -429,9 +425,11 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         private Style endStyle;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties (resolved via styleResolver in build())
-        private Color thumbColor;
-        private Color trackColor;
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> thumbColor =
+                StyledProperty.of(THUMB_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> trackColor =
+                StyledProperty.of(TRACK_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -558,7 +556,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * @return this builder
          */
         public Builder thumbColor(Color color) {
-            this.thumbColor = color;
+            this.thumbColor.set(color);
             return this;
         }
 
@@ -571,7 +569,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * @return this builder
          */
         public Builder trackColor(Color color) {
-            this.trackColor = color;
+            this.trackColor.set(color);
             return this;
         }
 
@@ -580,15 +578,6 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          */
         public Scrollbar build() {
             return new Scrollbar(this);
-        }
-
-        // Resolution helpers
-        private Color resolveThumbColor() {
-            return styleResolver.resolve(THUMB_COLOR, thumbColor);
-        }
-
-        private Color resolveTrackColor() {
-            return styleResolver.resolve(TRACK_COLOR, trackColor);
         }
     }
 }

@@ -70,6 +70,9 @@
     "richtext-demo": {
       "script-ref": "tamboui-toolkit/demos/richtext-demo/src/main/java/dev/tamboui/demo/RichTextDemo.java"
     },
+    "pygments-demo": {
+      "script-ref": "tamboui-pygments/demos/pygments-demo/src/main/java/dev/tamboui/demo/PygmentsDemo.java"
+    },
     "textarea-demo": {
       "script-ref": "tamboui-toolkit/demos/textarea-demo/src/main/java/dev/tamboui/demo/TextAreaDemo.java"
     },

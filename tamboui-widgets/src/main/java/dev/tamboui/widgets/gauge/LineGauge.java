@@ -9,11 +9,11 @@ import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.PropertyKey;
 import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.StandardProperties;
+import dev.tamboui.style.StandardPropertyKeys;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StyledProperty;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
@@ -55,20 +55,16 @@ public final class LineGauge implements Widget {
      * <p>
      * CSS property name: {@code filled-color}
      */
-    public static final PropertyDefinition<Color> FILLED_COLOR =
-            PropertyDefinition.of("filled-color", ColorConverter.INSTANCE);
+    public static final PropertyKey<Color> FILLED_COLOR =
+            PropertyKey.of("filled-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the unfilled portion color.
      * <p>
      * CSS property name: {@code unfilled-color}
      */
-    public static final PropertyDefinition<Color> UNFILLED_COLOR =
-            PropertyDefinition.of("unfilled-color", ColorConverter.INSTANCE);
-
-    static {
-        PropertyRegistry.registerAll(FILLED_COLOR, UNFILLED_COLOR);
-    }
+    public static final PropertyKey<Color> UNFILLED_COLOR =
+            PropertyKey.of("unfilled-color", ColorConverter.INSTANCE);
 
     private final double ratio;
     private final Line label;
@@ -83,9 +79,9 @@ public final class LineGauge implements Widget {
         this.lineSet = builder.lineSet;
 
         // Resolve style-aware properties
-        Color resolvedBg = builder.resolveBackground();
-        Color resolvedFilledColor = builder.resolveFilledColor();
-        Color resolvedUnfilledColor = builder.resolveUnfilledColor();
+        Color resolvedBg = builder.background.resolve();
+        Color resolvedFilledColor = builder.filledColor.resolve();
+        Color resolvedUnfilledColor = builder.unfilledColor.resolve();
 
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
@@ -221,10 +217,13 @@ public final class LineGauge implements Widget {
         private LineSet lineSet = NORMAL;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
-        // Style-aware properties (resolved via styleResolver in build())
-        private Color background;
-        private Color filledColor;
-        private Color unfilledColor;
+        // Style-aware properties bound to this builder's resolver
+        private final StyledProperty<Color> background =
+                StyledProperty.of(StandardPropertyKeys.BACKGROUND, null, () -> styleResolver);
+        private final StyledProperty<Color> filledColor =
+                StyledProperty.of(FILLED_COLOR, null, () -> styleResolver);
+        private final StyledProperty<Color> unfilledColor =
+                StyledProperty.of(UNFILLED_COLOR, null, () -> styleResolver);
 
         private Builder() {}
 
@@ -333,7 +332,7 @@ public final class LineGauge implements Widget {
          * @return this builder
          */
         public Builder background(Color color) {
-            this.background = color;
+            this.background.set(color);
             return this;
         }
 
@@ -346,7 +345,7 @@ public final class LineGauge implements Widget {
          * @return this builder
          */
         public Builder filledColor(Color color) {
-            this.filledColor = color;
+            this.filledColor.set(color);
             return this;
         }
 
@@ -359,25 +358,12 @@ public final class LineGauge implements Widget {
          * @return this builder
          */
         public Builder unfilledColor(Color color) {
-            this.unfilledColor = color;
+            this.unfilledColor.set(color);
             return this;
         }
 
         public LineGauge build() {
             return new LineGauge(this);
-        }
-
-        // Resolution helpers
-        private Color resolveBackground() {
-            return styleResolver.resolve(StandardProperties.BACKGROUND, background);
-        }
-
-        private Color resolveFilledColor() {
-            return styleResolver.resolve(FILLED_COLOR, filledColor);
-        }
-
-        private Color resolveUnfilledColor() {
-            return styleResolver.resolve(UNFILLED_COLOR, unfilledColor);
         }
     }
 }

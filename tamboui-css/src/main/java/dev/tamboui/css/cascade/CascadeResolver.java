@@ -8,12 +8,9 @@ import dev.tamboui.css.Styleable;
 import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.property.PropertyConverter;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.css.property.PropertyRegistry;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Resolves CSS cascade and specificity to produce final computed styles.
@@ -26,32 +23,23 @@ import java.util.logging.Logger;
  *   <li>!important declarations override all non-important</li>
  *   <li>Merge all matching declarations into a final style</li>
  * </ol>
- * <p>
- * Unknown properties (those not registered in {@link PropertyRegistry}) are handled
- * according to the configured {@link UnknownPropertyBehavior}.
  */
 public final class CascadeResolver {
 
-    private static final Logger LOGGER = Logger.getLogger(CascadeResolver.class.getName());
-
-    private final UnknownPropertyBehavior unknownPropertyBehavior;
+    private final PropertyRegistry propertyRegistry;
 
     /**
-     * Creates a new cascade resolver with default behavior (IGNORE unknown properties).
+     * Creates a new cascade resolver with the default property registry.
      */
     public CascadeResolver() {
-        this(UnknownPropertyBehavior.IGNORE);
+        this.propertyRegistry = PropertyRegistry.createDefault();
     }
 
     /**
-     * Creates a new cascade resolver with the specified unknown property behavior.
-     *
-     * @param unknownPropertyBehavior how to handle unknown CSS properties
+     * Creates a cascade resolver with a custom property registry.
      */
-    public CascadeResolver(UnknownPropertyBehavior unknownPropertyBehavior) {
-        this.unknownPropertyBehavior = unknownPropertyBehavior != null
-                ? unknownPropertyBehavior
-                : UnknownPropertyBehavior.IGNORE;
+    public CascadeResolver(PropertyRegistry propertyRegistry) {
+        this.propertyRegistry = propertyRegistry;
     }
 
     /**
@@ -116,56 +104,65 @@ public final class CascadeResolver {
         for (Map.Entry<String, PropertyValue> entry : props.entrySet()) {
             String prop = entry.getKey();
             String value = entry.getValue().raw();
-            String resolvedValue = PropertyConverter.resolveVariables(value, variables);
 
-            // Try to look up the property in the registry
-            Optional<PropertyDefinition<?>> propDef = PropertyRegistry.byName(prop);
-
-            if (propDef.isPresent()) {
-                // Handle known properties through the registry
-                convertAndSet(builder, propDef.get(), resolvedValue);
-            } else {
-                // Handle unknown properties according to configured behavior
-                handleUnknownProperty(builder, prop, resolvedValue);
+            switch (prop) {
+                case "color":
+                    propertyRegistry.convertColor(value, variables)
+                            .ifPresent(builder::foreground);
+                    break;
+                case "background":
+                case "background-color":
+                    propertyRegistry.convertColor(value, variables)
+                            .ifPresent(builder::background);
+                    break;
+                case "text-style":
+                    propertyRegistry.convertModifiers(value, variables)
+                            .ifPresent(builder::addModifiers);
+                    break;
+                case "padding":
+                    propertyRegistry.convertPadding(value, variables)
+                            .ifPresent(builder::padding);
+                    break;
+                case "text-align":
+                    propertyRegistry.convertAlignment(value, variables)
+                            .ifPresent(builder::alignment);
+                    break;
+                case "border-type":
+                    propertyRegistry.convertBorderType(value, variables)
+                            .ifPresent(builder::borderType);
+                    break;
+                case "width":
+                    propertyRegistry.convertConstraint(value, variables)
+                            .ifPresent(builder::widthConstraint);
+                    break;
+                case "flex":
+                    propertyRegistry.convertFlex(value, variables)
+                            .ifPresent(builder::flex);
+                    break;
+                case "direction":
+                    propertyRegistry.convertDirection(value, variables)
+                            .ifPresent(builder::direction);
+                    break;
+                case "margin":
+                    propertyRegistry.convertMargin(value, variables)
+                            .ifPresent(builder::margin);
+                    break;
+                case "spacing":
+                    propertyRegistry.convertSpacing(value, variables)
+                            .ifPresent(builder::spacing);
+                    break;
+                case "height":
+                    propertyRegistry.convertConstraint(value, variables)
+                            .ifPresent(builder::heightConstraint);
+                    break;
+                default:
+                    // Store as additional property for later use
+                    builder.property(prop, PropertyConverter.resolveVariables(value, variables));
+                    break;
             }
         }
 
         return builder.build();
-    }
-
-    /**
-     * Converts and sets a property value using the PropertyDefinition.
-     */
-    @SuppressWarnings("unchecked")
-    private <T> void convertAndSet(CssStyleResolver.Builder builder,
-                                   PropertyDefinition<T> property,
-                                   String resolvedValue) {
-        Optional<T> converted = property.convert(resolvedValue);
-        converted.ifPresent(v -> builder.set(property, v));
-    }
-
-    /**
-     * Handles unknown properties according to the configured behavior.
-     * <p>
-     * Unknown properties are stored as raw values for lazy conversion by
-     * widget-defined properties. The behavior setting controls whether to
-     * also log a warning or throw an exception.
-     */
-    private void handleUnknownProperty(CssStyleResolver.Builder builder, String prop, String value) {
-        switch (unknownPropertyBehavior) {
-            case IGNORE:
-                // Store as raw value for lazy conversion
-                builder.setRaw(prop, value);
-                break;
-            case WARN:
-                // Store as raw value AND log a warning
-                builder.setRaw(prop, value);
-                LOGGER.log(Level.WARNING, "Unknown CSS property: {0}", prop);
-                break;
-            case FAIL:
-                throw new UnknownCssPropertyException(prop, value);
-                // no default needed - all enum values covered
-        }
     }
 
     /**

@@ -18,8 +18,8 @@ import dev.tamboui.style.StyledAreaInfo;
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.RichTextState;
+import dev.tamboui.widgets.text.Overflow;
+import dev.tamboui.widgets.text.RichTextState;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

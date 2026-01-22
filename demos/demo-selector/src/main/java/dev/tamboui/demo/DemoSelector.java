@@ -14,7 +14,7 @@ import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.toolkit.elements.ListElement;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 import org.gradle.tooling.GradleConnector;
 
 import java.io.File;

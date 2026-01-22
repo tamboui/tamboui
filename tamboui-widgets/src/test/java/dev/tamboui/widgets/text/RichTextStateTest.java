@@ -4,7 +4,6 @@
  */
 package dev.tamboui.widgets.text;
 
-import dev.tamboui.style.RichTextState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 

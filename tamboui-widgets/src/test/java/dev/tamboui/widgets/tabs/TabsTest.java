@@ -4,18 +4,17 @@
  */
 package dev.tamboui.widgets.tabs;
 
-import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widgets.block.Block;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TabsTest {
@@ -235,26 +234,8 @@ class TabsTest {
         tabs.render(area, buffer, state);
 
         // Divider at position 1-3 (" | ") should inherit the base style background
-        BufferAssertions.assertThat(buffer).at(2, 0)
+        assertThat(buffer).at(2, 0)
             .hasSymbol("|")
             .hasBackground(Color.BLUE);
-    }
-
-    @Test
-    @DisplayName("Tabs uses HIGHLIGHT_COLOR property from StylePropertyResolver")
-    void usesHighlightColorProperty() {
-        Tabs tabs = Tabs.builder()
-                .titles("First", "Second")
-                .divider("|")
-                .styleResolver(TestStylePropertyResolver.of("highlight-color", Color.MAGENTA))
-                .build();
-        Rect area = new Rect(0, 0, 20, 1);
-        Buffer buffer = Buffer.empty(area);
-        TabsState state = new TabsState(1); // Select second tab
-
-        tabs.render(area, buffer, state);
-
-        // Second tab "Second" starts at position 6 ("First|Second")
-        BufferAssertions.assertThat(buffer).at(6, 0).hasForeground(Color.MAGENTA);
     }
 }

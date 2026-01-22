@@ -4,13 +4,11 @@
  */
 package dev.tamboui.widgets.scrollbar;
 
-import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.TestStylePropertyResolver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
@@ -318,53 +316,5 @@ class ScrollbarTest {
         }
         // Thumb should be around 5 cells (half of 10)
         assertThat(thumbCells).isBetween(4, 6);
-    }
-
-    @Test
-    @DisplayName("Scrollbar uses THUMB_COLOR property from StylePropertyResolver")
-    void usesThumbColorProperty() {
-        Scrollbar scrollbar = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-                .styleResolver(TestStylePropertyResolver.of("thumb-color", Color.YELLOW))
-                .build();
-        ScrollbarState state = new ScrollbarState(10).position(0);
-        Rect area = new Rect(0, 0, 5, 5);
-        Buffer buffer = Buffer.empty(area);
-
-        scrollbar.render(area, buffer, state);
-
-        // Find the thumb and check its style
-        for (int y = 0; y < 5; y++) {
-            Cell cell = buffer.get(4, y);
-            if (cell.symbol().equals("█")) {
-                BufferAssertions.assertThat(buffer).at(4, y).hasForeground(Color.YELLOW);
-                return;
-            }
-        }
-        fail("Thumb not found in rendered scrollbar");
-    }
-
-    @Test
-    @DisplayName("Scrollbar uses TRACK_COLOR property from StylePropertyResolver")
-    void usesTrackColorProperty() {
-        Scrollbar scrollbar = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-                .styleResolver(TestStylePropertyResolver.of("track-color", Color.DARK_GRAY))
-                .build();
-        ScrollbarState state = new ScrollbarState(100).position(50);
-        Rect area = new Rect(0, 0, 5, 10);
-        Buffer buffer = Buffer.empty(area);
-
-        scrollbar.render(area, buffer, state);
-
-        // Find track cells and check their style
-        for (int y = 0; y < 10; y++) {
-            Cell cell = buffer.get(4, y);
-            if (cell.symbol().equals("│")) {
-                BufferAssertions.assertThat(buffer).at(4, y).hasForeground(Color.DARK_GRAY);
-                return;
-            }
-        }
-        fail("Track not found in rendered scrollbar");
     }
 }

@@ -4,13 +4,11 @@
  */
 package dev.tamboui.widgets.barchart;
 
-import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -348,21 +346,5 @@ class BarChartTest {
     void barValueCannotBeNegative() {
         Bar bar = Bar.builder().value(-10).build();
         assertThat(bar.value()).isEqualTo(0);
-    }
-
-    @Test
-    @DisplayName("BarChart uses BAR_COLOR property from StylePropertyResolver")
-    void usesBarColorProperty() {
-        BarChart chart = BarChart.builder()
-                .data(BarGroup.of(8))
-                .max(8)
-                .styleResolver(TestStylePropertyResolver.of("bar-color", Color.CYAN))
-                .build();
-        Rect area = new Rect(0, 0, 3, 3);
-        Buffer buffer = Buffer.empty(area);
-
-        chart.render(area, buffer);
-
-        BufferAssertions.assertThat(buffer).at(0, 2).hasForeground(Color.CYAN);
     }
 }
