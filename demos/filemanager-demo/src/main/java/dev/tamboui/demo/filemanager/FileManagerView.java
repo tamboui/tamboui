@@ -9,7 +9,10 @@ import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import static dev.tamboui.pygments.Pygments.pygments;
+import dev.tamboui.pygments.Pygments;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
@@ -20,12 +23,13 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.widgets.text.Overflow;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -389,25 +393,58 @@ public class FileManagerView implements Element {
 
     private void renderTextFile(Frame frame, Rect area, Path textPath) {
         try {
-            byte[] bytes = Files.readAllBytes(textPath);
-            String content = new String(bytes, StandardCharsets.UTF_8);
+            String content = readFileUtf8WithLimit(textPath, 256 * 1024);
+            Pygments.Result result = pygments().highlightWithInfo(
+                textPath.getFileName().toString(),
+                content,
+                Duration.ofSeconds(2)
+            );
+            Text viewerText = result.text();
+            String status = result.highlighted()
+                ? ("pygments: " + result.lexer().orElse("?"))
+                : ("pygments: off (" + result.message().orElse("unknown") + ")");
+
             int scrollPos = manager.textScrollPosition();
             
             Paragraph paragraph = Paragraph.builder()
-                    .text(Text.from(content))
-                    .overflow(Overflow.WRAP_WORD)
+                    .text(viewerText)
+                    // Code/markup tends to render better with character wrapping than word wrapping.
+                    .overflow(Overflow.WRAP_CHARACTER)
                     .scroll(scrollPos)
-                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.WHITE))
+                    .style(Style.EMPTY.fg(Color.WHITE))
                     .build();
             frame.renderWidget(paragraph, area);
+
+            // Render a small status line in the bottom-right (inside the viewer area) if we have one.
+            if (status != null && !status.isEmpty() && area.height() > 1) {
+                int y = area.bottom() - 1;
+                int max = Math.max(0, area.width() - 1);
+                String msg = status;
+                if (msg.length() > max) {
+                    msg = msg.substring(0, max);
+                }
+                frame.buffer().setString(area.left(), y, msg, Style.EMPTY.fg(Color.GRAY));
+            }
         } catch (IOException e) {
             // Render error message
             Paragraph error = Paragraph.builder()
                     .text(Text.from("Error reading file: " + e.getMessage()))
-                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.RED))
+                    .style(Style.EMPTY.fg(Color.RED))
                     .build();
             frame.renderWidget(error, area);
         }
+    }
+
+    /** added so we don't crash on large files */
+    private static String readFileUtf8WithLimit(Path path, int maxBytes) throws IOException {
+        byte[] bytes = Files.readAllBytes(path);
+        if (bytes.length <= maxBytes) {
+            return new String(bytes, StandardCharsets.UTF_8);
+        }
+        byte[] truncated = new byte[maxBytes];
+        System.arraycopy(bytes, 0, truncated, 0, maxBytes);
+        return new String(truncated, StandardCharsets.UTF_8)
+            + "\n\n… (truncated, file is " + bytes.length + " bytes)";
     }
 
     private EventResult handleViewerKey(KeyEvent event) {

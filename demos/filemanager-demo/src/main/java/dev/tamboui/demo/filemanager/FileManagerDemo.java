@@ -2,6 +2,7 @@
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 //DEPS dev.tamboui:tamboui-image:LATEST
 //DEPS dev.tamboui:tamboui-panama-backend:LATEST
+//DEPS dev.tamboui:tamboui-pygments:LATEST
 
 
 //SOURCES FileManagerController.java FileManagerView.java FileManagerKeyHandler.java DirectoryBrowserController.java
