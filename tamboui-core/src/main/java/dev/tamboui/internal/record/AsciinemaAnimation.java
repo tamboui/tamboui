@@ -8,7 +8,9 @@ import dev.tamboui.buffer.Buffer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -92,6 +94,78 @@ final class AsciinemaAnimation {
             timedFrames.add(new TimedFrame(buffers.get(i), i * frameIntervalMs));
         }
         return new AsciinemaAnimation(timedFrames, fps);
+    }
+
+    /**
+     * Creates a cast file directly from raw captured frames.
+     * The raw bytes are output directly, preserving perfect fidelity with the original
+     * terminal output including all ANSI escape sequences.
+     *
+     * @param rawFrames the list of raw captured frames
+     * @param width terminal width for header
+     * @param height terminal height for header
+     * @return the complete cast file content as a string
+     */
+    static String fromRawFrames(List<RawFrame> rawFrames, int width, int height) {
+        if (rawFrames.isEmpty()) {
+            return "";
+        }
+
+        // Deduplicate consecutive identical frames
+        List<RawFrame> deduplicated = deduplicateRawFrames(rawFrames);
+        if (deduplicated.isEmpty()) {
+            return "";
+        }
+
+        StringWriter writer = new StringWriter();
+        try {
+            AsciinemaWriter.writeHeader(writer, width, height);
+
+            long firstTimestamp = deduplicated.get(0).timestampMs();
+            long lastTimestamp = rawFrames.get(rawFrames.size() - 1).timestampMs();
+
+            for (int i = 0; i < deduplicated.size(); i++) {
+                RawFrame frame = deduplicated.get(i);
+                double timeSeconds = (frame.timestampMs() - firstTimestamp) / 1000.0;
+
+                String output = new String(frame.data(), StandardCharsets.UTF_8);
+
+                AsciinemaWriter.writeOutputEvent(writer, timeSeconds, output);
+            }
+
+            // Add a final empty event to preserve total duration
+            double finalTimeSeconds = (lastTimestamp - firstTimestamp) / 1000.0;
+            double lastFrameTime = (deduplicated.get(deduplicated.size() - 1).timestampMs() - firstTimestamp) / 1000.0;
+            if (finalTimeSeconds > lastFrameTime) {
+                AsciinemaWriter.writeOutputEvent(writer, finalTimeSeconds, "");
+            }
+        } catch (IOException e) {
+            // StringWriter doesn't throw IOException
+            throw new RuntimeException("Unexpected IOException", e);
+        }
+
+        return writer.toString();
+    }
+
+    /**
+     * Removes consecutive duplicate raw frames, keeping only the first occurrence.
+     */
+    private static List<RawFrame> deduplicateRawFrames(List<RawFrame> frames) {
+        if (frames.size() <= 1) {
+            return frames;
+        }
+        List<RawFrame> deduplicated = new ArrayList<>();
+        RawFrame lastUnique = frames.get(0);
+        deduplicated.add(lastUnique);
+
+        for (int i = 1; i < frames.size(); i++) {
+            RawFrame current = frames.get(i);
+            if (!Arrays.equals(current.data(), lastUnique.data())) {
+                deduplicated.add(current);
+                lastUnique = current;
+            }
+        }
+        return deduplicated;
     }
 
     /**

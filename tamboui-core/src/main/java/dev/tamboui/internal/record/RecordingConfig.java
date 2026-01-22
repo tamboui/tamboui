@@ -108,21 +108,25 @@ public final class RecordingConfig {
      */
     private static void writeShutdownCast() {
         RecordingConfig config;
+        int captureWidth;
+        int captureHeight;
         synchronized (RecordingConfig.class) {
             config = activeConfig;
             if (config == null || !AnsiTerminalCapture.isInstalled()) {
                 return;
             }
+            // Capture dimensions before uninstalling
+            captureWidth = AnsiTerminalCapture.getWidth();
+            captureHeight = AnsiTerminalCapture.getHeight();
         }
 
         try {
-            List<dev.tamboui.buffer.Buffer> capturedFrames = AnsiTerminalCapture.uninstall();
+            List<RawFrame> capturedFrames = AnsiTerminalCapture.uninstall();
             if (capturedFrames.isEmpty()) {
                 return;
             }
 
-            AsciinemaAnimation animation = AsciinemaAnimation.fromBuffers(capturedFrames, config.fps());
-            String cast = animation.toCast();
+            String cast = AsciinemaAnimation.fromRawFrames(capturedFrames, captureWidth, captureHeight);
 
             Path outputPath = config.outputPath();
             Path parent = outputPath.getParent();
