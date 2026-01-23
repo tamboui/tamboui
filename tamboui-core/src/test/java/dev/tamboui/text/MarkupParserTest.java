@@ -16,6 +16,48 @@ import static org.assertj.core.api.Assertions.*;
 class MarkupParserTest {
 
     @Test
+    @DisplayName("parse hex color token in markup tag")
+    void parseHexColorToken() {
+        Text text = MarkupParser.parse("[#ff5733]X[/]");
+
+        assertThat(text.lines()).hasSize(1);
+        Span span = text.lines().get(0).spans().get(0);
+        assertThat(span.content()).isEqualTo("X");
+        assertThat(span.style().fg()).contains(Color.rgb(0xff, 0x57, 0x33));
+
+        Tags tags = span.style().extension(Tags.class, Tags.empty());
+        assertThat(tags.contains("#ff5733")).isFalse();
+    }
+
+    @Test
+    @DisplayName("parse rgb(r,g,b) color token in markup tag")
+    void parseRgbColorToken() {
+        Text text = MarkupParser.parse("[rgb(1,2,3)]X[/]");
+
+        assertThat(text.lines()).hasSize(1);
+        Span span = text.lines().get(0).spans().get(0);
+        assertThat(span.content()).isEqualTo("X");
+        assertThat(span.style().fg()).contains(Color.rgb(1, 2, 3));
+
+        Tags tags = span.style().extension(Tags.class, Tags.empty());
+        assertThat(tags.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("parse rgb(r, g, b) color token with spaces in markup tag")
+    void parseRgbColorTokenWithSpaces() {
+        Text text = MarkupParser.parse("[rgb(10, 20, 30)]X[/]");
+
+        assertThat(text.lines()).hasSize(1);
+        Span span = text.lines().get(0).spans().get(0);
+        assertThat(span.content()).isEqualTo("X");
+        assertThat(span.style().fg()).contains(Color.rgb(10, 20, 30));
+
+        Tags tags = span.style().extension(Tags.class, Tags.empty());
+        assertThat(tags.isEmpty()).isTrue();
+    }
+
+    @Test
     @DisplayName("parse plain text without markup")
     void parsePlainText() {
         Text text = MarkupParser.parse("Hello World");

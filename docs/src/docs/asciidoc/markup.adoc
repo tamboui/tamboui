@@ -68,39 +68,16 @@ Style tags use square brackets with a tag name:
 |`[strikethrough]`, `[s]`
 |===
 
-==== Color Tags
+==== Colors
 
-[cols="1,1",options="header"]
-|===
-|Tag |Color
+Colors can be specified the ways `ColorConverter` supports:
 
-|`[red]`
-|Red foreground
+- Named colors: `red`, `green`, `blue`, `yellow`, `cyan`, `magenta`, `white`, `black`, `gray`, etc.
+- Hex colors: `#RGB`, `#RRGGBB`
+- RGB colors: `rgb(r,g,b)`
+- Indexed colors: `indexed(index)`
 
-|`[green]`
-|Green foreground
-
-|`[blue]`
-|Blue foreground
-
-|`[yellow]`
-|Yellow foreground
-
-|`[cyan]`
-|Cyan foreground
-
-|`[magenta]`
-|Magenta foreground
-
-|`[white]`
-|White foreground
-
-|`[black]`
-|Black foreground
-
-|`[gray]` / `[grey]`
-|Gray foreground
-|===
+Only named colors are treated as tags/classes; explicit colors are not possible to be styled.
 
 === Implicit Close
 

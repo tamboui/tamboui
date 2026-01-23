@@ -1,5 +1,5 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
-//DEPS dev.tamboui:tamboui-jline:LATEST
+//DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 /*
  * Copyright (c) 2025 TamboUI Contributors
  * SPDX-License-Identifier: MIT
@@ -246,6 +246,12 @@ public class RichTextDemo implements Element {
                 
                 [bold]Escape brackets:[/bold]
                 Use [[double brackets]] to show literal [brackets]
+                
+                [bold]True colors:[/bold]
+                [ #FF5733]Red[/#FF5733]
+                [rgb(255, 238, 51)]RGB[/]
+                [rgb(41, 52, 204) on rgb(255, 87, 51)]Blue on RGB[/]
+                [ #0A2]simple hex[/] color
                 
                 [bold]Custom CSS tags:[/bold]
                 Switch to CSS tab and define styles for custom tags!

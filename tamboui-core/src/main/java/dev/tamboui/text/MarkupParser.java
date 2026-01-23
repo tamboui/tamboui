@@ -5,6 +5,7 @@
 package dev.tamboui.text;
 
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.Tags;
 
@@ -25,6 +26,10 @@ import java.util.Map;
  *       {@code [dim]}, {@code [reversed]}, {@code [crossed-out]}</li>
  *   <li>Built-in color tags: {@code [red]}, {@code [green]}, {@code [blue]}, {@code [yellow]},
  *       {@code [cyan]}, {@code [magenta]}, {@code [white]}, {@code [black]}, {@code [gray]}</li>
+ *   <li>True color tokens: {@code [#RGB]}, {@code [#RRGGBB]}, {@code [rgb(r,g,b)]} (spaces allowed)</li>
+ *   <li>Compound style specs: multiple tokens in a single tag, e.g.
+ *       {@code [bold #ff5733 on rgb(10, 20, 30)]text[/]}. Foreground/background tokens are parsed
+ *       using {@link dev.tamboui.style.ColorConverter} and modifiers are applied in addition to colors.</li>
  *   <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
  *   <li>Custom tags: resolved via a {@link StyleResolver}</li>
  *   <li>Escaped brackets: {@code [[} produces {@code [}, and {@code ]]} produces {@code ]}</li>
@@ -292,13 +297,17 @@ public final class MarkupParser {
             flushCurrentText();
 
             // Parse all tokens for CSS class targeting
-            String[] tokens = tagName.split("\\s+");
+            String[] tokens = tokenizeStyleSpec(tagName);
             String primaryTag = tokens[0];  // First token used for closing tag matching
 
-            // Collect all tokens as CSS class tags (excluding "on" keyword)
+            // Collect all tokens as CSS class tags (excluding "on" keyword and explicit colors)
             List<String> tagList = new ArrayList<>();
             for (String token : tokens) {
-                if (!token.isEmpty() && !"on".equals(token)) {
+                if (!token.isEmpty() && 
+                !"on".equals(token) && 
+                !token.startsWith("#")&& 
+                !token.startsWith("rgb(") &&
+                !token.startsWith("indexed(")) {
                     tagList.add(token);
                 }
             }
@@ -328,7 +337,7 @@ public final class MarkupParser {
             // 2. Parse compound style spec and patch on top (inline overrides base)
             // Skip primary tag in parsing only if resolver already handled it
             String skipToken = resolverHandledPrimaryTag ? primaryTag : null;
-            Style parsedStyle = parseStyleSpec(tagName, skipToken);
+            Style parsedStyle = parseStyleSpec(tokens, skipToken);
             Style combined = baseStyle.patch(parsedStyle);
 
             Style withTags = combined.patch(tagStyle);
@@ -405,9 +414,8 @@ public final class MarkupParser {
             }
         }
 
-        private Style parseStyleSpec(String spec, String skipToken) {
+        private Style parseStyleSpec(String[] tokens, String skipToken) {
             Style result = Style.EMPTY;
-            String[] tokens = spec.toLowerCase().split("\\s+");
 
             boolean expectBg = false;
             boolean skippedFirst = false;
@@ -452,20 +460,52 @@ public final class MarkupParser {
             return result;
         }
 
-        private Color parseColor(String name) {
-            switch (name) {
-                case "red": return Color.RED;
-                case "green": return Color.GREEN;
-                case "blue": return Color.BLUE;
-                case "yellow": return Color.YELLOW;
-                case "cyan": return Color.CYAN;
-                case "magenta": return Color.MAGENTA;
-                case "white": return Color.WHITE;
-                case "black": return Color.BLACK;
-                case "gray":
-                case "grey": return Color.GRAY;
-                default: return null;
+        private static String[] tokenizeStyleSpec(String spec) {
+            // Split on whitespace, but keep tokens like rgb(...) intact even if they contain spaces.
+            if (spec == null || spec.isEmpty()) {
+                return new String[0];
             }
+
+            String lower = spec.toLowerCase();
+            StringBuilder current = new StringBuilder();
+            List<String> tokens = new ArrayList<>();
+
+            int parenDepth = 0;
+            for (int i = 0; i < lower.length(); i++) {
+                char ch = lower.charAt(i);
+                if (ch == '(') {
+                    parenDepth++;
+                    current.append(ch);
+                    continue;
+                }
+                if (ch == ')') {
+                    if (parenDepth > 0) {
+                        parenDepth--;
+                    }
+                    current.append(ch);
+                    continue;
+                }
+
+                if (Character.isWhitespace(ch) && parenDepth == 0) {
+                    if (current.length() > 0) {
+                        tokens.add(current.toString());
+                        current.setLength(0);
+                    }
+                    continue;
+                }
+
+                current.append(ch);
+            }
+
+            if (current.length() > 0) {
+                tokens.add(current.toString());
+            }
+
+            return tokens.toArray(new String[0]);
+        }
+
+        private Color parseColor(String name) {
+            return ColorConverter.INSTANCE.convert(name).orElse(null);
         }
 
         private void flushCurrentText() {
