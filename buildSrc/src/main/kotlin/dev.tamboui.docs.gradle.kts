@@ -1,5 +1,6 @@
 import dev.tamboui.build.GenerateDemosGalleryTask
 import dev.tamboui.build.JavadocAggregatorPlugin
+import gradle.kotlin.dsl.accessors._6b89262683f96a5e8a91c5e9184f335e.java
 
 plugins {
     id("org.asciidoctor.jvm.convert")
@@ -20,6 +21,13 @@ val demoCasts = configurations.create("demoCasts") {
         attribute(Category.CATEGORY_ATTRIBUTE, objects.named("demo-cast"))
     }
 }
+val demoScreenshots = configurations.create("demoScreenshots") {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    attributes {
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named("demo-screenshots"))
+    }
+}
 
 // Configuration to resolve demo metadata files from demo projects
 val demoMetadata = configurations.create("demoMetadata") {
@@ -34,6 +42,10 @@ val copyCasts = tasks.register<Sync>("copyCasts") {
     from(demoCasts)
     destinationDir = layout.buildDirectory.dir("generated/docs/demos").get().asFile
 }
+val copyScreenshots = tasks.register<Sync>("copyScreenshots") {
+    from(demoScreenshots)
+    destinationDir = layout.buildDirectory.dir("generated/docs/screenshots").get().asFile
+}
 
 // Task to generate the demos gallery AsciiDoc pages (index + per-module)
 val generateDemosPage = tasks.register<GenerateDemosGalleryTask>("generateDemosPage") {
@@ -47,6 +59,7 @@ rootProject.allprojects {
     pluginManager.withPlugin("dev.tamboui.demo-project") {
         dependencies {
             demoCasts.dependencies.add(project(project.path))
+            demoScreenshots.dependencies.add(project(project.path))
             demoMetadata.dependencies.add(project(project.path))
         }
     }
@@ -62,7 +75,10 @@ val prepareAsciidocSources = tasks.register<Sync>("prepareAsciidocSources") {
 
 tasks.asciidoctor {
     val javadoc = tasks.named<Javadoc>("javadoc")
-    dependsOn(prepareAsciidocSources, copyCasts, javadoc)
+    inputs.files(prepareAsciidocSources)
+    inputs.files(copyCasts)
+    inputs.files(copyScreenshots)
+    inputs.files(javadoc)
 
     setSourceDir(layout.buildDirectory.dir("asciidoc-sources").get().asFile)
     setBaseDir(layout.buildDirectory.dir("asciidoc-sources").get().asFile)
@@ -76,6 +92,10 @@ tasks.asciidoctor {
         // Copy demo cast files from resolved configuration
         from(copyCasts) {
             into("demos")
+        }
+        // Copy screenshot files from resolved configuration
+        from(copyScreenshots) {
+            into("screenshots")
         }
         // Copy javadocs
         from(javadoc.map { it.destinationDir }) {

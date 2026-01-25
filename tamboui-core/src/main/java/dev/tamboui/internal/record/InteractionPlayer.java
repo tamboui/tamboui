@@ -200,7 +200,7 @@ final class InteractionPlayer {
                 break;
             case "screenshot":
                 // Resolve screenshot path relative to the .cast file's directory (same folder)
-                interactions.add(new Interaction.Screenshot(outputPath.resolve(args)));
+                interactions.add(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
                 break;
             case "type":
                 // Type "text" - parse quoted string and type each character
@@ -442,7 +442,7 @@ final class InteractionPlayer {
                 Interaction.Screenshot screenshot = (Interaction.Screenshot) interaction;
                 String svg = BufferSvgExporter.exportSvg(buffer);
                 try {
-                    screenshot.path().getParent().toFile().mkdirs();
+                    Files.createDirectories(screenshot.path().getParent());
                     Files.write(screenshot.path(), svg.getBytes(StandardCharsets.UTF_8));
                 } catch (IOException e) {
                     throw new UncheckedIOException("Warning: Failed to write screenshot: " + e.getMessage(),e);

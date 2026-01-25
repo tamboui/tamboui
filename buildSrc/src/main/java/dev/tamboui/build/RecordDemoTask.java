@@ -6,6 +6,7 @@ package dev.tamboui.build;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
@@ -18,12 +19,12 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
-import org.gradle.process.ExecResult;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -66,8 +67,13 @@ public abstract class RecordDemoTask extends DefaultTask {
     public abstract DirectoryProperty getOutputDirectory();
 
     @OutputFile
-    public Provider<RegularFile> getOutputFile() {
+    public Provider<RegularFile> getOutputCastFile() {
         return getOutputDirectory().map(dir -> dir.file(getProject().getName() + ".cast"));
+    }
+
+    @OutputDirectory
+    public Provider<Directory> getScreenshotsDirectory() {
+        return getOutputDirectory().map(dir -> dir.dir("screenshots"));
     }
 
     @Inject
@@ -131,7 +137,7 @@ public abstract class RecordDemoTask extends DefaultTask {
         var outDir = getOutputDirectory().get().getAsFile();
         outDir.mkdirs();
 
-        var outFile = getOutputFile().get().getAsFile();
+        var outFile = getOutputCastFile().get().getAsFile();
 
         // Calculate appropriate duration based on config file wait times
         var configFileObj = getConfigFile().isPresent() ? getConfigFile().get().getAsFile() : null;

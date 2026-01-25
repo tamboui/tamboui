@@ -71,6 +71,13 @@ val casts by configurations.creating {
         attribute(Category.CATEGORY_ATTRIBUTE, objects.named("demo-cast"))
     }
 }
+val screenshots by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+    attributes {
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named("demo-screenshots"))
+    }
+}
 
 // Configuration for metadata files
 val demoMetadata by configurations.creating {
@@ -147,7 +154,8 @@ val generateDemoMetadata = tasks.register<GenerateDemoMetadataTask>("generateDem
 }
 
 // Register artifacts
-casts.outgoing.artifact(recordDemo)
+casts.outgoing.artifact(recordDemo.map(RecordDemoTask::getOutputCastFile))
+screenshots.outgoing.artifact(recordDemo.map(RecordDemoTask::getScreenshotsDirectory))
 demoMetadata.outgoing.artifact(generateDemoMetadata)
 
 val validateDemo = tasks.register("validateDemo") {
