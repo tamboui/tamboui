@@ -9,7 +9,7 @@
 //JAVA_OPTIONS -Dapple.awt.UIElement=true
 
 /*
- * Copyright (c) 2025 TamboUI Contributors
+ * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
 package dev.tamboui.demo.filemanager;

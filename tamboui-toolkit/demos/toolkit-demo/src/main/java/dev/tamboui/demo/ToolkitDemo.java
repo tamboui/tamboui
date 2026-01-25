@@ -4,7 +4,7 @@
 // These are listed explicitly to allow running the demo without cloning the repo locally
 //SOURCES FloatingPanelsArea.java ClockPanel.java CounterPanel.java ProgressPanel.java ProgressPanel.java QuotePanel.java SystemInfoPanel.java TodoPanel.java FloatingPanel.java PanelContent.java
 /*
- * Copyright (c) 2025 TamboUI Contributors
+ * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
 package dev.tamboui.demo;

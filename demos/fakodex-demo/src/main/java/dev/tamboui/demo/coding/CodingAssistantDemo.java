@@ -3,7 +3,7 @@
 //FILES styles/codex.tcss=../../../../../resources/styles/codex.tcss
 
 /*
- * Copyright (c) 2025 TamboUI Contributors
+ * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
 package dev.tamboui.demo.coding;

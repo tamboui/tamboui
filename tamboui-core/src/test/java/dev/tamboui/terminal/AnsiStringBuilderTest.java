@@ -1,5 +1,5 @@
 /*
-a * Copyright (c) 2025 TamboUI Contributors
+a * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
 package dev.tamboui.terminal;

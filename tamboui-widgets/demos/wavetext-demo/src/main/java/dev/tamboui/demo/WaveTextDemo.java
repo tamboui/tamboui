@@ -3,7 +3,7 @@
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
 /*
- * Copyright (c) 2025 TamboUI Contributors
+ * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
 package dev.tamboui.demo;
