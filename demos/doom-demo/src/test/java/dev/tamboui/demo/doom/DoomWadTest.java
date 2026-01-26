@@ -39,6 +39,26 @@ class DoomWadTest {
         assertEquals(2.5, grid.startY(), 0.01);
     }
 
+    @Test
+    void loadsTextureFromWad() throws Exception {
+        byte[] wad = buildSimpleWad();
+        Path temp = Files.createTempFile("doom-demo-texture", ".wad");
+        temp.toFile().deleteOnExit();
+        Files.write(temp, wad);
+
+        DoomDemo.WadFile wadFile = DoomDemo.WadFile.open(temp);
+        DoomDemo.WadTextureSet textures = wadFile.textureSet();
+        DoomDemo.WadTexture texture = textures.texture("TESTTX");
+
+        assertNotNull(texture);
+        assertEquals(2, texture.width());
+        assertEquals(2, texture.height());
+        assertEquals(0xFFFF0000, texture.sample(0, 0));
+        assertEquals(0xFF00FF00, texture.sample(1, 0));
+        assertEquals(0xFF00FF00, texture.sample(0, 1));
+        assertEquals(0xFFFF0000, texture.sample(1, 1));
+    }
+
     private static byte[] buildSimpleWad() throws IOException {
         List<LumpData> lumps = new ArrayList<>();
         lumps.add(new LumpData("MAP01", new byte[0]));
@@ -70,7 +90,70 @@ class DoomWadTest {
         writeLine(linedefs, offset, 3, 0, 0);
         lumps.add(new LumpData("LINEDEFS", linedefs));
 
+        lumps.add(new LumpData("PLAYPAL", buildPalette()));
+        lumps.add(new LumpData("PNAMES", buildPatchNames()));
+        lumps.add(new LumpData("TEXTURE1", buildTextureLump()));
+        lumps.add(new LumpData("PATCH1", buildPatchLump()));
+
         return buildWad(lumps);
+    }
+
+    private static byte[] buildPalette() {
+        byte[] palette = new byte[256 * 3];
+        palette[3] = (byte) 255;
+        palette[6 + 1] = (byte) 255;
+        return palette;
+    }
+
+    private static byte[] buildPatchNames() throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        writeIntLE(out, 1);
+        writeName(out, "PATCH1");
+        return out.toByteArray();
+    }
+
+    private static byte[] buildTextureLump() throws IOException {
+        byte[] bytes = new byte[40];
+        writeIntLE(bytes, 0, 1);
+        writeIntLE(bytes, 4, 8);
+        writeName(bytes, 8, "TESTTX");
+        writeIntLE(bytes, 16, 0);
+        writeShortLE(bytes, 20, (short) 2);
+        writeShortLE(bytes, 22, (short) 2);
+        writeIntLE(bytes, 24, 0);
+        writeShortLE(bytes, 28, (short) 1);
+        int patchOffset = 30;
+        writeShortLE(bytes, patchOffset, (short) 0);
+        writeShortLE(bytes, patchOffset + 2, (short) 0);
+        writeShortLE(bytes, patchOffset + 4, (short) 0);
+        writeShortLE(bytes, patchOffset + 6, (short) 0);
+        writeShortLE(bytes, patchOffset + 8, (short) 0);
+        return bytes;
+    }
+
+    private static byte[] buildPatchLump() {
+        byte[] bytes = new byte[30];
+        writeShortLE(bytes, 0, (short) 2);
+        writeShortLE(bytes, 2, (short) 2);
+        writeShortLE(bytes, 4, (short) 0);
+        writeShortLE(bytes, 6, (short) 0);
+        writeIntLE(bytes, 8, 16);
+        writeIntLE(bytes, 12, 23);
+        bytes[16] = 0;
+        bytes[17] = 2;
+        bytes[18] = 0;
+        bytes[19] = 1;
+        bytes[20] = 2;
+        bytes[21] = 0;
+        bytes[22] = (byte) 0xFF;
+        bytes[23] = 0;
+        bytes[24] = 2;
+        bytes[25] = 0;
+        bytes[26] = 2;
+        bytes[27] = 1;
+        bytes[28] = 0;
+        bytes[29] = (byte) 0xFF;
+        return bytes;
     }
 
     private static int writeLine(byte[] buffer, int offset, int v1, int v2, int flags) {
@@ -117,6 +200,14 @@ class DoomWadTest {
         int count = Math.min(nameBytes.length, 8);
         System.arraycopy(nameBytes, 0, bytes, 0, count);
         out.write(bytes);
+    }
+
+    private static void writeName(byte[] buffer, int offset, String name) throws IOException {
+        byte[] bytes = new byte[8];
+        byte[] nameBytes = name.getBytes(StandardCharsets.US_ASCII);
+        int count = Math.min(nameBytes.length, 8);
+        System.arraycopy(nameBytes, 0, bytes, 0, count);
+        System.arraycopy(bytes, 0, buffer, offset, bytes.length);
     }
 
     private static void writeIntLE(ByteArrayOutputStream out, int value) throws IOException {

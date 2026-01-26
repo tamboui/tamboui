@@ -1,5 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-tui:LATEST
+//DEPS dev.tamboui:tamboui-image:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 /*
  * Copyright TamboUI Contributors
@@ -9,6 +10,16 @@ package dev.tamboui.demo.doom;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
+import dev.tamboui.image.Image;
+import dev.tamboui.image.ImageData;
+import dev.tamboui.image.ImageScaling;
+import dev.tamboui.image.capability.TerminalImageCapabilities;
+import dev.tamboui.image.protocol.BrailleProtocol;
+import dev.tamboui.image.protocol.HalfBlockProtocol;
+import dev.tamboui.image.protocol.ITermProtocol;
+import dev.tamboui.image.protocol.ImageProtocol;
+import dev.tamboui.image.protocol.KittyProtocol;
+import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -30,6 +41,7 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -52,7 +64,7 @@ import java.util.Map;
  *   <li>A/D - strafe left/right</li>
  *   <li>Left/Right or H/L - rotate</li>
  *   <li>M - toggle minimap</li>
- *   <li>V - toggle render mode (ASCII/Block)</li>
+ *   <li>V - toggle render mode (ASCII/Block/Image)</li>
  *   <li>C - toggle color output</li>
  *   <li>R - reset position</li>
  *   <li>Q or Ctrl+C - quit</li>
@@ -112,12 +124,14 @@ public class DoomDemo {
 
     private final DoomEngine engine;
     private final String mapInfo;
-    private final String mapWarning;
     private final int mapScale;
+    private final WadTexture wallTexture;
+    private final String wallTextureName;
+    private final ImageProtocol imageProtocol;
+    private final List<String> warnings;
     private RenderMode renderMode;
     private boolean useColor;
     private boolean showMap;
-    private long frameCount;
 
     /**
      * Entry point for the Doom raycaster demo.
@@ -135,11 +149,14 @@ public class DoomDemo {
         MapData map = loadResult.map();
         this.engine = new DoomEngine(map.map(), map.startX(), map.startY(), map.startAngle());
         this.mapInfo = buildMapInfo(map);
-        this.mapWarning = loadResult.warning();
         this.mapScale = map.scale();
+        this.wallTexture = loadResult.wallTexture();
+        this.wallTextureName = loadResult.wallTextureName();
+        this.warnings = loadResult.warnings();
         this.renderMode = config.renderMode();
         this.useColor = config.useColor();
         this.showMap = config.showMap();
+        this.imageProtocol = resolveImageProtocol(config.imageProtocol());
     }
 
     public void run() throws Exception {
@@ -215,13 +232,12 @@ public class DoomDemo {
     }
 
     private boolean handleTickEvent(TickEvent tickEvent) {
-        frameCount = tickEvent.frameCount();
         return true;
     }
 
     private void render(Frame frame) {
         Rect area = frame.area();
-        int hudHeight = mapWarning == null ? 5 : 6;
+        int hudHeight = 6 + warnings.size();
         List<Rect> layout = Layout.vertical()
                 .constraints(
                         Constraint.fill(),
@@ -250,11 +266,20 @@ public class DoomDemo {
         if (inner.width() < MIN_VIEW_WIDTH || inner.height() < MIN_VIEW_HEIGHT) {
             renderTooSmall(frame, inner);
         } else {
-            renderWorld(frame.buffer(), inner);
-            if (showMap) {
+            RenderMode mode = effectiveRenderMode();
+            if (mode == RenderMode.IMAGE) {
+                renderWorldImage(frame, inner);
+            } else if (mode == RenderMode.BLOCK) {
+                renderWorldBlocks(frame.buffer(), inner);
+            } else {
+                renderWorldAscii(frame.buffer(), inner);
+            }
+            if (showMap && mode != RenderMode.IMAGE) {
                 renderMiniMap(frame.buffer(), inner);
             }
-            renderCrosshair(frame.buffer(), inner);
+            if (mode != RenderMode.IMAGE) {
+                renderCrosshair(frame.buffer(), inner);
+            }
         }
 
         renderHud(frame, hudArea, inner);
@@ -296,6 +321,10 @@ public class DoomDemo {
         String mapState = showMap ? "Map: on" : "Map: off";
         String renderState = "Mode: " + effectiveRenderMode().label();
         String colorState = useColor ? "Color: on" : "Color: off";
+        String textureState = wallTextureName == null ? "Texture: none" : "Texture: " + wallTextureName;
+        String protocolState = effectiveRenderMode() == RenderMode.IMAGE
+                ? "Protocol: " + imageProtocol.name()
+                : null;
         String scaleState = mapScale > 1 ? "Scale: " + mapScale : null;
         String view = "View: " + viewArea.width() + "x" + viewArea.height();
 
@@ -316,15 +345,15 @@ public class DoomDemo {
         List<Line> lines = new ArrayList<>();
         lines.add(controls);
         lines.add(status);
-        if (scaleState != null || mapInfo != null) {
-            Line info = Line.from(
-                    Span.raw(mapInfo).cyan(),
-                    Span.raw(scaleState == null ? "" : "  " + scaleState).dim()
-            );
-            lines.add(info);
-        }
-        if (mapWarning != null) {
-            lines.add(Line.from(Span.raw(mapWarning).fg(Color.LIGHT_RED).dim()));
+        Line info = Line.from(
+                Span.raw(mapInfo).cyan(),
+                Span.raw("  " + textureState).yellow(),
+                Span.raw(scaleState == null ? "" : "  " + scaleState).dim(),
+                Span.raw(protocolState == null ? "" : "  " + protocolState).dim()
+        );
+        lines.add(info);
+        for (String warning : warnings) {
+            lines.add(Line.from(Span.raw(warning).fg(Color.LIGHT_RED).dim()));
         }
 
         Block hudBlock = Block.builder()
@@ -342,12 +371,70 @@ public class DoomDemo {
         frame.renderWidget(hud, area);
     }
 
-    private void renderWorld(Buffer buffer, Rect area) {
-        if (effectiveRenderMode() == RenderMode.BLOCK) {
-            renderWorldBlocks(buffer, area);
-        } else {
-            renderWorldAscii(buffer, area);
+    private void renderWorldImage(Frame frame, Rect area) {
+        int width = area.width();
+        int height = area.height();
+        if (width <= 0 || height <= 0) {
+            return;
         }
+
+        int pixelHeight = height * 2;
+        int[] pixels = new int[width * pixelHeight];
+        int halfHeight = pixelHeight / 2;
+        int maxPixel = pixelHeight - 1;
+        double maxDistance = engine.maxViewDistance();
+
+        for (int x = 0; x < width; x++) {
+            double ratio = width == 1 ? 0.5 : (double) x / (double) (width - 1);
+            double rayAngle = engine.angle() - (FOV / 2.0) + (FOV * ratio);
+            double rayDirX = Math.cos(rayAngle);
+            double rayDirY = Math.sin(rayAngle);
+
+            RaycastHit hit = engine.castRay(rayAngle, maxDistance);
+            double distance = Math.max(0.0001, hit.distance());
+
+            int lineHeight = (int) Math.min(pixelHeight, pixelHeight / distance);
+            int drawStart = Math.max(0, halfHeight - lineHeight / 2);
+            int drawEnd = Math.min(maxPixel, halfHeight + lineHeight / 2);
+
+            double wallX = hit.verticalSide() ? hit.hitY() : hit.hitX();
+            wallX -= Math.floor(wallX);
+            if (hit.verticalSide() && rayDirX > 0) {
+                wallX = 1.0 - wallX;
+            }
+            if (!hit.verticalSide() && rayDirY < 0) {
+                wallX = 1.0 - wallX;
+            }
+
+            int texX = wallTexture == null ? 0
+                    : clamp((int) Math.floor(wallX * wallTexture.width()), 0, wallTexture.width() - 1);
+
+            for (int y = 0; y < pixelHeight; y++) {
+                int index = y * width + x;
+                if (y < drawStart) {
+                    pixels[index] = argb(ceilingColor(y, pixelHeight));
+                } else if (y <= drawEnd) {
+                    int argb = wallTexture == null
+                            ? argb(wallColor(distance, hit.verticalSide(), maxDistance))
+                            : wallTexture.sample(texX, textureY(y, drawStart, lineHeight, wallTexture.height()));
+                    if (wallTexture == null || ImageData.isVisible(argb)) {
+                        pixels[index] = argb;
+                    } else {
+                        pixels[index] = argb(wallColor(distance, hit.verticalSide(), maxDistance));
+                    }
+                } else {
+                    pixels[index] = argb(floorColor(y, pixelHeight));
+                }
+            }
+        }
+
+        ImageData data = imageDataFromPixels(width, pixelHeight, pixels);
+        Image image = Image.builder()
+                .data(data)
+                .scaling(ImageScaling.STRETCH)
+                .protocol(imageProtocol)
+                .build();
+        frame.renderWidget(image, area);
     }
 
     private void renderWorldAscii(Buffer buffer, Rect area) {
@@ -433,8 +520,11 @@ public class DoomDemo {
     }
 
     private RenderMode effectiveRenderMode() {
-        if (!useColor && renderMode == RenderMode.BLOCK) {
+        if (!useColor && (renderMode == RenderMode.BLOCK || renderMode == RenderMode.IMAGE)) {
             return RenderMode.ASCII;
+        }
+        if (renderMode == RenderMode.IMAGE && wallTexture == null) {
+            return RenderMode.BLOCK;
         }
         return renderMode;
     }
@@ -596,6 +686,26 @@ public class DoomDemo {
         return new Color.Rgb(r, g, b);
     }
 
+    private static int textureY(int pixelY, int drawStart, int lineHeight, int textureHeight) {
+        if (lineHeight <= 0 || textureHeight <= 0) {
+            return 0;
+        }
+        double ratio = (pixelY - drawStart) / (double) lineHeight;
+        int texY = (int) Math.floor(ratio * textureHeight);
+        return clamp(texY, 0, textureHeight - 1);
+    }
+
+    private static int argb(Color color) {
+        Color.Rgb rgb = color.toRgb();
+        return 0xFF000000 | (rgb.r() << 16) | (rgb.g() << 8) | rgb.b();
+    }
+
+    private static ImageData imageDataFromPixels(int width, int height, int[] pixels) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        image.setRGB(0, 0, width, height, pixels, 0, width);
+        return ImageData.fromBufferedImage(image);
+    }
+
     private static Cell[] buildWallShades(boolean useColor) {
         if (!useColor) {
             return new Cell[] {
@@ -674,8 +784,9 @@ public class DoomDemo {
     }
 
     private static MapLoadResult loadMap(DemoConfig config) {
+        List<String> warnings = new ArrayList<>();
         if (config.wadPath() == null) {
-            return new MapLoadResult(defaultMapData(), null);
+            return new MapLoadResult(defaultMapData(), null, null, warnings);
         }
 
         Path wadPath = Paths.get(config.wadPath());
@@ -687,10 +798,28 @@ public class DoomDemo {
             }
             WadMap map = wad.loadMap(mapName);
             MapData data = WadRasterizer.rasterize(map, config.mapScale(), wadPath.getFileName().toString());
-            return new MapLoadResult(data, null);
+
+            WadTexture wallTexture = null;
+            String textureName = config.textureName();
+            try {
+                WadTextureSet textures = wad.textureSet();
+                if (textureName == null) {
+                    textureName = textures.defaultTextureName();
+                }
+                if (textureName != null) {
+                    wallTexture = textures.texture(textureName);
+                }
+                if (wallTexture == null && textureName != null) {
+                    warnings.add("Texture not found: " + textureName);
+                }
+            } catch (Exception e) {
+                warnings.add("Texture load failed: " + e.getMessage());
+            }
+
+            return new MapLoadResult(data, wallTexture, textureName, warnings);
         } catch (Exception e) {
-            String warning = "WAD load failed: " + e.getMessage();
-            return new MapLoadResult(defaultMapData(), warning);
+            warnings.add("WAD load failed: " + e.getMessage());
+            return new MapLoadResult(defaultMapData(), null, null, warnings);
         }
     }
 
@@ -699,9 +828,32 @@ public class DoomDemo {
         return new MapData(map, 3.5, 3.5, Math.toRadians(45), "Default", "Built-in", 1);
     }
 
+    private static ImageProtocol resolveImageProtocol(String value) {
+        if (value == null) {
+            return new HalfBlockProtocol();
+        }
+        switch (value.toLowerCase(Locale.ROOT)) {
+            case "half":
+                return new HalfBlockProtocol();
+            case "braille":
+                return new BrailleProtocol();
+            case "kitty":
+                return new KittyProtocol();
+            case "sixel":
+                return new SixelProtocol();
+            case "iterm":
+                return new ITermProtocol();
+            case "auto":
+                return TerminalImageCapabilities.detect().bestProtocol();
+            default:
+                return new HalfBlockProtocol();
+        }
+    }
+
     private enum RenderMode {
         ASCII("ASCII"),
-        BLOCK("Block");
+        BLOCK("Block"),
+        IMAGE("Image");
 
         private final String label;
 
@@ -714,7 +866,14 @@ public class DoomDemo {
         }
 
         RenderMode toggle() {
-            return this == ASCII ? BLOCK : ASCII;
+            switch (this) {
+                case ASCII:
+                    return BLOCK;
+                case BLOCK:
+                    return IMAGE;
+                default:
+                    return ASCII;
+            }
         }
 
         static RenderMode parse(String value) {
@@ -726,6 +885,8 @@ public class DoomDemo {
                     return ASCII;
                 case "block":
                     return BLOCK;
+                case "image":
+                    return IMAGE;
                 default:
                     throw new IllegalArgumentException("Unknown render mode: " + value);
             }
@@ -733,7 +894,7 @@ public class DoomDemo {
     }
 
     private record DemoConfig(String wadPath, String mapName, int mapScale, RenderMode renderMode,
-                              boolean useColor, boolean showMap) {
+                              boolean useColor, boolean showMap, String textureName, String imageProtocol) {
 
         static DemoConfig parseArgs(String[] args) {
             String wadPath = null;
@@ -742,6 +903,8 @@ public class DoomDemo {
             RenderMode renderMode = RenderMode.BLOCK;
             boolean useColor = true;
             boolean showMap = true;
+            String textureName = null;
+            String imageProtocol = "half";
 
             for (int i = 0; i < args.length; i++) {
                 String arg = args[i];
@@ -765,6 +928,17 @@ public class DoomDemo {
                             System.exit(1);
                         }
                         break;
+                    case "--texture":
+                        textureName = requireValue(args, ++i, "--texture").toUpperCase(Locale.ROOT);
+                        break;
+                    case "--protocol":
+                        String protocolValue = requireValue(args, ++i, "--protocol");
+                        if (!isValidProtocol(protocolValue)) {
+                            printUsage("Unknown protocol: " + protocolValue);
+                            System.exit(1);
+                        }
+                        imageProtocol = protocolValue;
+                        break;
                     case "--no-color":
                         useColor = false;
                         break;
@@ -787,7 +961,8 @@ public class DoomDemo {
                 System.exit(1);
             }
 
-            return new DemoConfig(wadPath, mapName, mapScale, renderMode, useColor, showMap);
+            return new DemoConfig(wadPath, mapName, mapScale, renderMode, useColor, showMap, textureName,
+                    imageProtocol);
         }
 
         private static String requireValue(String[] args, int index, String option) {
@@ -808,6 +983,23 @@ public class DoomDemo {
             }
         }
 
+        private static boolean isValidProtocol(String value) {
+            if (value == null) {
+                return false;
+            }
+            switch (value.toLowerCase(Locale.ROOT)) {
+                case "half":
+                case "braille":
+                case "kitty":
+                case "sixel":
+                case "iterm":
+                case "auto":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private static void printUsage(String error) {
             if (error != null && !error.isEmpty()) {
                 System.err.println(error);
@@ -816,14 +1008,17 @@ public class DoomDemo {
             System.out.println("  --wad <path>     Load a DOOM WAD file");
             System.out.println("  --map <name>     Map name (e.g. E1M1, MAP01)");
             System.out.println("  --scale <int>    Map units per grid cell (default: " + DEFAULT_MAP_SCALE + ")");
-            System.out.println("  --render <mode>  Render mode: ascii|block");
+            System.out.println("  --render <mode>  Render mode: ascii|block|image");
+            System.out.println("  --texture <name> Wall texture name (TEXTURE1 entry)");
+            System.out.println("  --protocol <p>   Image protocol: half|braille|kitty|sixel|iterm|auto");
             System.out.println("  --no-color       Disable color output");
             System.out.println("  --no-map         Hide minimap overlay");
             System.out.println("  --help           Show this help");
         }
     }
 
-    private record MapLoadResult(MapData map, String warning) {
+    private record MapLoadResult(MapData map, WadTexture wallTexture, String wallTextureName,
+                                 List<String> warnings) {
     }
 
     record MapData(char[][] map, double startX, double startY, double startAngle,
@@ -836,6 +1031,7 @@ public class DoomDemo {
 
         private final byte[] data;
         private final List<WadLump> lumps;
+        private WadTextureSet textureSet;
 
         private WadFile(byte[] data, List<WadLump> lumps) {
             this.data = data;
@@ -922,6 +1118,28 @@ public class DoomDemo {
             return new WadMap(target, vertexList, lineList, thingList);
         }
 
+        WadTextureSet textureSet() {
+            if (textureSet == null) {
+                textureSet = WadTextureSet.fromWad(this);
+            }
+            return textureSet;
+        }
+
+        boolean hasLump(String name) {
+            return findLump(name) != null;
+        }
+
+        WadLump findLump(String name) {
+            String target = name.toUpperCase(Locale.ROOT);
+            for (int i = lumps.size() - 1; i >= 0; i--) {
+                WadLump lump = lumps.get(i);
+                if (lump.name().equals(target)) {
+                    return lump;
+                }
+            }
+            return null;
+        }
+
         private WadLump requireLump(Map<String, WadLump> mapLumps, String name) {
             WadLump lump = mapLumps.get(name);
             if (lump == null) {
@@ -990,6 +1208,14 @@ public class DoomDemo {
             return Arrays.copyOfRange(data, start, end);
         }
 
+        private byte[] readLumpBytes(String name) {
+            WadLump lump = findLump(name);
+            if (lump == null) {
+                throw new IllegalArgumentException("Missing lump: " + name);
+            }
+            return readLumpBytes(lump);
+        }
+
         private static boolean isMapLabel(String name) {
             if (name == null) {
                 return false;
@@ -1047,6 +1273,266 @@ public class DoomDemo {
                 }
             }
             return things.isEmpty() ? null : things.get(0);
+        }
+    }
+
+    record WadTexture(String name, int width, int height, int[] pixels) {
+        int sample(int x, int y) {
+            if (x < 0 || x >= width || y < 0 || y >= height) {
+                return 0;
+            }
+            return pixels[y * width + x];
+        }
+    }
+
+    private record TextureDef(String name, int width, int height, List<TexturePatch> patches) {
+    }
+
+    private record TexturePatch(int originX, int originY, String patchName) {
+    }
+
+    private record WadPatch(int width, int height, int[] pixels) {
+        int pixelAt(int x, int y) {
+            if (x < 0 || x >= width || y < 0 || y >= height) {
+                return 0;
+            }
+            return pixels[y * width + x];
+        }
+    }
+
+    static final class WadTextureSet {
+        private static final int TRANSPARENT = 0x00000000;
+        private static final String[] PREFERRED_TEXTURES = {
+                "STARTAN3", "STARTAN2", "STARTAN1", "STONE2", "STONE3", "BRICK1"
+        };
+
+        private final WadFile wad;
+        private final int[] palette;
+        private final Map<String, TextureDef> textures;
+        private final Map<String, WadPatch> patchCache = new HashMap<>();
+        private final Map<String, WadTexture> textureCache = new HashMap<>();
+
+        private WadTextureSet(WadFile wad, int[] palette, Map<String, TextureDef> textures) {
+            this.wad = wad;
+            this.palette = palette;
+            this.textures = textures;
+        }
+
+        static WadTextureSet fromWad(WadFile wad) {
+            int[] palette = loadPalette(wad);
+            List<String> patchNames = loadPatchNames(wad);
+            Map<String, TextureDef> textures = new HashMap<>();
+
+            if (wad.hasLump("TEXTURE1")) {
+                parseTextures(wad.readLumpBytes("TEXTURE1"), patchNames, textures);
+            }
+            if (wad.hasLump("TEXTURE2")) {
+                parseTextures(wad.readLumpBytes("TEXTURE2"), patchNames, textures);
+            }
+
+            if (textures.isEmpty()) {
+                throw new IllegalArgumentException("No textures found in WAD.");
+            }
+            return new WadTextureSet(wad, palette, textures);
+        }
+
+        String defaultTextureName() {
+            for (String preferred : PREFERRED_TEXTURES) {
+                if (textures.containsKey(preferred)) {
+                    return preferred;
+                }
+            }
+            List<String> names = new ArrayList<>(textures.keySet());
+            names.sort(String::compareTo);
+            return names.isEmpty() ? null : names.get(0);
+        }
+
+        WadTexture texture(String name) {
+            if (name == null) {
+                return null;
+            }
+            String key = name.toUpperCase(Locale.ROOT);
+            WadTexture cached = textureCache.get(key);
+            if (cached != null) {
+                return cached;
+            }
+            TextureDef def = textures.get(key);
+            if (def == null) {
+                return null;
+            }
+
+            int[] pixels = new int[def.width() * def.height()];
+            Arrays.fill(pixels, TRANSPARENT);
+
+            for (TexturePatch patch : def.patches()) {
+                WadPatch patchImage = loadPatch(patch.patchName());
+                if (patchImage == null) {
+                    continue;
+                }
+                blitPatch(pixels, def.width(), def.height(), patchImage, patch.originX(), patch.originY());
+            }
+
+            WadTexture texture = new WadTexture(def.name(), def.width(), def.height(), pixels);
+            textureCache.put(key, texture);
+            return texture;
+        }
+
+        private static int[] loadPalette(WadFile wad) {
+            if (!wad.hasLump("PLAYPAL")) {
+                int[] fallback = new int[256];
+                for (int i = 0; i < fallback.length; i++) {
+                    int v = i & 0xFF;
+                    fallback[i] = 0xFF000000 | (v << 16) | (v << 8) | v;
+                }
+                return fallback;
+            }
+
+            byte[] bytes = wad.readLumpBytes("PLAYPAL");
+            if (bytes.length < 256 * 3) {
+                throw new IllegalArgumentException("PLAYPAL lump is too small.");
+            }
+            int[] palette = new int[256];
+            for (int i = 0; i < 256; i++) {
+                int r = bytes[i * 3] & 0xFF;
+                int g = bytes[i * 3 + 1] & 0xFF;
+                int b = bytes[i * 3 + 2] & 0xFF;
+                palette[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
+            }
+            return palette;
+        }
+
+        private static List<String> loadPatchNames(WadFile wad) {
+            byte[] bytes = wad.readLumpBytes("PNAMES");
+            int count = WadFile.readIntLE(bytes, 0);
+            if (count < 0 || bytes.length < 4 + count * 8) {
+                throw new IllegalArgumentException("PNAMES lump is invalid.");
+            }
+            List<String> names = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                int offset = 4 + i * 8;
+                String name = WadFile.readName(bytes, offset, 8).toUpperCase(Locale.ROOT);
+                names.add(name);
+            }
+            return names;
+        }
+
+        private static void parseTextures(byte[] bytes, List<String> patchNames, Map<String, TextureDef> target) {
+            if (bytes.length < 4) {
+                throw new IllegalArgumentException("Texture lump is too small.");
+            }
+            int numTextures = WadFile.readIntLE(bytes, 0);
+            if (numTextures < 0 || bytes.length < 4 + numTextures * 4) {
+                throw new IllegalArgumentException("Texture lump header invalid.");
+            }
+            for (int i = 0; i < numTextures; i++) {
+                int offset = WadFile.readIntLE(bytes, 4 + i * 4);
+                if (offset < 0 || offset >= bytes.length) {
+                    continue;
+                }
+                String name = WadFile.readName(bytes, offset, 8).toUpperCase(Locale.ROOT);
+                int width = WadFile.readShortLE(bytes, offset + 12) & 0xFFFF;
+                int height = WadFile.readShortLE(bytes, offset + 14) & 0xFFFF;
+                int patchCount = WadFile.readShortLE(bytes, offset + 20) & 0xFFFF;
+                int patchOffset = offset + 22;
+                List<TexturePatch> patches = new ArrayList<>(patchCount);
+
+                for (int p = 0; p < patchCount; p++) {
+                    int entryOffset = patchOffset + p * 10;
+                    if (entryOffset + 10 > bytes.length) {
+                        break;
+                    }
+                    int originX = WadFile.readShortLE(bytes, entryOffset);
+                    int originY = WadFile.readShortLE(bytes, entryOffset + 2);
+                    int patchIndex = WadFile.readShortLE(bytes, entryOffset + 4) & 0xFFFF;
+                    String patchName = patchIndex < patchNames.size() ? patchNames.get(patchIndex) : null;
+                    if (patchName != null && !patchName.isEmpty()) {
+                        patches.add(new TexturePatch(originX, originY, patchName));
+                    }
+                }
+
+                if (!target.containsKey(name)) {
+                    target.put(name, new TextureDef(name, width, height, patches));
+                }
+            }
+        }
+
+        private WadPatch loadPatch(String name) {
+            if (name == null) {
+                return null;
+            }
+            String key = name.toUpperCase(Locale.ROOT);
+            WadPatch cached = patchCache.get(key);
+            if (cached != null) {
+                return cached;
+            }
+            WadLump lump = wad.findLump(key);
+            if (lump == null) {
+                return null;
+            }
+            byte[] bytes = wad.readLumpBytes(lump);
+            WadPatch patch = decodePatch(bytes);
+            patchCache.put(key, patch);
+            return patch;
+        }
+
+        private WadPatch decodePatch(byte[] bytes) {
+            if (bytes.length < 8) {
+                throw new IllegalArgumentException("Patch lump is too small.");
+            }
+            int width = WadFile.readShortLE(bytes, 0) & 0xFFFF;
+            int height = WadFile.readShortLE(bytes, 2) & 0xFFFF;
+            int[] pixels = new int[width * height];
+            Arrays.fill(pixels, TRANSPARENT);
+
+            int columnTableOffset = 8;
+            if (bytes.length < columnTableOffset + width * 4) {
+                throw new IllegalArgumentException("Patch column table is incomplete.");
+            }
+
+            for (int x = 0; x < width; x++) {
+                int columnOffset = WadFile.readIntLE(bytes, columnTableOffset + x * 4);
+                if (columnOffset < 0 || columnOffset >= bytes.length) {
+                    continue;
+                }
+                int pointer = columnOffset;
+                while (pointer < bytes.length) {
+                    int topDelta = bytes[pointer] & 0xFF;
+                    if (topDelta == 0xFF) {
+                        break;
+                    }
+                    int length = bytes[pointer + 1] & 0xFF;
+                    int dataStart = pointer + 3;
+                    for (int i = 0; i < length; i++) {
+                        int y = topDelta + i;
+                        if (y >= 0 && y < height && dataStart + i < bytes.length) {
+                            int index = bytes[dataStart + i] & 0xFF;
+                            pixels[y * width + x] = palette[index];
+                        }
+                    }
+                    pointer += length + 4;
+                }
+            }
+            return new WadPatch(width, height, pixels);
+        }
+
+        private static void blitPatch(int[] target, int targetWidth, int targetHeight,
+                                      WadPatch patch, int originX, int originY) {
+            for (int y = 0; y < patch.height(); y++) {
+                int destY = originY + y;
+                if (destY < 0 || destY >= targetHeight) {
+                    continue;
+                }
+                for (int x = 0; x < patch.width(); x++) {
+                    int destX = originX + x;
+                    if (destX < 0 || destX >= targetWidth) {
+                        continue;
+                    }
+                    int color = patch.pixelAt(x, y);
+                    if (ImageData.isVisible(color)) {
+                        target[destY * targetWidth + destX] = color;
+                    }
+                }
+            }
         }
     }
 
@@ -1331,7 +1817,9 @@ public class DoomDemo {
             }
 
             distance = Math.max(0.0001, Math.min(maxDistance, distance));
-            return new RaycastHit(distance, side == 0);
+            double hitX = playerX + rayDirX * distance;
+            double hitY = playerY + rayDirY * distance;
+            return new RaycastHit(distance, side == 0, hitX, hitY);
         }
 
         private double computePerpendicularDistance(double rayDirX, double rayDirY,
@@ -1362,6 +1850,6 @@ public class DoomDemo {
         }
     }
 
-    record RaycastHit(double distance, boolean verticalSide) {
+    record RaycastHit(double distance, boolean verticalSide, double hitX, double hitY) {
     }
 }
