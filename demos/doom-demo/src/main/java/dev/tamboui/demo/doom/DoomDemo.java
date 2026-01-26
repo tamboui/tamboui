@@ -873,7 +873,7 @@ public class DoomDemo {
     private static MapLoadResult loadMap(DemoConfig config) {
         List<String> warnings = new ArrayList<>();
         if (config.wadPath() == null) {
-            return new MapLoadResult(defaultMapData(), null, null, null, null, null, null, warnings);
+            return new MapLoadResult(defaultMapData(), null, null, null, null, null, null, null, warnings);
         }
 
         Path wadPath = Paths.get(config.wadPath());
@@ -925,7 +925,7 @@ public class DoomDemo {
                     floorTexture, floorTextureName, ceilingTexture, ceilingTextureName, warnings);
         } catch (Exception e) {
             warnings.add("WAD load failed: " + e.getMessage());
-            return new MapLoadResult(defaultMapData(), null, null, null, null, null, null, warnings);
+            return new MapLoadResult(defaultMapData(), null, null, null, null, null, null, null, warnings);
         }
     }
 
