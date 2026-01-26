@@ -2,6 +2,8 @@
 //DEPS dev.tamboui:tamboui-tui:LATEST
 //DEPS dev.tamboui:tamboui-image:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
+//DEPS dev.tamboui:tamboui-panama-backend:LATEST
+
 /*
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
@@ -33,6 +35,8 @@ import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.widgets.block.Block;
@@ -71,6 +75,7 @@ import java.util.Set;
  *   <li>P - cycle image protocol (Image mode only)</li>
  *   <li>T - toggle movement speed (0.5x / 1.0x / 2.0x)</li>
  *   <li>Y - toggle turn sensitivity (0.5x / 1.0x / 2.0x)</li>
+ *   <li>U - toggle mouse look (mouse controls rotation)</li>
  *   <li>R - reset position</li>
  *   <li>Q or Ctrl+C - quit</li>
  * </ul>
@@ -148,6 +153,9 @@ public class DoomDemo {
     private long lastKeyPressTime;
     private double movementSpeed = 1.0;
     private double turnSensitivity = 1.0;
+    private Integer lastMouseX;
+    private Rect currentViewArea;
+    private boolean mouseLookEnabled = true;
 
     /**
      * Entry point for the Doom raycaster demo.
@@ -183,6 +191,7 @@ public class DoomDemo {
     public void run() throws Exception {
         var config = TuiConfig.builder()
                 .tickRate(Duration.ofMillis(50))
+                .mouseCapture(true)
                 .build();
 
         try (var tui = TuiRunner.create(config)) {
@@ -193,6 +202,9 @@ public class DoomDemo {
     private boolean handleEvent(Event event, TuiRunner runner) {
         if (event instanceof KeyEvent keyEvent) {
             return handleKeyEvent(keyEvent, runner);
+        }
+        if (event instanceof MouseEvent mouseEvent) {
+            return handleMouseEvent(mouseEvent);
         }
         if (event instanceof TickEvent tickEvent) {
             return handleTickEvent(tickEvent);
@@ -288,13 +300,57 @@ public class DoomDemo {
             }
             redraw = true;
         }
+        if (key.isCharIgnoreCase('u')) {
+            // Toggle mouse look
+            mouseLookEnabled = !mouseLookEnabled;
+            lastMouseX = null; // Reset tracking when toggling
+            redraw = true;
+        }
         if (key.isCharIgnoreCase('r')) {
             engine.reset();
             activeKeys.clear();
+            lastMouseX = null;
+            currentViewArea = null;
             redraw = true;
         }
 
         return redraw;
+    }
+
+    private boolean handleMouseEvent(MouseEvent mouseEvent) {
+        if (!mouseLookEnabled) {
+            lastMouseX = null; // Reset tracking when disabled
+            return false;
+        }
+
+        // Handle any mouse event that gives us position (MOVE, DRAG, PRESS, RELEASE)
+        // This ensures we track mouse movement continuously
+        int currentX = mouseEvent.x();
+        
+        // Check if mouse is over the view area
+        if (currentViewArea != null && 
+            currentX >= currentViewArea.x() && 
+            currentX < currentViewArea.x() + currentViewArea.width()) {
+            
+            if (lastMouseX != null) {
+                int deltaX = currentX - lastMouseX;
+                if (deltaX != 0) {
+                    // Convert horizontal mouse movement to rotation
+                    // Scale factor: each pixel of movement = some rotation amount
+                    double rotationAmount = deltaX * 0.01 * turnSensitivity; // 0.01 radians per pixel base
+                    engine.rotate(rotationAmount);
+                    lastMouseX = currentX;
+                    return true;
+                }
+            }
+            // Always update last position when mouse is over view area
+            lastMouseX = currentX;
+        } else {
+            // Mouse left view area, reset tracking
+            lastMouseX = null;
+        }
+        
+        return false;
     }
 
     private boolean applyMovement(boolean fast) {
@@ -380,6 +436,9 @@ public class DoomDemo {
 
         frame.renderWidget(viewBlock, viewArea);
         Rect inner = viewBlock.inner(viewArea);
+        
+        // Store view area for mouse tracking
+        currentViewArea = inner;
 
         if (inner.width() < MIN_VIEW_WIDTH || inner.height() < MIN_VIEW_HEIGHT) {
             renderTooSmall(frame, inner);
@@ -436,6 +495,8 @@ public class DoomDemo {
                 Span.raw(" speed ").dim(),
                 Span.raw("Y").yellow().bold(),
                 Span.raw(" turn ").dim(),
+                Span.raw("U").yellow().bold(),
+                Span.raw(" mouse ").dim(),
                 Span.raw("Q").yellow().bold(),
                 Span.raw(" quit").dim()
         );
@@ -456,6 +517,7 @@ public class DoomDemo {
         String fpsState = String.format("FPS: %.1f", fps);
         String speedState = String.format("Speed: %.1fx", movementSpeed);
         String turnState = String.format("Turn: %.1fx", turnSensitivity);
+        String mouseState = mouseLookEnabled ? "Mouse: on" : "Mouse: off";
 
         Line status = Line.from(
                 Span.raw(position).cyan(),
@@ -471,6 +533,8 @@ public class DoomDemo {
                 Span.raw(speedState).cyan(),
                 Span.raw("  ").dim(),
                 Span.raw(turnState).cyan(),
+                Span.raw("  ").dim(),
+                Span.raw(mouseState).green(),
                 Span.raw("  ").dim(),
                 Span.raw(fpsState).green(),
                 Span.raw("  ").dim(),
