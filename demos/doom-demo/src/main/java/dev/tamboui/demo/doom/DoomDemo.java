@@ -366,14 +366,13 @@ public class DoomDemo {
         int halfHeight = height / 2;
         int maxY = height - 1;
         double maxDistance = engine.maxViewDistance();
-        double pulse = 0.85 + 0.15 * Math.sin(frameCount * 0.12);
 
         for (int x = 0; x < width; x++) {
             double ratio = width == 1 ? 0.5 : (double) x / (double) (width - 1);
             double rayAngle = engine.angle() - (FOV / 2.0) + (FOV * ratio);
 
             RaycastHit hit = engine.castRay(rayAngle, maxDistance);
-            double distance = Math.max(0.0001, hit.distance() / pulse);
+            double distance = Math.max(0.0001, hit.distance());
 
             int lineHeight = (int) Math.min(height, height / distance);
             int drawStart = Math.max(0, halfHeight - lineHeight / 2);
@@ -411,14 +410,13 @@ public class DoomDemo {
         int halfHeight = pixelHeight / 2;
         int maxPixel = pixelHeight - 1;
         double maxDistance = engine.maxViewDistance();
-        double pulse = 0.85 + 0.15 * Math.sin(frameCount * 0.12);
 
         for (int x = 0; x < width; x++) {
             double ratio = width == 1 ? 0.5 : (double) x / (double) (width - 1);
             double rayAngle = engine.angle() - (FOV / 2.0) + (FOV * ratio);
 
             RaycastHit hit = engine.castRay(rayAngle, maxDistance);
-            double distance = Math.max(0.0001, hit.distance() / pulse);
+            double distance = Math.max(0.0001, hit.distance());
 
             int lineHeight = (int) Math.min(pixelHeight, pixelHeight / distance);
             int drawStart = Math.max(0, halfHeight - lineHeight / 2);
