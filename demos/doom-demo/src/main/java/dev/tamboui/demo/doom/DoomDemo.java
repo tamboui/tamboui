@@ -133,6 +133,8 @@ public class DoomDemo {
     private RenderMode renderMode;
     private boolean useColor;
     private boolean showMap;
+    private long lastFrameTime;
+    private double fps;
 
     /**
      * Entry point for the Doom raycaster demo.
@@ -237,6 +239,14 @@ public class DoomDemo {
     }
 
     private boolean handleTickEvent(TickEvent tickEvent) {
+        long currentTime = System.nanoTime();
+        if (lastFrameTime > 0) {
+            long deltaNanos = currentTime - lastFrameTime;
+            if (deltaNanos > 0) {
+                fps = 1_000_000_000.0 / deltaNanos;
+            }
+        }
+        lastFrameTime = currentTime;
         return true;
     }
 
@@ -334,6 +344,7 @@ public class DoomDemo {
                 : null;
         String scaleState = mapScale > 1 ? "Scale: " + mapScale : null;
         String view = "View: " + viewArea.width() + "x" + viewArea.height();
+        String fpsState = String.format("FPS: %.1f", fps);
 
         Line status = Line.from(
                 Span.raw(position).cyan(),
@@ -345,6 +356,8 @@ public class DoomDemo {
                 Span.raw(renderState).yellow(),
                 Span.raw("  ").dim(),
                 Span.raw(colorState).yellow(),
+                Span.raw("  ").dim(),
+                Span.raw(fpsState).green(),
                 Span.raw("  ").dim(),
                 Span.raw(view).dim()
         );
