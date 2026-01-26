@@ -66,6 +66,7 @@ import java.util.Map;
  *   <li>M - toggle minimap</li>
  *   <li>V - toggle render mode (ASCII/Block/Image)</li>
  *   <li>C - toggle color output</li>
+ *   <li>P - cycle image protocol (Image mode only)</li>
  *   <li>R - reset position</li>
  *   <li>Q or Ctrl+C - quit</li>
  * </ul>
@@ -127,7 +128,7 @@ public class DoomDemo {
     private final int mapScale;
     private final WadTexture wallTexture;
     private final String wallTextureName;
-    private final ImageProtocol imageProtocol;
+    private ImageProtocol imageProtocol;
     private final List<String> warnings;
     private RenderMode renderMode;
     private boolean useColor;
@@ -223,6 +224,10 @@ public class DoomDemo {
             useColor = !useColor;
             redraw = true;
         }
+        if (key.isCharIgnoreCase('p') && renderMode == RenderMode.IMAGE) {
+            imageProtocol = cycleProtocol(imageProtocol);
+            redraw = true;
+        }
         if (key.isCharIgnoreCase('r')) {
             engine.reset();
             redraw = true;
@@ -312,6 +317,8 @@ public class DoomDemo {
                 Span.raw(" mode ").dim(),
                 Span.raw("C").yellow().bold(),
                 Span.raw(" color ").dim(),
+                Span.raw("P").yellow().bold(),
+                Span.raw(" protocol ").dim(),
                 Span.raw("Q").yellow().bold(),
                 Span.raw(" quit").dim()
         );
@@ -848,6 +855,26 @@ public class DoomDemo {
             default:
                 return new HalfBlockProtocol();
         }
+    }
+
+    private static ImageProtocol cycleProtocol(ImageProtocol current) {
+        if (current instanceof HalfBlockProtocol) {
+            return new BrailleProtocol();
+        }
+        if (current instanceof BrailleProtocol) {
+            return new KittyProtocol();
+        }
+        if (current instanceof KittyProtocol) {
+            return new SixelProtocol();
+        }
+        if (current instanceof SixelProtocol) {
+            return new ITermProtocol();
+        }
+        if (current instanceof ITermProtocol) {
+            return TerminalImageCapabilities.detect().bestProtocol();
+        }
+        // For auto-detected protocol, cycle back to half
+        return new HalfBlockProtocol();
     }
 
     private enum RenderMode {
