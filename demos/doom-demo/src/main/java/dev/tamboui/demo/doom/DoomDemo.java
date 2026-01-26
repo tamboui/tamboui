@@ -51,9 +51,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Doom-style raycasting demo for TamboUI.
@@ -67,6 +69,8 @@ import java.util.Map;
  *   <li>V - toggle render mode (ASCII/Block/Image)</li>
  *   <li>C - toggle color output</li>
  *   <li>P - cycle image protocol (Image mode only)</li>
+ *   <li>T - toggle movement speed (0.5x / 1.0x / 2.0x)</li>
+ *   <li>Y - toggle turn sensitivity (0.5x / 1.0x / 2.0x)</li>
  *   <li>R - reset position</li>
  *   <li>Q or Ctrl+C - quit</li>
  * </ul>
@@ -140,6 +144,10 @@ public class DoomDemo {
     private boolean showMap;
     private long lastFrameTime;
     private double fps;
+    private final Set<Character> activeKeys = new HashSet<>();
+    private long lastKeyPressTime;
+    private double movementSpeed = 1.0;
+    private double turnSensitivity = 1.0;
 
     /**
      * Entry point for the Doom raycaster demo.
@@ -202,28 +210,46 @@ public class DoomDemo {
         }
 
         boolean redraw = false;
-        double moveStep = key.hasShift() ? MOVE_STEP * 1.7 : MOVE_STEP;
+        boolean isMovementKey = false;
 
+        // Track movement keys for continuous movement
         if (key.isUp() || key.isCharIgnoreCase('w')) {
-            redraw |= engine.moveForward(moveStep);
+            activeKeys.add('w');
+            lastKeyPressTime = System.nanoTime();
+            isMovementKey = true;
         }
         if (key.isDown() || key.isCharIgnoreCase('s')) {
-            redraw |= engine.moveForward(-moveStep);
+            activeKeys.add('s');
+            lastKeyPressTime = System.nanoTime();
+            isMovementKey = true;
         }
         if (key.isCharIgnoreCase('a')) {
-            redraw |= engine.strafe(-moveStep);
+            activeKeys.add('a');
+            lastKeyPressTime = System.nanoTime();
+            isMovementKey = true;
         }
         if (key.isCharIgnoreCase('d')) {
-            redraw |= engine.strafe(moveStep);
+            activeKeys.add('d');
+            lastKeyPressTime = System.nanoTime();
+            isMovementKey = true;
         }
         if (key.isLeft() || key.isCharIgnoreCase('h')) {
-            engine.rotate(-TURN_STEP);
-            redraw = true;
+            activeKeys.add('h');
+            lastKeyPressTime = System.nanoTime();
+            isMovementKey = true;
         }
         if (key.isRight() || key.isCharIgnoreCase('l')) {
-            engine.rotate(TURN_STEP);
-            redraw = true;
+            activeKeys.add('l');
+            lastKeyPressTime = System.nanoTime();
+            isMovementKey = true;
         }
+
+        // Apply immediate movement for responsiveness
+        if (isMovementKey) {
+            redraw = applyMovement(key.hasShift());
+        }
+
+        // Toggle keys
         if (key.isCharIgnoreCase('m')) {
             showMap = !showMap;
             redraw = true;
@@ -240,12 +266,65 @@ public class DoomDemo {
             imageProtocol = cycleProtocol(imageProtocol);
             redraw = true;
         }
+        if (key.isCharIgnoreCase('t')) {
+            // Toggle movement speed: 1.0 -> 0.5 -> 2.0 -> 1.0
+            if (movementSpeed == 1.0) {
+                movementSpeed = 0.5;
+            } else if (movementSpeed == 0.5) {
+                movementSpeed = 2.0;
+            } else {
+                movementSpeed = 1.0;
+            }
+            redraw = true;
+        }
+        if (key.isCharIgnoreCase('y')) {
+            // Toggle turn sensitivity: 1.0 -> 0.5 -> 2.0 -> 1.0
+            if (turnSensitivity == 1.0) {
+                turnSensitivity = 0.5;
+            } else if (turnSensitivity == 0.5) {
+                turnSensitivity = 2.0;
+            } else {
+                turnSensitivity = 1.0;
+            }
+            redraw = true;
+        }
         if (key.isCharIgnoreCase('r')) {
             engine.reset();
+            activeKeys.clear();
             redraw = true;
         }
 
         return redraw;
+    }
+
+    private boolean applyMovement(boolean fast) {
+        boolean moved = false;
+        double baseStep = MOVE_STEP * movementSpeed;
+        double moveStep = fast ? baseStep * 1.7 : baseStep;
+        double turnStep = TURN_STEP * turnSensitivity;
+
+        if (activeKeys.contains('w')) {
+            moved |= engine.moveForward(moveStep);
+        }
+        if (activeKeys.contains('s')) {
+            moved |= engine.moveForward(-moveStep);
+        }
+        if (activeKeys.contains('a')) {
+            moved |= engine.strafe(-moveStep);
+        }
+        if (activeKeys.contains('d')) {
+            moved |= engine.strafe(moveStep);
+        }
+        if (activeKeys.contains('h')) {
+            engine.rotate(-turnStep);
+            moved = true;
+        }
+        if (activeKeys.contains('l')) {
+            engine.rotate(turnStep);
+            moved = true;
+        }
+
+        return moved;
     }
 
     private boolean handleTickEvent(TickEvent tickEvent) {
@@ -257,6 +336,20 @@ public class DoomDemo {
             }
         }
         lastFrameTime = currentTime;
+
+        // Clear active keys if no key press for 200ms (allows for smooth continuous movement)
+        if (!activeKeys.isEmpty() && lastKeyPressTime > 0) {
+            long timeSinceLastPress = currentTime - lastKeyPressTime;
+            if (timeSinceLastPress > 200_000_000L) { // 200ms in nanoseconds
+                activeKeys.clear();
+                lastKeyPressTime = 0;
+            }
+        }
+
+        // Apply continuous movement every tick
+        if (!activeKeys.isEmpty()) {
+            return applyMovement(false);
+        }
         return true;
     }
 
@@ -339,6 +432,10 @@ public class DoomDemo {
                 Span.raw(" color ").dim(),
                 Span.raw("P").yellow().bold(),
                 Span.raw(" protocol ").dim(),
+                Span.raw("T").yellow().bold(),
+                Span.raw(" speed ").dim(),
+                Span.raw("Y").yellow().bold(),
+                Span.raw(" turn ").dim(),
                 Span.raw("Q").yellow().bold(),
                 Span.raw(" quit").dim()
         );
@@ -357,6 +454,8 @@ public class DoomDemo {
         String scaleState = mapScale > 1 ? "Scale: " + mapScale : null;
         String view = "View: " + viewArea.width() + "x" + viewArea.height();
         String fpsState = String.format("FPS: %.1f", fps);
+        String speedState = String.format("Speed: %.1fx", movementSpeed);
+        String turnState = String.format("Turn: %.1fx", turnSensitivity);
 
         Line status = Line.from(
                 Span.raw(position).cyan(),
@@ -368,6 +467,10 @@ public class DoomDemo {
                 Span.raw(renderState).yellow(),
                 Span.raw("  ").dim(),
                 Span.raw(colorState).yellow(),
+                Span.raw("  ").dim(),
+                Span.raw(speedState).cyan(),
+                Span.raw("  ").dim(),
+                Span.raw(turnState).cyan(),
                 Span.raw("  ").dim(),
                 Span.raw(fpsState).green(),
                 Span.raw("  ").dim(),
@@ -972,9 +1075,10 @@ public class DoomDemo {
             return new ITermProtocol();
         }
         if (current instanceof ITermProtocol) {
-            return TerminalImageCapabilities.detect().bestProtocol();
+            // Cycle back to HalfBlock to complete the round-robin
+            return new HalfBlockProtocol();
         }
-        // For auto-detected protocol, cycle back to half
+        // For any unknown/auto-detected protocol, start from HalfBlock
         return new HalfBlockProtocol();
     }
 
