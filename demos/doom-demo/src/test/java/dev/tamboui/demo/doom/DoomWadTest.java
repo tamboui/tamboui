@@ -37,6 +37,8 @@ class DoomWadTest {
         assertEquals('.', grid.map()[2][2]);
         assertEquals(2.5, grid.startX(), 0.01);
         assertEquals(2.5, grid.startY(), 0.01);
+        assertEquals("FLOOR1", grid.floorTextureName());
+        assertEquals("CEIL1", grid.ceilingTextureName());
     }
 
     @Test
@@ -57,6 +59,12 @@ class DoomWadTest {
         assertEquals(0xFF00FF00, texture.sample(1, 0));
         assertEquals(0xFF00FF00, texture.sample(0, 1));
         assertEquals(0xFFFF0000, texture.sample(1, 1));
+
+        DoomDemo.WadTexture flat = textures.flat("FLOOR1");
+        assertNotNull(flat);
+        assertEquals(64, flat.width());
+        assertEquals(64, flat.height());
+        assertEquals(0xFF00FF00, flat.sample(0, 0));
     }
 
     private static byte[] buildSimpleWad() throws IOException {
@@ -71,6 +79,16 @@ class DoomWadTest {
         writeShortLE(things, 8, (short) 0);   // options
         lumps.add(new LumpData("THINGS", things));
 
+        byte[] linedefs = new byte[56];
+        int offset = 0;
+        offset = writeLine(linedefs, offset, 0, 1, 0);
+        offset = writeLine(linedefs, offset, 1, 2, 0);
+        offset = writeLine(linedefs, offset, 2, 3, 0);
+        writeLine(linedefs, offset, 3, 0, 0);
+        lumps.add(new LumpData("LINEDEFS", linedefs));
+
+        lumps.add(new LumpData("SIDEDEFS", buildSideDefs()));
+
         byte[] vertexes = new byte[16];
         writeShortLE(vertexes, 0, (short) 0);
         writeShortLE(vertexes, 2, (short) 0);
@@ -82,18 +100,14 @@ class DoomWadTest {
         writeShortLE(vertexes, 14, (short) 128);
         lumps.add(new LumpData("VERTEXES", vertexes));
 
-        byte[] linedefs = new byte[56];
-        int offset = 0;
-        offset = writeLine(linedefs, offset, 0, 1, 0);
-        offset = writeLine(linedefs, offset, 1, 2, 0);
-        offset = writeLine(linedefs, offset, 2, 3, 0);
-        writeLine(linedefs, offset, 3, 0, 0);
-        lumps.add(new LumpData("LINEDEFS", linedefs));
+        lumps.add(new LumpData("SECTORS", buildSectors()));
 
         lumps.add(new LumpData("PLAYPAL", buildPalette()));
         lumps.add(new LumpData("PNAMES", buildPatchNames()));
         lumps.add(new LumpData("TEXTURE1", buildTextureLump()));
         lumps.add(new LumpData("PATCH1", buildPatchLump()));
+        lumps.add(new LumpData("FLOOR1", buildFlat((byte) 2)));
+        lumps.add(new LumpData("CEIL1", buildFlat((byte) 1)));
 
         return buildWad(lumps);
     }
@@ -103,6 +117,22 @@ class DoomWadTest {
         palette[3] = (byte) 255;
         palette[6 + 1] = (byte) 255;
         return palette;
+    }
+
+    private static byte[] buildSideDefs() throws IOException {
+        byte[] bytes = new byte[30];
+        writeName(bytes, 4, "-");
+        writeName(bytes, 12, "-");
+        writeName(bytes, 20, "TESTTX");
+        writeShortLE(bytes, 28, (short) 0);
+        return bytes;
+    }
+
+    private static byte[] buildSectors() throws IOException {
+        byte[] bytes = new byte[26];
+        writeName(bytes, 4, "FLOOR1");
+        writeName(bytes, 12, "CEIL1");
+        return bytes;
     }
 
     private static byte[] buildPatchNames() throws IOException {
@@ -153,6 +183,14 @@ class DoomWadTest {
         bytes[27] = 1;
         bytes[28] = 0;
         bytes[29] = (byte) 0xFF;
+        return bytes;
+    }
+
+    private static byte[] buildFlat(byte index) {
+        byte[] bytes = new byte[64 * 64];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = index;
+        }
         return bytes;
     }
 

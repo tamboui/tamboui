@@ -126,8 +126,13 @@ public class DoomDemo {
     private final DoomEngine engine;
     private final String mapInfo;
     private final int mapScale;
+    private final WadTextureSet textureSet;
     private final WadTexture wallTexture;
+    private final WadTexture floorTexture;
+    private final WadTexture ceilingTexture;
     private final String wallTextureName;
+    private final String floorTextureName;
+    private final String ceilingTextureName;
     private ImageProtocol imageProtocol;
     private final List<String> warnings;
     private RenderMode renderMode;
@@ -150,11 +155,16 @@ public class DoomDemo {
     public DoomDemo(DemoConfig config) {
         MapLoadResult loadResult = loadMap(config);
         MapData map = loadResult.map();
-        this.engine = new DoomEngine(map.map(), map.startX(), map.startY(), map.startAngle());
+        this.engine = new DoomEngine(map.map(), map.wallTextures(), map.startX(), map.startY(), map.startAngle());
         this.mapInfo = buildMapInfo(map);
         this.mapScale = map.scale();
+        this.textureSet = loadResult.textureSet();
         this.wallTexture = loadResult.wallTexture();
         this.wallTextureName = loadResult.wallTextureName();
+        this.floorTexture = loadResult.floorTexture();
+        this.floorTextureName = loadResult.floorTextureName();
+        this.ceilingTexture = loadResult.ceilingTexture();
+        this.ceilingTextureName = loadResult.ceilingTextureName();
         this.warnings = loadResult.warnings();
         this.renderMode = config.renderMode();
         this.useColor = config.useColor();
@@ -339,6 +349,8 @@ public class DoomDemo {
         String renderState = "Mode: " + effectiveRenderMode().label();
         String colorState = useColor ? "Color: on" : "Color: off";
         String textureState = wallTextureName == null ? "Texture: none" : "Texture: " + wallTextureName;
+        String floorState = floorTextureName == null ? "Floor: none" : "Floor: " + floorTextureName;
+        String ceilingState = ceilingTextureName == null ? "Ceil: none" : "Ceil: " + ceilingTextureName;
         String protocolState = effectiveRenderMode() == RenderMode.IMAGE
                 ? "Protocol: " + imageProtocol.name()
                 : null;
@@ -368,6 +380,8 @@ public class DoomDemo {
         Line info = Line.from(
                 Span.raw(mapInfo).cyan(),
                 Span.raw("  " + textureState).yellow(),
+                Span.raw("  " + floorState).green(),
+                Span.raw("  " + ceilingState).green(),
                 Span.raw(scaleState == null ? "" : "  " + scaleState).dim(),
                 Span.raw(protocolState == null ? "" : "  " + protocolState).dim()
         );
@@ -403,6 +417,8 @@ public class DoomDemo {
         int halfHeight = pixelHeight / 2;
         int maxPixel = pixelHeight - 1;
         double maxDistance = engine.maxViewDistance();
+        WadTexture floorTex = floorTexture;
+        WadTexture ceilingTex = ceilingTexture;
 
         for (int x = 0; x < width; x++) {
             double ratio = width == 1 ? 0.5 : (double) x / (double) (width - 1);
@@ -412,6 +428,7 @@ public class DoomDemo {
 
             RaycastHit hit = engine.castRay(rayAngle, maxDistance);
             double distance = Math.max(0.0001, hit.distance());
+            WadTexture wallTex = wallTextureForHit(hit);
 
             int lineHeight = (int) Math.min(pixelHeight, pixelHeight / distance);
             int drawStart = Math.max(0, halfHeight - lineHeight / 2);
@@ -426,24 +443,42 @@ public class DoomDemo {
                 wallX = 1.0 - wallX;
             }
 
-            int texX = wallTexture == null ? 0
-                    : clamp((int) Math.floor(wallX * wallTexture.width()), 0, wallTexture.width() - 1);
+            int texX = wallTex == null ? 0
+                    : clamp((int) Math.floor(wallX * wallTex.width()), 0, wallTex.width() - 1);
 
-            for (int y = 0; y < pixelHeight; y++) {
+            for (int y = 0; y < drawStart; y++) {
                 int index = y * width + x;
-                if (y < drawStart) {
+                if (ceilingTex == null) {
                     pixels[index] = argb(ceilingColor(y, pixelHeight));
-                } else if (y <= drawEnd) {
-                    int argb = wallTexture == null
-                            ? argb(wallColor(distance, hit.verticalSide(), maxDistance))
-                            : wallTexture.sample(texX, textureY(y, drawStart, lineHeight, wallTexture.height()));
-                    if (wallTexture == null || ImageData.isVisible(argb)) {
-                        pixels[index] = argb;
-                    } else {
-                        pixels[index] = argb(wallColor(distance, hit.verticalSide(), maxDistance));
-                    }
                 } else {
+                    double rowDistance = (double) pixelHeight / (2.0 * (halfHeight - y));
+                    double worldX = engine.playerX() + rowDistance * rayDirX;
+                    double worldY = engine.playerY() + rowDistance * rayDirY;
+                    pixels[index] = sampleFlat(ceilingTex, worldX, worldY);
+                }
+            }
+
+            for (int y = drawStart; y <= drawEnd; y++) {
+                int index = y * width + x;
+                int argb = wallTex == null
+                        ? argb(wallColor(distance, hit.verticalSide(), maxDistance))
+                        : wallTex.sample(texX, textureY(y, drawStart, lineHeight, wallTex.height()));
+                if (wallTex == null || ImageData.isVisible(argb)) {
+                    pixels[index] = argb;
+                } else {
+                    pixels[index] = argb(wallColor(distance, hit.verticalSide(), maxDistance));
+                }
+            }
+
+            for (int y = drawEnd + 1; y < pixelHeight; y++) {
+                int index = y * width + x;
+                if (floorTex == null) {
                     pixels[index] = argb(floorColor(y, pixelHeight));
+                } else {
+                    double rowDistance = (double) pixelHeight / (2.0 * (y - halfHeight));
+                    double worldX = engine.playerX() + rowDistance * rayDirX;
+                    double worldY = engine.playerY() + rowDistance * rayDirY;
+                    pixels[index] = sampleFlat(floorTex, worldX, worldY);
                 }
             }
         }
@@ -543,7 +578,7 @@ public class DoomDemo {
         if (!useColor && (renderMode == RenderMode.BLOCK || renderMode == RenderMode.IMAGE)) {
             return RenderMode.ASCII;
         }
-        if (renderMode == RenderMode.IMAGE && wallTexture == null) {
+        if (renderMode == RenderMode.IMAGE && (wallTexture == null || textureSet == null)) {
             return RenderMode.BLOCK;
         }
         return renderMode;
@@ -720,6 +755,27 @@ public class DoomDemo {
         return 0xFF000000 | (rgb.r() << 16) | (rgb.g() << 8) | rgb.b();
     }
 
+    private WadTexture wallTextureForHit(RaycastHit hit) {
+        if (textureSet == null) {
+            return wallTexture;
+        }
+        String name = engine.wallTextureAt(hit.cellX(), hit.cellY());
+        if (name == null) {
+            return wallTexture;
+        }
+        WadTexture texture = textureSet.texture(name);
+        return texture == null ? wallTexture : texture;
+    }
+
+    private static int sampleFlat(WadTexture texture, double worldX, double worldY) {
+        if (texture == null) {
+            return 0;
+        }
+        int texX = Math.floorMod((int) Math.floor(worldX * texture.width()), texture.width());
+        int texY = Math.floorMod((int) Math.floor(worldY * texture.height()), texture.height());
+        return texture.sample(texX, texY);
+    }
+
     private static ImageData imageDataFromPixels(int width, int height, int[] pixels) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         image.setRGB(0, 0, width, height, pixels, 0, width);
@@ -803,10 +859,21 @@ public class DoomDemo {
         return source + " " + name;
     }
 
+    private static String normalizeTextureName(String name) {
+        if (name == null) {
+            return null;
+        }
+        String trimmed = name.trim();
+        if (trimmed.isEmpty() || "-".equals(trimmed)) {
+            return null;
+        }
+        return trimmed;
+    }
+
     private static MapLoadResult loadMap(DemoConfig config) {
         List<String> warnings = new ArrayList<>();
         if (config.wadPath() == null) {
-            return new MapLoadResult(defaultMapData(), null, null, warnings);
+            return new MapLoadResult(defaultMapData(), null, null, null, null, null, null, warnings);
         }
 
         Path wadPath = Paths.get(config.wadPath());
@@ -821,8 +888,13 @@ public class DoomDemo {
 
             WadTexture wallTexture = null;
             String textureName = config.textureName();
+            WadTextureSet textures = null;
+            WadTexture floorTexture = null;
+            WadTexture ceilingTexture = null;
+            String floorTextureName = data.floorTextureName();
+            String ceilingTextureName = data.ceilingTextureName();
             try {
-                WadTextureSet textures = wad.textureSet();
+                textures = wad.textureSet();
                 if (textureName == null) {
                     textureName = textures.defaultTextureName();
                 }
@@ -832,20 +904,36 @@ public class DoomDemo {
                 if (wallTexture == null && textureName != null) {
                     warnings.add("Texture not found: " + textureName);
                 }
+
+                if (floorTextureName != null) {
+                    floorTexture = textures.flat(floorTextureName);
+                    if (floorTexture == null) {
+                        warnings.add("Floor texture not found: " + floorTextureName);
+                    }
+                }
+                if (ceilingTextureName != null) {
+                    ceilingTexture = textures.flat(ceilingTextureName);
+                    if (ceilingTexture == null) {
+                        warnings.add("Ceiling texture not found: " + ceilingTextureName);
+                    }
+                }
             } catch (Exception e) {
                 warnings.add("Texture load failed: " + e.getMessage());
             }
 
-            return new MapLoadResult(data, wallTexture, textureName, warnings);
+            return new MapLoadResult(data, textures, wallTexture, textureName,
+                    floorTexture, floorTextureName, ceilingTexture, ceilingTextureName, warnings);
         } catch (Exception e) {
             warnings.add("WAD load failed: " + e.getMessage());
-            return new MapLoadResult(defaultMapData(), null, null, warnings);
+            return new MapLoadResult(defaultMapData(), null, null, null, null, null, null, warnings);
         }
     }
 
     private static MapData defaultMapData() {
         char[][] map = toCharMap(DEFAULT_MAP);
-        return new MapData(map, 3.5, 3.5, Math.toRadians(45), "Default", "Built-in", 1);
+        String[][] wallTextures = new String[map.length][map[0].length];
+        return new MapData(map, wallTextures, 3.5, 3.5, Math.toRadians(45), "Default", "Built-in", 1,
+                null, null);
     }
 
     private static ImageProtocol resolveImageProtocol(String value) {
@@ -1057,12 +1145,14 @@ public class DoomDemo {
         }
     }
 
-    private record MapLoadResult(MapData map, WadTexture wallTexture, String wallTextureName,
+    private record MapLoadResult(MapData map, WadTextureSet textureSet, WadTexture wallTexture, String wallTextureName,
+                                 WadTexture floorTexture, String floorTextureName,
+                                 WadTexture ceilingTexture, String ceilingTextureName,
                                  List<String> warnings) {
     }
 
-    record MapData(char[][] map, double startX, double startY, double startAngle,
-                   String mapName, String source, int scale) {
+    record MapData(char[][] map, String[][] wallTextures, double startX, double startY, double startAngle,
+                   String mapName, String source, int scale, String floorTextureName, String ceilingTextureName) {
     }
 
     static final class WadFile {
@@ -1149,13 +1239,17 @@ public class DoomDemo {
 
             WadLump things = requireLump(mapLumps, "THINGS");
             WadLump linedefs = requireLump(mapLumps, "LINEDEFS");
+            WadLump sidedefs = requireLump(mapLumps, "SIDEDEFS");
             WadLump vertexes = requireLump(mapLumps, "VERTEXES");
+            WadLump sectors = requireLump(mapLumps, "SECTORS");
 
             List<WadThing> thingList = readThings(things);
             List<WadLine> lineList = readLines(linedefs);
+            List<WadSideDef> sideList = readSideDefs(sidedefs);
             List<WadVertex> vertexList = readVertices(vertexes);
+            List<WadSector> sectorList = readSectors(sectors);
 
-            return new WadMap(target, vertexList, lineList, thingList);
+            return new WadMap(target, vertexList, lineList, thingList, sideList, sectorList);
         }
 
         WadTextureSet textureSet() {
@@ -1216,9 +1310,46 @@ public class DoomDemo {
                 int v1 = readShortLE(bytes, offset);
                 int v2 = readShortLE(bytes, offset + 2);
                 int flags = readShortLE(bytes, offset + 4);
-                lines.add(new WadLine(v1, v2, flags));
+                int side0 = readShortLE(bytes, offset + 10);
+                int side1 = readShortLE(bytes, offset + 12);
+                lines.add(new WadLine(v1, v2, flags, side0, side1));
             }
             return lines;
+        }
+
+        private List<WadSideDef> readSideDefs(WadLump lump) {
+            byte[] bytes = readLumpBytes(lump);
+            if (bytes.length % 30 != 0) {
+                throw new IllegalArgumentException("SIDEDEFS lump size invalid.");
+            }
+            int count = bytes.length / 30;
+            List<WadSideDef> sides = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                int offset = i * 30;
+                String top = readName(bytes, offset + 4, 8).toUpperCase(Locale.ROOT);
+                String bottom = readName(bytes, offset + 12, 8).toUpperCase(Locale.ROOT);
+                String mid = readName(bytes, offset + 20, 8).toUpperCase(Locale.ROOT);
+                int sector = readShortLE(bytes, offset + 28);
+                sides.add(new WadSideDef(normalizeTextureName(top), normalizeTextureName(bottom),
+                        normalizeTextureName(mid), sector));
+            }
+            return sides;
+        }
+
+        private List<WadSector> readSectors(WadLump lump) {
+            byte[] bytes = readLumpBytes(lump);
+            if (bytes.length % 26 != 0) {
+                throw new IllegalArgumentException("SECTORS lump size invalid.");
+            }
+            int count = bytes.length / 26;
+            List<WadSector> sectors = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                int offset = i * 26;
+                String floor = readName(bytes, offset + 4, 8).toUpperCase(Locale.ROOT);
+                String ceiling = readName(bytes, offset + 12, 8).toUpperCase(Locale.ROOT);
+                sectors.add(new WadSector(normalizeTextureName(floor), normalizeTextureName(ceiling)));
+            }
+            return sectors;
         }
 
         private List<WadThing> readThings(WadLump lump) {
@@ -1296,16 +1427,36 @@ public class DoomDemo {
     private record WadVertex(short x, short y) {
     }
 
-    private record WadLine(int v1, int v2, int flags) {
+    private record WadLine(int v1, int v2, int flags, int side0, int side1) {
         boolean isBlocking() {
             return (flags & 0x1) != 0 || (flags & 0x4) == 0;
+        }
+
+        int primarySide() {
+            return side0 >= 0 ? side0 : side1;
         }
     }
 
     private record WadThing(short x, short y, short angle, short type) {
     }
 
-    record WadMap(String name, List<WadVertex> vertices, List<WadLine> lines, List<WadThing> things) {
+    private record WadSideDef(String topTexture, String bottomTexture, String midTexture, int sector) {
+        String wallTexture() {
+            if (midTexture != null) {
+                return midTexture;
+            }
+            if (topTexture != null) {
+                return topTexture;
+            }
+            return bottomTexture;
+        }
+    }
+
+    private record WadSector(String floorTexture, String ceilingTexture) {
+    }
+
+    record WadMap(String name, List<WadVertex> vertices, List<WadLine> lines, List<WadThing> things,
+                  List<WadSideDef> sidedefs, List<WadSector> sectors) {
         WadThing playerStart() {
             for (WadThing thing : things) {
                 if (thing.type() == 1) {
@@ -1351,6 +1502,7 @@ public class DoomDemo {
         private final Map<String, TextureDef> textures;
         private final Map<String, WadPatch> patchCache = new HashMap<>();
         private final Map<String, WadTexture> textureCache = new HashMap<>();
+        private final Map<String, WadTexture> flatCache = new HashMap<>();
 
         private WadTextureSet(WadFile wad, int[] palette, Map<String, TextureDef> textures) {
             this.wad = wad;
@@ -1415,6 +1567,33 @@ public class DoomDemo {
             WadTexture texture = new WadTexture(def.name(), def.width(), def.height(), pixels);
             textureCache.put(key, texture);
             return texture;
+        }
+
+        WadTexture flat(String name) {
+            if (name == null) {
+                return null;
+            }
+            String key = name.toUpperCase(Locale.ROOT);
+            WadTexture cached = flatCache.get(key);
+            if (cached != null) {
+                return cached;
+            }
+            WadLump lump = wad.findLump(key);
+            if (lump == null) {
+                return null;
+            }
+            if (lump.size() != 64 * 64) {
+                return null;
+            }
+            byte[] bytes = wad.readLumpBytes(lump);
+            int[] pixels = new int[64 * 64];
+            for (int i = 0; i < bytes.length; i++) {
+                int index = bytes[i] & 0xFF;
+                pixels[i] = palette[index];
+            }
+            WadTexture flat = new WadTexture(key, 64, 64, pixels);
+            flatCache.put(key, flat);
+            return flat;
         }
 
         private static int[] loadPalette(WadFile wad) {
@@ -1595,6 +1774,7 @@ public class DoomDemo {
             int width = (int) Math.ceil((maxX - minX) / (double) scale) + 3;
             int height = (int) Math.ceil((maxY - minY) / (double) scale) + 3;
             char[][] grid = new char[height][width];
+            String[][] wallTextures = new String[height][width];
             for (int y = 0; y < height; y++) {
                 Arrays.fill(grid[y], '.');
             }
@@ -1603,13 +1783,14 @@ public class DoomDemo {
                 if (!line.isBlocking()) {
                     continue;
                 }
+                String textureName = resolveWallTexture(line, map.sidedefs());
                 WadVertex v1 = map.vertices().get(line.v1());
                 WadVertex v2 = map.vertices().get(line.v2());
                 int x1 = toGridX(v1.x(), minX, scale) + 1;
                 int y1 = toGridY(v1.y(), maxY, scale) + 1;
                 int x2 = toGridX(v2.x(), minX, scale) + 1;
                 int y2 = toGridY(v2.y(), maxY, scale) + 1;
-                drawLine(grid, x1, y1, x2, y2);
+                drawLine(grid, wallTextures, x1, y1, x2, y2, textureName);
             }
 
             sealBorders(grid);
@@ -1634,8 +1815,11 @@ public class DoomDemo {
                 grid[startCellY][startCellX] = '.';
             }
 
+            String floorTexture = map.sectors().isEmpty() ? null : map.sectors().get(0).floorTexture();
+            String ceilingTexture = map.sectors().isEmpty() ? null : map.sectors().get(0).ceilingTexture();
             String sourceLabel = source == null ? "WAD" : "WAD:" + source;
-            return new MapData(grid, startX, startY, startAngle, map.name(), sourceLabel, scale);
+            return new MapData(grid, wallTextures, startX, startY, startAngle,
+                    map.name(), sourceLabel, scale, floorTexture, ceilingTexture);
         }
 
         private static int toGridX(int x, int minX, int scale) {
@@ -1646,7 +1830,8 @@ public class DoomDemo {
             return (int) Math.round((maxY - y) / (double) scale);
         }
 
-        private static void drawLine(char[][] grid, int x0, int y0, int x1, int y1) {
+        private static void drawLine(char[][] grid, String[][] wallTextures,
+                                     int x0, int y0, int x1, int y1, String textureName) {
             int dx = Math.abs(x1 - x0);
             int dy = -Math.abs(y1 - y0);
             int sx = x0 < x1 ? 1 : -1;
@@ -1655,7 +1840,7 @@ public class DoomDemo {
             int x = x0;
             int y = y0;
             while (true) {
-                plot(grid, x, y);
+                plot(grid, wallTextures, x, y, textureName);
                 if (x == x1 && y == y1) {
                     break;
                 }
@@ -1671,11 +1856,23 @@ public class DoomDemo {
             }
         }
 
-        private static void plot(char[][] grid, int x, int y) {
+        private static void plot(char[][] grid, String[][] wallTextures,
+                                 int x, int y, String textureName) {
             if (y < 0 || y >= grid.length || x < 0 || x >= grid[0].length) {
                 return;
             }
             grid[y][x] = '#';
+            if (textureName != null && wallTextures[y][x] == null) {
+                wallTextures[y][x] = textureName;
+            }
+        }
+
+        private static String resolveWallTexture(WadLine line, List<WadSideDef> sides) {
+            int sideIndex = line.primarySide();
+            if (sideIndex < 0 || sideIndex >= sides.size()) {
+                return null;
+            }
+            return sides.get(sideIndex).wallTexture();
         }
 
         private static void sealBorders(char[][] grid) {
@@ -1694,6 +1891,7 @@ public class DoomDemo {
 
     static final class DoomEngine {
         private final char[][] map;
+        private final String[][] wallTextures;
         private final int width;
         private final int height;
         private final double startX;
@@ -1705,16 +1903,17 @@ public class DoomDemo {
         private double angle;
 
         DoomEngine(String[] mapRows, double startX, double startY, double startAngle) {
-            this(toCharMap(mapRows), startX, startY, startAngle);
+            this(toCharMap(mapRows), null, startX, startY, startAngle);
         }
 
-        DoomEngine(char[][] map, double startX, double startY, double startAngle) {
+        DoomEngine(char[][] map, String[][] wallTextures, double startX, double startY, double startAngle) {
             if (map.length == 0) {
                 throw new IllegalArgumentException("Map cannot be empty.");
             }
             this.height = map.length;
             this.width = map[0].length;
             this.map = map;
+            this.wallTextures = wallTextures;
             this.startX = startX;
             this.startY = startY;
             this.startAngle = normalizeAngle(startAngle);
@@ -1755,6 +1954,14 @@ public class DoomDemo {
                 return '#';
             }
             return map[y][x];
+        }
+
+        String wallTextureAt(int x, int y) {
+            if (wallTextures == null || y < 0 || y >= wallTextures.length
+                    || x < 0 || x >= wallTextures[y].length) {
+                return null;
+            }
+            return wallTextures[y][x];
         }
 
         void reset() {
@@ -1859,7 +2066,7 @@ public class DoomDemo {
             distance = Math.max(0.0001, Math.min(maxDistance, distance));
             double hitX = playerX + rayDirX * distance;
             double hitY = playerY + rayDirY * distance;
-            return new RaycastHit(distance, side == 0, hitX, hitY);
+            return new RaycastHit(distance, side == 0, hitX, hitY, mapX, mapY);
         }
 
         private double computePerpendicularDistance(double rayDirX, double rayDirY,
@@ -1890,6 +2097,6 @@ public class DoomDemo {
         }
     }
 
-    record RaycastHit(double distance, boolean verticalSide, double hitX, double hitY) {
+    record RaycastHit(double distance, boolean verticalSide, double hitX, double hitY, int cellX, int cellY) {
     }
 }
