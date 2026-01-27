@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui.bindings;
 
+import dev.tamboui.TerminalException;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEventKind;
@@ -65,11 +66,11 @@ public final class BindingSets {
         try (InputStream in = BindingSets.class.getClassLoader()
                 .getResourceAsStream(BINDINGS_RESOURCE_PATH + resourceName)) {
             if (in == null) {
-                throw new RuntimeException("Built-in bindings not found: " + resourceName);
+                throw new TerminalException("Built-in bindings not found: " + resourceName);
             }
             return load(in, base);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load built-in bindings: " + resourceName, e);
+            throw new TerminalException("Failed to load built-in bindings: " + resourceName, e);
         }
     }
 

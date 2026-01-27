@@ -88,11 +88,7 @@ public class Demo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
                     terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
             });
 
             // Select first item

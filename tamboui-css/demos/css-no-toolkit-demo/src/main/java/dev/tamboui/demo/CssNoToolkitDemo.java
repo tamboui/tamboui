@@ -117,11 +117,7 @@ public class CssNoToolkitDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
                     terminal.draw(this::render);
-                } catch (IOException e) {
-                    // Ignore
-                }
             });
 
             // Event loop

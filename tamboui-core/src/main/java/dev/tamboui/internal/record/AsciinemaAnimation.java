@@ -4,6 +4,7 @@
  */
 package dev.tamboui.internal.record;
 
+import dev.tamboui.TerminalException;
 import dev.tamboui.buffer.Buffer;
 
 import java.io.IOException;
@@ -141,7 +142,7 @@ final class AsciinemaAnimation {
             }
         } catch (IOException e) {
             // StringWriter doesn't throw IOException
-            throw new RuntimeException("Unexpected IOException", e);
+            throw new TerminalException("Unexpected IOException", e);
         }
 
         return writer.toString();
@@ -202,7 +203,7 @@ final class AsciinemaAnimation {
             }
         } catch (IOException e) {
             // StringWriter doesn't throw IOException
-            throw new RuntimeException("Unexpected IOException", e);
+            throw new TerminalException("Unexpected IOException", e);
         }
 
         return writer.toString();

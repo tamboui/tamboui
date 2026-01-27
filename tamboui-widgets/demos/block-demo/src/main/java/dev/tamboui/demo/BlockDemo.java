@@ -27,8 +27,6 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-
 /**
  * Demo TUI application showcasing the Block widget.
  * <p>
@@ -74,11 +72,7 @@ public class BlockDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::ui);
             });
 
             // Event loop

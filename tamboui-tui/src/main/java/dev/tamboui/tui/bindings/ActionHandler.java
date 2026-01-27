@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui.bindings;
 
+import dev.tamboui.TerminalException;
 import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.tui.event.Event;
 
@@ -199,7 +200,8 @@ public final class ActionHandler {
                     try {
                         method.invoke(target, event);
                     } catch (Exception e) {
-                        throw new RuntimeException("Failed to invoke @OnAction method: " + method.getName(), e);
+                        throw new TerminalException(
+                                "Failed to invoke @OnAction method: " + method.getName(), e);
                     }
                 });
             }

@@ -84,11 +84,7 @@ public class ListDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
                     terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
             });
 
             // Select first item in both lists

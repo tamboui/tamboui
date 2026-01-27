@@ -1,0 +1,49 @@
+/*
+ * Copyright TamboUI Contributors
+ * SPDX-License-Identifier: MIT
+ */
+package dev.tamboui;
+
+import java.io.IOException;
+
+/**
+ * Exception thrown when a terminal I/O operation fails.
+ * <p>
+ * This exception is used for errors that occur during terminal I/O operations,
+ * such as reading from or writing to the terminal, setting terminal attributes,
+ * or querying terminal state.
+ *
+ * @see TerminalException
+ */
+public class TerminalIOException extends TerminalException {
+
+    /**
+     * Creates a new terminal I/O exception with the given message.
+     *
+     * @param message the error message
+     */
+    public TerminalIOException(String message) {
+        super(message);
+    }
+
+    /**
+     * Creates a new terminal I/O exception with the given message and cause.
+     *
+     * @param message the error message
+     * @param cause   the underlying IOException
+     */
+    public TerminalIOException(String message, IOException cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Returns the underlying IOException that caused this exception.
+     *
+     * @return the IOException cause, or null if not available
+     */
+    @Override
+    public IOException getCause() {
+        Throwable cause = super.getCause();
+        return cause instanceof IOException ? (IOException) cause : null;
+    }
+}

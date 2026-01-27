@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui;
 
+import dev.tamboui.TerminalException;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
@@ -434,7 +435,7 @@ public final class TuiRunner implements AutoCloseable {
                     buffer.setLine(inner.left(), inner.top() + i, line);
                 }
             });
-        } catch (IOException e) {
+        } catch (TerminalException e) {
             // Failed to render error display - write to error output
             errorOutput.println("Failed to render error display: " + e.getMessage());
             lastError.cause().printStackTrace(errorOutput);
@@ -512,9 +513,9 @@ public final class TuiRunner implements AutoCloseable {
      * Draws the UI using the given renderer.
      *
      * @param renderer the render function
-     * @throws IOException if an I/O error occurs
+     * @throws TerminalException if a terminal error occurs
      */
-    public void draw(Consumer<Frame> renderer) throws IOException {
+    public void draw(Consumer<Frame> renderer) {
         terminal.draw(renderer);
     }
 

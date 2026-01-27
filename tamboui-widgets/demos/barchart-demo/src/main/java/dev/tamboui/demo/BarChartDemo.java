@@ -76,12 +76,8 @@ public class BarChartDemo {
             Terminal<Backend> terminal = new Terminal<>(backend);
 
             backend.onResize(() -> {
-                try {
                     terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
-            });
+                 });
 
             while (running) {
                 terminal.draw(this::ui);

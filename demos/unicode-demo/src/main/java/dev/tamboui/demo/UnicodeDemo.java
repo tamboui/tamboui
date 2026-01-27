@@ -70,11 +70,7 @@ public class UnicodeDemo {
             Terminal<Backend> terminal = new Terminal<>(backend);
 
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::render);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::render);
             });
 
             while (running) {

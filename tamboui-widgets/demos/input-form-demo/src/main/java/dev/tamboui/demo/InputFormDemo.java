@@ -86,11 +86,7 @@ public class InputFormDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::ui);
             });
 
             // Event loop

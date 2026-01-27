@@ -89,11 +89,7 @@ public class CanvasDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
                     terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
             });
 
             // Event loop with animation

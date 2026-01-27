@@ -176,6 +176,67 @@ CharWidth.truncateWithEllipsis(s, w, pos) // Truncate with "..."
 
 See `Paragraph.java` for correct CharWidth usage in text rendering.
 
+## Exception Handling Strategy
+
+TamboUI uses a consistent exception hierarchy for framework errors.
+
+### Exception Hierarchy
+
+- **`TerminalException`** (`dev.tamboui.TerminalException`) - Base exception for all TamboUI framework errors
+  - Extends `RuntimeException` (unchecked)
+  - Used for general framework errors and as the base for more specific exceptions
+  - **`TerminalIOException`** (`dev.tamboui.TerminalIOException`) - Extends `TerminalException`
+    - Used specifically for terminal I/O errors (wraps `IOException` from backend operations)
+    - Provides type-safe access to the underlying `IOException` via `getCause()`
+
+### Exception Usage Guidelines
+
+1. **Terminal Operations**: All `Terminal` methods throw `TerminalIOException` for I/O errors
+   - Terminal wraps all `IOException`s from the backend in `TerminalIOException` with descriptive messages
+   - This provides a cleaner API and consistent error handling
+   - Use `TerminalIOException` when you know the error is I/O related
+
+2. **Backend Operations**: `Backend` interface methods still throw `IOException` (checked exception)
+   - Backends are low-level implementations; `IOException` is appropriate here
+   - Terminal layer wraps these in `TerminalIOException` for user-facing APIs
+
+3. **General Framework Errors**: Use `TerminalException` for non-I/O framework errors:
+   - Resource loading failures (e.g., bindings, configuration)
+   - Native code failures (e.g., Panama FFI errors)
+   - Other framework-level errors that aren't I/O or rendering specific
+
+4. **Parameter Validation**: Use standard Java exceptions:
+   - `IllegalArgumentException` for invalid method parameters
+   - `IllegalStateException` for invalid object state
+   - `NullPointerException` for null values (via `Objects.requireNonNull()`)
+
+5. **Domain-Specific Exceptions**: Existing domain exceptions remain:
+   - `SolverException` and subclasses for layout constraint solver errors
+   - `CssParseException` for CSS parsing errors
+   - `UnknownCssPropertyException` for unknown CSS properties
+
+### Error Context
+
+When wrapping exceptions, always include context:
+```java
+// Good: includes context and uses appropriate exception type
+throw new TerminalIOException(
+    String.format("Failed to set cursor position to %s: %s", pos, e.getMessage()), e);
+
+// Good: general framework error
+throw new TerminalException("Failed to load built-in bindings: " + resourceName, e);
+
+// Avoid: generic message
+throw new RuntimeException("Error", e);
+```
+
+### Error Handling in TuiRunner
+
+- `TuiRunner` catches all exceptions during rendering and event handling
+- Errors are passed to `RenderErrorHandler` for customizable handling
+- Default handler displays errors in the UI with scrollable stack traces
+- See `RenderErrorHandlers` for pre-built handlers
+
 ## Code Style Guidelines
 
 - You MUST use Java 8 source compatibility for library modules
