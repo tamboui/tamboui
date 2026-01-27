@@ -15,6 +15,7 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
+import dev.tamboui.terminal.BackendException;
 
 /**
  * Panama FFI bindings to libc functions for terminal operations.
@@ -239,7 +240,7 @@ public final class LibC {
         try {
             return (int) TCGETATTR.invokeExact(fd, termios);
         } catch (Throwable t) {
-            throw new RuntimeException("tcgetattr failed", t);
+            throw new BackendException("tcgetattr failed", t);
         }
     }
 
@@ -255,7 +256,7 @@ public final class LibC {
         try {
             return (int) TCSETATTR.invokeExact(fd, optionalActions, termios);
         } catch (Throwable t) {
-            throw new RuntimeException("tcsetattr failed", t);
+            throw new BackendException("tcsetattr failed", t);
         }
     }
 
@@ -278,7 +279,7 @@ public final class LibC {
             }
             return result;
         } catch (Throwable t) {
-            throw new RuntimeException("ioctl failed", t);
+            throw new BackendException("ioctl failed", t);
         }
     }
 
@@ -305,7 +306,7 @@ public final class LibC {
         try {
             return (long) READ.invokeExact(fd, buf, count);
         } catch (Throwable t) {
-            throw new RuntimeException("read failed", t);
+            throw new BackendException("read failed", t);
         }
     }
 
@@ -328,7 +329,7 @@ public final class LibC {
             }
             return result;
         } catch (Throwable t) {
-            throw new RuntimeException("write failed", t);
+            throw new BackendException("write failed", t);
         }
     }
 
@@ -357,7 +358,7 @@ public final class LibC {
             }
             return result;
         } catch (Throwable t) {
-            throw new RuntimeException("poll failed", t);
+            throw new BackendException("poll failed", t);
         }
     }
 
@@ -371,7 +372,7 @@ public final class LibC {
         try {
             return (int) ISATTY.invokeExact(fd);
         } catch (Throwable t) {
-            throw new RuntimeException("isatty failed", t);
+            throw new BackendException("isatty failed", t);
         }
     }
 
@@ -392,7 +393,7 @@ public final class LibC {
             }
             return result;
         } catch (Throwable t) {
-            throw new RuntimeException("open failed", t);
+            throw new BackendException("open failed", t);
         }
     }
 
@@ -406,7 +407,7 @@ public final class LibC {
         try {
             return (int) CLOSE.invokeExact(fd);
         } catch (Throwable t) {
-            throw new RuntimeException("close failed", t);
+            throw new BackendException("close failed", t);
         }
     }
 
@@ -423,7 +424,7 @@ public final class LibC {
         try {
             return (MemorySegment) SIGNAL.invokeExact(signum, handler);
         } catch (Throwable t) {
-            throw new RuntimeException("signal failed", t);
+            throw new BackendException("signal failed", t);
         }
     }
     
@@ -441,7 +442,7 @@ public final class LibC {
         try {
             return (int) SIGACTION.invokeExact(signum, act, oldact);
         } catch (Throwable t) {
-            throw new RuntimeException("sigaction failed", t);
+            throw new BackendException("sigaction failed", t);
         }
     }
     
@@ -546,7 +547,7 @@ public final class LibC {
             // Bind handler when creating upcall stub (matches jextract pattern)
             return LINKER.upcallStub(unboundHandle.bindTo(handler), SIGNAL_HANDLER_DESC, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to create signal handler", e);
+            throw new BackendException("Failed to create signal handler", e);
         }
     }
 

@@ -27,8 +27,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.layout.grid.Grid;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-
 /**
  * Demo TUI application showcasing the Grid widget.
  * <p>
@@ -70,11 +68,7 @@ public class GridDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::ui);
             });
 
             // Event loop

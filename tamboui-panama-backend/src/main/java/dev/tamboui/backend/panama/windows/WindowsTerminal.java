@@ -4,6 +4,7 @@
  */
 package dev.tamboui.backend.panama.windows;
 
+import dev.tamboui.TerminalIOException;
 import dev.tamboui.backend.panama.PlatformTerminal;
 import dev.tamboui.layout.Size;
 
@@ -48,7 +49,7 @@ public final class WindowsTerminal implements PlatformTerminal {
         if (inputHandle.address() == Kernel32.INVALID_HANDLE_VALUE ||
             outputHandle.address() == Kernel32.INVALID_HANDLE_VALUE) {
             arena.close();
-            throw new IOException("Failed to get console handles");
+            throw new TerminalIOException("Failed to get console handles");
         }
 
         screenBufferInfo = Kernel32.allocateConsoleScreenBufferInfo(arena);
@@ -58,13 +59,13 @@ public final class WindowsTerminal implements PlatformTerminal {
         // Save original console modes
         if (Kernel32.getConsoleMode(inputHandle, intBuffer) == 0) {
             arena.close();
-            throw new IOException("Failed to get input console mode");
+            throw new TerminalIOException("Failed to get input console mode");
         }
         savedInputMode = intBuffer.get(ValueLayout.JAVA_INT, 0);
 
         if (Kernel32.getConsoleMode(outputHandle, intBuffer) == 0) {
             arena.close();
-            throw new IOException("Failed to get output console mode");
+            throw new TerminalIOException("Failed to get output console mode");
         }
         savedOutputMode = intBuffer.get(ValueLayout.JAVA_INT, 0);
 
@@ -83,7 +84,7 @@ public final class WindowsTerminal implements PlatformTerminal {
                 | Kernel32.ENABLE_VIRTUAL_TERMINAL_INPUT | Kernel32.ENABLE_WINDOW_INPUT;
 
         if (Kernel32.setConsoleMode(inputHandle, newInputMode) == 0) {
-            throw new IOException("Failed to set input console mode (error=" + Kernel32.getLastError() + ")");
+            throw new TerminalIOException("Failed to set input console mode (error=" + Kernel32.getLastError() + ")");
         }
 
         // Set output mode: enable VT processing
@@ -92,7 +93,7 @@ public final class WindowsTerminal implements PlatformTerminal {
 
         if (Kernel32.setConsoleMode(outputHandle, newOutputMode) == 0) {
             Kernel32.setConsoleMode(inputHandle, savedInputMode);
-            throw new IOException("Failed to set output console mode (error=" + Kernel32.getLastError() + ")");
+            throw new TerminalIOException("Failed to set output console mode (error=" + Kernel32.getLastError() + ")");
         }
 
         rawModeEnabled = true;
@@ -105,11 +106,11 @@ public final class WindowsTerminal implements PlatformTerminal {
         }
 
         if (Kernel32.setConsoleMode(inputHandle, savedInputMode) == 0) {
-            throw new IOException("Failed to restore input console mode");
+            throw new TerminalIOException("Failed to restore input console mode");
         }
 
         if (Kernel32.setConsoleMode(outputHandle, savedOutputMode) == 0) {
-            throw new IOException("Failed to restore output console mode");
+            throw new TerminalIOException("Failed to restore output console mode");
         }
 
         rawModeEnabled = false;
@@ -118,7 +119,7 @@ public final class WindowsTerminal implements PlatformTerminal {
     @Override
     public Size getSize() throws IOException {
         if (Kernel32.getConsoleScreenBufferInfo(outputHandle, screenBufferInfo) == 0) {
-            throw new IOException("Failed to get console screen buffer info (error=" + Kernel32.getLastError() + ")");
+            throw new TerminalIOException("Failed to get console screen buffer info (error=" + Kernel32.getLastError() + ")");
         }
 
         var left = (short) Kernel32.CSBI_WINDOW_LEFT.get(screenBufferInfo, 0L);
@@ -132,13 +133,13 @@ public final class WindowsTerminal implements PlatformTerminal {
         if (cols > 0 && rows > 0) {
             return new Size(cols, rows);
         }
-        throw new IOException("Invalid console size");
+        throw new TerminalIOException("Invalid console size");
     }
 
     @Override
     public int read(int timeoutMs) throws IOException {
         if (Kernel32.getNumberOfConsoleInputEvents(inputHandle, intBuffer) == 0) {
-            throw new IOException("Failed to get number of console input events");
+            throw new TerminalIOException("Failed to get number of console input events");
         }
 
         if (intBuffer.get(ValueLayout.JAVA_INT, 0) == 0) {
@@ -151,13 +152,13 @@ public final class WindowsTerminal implements PlatformTerminal {
                 return -2; // Timeout, no data
             }
             if (waitResult == Kernel32.WAIT_FAILED) {
-                throw new IOException("WaitForSingleObject failed (error=" + Kernel32.getLastError() + ")");
+                throw new TerminalIOException("WaitForSingleObject failed (error=" + Kernel32.getLastError() + ")");
             }
             // WAIT_OBJECT_0: input is available, proceed to read
         }
 
         if (Kernel32.readConsoleInput(inputHandle, inputRecord, 1, intBuffer) == 0) {
-            throw new IOException("Failed to read console input");
+            throw new TerminalIOException("Failed to read console input");
         }
 
         if (intBuffer.get(ValueLayout.JAVA_INT, 0) == 0) {
@@ -186,7 +187,7 @@ public final class WindowsTerminal implements PlatformTerminal {
     @Override
     public int peek(int timeoutMs) throws IOException {
         if (Kernel32.getNumberOfConsoleInputEvents(inputHandle, intBuffer) == 0) {
-            throw new IOException("Failed to get number of console input events");
+            throw new TerminalIOException("Failed to get number of console input events");
         }
         return intBuffer.get(ValueLayout.JAVA_INT, 0) > 0 ? 0 : -2;
     }
@@ -220,7 +221,7 @@ public final class WindowsTerminal implements PlatformTerminal {
 
             var written = writeArena.allocate(ValueLayout.JAVA_INT);
             if (Kernel32.writeConsole(outputHandle, buffer, chars.length, written, MemorySegment.NULL) == 0) {
-                throw new IOException("Write failed (error=" + Kernel32.getLastError() + ")");
+                throw new TerminalIOException("Write failed (error=" + Kernel32.getLastError() + ")");
             }
         }
     }

@@ -8,8 +8,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.tamboui.TerminalIOException;
 
 /**
  * Captures raw bytes written to System.out for recording inline demos.
@@ -66,8 +69,8 @@ public final class AnsiTerminalCapture extends OutputStream {
         instance = new AnsiTerminalCapture(originalOut, config);
         try {
             System.setOut(new PrintStream(instance, true, "UTF-8"));
-        } catch (java.io.UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8 not supported", e);
+        } catch (UnsupportedEncodingException e) {
+            throw new TerminalIOException("UTF-8 not supported", e);
         }
     }
 

@@ -4,7 +4,7 @@
  */
 package dev.tamboui.terminal;
 
-import dev.tamboui.TerminalException;
+import dev.tamboui.TamboUIException;
 import dev.tamboui.internal.record.RecordingBackend;
 import dev.tamboui.internal.record.RecordingConfig;
 import dev.tamboui.util.SafeServiceLoader;
@@ -106,7 +106,7 @@ public final class BackendFactory {
      * @param providerSpec the provider specification (may be comma-separated)
      * @param allProviders all available providers from ServiceLoader
      * @return list of matching providers in the specified order
-     * @throws TerminalException if a specified provider is not found
+     * @throws BackendException if a backend provider is not found
      */
     private static List<BackendProvider> resolveProviders(String providerSpec, List<BackendProvider> allProviders) {
         List<BackendProvider> resolved = new java.util.ArrayList<>();
@@ -118,7 +118,7 @@ public final class BackendFactory {
             BackendProvider provider = allProviders.stream()
                     .filter(p -> p.name().equals(trimmedSpec))
                     .findFirst()
-                    .orElseThrow(() -> new TerminalException(
+                    .orElseThrow(() -> new BackendException(
                             "No BackendProvider found on classpath for provider name" +
                                     " '" + trimmedSpec + "'.\n" +
                                     "Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backend."
@@ -137,7 +137,7 @@ public final class BackendFactory {
      */
     private static Backend tryProviders(List<BackendProvider> providers) {
         if (providers.isEmpty()) {
-            throw new IllegalStateException(
+            throw new BackendException(
                     "No BackendProvider found on classpath.\n" +
                             "Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backend."
             );
@@ -155,7 +155,7 @@ public final class BackendFactory {
             }
         }
 
-        throw new IllegalStateException(
+        throw new BackendException(
                 "All backend providers failed to create a backend.\n" +
                         "Tried: " + formatAvailableProviders(providers) + "\n" +
                         "Errors:\n" + errors

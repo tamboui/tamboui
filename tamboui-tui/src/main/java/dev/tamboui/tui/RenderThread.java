@@ -64,7 +64,7 @@ public final class RenderThread {
         // Only enforce if render thread has been set
         if (ui != null && Thread.currentThread() != ui) {
             Thread current = Thread.currentThread();
-            throw new IllegalStateException(
+            throw new TuiException(
                 "Must be called on render thread. Current: " + current.getName() +
                 " (id=" + current.getId() + "), render thread: " + ui.getName());
         }

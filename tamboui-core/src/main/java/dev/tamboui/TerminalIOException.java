@@ -13,9 +13,9 @@ import java.io.IOException;
  * such as reading from or writing to the terminal, setting terminal attributes,
  * or querying terminal state.
  *
- * @see TerminalException
+ * @see TamboUIException
  */
-public class TerminalIOException extends TerminalException {
+public class TerminalIOException extends TamboUIException {
 
     /**
      * Creates a new terminal I/O exception with the given message.
@@ -32,18 +32,9 @@ public class TerminalIOException extends TerminalException {
      * @param message the error message
      * @param cause   the underlying IOException
      */
-    public TerminalIOException(String message, IOException cause) {
+    public TerminalIOException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    /**
-     * Returns the underlying IOException that caused this exception.
-     *
-     * @return the IOException cause, or null if not available
-     */
-    @Override
-    public IOException getCause() {
-        Throwable cause = super.getCause();
-        return cause instanceof IOException ? (IOException) cause : null;
-    }
+   
 }

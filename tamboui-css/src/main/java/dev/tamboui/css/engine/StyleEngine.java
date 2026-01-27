@@ -4,6 +4,7 @@
  */
 package dev.tamboui.css.engine;
 
+import dev.tamboui.TerminalIOException;
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CascadeResolver;
 import dev.tamboui.css.cascade.PseudoClassState;
@@ -393,7 +394,7 @@ public final class StyleEngine {
                     resource.startsWith("/") ? resource.substring(1) : resource);
         }
         if (is == null) {
-            throw new IOException("Classpath resource not found: " + resource);
+            throw new TerminalIOException("Classpath resource not found: " + resource);
         }
 
         try (BufferedReader reader = new BufferedReader(

@@ -84,7 +84,7 @@ class RenderThreadTest {
         latch.await(1, TimeUnit.SECONDS);
 
         assertThat(caught.get())
-            .isInstanceOf(IllegalStateException.class)
+            .isInstanceOf(TuiException.class)
             .hasMessageContaining("test-thread")
             .hasMessageContaining("render thread");
     }

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.widgets.block;
 
+import dev.tamboui.TerminalIOException;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Padding;
@@ -20,6 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -668,14 +670,14 @@ class BlockTest {
             // Compare the entire buffer directly, just like Ratatui does
             assertThat(buffer).isEqualTo(expected);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load expected file: " + resourceFile, e);
+            throw new UncheckedIOException("Failed to load expected file: " + resourceFile, e);
         }
     }
 
     private String loadResourceFile(String resourcePath) throws IOException {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
             if (is == null) {
-                throw new IOException("Resource not found: " + resourcePath);
+                throw new TerminalIOException("Resource not found: " + resourcePath);
             }
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 scanner.useDelimiter("\\A");

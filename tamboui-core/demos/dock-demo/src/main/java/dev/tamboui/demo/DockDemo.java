@@ -27,8 +27,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.layout.dock.Dock;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-
 /**
  * Demo TUI application showcasing the Dock widget.
  * <p>
@@ -66,11 +64,7 @@ public class DockDemo {
             Terminal<Backend> terminal = new Terminal<>(backend);
 
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::ui);
             });
 
             while (running) {

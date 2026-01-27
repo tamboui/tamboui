@@ -4,7 +4,6 @@
  */
 package dev.tamboui.terminal;
 
-import dev.tamboui.TerminalException;
 import dev.tamboui.TerminalIOException;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.CellUpdate;

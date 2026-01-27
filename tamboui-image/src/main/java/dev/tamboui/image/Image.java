@@ -4,6 +4,7 @@
  */
 package dev.tamboui.image;
 
+import dev.tamboui.TerminalIOException;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
 import dev.tamboui.image.protocol.ImageProtocol;
@@ -143,7 +144,7 @@ public final class Image implements Widget, RawOutputCapable {
         try {
             protocol.render(scaledData, imageArea, buffer, rawOutput);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to render image", e);
+            throw new TerminalIOException("Failed to render image using protocol " + protocol.name(), e);
         }
     }
 

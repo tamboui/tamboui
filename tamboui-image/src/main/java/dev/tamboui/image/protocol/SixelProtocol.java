@@ -4,6 +4,7 @@
  */
 package dev.tamboui.image.protocol;
 
+import dev.tamboui.TerminalIOException;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
@@ -64,7 +65,7 @@ public final class SixelProtocol implements ImageProtocol {
     @Override
     public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput) throws IOException {
         if (rawOutput == null) {
-            throw new IOException("Sixel protocol requires raw output stream");
+            throw new TerminalIOException("Sixel protocol requires raw output stream");
         }
 
         if (area.isEmpty()) {

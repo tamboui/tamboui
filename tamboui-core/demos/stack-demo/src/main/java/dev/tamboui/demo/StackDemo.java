@@ -28,8 +28,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.layout.stack.Stack;
 
-import java.io.IOException;
-
 /**
  * Demo TUI application showcasing the Stack widget.
  * <p>
@@ -68,11 +66,7 @@ public class StackDemo {
             Terminal<Backend> terminal = new Terminal<>(backend);
 
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::ui);
             });
 
             while (running) {

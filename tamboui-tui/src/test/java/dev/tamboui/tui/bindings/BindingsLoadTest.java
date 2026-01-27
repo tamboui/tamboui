@@ -4,6 +4,9 @@
  */
 package dev.tamboui.tui.bindings;
 
+import dev.tamboui.TamboUIException;
+import dev.tamboui.TerminalIOException;
+import dev.tamboui.tui.TuiException;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
@@ -173,7 +176,7 @@ class BindingsLoadTest {
         ByteArrayInputStream in = new ByteArrayInputStream(props.getBytes(StandardCharsets.UTF_8));
 
         assertThatThrownBy(() -> BindingSets.load(in))
-            .isInstanceOf(IOException.class)
+            .isInstanceOf(TuiException.class)
             .hasMessageContaining("Unknown key");
     }
 
@@ -181,7 +184,7 @@ class BindingsLoadTest {
     @DisplayName("Throws IOException for non-existent resource")
     void throwsForNonExistentResource() {
         assertThatThrownBy(() -> BindingSets.loadResource("/non-existent.properties"))
-            .isInstanceOf(IOException.class)
+            .isInstanceOf(TamboUIException.class)
             .hasMessageContaining("Resource not found");
     }
 

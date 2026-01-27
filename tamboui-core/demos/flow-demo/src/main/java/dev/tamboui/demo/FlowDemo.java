@@ -28,8 +28,6 @@ import dev.tamboui.layout.flow.Flow;
 import dev.tamboui.layout.flow.FlowItem;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-
 /**
  * Demo TUI application showcasing the Flow widget.
  * <p>
@@ -82,11 +80,7 @@ public class FlowDemo {
             Terminal<Backend> terminal = new Terminal<>(backend);
 
             backend.onResize(() -> {
-                try {
-                    terminal.draw(this::ui);
-                } catch (IOException e) {
-                    // Ignore
-                }
+                terminal.draw(this::ui);
             });
 
             while (running) {
