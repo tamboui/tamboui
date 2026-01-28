@@ -43,6 +43,7 @@ tasks.withType<Javadoc>().configureEach {
     JavadocTheming.configure(this, project)
     (options as StandardJavadocDocletOptions).apply {
         addStringOption("Xmaxwarns", "10000")
+        addBooleanOption("Xwerror", true)
     }
 }
 
