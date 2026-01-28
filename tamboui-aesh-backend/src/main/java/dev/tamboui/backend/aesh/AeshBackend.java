@@ -52,7 +52,7 @@ public class AeshBackend implements Backend {
      */
     public AeshBackend() throws IOException {
         this.connection = new TerminalConnection();
-        this.connection.openBlocking();
+        this.connection.openNonBlocking();
         this.outputBuffer = new StringBuilder();
         this.inputQueue = new LinkedBlockingQueue<>();
         this.inAlternateScreen = false;
@@ -352,10 +352,8 @@ public class AeshBackend implements Backend {
 
     @Override
     public int peek(int timeoutMs) throws IOException {
-        // aesh-readline doesn't support peek directly
-        // We could peek at the queue, but that's not truly a peek at the terminal level
-        // Return timeout as fallback
-        return -2;
+        Integer val = inputQueue.peek(); // TODO: we just return if nothing in the queue - do we need to wait?
+        return val == null ? -2 : val;
     }
 
     @Override
