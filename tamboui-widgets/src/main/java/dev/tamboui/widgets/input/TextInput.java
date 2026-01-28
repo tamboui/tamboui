@@ -83,6 +83,11 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         this.placeholderStyle = basePlaceholderStyle;
     }
 
+    /**
+     * Creates a new text input builder.
+     *
+     * @return a new Builder
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -157,6 +162,11 @@ public final class TextInput implements StatefulWidget<TextInputState> {
     /**
      * Renders the widget and sets the cursor position on the frame.
      * Call this instead of render() when this input is focused.
+     *
+     * @param area   the area to render in
+     * @param buffer the buffer to render to
+     * @param state  the text input state
+     * @param frame  the frame for cursor positioning
      */
     public void renderWithCursor(Rect area, Buffer buffer, TextInputState state, Frame frame) {
         render(area, buffer, state);
@@ -195,6 +205,9 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
     }
 
+    /**
+     * Builder for {@link TextInput}.
+     */
     public static final class Builder {
         private Block block;
         private Style style = Style.EMPTY;
@@ -211,26 +224,56 @@ public final class TextInput implements StatefulWidget<TextInputState> {
 
         private Builder() {}
 
+        /**
+         * Wraps the text input in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
+         */
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
+        /**
+         * Sets the base style.
+         *
+         * @param style the base style
+         * @return this builder
+         */
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
+        /**
+         * Sets the cursor style.
+         *
+         * @param cursorStyle the cursor style
+         * @return this builder
+         */
         public Builder cursorStyle(Style cursorStyle) {
             this.cursorStyle = cursorStyle;
             return this;
         }
 
+        /**
+         * Sets the placeholder text shown when the input is empty.
+         *
+         * @param placeholder the placeholder text
+         * @return this builder
+         */
         public Builder placeholder(String placeholder) {
             this.placeholder = placeholder;
             return this;
         }
 
+        /**
+         * Sets the placeholder text style.
+         *
+         * @param placeholderStyle the placeholder style
+         * @return this builder
+         */
         public Builder placeholderStyle(Style placeholderStyle) {
             this.placeholderStyle = placeholderStyle;
             return this;
@@ -303,6 +346,11 @@ public final class TextInput implements StatefulWidget<TextInputState> {
             return this;
         }
 
+        /**
+         * Builds the text input.
+         *
+         * @return a new TextInput
+         */
         public TextInput build() {
             return new TextInput(this);
         }

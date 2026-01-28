@@ -85,7 +85,7 @@ public class RichTextDemo implements Element {
     private String lastAppliedCss = "";
     private String cssError = null;
 
-    public RichTextDemo() {
+    private RichTextDemo() {
         // Initialize style engine
         styleEngine = StyleEngine.create();
 
@@ -111,12 +111,22 @@ public class RichTextDemo implements Element {
                 .fill();
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var demo = new RichTextDemo();
         demo.run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         // Create bindings with F1/F2 for tab switching
         var bindings = BindingSets.standard()
                 .toBuilder()

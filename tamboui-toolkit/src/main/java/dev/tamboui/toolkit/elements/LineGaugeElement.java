@@ -54,19 +54,33 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
     private Style unfilledStyle;
     private LineGauge.LineSet lineSet = LineGauge.NORMAL;
 
+    /** Creates a line gauge with zero progress. */
     public LineGaugeElement() {
     }
 
+    /**
+     * Creates a line gauge with the given progress ratio.
+     *
+     * @param ratio the progress ratio (0.0 to 1.0)
+     */
     public LineGaugeElement(double ratio) {
         this.ratio = Math.max(0.0, Math.min(1.0, ratio));
     }
 
+    /**
+     * Creates a line gauge with the given progress percentage.
+     *
+     * @param percent the progress percentage (0 to 100)
+     */
     public LineGaugeElement(int percent) {
         this.ratio = Math.max(0, Math.min(100, percent)) / 100.0;
     }
 
     /**
      * Sets the progress as a ratio (0.0-1.0).
+     *
+     * @param ratio the progress ratio
+     * @return this element
      */
     public LineGaugeElement ratio(double ratio) {
         this.ratio = Math.max(0.0, Math.min(1.0, ratio));
@@ -83,6 +97,9 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Sets the label displayed before the gauge line.
+     *
+     * @param label the label text
+     * @return this element
      */
     public LineGaugeElement label(String label) {
         this.label = label;
@@ -91,6 +108,9 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Sets the style for the filled portion.
+     *
+     * @param style the filled style
+     * @return this element
      */
     public LineGaugeElement filledStyle(Style style) {
         this.filledStyle = style;
@@ -99,6 +119,9 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Sets the color for the filled portion.
+     *
+     * @param color the filled color
+     * @return this element
      */
     public LineGaugeElement filledColor(Color color) {
         this.filledStyle = Style.EMPTY.fg(color);
@@ -107,6 +130,9 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Sets the style for the unfilled portion.
+     *
+     * @param style the unfilled style
+     * @return this element
      */
     public LineGaugeElement unfilledStyle(Style style) {
         this.unfilledStyle = style;
@@ -115,6 +141,9 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Sets the color for the unfilled portion.
+     *
+     * @param color the unfilled color
+     * @return this element
      */
     public LineGaugeElement unfilledColor(Color color) {
         this.unfilledStyle = Style.EMPTY.fg(color);
@@ -123,6 +152,8 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Uses thick line characters.
+     *
+     * @return this element
      */
     public LineGaugeElement thick() {
         this.lineSet = LineGauge.THICK;
@@ -131,6 +162,8 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Uses double line characters.
+     *
+     * @return this element
      */
     public LineGaugeElement doubleLine() {
         this.lineSet = LineGauge.DOUBLE;
@@ -139,6 +172,9 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
 
     /**
      * Sets the line character set.
+     *
+     * @param lineSet the line character set to use
+     * @return this element
      */
     public LineGaugeElement lineSet(LineGauge.LineSet lineSet) {
         this.lineSet = lineSet;

@@ -58,9 +58,14 @@ import java.util.List;
  * skip cells that don't match the filter criteria.
  */
 public abstract class CellFilter {
-    
+
+    private CellFilter() {
+    }
+
     /**
      * Selects every cell in the area (no filtering).
+     *
+     * @return a filter that matches all cells
      */
     public static CellFilter all() {
         return All.INSTANCE;
@@ -68,6 +73,8 @@ public abstract class CellFilter {
     
     /**
      * Selects no cells.
+     *
+     * @return a filter that matches no cells
      */
     public static CellFilter none() {
         return None.INSTANCE;
@@ -75,6 +82,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells within the specified rectangular area.
+     *
+     * @param area the rectangular area to match
+     * @return a filter that matches cells within the area
      */
     public static CellFilter area(Rect area) {
         return new Area(area);
@@ -82,6 +92,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells with a matching foreground color.
+     *
+     * @param color the foreground color to match
+     * @return a filter that matches cells with the specified foreground color
      */
     public static CellFilter fgColor(Color color) {
         return new FgColor(color);
@@ -89,6 +102,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells with a matching background color.
+     *
+     * @param color the background color to match
+     * @return a filter that matches cells with the specified background color
      */
     public static CellFilter bgColor(Color color) {
         return new BgColor(color);
@@ -96,6 +112,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells within the inner margin of the area.
+     *
+     * @param margin the margin defining the inner region
+     * @return a filter that matches cells within the inner margin
      */
     public static CellFilter inner(Margin margin) {
         return new Inner(margin);
@@ -103,6 +122,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells outside the inner margin of the area (border region).
+     *
+     * @param margin the margin defining the outer region
+     * @return a filter that matches cells outside the inner margin
      */
     public static CellFilter outer(Margin margin) {
         return new Outer(margin);
@@ -110,6 +132,8 @@ public abstract class CellFilter {
     
     /**
      * Selects cells containing textual content.
+     *
+     * @return a filter that matches cells containing text
      */
     public static CellFilter text() {
         return Text.INSTANCE;
@@ -117,6 +141,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells that match ALL of the given filters (logical AND).
+     *
+     * @param filters the filters to combine
+     * @return a filter that matches cells matching all given filters
      */
     public static CellFilter allOf(List<CellFilter> filters) {
         return new AllOf(filters);
@@ -124,6 +151,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells that match ANY of the given filters (logical OR).
+     *
+     * @param filters the filters to combine
+     * @return a filter that matches cells matching any given filter
      */
     public static CellFilter anyOf(List<CellFilter> filters) {
         return new AnyOf(filters);
@@ -131,6 +161,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells that match NONE of the given filters (logical NOR).
+     *
+     * @param filters the filters to combine
+     * @return a filter that matches cells matching none of the given filters
      */
     public static CellFilter noneOf(List<CellFilter> filters) {
         return new NoneOf(filters);
@@ -138,6 +171,9 @@ public abstract class CellFilter {
     
     /**
      * Inverts the result of the given filter (logical NOT).
+     *
+     * @param filter the filter to invert
+     * @return a filter that matches cells not matching the given filter
      */
     public static CellFilter not(CellFilter filter) {
         return new Not(filter);
@@ -145,6 +181,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells using a custom position-based predicate function.
+     *
+     * @param predicate the position predicate to evaluate
+     * @return a filter that matches cells whose position satisfies the predicate
      */
     public static CellFilter positionFn(java.util.function.Predicate<Position> predicate) {
         return new PositionFn(predicate);
@@ -152,6 +191,9 @@ public abstract class CellFilter {
     
     /**
      * Selects cells using a custom cell-content-based predicate function.
+     *
+     * @param predicate the cell predicate to evaluate
+     * @return a filter that matches cells satisfying the predicate
      */
     public static CellFilter evalCell(java.util.function.Predicate<Cell> predicate) {
         return new EvalCell(predicate);

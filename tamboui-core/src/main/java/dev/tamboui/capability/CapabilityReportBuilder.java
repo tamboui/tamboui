@@ -15,6 +15,10 @@ import java.util.Objects;
  */
 public final class CapabilityReportBuilder {
 
+    /** Creates a new empty builder. */
+    public CapabilityReportBuilder() {
+    }
+
     private final Map<String, List<String>> environmentBySource = new LinkedHashMap<>();
     private final Map<String, List<String>> propertiesBySource = new LinkedHashMap<>();
     private final Map<String, Map<String, Object>> featuresBySource = new LinkedHashMap<>();
@@ -23,6 +27,10 @@ public final class CapabilityReportBuilder {
      * Adds an environment key that should be printed (value resolved at print-time).
      * <p>
      * Prefer using environment variable names as keys.
+     *
+     * @param source the provider source name
+     * @param key    the environment variable name
+     * @return this builder
      */
     public CapabilityReportBuilder env(String source, String key) {
         Objects.requireNonNull(source, "source");
@@ -39,6 +47,10 @@ public final class CapabilityReportBuilder {
      * Adds a property key that should be printed (value resolved at print-time).
      * <p>
      * Prefer using property names as keys (e.g. {@code java.version}).
+     *
+     * @param source the provider source name
+     * @param key    the system property name
+     * @return this builder
      */
     public CapabilityReportBuilder property(String source, String key) {
         Objects.requireNonNull(source, "source");
@@ -53,6 +65,11 @@ public final class CapabilityReportBuilder {
 
     /**
      * Adds a general capability/feature. Keys SHOULD use dotted notation to create stable namespaces.
+     *
+     * @param source the provider source name
+     * @param key    the feature key (prefer dotted notation)
+     * @param value  the feature value
+     * @return this builder
      */
     public CapabilityReportBuilder feature(String source, String key, Object value) {
         Objects.requireNonNull(source, "source");
@@ -65,6 +82,11 @@ public final class CapabilityReportBuilder {
         return this;
     }
 
+    /**
+     * Builds the capability report from the accumulated data.
+     *
+     * @return the assembled capability report
+     */
     public CapabilityReport build() {
         return new CapabilityReport(environmentBySource, propertiesBySource, featuresBySource);
     }

@@ -51,11 +51,18 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /**
+     * Creates a new canvas element with default bounds and Braille marker.
+     */
     public CanvasElement() {
     }
 
     /**
      * Sets the X-axis bounds.
+     *
+     * @param min the minimum X value
+     * @param max the maximum X value
+     * @return this element
      */
     public CanvasElement xBounds(double min, double max) {
         this.xMin = min;
@@ -65,6 +72,10 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets the Y-axis bounds.
+     *
+     * @param min the minimum Y value
+     * @param max the maximum Y value
+     * @return this element
      */
     public CanvasElement yBounds(double min, double max) {
         this.yMin = min;
@@ -74,6 +85,12 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets both axis bounds.
+     *
+     * @param xMin the minimum X value
+     * @param xMax the maximum X value
+     * @param yMin the minimum Y value
+     * @param yMax the maximum Y value
+     * @return this element
      */
     public CanvasElement bounds(double xMin, double xMax, double yMin, double yMax) {
         this.xMin = xMin;
@@ -85,6 +102,9 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets the marker type for rendering points.
+     *
+     * @param marker the marker type
+     * @return this element
      */
     public CanvasElement marker(Marker marker) {
         this.marker = marker != null ? marker : Marker.BRAILLE;
@@ -93,6 +113,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Uses Braille marker (highest resolution).
+     *
+     * @return this element
      */
     public CanvasElement braille() {
         this.marker = Marker.BRAILLE;
@@ -101,6 +123,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Uses half-block marker.
+     *
+     * @return this element
      */
     public CanvasElement halfBlock() {
         this.marker = Marker.HALF_BLOCK;
@@ -109,6 +133,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Uses dot marker.
+     *
+     * @return this element
      */
     public CanvasElement dot() {
         this.marker = Marker.DOT;
@@ -117,6 +143,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Uses block marker.
+     *
+     * @return this element
      */
     public CanvasElement block() {
         this.marker = Marker.BLOCK;
@@ -125,6 +153,9 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets the background color.
+     *
+     * @param color the background color
+     * @return this element
      */
     public CanvasElement backgroundColor(Color color) {
         this.backgroundColor = color;
@@ -133,6 +164,9 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets the paint callback for drawing shapes.
+     *
+     * @param callback the paint callback receiving a drawing context
+     * @return this element
      */
     public CanvasElement paint(Consumer<Context> callback) {
         this.paintCallback = callback;
@@ -141,6 +175,9 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets the title.
+     *
+     * @param title the canvas title
+     * @return this element
      */
     public CanvasElement title(String title) {
         this.title = title;
@@ -149,6 +186,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this element
      */
     public CanvasElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -157,6 +196,9 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public CanvasElement borderColor(Color color) {
         this.borderColor = color;

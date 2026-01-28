@@ -49,6 +49,8 @@ public final class Dataset {
 
         /**
          * Returns the marker symbol.
+         *
+         * @return the marker symbol string
          */
         public String symbol() {
             return symbol;
@@ -71,6 +73,8 @@ public final class Dataset {
 
     /**
      * Creates a new dataset builder.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -78,6 +82,9 @@ public final class Dataset {
 
     /**
      * Creates a dataset with just data points.
+     *
+     * @param data the data points as [x, y] pairs
+     * @return a new dataset
      */
     public static Dataset of(double[][] data) {
         return builder().data(data).build();
@@ -85,6 +92,10 @@ public final class Dataset {
 
     /**
      * Creates a named dataset with data points.
+     *
+     * @param name the dataset name
+     * @param data the data points as [x, y] pairs
+     * @return a new dataset
      */
     public static Dataset of(String name, double[][] data) {
         return builder().name(name).data(data).build();
@@ -92,6 +103,8 @@ public final class Dataset {
 
     /**
      * Returns the dataset name.
+     *
+     * @return the dataset name, or empty if not set
      */
     public Optional<Line> name() {
         return Optional.ofNullable(name);
@@ -99,6 +112,8 @@ public final class Dataset {
 
     /**
      * Returns the data points as [x, y] pairs.
+     *
+     * @return the data points array
      */
     public double[][] data() {
         return data;
@@ -106,6 +121,8 @@ public final class Dataset {
 
     /**
      * Returns the number of data points.
+     *
+     * @return the number of data points
      */
     public int size() {
         return data.length;
@@ -113,6 +130,8 @@ public final class Dataset {
 
     /**
      * Returns the marker type.
+     *
+     * @return the marker type
      */
     public Marker marker() {
         return marker;
@@ -120,6 +139,8 @@ public final class Dataset {
 
     /**
      * Returns the graph type.
+     *
+     * @return the graph type
      */
     public GraphType graphType() {
         return graphType;
@@ -127,6 +148,8 @@ public final class Dataset {
 
     /**
      * Returns the style.
+     *
+     * @return the style, or {@link Style#EMPTY} if not set
      */
     public Style style() {
         return style != null ? style : Style.EMPTY;
@@ -134,6 +157,8 @@ public final class Dataset {
 
     /**
      * Returns true if this dataset has a name.
+     *
+     * @return {@code true} if this dataset has a name
      */
     public boolean hasName() {
         return name != null;
@@ -153,6 +178,9 @@ public final class Dataset {
 
         /**
          * Sets the dataset name (for legend).
+         *
+         * @param name the dataset name
+         * @return this builder
          */
         public Builder name(String name) {
             this.name = name != null ? Line.from(name) : null;
@@ -161,6 +189,9 @@ public final class Dataset {
 
         /**
          * Sets the dataset name.
+         *
+         * @param name the dataset name as a styled line
+         * @return this builder
          */
         public Builder name(Line name) {
             this.name = name;
@@ -169,6 +200,9 @@ public final class Dataset {
 
         /**
          * Sets the data points as [x, y] pairs.
+         *
+         * @param data the data points as [x, y] pairs
+         * @return this builder
          */
         public Builder data(double[][] data) {
             if (data == null) {
@@ -184,6 +218,9 @@ public final class Dataset {
 
         /**
          * Sets the data points from a list of [x, y] pairs.
+         *
+         * @param data the data points as a list of [x, y] pairs
+         * @return this builder
          */
         public Builder data(List<double[]> data) {
             if (data == null || data.isEmpty()) {
@@ -199,6 +236,10 @@ public final class Dataset {
 
         /**
          * Adds a single data point.
+         *
+         * @param x the x coordinate
+         * @param y the y coordinate
+         * @return this builder
          */
         public Builder addPoint(double x, double y) {
             double[][] newData = Arrays.copyOf(this.data, this.data.length + 1);
@@ -209,6 +250,9 @@ public final class Dataset {
 
         /**
          * Sets the marker type for data points.
+         *
+         * @param marker the marker type
+         * @return this builder
          */
         public Builder marker(Marker marker) {
             this.marker = marker != null ? marker : Marker.DOT;
@@ -217,6 +261,9 @@ public final class Dataset {
 
         /**
          * Sets the graph type.
+         *
+         * @param graphType the graph type
+         * @return this builder
          */
         public Builder graphType(GraphType graphType) {
             this.graphType = graphType != null ? graphType : GraphType.SCATTER;
@@ -225,6 +272,9 @@ public final class Dataset {
 
         /**
          * Sets the dataset style.
+         *
+         * @param style the style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -233,6 +283,8 @@ public final class Dataset {
 
         /**
          * Builds the dataset.
+         *
+         * @return the new dataset
          */
         public Dataset build() {
             return new Dataset(this);

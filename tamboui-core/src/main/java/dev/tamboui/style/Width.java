@@ -61,6 +61,8 @@ public final class Width {
 
     /**
      * Returns true if this width fills the container.
+     *
+     * @return true if fill width
      */
     public boolean isFill() {
         return type == Type.FILL;
@@ -68,6 +70,8 @@ public final class Width {
 
     /**
      * Returns true if this width fits the content.
+     *
+     * @return true if fit width
      */
     public boolean isFit() {
         return type == Type.FIT;
@@ -75,6 +79,8 @@ public final class Width {
 
     /**
      * Returns true if this width is a percentage.
+     *
+     * @return true if percentage width
      */
     public boolean isPercent() {
         return type == Type.PERCENT;
@@ -82,6 +88,8 @@ public final class Width {
 
     /**
      * Returns true if this width is a fixed character count.
+     *
+     * @return true if fixed width
      */
     public boolean isFixed() {
         return type == Type.FIXED;
@@ -90,6 +98,8 @@ public final class Width {
     /**
      * Returns the percentage value (0.0 to 1.0).
      * Only meaningful if {@link #isPercent()} returns true.
+     *
+     * @return the percentage value
      */
     public double percent() {
         return value;
@@ -98,6 +108,8 @@ public final class Width {
     /**
      * Returns the fixed character count.
      * Only meaningful if {@link #isFixed()} returns true.
+     *
+     * @return the character count
      */
     public int chars() {
         return (int) value;

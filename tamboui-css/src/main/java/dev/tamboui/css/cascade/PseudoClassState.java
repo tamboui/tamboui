@@ -48,6 +48,18 @@ public final class PseudoClassState {
     private final boolean lastChild;
     private final int nthChild; // 1-based position, 0 means not set
 
+    /**
+     * Creates a pseudo-class state with the given flags.
+     *
+     * @param focused    whether the element has keyboard focus
+     * @param hovered    whether the mouse is over the element
+     * @param disabled   whether the element is disabled
+     * @param active     whether the element is being activated
+     * @param selected   whether the element is selected
+     * @param firstChild whether the element is the first child of its parent
+     * @param lastChild  whether the element is the last child of its parent
+     * @param nthChild   the 1-based child position, or 0 if not set
+     */
     public PseudoClassState(boolean focused,
                             boolean hovered,
                             boolean disabled,
@@ -68,6 +80,8 @@ public final class PseudoClassState {
 
     /**
      * Returns a state with only the focused flag set.
+     *
+     * @return a focused pseudo-class state
      */
     public static PseudoClassState ofFocused() {
         return FOCUSED;
@@ -75,6 +89,8 @@ public final class PseudoClassState {
 
     /**
      * Returns a state with only the hovered flag set.
+     *
+     * @return a hovered pseudo-class state
      */
     public static PseudoClassState ofHovered() {
         return HOVERED;
@@ -82,6 +98,8 @@ public final class PseudoClassState {
 
     /**
      * Returns a state with only the disabled flag set.
+     *
+     * @return a disabled pseudo-class state
      */
     public static PseudoClassState ofDisabled() {
         return DISABLED;
@@ -89,6 +107,8 @@ public final class PseudoClassState {
 
     /**
      * Returns a state with only the selected flag set.
+     *
+     * @return a selected pseudo-class state
      */
     public static PseudoClassState ofSelected() {
         return SELECTED;
@@ -97,41 +117,80 @@ public final class PseudoClassState {
     /**
      * Returns a state with all pseudo-classes matching.
      * Useful for lenient/structural matching where pseudo-class state should be ignored.
+     *
+     * @return a pseudo-class state with all flags set to true
      */
     public static PseudoClassState allMatch() {
         return ALL_MATCH;
     }
 
+    /**
+     * Returns whether the element has keyboard focus.
+     *
+     * @return {@code true} if focused
+     */
     public boolean isFocused() {
         return focused;
     }
 
+    /**
+     * Returns whether the mouse is over the element.
+     *
+     * @return {@code true} if hovered
+     */
     public boolean isHovered() {
         return hovered;
     }
 
+    /**
+     * Returns whether the element is disabled.
+     *
+     * @return {@code true} if disabled
+     */
     public boolean isDisabled() {
         return disabled;
     }
 
+    /**
+     * Returns whether the element is being activated.
+     *
+     * @return {@code true} if active
+     */
     public boolean isActive() {
         return active;
     }
 
+    /**
+     * Returns whether the element is selected.
+     *
+     * @return {@code true} if selected
+     */
     public boolean isSelected() {
         return selected;
     }
 
+    /**
+     * Returns whether the element is the first child of its parent.
+     *
+     * @return {@code true} if first child
+     */
     public boolean isFirstChild() {
         return firstChild;
     }
 
+    /**
+     * Returns whether the element is the last child of its parent.
+     *
+     * @return {@code true} if last child
+     */
     public boolean isLastChild() {
         return lastChild;
     }
 
     /**
      * Returns the 1-based child position, or 0 if not set.
+     *
+     * @return the child position
      */
     public int nthChild() {
         return nthChild;
@@ -139,6 +198,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the focused flag set.
+     *
+     * @param focused the focused flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withFocused(boolean focused) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -146,6 +208,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the hovered flag set.
+     *
+     * @param hovered the hovered flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withHovered(boolean hovered) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -153,6 +218,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the disabled flag set.
+     *
+     * @param disabled the disabled flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withDisabled(boolean disabled) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -160,6 +228,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the active flag set.
+     *
+     * @param active the active flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withActive(boolean active) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -167,6 +238,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the selected flag set.
+     *
+     * @param selected the selected flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withSelected(boolean selected) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -174,6 +248,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the firstChild flag set.
+     *
+     * @param firstChild the firstChild flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withFirstChild(boolean firstChild) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -181,6 +258,9 @@ public final class PseudoClassState {
 
     /**
      * Returns a new state with the lastChild flag set.
+     *
+     * @param lastChild the lastChild flag value
+     * @return a new state with the updated flag
      */
     public PseudoClassState withLastChild(boolean lastChild) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);
@@ -190,6 +270,7 @@ public final class PseudoClassState {
      * Returns a new state with the nthChild position set.
      *
      * @param nthChild the 1-based child position
+     * @return a new state with the updated position
      */
     public PseudoClassState withNthChild(int nthChild) {
         return new PseudoClassState(focused, hovered, disabled, active, selected, firstChild, lastChild, nthChild);

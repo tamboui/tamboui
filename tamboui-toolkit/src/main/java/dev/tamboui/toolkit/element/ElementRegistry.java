@@ -68,6 +68,12 @@ import java.util.Set;
  */
 public final class ElementRegistry {
 
+    /**
+     * Creates a new empty element registry.
+     */
+    public ElementRegistry() {
+    }
+
     private final Map<String, ElementInfo> elementsById = new HashMap<>();
     private final List<ElementInfo> allElements = new ArrayList<>();
 
@@ -96,6 +102,8 @@ public final class ElementRegistry {
 
         /**
          * Returns the element ID, or null if not set.
+         *
+         * @return the element ID, or null
          */
         public String id() {
             return id;
@@ -103,6 +111,8 @@ public final class ElementRegistry {
 
         /**
          * Returns the element type name.
+         *
+         * @return the element type name
          */
         public String type() {
             return type;
@@ -110,6 +120,8 @@ public final class ElementRegistry {
 
         /**
          * Returns the element's rendered area.
+         *
+         * @return the rendered area
          */
         public Rect area() {
             return area;
@@ -117,6 +129,8 @@ public final class ElementRegistry {
 
         /**
          * Returns the parent element info, or null if this is a root element.
+         *
+         * @return the parent element info, or null
          */
         public ElementInfo parent() {
             return parent;

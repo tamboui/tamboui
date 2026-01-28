@@ -31,6 +31,8 @@ public final class DiagonalPattern implements Pattern {
     
     /**
      * Creates a diagonal pattern from top-left to bottom-right.
+     *
+     * @return a new diagonal pattern sweeping from top-left to bottom-right
      */
     public static DiagonalPattern topLeftToBottomRight() {
         return new DiagonalPattern(DiagonalDirection.TOP_LEFT_TO_BOTTOM_RIGHT, 2.0f);
@@ -38,6 +40,8 @@ public final class DiagonalPattern implements Pattern {
     
     /**
      * Creates a diagonal pattern from top-right to bottom-left.
+     *
+     * @return a new diagonal pattern sweeping from top-right to bottom-left
      */
     public static DiagonalPattern topRightToBottomLeft() {
         return new DiagonalPattern(DiagonalDirection.TOP_RIGHT_TO_BOTTOM_LEFT, 2.0f);
@@ -45,6 +49,8 @@ public final class DiagonalPattern implements Pattern {
     
     /**
      * Creates a diagonal pattern from bottom-left to top-right.
+     *
+     * @return a new diagonal pattern sweeping from bottom-left to top-right
      */
     public static DiagonalPattern bottomLeftToTopRight() {
         return new DiagonalPattern(DiagonalDirection.BOTTOM_LEFT_TO_TOP_RIGHT, 2.0f);
@@ -52,6 +58,8 @@ public final class DiagonalPattern implements Pattern {
     
     /**
      * Creates a diagonal pattern from bottom-right to top-left.
+     *
+     * @return a new diagonal pattern sweeping from bottom-right to top-left
      */
     public static DiagonalPattern bottomRightToTopLeft() {
         return new DiagonalPattern(DiagonalDirection.BOTTOM_RIGHT_TO_TOP_LEFT, 2.0f);
@@ -59,6 +67,10 @@ public final class DiagonalPattern implements Pattern {
     
     /**
      * Creates a diagonal pattern with specified direction and transition width.
+     *
+     * @param direction the diagonal sweep direction
+     * @param transitionWidth the width of the transition zone
+     * @return a new diagonal pattern with the specified configuration
      */
     public static DiagonalPattern newPattern(DiagonalDirection direction, float transitionWidth) {
         return new DiagonalPattern(direction, transitionWidth);
@@ -71,6 +83,9 @@ public final class DiagonalPattern implements Pattern {
     
     /**
      * Creates a new pattern with a different transition width.
+     *
+     * @param width the new transition width
+     * @return a new diagonal pattern with the specified transition width
      */
     public DiagonalPattern withTransitionWidth(float width) {
         return new DiagonalPattern(direction, width);

@@ -25,6 +25,7 @@ public final class DirectionalVariance {
      * @param rng The RNG to use for generating variances
      * @param direction The direction of the effect
      * @param max The maximum variance that can be generated
+     * @return a new DirectionalVariance instance
      */
     public static DirectionalVariance withRng(SimpleRng rng, Motion direction, int max) {
         return new DirectionalVariance(rng, direction, max);

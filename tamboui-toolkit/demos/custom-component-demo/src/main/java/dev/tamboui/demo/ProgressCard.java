@@ -27,8 +27,17 @@ public final class ProgressCard extends Component<ProgressCard> {
      * Status of the task shown in the card.
      */
     public enum Status {
+        /**
+         * Task has not started yet.
+         */
         PENDING("pending"),
+        /**
+         * Task is currently in progress.
+         */
         IN_PROGRESS("in-progress"),
+        /**
+         * Task has completed successfully.
+         */
         COMPLETE("complete");
 
         private final String cssClass;
@@ -37,6 +46,11 @@ public final class ProgressCard extends Component<ProgressCard> {
             this.cssClass = cssClass;
         }
 
+        /**
+         * Returns the CSS class associated with the status.
+         *
+         * @return the CSS class
+         */
         public String cssClass() {
             return cssClass;
         }
@@ -55,6 +69,9 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Sets the card title.
+     *
+     * @param title the title
+     * @return this ProgressCard
      */
     public ProgressCard title(String title) {
         this.title = title != null ? title : "";
@@ -63,6 +80,9 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Sets the card description.
+     *
+     * @param description the description
+     * @return this ProgressCard
      */
     public ProgressCard description(String description) {
         this.description = description != null ? description : "";
@@ -71,6 +91,9 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Sets the progress value (0.0 to 1.0).
+     *
+     * @param progress the progress
+     * @return this ProgressCard
      */
     public ProgressCard progress(double progress) {
         this.progress = Math.max(0.0, Math.min(1.0, progress));
@@ -80,6 +103,7 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Returns the current progress value.
+     * @return the progress value
      */
     public double progress() {
         return progress;
@@ -87,6 +111,7 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Returns the current status.
+     * @return the status
      */
     public Status status() {
         return status;

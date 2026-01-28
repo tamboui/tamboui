@@ -47,6 +47,11 @@ public final class FormTableDemo {
     private FormTableDemo() {
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var config = TuiConfig.builder()
                 .tickRate(Duration.ofMillis(100))

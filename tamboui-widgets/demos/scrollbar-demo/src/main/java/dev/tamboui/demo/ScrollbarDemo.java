@@ -52,11 +52,16 @@ public class ScrollbarDemo {
     private final ScrollbarState verticalScrollState = new ScrollbarState(ITEM_COUNT);
     private final ScrollbarState horizontalScrollState = new ScrollbarState(50);
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new ScrollbarDemo().run();
     }
 
-    public ScrollbarDemo() {
+    private ScrollbarDemo() {
         // Generate sample items
         for (int i = 1; i <= ITEM_COUNT; i++) {
             items.add("Item " + i + " - This is a sample list item with some extra text for horizontal scrolling");
@@ -65,7 +70,12 @@ public class ScrollbarDemo {
         verticalScrollState.viewportContentLength(10);
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

@@ -48,11 +48,16 @@ public class SparklineDemo {
     private final Random random = new Random();
     private long frameCount = 0;
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new SparklineDemo().run();
     }
 
-    public SparklineDemo() {
+    private SparklineDemo() {
         // Initialize with some random data
         for (int i = 0; i < DATA_SIZE; i++) {
             cpuData[i] = 30 + random.nextInt(40);
@@ -62,7 +67,12 @@ public class SparklineDemo {
         }
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

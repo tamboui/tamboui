@@ -14,7 +14,11 @@ import java.util.Optional;
  */
 public final class IntegerConverter implements PropertyConverter<Integer> {
 
+    /** Singleton instance. */
     public static final IntegerConverter INSTANCE = new IntegerConverter();
+
+    private IntegerConverter() {
+    }
 
     @Override
     public Optional<Integer> convert(String value, Map<String, String> variables) {

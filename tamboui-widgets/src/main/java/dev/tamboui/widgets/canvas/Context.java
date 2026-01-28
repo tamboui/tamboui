@@ -201,6 +201,8 @@ public class Context {
 
     /**
      * Returns the current grid plus all saved layers.
+     *
+     * @return a list containing all saved layers and the current grid
      */
     public List<Color[][]> allLayers() {
         List<Color[][]> all = new ArrayList<>(layers);

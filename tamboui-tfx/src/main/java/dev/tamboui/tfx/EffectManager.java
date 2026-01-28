@@ -109,6 +109,8 @@ public final class EffectManager {
     
     /**
      * Returns the number of active effects.
+     *
+     * @return the number of active effects
      */
     public int size() {
         return effects.size();

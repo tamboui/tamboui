@@ -52,6 +52,8 @@ public final class ChildPosition {
 
     /**
      * Returns the zero-based index of this child.
+     *
+     * @return the zero-based index
      */
     public int index() {
         return index;
@@ -59,6 +61,8 @@ public final class ChildPosition {
 
     /**
      * Returns the total number of children.
+     *
+     * @return the total number of children
      */
     public int total() {
         return total;
@@ -66,6 +70,8 @@ public final class ChildPosition {
 
     /**
      * Returns true if this is the first child (index == 0).
+     *
+     * @return true if this is the first child
      */
     public boolean isFirst() {
         return index == 0;
@@ -73,6 +79,8 @@ public final class ChildPosition {
 
     /**
      * Returns true if this is the last child (index == total - 1).
+     *
+     * @return true if this is the last child
      */
     public boolean isLast() {
         return index == total - 1;
@@ -81,6 +89,8 @@ public final class ChildPosition {
     /**
      * Returns true if this child is at an even position (0, 2, 4, ...).
      * Note: This uses zero-based indexing, so the first child is "even".
+     *
+     * @return true if this child is at an even position
      */
     public boolean isEven() {
         return index % 2 == 0;
@@ -88,6 +98,8 @@ public final class ChildPosition {
 
     /**
      * Returns true if this child is at an odd position (1, 3, 5, ...).
+     *
+     * @return true if this child is at an odd position
      */
     public boolean isOdd() {
         return index % 2 == 1;
@@ -95,6 +107,8 @@ public final class ChildPosition {
 
     /**
      * Returns the 1-based position (CSS nth-child uses 1-based counting).
+     *
+     * @return the 1-based child position
      */
     public int nthChild() {
         return index + 1;

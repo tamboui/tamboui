@@ -176,6 +176,8 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a press event.
+     *
+     * @return true if this is a mouse press event
      */
     public boolean isPress() {
         return kind == MouseEventKind.PRESS;
@@ -183,6 +185,8 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a release event.
+     *
+     * @return true if this is a mouse release event
      */
     public boolean isRelease() {
         return kind == MouseEventKind.RELEASE;
@@ -190,6 +194,8 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a left button event.
+     *
+     * @return true if the left mouse button is involved
      */
     public boolean isLeftButton() {
         return button == MouseButton.LEFT;
@@ -197,6 +203,8 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a right button event.
+     *
+     * @return true if the right mouse button is involved
      */
     public boolean isRightButton() {
         return button == MouseButton.RIGHT;
@@ -204,37 +212,63 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a scroll event.
+     *
+     * @return true if this is a scroll-up or scroll-down event
      */
     public boolean isScroll() {
         return kind == MouseEventKind.SCROLL_UP || kind == MouseEventKind.SCROLL_DOWN;
     }
 
-    /** Returns the event kind. */
+    /**
+     * Returns the event kind.
+     *
+     * @return the mouse event kind
+     */
     public MouseEventKind kind() {
         return kind;
     }
 
-    /** Returns the button involved in the event. */
+    /**
+     * Returns the button involved in the event.
+     *
+     * @return the mouse button
+     */
     public MouseButton button() {
         return button;
     }
 
-    /** Returns the x coordinate (0-based). */
+    /**
+     * Returns the x coordinate (0-based).
+     *
+     * @return the x coordinate
+     */
     public int x() {
         return x;
     }
 
-    /** Returns the y coordinate (0-based). */
+    /**
+     * Returns the y coordinate (0-based).
+     *
+     * @return the y coordinate
+     */
     public int y() {
         return y;
     }
 
-    /** Returns active keyboard modifiers. */
+    /**
+     * Returns active keyboard modifiers.
+     *
+     * @return the modifier state
+     */
     public KeyModifiers modifiers() {
         return modifiers;
     }
 
-    /** Returns the bindings associated with this event. */
+    /**
+     * Returns the bindings associated with this event.
+     *
+     * @return the bindings
+     */
     public Bindings bindings() {
         return bindings;
     }
@@ -262,6 +296,8 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a "click" event (left mouse press) according to the bindings.
+     *
+     * @return true if this event triggers the click action
      */
     public boolean isClick() {
         return matches(Actions.CLICK);
@@ -269,6 +305,8 @@ public final class MouseEvent implements Event {
 
     /**
      * Returns true if this is a "right click" event according to the bindings.
+     *
+     * @return true if this event triggers the right-click action
      */
     public boolean isRightClick() {
         return matches(Actions.RIGHT_CLICK);

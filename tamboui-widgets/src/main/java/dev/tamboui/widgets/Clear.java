@@ -45,6 +45,8 @@ public final class Clear implements Widget {
 
     /**
      * Returns the singleton Clear widget instance.
+     *
+     * @return the singleton Clear instance
      */
     public static Clear clear() {
         return INSTANCE;

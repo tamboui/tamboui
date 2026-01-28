@@ -205,7 +205,7 @@ public class CustomComponentDemo implements Element {
     private String parseError = null;
     private String lastAppliedCss = "";
 
-    public CustomComponentDemo() {
+    private CustomComponentDemo() {
         styleEngine = StyleEngine.create();
 
         // Initialize CSS editor state with default CSS
@@ -234,12 +234,22 @@ public class CustomComponentDemo implements Element {
             .progress(0.0));
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var demo = new CustomComponentDemo();
         demo.run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         // Create bindings with increment/decrement actions for ProgressCard
         var bindings = BindingSets.standard()
                 .toBuilder()

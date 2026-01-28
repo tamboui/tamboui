@@ -15,6 +15,12 @@ import java.util.stream.Collectors;
  */
 public final class ImageCapabilityProvider implements CapabilityProvider {
 
+    /**
+     * Creates a new image capability provider.
+     */
+    public ImageCapabilityProvider() {
+    }
+
     @Override
     public String source() {
         return "tamboui-image";

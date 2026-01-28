@@ -202,6 +202,8 @@ public interface RenderContext {
     /**
      * Creates an empty context for simple rendering without focus management.
      * Primarily useful for testing.
+     *
+     * @return an empty render context
      */
     static RenderContext empty() {
         return DefaultRenderContext.createEmpty();

@@ -20,7 +20,9 @@ import java.util.List;
  */
 public final class TuiConfig {
 
+    /** Default poll timeout in milliseconds. */
     public static final int DEFAULT_POLL_TIMEOUT = 40;
+    /** Default tick rate in milliseconds. */
     public static final int DEFAULT_TICK_TIMEOUT = 40;
     /**
      * Default grace period for resize events (250ms).
@@ -41,6 +43,25 @@ public final class TuiConfig {
     private final boolean fpsOverlayEnabled;
     private final List<PostRenderProcessor> postRenderProcessors;
 
+    /**
+     * Creates a new TUI configuration with the specified options.
+     * <p>
+     * Prefer using {@link #builder()} or {@link #defaults()} instead of this constructor.
+     *
+     * @param rawMode whether to enable raw terminal mode
+     * @param alternateScreen whether to use the alternate screen buffer
+     * @param hideCursor whether to hide the cursor
+     * @param mouseCapture whether to capture mouse events
+     * @param pollTimeout timeout for polling events
+     * @param tickRate interval between tick events, or null to disable
+     * @param resizeGracePeriod grace period for resize events, or null to disable
+     * @param shutdownHook whether to register a JVM shutdown hook
+     * @param bindings the key/mouse bindings for semantic actions
+     * @param errorHandler the handler for render errors
+     * @param errorOutput the output stream for error logging
+     * @param fpsOverlayEnabled whether to show the FPS overlay
+     * @param postRenderProcessors list of post-render processors
+     */
     public TuiConfig(
             boolean rawMode,
             boolean alternateScreen,
@@ -78,6 +99,8 @@ public final class TuiConfig {
      * <p>
      * By default, tick events are generated every 100ms to ensure periodic UI refresh.
      * Use {@link Builder#noTick()} to disable automatic ticking.
+     *
+     * @return the default TUI configuration
      */
     public static TuiConfig defaults() {
         return new TuiConfig(
@@ -109,6 +132,8 @@ public final class TuiConfig {
 
     /**
      * Returns a new builder with default values.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -116,6 +141,8 @@ public final class TuiConfig {
 
     /**
      * Returns true if tick events are enabled.
+     *
+     * @return true if tick rate is configured
      */
     public boolean ticksEnabled() {
         return tickRate != null;
@@ -123,6 +150,8 @@ public final class TuiConfig {
 
     /**
      * Returns whether raw mode is enabled.
+     *
+     * @return true if raw mode is enabled
      */
     public boolean rawMode() {
         return rawMode;
@@ -130,6 +159,8 @@ public final class TuiConfig {
 
     /**
      * Returns whether the alternate screen buffer is used.
+     *
+     * @return true if the alternate screen buffer is used
      */
     public boolean alternateScreen() {
         return alternateScreen;
@@ -137,6 +168,8 @@ public final class TuiConfig {
 
     /**
      * Returns whether the cursor should be hidden.
+     *
+     * @return true if the cursor is hidden
      */
     public boolean hideCursor() {
         return hideCursor;
@@ -144,6 +177,8 @@ public final class TuiConfig {
 
     /**
      * Returns whether mouse capture is enabled.
+     *
+     * @return true if mouse capture is enabled
      */
     public boolean mouseCapture() {
         return mouseCapture;
@@ -151,6 +186,8 @@ public final class TuiConfig {
 
     /**
      * Returns the poll timeout for reading events.
+     *
+     * @return the poll timeout duration
      */
     public Duration pollTimeout() {
         return pollTimeout;
@@ -158,6 +195,8 @@ public final class TuiConfig {
 
     /**
      * Returns the tick interval, or null if ticks are disabled.
+     *
+     * @return the tick rate duration, or null
      */
     public Duration tickRate() {
         return tickRate;
@@ -178,6 +217,8 @@ public final class TuiConfig {
 
     /**
      * Returns whether a shutdown hook is registered to restore the terminal.
+     *
+     * @return true if a shutdown hook is registered
      */
     public boolean shutdownHook() {
         return shutdownHook;
@@ -493,6 +534,8 @@ public final class TuiConfig {
 
         /**
          * Builds the configuration.
+         *
+         * @return the constructed TuiConfig
          */
         public TuiConfig build() {
             return new TuiConfig(

@@ -40,21 +40,39 @@ import java.util.function.BiConsumer;
  */
 public abstract class StyledElement<T extends StyledElement<T>> implements Element, Styleable {
 
+    /** Creates a new styled element with default values. */
+    protected StyledElement() {
+    }
+
+    /** The inline style applied to this element. */
     protected Style style = Style.EMPTY;
+    /** The layout constraint for this element. */
     protected Constraint layoutConstraint;
+    /** The unique identifier for this element. */
     protected String elementId;
+    /** The CSS classes applied to this element. */
     protected Set<String> cssClasses = new LinkedHashSet<>();
+    /** The style attributes for CSS attribute selector matching. */
     protected Map<String, String> styleAttrs = new LinkedHashMap<>();
+    /** The CSS parent for ancestor matching. */
     protected Styleable cssParent;
+    /** The key event handler for this element. */
     protected KeyEventHandler keyHandler;
+    /** The mouse event handler for this element. */
     protected MouseEventHandler mouseHandler;
+    /** The drag handler for this element. */
     protected DragHandler dragHandler;
+    /** Whether this element is draggable. */
     protected boolean draggable;
+    /** Whether this element is focusable. */
     protected boolean focusable;
+    /** The last area this element was rendered in. */
     protected Rect lastRenderedArea;
 
     /**
      * Returns this element cast to the concrete type for method chaining.
+     *
+     * @return this element
      */
     @SuppressWarnings("unchecked")
     protected T self() {
@@ -63,113 +81,240 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
 
     // Foreground colors
 
+    /**
+     * Sets the foreground color.
+     *
+     * @param color the foreground color
+     * @return this element for chaining
+     */
     public T fg(Color color) {
         this.style = style.fg(color);
         return self();
     }
 
+    /**
+     * Sets the foreground color to black.
+     *
+     * @return this element for chaining
+     */
     public T black() {
         return fg(Color.BLACK);
     }
 
+    /**
+     * Sets the foreground color to red.
+     *
+     * @return this element for chaining
+     */
     public T red() {
         return fg(Color.RED);
     }
 
+    /**
+     * Sets the foreground color to green.
+     *
+     * @return this element for chaining
+     */
     public T green() {
         return fg(Color.GREEN);
     }
 
+    /**
+     * Sets the foreground color to yellow.
+     *
+     * @return this element for chaining
+     */
     public T yellow() {
         return fg(Color.YELLOW);
     }
 
+    /**
+     * Sets the foreground color to blue.
+     *
+     * @return this element for chaining
+     */
     public T blue() {
         return fg(Color.BLUE);
     }
 
+    /**
+     * Sets the foreground color to magenta.
+     *
+     * @return this element for chaining
+     */
     public T magenta() {
         return fg(Color.MAGENTA);
     }
 
+    /**
+     * Sets the foreground color to cyan.
+     *
+     * @return this element for chaining
+     */
     public T cyan() {
         return fg(Color.CYAN);
     }
 
+    /**
+     * Sets the foreground color to white.
+     *
+     * @return this element for chaining
+     */
     public T white() {
         return fg(Color.WHITE);
     }
 
+    /**
+     * Sets the foreground color to gray.
+     *
+     * @return this element for chaining
+     */
     public T gray() {
         return fg(Color.GRAY);
     }
 
     // Background colors
 
+    /**
+     * Sets the background color.
+     *
+     * @param color the background color
+     * @return this element for chaining
+     */
     public T bg(Color color) {
         this.style = style.bg(color);
         return self();
     }
 
+    /**
+     * Sets the background color to black.
+     *
+     * @return this element for chaining
+     */
     public T onBlack() {
         return bg(Color.BLACK);
     }
 
+    /**
+     * Sets the background color to red.
+     *
+     * @return this element for chaining
+     */
     public T onRed() {
         return bg(Color.RED);
     }
 
+    /**
+     * Sets the background color to green.
+     *
+     * @return this element for chaining
+     */
     public T onGreen() {
         return bg(Color.GREEN);
     }
 
+    /**
+     * Sets the background color to yellow.
+     *
+     * @return this element for chaining
+     */
     public T onYellow() {
         return bg(Color.YELLOW);
     }
 
+    /**
+     * Sets the background color to blue.
+     *
+     * @return this element for chaining
+     */
     public T onBlue() {
         return bg(Color.BLUE);
     }
 
+    /**
+     * Sets the background color to magenta.
+     *
+     * @return this element for chaining
+     */
     public T onMagenta() {
         return bg(Color.MAGENTA);
     }
 
+    /**
+     * Sets the background color to cyan.
+     *
+     * @return this element for chaining
+     */
     public T onCyan() {
         return bg(Color.CYAN);
     }
 
+    /**
+     * Sets the background color to white.
+     *
+     * @return this element for chaining
+     */
     public T onWhite() {
         return bg(Color.WHITE);
     }
 
     // Modifiers
 
+    /**
+     * Applies the bold modifier.
+     *
+     * @return this element for chaining
+     */
     public T bold() {
         this.style = style.bold();
         return self();
     }
 
+    /**
+     * Applies the dim modifier.
+     *
+     * @return this element for chaining
+     */
     public T dim() {
         this.style = style.dim();
         return self();
     }
 
+    /**
+     * Applies the italic modifier.
+     *
+     * @return this element for chaining
+     */
     public T italic() {
         this.style = style.italic();
         return self();
     }
 
+    /**
+     * Applies the underlined modifier.
+     *
+     * @return this element for chaining
+     */
     public T underlined() {
         this.style = style.underlined();
         return self();
     }
 
+    /**
+     * Applies the reversed modifier.
+     *
+     * @return this element for chaining
+     */
     public T reversed() {
         this.style = style.reversed();
         return self();
     }
 
+    /**
+     * Applies the crossed-out modifier.
+     *
+     * @return this element for chaining
+     */
     public T crossedOut() {
         this.style = style.crossedOut();
         return self();
@@ -177,11 +322,22 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
 
     // Style
 
+    /**
+     * Sets the style for this element.
+     *
+     * @param style the style to apply
+     * @return this element for chaining
+     */
     public T style(Style style) {
         this.style = style;
         return self();
     }
 
+    /**
+     * Returns the current style.
+     *
+     * @return the style
+     */
     public Style getStyle() {
         return style;
     }
@@ -360,31 +516,72 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
 
     // Layout constraint
 
+    /**
+     * Sets the layout constraint for this element.
+     *
+     * @param constraint the constraint
+     * @return this element for chaining
+     */
     public T constraint(Constraint constraint) {
         this.layoutConstraint = constraint;
         return self();
     }
 
+    /**
+     * Sets the constraint to an exact length.
+     *
+     * @param length the exact length
+     * @return this element for chaining
+     */
     public T length(int length) {
         return constraint(Constraint.length(length));
     }
 
+    /**
+     * Sets the constraint to a percentage of the parent's size.
+     *
+     * @param percent the percentage value
+     * @return this element for chaining
+     */
     public T percent(int percent) {
         return constraint(Constraint.percentage(percent));
     }
 
+    /**
+     * Sets the constraint to fill available space.
+     *
+     * @return this element for chaining
+     */
     public T fill() {
         return constraint(Constraint.fill());
     }
 
+    /**
+     * Sets the constraint to fill available space with the given weight.
+     *
+     * @param weight the fill weight
+     * @return this element for chaining
+     */
     public T fill(int weight) {
         return constraint(Constraint.fill(weight));
     }
 
+    /**
+     * Sets a minimum size constraint.
+     *
+     * @param min the minimum size
+     * @return this element for chaining
+     */
     public T min(int min) {
         return constraint(Constraint.min(min));
     }
 
+    /**
+     * Sets a maximum size constraint.
+     *
+     * @param max the maximum size
+     * @return this element for chaining
+     */
     public T max(int max) {
         return constraint(Constraint.max(max));
     }
@@ -721,6 +918,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
 
     /**
      * Returns the drag handler, if any.
+     *
+     * @return the drag handler, or {@code null} if none is set
      */
     public DragHandler dragHandler() {
         return dragHandler;

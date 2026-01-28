@@ -58,6 +58,7 @@ package dev.tamboui.tfx;
  */
 public final class TFxDuration {
     
+    /** A duration of zero milliseconds. */
     public static final TFxDuration ZERO = new TFxDuration(0);
     
     private final long milliseconds;
@@ -68,6 +69,9 @@ public final class TFxDuration {
     
     /**
      * Creates a duration from milliseconds.
+     *
+     * @param milliseconds the number of milliseconds (must be non-negative)
+     * @return a new duration
      */
     public static TFxDuration fromMillis(long milliseconds) {
         if (milliseconds < 0) {
@@ -78,6 +82,9 @@ public final class TFxDuration {
     
     /**
      * Creates a duration from seconds.
+     *
+     * @param seconds the number of seconds
+     * @return a new duration
      */
     public static TFxDuration fromSecs(long seconds) {
         return fromMillis(seconds * 1000);
@@ -85,6 +92,9 @@ public final class TFxDuration {
     
     /**
      * Creates a duration from fractional seconds.
+     *
+     * @param seconds the number of seconds as a float
+     * @return a new duration
      */
     public static TFxDuration fromSecsF32(float seconds) {
         return fromMillis((long) (seconds * 1000.0f));
@@ -92,6 +102,9 @@ public final class TFxDuration {
     
     /**
      * Converts from java.time.Duration.
+     *
+     * @param duration the Java duration to convert
+     * @return a new TFxDuration equivalent to the given Java duration
      */
     public static TFxDuration fromJavaDuration(java.time.Duration duration) {
         return fromMillis(duration.toMillis());
@@ -99,6 +112,8 @@ public final class TFxDuration {
     
     /**
      * Returns the duration in milliseconds.
+     *
+     * @return the duration in milliseconds
      */
     public long asMillis() {
         return milliseconds;
@@ -106,6 +121,8 @@ public final class TFxDuration {
     
     /**
      * Returns the duration in seconds as a float.
+     *
+     * @return the duration in seconds
      */
     public float asSecsF32() {
         return milliseconds / 1000.0f;
@@ -113,6 +130,8 @@ public final class TFxDuration {
     
     /**
      * Converts to java.time.Duration.
+     *
+     * @return the equivalent java.time.Duration
      */
     public java.time.Duration toJavaDuration() {
         return java.time.Duration.ofMillis(milliseconds);
@@ -120,6 +139,8 @@ public final class TFxDuration {
     
     /**
      * Returns true if this duration is zero.
+     *
+     * @return {@code true} if this duration is zero
      */
     public boolean isZero() {
         return milliseconds == 0;
@@ -127,6 +148,9 @@ public final class TFxDuration {
     
     /**
      * Subtracts another duration, returning null if the result would be negative.
+     *
+     * @param other the duration to subtract
+     * @return the result of the subtraction, or {@code null} if the result would be negative
      */
     public TFxDuration checkedSub(TFxDuration other) {
         if (milliseconds < other.milliseconds) {
@@ -137,6 +161,9 @@ public final class TFxDuration {
     
     /**
      * Adds another duration.
+     *
+     * @param other the duration to add
+     * @return a new duration representing the sum
      */
     public TFxDuration add(TFxDuration other) {
         return fromMillis(milliseconds + other.milliseconds);
@@ -144,6 +171,9 @@ public final class TFxDuration {
     
     /**
      * Subtracts another duration.
+     *
+     * @param other the duration to subtract
+     * @return a new duration representing the difference
      */
     public TFxDuration sub(TFxDuration other) {
         return fromMillis(milliseconds - other.milliseconds);
@@ -151,6 +181,9 @@ public final class TFxDuration {
     
     /**
      * Multiplies this duration by a scalar.
+     *
+     * @param scalar the multiplier
+     * @return a new duration representing the product
      */
     public TFxDuration mul(long scalar) {
         return fromMillis(milliseconds * scalar);
@@ -158,6 +191,9 @@ public final class TFxDuration {
     
     /**
      * Multiplies this duration by a float scalar.
+     *
+     * @param scalar the float multiplier
+     * @return a new duration representing the product
      */
     public TFxDuration mul(float scalar) {
         return fromMillis((long) (milliseconds * scalar));

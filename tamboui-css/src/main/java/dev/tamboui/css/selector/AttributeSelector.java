@@ -73,6 +73,8 @@ public final class AttributeSelector implements Selector {
 
     /**
      * Returns the attribute name.
+     *
+     * @return the attribute name
      */
     public String attribute() {
         return attribute;
@@ -80,6 +82,8 @@ public final class AttributeSelector implements Selector {
 
     /**
      * Returns the matching operator.
+     *
+     * @return the matching operator
      */
     public Operator operator() {
         return operator;
@@ -87,6 +91,8 @@ public final class AttributeSelector implements Selector {
 
     /**
      * Returns the value to match against (null for EXISTS operator).
+     *
+     * @return the value to match against, or {@code null} for the EXISTS operator
      */
     public String value() {
         return value;

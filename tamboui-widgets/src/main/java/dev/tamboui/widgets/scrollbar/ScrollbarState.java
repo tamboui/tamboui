@@ -59,6 +59,8 @@ public final class ScrollbarState {
 
     /**
      * Returns the total length of the scrollable content.
+     *
+     * @return the content length
      */
     public int contentLength() {
         return contentLength;
@@ -83,6 +85,8 @@ public final class ScrollbarState {
 
     /**
      * Returns the current scroll position.
+     *
+     * @return the scroll position
      */
     public int position() {
         return position;
@@ -106,6 +110,8 @@ public final class ScrollbarState {
      * Returns the viewport content length.
      * <p>
      * If not set (0), the scrollbar will use the track size.
+     *
+     * @return the viewport content length
      */
     public int viewportContentLength() {
         return viewportContentLength;
@@ -191,6 +197,8 @@ public final class ScrollbarState {
 
     /**
      * Returns true if scrolled to the beginning (position 0).
+     *
+     * @return true if at the start
      */
     public boolean isAtStart() {
         return position == 0;
@@ -198,6 +206,8 @@ public final class ScrollbarState {
 
     /**
      * Returns true if scrolled to the end.
+     *
+     * @return true if at the end
      */
     public boolean isAtEnd() {
         return contentLength == 0 || position >= contentLength - 1;
@@ -205,6 +215,8 @@ public final class ScrollbarState {
 
     /**
      * Calculates the scroll percentage (0.0 to 1.0).
+     *
+     * @return the scroll percentage
      */
     public double scrollPercentage() {
         if (contentLength <= 1) {

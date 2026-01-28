@@ -107,6 +107,9 @@ public final class EventRouter {
      * <p>
      * Elements are also registered in the {@link ElementRegistry}
      * for CSS-like queries by external systems (like effects).
+     *
+     * @param element the element to register
+     * @param area the element's rendered area
      */
     public void registerElement(Element element, Rect area) {
         // Prevent duplicate registration (element identity check)
@@ -357,6 +360,8 @@ public final class EventRouter {
 
     /**
      * Returns whether a drag operation is in progress.
+     *
+     * @return true if a drag is in progress
      */
     public boolean isDragging() {
         return draggingElement != null;
@@ -364,6 +369,8 @@ public final class EventRouter {
 
     /**
      * Returns the element being dragged.
+     *
+     * @return the element being dragged, or null if no drag is in progress
      */
     public Element draggingElement() {
         return draggingElement;
@@ -371,6 +378,8 @@ public final class EventRouter {
 
     /**
      * Returns the number of registered elements (for debugging).
+     *
+     * @return the number of registered elements
      */
     public int elementCount() {
         return elements.size();

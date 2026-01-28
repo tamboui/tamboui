@@ -71,6 +71,15 @@ public final class NewYearDemo extends ToolkitApp {
     private double cameraZ = 0.0;
     private static final double CAMERA_SPEED = 15.0; // pixels/second through Z-space
 
+    private NewYearDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new NewYearDemo().run();
     }

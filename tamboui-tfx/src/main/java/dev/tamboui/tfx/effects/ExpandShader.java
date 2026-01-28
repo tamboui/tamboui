@@ -30,6 +30,10 @@ public final class ExpandShader implements Shader {
     
     /**
      * Creates a new expand effect with the specified direction, style, and timing.
+     *
+     * @param direction the expansion direction (horizontal or vertical)
+     * @param style the style to apply during expansion
+     * @param timer the effect timer controlling the expansion duration
      */
     public ExpandShader(ExpandDirection direction, Style style, EffectTimer timer) {
         this.direction = direction;

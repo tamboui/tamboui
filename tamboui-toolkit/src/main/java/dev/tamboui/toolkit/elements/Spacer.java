@@ -18,15 +18,23 @@ public final class Spacer implements Element {
 
     private Constraint layoutConstraint = Constraint.fill();
 
+    /** Creates a spacer that fills available space. */
     public Spacer() {
     }
 
+    /**
+     * Creates a spacer with a fixed length.
+     *
+     * @param length the fixed length in cells
+     */
     public Spacer(int length) {
         this.layoutConstraint = Constraint.length(length);
     }
 
     /**
      * Creates a spacer that fills available space.
+     *
+     * @return a new fill spacer
      */
     public static Spacer fill() {
         return new Spacer();
@@ -34,6 +42,9 @@ public final class Spacer implements Element {
 
     /**
      * Creates a spacer with a fixed length.
+     *
+     * @param length the fixed length in cells
+     * @return a new fixed-length spacer
      */
     public static Spacer length(int length) {
         return new Spacer(length);
@@ -41,6 +52,9 @@ public final class Spacer implements Element {
 
     /**
      * Sets the constraint to fill available space with given weight.
+     *
+     * @param weight the fill weight
+     * @return this spacer
      */
     public Spacer withWeight(int weight) {
         this.layoutConstraint = Constraint.fill(weight);
@@ -49,6 +63,9 @@ public final class Spacer implements Element {
 
     /**
      * Sets the constraint to a percentage.
+     *
+     * @param percent the percentage of available space (0 to 100)
+     * @return this spacer
      */
     public Spacer percent(int percent) {
         this.layoutConstraint = Constraint.percentage(percent);

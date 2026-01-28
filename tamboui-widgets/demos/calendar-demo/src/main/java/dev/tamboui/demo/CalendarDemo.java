@@ -48,11 +48,25 @@ public class CalendarDemo {
     private DayOfWeek firstDayOfWeek = DayOfWeek.MONDAY;
     private boolean showSurrounding = true;
 
+    private CalendarDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new CalendarDemo().run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

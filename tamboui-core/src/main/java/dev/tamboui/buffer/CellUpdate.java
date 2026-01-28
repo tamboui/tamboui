@@ -12,20 +12,42 @@ public final class CellUpdate {
     private final int y;
     private final Cell cell;
 
+    /**
+     * Creates a cell update at the given position.
+     *
+     * @param x    the column position
+     * @param y    the row position
+     * @param cell the cell value
+     */
     public CellUpdate(int x, int y, Cell cell) {
         this.x = x;
         this.y = y;
         this.cell = cell;
     }
 
+    /**
+     * Returns the column position.
+     *
+     * @return the x coordinate
+     */
     public int x() {
         return x;
     }
 
+    /**
+     * Returns the row position.
+     *
+     * @return the y coordinate
+     */
     public int y() {
         return y;
     }
 
+    /**
+     * Returns the cell value.
+     *
+     * @return the cell
+     */
     public Cell cell() {
         return cell;
     }

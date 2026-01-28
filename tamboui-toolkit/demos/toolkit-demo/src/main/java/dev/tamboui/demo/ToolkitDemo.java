@@ -32,14 +32,24 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public class ToolkitDemo {
 
-    public ToolkitDemo() {
+    private ToolkitDemo() {
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new ToolkitDemo().run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         var config = TuiConfig.builder()
             .mouseCapture(true)
             .tickRate(Duration.ofMillis(100))

@@ -74,6 +74,8 @@ public final class Monthly implements Widget {
 
     /**
      * Creates a calendar for the current month with no special styling.
+     *
+     * @return a new Monthly calendar for the current month
      */
     public static Monthly ofCurrentMonth() {
         return of(LocalDate.now(), date -> Style.EMPTY);
@@ -81,6 +83,10 @@ public final class Monthly implements Widget {
 
     /**
      * Creates a builder for a calendar displaying the given month.
+     *
+     * @param displayDate the date determining which month to display
+     * @param dateStyler  the styler for individual dates
+     * @return a new Builder
      */
     public static Builder builder(LocalDate displayDate, DateStyler dateStyler) {
         return new Builder(displayDate, dateStyler);
@@ -88,6 +94,9 @@ public final class Monthly implements Widget {
 
     /**
      * Returns a new calendar with the month header shown.
+     *
+     * @param style the style for the month header
+     * @return a new Monthly with the month header enabled
      */
     public Monthly showMonthHeader(Style style) {
         return toBuilder().monthHeaderStyle(style).build();
@@ -95,6 +104,9 @@ public final class Monthly implements Widget {
 
     /**
      * Returns a new calendar with the weekdays header shown.
+     *
+     * @param style the style for the weekdays header
+     * @return a new Monthly with the weekdays header enabled
      */
     public Monthly showWeekdaysHeader(Style style) {
         return toBuilder().weekdaysHeaderStyle(style).build();
@@ -105,6 +117,9 @@ public final class Monthly implements Widget {
      * <p>
      * Surrounding days are days from the previous/next month that
      * appear in the calendar grid.
+     *
+     * @param style the style for surrounding days
+     * @return a new Monthly with surrounding days enabled
      */
     public Monthly showSurrounding(Style style) {
         return toBuilder().surroundingStyle(style).build();
@@ -112,6 +127,9 @@ public final class Monthly implements Widget {
 
     /**
      * Returns a new calendar with the default date style.
+     *
+     * @param style the default style for dates
+     * @return a new Monthly with the given default style
      */
     public Monthly defaultStyle(Style style) {
         return toBuilder().defaultStyle(style).build();
@@ -119,6 +137,9 @@ public final class Monthly implements Widget {
 
     /**
      * Returns a new calendar wrapped in a block.
+     *
+     * @param block the block to wrap the calendar in
+     * @return a new Monthly wrapped in the given block
      */
     public Monthly block(Block block) {
         return toBuilder().block(block).build();
@@ -126,6 +147,9 @@ public final class Monthly implements Widget {
 
     /**
      * Returns a new calendar with the given first day of week.
+     *
+     * @param dayOfWeek the first day of the week
+     * @return a new Monthly with the given first day of week
      */
     public Monthly firstDayOfWeek(DayOfWeek dayOfWeek) {
         return toBuilder().firstDayOfWeek(dayOfWeek).build();
@@ -308,6 +332,9 @@ public final class Monthly implements Widget {
 
         /**
          * Shows the month header with the given style.
+         *
+         * @param style the month header style
+         * @return this builder
          */
         public Builder monthHeaderStyle(Style style) {
             this.monthHeaderStyle = style;
@@ -316,6 +343,9 @@ public final class Monthly implements Widget {
 
         /**
          * Shows the weekdays header with the given style.
+         *
+         * @param style the weekdays header style
+         * @return this builder
          */
         public Builder weekdaysHeaderStyle(Style style) {
             this.weekdaysHeaderStyle = style;
@@ -324,6 +354,9 @@ public final class Monthly implements Widget {
 
         /**
          * Shows surrounding days with the given style.
+         *
+         * @param style the surrounding days style
+         * @return this builder
          */
         public Builder surroundingStyle(Style style) {
             this.surroundingStyle = style;
@@ -332,6 +365,9 @@ public final class Monthly implements Widget {
 
         /**
          * Sets the default style for dates.
+         *
+         * @param style the default date style
+         * @return this builder
          */
         public Builder defaultStyle(Style style) {
             this.defaultStyle = style;
@@ -340,6 +376,9 @@ public final class Monthly implements Widget {
 
         /**
          * Wraps the calendar in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -348,6 +387,9 @@ public final class Monthly implements Widget {
 
         /**
          * Sets the first day of the week.
+         *
+         * @param dayOfWeek the first day of the week
+         * @return this builder
          */
         public Builder firstDayOfWeek(DayOfWeek dayOfWeek) {
             this.firstDayOfWeek = dayOfWeek != null ? dayOfWeek : DayOfWeek.MONDAY;
@@ -356,6 +398,8 @@ public final class Monthly implements Widget {
 
         /**
          * Builds the calendar.
+         *
+         * @return a new Monthly calendar
          */
         public Monthly build() {
             return new Monthly(this);

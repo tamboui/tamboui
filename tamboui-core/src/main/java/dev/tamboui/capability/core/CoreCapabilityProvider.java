@@ -20,6 +20,12 @@ import dev.tamboui.util.SafeServiceLoader;
  */
 public final class CoreCapabilityProvider implements CapabilityProvider {
 
+    /**
+     * Creates a new core capability provider.
+     */
+    public CoreCapabilityProvider() {
+    }
+
     @Override
     public String source() {
         return "tamboui-core";

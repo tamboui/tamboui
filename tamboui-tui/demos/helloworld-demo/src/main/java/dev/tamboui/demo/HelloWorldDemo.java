@@ -14,6 +14,15 @@ import dev.tamboui.text.Text;
  * Minimal Hello World demo using immediate mode rendering.
  */
 public class HelloWorldDemo {
+    private HelloWorldDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();

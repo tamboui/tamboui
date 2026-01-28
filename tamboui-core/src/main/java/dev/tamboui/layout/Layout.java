@@ -56,6 +56,8 @@ public final class Layout {
 
     /**
      * Creates a vertical layout (top-to-bottom).
+     *
+     * @return a new vertical layout
      */
     public static Layout vertical() {
         return new Layout(Direction.VERTICAL, listCopyOf(), Margin.NONE, 0, Flex.START);
@@ -63,6 +65,8 @@ public final class Layout {
 
     /**
      * Creates a horizontal layout (left-to-right).
+     *
+     * @return a new horizontal layout
      */
     public static Layout horizontal() {
         return new Layout(Direction.HORIZONTAL, listCopyOf(), Margin.NONE, 0, Flex.START);
@@ -138,27 +142,42 @@ public final class Layout {
         return new Layout(direction, constraints, margin, spacing, flex);
     }
 
-    /** Returns the layout direction. */
+    /** Returns the layout direction.
+     *
+     * @return the layout direction
+     */
     public Direction direction() {
         return direction;
     }
 
-    /** Returns the constraints for the split. */
+    /** Returns the constraints for the split.
+     *
+     * @return the constraints
+     */
     public List<Constraint> constraints() {
         return constraints;
     }
 
-    /** Returns the outer margin. */
+    /** Returns the outer margin.
+     *
+     * @return the outer margin
+     */
     public Margin margin() {
         return margin;
     }
 
-    /** Returns the spacing between areas. */
+    /** Returns the spacing between areas.
+     *
+     * @return the spacing between areas
+     */
     public int spacing() {
         return spacing;
     }
 
-    /** Returns the flex mode used to distribute extra space. */
+    /** Returns the flex mode used to distribute extra space.
+     *
+     * @return the flex mode
+     */
     public Flex flex() {
         return flex;
     }

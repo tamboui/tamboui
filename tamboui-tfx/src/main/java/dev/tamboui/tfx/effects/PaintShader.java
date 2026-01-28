@@ -27,6 +27,11 @@ public final class PaintShader implements Shader {
     
     /**
      * Creates a paint shader that paints foreground and/or background colors.
+     *
+     * @param fg the foreground color
+     * @param bg the background color
+     * @param timer the effect timer controlling the paint duration
+     * @return a new paint shader
      */
     public static PaintShader paint(Color fg, Color bg, EffectTimer timer) {
         return new PaintShader(fg, bg, timer);
@@ -34,6 +39,10 @@ public final class PaintShader implements Shader {
     
     /**
      * Creates a paint shader that paints only foreground color.
+     *
+     * @param fg the foreground color
+     * @param timer the effect timer controlling the paint duration
+     * @return a new paint shader for foreground only
      */
     public static PaintShader paintFg(Color fg, EffectTimer timer) {
         return new PaintShader(fg, null, timer);
@@ -41,6 +50,10 @@ public final class PaintShader implements Shader {
     
     /**
      * Creates a paint shader that paints only background color.
+     *
+     * @param bg the background color
+     * @param timer the effect timer controlling the paint duration
+     * @return a new paint shader for background only
      */
     public static PaintShader paintBg(Color bg, EffectTimer timer) {
         return new PaintShader(null, bg, timer);

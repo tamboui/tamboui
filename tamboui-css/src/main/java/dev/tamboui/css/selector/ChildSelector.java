@@ -22,15 +22,31 @@ public final class ChildSelector implements Selector {
     private final Selector parent;
     private final Selector child;
 
+    /**
+     * Creates a child combinator selector.
+     *
+     * @param parent the parent selector
+     * @param child  the child selector
+     */
     public ChildSelector(Selector parent, Selector child) {
         this.parent = Objects.requireNonNull(parent);
         this.child = Objects.requireNonNull(child);
     }
 
+    /**
+     * Returns the parent selector.
+     *
+     * @return the parent selector
+     */
     public Selector parent() {
         return parent;
     }
 
+    /**
+     * Returns the child selector.
+     *
+     * @return the child selector
+     */
     public Selector child() {
         return child;
     }

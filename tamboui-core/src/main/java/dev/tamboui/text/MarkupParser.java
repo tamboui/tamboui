@@ -177,6 +177,14 @@ public final class MarkupParser {
         return parser.parse();
     }
 
+    /**
+     * Parses markup text with custom style and emoji resolution.
+     *
+     * @param markup the markup text to parse
+     * @param resolver optional resolver for custom tags
+     * @param emojiResolver resolver for emoji codes
+     * @return the parsed styled text
+     */
     public static Text parse(String markup, StyleResolver resolver, EmojiResolver emojiResolver) {
         if (markup == null || markup.isEmpty()) {
             return Text.empty();
@@ -578,6 +586,12 @@ public final class MarkupParser {
         }
     }
 
+    /**
+     * Replaces emoji codes in text with Unicode emoji characters using the default resolver.
+     *
+     * @param emoji text that may contain emoji codes
+     * @return text with emoji codes replaced
+     */
     public static String replaceEmoji(String emoji) {
         return replaceEmoji(emoji, DEFAULT_EMOJI_RESOLVER);
     }
@@ -586,6 +600,7 @@ public final class MarkupParser {
      * Replaces emoji codes in text with Unicode emoji characters.
      *
      * @param text text that may contain emoji codes
+     * @param resolver the emoji resolver to use
      * @return text with emoji codes replaced
      */
      public static String replaceEmoji(String text, EmojiResolver resolver) {

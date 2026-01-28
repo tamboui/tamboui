@@ -65,11 +65,14 @@ public class WaveTextDemo {
     private final WaveTextState multiPeakState = new WaveTextState();
     private final WaveTextState oscillateState = new WaveTextState();
 
+    private WaveTextDemo() {
+
+    }
+
     /**
-     * Entry point for the demo.
-     *
-     * @param args command line arguments (not used)
-     * @throws Exception if an error occurs
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new WaveTextDemo().run();

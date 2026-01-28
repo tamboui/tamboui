@@ -64,6 +64,10 @@ public final class EffectTimer {
     
     /**
      * Creates a new EffectTimer with the specified duration in milliseconds and interpolation.
+     *
+     * @param milliseconds the duration in milliseconds
+     * @param interpolation the interpolation function to apply
+     * @return a new EffectTimer instance
      */
     public static EffectTimer fromMs(long milliseconds, Interpolation interpolation) {
         return new EffectTimer(TFxDuration.fromMillis(milliseconds), interpolation);
@@ -71,6 +75,10 @@ public final class EffectTimer {
     
     /**
      * Creates a new EffectTimer with the specified duration and interpolation.
+     *
+     * @param duration the total duration
+     * @param interpolation the interpolation function to apply
+     * @return a new EffectTimer instance
      */
     public static EffectTimer of(TFxDuration duration, Interpolation interpolation) {
         return new EffectTimer(duration, interpolation);
@@ -78,6 +86,9 @@ public final class EffectTimer {
     
     /**
      * Creates a new EffectTimer with the specified duration and Linear interpolation.
+     *
+     * @param duration the total duration
+     * @return a new EffectTimer instance with Linear interpolation
      */
     public static EffectTimer of(TFxDuration duration) {
         return new EffectTimer(duration, Interpolation.Linear);
@@ -120,6 +131,8 @@ public final class EffectTimer {
     
     /**
      * Returns a new timer with reversed direction.
+     *
+     * @return a new timer with the reverse flag toggled
      */
     public EffectTimer reversed() {
         EffectTimer timer = new EffectTimer(total, interpolation);
@@ -131,6 +144,8 @@ public final class EffectTimer {
     
     /**
      * Returns true if the timer is reversed.
+     *
+     * @return true if the timer is playing in reverse
      */
     public boolean isReversed() {
         return reverse;
@@ -142,6 +157,8 @@ public final class EffectTimer {
      * This preserves the visual curve shape when used with effects that reverse at
      * construction time. Unlike reversed(), which flips both direction and interpolation
      * type, mirrored() flips the interpolation to compensate for the reversed direction.
+     *
+     * @return a new timer with reversed direction and flipped interpolation
      */
     public EffectTimer mirrored() {
         EffectTimer timer = new EffectTimer(total, interpolation.flipped());
@@ -153,6 +170,8 @@ public final class EffectTimer {
     
     /**
      * Returns true if the timer has started (i.e., remaining != total).
+     *
+     * @return true if the timer has started processing
      */
     public boolean started() {
         return !total.equals(remaining);
@@ -185,6 +204,8 @@ public final class EffectTimer {
     
     /**
      * Returns the remaining duration.
+     *
+     * @return the remaining duration
      */
     public TFxDuration remaining() {
         return remaining;
@@ -192,6 +213,8 @@ public final class EffectTimer {
     
     /**
      * Returns the total duration.
+     *
+     * @return the total duration
      */
     public TFxDuration duration() {
         return total;
@@ -251,6 +274,8 @@ public final class EffectTimer {
      * <p>
      * For looping timers ({@link LoopMode#LOOP} and {@link LoopMode#PING_PONG}),
      * this method always returns false since looping timers never complete on their own.
+     *
+     * @return true if the timer has completed
      */
     public boolean done() {
         if (loopMode != LoopMode.ONCE) {
@@ -261,6 +286,8 @@ public final class EffectTimer {
     
     /**
      * Returns the interpolation method.
+     *
+     * @return the interpolation function
      */
     public Interpolation interpolation() {
         return interpolation;

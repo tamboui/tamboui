@@ -136,6 +136,9 @@ public enum Interpolation {
     
     /**
      * Applies the interpolation function to the given alpha value (0.0 to 1.0).
+     *
+     * @param a the input alpha value (0.0 to 1.0)
+     * @return the interpolated alpha value
      */
     public float alpha(float a) {
         switch (this) {
@@ -210,6 +213,8 @@ public enum Interpolation {
     
     /**
      * Returns the flipped version of this interpolation (in ↔ out).
+     *
+     * @return the flipped interpolation
      */
     public Interpolation flipped() {
         switch (this) {

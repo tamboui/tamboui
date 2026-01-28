@@ -66,6 +66,7 @@ import java.util.function.Function;
  *   <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
  * </ul>
  *
+ * @param <T> the type of data items backing each list entry
  * @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
  */
 public final class ListElement<T> extends StyledElement<ListElement<T>> {
@@ -108,15 +109,26 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     private int lastItemCount;
     private int lastViewportHeight;
 
+    /** Creates an empty list element. */
     public ListElement() {
     }
 
+    /**
+     * Creates a list element with the given string items.
+     *
+     * @param items the text items
+     */
     public ListElement(String... items) {
         for (String item : items) {
             this.items.add(new TextElement(item));
         }
     }
 
+    /**
+     * Creates a list element with the given string items.
+     *
+     * @param items the text items
+     */
     public ListElement(List<String> items) {
         for (String item : items) {
             this.items.add(new TextElement(item));
@@ -216,6 +228,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     /**
      * Sets the highlight style for selected items.
+     *
+     * @param style the highlight style
+     * @return this element
      */
     public ListElement<T> highlightStyle(Style style) {
         this.highlightStyle = style;
@@ -224,6 +239,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     /**
      * Sets the highlight color for selected items.
+     *
+     * @param color the highlight color
+     * @return this element
      */
     public ListElement<T> highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
@@ -232,6 +250,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     /**
      * Sets the symbol displayed before the selected item.
+     *
+     * @param symbol the highlight symbol
+     * @return this element
      */
     public ListElement<T> highlightSymbol(String symbol) {
         this.highlightSymbol = symbol;
@@ -240,6 +261,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     /**
      * Sets the title.
+     *
+     * @param title the list title
+     * @return this element
      */
     public ListElement<T> title(String title) {
         this.title = title;
@@ -248,6 +272,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this element
      */
     public ListElement<T> rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -256,6 +282,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public ListElement<T> borderColor(Color color) {
         this.borderColor = color;

@@ -29,7 +29,11 @@ import java.util.Optional;
  */
 public final class BorderSetConverter implements PropertyConverter<BorderSet> {
 
+    /** Singleton instance. */
     public static final BorderSetConverter INSTANCE = new BorderSetConverter();
+
+    private BorderSetConverter() {
+    }
 
     @Override
     public Optional<BorderSet> convert(String value, Map<String, String> variables) {

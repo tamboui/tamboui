@@ -16,6 +16,12 @@ import java.io.IOException;
  */
 public class JLineBackendProvider implements BackendProvider {
 
+    /**
+     * Creates a new JLine 3 backend provider.
+     */
+    public JLineBackendProvider() {
+    }
+
     @Override
     public String name() {
         return "jline3";

@@ -101,6 +101,11 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         this.lineNumberStyle = baseLineNumberStyle;
     }
 
+    /**
+     * Creates a new text area builder.
+     *
+     * @return a new Builder
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -209,6 +214,11 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
     /**
      * Renders the widget and sets the cursor position on the frame.
      * Call this instead of render() when this input is focused.
+     *
+     * @param area   the area to render in
+     * @param buffer the buffer to render to
+     * @param state  the text area state
+     * @param frame  the frame for cursor positioning
      */
     public void renderWithCursor(Rect area, Buffer buffer, TextAreaState state, Frame frame) {
         render(area, buffer, state);
@@ -257,6 +267,9 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         }
     }
 
+    /**
+     * Builder for {@link TextArea}.
+     */
     public static final class Builder {
         private Block block;
         private Style style = Style.EMPTY;
@@ -276,36 +289,78 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
 
         private Builder() {}
 
+        /**
+         * Wraps the text area in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
+         */
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
+        /**
+         * Sets the base style.
+         *
+         * @param style the base style
+         * @return this builder
+         */
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
+        /**
+         * Sets the cursor style.
+         *
+         * @param cursorStyle the cursor style
+         * @return this builder
+         */
         public Builder cursorStyle(Style cursorStyle) {
             this.cursorStyle = cursorStyle;
             return this;
         }
 
+        /**
+         * Sets the placeholder text shown when the text area is empty.
+         *
+         * @param placeholder the placeholder text
+         * @return this builder
+         */
         public Builder placeholder(String placeholder) {
             this.placeholder = placeholder;
             return this;
         }
 
+        /**
+         * Sets the placeholder text style.
+         *
+         * @param placeholderStyle the placeholder style
+         * @return this builder
+         */
         public Builder placeholderStyle(Style placeholderStyle) {
             this.placeholderStyle = placeholderStyle;
             return this;
         }
 
+        /**
+         * Sets whether to show line numbers.
+         *
+         * @param show true to show line numbers
+         * @return this builder
+         */
         public Builder showLineNumbers(boolean show) {
             this.showLineNumbers = show;
             return this;
         }
 
+        /**
+         * Sets the line number style.
+         *
+         * @param style the line number style
+         * @return this builder
+         */
         public Builder lineNumberStyle(Style style) {
             this.lineNumberStyle = style;
             return this;
@@ -391,6 +446,11 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
             return this;
         }
 
+        /**
+         * Builds the text area.
+         *
+         * @return a new TextArea
+         */
         public TextArea build() {
             return new TextArea(this);
         }

@@ -93,12 +93,20 @@ public final class Gauge implements Widget {
         this.gaugeStyle = baseGaugeStyle;
     }
 
+    /**
+     * Creates a new gauge builder.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
      * Creates a gauge with the given percentage (0-100).
+     *
+     * @param percent the progress percentage (0-100)
+     * @return a new gauge
      */
     public static Gauge percent(int percent) {
         return builder().percent(percent).build();
@@ -106,6 +114,9 @@ public final class Gauge implements Widget {
 
     /**
      * Creates a gauge with the given ratio (0.0-1.0).
+     *
+     * @param ratio the progress ratio (0.0-1.0)
+     * @return a new gauge
      */
     public static Gauge ratio(double ratio) {
         return builder().ratio(ratio).build();
@@ -190,6 +201,9 @@ public final class Gauge implements Widget {
         }
     }
 
+    /**
+     * Builder for {@link Gauge}.
+     */
     public static final class Builder {
         private double ratio = 0.0;
         private Line label;
@@ -208,6 +222,8 @@ public final class Gauge implements Widget {
         /**
          * Sets the progress as a percentage (0-100).
          *
+         * @param percent the progress percentage (0-100)
+         * @return this builder
          * @throws IllegalArgumentException if percent is not in range 0-100
          */
         public Builder percent(int percent) {
@@ -221,6 +237,8 @@ public final class Gauge implements Widget {
         /**
          * Sets the progress as a ratio (0.0-1.0).
          *
+         * @param ratio the progress ratio (0.0-1.0)
+         * @return this builder
          * @throws IllegalArgumentException if ratio is not in range 0.0-1.0
          */
         public Builder ratio(double ratio) {
@@ -234,6 +252,9 @@ public final class Gauge implements Widget {
         /**
          * Sets the label displayed centered in the gauge.
          * If not set, defaults to showing the percentage.
+         *
+         * @param label the label text
+         * @return this builder
          */
         public Builder label(String label) {
             this.label = Line.from(label);
@@ -242,6 +263,9 @@ public final class Gauge implements Widget {
 
         /**
          * Sets the label displayed centered in the gauge.
+         *
+         * @param label the label as a styled line
+         * @return this builder
          */
         public Builder label(Line label) {
             this.label = label;
@@ -250,6 +274,9 @@ public final class Gauge implements Widget {
 
         /**
          * Sets the label displayed centered in the gauge.
+         *
+         * @param span the label as a styled span
+         * @return this builder
          */
         public Builder label(Span span) {
             this.label = Line.from(span);
@@ -258,6 +285,9 @@ public final class Gauge implements Widget {
 
         /**
          * Wraps the gauge in a block container.
+         *
+         * @param block the block container
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -266,6 +296,9 @@ public final class Gauge implements Widget {
 
         /**
          * Sets the style for the widget background (not the filled bar).
+         *
+         * @param style the background style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -274,6 +307,9 @@ public final class Gauge implements Widget {
 
         /**
          * Sets the style for the filled portion of the gauge.
+         *
+         * @param gaugeStyle the gauge style
+         * @return this builder
          */
         public Builder gaugeStyle(Style gaugeStyle) {
             this.gaugeStyle = gaugeStyle;
@@ -283,6 +319,9 @@ public final class Gauge implements Widget {
         /**
          * Enables or disables unicode block characters for smoother rendering.
          * When enabled (default), uses 8 fractional parts per cell.
+         *
+         * @param useUnicode {@code true} to enable unicode rendering
+         * @return this builder
          */
         public Builder useUnicode(boolean useUnicode) {
             this.useUnicode = useUnicode;
@@ -329,6 +368,11 @@ public final class Gauge implements Widget {
             return this;
         }
 
+        /**
+         * Builds the gauge.
+         *
+         * @return the new gauge
+         */
         public Gauge build() {
             return new Gauge(this);
         }

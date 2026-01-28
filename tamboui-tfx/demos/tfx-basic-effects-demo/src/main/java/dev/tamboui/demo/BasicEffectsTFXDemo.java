@@ -82,7 +82,16 @@ public class BasicEffectsTFXDemo {
             this.effectFactory = effectFactory;
         }
     }
-    
+
+    private BasicEffectsTFXDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new BasicEffectsTFXDemo().run();
     }

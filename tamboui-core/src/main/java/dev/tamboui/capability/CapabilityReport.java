@@ -34,6 +34,8 @@ public final class CapabilityReport {
      * Environment entries grouped by provider source.
      * <p>
      * Each list entry is an environment variable name (value is resolved at print-time).
+     *
+     * @return unmodifiable map of source to environment variable names
      */
     public Map<String, List<String>> environmentBySource() {
         return environmentBySource;
@@ -43,6 +45,8 @@ public final class CapabilityReport {
      * Java/system properties (and similar) grouped by provider source.
      * <p>
      * Each list entry is a property name (value is resolved at print-time).
+     *
+     * @return unmodifiable map of source to property names
      */
     public Map<String, List<String>> propertiesBySource() {
         return propertiesBySource;
@@ -52,11 +56,20 @@ public final class CapabilityReport {
      * Free-form capability/features map, grouped by provider source.
      * <p>
      * Keys SHOULD use dotted notation to create stable namespaces, e.g. {@code image.protocol.kitty}.
+     *
+     * @return unmodifiable map of source to feature key-value pairs
      */
     public Map<String, Map<String, Object>> featuresBySource() {
         return featuresBySource;
     }
 
+    /**
+     * Looks up a feature value by source and key.
+     *
+     * @param source source id (e.g. {@code tamboui-core})
+     * @param key    key within the source feature map
+     * @return the feature value if present
+     */
     public Optional<Object> feature(String source, String key) {
         if (source == null || key == null) {
             return Optional.empty();
@@ -92,6 +105,11 @@ public final class CapabilityReport {
         return Optional.of(type.cast(o));
     }
 
+    /**
+     * Prints this capability report to the given stream.
+     *
+     * @param out the output stream
+     */
     public void print(PrintStream out) {
         out.println("TamboUI capability report");
         out.println();

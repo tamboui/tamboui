@@ -158,11 +158,21 @@ public final class CellIterator implements Iterable<CellIterator.CellEntry> {
             this.position = position;
             this.cell = cell;
         }
-        
+
+        /**
+         * Returns the position of this cell entry.
+         *
+         * @return the cell position
+         */
         public Position position() {
             return position;
         }
-        
+
+        /**
+         * Returns the cell value of this entry.
+         *
+         * @return the cell
+         */
         public Cell cell() {
             return cell;
         }

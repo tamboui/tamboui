@@ -56,6 +56,15 @@ import java.time.Duration;
  */
 public class FileManagerDemo {
 
+    private FileManagerDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         // Determine starting directories
         Path home = Paths.get(System.getProperty("user.home"));

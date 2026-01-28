@@ -41,6 +41,9 @@ public final class Effect {
     
     /**
      * Creates a new Effect with the specified shader.
+     *
+     * @param shader the shader to wrap
+     * @return a new Effect instance
      */
     public static Effect of(Shader shader) {
         return new Effect(shader);
@@ -134,6 +137,8 @@ public final class Effect {
     
     /**
      * Returns true if the effect is done.
+     *
+     * @return true if the effect has completed
      */
     public boolean done() {
         return shader.done();
@@ -141,6 +146,8 @@ public final class Effect {
     
     /**
      * Returns true if the effect is still running.
+     *
+     * @return true if the effect is still running
      */
     public boolean running() {
         return shader.running();
@@ -148,6 +155,8 @@ public final class Effect {
     
     /**
      * Returns the name of the underlying shader.
+     *
+     * @return the shader name
      */
     public String name() {
         return shader.name();

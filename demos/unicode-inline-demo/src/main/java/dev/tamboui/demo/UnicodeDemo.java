@@ -35,7 +35,14 @@ import dev.tamboui.widgets.paragraph.Paragraph;
  * </ul>
  */
 public class UnicodeDemo {
+    private UnicodeDemo() {
+    }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         try (InlineDisplay display = InlineDisplay.create(20)) {
             display.render(UnicodeDemo::renderDemo);

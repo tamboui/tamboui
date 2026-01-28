@@ -52,7 +52,7 @@ public class CssDemo implements Element {
     );
     private final ListElement<?> navList;
 
-    public CssDemo() {
+    private CssDemo() {
         styleEngine = StyleEngine.create();
         try {
             // Load both themes
@@ -70,12 +70,22 @@ public class CssDemo implements Element {
             .autoScroll();
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var demo = new CssDemo();
         demo.run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         var config = TuiConfig.builder()
             .mouseCapture(true)
             .tickRate(Duration.ofMillis(100))

@@ -56,14 +56,24 @@ public class LayoutDemo {
     private LayoutMode mode = LayoutMode.COLUMNS;
     private int spacing = 1;
 
-    public LayoutDemo() {
+    private LayoutDemo() {
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new LayoutDemo().run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         var config = TuiConfig.builder()
             .tickRate(Duration.ofMillis(100))
             .build();

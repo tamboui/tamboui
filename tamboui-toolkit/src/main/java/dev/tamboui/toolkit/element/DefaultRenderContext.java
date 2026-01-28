@@ -72,6 +72,8 @@ public final class DefaultRenderContext implements RenderContext {
 
     /**
      * Creates an empty context for simple rendering without focus management.
+     *
+     * @return a new empty render context
      */
     public static DefaultRenderContext createEmpty() {
         FocusManager fm = new FocusManager();
@@ -90,6 +92,8 @@ public final class DefaultRenderContext implements RenderContext {
 
     /**
      * Returns the style engine, if configured.
+     *
+     * @return the style engine, or empty if not configured
      */
     public Optional<StyleEngine> styleEngine() {
         return Optional.ofNullable(styleEngine);
@@ -377,6 +381,8 @@ public final class DefaultRenderContext implements RenderContext {
      * Returns the focus manager.
      * <p>
      * Internal use only.
+     *
+     * @return the focus manager
      */
     public FocusManager focusManager() {
         return focusManager;
@@ -386,6 +392,8 @@ public final class DefaultRenderContext implements RenderContext {
      * Returns the event router.
      * <p>
      * Internal use only.
+     *
+     * @return the event router
      */
     public EventRouter eventRouter() {
         return eventRouter;
@@ -482,6 +490,8 @@ public final class DefaultRenderContext implements RenderContext {
 
     /**
      * Returns the current element being rendered, if any.
+     *
+     * @return the current element, or empty if no element is being rendered
      */
     public Optional<Styleable> currentElement() {
         return elementStack.isEmpty() ? Optional.empty() : Optional.of(elementStack.peek());
@@ -492,6 +502,8 @@ public final class DefaultRenderContext implements RenderContext {
      * <p>
      * This allows child elements to access CSS properties from their parent elements
      * that are not part of the Style cascade (e.g., border-type).
+     *
+     * @return the current CSS resolver, or empty if none is active
      */
     public Optional<CssStyleResolver> currentResolver() {
         return resolverStack.isEmpty() ? Optional.empty() : Optional.of(resolverStack.peek());

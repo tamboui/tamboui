@@ -34,6 +34,11 @@ public final class CompoundSelector implements Selector {
         this.parts = Collections.unmodifiableList(new ArrayList<>(parts));
     }
 
+    /**
+     * Returns the selector parts that make up this compound selector.
+     *
+     * @return the unmodifiable list of selector parts
+     */
     public List<Selector> parts() {
         return parts;
     }

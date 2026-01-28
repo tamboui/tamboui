@@ -63,22 +63,51 @@ public final class Paragraph implements Widget {
         this.style = baseStyle;
     }
 
+    /**
+     * Creates a new paragraph builder.
+     *
+     * @return a new Builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Creates a paragraph from a string.
+     *
+     * @param text the text content
+     * @return a new Paragraph
+     */
     public static Paragraph from(String text) {
         return builder().text(Text.from(text)).build();
     }
 
+    /**
+     * Creates a paragraph from a text.
+     *
+     * @param text the text content
+     * @return a new Paragraph
+     */
     public static Paragraph from(Text text) {
         return builder().text(text).build();
     }
 
+    /**
+     * Creates a paragraph from a line.
+     *
+     * @param line the line content
+     * @return a new Paragraph
+     */
     public static Paragraph from(Line line) {
         return builder().text(Text.from(line)).build();
     }
 
+    /**
+     * Creates a paragraph from a span.
+     *
+     * @param span the span content
+     * @return a new Paragraph
+     */
     public static Paragraph from(Span span) {
         return builder().text(Text.from(span)).build();
     }
@@ -198,7 +227,14 @@ public final class Paragraph implements Widget {
         return result;
     }
 
-    private enum EllipsisPosition { START, MIDDLE, END }
+    private enum EllipsisPosition {
+        /** Ellipsis at the start. */
+        START,
+        /** Ellipsis in the middle. */
+        MIDDLE,
+        /** Ellipsis at the end. */
+        END
+    }
 
     private List<Line> truncateWithEllipsis(List<Line> lines, int maxWidth, EllipsisPosition position) {
         List<Line> result = new ArrayList<>();
@@ -561,6 +597,9 @@ public final class Paragraph implements Widget {
         return end == len ? s : s.substring(0, end);
     }
 
+    /**
+     * Builder for {@link Paragraph}.
+     */
     public static final class Builder {
         private Text text = Text.empty();
         private Block block;
@@ -576,43 +615,94 @@ public final class Paragraph implements Widget {
 
         private Builder() {}
 
+        /**
+         * Sets the text content.
+         *
+         * @param text the text content
+         * @return this builder
+         */
         public Builder text(Text text) {
             this.text = text;
             return this;
         }
 
+        /**
+         * Sets the text content from a string.
+         *
+         * @param text the text content
+         * @return this builder
+         */
         public Builder text(String text) {
             this.text = Text.from(text);
             return this;
         }
 
+        /**
+         * Wraps the paragraph in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
+         */
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
+        /**
+         * Sets the base style.
+         *
+         * @param style the base style
+         * @return this builder
+         */
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
+        /**
+         * Sets the text alignment.
+         *
+         * @param alignment the text alignment
+         * @return this builder
+         */
         public Builder alignment(Alignment alignment) {
             this.alignment = alignment;
             return this;
         }
 
+        /**
+         * Sets left alignment.
+         *
+         * @return this builder
+         */
         public Builder left() {
             return alignment(Alignment.LEFT);
         }
 
+        /**
+         * Sets center alignment.
+         *
+         * @return this builder
+         */
         public Builder centered() {
             return alignment(Alignment.CENTER);
         }
 
+        /**
+         * Sets right alignment.
+         *
+         * @return this builder
+         */
         public Builder right() {
             return alignment(Alignment.RIGHT);
         }
 
+        /**
+         * Sets the overflow mode.
+         *
+         * @param overflow the overflow mode
+         * @return this builder
+         */
         public Builder overflow(Overflow overflow) {
             this.overflow = overflow;
             return this;
@@ -640,6 +730,12 @@ public final class Paragraph implements Widget {
             return this;
         }
 
+        /**
+         * Sets the scroll offset.
+         *
+         * @param scroll the number of lines to skip from the top
+         * @return this builder
+         */
         public Builder scroll(int scroll) {
             this.scroll = Math.max(0, scroll);
             return this;
@@ -659,6 +755,11 @@ public final class Paragraph implements Widget {
             return this;
         }
 
+        /**
+         * Builds the paragraph.
+         *
+         * @return a new Paragraph
+         */
         public Paragraph build() {
             return new Paragraph(this);
         }

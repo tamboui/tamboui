@@ -36,10 +36,20 @@ public final class Stylesheet {
         return new Stylesheet(Collections.emptyMap(), Collections.emptyList());
     }
 
+    /**
+     * Returns the CSS variables defined in this stylesheet.
+     *
+     * @return an unmodifiable map of variable names to values
+     */
     public Map<String, String> variables() {
         return variables;
     }
 
+    /**
+     * Returns the CSS rules defined in this stylesheet.
+     *
+     * @return an unmodifiable list of rules
+     */
     public List<Rule> rules() {
         return rules;
     }

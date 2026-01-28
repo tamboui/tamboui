@@ -41,6 +41,15 @@ public class JTopDemo {
 
     private static final Duration UPDATE_INTERVAL = Duration.ofMillis(500);
 
+    private JTopDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var config = TuiConfig.builder()
             .build();

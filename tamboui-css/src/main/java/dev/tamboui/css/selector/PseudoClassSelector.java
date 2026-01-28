@@ -29,10 +29,20 @@ public final class PseudoClassSelector implements Selector {
 
     private final String pseudoClass;
 
+    /**
+     * Creates a pseudo-class selector for the given pseudo-class name.
+     *
+     * @param pseudoClass the pseudo-class name (without the leading colon)
+     */
     public PseudoClassSelector(String pseudoClass) {
         this.pseudoClass = Objects.requireNonNull(pseudoClass);
     }
 
+    /**
+     * Returns the pseudo-class name (without the leading colon).
+     *
+     * @return the pseudo-class name
+     */
     public String pseudoClass() {
         return pseudoClass;
     }

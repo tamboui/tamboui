@@ -13,6 +13,10 @@ public interface Color {
      * Reset to default terminal color.
      */
     final class Reset implements Color {
+        /** Creates a reset color instance. */
+        public Reset() {
+        }
+
         @Override
         public String toAnsiForeground() {
             return "39";
@@ -61,6 +65,8 @@ public interface Color {
 
         /**
          * Returns the ANSI color.
+         *
+         * @return the ANSI palette entry
          */
         public AnsiColor color() {
             return color;
@@ -122,7 +128,11 @@ public interface Color {
             this.index = index;
         }
 
-        /** Returns the palette index. */
+        /**
+         * Returns the palette index.
+         *
+         * @return the 256-color palette index
+         */
         public int index() {
             return index;
         }
@@ -193,6 +203,8 @@ public interface Color {
 
         /**
          * Returns the CSS class name for this color.
+         *
+         * @return the CSS class name
          */
         public String name() {
             return name;
@@ -200,6 +212,8 @@ public interface Color {
 
         /**
          * Returns the default color value.
+         *
+         * @return the fallback color
          */
         public Color defaultValue() {
             return defaultValue;
@@ -273,17 +287,29 @@ public interface Color {
             this.b = b;
         }
 
-        /** Returns the red component. */
+        /**
+         * Returns the red component.
+         *
+         * @return the red value (0-255)
+         */
         public int r() {
             return r;
         }
 
-        /** Returns the green component. */
+        /**
+         * Returns the green component.
+         *
+         * @return the green value (0-255)
+         */
         public int g() {
             return g;
         }
 
-        /** Returns the blue component. */
+        /**
+         * Returns the blue component.
+         *
+         * @return the blue value (0-255)
+         */
         public int b() {
             return b;
         }
@@ -310,6 +336,9 @@ public interface Color {
 
         /**
          * Creates an RGB color from a hex string (e.g. {@code #112233} or {@code 112233}).
+         *
+         * @param hex the hex color string with or without leading {@code #}
+         * @return the parsed RGB color
          */
         public static Rgb fromHex(String hex) {
             String h = hex.startsWith("#") ? hex.substring(1) : hex;
@@ -348,28 +377,43 @@ public interface Color {
         }
     }
 
-    // Singleton for reset
+    /** Reset to default terminal color. */
     Color RESET = new Reset();
 
-    // Standard ANSI colors as Named (enabling CSS class-based theming)
+    /** Black. */
     Color BLACK = new Named("black", new Ansi(AnsiColor.BLACK));
+    /** Red. */
     Color RED = new Named("red", new Ansi(AnsiColor.RED));
+    /** Green. */
     Color GREEN = new Named("green", new Ansi(AnsiColor.GREEN));
+    /** Yellow. */
     Color YELLOW = new Named("yellow", new Ansi(AnsiColor.YELLOW));
+    /** Blue. */
     Color BLUE = new Named("blue", new Ansi(AnsiColor.BLUE));
+    /** Magenta. */
     Color MAGENTA = new Named("magenta", new Ansi(AnsiColor.MAGENTA));
+    /** Cyan. */
     Color CYAN = new Named("cyan", new Ansi(AnsiColor.CYAN));
+    /** White. */
     Color WHITE = new Named("white", new Ansi(AnsiColor.BRIGHT_WHITE));
-    Color GRAY = new Named("gray", new Ansi(AnsiColor.WHITE));  // ANSI WHITE (7) renders as light gray
+    /** Gray (ANSI WHITE renders as light gray). */
+    Color GRAY = new Named("gray", new Ansi(AnsiColor.WHITE));
 
-    // Bright ANSI colors as Named
-    Color DARK_GRAY = new Named("dark-gray", new Ansi(AnsiColor.BRIGHT_BLACK));  // ANSI BRIGHT_BLACK (8) renders as dark gray
+    /** Dark gray (ANSI BRIGHT_BLACK renders as dark gray). */
+    Color DARK_GRAY = new Named("dark-gray", new Ansi(AnsiColor.BRIGHT_BLACK));
+    /** Light red. */
     Color LIGHT_RED = new Named("light-red", new Ansi(AnsiColor.BRIGHT_RED));
+    /** Light green. */
     Color LIGHT_GREEN = new Named("light-green", new Ansi(AnsiColor.BRIGHT_GREEN));
+    /** Light yellow. */
     Color LIGHT_YELLOW = new Named("light-yellow", new Ansi(AnsiColor.BRIGHT_YELLOW));
+    /** Light blue. */
     Color LIGHT_BLUE = new Named("light-blue", new Ansi(AnsiColor.BRIGHT_BLUE));
+    /** Light magenta. */
     Color LIGHT_MAGENTA = new Named("light-magenta", new Ansi(AnsiColor.BRIGHT_MAGENTA));
+    /** Light cyan. */
     Color LIGHT_CYAN = new Named("light-cyan", new Ansi(AnsiColor.BRIGHT_CYAN));
+    /** Bright white. */
     Color BRIGHT_WHITE = new Named("bright-white", new Ansi(AnsiColor.BRIGHT_WHITE));
 
     // Factory methods
@@ -387,6 +431,7 @@ public interface Color {
      * Creates a 256-color indexed value.
      *
      * @param index palette index (0-255)
+     * @return a color instance
      */
     static Color indexed(int index) {
         return new Indexed(index);
@@ -394,6 +439,11 @@ public interface Color {
 
     /**
      * Creates an RGB true-color value.
+     *
+     * @param r red component (0-255)
+     * @param g green component (0-255)
+     * @param b blue component (0-255)
+     * @return a color instance
      */
     static Color rgb(int r, int g, int b) {
         return new Rgb(r, g, b);
@@ -401,6 +451,9 @@ public interface Color {
 
     /**
      * Creates an RGB true-color value from a {@code #rrggbb} string.
+     *
+     * @param hex the hex color string with or without leading {@code #}
+     * @return a color instance
      */
     static Color hex(String hex) {
         return Rgb.fromHex(hex);

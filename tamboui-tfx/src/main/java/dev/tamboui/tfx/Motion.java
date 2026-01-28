@@ -63,6 +63,8 @@ public enum Motion {
     
     /**
      * Returns the opposite direction of the current motion.
+     *
+     * @return the opposite motion direction
      */
     public Motion flipped() {
         switch (this) {
@@ -84,6 +86,8 @@ public enum Motion {
      * <p>
      * Some motions (RIGHT_TO_LEFT and DOWN_TO_UP) require the effect timer to be reversed
      * to maintain consistent animation behavior.
+     *
+     * @return true if this motion direction requires timer reversal
      */
     public boolean flipsTimer() {
         return this == RIGHT_TO_LEFT || this == DOWN_TO_UP;

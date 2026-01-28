@@ -41,6 +41,9 @@ tasks.withType<Test> {
 
 tasks.withType<Javadoc>().configureEach {
     JavadocTheming.configure(this, project)
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xmaxwarns", "10000")
+    }
 }
 
 group = "dev.tamboui"

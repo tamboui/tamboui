@@ -9,6 +9,7 @@ package dev.tamboui.layout;
  */
 public final class Size {
 
+    /** A size with zero width and height. */
     public static final Size ZERO = new Size(0, 0);
 
     private final int width;

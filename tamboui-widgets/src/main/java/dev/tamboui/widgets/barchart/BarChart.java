@@ -95,6 +95,19 @@ public final class BarChart implements Widget {
         private final String sevenEighths;
         private final String full;
 
+        /**
+         * Creates a new bar set with the given symbols for each fill level.
+         *
+         * @param empty the empty symbol
+         * @param oneEighth the one-eighth fill symbol
+         * @param oneQuarter the one-quarter fill symbol
+         * @param threeEighths the three-eighths fill symbol
+         * @param half the half fill symbol
+         * @param fiveEighths the five-eighths fill symbol
+         * @param threeQuarters the three-quarters fill symbol
+         * @param sevenEighths the seven-eighths fill symbol
+         * @param full the full fill symbol
+         */
         public BarSet(
             String empty,
             String oneEighth,
@@ -140,6 +153,8 @@ public final class BarChart implements Widget {
 
         /**
          * Returns the symbols as an array for indexed access.
+         *
+         * @return the symbols array
          */
         public String[] symbols() {
             return new String[] {
@@ -148,38 +163,83 @@ public final class BarChart implements Widget {
             };
         }
 
+        /**
+         * Returns the empty symbol.
+         *
+         * @return the empty symbol
+         */
         public String empty() {
             return empty;
         }
 
+        /**
+         * Returns the one-eighth fill symbol.
+         *
+         * @return the one-eighth fill symbol
+         */
         public String oneEighth() {
             return oneEighth;
         }
 
+        /**
+         * Returns the one-quarter fill symbol.
+         *
+         * @return the one-quarter fill symbol
+         */
         public String oneQuarter() {
             return oneQuarter;
         }
 
+        /**
+         * Returns the three-eighths fill symbol.
+         *
+         * @return the three-eighths fill symbol
+         */
         public String threeEighths() {
             return threeEighths;
         }
 
+        /**
+         * Returns the half fill symbol.
+         *
+         * @return the half fill symbol
+         */
         public String half() {
             return half;
         }
 
+        /**
+         * Returns the five-eighths fill symbol.
+         *
+         * @return the five-eighths fill symbol
+         */
         public String fiveEighths() {
             return fiveEighths;
         }
 
+        /**
+         * Returns the three-quarters fill symbol.
+         *
+         * @return the three-quarters fill symbol
+         */
         public String threeQuarters() {
             return threeQuarters;
         }
 
+        /**
+         * Returns the seven-eighths fill symbol.
+         *
+         * @return the seven-eighths fill symbol
+         */
         public String sevenEighths() {
             return sevenEighths;
         }
 
+        /**
+         * Returns the full fill symbol.
+         *
+         * @return the full fill symbol
+         */
         public String full() {
             return full;
         }
@@ -290,6 +350,8 @@ public final class BarChart implements Widget {
 
     /**
      * Creates a new bar chart builder.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -553,6 +615,9 @@ public final class BarChart implements Widget {
 
         /**
          * Adds bar groups to the chart.
+         *
+         * @param groups the bar groups to add
+         * @return this builder
          */
         public Builder data(BarGroup... groups) {
             if (groups != null) {
@@ -563,6 +628,9 @@ public final class BarChart implements Widget {
 
         /**
          * Adds bar groups to the chart.
+         *
+         * @param groups the bar groups to add
+         * @return this builder
          */
         public Builder data(List<BarGroup> groups) {
             if (groups != null) {
@@ -573,6 +641,9 @@ public final class BarChart implements Widget {
 
         /**
          * Adds a single bar group.
+         *
+         * @param group the bar group to add
+         * @return this builder
          */
         public Builder addGroup(BarGroup group) {
             if (group != null) {
@@ -583,6 +654,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the maximum value for scaling.
+         *
+         * @param max the maximum value
+         * @return this builder
          */
         public Builder max(long max) {
             this.max = max;
@@ -591,6 +665,8 @@ public final class BarChart implements Widget {
 
         /**
          * Clears the explicit max, using data maximum instead.
+         *
+         * @return this builder
          */
         public Builder autoMax() {
             this.max = null;
@@ -599,6 +675,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the bar width (default: 1).
+         *
+         * @param barWidth the bar width
+         * @return this builder
          */
         public Builder barWidth(int barWidth) {
             this.barWidth = Math.max(1, barWidth);
@@ -607,6 +686,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the gap between bars in a group (default: 1).
+         *
+         * @param barGap the gap between bars
+         * @return this builder
          */
         public Builder barGap(int barGap) {
             this.barGap = Math.max(0, barGap);
@@ -615,6 +697,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the gap between groups (default: 1).
+         *
+         * @param groupGap the gap between groups
+         * @return this builder
          */
         public Builder groupGap(int groupGap) {
             this.groupGap = Math.max(0, groupGap);
@@ -623,6 +708,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the chart direction (default: VERTICAL).
+         *
+         * @param direction the chart direction
+         * @return this builder
          */
         public Builder direction(Direction direction) {
             this.direction = direction != null ? direction : Direction.VERTICAL;
@@ -631,6 +719,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the overall chart style.
+         *
+         * @param style the chart style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -639,6 +730,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the default bar style.
+         *
+         * @param barStyle the bar style
+         * @return this builder
          */
         public Builder barStyle(Style barStyle) {
             this.barStyle = barStyle;
@@ -647,6 +741,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the value display style.
+         *
+         * @param valueStyle the value style
+         * @return this builder
          */
         public Builder valueStyle(Style valueStyle) {
             this.valueStyle = valueStyle;
@@ -655,6 +752,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the label style.
+         *
+         * @param labelStyle the label style
+         * @return this builder
          */
         public Builder labelStyle(Style labelStyle) {
             this.labelStyle = labelStyle;
@@ -663,6 +763,9 @@ public final class BarChart implements Widget {
 
         /**
          * Wraps the chart in a block.
+         *
+         * @param block the surrounding block
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -671,6 +774,9 @@ public final class BarChart implements Widget {
 
         /**
          * Sets the bar symbol set.
+         *
+         * @param barSet the bar symbol set
+         * @return this builder
          */
         public Builder barSet(BarSet barSet) {
             this.barSet = barSet != null ? barSet : BarSet.NINE_LEVELS;
@@ -746,6 +852,8 @@ public final class BarChart implements Widget {
 
         /**
          * Builds the bar chart.
+         *
+         * @return the built bar chart
          */
         public BarChart build() {
             return new BarChart(this);

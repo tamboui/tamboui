@@ -124,12 +124,19 @@ public final class Table implements StatefulWidget<TableState> {
         }
     }
 
+    /**
+     * Creates a new table builder.
+     *
+     * @return a new Builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
      * Returns the rows in this table.
+     *
+     * @return the rows
      */
     public List<Row> rows() {
         return rows;
@@ -320,6 +327,9 @@ public final class Table implements StatefulWidget<TableState> {
         NEVER
     }
 
+    /**
+     * Builder for {@link Table}.
+     */
     public static final class Builder {
         private List<Row> rows = new ArrayList<>();
         private List<Constraint> widths = new ArrayList<>();
@@ -342,6 +352,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the data rows.
+         *
+         * @param rows the rows to display
+         * @return this builder
          */
         public Builder rows(List<Row> rows) {
             this.rows = new ArrayList<>(rows);
@@ -350,6 +363,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the data rows.
+         *
+         * @param rows the rows to display
+         * @return this builder
          */
         public Builder rows(Row... rows) {
             this.rows = new ArrayList<>(Arrays.asList(rows));
@@ -358,6 +374,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Adds a row.
+         *
+         * @param row the row to add
+         * @return this builder
          */
         public Builder addRow(Row row) {
             this.rows.add(row);
@@ -368,6 +387,9 @@ public final class Table implements StatefulWidget<TableState> {
          * Sets the column width constraints.
          * <p>
          * This is required - columns will have 0 width without constraints.
+         *
+         * @param widths the column width constraints
+         * @return this builder
          */
         public Builder widths(List<Constraint> widths) {
             this.widths = new ArrayList<>(widths);
@@ -376,6 +398,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the column width constraints.
+         *
+         * @param widths the column width constraints
+         * @return this builder
          */
         public Builder widths(Constraint... widths) {
             this.widths = new ArrayList<>(Arrays.asList(widths));
@@ -384,6 +409,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the header row.
+         *
+         * @param header the header row
+         * @return this builder
          */
         public Builder header(Row header) {
             this.header = header;
@@ -392,6 +420,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the footer row.
+         *
+         * @param footer the footer row
+         * @return this builder
          */
         public Builder footer(Row footer) {
             this.footer = footer;
@@ -400,6 +431,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Wraps the table in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -408,6 +442,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the base style.
+         *
+         * @param style the base style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -416,6 +453,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the style for the selected row.
+         *
+         * @param style the highlight style
+         * @return this builder
          */
         public Builder highlightStyle(Style style) {
             this.rowHighlightStyle = style;
@@ -424,6 +464,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the symbol displayed before the selected row.
+         *
+         * @param symbol the highlight symbol
+         * @return this builder
          */
         public Builder highlightSymbol(String symbol) {
             this.highlightSymbol = symbol != null ? symbol : "";
@@ -432,6 +475,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets the spacing between columns.
+         *
+         * @param spacing the column spacing
+         * @return this builder
          */
         public Builder columnSpacing(int spacing) {
             this.columnSpacing = Math.max(0, spacing);
@@ -440,6 +486,9 @@ public final class Table implements StatefulWidget<TableState> {
 
         /**
          * Sets when to allocate space for the highlight symbol.
+         *
+         * @param spacing the highlight spacing mode
+         * @return this builder
          */
         public Builder highlightSpacing(HighlightSpacing spacing) {
             this.highlightSpacing = spacing;
@@ -501,6 +550,11 @@ public final class Table implements StatefulWidget<TableState> {
             return this;
         }
 
+        /**
+         * Builds the table.
+         *
+         * @return a new Table
+         */
         public Table build() {
             return new Table(this);
         }

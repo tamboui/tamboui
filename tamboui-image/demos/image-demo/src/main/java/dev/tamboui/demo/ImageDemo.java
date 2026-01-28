@@ -76,12 +76,17 @@ public class ImageDemo {
     private ImageScaling currentScaling = ImageScaling.FIT;
     private boolean forceProtocol;
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var customImagePath = args.length > 0 ? args[0] : null;
         new ImageDemo(customImagePath).run();
     }
 
-    public ImageDemo(String customImagePath) throws IOException {
+    private ImageDemo(String customImagePath) throws IOException {
         try (var backend = BackendFactory.create()) {
             if (backend instanceof RecordingBackend) {
                 this.capabilities = TerminalImageCapabilities.withSupport(EnumSet.of(
@@ -104,7 +109,12 @@ public class ImageDemo {
         }
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (var backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

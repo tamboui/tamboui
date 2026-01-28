@@ -118,6 +118,8 @@ public final class TerminalImageCapabilities {
      * Returns all supported protocols.
      * <p>
      * The returned set is immutable.
+     *
+     * @return the set of supported protocols
      */
     public Set<TerminalImageProtocol> supportedProtocols() {
         return supportedProtocols;

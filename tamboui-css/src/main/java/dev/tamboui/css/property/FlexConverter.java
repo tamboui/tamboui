@@ -24,7 +24,11 @@ import java.util.Optional;
  */
 public final class FlexConverter implements PropertyConverter<Flex> {
 
+    /** Singleton instance. */
     public static final FlexConverter INSTANCE = new FlexConverter();
+
+    private FlexConverter() {
+    }
 
     @Override
     public Optional<Flex> convert(String value, Map<String, String> variables) {

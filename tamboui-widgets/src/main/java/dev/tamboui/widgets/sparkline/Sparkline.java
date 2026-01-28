@@ -81,6 +81,19 @@ public final class Sparkline implements Widget {
         private final String sevenEighths;
         private final String full;
 
+        /**
+         * Creates a new bar set with the given symbols.
+         *
+         * @param empty         symbol for zero/empty value
+         * @param oneEighth     symbol for 1/8 fill
+         * @param oneQuarter    symbol for 1/4 fill
+         * @param threeEighths  symbol for 3/8 fill
+         * @param half          symbol for 1/2 fill
+         * @param fiveEighths   symbol for 5/8 fill
+         * @param threeQuarters symbol for 3/4 fill
+         * @param sevenEighths  symbol for 7/8 fill
+         * @param full          symbol for full fill
+         */
         public BarSet(
             String empty,
             String oneEighth,
@@ -120,6 +133,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Returns the symbol for the given fill level (0.0 to 1.0).
+         *
+         * @param level the fill level between 0.0 and 1.0
+         * @return the symbol for the given level
          */
         public String symbolForLevel(double level) {
             if (level <= 0.0) {
@@ -149,38 +165,83 @@ public final class Sparkline implements Widget {
             return full;
         }
 
+        /**
+         * Returns the empty symbol.
+         *
+         * @return the empty symbol
+         */
         public String empty() {
             return empty;
         }
 
+        /**
+         * Returns the one-eighth fill symbol.
+         *
+         * @return the one-eighth symbol
+         */
         public String oneEighth() {
             return oneEighth;
         }
 
+        /**
+         * Returns the one-quarter fill symbol.
+         *
+         * @return the one-quarter symbol
+         */
         public String oneQuarter() {
             return oneQuarter;
         }
 
+        /**
+         * Returns the three-eighths fill symbol.
+         *
+         * @return the three-eighths symbol
+         */
         public String threeEighths() {
             return threeEighths;
         }
 
+        /**
+         * Returns the half fill symbol.
+         *
+         * @return the half symbol
+         */
         public String half() {
             return half;
         }
 
+        /**
+         * Returns the five-eighths fill symbol.
+         *
+         * @return the five-eighths symbol
+         */
         public String fiveEighths() {
             return fiveEighths;
         }
 
+        /**
+         * Returns the three-quarters fill symbol.
+         *
+         * @return the three-quarters symbol
+         */
         public String threeQuarters() {
             return threeQuarters;
         }
 
+        /**
+         * Returns the seven-eighths fill symbol.
+         *
+         * @return the seven-eighths symbol
+         */
         public String sevenEighths() {
             return sevenEighths;
         }
 
+        /**
+         * Returns the full fill symbol.
+         *
+         * @return the full symbol
+         */
         public String full() {
             return full;
         }
@@ -253,6 +314,8 @@ public final class Sparkline implements Widget {
 
     /**
      * Creates a new sparkline builder.
+     *
+     * @return a new Builder
      */
     public static Builder builder() {
         return new Builder();
@@ -260,6 +323,9 @@ public final class Sparkline implements Widget {
 
     /**
      * Creates a sparkline with the given data values.
+     *
+     * @param data the data values
+     * @return a new Sparkline
      */
     public static Sparkline from(long... data) {
         return builder().data(data).build();
@@ -267,6 +333,9 @@ public final class Sparkline implements Widget {
 
     /**
      * Creates a sparkline with the given data values.
+     *
+     * @param data the data values
+     * @return a new Sparkline
      */
     public static Sparkline from(List<Long> data) {
         return builder().data(data).build();
@@ -354,6 +423,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Sets the data values to display.
+         *
+         * @param data the data values
+         * @return this builder
          */
         public Builder data(long... data) {
             this.data = data != null ? data.clone() : new long[0];
@@ -362,6 +434,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Sets the data values from a list.
+         *
+         * @param data the data values
+         * @return this builder
          */
         public Builder data(List<Long> data) {
             if (data == null || data.isEmpty()) {
@@ -374,6 +449,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Sets the data values from an int array.
+         *
+         * @param data the data values
+         * @return this builder
          */
         public Builder data(int... data) {
             if (data == null) {
@@ -391,6 +469,9 @@ public final class Sparkline implements Widget {
          * Sets the maximum value for scaling.
          * <p>
          * If not set, the maximum value in the data is used.
+         *
+         * @param max the maximum value
+         * @return this builder
          */
         public Builder max(long max) {
             this.max = max;
@@ -399,6 +480,8 @@ public final class Sparkline implements Widget {
 
         /**
          * Clears the explicit maximum value, using data maximum instead.
+         *
+         * @return this builder
          */
         public Builder autoMax() {
             this.max = null;
@@ -407,6 +490,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Wraps the sparkline in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -415,6 +501,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Sets the bar symbol set.
+         *
+         * @param barSet the bar symbol set
+         * @return this builder
          */
         public Builder barSet(BarSet barSet) {
             this.barSet = barSet != null ? barSet : BarSet.NINE_LEVELS;
@@ -423,6 +512,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Sets the render direction.
+         *
+         * @param direction the render direction
+         * @return this builder
          */
         public Builder direction(RenderDirection direction) {
             this.direction = direction != null ? direction : RenderDirection.LEFT_TO_RIGHT;
@@ -431,6 +523,9 @@ public final class Sparkline implements Widget {
 
         /**
          * Sets the style for the sparkline bars.
+         *
+         * @param style the bar style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style != null ? style : Style.EMPTY;
@@ -466,6 +561,8 @@ public final class Sparkline implements Widget {
 
         /**
          * Builds the sparkline.
+         *
+         * @return a new Sparkline
          */
         public Sparkline build() {
             return new Sparkline(this);

@@ -50,15 +50,26 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /**
+     * Creates a new calendar element for the current month.
+     */
     public CalendarElement() {
     }
 
+    /**
+     * Creates a new calendar element for the month of the given date.
+     *
+     * @param date the date determining which month to display
+     */
     public CalendarElement(LocalDate date) {
         this.displayDate = date != null ? date : LocalDate.now();
     }
 
     /**
      * Sets the display date (determines which month to show).
+     *
+     * @param date the date determining which month to display
+     * @return this element
      */
     public CalendarElement date(LocalDate date) {
         this.displayDate = date != null ? date : LocalDate.now();
@@ -67,6 +78,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Sets the date styler for customizing individual dates.
+     *
+     * @param styler the date styler callback
+     * @return this element
      */
     public CalendarElement dateStyler(DateStyler styler) {
         this.dateStyler = styler != null ? styler : date -> Style.EMPTY;
@@ -75,6 +89,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Highlights today with the given color.
+     *
+     * @param color the highlight color for today
+     * @return this element
      */
     public CalendarElement highlightToday(Color color) {
         this.dateStyler = CalendarEventStore.today(Style.EMPTY.fg(color).bold());
@@ -83,6 +100,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Highlights today with the given style.
+     *
+     * @param style the highlight style for today
+     * @return this element
      */
     public CalendarElement highlightToday(Style style) {
         this.dateStyler = CalendarEventStore.today(style);
@@ -91,6 +111,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Shows the month header with the given style.
+     *
+     * @param style the month header style
+     * @return this element
      */
     public CalendarElement showMonthHeader(Style style) {
         this.monthHeaderStyle = style;
@@ -99,6 +122,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Shows the month header with bold style.
+     *
+     * @return this element
      */
     public CalendarElement showMonthHeader() {
         this.monthHeaderStyle = Style.EMPTY.bold();
@@ -107,6 +132,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Shows the weekdays header with the given style.
+     *
+     * @param style the weekdays header style
+     * @return this element
      */
     public CalendarElement showWeekdaysHeader(Style style) {
         this.weekdaysHeaderStyle = style;
@@ -115,6 +143,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Shows the weekdays header with cyan color.
+     *
+     * @return this element
      */
     public CalendarElement showWeekdaysHeader() {
         this.weekdaysHeaderStyle = Style.EMPTY.fg(Color.CYAN);
@@ -123,6 +153,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Shows surrounding days (from previous/next month) with the given style.
+     *
+     * @param style the surrounding days style
+     * @return this element
      */
     public CalendarElement showSurrounding(Style style) {
         this.surroundingStyle = style;
@@ -131,6 +164,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Shows surrounding days with dim style.
+     *
+     * @return this element
      */
     public CalendarElement showSurrounding() {
         this.surroundingStyle = Style.EMPTY.dim();
@@ -139,6 +174,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Sets the default date style.
+     *
+     * @param style the default style for dates
+     * @return this element
      */
     public CalendarElement defaultStyle(Style style) {
         this.defaultStyle = style;
@@ -147,6 +185,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Sets the first day of the week.
+     *
+     * @param day the first day of the week
+     * @return this element
      */
     public CalendarElement firstDayOfWeek(DayOfWeek day) {
         this.firstDayOfWeek = day != null ? day : DayOfWeek.MONDAY;
@@ -155,6 +196,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Sets the first day of week to Sunday.
+     *
+     * @return this element
      */
     public CalendarElement sundayFirst() {
         this.firstDayOfWeek = DayOfWeek.SUNDAY;
@@ -163,6 +206,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Sets the title.
+     *
+     * @param title the calendar title
+     * @return this element
      */
     public CalendarElement title(String title) {
         this.title = title;
@@ -171,6 +217,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this element
      */
     public CalendarElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -179,6 +227,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public CalendarElement borderColor(Color color) {
         this.borderColor = color;

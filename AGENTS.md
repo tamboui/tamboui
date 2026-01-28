@@ -200,7 +200,9 @@ See `Paragraph.java` for correct CharWidth usage in text rendering.
 - Run `./gradlew -q test` for quiet output
 - Do not consider the task complete until all tests pass without errors
 - Run `./gradlew -q build` to ensure the project builds successfully
-- Use `BufferAssertions` for testing buffer contents in widget tests
+- Run `./gradlew -q uJB` to update the JBang demo catalog when a demo is added
+- Before calling something done, run `./gradlew -q javadoc` to ensure no javadoc warnings are emitted
+- Use `BufferAssertions` for testing buffer contents in tests
 
 ## Documentation
 

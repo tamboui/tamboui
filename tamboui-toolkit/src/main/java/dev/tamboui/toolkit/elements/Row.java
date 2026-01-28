@@ -44,9 +44,15 @@ public final class Row extends ContainerElement<Row> {
     private Flex flex;
     private Margin margin;
 
+    /** Creates an empty row. */
     public Row() {
     }
 
+    /**
+     * Creates a row with the given children.
+     *
+     * @param children the child elements
+     */
     public Row(Element... children) {
         this.children.addAll(Arrays.asList(children));
     }

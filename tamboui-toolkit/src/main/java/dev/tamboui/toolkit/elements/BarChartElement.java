@@ -55,11 +55,17 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /**
+     * Creates a new bar chart element with default settings.
+     */
     public BarChartElement() {
     }
 
     /**
      * Adds data as simple values (single group).
+     *
+     * @param values the data values
+     * @return this element
      */
     public BarChartElement data(long... values) {
         this.groups.clear();
@@ -69,6 +75,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Adds data as bars with labels.
+     *
+     * @param bars the bars to display
+     * @return this element
      */
     public BarChartElement data(Bar... bars) {
         this.groups.clear();
@@ -78,6 +87,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Adds a bar group.
+     *
+     * @param group the bar group to add
+     * @return this element
      */
     public BarChartElement group(BarGroup group) {
         this.groups.add(group);
@@ -86,6 +98,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Adds bar groups.
+     *
+     * @param groups the bar groups to set
+     * @return this element
      */
     public BarChartElement groups(BarGroup... groups) {
         this.groups.clear();
@@ -95,6 +110,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Adds bar groups from a list.
+     *
+     * @param groups the bar groups to set
+     * @return this element
      */
     public BarChartElement groups(List<BarGroup> groups) {
         this.groups.clear();
@@ -104,6 +122,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the maximum value for scaling.
+     *
+     * @param max the maximum value
+     * @return this element
      */
     public BarChartElement max(long max) {
         this.max = max;
@@ -112,6 +133,8 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Uses auto-scaling based on data maximum.
+     *
+     * @return this element
      */
     public BarChartElement autoMax() {
         this.max = null;
@@ -120,6 +143,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the bar width.
+     *
+     * @param width the bar width in columns
+     * @return this element
      */
     public BarChartElement barWidth(int width) {
         this.barWidth = Math.max(1, width);
@@ -128,6 +154,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the gap between bars in a group.
+     *
+     * @param gap the gap between bars
+     * @return this element
      */
     public BarChartElement barGap(int gap) {
         this.barGap = Math.max(0, gap);
@@ -136,6 +165,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the gap between groups.
+     *
+     * @param gap the gap between groups
+     * @return this element
      */
     public BarChartElement groupGap(int gap) {
         this.groupGap = Math.max(0, gap);
@@ -144,6 +176,8 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets horizontal direction.
+     *
+     * @return this element
      */
     public BarChartElement horizontal() {
         this.direction = Direction.HORIZONTAL;
@@ -152,6 +186,8 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets vertical direction.
+     *
+     * @return this element
      */
     public BarChartElement vertical() {
         this.direction = Direction.VERTICAL;
@@ -160,6 +196,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the direction.
+     *
+     * @param direction the chart direction
+     * @return this element
      */
     public BarChartElement direction(Direction direction) {
         this.direction = direction;
@@ -168,6 +207,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the bar style.
+     *
+     * @param style the bar style
+     * @return this element
      */
     public BarChartElement barStyle(Style style) {
         this.barStyle = style;
@@ -176,6 +218,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the bar color.
+     *
+     * @param color the bar foreground color
+     * @return this element
      */
     public BarChartElement barColor(Color color) {
         this.barStyle = Style.EMPTY.fg(color);
@@ -184,6 +229,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the value display style.
+     *
+     * @param style the value label style
+     * @return this element
      */
     public BarChartElement valueStyle(Style style) {
         this.valueStyle = style;
@@ -192,6 +240,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the label style.
+     *
+     * @param style the bar label style
+     * @return this element
      */
     public BarChartElement labelStyle(Style style) {
         this.labelStyle = style;
@@ -200,6 +251,8 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Uses three-level bar set.
+     *
+     * @return this element
      */
     public BarChartElement threeLevels() {
         this.barSet = BarChart.BarSet.THREE_LEVELS;
@@ -208,6 +261,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the bar character set.
+     *
+     * @param barSet the bar character set to use
+     * @return this element
      */
     public BarChartElement barSet(BarChart.BarSet barSet) {
         this.barSet = barSet;
@@ -216,6 +272,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the title.
+     *
+     * @param title the chart title
+     * @return this element
      */
     public BarChartElement title(String title) {
         this.title = title;
@@ -224,6 +283,8 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this element
      */
     public BarChartElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -232,6 +293,9 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public BarChartElement borderColor(Color color) {
         this.borderColor = color;

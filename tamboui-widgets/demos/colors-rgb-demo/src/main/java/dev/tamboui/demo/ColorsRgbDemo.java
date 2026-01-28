@@ -39,11 +39,25 @@ public class ColorsRgbDemo {
     private final FpsWidget fpsWidget = new FpsWidget();
     private final ColorsWidget colorsWidget = new ColorsWidget();
 
+    private ColorsRgbDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new ColorsRgbDemo().run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

@@ -45,6 +45,10 @@ public class FlexDemo {
     private static final AtomicInteger modeIndex = new AtomicInteger(0);
     private static final AtomicInteger exampleIndex = new AtomicInteger(0);
 
+    private FlexDemo() {
+
+    }
+
     /**
      * Entry point for the flex demo application.
      *
@@ -57,7 +61,7 @@ public class FlexDemo {
                 .build();
 
         try (var runner = ToolkitRunner.create(config)) {
-            runner.run(() -> renderUI());
+            runner.run(FlexDemo::renderUI);
         }
     }
 

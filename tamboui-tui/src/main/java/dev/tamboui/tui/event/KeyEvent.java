@@ -191,6 +191,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if Ctrl modifier was pressed.
+     *
+     * @return true if Ctrl was held
      */
     public boolean hasCtrl() {
         return modifiers.ctrl();
@@ -198,6 +200,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if Alt modifier was pressed.
+     *
+     * @return true if Alt was held
      */
     public boolean hasAlt() {
         return modifiers.alt();
@@ -205,6 +209,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if Shift modifier was pressed.
+     *
+     * @return true if Shift was held
      */
     public boolean hasShift() {
         return modifiers.shift();
@@ -212,6 +218,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a Ctrl+C event (common quit signal).
+     *
+     * @return true if Ctrl+C was pressed
      */
     public boolean isCtrlC() {
         return hasCtrl() && isChar('c');
@@ -219,6 +227,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns the key code.
+     *
+     * @return the key code
      */
     public KeyCode code() {
         return code;
@@ -226,6 +236,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns the modifier state.
+     *
+     * @return the modifier state
      */
     public KeyModifiers modifiers() {
         return modifiers;
@@ -233,6 +245,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns the character for {@link KeyCode#CHAR} events, or {@code '\0'} otherwise.
+     *
+     * @return the character value
      */
     public char character() {
         return character;
@@ -240,6 +254,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns the bindings associated with this event.
+     *
+     * @return the bindings
      */
     public Bindings bindings() {
         return bindings;
@@ -268,6 +284,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is an "up" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the move-up action
      */
     public boolean isUp() {
         return matches(Actions.MOVE_UP);
@@ -275,6 +293,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "down" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the move-down action
      */
     public boolean isDown() {
         return matches(Actions.MOVE_DOWN);
@@ -282,6 +302,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "left" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the move-left action
      */
     public boolean isLeft() {
         return matches(Actions.MOVE_LEFT);
@@ -289,6 +311,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "right" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the move-right action
      */
     public boolean isRight() {
         return matches(Actions.MOVE_RIGHT);
@@ -296,6 +320,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "page up" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the page-up action
      */
     public boolean isPageUp() {
         return matches(Actions.PAGE_UP);
@@ -303,6 +329,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "page down" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the page-down action
      */
     public boolean isPageDown() {
         return matches(Actions.PAGE_DOWN);
@@ -310,6 +338,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "home" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the home action
      */
     public boolean isHome() {
         return matches(Actions.HOME);
@@ -317,6 +347,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is an "end" navigation event according to the bindings.
+     *
+     * @return true if this event triggers the end action
      */
     public boolean isEnd() {
         return matches(Actions.END);
@@ -324,6 +356,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "select" event (Enter or Space) according to the bindings.
+     *
+     * @return true if this event triggers the select action
      */
     public boolean isSelect() {
         return matches(Actions.SELECT);
@@ -331,6 +365,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "confirm" event (Enter) according to the bindings.
+     *
+     * @return true if this event triggers the confirm action
      */
     public boolean isConfirm() {
         return matches(Actions.CONFIRM);
@@ -338,6 +374,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "cancel" event (Escape) according to the bindings.
+     *
+     * @return true if this event triggers the cancel action
      */
     public boolean isCancel() {
         return matches(Actions.CANCEL);
@@ -345,6 +383,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "quit" event according to the bindings.
+     *
+     * @return true if this event triggers the quit action
      */
     public boolean isQuit() {
         return matches(Actions.QUIT);
@@ -352,6 +392,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "focus next" event (Tab) according to the bindings.
+     *
+     * @return true if this event triggers the focus-next action
      */
     public boolean isFocusNext() {
         return matches(Actions.FOCUS_NEXT);
@@ -359,6 +401,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "focus previous" event (Shift+Tab) according to the bindings.
+     *
+     * @return true if this event triggers the focus-previous action
      */
     public boolean isFocusPrevious() {
         return matches(Actions.FOCUS_PREVIOUS);
@@ -366,6 +410,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "delete backward" event (Backspace) according to the bindings.
+     *
+     * @return true if this event triggers the delete-backward action
      */
     public boolean isDeleteBackward() {
         return matches(Actions.DELETE_BACKWARD);
@@ -373,6 +419,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a "delete forward" event (Delete) according to the bindings.
+     *
+     * @return true if this event triggers the delete-forward action
      */
     public boolean isDeleteForward() {
         return matches(Actions.DELETE_FORWARD);

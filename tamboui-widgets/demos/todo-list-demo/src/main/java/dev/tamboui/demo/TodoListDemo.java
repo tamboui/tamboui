@@ -70,11 +70,16 @@ public class TodoListDemo {
     private final ListState listState = new ListState();
     private final List<TodoItem> todoItems = new ArrayList<>();
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new TodoListDemo().run();
     }
 
-    public TodoListDemo() {
+    private TodoListDemo() {
         // Initialize with default todo items
         todoItems.add(new TodoItem(Status.TODO, "Rewrite everything with your programming language of choice!",
             "I can't hold my inner voice. He tells me to rewrite the complete universe with Java"));
@@ -90,7 +95,12 @@ public class TodoListDemo {
             "If you see this info that means I completed this task!"));
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

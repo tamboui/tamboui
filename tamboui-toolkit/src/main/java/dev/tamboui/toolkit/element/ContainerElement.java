@@ -30,6 +30,13 @@ import java.util.List;
  */
 public abstract class ContainerElement<T extends ContainerElement<T>> extends StyledElement<T> {
 
+    /**
+     * Creates a new container element.
+     */
+    protected ContainerElement() {
+    }
+
+    /** The list of child elements in this container. */
     protected final List<Element> children = new ArrayList<>();
 
     /**

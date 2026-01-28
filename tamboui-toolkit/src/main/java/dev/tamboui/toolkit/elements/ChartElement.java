@@ -51,11 +51,17 @@ public final class ChartElement extends StyledElement<ChartElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /**
+     * Creates a new chart element with default settings.
+     */
     public ChartElement() {
     }
 
     /**
      * Adds a dataset.
+     *
+     * @param dataset the dataset to add
+     * @return this element
      */
     public ChartElement dataset(Dataset dataset) {
         this.datasets.add(dataset);
@@ -64,6 +70,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets all datasets.
+     *
+     * @param datasets the datasets to set
+     * @return this element
      */
     public ChartElement datasets(Dataset... datasets) {
         this.datasets.clear();
@@ -73,6 +82,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets all datasets from a list.
+     *
+     * @param datasets the datasets to set
+     * @return this element
      */
     public ChartElement datasets(List<Dataset> datasets) {
         this.datasets.clear();
@@ -82,6 +94,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets the X-axis configuration.
+     *
+     * @param xAxis the X-axis configuration
+     * @return this element
      */
     public ChartElement xAxis(Axis xAxis) {
         this.xAxis = xAxis != null ? xAxis : Axis.defaults();
@@ -90,6 +105,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets the Y-axis configuration.
+     *
+     * @param yAxis the Y-axis configuration
+     * @return this element
      */
     public ChartElement yAxis(Axis yAxis) {
         this.yAxis = yAxis != null ? yAxis : Axis.defaults();
@@ -98,6 +116,12 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets both axis bounds.
+     *
+     * @param xMin the minimum X value
+     * @param xMax the maximum X value
+     * @param yMin the minimum Y value
+     * @param yMax the maximum Y value
+     * @return this element
      */
     public ChartElement bounds(double xMin, double xMax, double yMin, double yMax) {
         this.xAxis = Axis.builder().bounds(xMin, xMax).build();
@@ -107,6 +131,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets the legend position.
+     *
+     * @param position the legend position
+     * @return this element
      */
     public ChartElement legendPosition(LegendPosition position) {
         this.legendPosition = position;
@@ -115,6 +142,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Hides the legend.
+     *
+     * @return this element
      */
     public ChartElement hideLegend() {
         this.legendPosition = null;
@@ -123,6 +152,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets the title.
+     *
+     * @param title the chart title
+     * @return this element
      */
     public ChartElement title(String title) {
         this.title = title;
@@ -131,6 +163,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this element
      */
     public ChartElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -139,6 +173,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public ChartElement borderColor(Color color) {
         this.borderColor = color;

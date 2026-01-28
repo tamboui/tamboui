@@ -88,12 +88,20 @@ public final class Tabs implements StatefulWidget<TabsState> {
         this.highlightStyle = baseHighlightStyle;
     }
 
+    /**
+     * Creates a new tabs builder.
+     *
+     * @return a new Builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
      * Creates tabs from string titles.
+     *
+     * @param titles the tab titles
+     * @return a new Tabs
      */
     public static Tabs from(String... titles) {
         return builder().titles(titles).build();
@@ -101,6 +109,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
     /**
      * Creates tabs from line titles.
+     *
+     * @param titles the tab titles
+     * @return a new Tabs
      */
     public static Tabs from(Line... titles) {
         return builder().titles(titles).build();
@@ -108,6 +119,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
     /**
      * Returns the number of tabs.
+     *
+     * @return the tab count
      */
     public int size() {
         return titles.size();
@@ -115,6 +128,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
     /**
      * Returns the tab titles.
+     *
+     * @return the titles
      */
     public List<Line> titles() {
         return titles;
@@ -199,6 +214,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
         }
     }
 
+    /**
+     * Builder for {@link Tabs}.
+     */
     public static final class Builder {
         private List<Line> titles = new ArrayList<>();
         private Block block;
@@ -217,6 +235,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the tab titles from strings.
+         *
+         * @param titles the tab titles
+         * @return this builder
          */
         public Builder titles(String... titles) {
             this.titles = new ArrayList<>();
@@ -228,6 +249,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the tab titles from lines.
+         *
+         * @param titles the tab titles
+         * @return this builder
          */
         public Builder titles(Line... titles) {
             this.titles = new ArrayList<>(Arrays.asList(titles));
@@ -236,6 +260,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the tab titles from a list.
+         *
+         * @param titles the tab titles
+         * @return this builder
          */
         public Builder titles(List<Line> titles) {
             this.titles = new ArrayList<>(titles);
@@ -244,6 +271,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Adds a tab title.
+         *
+         * @param title the tab title
+         * @return this builder
          */
         public Builder addTitle(String title) {
             this.titles.add(Line.from(title));
@@ -252,6 +282,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Adds a tab title.
+         *
+         * @param title the tab title
+         * @return this builder
          */
         public Builder addTitle(Line title) {
             this.titles.add(title);
@@ -260,6 +293,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Wraps the tabs in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -268,6 +304,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the base style for unselected tabs.
+         *
+         * @param style the base style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -276,6 +315,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the style for the selected tab.
+         *
+         * @param style the highlight style
+         * @return this builder
          */
         public Builder highlightStyle(Style style) {
             this.highlightStyle = style;
@@ -284,6 +326,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the divider between tabs.
+         *
+         * @param divider the divider text
+         * @return this builder
          */
         public Builder divider(String divider) {
             this.divider = Span.raw(divider);
@@ -292,6 +337,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the divider between tabs.
+         *
+         * @param divider the divider span
+         * @return this builder
          */
         public Builder divider(Span divider) {
             this.divider = divider;
@@ -300,6 +348,10 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the padding on both sides of each tab title.
+         *
+         * @param left  the left padding
+         * @param right the right padding
+         * @return this builder
          */
         public Builder padding(String left, String right) {
             this.paddingLeft = left;
@@ -309,6 +361,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the left padding for each tab title.
+         *
+         * @param padding the left padding
+         * @return this builder
          */
         public Builder paddingLeft(String padding) {
             this.paddingLeft = padding;
@@ -317,6 +372,9 @@ public final class Tabs implements StatefulWidget<TabsState> {
 
         /**
          * Sets the right padding for each tab title.
+         *
+         * @param padding the right padding
+         * @return this builder
          */
         public Builder paddingRight(String padding) {
             this.paddingRight = padding;
@@ -363,6 +421,11 @@ public final class Tabs implements StatefulWidget<TabsState> {
             return this;
         }
 
+        /**
+         * Builds the tabs.
+         *
+         * @return a new Tabs
+         */
         public Tabs build() {
             return new Tabs(this);
         }

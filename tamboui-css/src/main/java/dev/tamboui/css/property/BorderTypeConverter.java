@@ -22,7 +22,11 @@ import java.util.Optional;
  */
 public final class BorderTypeConverter implements PropertyConverter<BorderType> {
 
+    /** Singleton instance. */
     public static final BorderTypeConverter INSTANCE = new BorderTypeConverter();
+
+    private BorderTypeConverter() {
+    }
 
     @Override
     public Optional<BorderType> convert(String value, Map<String, String> variables) {

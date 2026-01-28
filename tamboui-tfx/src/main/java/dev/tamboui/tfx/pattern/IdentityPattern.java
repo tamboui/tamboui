@@ -14,6 +14,7 @@ import dev.tamboui.layout.Rect;
  */
 public final class IdentityPattern implements Pattern {
     
+    /** Singleton instance of the identity pattern. */
     public static final IdentityPattern INSTANCE = new IdentityPattern();
     
     private IdentityPattern() {

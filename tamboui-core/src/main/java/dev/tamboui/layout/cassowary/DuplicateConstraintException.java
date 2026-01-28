@@ -9,6 +9,7 @@ package dev.tamboui.layout.cassowary;
  */
 public final class DuplicateConstraintException extends SolverException {
 
+    /** The duplicate constraint. */
     private final CassowaryConstraint constraint;
 
     /**

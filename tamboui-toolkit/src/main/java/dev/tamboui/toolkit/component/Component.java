@@ -38,8 +38,16 @@ import dev.tamboui.tui.event.MouseEvent;
  *     }
  * }
  * }</pre>
+ *
+ * @param <T> the concrete component subclass, for fluent method chaining
  */
 public abstract class Component<T extends Component<T>> extends StyledElement<T> implements Focusable {
+
+    /**
+     * Creates a new component.
+     */
+    protected Component() {
+    }
 
     private ActionHandler actionHandler;
     private RenderContext currentRenderContext;

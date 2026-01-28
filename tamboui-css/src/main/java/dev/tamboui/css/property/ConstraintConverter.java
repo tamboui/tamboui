@@ -27,7 +27,11 @@ import java.util.regex.Pattern;
  */
 public final class ConstraintConverter implements PropertyConverter<Constraint> {
 
+    /** Singleton instance. */
     public static final ConstraintConverter INSTANCE = new ConstraintConverter();
+
+    private ConstraintConverter() {
+    }
 
     private static final Pattern FILL_PATTERN = Pattern.compile("fill(?:\\((\\d+)\\))?");
     private static final Pattern FR_PATTERN = Pattern.compile("(\\d+)fr");

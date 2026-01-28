@@ -35,6 +35,8 @@ public final class Masked {
 
     /**
      * Returns the character used for masking.
+     *
+     * @return the mask character
      */
     public char maskChar() {
         return maskChar;
@@ -43,6 +45,8 @@ public final class Masked {
     /**
      * Returns the underlying string, with all characters masked.
      * Uses code point count to handle Unicode properly.
+     *
+     * @return the masked string
      */
     public String value() {
         if (inner.isEmpty()) {
@@ -59,6 +63,8 @@ public final class Masked {
     /**
      * Returns the original (unmasked) text.
      * Use with caution - this exposes the sensitive data.
+     *
+     * @return the original unmasked text
      */
     public String original() {
         return inner;

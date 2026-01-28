@@ -37,6 +37,15 @@ public class ActionHandlerDemo {
 
     private static final int MAX_LOG_ENTRIES = 6;
 
+    private ActionHandlerDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new ActionHandlerDemo().run();
     }

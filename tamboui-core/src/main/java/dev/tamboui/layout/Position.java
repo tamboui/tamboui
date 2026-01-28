@@ -9,6 +9,7 @@ package dev.tamboui.layout;
  */
 public final class Position {
 
+    /** The origin position at (0, 0). */
     public static final Position ORIGIN = new Position(0, 0);
 
     private final int x;
@@ -29,6 +30,8 @@ public final class Position {
 
     /**
      * Returns the x coordinate.
+     *
+     * @return the x coordinate
      */
     public int x() {
         return x;
@@ -36,6 +39,8 @@ public final class Position {
 
     /**
      * Returns the y coordinate.
+     *
+     * @return the y coordinate
      */
     public int y() {
         return y;

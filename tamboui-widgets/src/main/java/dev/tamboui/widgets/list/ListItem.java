@@ -16,35 +16,80 @@ public final class ListItem {
     private final Text content;
     private final Style style;
 
+    /**
+     * Creates a new list item with the given content and style.
+     *
+     * @param content the item content
+     * @param style the item style
+     */
     public ListItem(Text content, Style style) {
         this.content = content;
         this.style = style;
     }
 
+    /**
+     * Creates a list item from a string.
+     *
+     * @param text the item text
+     * @return a new list item
+     */
     public static ListItem from(String text) {
         return new ListItem(Text.from(text), Style.EMPTY);
     }
 
+    /**
+     * Creates a list item from a styled line.
+     *
+     * @param line the item content as a line
+     * @return a new list item
+     */
     public static ListItem from(Line line) {
         return new ListItem(Text.from(line), Style.EMPTY);
     }
 
+    /**
+     * Creates a list item from a text.
+     *
+     * @param text the item content
+     * @return a new list item
+     */
     public static ListItem from(Text text) {
         return new ListItem(text, Style.EMPTY);
     }
 
+    /**
+     * Returns a new list item with the given style applied.
+     *
+     * @param style the style to apply
+     * @return a new list item with the given style
+     */
     public ListItem style(Style style) {
         return new ListItem(content, style);
     }
 
+    /**
+     * Returns the height of this item in lines.
+     *
+     * @return the height in lines
+     */
     public int height() {
         return content.height();
     }
 
+    /**
+     * Returns the item content.
+     *
+     * @return the content
+     */
     public Text content() {
         return content;
     }
 
+    /**
+     * Returns the item style.
+     *
+     * @return the style
+     */
     public Style style() {
         return style;
     }

@@ -15,6 +15,12 @@ public final class ResizeEvent implements Event {
     private final int width;
     private final int height;
 
+    /**
+     * Creates a resize event with the given dimensions.
+     *
+     * @param width  the new terminal width in columns
+     * @param height the new terminal height in rows
+     */
     public ResizeEvent(int width, int height) {
         this.width = width;
         this.height = height;
@@ -22,15 +28,29 @@ public final class ResizeEvent implements Event {
 
     /**
      * Creates a resize event with the given dimensions.
+     *
+     * @param width  the new terminal width in columns
+     * @param height the new terminal height in rows
+     * @return a new resize event
      */
     public static ResizeEvent of(int width, int height) {
         return new ResizeEvent(width, height);
     }
 
+    /**
+     * Returns the new terminal width in columns.
+     *
+     * @return the width
+     */
     public int width() {
         return width;
     }
 
+    /**
+     * Returns the new terminal height in rows.
+     *
+     * @return the height
+     */
     public int height() {
         return height;
     }

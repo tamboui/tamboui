@@ -72,16 +72,25 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     private Style lineNumberStyle;
     private TextChangeListener changeListener;
 
+    /** Creates a new text area element with a default state. */
     public TextAreaElement() {
         this.state = new TextAreaState();
     }
 
+    /**
+     * Creates a new text area element with the given state.
+     *
+     * @param state the text area state, or null for a default state
+     */
     public TextAreaElement(TextAreaState state) {
         this.state = state != null ? state : new TextAreaState();
     }
 
     /**
      * Sets the text area state.
+     *
+     * @param state the text area state
+     * @return this builder
      */
     public TextAreaElement state(TextAreaState state) {
         this.state = state != null ? state : new TextAreaState();
@@ -90,6 +99,8 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Returns the current state.
+     *
+     * @return the text area state
      */
     public TextAreaState getState() {
         return state;
@@ -97,6 +108,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the initial text.
+     *
+     * @param text the initial text content
+     * @return this builder
      */
     public TextAreaElement text(String text) {
         if (state != null && text != null) {
@@ -107,6 +121,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the placeholder text.
+     *
+     * @param placeholder the placeholder text
+     * @return this builder
      */
     public TextAreaElement placeholder(String placeholder) {
         this.placeholder = placeholder != null ? placeholder : "";
@@ -115,6 +132,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the placeholder style.
+     *
+     * @param style the placeholder style
+     * @return this builder
      */
     public TextAreaElement placeholderStyle(Style style) {
         this.placeholderStyle = style;
@@ -123,6 +143,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the placeholder color.
+     *
+     * @param color the placeholder color
+     * @return this builder
      */
     public TextAreaElement placeholderColor(Color color) {
         this.placeholderStyle = Style.EMPTY.fg(color);
@@ -131,6 +154,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the cursor style.
+     *
+     * @param style the cursor style
+     * @return this builder
      */
     public TextAreaElement cursorStyle(Style style) {
         this.cursorStyle = style;
@@ -139,6 +165,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets whether to show the cursor.
+     *
+     * @param show true to show the cursor
+     * @return this builder
      */
     public TextAreaElement showCursor(boolean show) {
         this.showCursor = show;
@@ -147,6 +176,8 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Enables line number display.
+     *
+     * @return this builder
      */
     public TextAreaElement showLineNumbers() {
         this.showLineNumbers = true;
@@ -155,6 +186,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the line number style.
+     *
+     * @param style the line number style
+     * @return this builder
      */
     public TextAreaElement lineNumberStyle(Style style) {
         this.lineNumberStyle = style;
@@ -163,6 +197,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the title for the border.
+     *
+     * @param title the border title
+     * @return this builder
      */
     public TextAreaElement title(String title) {
         this.title = title;
@@ -171,6 +208,8 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this builder
      */
     public TextAreaElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -179,6 +218,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this builder
      */
     public TextAreaElement borderColor(Color color) {
         this.borderColor = color;
@@ -189,6 +231,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      * Sets the border color to use when focused.
      * If not set, no special focused border styling is applied
      * (CSS :focused pseudo-class can be used instead).
+     *
+     * @param color the focused border color
+     * @return this builder
      */
     public TextAreaElement focusedBorderColor(Color color) {
         this.focusedBorderColor = color;
@@ -197,6 +242,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Sets a listener for text changes.
+     *
+     * @param listener the text change listener
+     * @return this builder
      */
     public TextAreaElement onTextChange(TextChangeListener listener) {
         this.changeListener = listener;
@@ -346,6 +394,11 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      */
     @FunctionalInterface
     public interface TextChangeListener {
+        /**
+         * Called when the text content changes.
+         *
+         * @param newText the new text content
+         */
         void onTextChange(String newText);
     }
 }

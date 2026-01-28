@@ -44,9 +44,17 @@ public final class Column extends ContainerElement<Column> {
     private Flex flex;
     private Margin margin;
 
+    /**
+     * Creates a new empty column.
+     */
     public Column() {
     }
 
+    /**
+     * Creates a new column with the given children.
+     *
+     * @param children the child elements to arrange vertically
+     */
     public Column(Element... children) {
         this.children.addAll(Arrays.asList(children));
     }

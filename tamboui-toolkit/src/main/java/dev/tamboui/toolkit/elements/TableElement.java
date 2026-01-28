@@ -60,12 +60,16 @@ public final class TableElement extends StyledElement<TableElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /** Creates a new empty table element. */
     public TableElement() {
     }
 
     /**
      * Sets the header row from strings.
      * The header style will be resolved from CSS (TableElement-header) or use default bold.
+     *
+     * @param cells the header cell values
+     * @return this builder
      */
     public TableElement header(String... cells) {
         this.header = Row.from(cells);  // Style applied in renderContent from CSS
@@ -74,6 +78,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the header row.
+     *
+     * @param header the header row
+     * @return this builder
      */
     public TableElement header(Row header) {
         this.header = header;
@@ -82,6 +89,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the footer row from strings.
+     *
+     * @param cells the footer cell values
+     * @return this builder
      */
     public TableElement footer(String... cells) {
         this.footer = Row.from(cells);
@@ -90,6 +100,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the footer row.
+     *
+     * @param footer the footer row
+     * @return this builder
      */
     public TableElement footer(Row footer) {
         this.footer = footer;
@@ -98,6 +111,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Adds a row from strings.
+     *
+     * @param cells the row cell values
+     * @return this builder
      */
     public TableElement row(String... cells) {
         this.rows.add(Row.from(cells));
@@ -106,6 +122,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Adds a row.
+     *
+     * @param row the row to add
+     * @return this builder
      */
     public TableElement row(Row row) {
         this.rows.add(row);
@@ -114,6 +133,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets all rows.
+     *
+     * @param rows the rows to set
+     * @return this builder
      */
     public TableElement rows(Row... rows) {
         this.rows.clear();
@@ -123,6 +145,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets all rows from a list.
+     *
+     * @param rows the rows to set
+     * @return this builder
      */
     public TableElement rows(List<Row> rows) {
         this.rows.clear();
@@ -132,6 +157,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the column width constraints.
+     *
+     * @param widths the width constraints
+     * @return this builder
      */
     public TableElement widths(Constraint... widths) {
         this.widths.clear();
@@ -141,6 +169,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the column width constraints from a list.
+     *
+     * @param widths the width constraints
+     * @return this builder
      */
     public TableElement widths(List<Constraint> widths) {
         this.widths.clear();
@@ -150,6 +181,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the table state for selection tracking.
+     *
+     * @param state the table state
+     * @return this builder
      */
     public TableElement state(TableState state) {
         this.state = state;
@@ -158,6 +192,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the highlight style for selected rows.
+     *
+     * @param style the highlight style
+     * @return this builder
      */
     public TableElement highlightStyle(Style style) {
         this.highlightStyle = style;
@@ -166,6 +203,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the highlight color for selected rows.
+     *
+     * @param color the highlight color
+     * @return this builder
      */
     public TableElement highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
@@ -174,6 +214,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the symbol displayed before the selected row.
+     *
+     * @param symbol the highlight symbol
+     * @return this builder
      */
     public TableElement highlightSymbol(String symbol) {
         this.highlightSymbol = symbol;
@@ -182,6 +225,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the spacing between columns.
+     *
+     * @param spacing the column spacing
+     * @return this builder
      */
     public TableElement columnSpacing(int spacing) {
         this.columnSpacing = spacing;
@@ -190,6 +236,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the title.
+     *
+     * @param title the table title
+     * @return this builder
      */
     public TableElement title(String title) {
         this.title = title;
@@ -198,6 +247,8 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this builder
      */
     public TableElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -206,6 +257,9 @@ public final class TableElement extends StyledElement<TableElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this builder
      */
     public TableElement borderColor(Color color) {
         this.borderColor = color;

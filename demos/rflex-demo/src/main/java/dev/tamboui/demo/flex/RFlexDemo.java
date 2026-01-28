@@ -78,6 +78,10 @@ public final class RFlexDemo {
     private static final Color INDIGO_400 = Color.rgb(0x81, 0x8c, 0xf8);
     private static final Color INDIGO_500 = Color.rgb(0x63, 0x66, 0xf1);
 
+    private RFlexDemo() {
+
+    }
+
     private static final ExampleData[] EXAMPLE_DATA = {
         new ExampleData(
             "Min(u16) takes any excess space always",
@@ -221,11 +225,21 @@ public final class RFlexDemo {
     private int scrollOffset = 0;
     private int spacing = 0;
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new RFlexDemo().run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         TuiConfig config = TuiConfig.builder()
             .tickRate(Duration.ofMillis(100))
             .build();

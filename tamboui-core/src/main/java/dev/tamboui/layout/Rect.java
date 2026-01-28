@@ -14,6 +14,7 @@ import java.util.stream.Stream;
  */
 public final class Rect {
 
+    /** A zero-sized rectangle at the origin. */
     public static final Rect ZERO = new Rect(0, 0, 0, 0);
 
     private final int x;

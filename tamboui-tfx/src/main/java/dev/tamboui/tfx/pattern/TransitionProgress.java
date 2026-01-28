@@ -102,6 +102,8 @@ public final class TransitionProgress {
     
     /**
      * Returns the transition width.
+     *
+     * @return the transition width in terminal cells
      */
     public float transitionWidth() {
         return transitionWidth;

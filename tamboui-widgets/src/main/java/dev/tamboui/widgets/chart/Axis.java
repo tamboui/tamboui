@@ -46,6 +46,8 @@ public final class Axis {
 
     /**
      * Creates a new axis builder.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -53,6 +55,8 @@ public final class Axis {
 
     /**
      * Creates an axis with default settings.
+     *
+     * @return an axis with default settings
      */
     public static Axis defaults() {
         return builder().build();
@@ -60,6 +64,8 @@ public final class Axis {
 
     /**
      * Returns the axis title.
+     *
+     * @return the axis title
      */
     public Optional<Line> title() {
         return Optional.ofNullable(title);
@@ -67,6 +73,8 @@ public final class Axis {
 
     /**
      * Returns the axis bounds [min, max].
+     *
+     * @return the axis bounds
      */
     public double[] bounds() {
         return bounds.clone();
@@ -74,6 +82,8 @@ public final class Axis {
 
     /**
      * Returns the minimum bound.
+     *
+     * @return the minimum bound
      */
     public double min() {
         return bounds[0];
@@ -81,6 +91,8 @@ public final class Axis {
 
     /**
      * Returns the maximum bound.
+     *
+     * @return the maximum bound
      */
     public double max() {
         return bounds[1];
@@ -88,6 +100,8 @@ public final class Axis {
 
     /**
      * Returns the axis labels.
+     *
+     * @return the axis labels
      */
     public List<Span> labels() {
         return labels;
@@ -95,6 +109,8 @@ public final class Axis {
 
     /**
      * Returns the axis style.
+     *
+     * @return the axis style
      */
     public Style style() {
         return style != null ? style : Style.EMPTY;
@@ -102,6 +118,8 @@ public final class Axis {
 
     /**
      * Returns the labels alignment.
+     *
+     * @return the labels alignment
      */
     public Alignment labelsAlignment() {
         return labelsAlignment;
@@ -109,6 +127,8 @@ public final class Axis {
 
     /**
      * Returns true if this axis has labels.
+     *
+     * @return true if this axis has labels
      */
     public boolean hasLabels() {
         return !labels.isEmpty();
@@ -116,6 +136,8 @@ public final class Axis {
 
     /**
      * Returns the range (max - min).
+     *
+     * @return the range
      */
     public double range() {
         return bounds[1] - bounds[0];
@@ -135,6 +157,9 @@ public final class Axis {
 
         /**
          * Sets the axis title.
+         *
+         * @param title the title
+         * @return this builder
          */
         public Builder title(String title) {
             this.title = title != null ? Line.from(title) : null;
@@ -143,6 +168,9 @@ public final class Axis {
 
         /**
          * Sets the axis title.
+         *
+         * @param title the title
+         * @return this builder
          */
         public Builder title(Line title) {
             this.title = title;
@@ -151,6 +179,9 @@ public final class Axis {
 
         /**
          * Sets the axis title with styling.
+         *
+         * @param spans the spans composing the title
+         * @return this builder
          */
         public Builder title(Span... spans) {
             this.title = Line.from(spans);
@@ -159,6 +190,10 @@ public final class Axis {
 
         /**
          * Sets the axis bounds [min, max].
+         *
+         * @param min the minimum bound
+         * @param max the maximum bound
+         * @return this builder
          */
         public Builder bounds(double min, double max) {
             this.bounds = new double[] {min, max};
@@ -167,6 +202,9 @@ public final class Axis {
 
         /**
          * Sets the axis bounds.
+         *
+         * @param bounds the bounds array
+         * @return this builder
          */
         public Builder bounds(double[] bounds) {
             if (bounds != null && bounds.length >= 2) {
@@ -177,6 +215,9 @@ public final class Axis {
 
         /**
          * Sets the axis labels.
+         *
+         * @param labels the labels
+         * @return this builder
          */
         public Builder labels(String... labels) {
             this.labels.clear();
@@ -190,6 +231,9 @@ public final class Axis {
 
         /**
          * Sets the axis labels.
+         *
+         * @param labels the labels
+         * @return this builder
          */
         public Builder labels(Span... labels) {
             this.labels.clear();
@@ -201,6 +245,9 @@ public final class Axis {
 
         /**
          * Sets the axis labels.
+         *
+         * @param labels the labels
+         * @return this builder
          */
         public Builder labels(List<Span> labels) {
             this.labels.clear();
@@ -212,6 +259,9 @@ public final class Axis {
 
         /**
          * Adds a label.
+         *
+         * @param label the label
+         * @return this builder
          */
         public Builder addLabel(String label) {
             this.labels.add(Span.raw(label));
@@ -220,6 +270,9 @@ public final class Axis {
 
         /**
          * Adds a label.
+         *
+         * @param label the label
+         * @return this builder
          */
         public Builder addLabel(Span label) {
             this.labels.add(label);
@@ -228,6 +281,9 @@ public final class Axis {
 
         /**
          * Sets the axis style.
+         *
+         * @param style the style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -236,6 +292,9 @@ public final class Axis {
 
         /**
          * Sets the labels alignment.
+         *
+         * @param alignment the alignment
+         * @return this builder
          */
         public Builder labelsAlignment(Alignment alignment) {
             this.labelsAlignment = alignment != null ? alignment : Alignment.LEFT;
@@ -244,6 +303,8 @@ public final class Axis {
 
         /**
          * Builds the axis.
+         *
+         * @return the built axis
          */
         public Axis build() {
             return new Axis(this);

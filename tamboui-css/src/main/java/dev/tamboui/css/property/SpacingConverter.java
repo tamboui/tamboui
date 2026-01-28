@@ -21,7 +21,11 @@ import java.util.Optional;
  */
 public final class SpacingConverter implements PropertyConverter<Padding> {
 
+    /** Singleton instance. */
     public static final SpacingConverter INSTANCE = new SpacingConverter();
+
+    private SpacingConverter() {
+    }
 
     @Override
     public Optional<Padding> convert(String value, Map<String, String> variables) {

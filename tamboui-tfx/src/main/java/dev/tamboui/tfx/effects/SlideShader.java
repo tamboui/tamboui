@@ -43,6 +43,13 @@ public final class SlideShader implements Shader {
     
     /**
      * Creates a slide shader that slides out in the specified direction.
+     *
+     * @param direction the direction of the slide animation
+     * @param gradientLength the length of the gradient transition zone
+     * @param randomness the amount of randomness to apply to the slide
+     * @param colorBehindCell the color revealed behind cells as they slide away
+     * @param timer the effect timer controlling the animation
+     * @return a new slide shader
      */
     public static SlideShader slideOut(Motion direction, int gradientLength, int randomness,
                                       Color colorBehindCell, EffectTimer timer) {

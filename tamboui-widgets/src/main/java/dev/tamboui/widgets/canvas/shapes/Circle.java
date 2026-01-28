@@ -25,6 +25,14 @@ public final class Circle implements Shape {
     private final double radius;
     private final Color color;
 
+    /**
+     * Creates a circle centered at (x, y) with the given radius and color.
+     *
+     * @param x      the x coordinate of the center
+     * @param y      the y coordinate of the center
+     * @param radius the radius of the circle
+     * @param color  the color to draw with
+     */
     public Circle(double x, double y, double radius, Color color) {
         this.x = x;
         this.y = y;
@@ -34,6 +42,12 @@ public final class Circle implements Shape {
 
     /**
      * Creates a circle centered at (x, y) with the given radius and color.
+     *
+     * @param x      the x coordinate of the center
+     * @param y      the y coordinate of the center
+     * @param radius the radius of the circle
+     * @param color  the color to draw with
+     * @return a new circle
      */
     public static Circle of(double x, double y, double radius, Color color) {
         return new Circle(x, y, radius, color);
@@ -60,18 +74,38 @@ public final class Circle implements Shape {
             painter.paint(p.x(), p.y(), color));
     }
 
+    /**
+     * Returns the x coordinate of the center.
+     *
+     * @return the x coordinate
+     */
     public double x() {
         return x;
     }
 
+    /**
+     * Returns the y coordinate of the center.
+     *
+     * @return the y coordinate
+     */
     public double y() {
         return y;
     }
 
+    /**
+     * Returns the radius of the circle.
+     *
+     * @return the radius
+     */
     public double radius() {
         return radius;
     }
 
+    /**
+     * Returns the color of the circle.
+     *
+     * @return the color
+     */
     public Color color() {
         return color;
     }

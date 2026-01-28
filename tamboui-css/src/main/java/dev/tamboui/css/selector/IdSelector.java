@@ -19,10 +19,20 @@ public final class IdSelector implements Selector {
 
     private final String id;
 
+    /**
+     * Creates an ID selector for the given identifier.
+     *
+     * @param id the element identifier
+     */
     public IdSelector(String id) {
         this.id = Objects.requireNonNull(id);
     }
 
+    /**
+     * Returns the identifier this selector matches.
+     *
+     * @return the element identifier
+     */
     public String id() {
         return id;
     }

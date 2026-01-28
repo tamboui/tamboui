@@ -29,6 +29,15 @@ public final class Line implements Shape {
     private final double y2;
     private final Color color;
 
+    /**
+     * Creates a line segment between two points.
+     *
+     * @param x1 the x coordinate of the start point
+     * @param y1 the y coordinate of the start point
+     * @param x2 the x coordinate of the end point
+     * @param y2 the y coordinate of the end point
+     * @param color the line color
+     */
     public Line(double x1, double y1, double x2, double y2, Color color) {
         this.x1 = x1;
         this.y1 = y1;
@@ -39,6 +48,13 @@ public final class Line implements Shape {
 
     /**
      * Creates a line from (x1, y1) to (x2, y2) with the given color.
+     *
+     * @param x1 the x coordinate of the start point
+     * @param y1 the y coordinate of the start point
+     * @param x2 the x coordinate of the end point
+     * @param y2 the y coordinate of the end point
+     * @param color the line color
+     * @return a new line
      */
     public static Line of(double x1, double y1, double x2, double y2, Color color) {
         return new Line(x1, y1, x2, y2, color);
@@ -109,22 +125,47 @@ public final class Line implements Shape {
         }
     }
 
+    /**
+     * Returns the x coordinate of the start point.
+     *
+     * @return the x1 coordinate
+     */
     public double x1() {
         return x1;
     }
 
+    /**
+     * Returns the y coordinate of the start point.
+     *
+     * @return the y1 coordinate
+     */
     public double y1() {
         return y1;
     }
 
+    /**
+     * Returns the x coordinate of the end point.
+     *
+     * @return the x2 coordinate
+     */
     public double x2() {
         return x2;
     }
 
+    /**
+     * Returns the y coordinate of the end point.
+     *
+     * @return the y2 coordinate
+     */
     public double y2() {
         return y2;
     }
 
+    /**
+     * Returns the line color.
+     *
+     * @return the color
+     */
     public Color color() {
         return color;
     }

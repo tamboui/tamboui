@@ -18,6 +18,7 @@ public final class TextAreaState {
     private int scrollRow;
     private int scrollCol;
 
+    /** Creates a new empty text area state. */
     public TextAreaState() {
         this.lines = new ArrayList<>();
         this.lines.add(new StringBuilder());
@@ -27,6 +28,11 @@ public final class TextAreaState {
         this.scrollCol = 0;
     }
 
+    /**
+     * Creates a new text area state with the given initial text.
+     *
+     * @param initialText the initial text content
+     */
     public TextAreaState(String initialText) {
         this();
         setText(initialText);
@@ -34,6 +40,11 @@ public final class TextAreaState {
 
     // --- Text Access ---
 
+    /**
+     * Returns the full text content.
+     *
+     * @return the text
+     */
     public String text() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < lines.size(); i++) {
@@ -45,10 +56,21 @@ public final class TextAreaState {
         return sb.toString();
     }
 
+    /**
+     * Returns the number of lines.
+     *
+     * @return the line count
+     */
     public int lineCount() {
         return lines.size();
     }
 
+    /**
+     * Returns the text of the line at the given row.
+     *
+     * @param row the row index
+     * @return the line text, or empty string if out of range
+     */
     public String getLine(int row) {
         if (row >= 0 && row < lines.size()) {
             return lines.get(row).toString();
@@ -58,24 +80,49 @@ public final class TextAreaState {
 
     // --- Cursor Access ---
 
+    /**
+     * Returns the cursor row.
+     *
+     * @return the cursor row index
+     */
     public int cursorRow() {
         return cursorRow;
     }
 
+    /**
+     * Returns the cursor column.
+     *
+     * @return the cursor column index
+     */
     public int cursorCol() {
         return cursorCol;
     }
 
+    /**
+     * Returns the vertical scroll offset.
+     *
+     * @return the scroll row
+     */
     public int scrollRow() {
         return scrollRow;
     }
 
+    /**
+     * Returns the horizontal scroll offset.
+     *
+     * @return the scroll column
+     */
     public int scrollCol() {
         return scrollCol;
     }
 
     // --- Text Modification ---
 
+    /**
+     * Inserts a character at the cursor position.
+     *
+     * @param c the character to insert
+     */
     public void insert(char c) {
         if (c == '\n') {
             insertNewline();
@@ -85,6 +132,11 @@ public final class TextAreaState {
         }
     }
 
+    /**
+     * Inserts a string at the cursor position.
+     *
+     * @param s the string to insert
+     */
     public void insert(String s) {
         for (char c : s.toCharArray()) {
             insert(c);
@@ -100,6 +152,7 @@ public final class TextAreaState {
         lines.add(cursorRow, new StringBuilder(afterCursor));
     }
 
+    /** Deletes the character before the cursor. */
     public void deleteBackward() {
         if (cursorCol > 0) {
             lines.get(cursorRow).deleteCharAt(cursorCol - 1);
@@ -114,6 +167,7 @@ public final class TextAreaState {
         }
     }
 
+    /** Deletes the character after the cursor. */
     public void deleteForward() {
         StringBuilder currentLine = lines.get(cursorRow);
         if (cursorCol < currentLine.length()) {
@@ -127,6 +181,7 @@ public final class TextAreaState {
 
     // --- Cursor Movement ---
 
+    /** Moves the cursor one position to the left. */
     public void moveCursorLeft() {
         if (cursorCol > 0) {
             cursorCol--;
@@ -136,6 +191,7 @@ public final class TextAreaState {
         }
     }
 
+    /** Moves the cursor one position to the right. */
     public void moveCursorRight() {
         StringBuilder currentLine = lines.get(cursorRow);
         if (cursorCol < currentLine.length()) {
@@ -146,6 +202,7 @@ public final class TextAreaState {
         }
     }
 
+    /** Moves the cursor one row up. */
     public void moveCursorUp() {
         if (cursorRow > 0) {
             cursorRow--;
@@ -153,6 +210,7 @@ public final class TextAreaState {
         }
     }
 
+    /** Moves the cursor one row down. */
     public void moveCursorDown() {
         if (cursorRow < lines.size() - 1) {
             cursorRow++;
@@ -160,19 +218,23 @@ public final class TextAreaState {
         }
     }
 
+    /** Moves the cursor to the start of the current line. */
     public void moveCursorToLineStart() {
         cursorCol = 0;
     }
 
+    /** Moves the cursor to the end of the current line. */
     public void moveCursorToLineEnd() {
         cursorCol = lines.get(cursorRow).length();
     }
 
+    /** Moves the cursor to the very beginning of the text. */
     public void moveCursorToStart() {
         cursorRow = 0;
         cursorCol = 0;
     }
 
+    /** Moves the cursor to the very end of the text. */
     public void moveCursorToEnd() {
         cursorRow = lines.size() - 1;
         cursorCol = lines.get(cursorRow).length();
@@ -180,6 +242,12 @@ public final class TextAreaState {
 
     // --- Scrolling ---
 
+    /**
+     * Adjusts scroll offsets to keep the cursor visible.
+     *
+     * @param visibleRows the number of visible rows
+     * @param visibleCols the number of visible columns
+     */
     public void ensureCursorVisible(int visibleRows, int visibleCols) {
         // Vertical scrolling
         if (cursorRow < scrollRow) {
@@ -196,10 +264,21 @@ public final class TextAreaState {
         }
     }
 
+    /**
+     * Scrolls up by the given amount of rows.
+     *
+     * @param amount the number of rows to scroll up
+     */
     public void scrollUp(int amount) {
         scrollRow = Math.max(0, scrollRow - amount);
     }
 
+    /**
+     * Scrolls down by the given amount of rows.
+     *
+     * @param amount      the number of rows to scroll down
+     * @param visibleRows the number of visible rows
+     */
     public void scrollDown(int amount, int visibleRows) {
         int maxScroll = Math.max(0, lines.size() - visibleRows);
         scrollRow = Math.min(maxScroll, scrollRow + amount);
@@ -207,6 +286,7 @@ public final class TextAreaState {
 
     // --- Bulk Operations ---
 
+    /** Clears all text and resets the cursor and scroll positions. */
     public void clear() {
         lines.clear();
         lines.add(new StringBuilder());
@@ -216,6 +296,11 @@ public final class TextAreaState {
         scrollCol = 0;
     }
 
+    /**
+     * Replaces the text content and moves the cursor to the end.
+     *
+     * @param newText the new text content
+     */
     public void setText(String newText) {
         lines.clear();
         if (newText == null || newText.isEmpty()) {

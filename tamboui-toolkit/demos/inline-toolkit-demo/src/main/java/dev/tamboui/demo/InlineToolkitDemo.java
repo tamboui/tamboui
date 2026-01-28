@@ -67,6 +67,15 @@ public class InlineToolkitDemo extends InlineApp {
     private final TextInputState projectNameState = new TextInputState();
     private final TextInputState authorState = new TextInputState();
 
+    private InlineToolkitDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         System.out.println("=== Inline Toolkit Demo ===\n");
         System.out.println("--- NPM-style Install (Toolkit Version) ---\n");

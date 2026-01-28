@@ -19,6 +19,12 @@ public final class TickEvent implements Event {
     private final long frameCount;
     private final Duration elapsed;
 
+    /**
+     * Creates a tick event with the given frame count and elapsed time.
+     *
+     * @param frameCount the total number of frames elapsed
+     * @param elapsed    the time elapsed since the last tick
+     */
     public TickEvent(long frameCount, Duration elapsed) {
         this.frameCount = frameCount;
         this.elapsed = elapsed;
@@ -26,6 +32,10 @@ public final class TickEvent implements Event {
 
     /**
      * Creates a tick event with the given frame count and elapsed time.
+     *
+     * @param frameCount the total number of frames elapsed
+     * @param elapsed    the time elapsed since the last tick
+     * @return a new tick event
      */
     public static TickEvent of(long frameCount, Duration elapsed) {
         return new TickEvent(frameCount, elapsed);
@@ -33,6 +43,8 @@ public final class TickEvent implements Event {
 
     /**
      * Returns the elapsed time in milliseconds.
+     *
+     * @return elapsed milliseconds since the last tick
      */
     public long elapsedMillis() {
         return elapsed.toMillis();
@@ -40,15 +52,27 @@ public final class TickEvent implements Event {
 
     /**
      * Returns the elapsed time in seconds as a double.
+     *
+     * @return elapsed seconds since the last tick
      */
     public double elapsedSeconds() {
         return elapsed.toNanos() / 1_000_000_000.0;
     }
 
+    /**
+     * Returns the total number of frames elapsed.
+     *
+     * @return the frame count
+     */
     public long frameCount() {
         return frameCount;
     }
 
+    /**
+     * Returns the time elapsed since the last tick.
+     *
+     * @return the elapsed duration
+     */
     public Duration elapsed() {
         return elapsed;
     }

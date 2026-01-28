@@ -65,12 +65,24 @@ public final class SlidingWindowAlpha {
         this.alphaPerCell = gradientRange > 0 ? 1.0f / gradientRange : 1.0f;
     }
     
+    /**
+     * Creates a new sliding window alpha calculator.
+     *
+     * @param direction the direction of the sliding window
+     * @param area the rectangular area to apply the effect to
+     * @param progress the global animation progress (0.0 to 1.0)
+     * @param gradientLength the width of the gradient transition zone
+     * @return a new sliding window alpha calculator
+     */
     public static SlidingWindowAlpha create(Motion direction, Rect area, float progress, float gradientLength) {
         return new SlidingWindowAlpha(direction, area, progress, gradientLength);
     }
     
     /**
      * Calculates the alpha value for a given position.
+     *
+     * @param position the position to calculate alpha for
+     * @return the alpha value (0.0 to 1.0) for the given position
      */
     public float alpha(Position position) {
         switch (direction) {

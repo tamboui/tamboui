@@ -38,6 +38,11 @@ public final class LayoutCache {
         };
     }
 
+    /**
+     * Returns the thread-local layout cache instance.
+     *
+     * @return the layout cache for the current thread
+     */
     public static LayoutCache instance() {
         return INSTANCE.get();
     }

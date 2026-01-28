@@ -73,6 +73,8 @@ public interface Shader {
     
     /**
      * Returns the name of this shader.
+     *
+     * @return the shader name
      */
     String name();
     
@@ -120,11 +122,15 @@ public interface Shader {
     
     /**
      * Returns true if the shader effect is done.
+     *
+     * @return true if the effect has completed
      */
     boolean done();
     
     /**
      * Returns true if the shader is still running.
+     *
+     * @return true if the effect is still running
      */
     default boolean running() {
         return !done();
@@ -132,6 +138,8 @@ public interface Shader {
     
     /**
      * Returns the area where the shader effect is applied, or null if not set.
+     *
+     * @return the effect area, or null if not set
      */
     default Rect area() {
         return null;
@@ -139,6 +147,8 @@ public interface Shader {
     
     /**
      * Sets the area where the shader effect will be applied.
+     *
+     * @param area the rectangular area for the effect
      */
     default void setArea(Rect area) {
         // Default implementation does nothing
@@ -146,6 +156,8 @@ public interface Shader {
     
     /**
      * Returns the timer associated with this shader effect, or null if none.
+     *
+     * @return the effect timer, or null if none
      */
     default EffectTimer timer() {
         return null;
@@ -155,6 +167,8 @@ public interface Shader {
      * Returns a mutable timer if available, or null if none.
      * <p>
      * This is used internally for timer updates.
+     *
+     * @return the mutable effect timer, or null if none
      */
     default EffectTimer mutableTimer() {
         return timer();
@@ -162,6 +176,8 @@ public interface Shader {
     
     /**
      * Returns the cell filter for this shader, or null if none.
+     *
+     * @return the cell filter, or null if none
      */
     default CellFilter cellFilter() {
         return null;
@@ -169,6 +185,8 @@ public interface Shader {
     
     /**
      * Sets the cell filter for this shader.
+     *
+     * @param filter the cell filter to apply
      */
     default void setCellFilter(CellFilter filter) {
         // Default implementation does nothing
@@ -176,6 +194,8 @@ public interface Shader {
     
     /**
      * Returns the color space for this shader, or null if not applicable.
+     *
+     * @return the color space, or null if not applicable
      */
     default TFxColorSpace colorSpace() {
         return null;
@@ -183,6 +203,8 @@ public interface Shader {
     
     /**
      * Sets the color space for this shader.
+     *
+     * @param colorSpace the color space to use for interpolation
      */
     default void setColorSpace(TFxColorSpace colorSpace) {
         // Default implementation does nothing
@@ -190,6 +212,8 @@ public interface Shader {
     
     /**
      * Returns the pattern for this shader, or null if not applicable.
+     *
+     * @return the spatial pattern, or null if not applicable
      */
     default dev.tamboui.tfx.pattern.Pattern pattern() {
         return null;
@@ -197,6 +221,8 @@ public interface Shader {
     
     /**
      * Sets the pattern for this shader.
+     *
+     * @param pattern the spatial pattern to use
      */
     default void setPattern(dev.tamboui.tfx.pattern.Pattern pattern) {
         // Default implementation does nothing
@@ -237,6 +263,8 @@ public interface Shader {
      * Creates a copy of this shader.
      * <p>
      * This is used for effect composition and cloning.
+     *
+     * @return a copy of this shader
      */
     Shader copy();
 }

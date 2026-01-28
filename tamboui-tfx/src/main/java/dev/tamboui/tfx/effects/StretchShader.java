@@ -39,6 +39,10 @@ public final class StretchShader implements Shader {
     
     /**
      * Creates a new stretch shader.
+     *
+     * @param style the style to apply to the stretched area
+     * @param direction the direction of the stretch animation
+     * @param timer the effect timer controlling the animation
      */
     public StretchShader(Style style, Motion direction, EffectTimer timer) {
         this.style = style;

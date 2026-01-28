@@ -27,6 +27,7 @@ public final class Style {
     private final Map<Class<?>, Object> extensions;
     private final int cachedHashCode;
 
+    /** An empty style with no colors or modifiers set. */
     public static final Style EMPTY = new Style(
         null,
         null,
@@ -36,6 +37,15 @@ public final class Style {
         Collections.emptyMap()
     );
 
+    /**
+     * Creates a style with the given colors and modifiers.
+     *
+     * @param fg the foreground color, or null
+     * @param bg the background color, or null
+     * @param underlineColor the underline color, or null
+     * @param addModifiers the modifiers to add
+     * @param subModifiers the modifiers to subtract
+     */
     public Style(
         Color fg,
         Color bg,
@@ -46,6 +56,16 @@ public final class Style {
         this(fg, bg, underlineColor, addModifiers, subModifiers, Collections.emptyMap());
     }
 
+    /**
+     * Creates a style with the given colors, modifiers, and extensions.
+     *
+     * @param fg the foreground color, or null
+     * @param bg the background color, or null
+     * @param underlineColor the underline color, or null
+     * @param addModifiers the modifiers to add
+     * @param subModifiers the modifiers to subtract
+     * @param extensions the extensions map
+     */
     public Style(
         Color fg,
         Color bg,
@@ -102,6 +122,8 @@ public final class Style {
 
     /**
      * Creates a new style builder.
+     *
+     * @return a new empty style
      */
     public static Style create() {
         return EMPTY;
@@ -119,47 +141,65 @@ public final class Style {
         return new Style(color, bg, underlineColor, addModifiers, subModifiers, extensions);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#BLACK}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#BLACK}.
+     * @return a new style with black foreground
+     */
     public Style black() {
         return fg(Color.BLACK);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#RED}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#RED}.
+     * @return a new style with red foreground
+     */
     public Style red() {
         return fg(Color.RED);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#GREEN}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#GREEN}.
+     * @return a new style with green foreground
+     */
     public Style green() {
         return fg(Color.GREEN);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#YELLOW}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#YELLOW}.
+     * @return a new style with yellow foreground
+     */
     public Style yellow() {
         return fg(Color.YELLOW);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#BLUE}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#BLUE}.
+     * @return a new style with blue foreground
+     */
     public Style blue() {
         return fg(Color.BLUE);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#MAGENTA}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#MAGENTA}.
+     * @return a new style with magenta foreground
+     */
     public Style magenta() {
         return fg(Color.MAGENTA);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#CYAN}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#CYAN}.
+     * @return a new style with cyan foreground
+     */
     public Style cyan() {
         return fg(Color.CYAN);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#WHITE}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#WHITE}.
+     * @return a new style with white foreground
+     */
     public Style white() {
         return fg(Color.WHITE);
     }
 
-    /** Shorthand for {@link #fg(Color)} with {@link Color#GRAY}. */
+    /** Shorthand for {@link #fg(Color)} with {@link Color#GRAY}.
+     * @return a new style with gray foreground
+     */
     public Style gray() {
         return fg(Color.GRAY);
     }
@@ -176,42 +216,58 @@ public final class Style {
         return new Style(fg, color, underlineColor, addModifiers, subModifiers, extensions);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#BLACK}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#BLACK}.
+     * @return a new style with black background
+     */
     public Style onBlack() {
         return bg(Color.BLACK);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#RED}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#RED}.
+     * @return a new style with red background
+     */
     public Style onRed() {
         return bg(Color.RED);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#GREEN}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#GREEN}.
+     * @return a new style with green background
+     */
     public Style onGreen() {
         return bg(Color.GREEN);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#YELLOW}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#YELLOW}.
+     * @return a new style with yellow background
+     */
     public Style onYellow() {
         return bg(Color.YELLOW);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#BLUE}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#BLUE}.
+     * @return a new style with blue background
+     */
     public Style onBlue() {
         return bg(Color.BLUE);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#MAGENTA}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#MAGENTA}.
+     * @return a new style with magenta background
+     */
     public Style onMagenta() {
         return bg(Color.MAGENTA);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#CYAN}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#CYAN}.
+     * @return a new style with cyan background
+     */
     public Style onCyan() {
         return bg(Color.CYAN);
     }
 
-    /** Shorthand for {@link #bg(Color)} with {@link Color#WHITE}. */
+    /** Shorthand for {@link #bg(Color)} with {@link Color#WHITE}.
+     * @return a new style with white background
+     */
     public Style onWhite() {
         return bg(Color.WHITE);
     }
@@ -233,6 +289,9 @@ public final class Style {
     /**
      * Returns a new style with the given modifier enabled.
      * If the modifier was previously removed (subtracted), it is added back.
+     *
+     * @param modifier the modifier to enable
+     * @return a new style with the modifier enabled
      */
     public Style addModifier(Modifier modifier) {
         EnumSet<Modifier> newAdd = EnumSet.copyOf(addModifiers);
@@ -245,6 +304,9 @@ public final class Style {
     /**
      * Returns a new style with the given modifier removed (subtracted).
      * If the modifier was previously added, it is removed.
+     *
+     * @param modifier the modifier to remove
+     * @return a new style with the modifier removed
      */
     public Style removeModifier(Modifier modifier) {
         EnumSet<Modifier> newAdd = EnumSet.copyOf(addModifiers);
@@ -254,82 +316,114 @@ public final class Style {
         return new Style(fg, bg, underlineColor, newAdd, newSub, extensions);
     }
 
-    /** Enables bold text. */
+    /** Enables bold text.
+     * @return a new style with bold enabled
+     */
     public Style bold() {
         return addModifier(Modifier.BOLD);
     }
 
-    /** Disables bold text. */
+    /** Disables bold text.
+     * @return a new style with bold disabled
+     */
     public Style notBold() {
         return removeModifier(Modifier.BOLD);
     }
 
-    /** Enables dim text. */
+    /** Enables dim text.
+     * @return a new style with dim enabled
+     */
     public Style dim() {
         return addModifier(Modifier.DIM);
     }
 
-    /** Disables dim text. */
+    /** Disables dim text.
+     * @return a new style with dim disabled
+     */
     public Style notDim() {
         return removeModifier(Modifier.DIM);
     }
 
-    /** Enables italic text. */
+    /** Enables italic text.
+     * @return a new style with italic enabled
+     */
     public Style italic() {
         return addModifier(Modifier.ITALIC);
     }
 
-    /** Disables italic text. */
+    /** Disables italic text.
+     * @return a new style with italic disabled
+     */
     public Style notItalic() {
         return removeModifier(Modifier.ITALIC);
     }
 
-    /** Enables underline. */
+    /** Enables underline.
+     * @return a new style with underline enabled
+     */
     public Style underlined() {
         return addModifier(Modifier.UNDERLINED);
     }
 
-    /** Disables underline. */
+    /** Disables underline.
+     * @return a new style with underline disabled
+     */
     public Style notUnderlined() {
         return removeModifier(Modifier.UNDERLINED);
     }
 
-    /** Enables slow blink. */
+    /** Enables slow blink.
+     * @return a new style with slow blink enabled
+     */
     public Style slowBlink() {
         return addModifier(Modifier.SLOW_BLINK);
     }
 
-    /** Enables rapid blink. */
+    /** Enables rapid blink.
+     * @return a new style with rapid blink enabled
+     */
     public Style rapidBlink() {
         return addModifier(Modifier.RAPID_BLINK);
     }
 
-    /** Enables reverse video. */
+    /** Enables reverse video.
+     * @return a new style with reverse video enabled
+     */
     public Style reversed() {
         return addModifier(Modifier.REVERSED);
     }
 
-    /** Disables reverse video. */
+    /** Disables reverse video.
+     * @return a new style with reverse video disabled
+     */
     public Style notReversed() {
         return removeModifier(Modifier.REVERSED);
     }
 
-    /** Hides text. */
+    /** Hides text.
+     * @return a new style with hidden enabled
+     */
     public Style hidden() {
         return addModifier(Modifier.HIDDEN);
     }
 
-    /** Unhides text. */
+    /** Unhides text.
+     * @return a new style with hidden disabled
+     */
     public Style notHidden() {
         return removeModifier(Modifier.HIDDEN);
     }
 
-    /** Enables strikethrough. */
+    /** Enables strikethrough.
+     * @return a new style with strikethrough enabled
+     */
     public Style crossedOut() {
         return addModifier(Modifier.CROSSED_OUT);
     }
 
-    /** Disables strikethrough. */
+    /** Disables strikethrough.
+     * @return a new style with strikethrough disabled
+     */
     public Style notCrossedOut() {
         return removeModifier(Modifier.CROSSED_OUT);
     }
@@ -492,6 +586,8 @@ public final class Style {
 
     /**
      * Returns the effective set of modifiers (add - sub).
+     *
+     * @return the effective modifiers
      */
     public EnumSet<Modifier> effectiveModifiers() {
         EnumSet<Modifier> result = EnumSet.copyOf(addModifiers);
@@ -501,6 +597,8 @@ public final class Style {
 
     /**
      * Returns the foreground color if set.
+     *
+     * @return the foreground color, or empty if not set
      */
     public Optional<Color> fg() {
         return Optional.ofNullable(fg);
@@ -508,6 +606,8 @@ public final class Style {
 
     /**
      * Returns the background color if set.
+     *
+     * @return the background color, or empty if not set
      */
     public Optional<Color> bg() {
         return Optional.ofNullable(bg);
@@ -515,6 +615,8 @@ public final class Style {
 
     /**
      * Returns the underline color if set.
+     *
+     * @return the underline color, or empty if not set
      */
     public Optional<Color> underlineColor() {
         return Optional.ofNullable(underlineColor);
@@ -522,6 +624,8 @@ public final class Style {
 
     /**
      * Returns the modifiers explicitly added to this style.
+     *
+     * @return the added modifiers
      */
     public EnumSet<Modifier> addModifiers() {
         return EnumSet.copyOf(addModifiers);
@@ -529,6 +633,8 @@ public final class Style {
 
     /**
      * Returns the modifiers explicitly removed from this style.
+     *
+     * @return the subtracted modifiers
      */
     public EnumSet<Modifier> subModifiers() {
         return EnumSet.copyOf(subModifiers);

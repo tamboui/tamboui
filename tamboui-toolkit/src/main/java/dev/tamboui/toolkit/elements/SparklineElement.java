@@ -41,13 +41,24 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /** Creates a sparkline element with no data. */
     public SparklineElement() {
     }
 
+    /**
+     * Creates a sparkline element with the given data values.
+     *
+     * @param data the data values
+     */
     public SparklineElement(long... data) {
         this.data = data != null ? data.clone() : new long[0];
     }
 
+    /**
+     * Creates a sparkline element with the given integer data values.
+     *
+     * @param data the data values as integers
+     */
     public SparklineElement(int... data) {
         if (data != null) {
             this.data = new long[data.length];
@@ -57,6 +68,11 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
         }
     }
 
+    /**
+     * Creates a sparkline element with data values from a collection.
+     *
+     * @param data the data values as a collection of numbers
+     */
     public SparklineElement(Collection<? extends Number> data) {
         if (data != null) {
             this.data = data.stream().mapToLong(Number::longValue).toArray();
@@ -65,6 +81,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the data values.
+     *
+     * @param data the data values
+     * @return this element
      */
     public SparklineElement data(long... data) {
         this.data = data != null ? data.clone() : new long[0];
@@ -73,6 +92,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the data values from integers.
+     *
+     * @param data the data values as integers
+     * @return this element
      */
     public SparklineElement data(int... data) {
         if (data != null) {
@@ -86,6 +108,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the data values from a collection.
+     *
+     * @param data the data values as a collection of numbers
+     * @return this element
      */
     public SparklineElement data(Collection<? extends Number> data) {
         if (data != null) {
@@ -96,6 +121,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the maximum value for scaling.
+     *
+     * @param max the maximum value
+     * @return this element
      */
     public SparklineElement max(long max) {
         this.max = max;
@@ -104,6 +132,8 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Uses auto-scaling based on data maximum.
+     *
+     * @return this element
      */
     public SparklineElement autoMax() {
         this.max = null;
@@ -112,6 +142,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the sparkline color.
+     *
+     * @param color the sparkline color
+     * @return this element
      */
     public SparklineElement color(Color color) {
         return fg(color);
@@ -119,6 +152,8 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Uses three-level bar set (coarser display).
+     *
+     * @return this element
      */
     public SparklineElement threeLevels() {
         this.barSet = Sparkline.BarSet.THREE_LEVELS;
@@ -127,6 +162,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the bar character set.
+     *
+     * @param barSet the bar character set
+     * @return this element
      */
     public SparklineElement barSet(Sparkline.BarSet barSet) {
         this.barSet = barSet;
@@ -135,6 +173,8 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Renders data from right to left.
+     *
+     * @return this element
      */
     public SparklineElement rightToLeft() {
         this.direction = Sparkline.RenderDirection.RIGHT_TO_LEFT;
@@ -143,6 +183,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the render direction.
+     *
+     * @param direction the render direction
+     * @return this element
      */
     public SparklineElement direction(Sparkline.RenderDirection direction) {
         this.direction = direction;
@@ -151,6 +194,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the title.
+     *
+     * @param title the sparkline title
+     * @return this element
      */
     public SparklineElement title(String title) {
         this.title = title;
@@ -159,6 +205,8 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this element
      */
     public SparklineElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -167,6 +215,9 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public SparklineElement borderColor(Color color) {
         this.borderColor = color;

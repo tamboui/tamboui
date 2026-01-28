@@ -32,6 +32,11 @@ import java.util.regex.Pattern;
  */
 public final class Emoji {
 
+    /**
+     * Returns the map of emoji shortcodes to Unicode emoji characters.
+     *
+     * @return an unmodifiable map of emoji shortcodes to their Unicode representations
+     */
     public static Map<String, String> emojis() {
         // using Holder to delay loading until accesses.
         return Holder.EMOJIS;

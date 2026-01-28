@@ -53,6 +53,12 @@ import dev.tamboui.tui.InlineTuiConfig;
  */
 public abstract class InlineApp {
 
+    /**
+     * Creates a new inline application.
+     */
+    protected InlineApp() {
+    }
+
     private InlineToolkitRunner runner;
 
     /**

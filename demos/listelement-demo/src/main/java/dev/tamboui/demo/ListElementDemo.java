@@ -35,7 +35,7 @@ public class ListElementDemo extends ToolkitApp {
 
     private final ListElement<?> listElement;
 
-    public ListElementDemo() {
+    private ListElementDemo() {
         // Each .add() creates ONE selectable item - all items are independent (flat list)
         listElement = list()
             .add(text("1. Plain text item"))
@@ -58,6 +58,11 @@ public class ListElementDemo extends ToolkitApp {
             .scrollbarThumbColor(Color.CYAN);
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new ListElementDemo().run();
     }

@@ -24,54 +24,71 @@ import java.lang.invoke.VarHandle;
  */
 public final class LibC {
 
-    // File descriptors
+    /** Standard input file descriptor. */
     public static final int STDIN_FILENO = 0;
+    /** Standard output file descriptor. */
     public static final int STDOUT_FILENO = 1;
+    /** Standard error file descriptor. */
     public static final int STDERR_FILENO = 2;
 
-    // open() flags
+    /** Open flag for read/write access. */
     public static final int O_RDWR = 2;
+    /** Open flag to not make the opened file the controlling terminal. */
     public static final int O_NOCTTY = 0x100;
 
-    // termios constants
+    /** Apply termios changes immediately. */
     public static final int TCSANOW = 0;
+    /** Apply termios changes after all output has been transmitted. */
     public static final int TCSADRAIN = 1;
+    /** Apply termios changes after all output has been transmitted, discarding pending input. */
     public static final int TCSAFLUSH = 2;
 
-    // ioctl requests
+    /** ioctl request code to get terminal window size. */
     public static final long TIOCGWINSZ = PlatformConstants.TIOCGWINSZ;
 
-    // Local flags (c_lflag)
+    /** Local flag: enable echo of input characters. */
     public static final int ECHO = PlatformConstants.ECHO;
+    /** Local flag: enable canonical (line-by-line) input mode. */
     public static final int ICANON = PlatformConstants.ICANON;
+    /** Local flag: enable signal generation for INTR, QUIT, SUSP characters. */
     public static final int ISIG = PlatformConstants.ISIG;
+    /** Local flag: enable implementation-defined input processing. */
     public static final int IEXTEN = PlatformConstants.IEXTEN;
 
-    // Input flags (c_iflag)
+    /** Input flag: enable XON/XOFF flow control on output. */
     public static final int IXON = PlatformConstants.IXON;
+    /** Input flag: translate carriage return to newline on input. */
     public static final int ICRNL = PlatformConstants.ICRNL;
+    /** Input flag: signal interrupt on break. */
     public static final int BRKINT = PlatformConstants.BRKINT;
+    /** Input flag: enable input parity check. */
     public static final int INPCK = PlatformConstants.INPCK;
+    /** Input flag: strip eighth bit off input characters. */
     public static final int ISTRIP = PlatformConstants.ISTRIP;
 
-    // Output flags (c_oflag)
+    /** Output flag: enable implementation-defined output processing. */
     public static final int OPOST = PlatformConstants.OPOST;
 
-    // Control flags (c_cflag)
+    /** Control flag: set character size to 8 bits. */
     public static final int CS8 = PlatformConstants.CS8;
 
-    // Control characters indices
+    /** Control character index for minimum number of bytes for non-canonical read. */
     public static final int VMIN = PlatformConstants.VMIN;
+    /** Control character index for timeout in deciseconds for non-canonical read. */
     public static final int VTIME = PlatformConstants.VTIME;
 
-    // poll() events
+    /** Poll event: there is data to read. */
     public static final short POLLIN = 0x0001;
+    /** Poll event: there is urgent data to read. */
     public static final short POLLPRI = 0x0002;
+    /** Poll event: error condition on the file descriptor. */
     public static final short POLLERR = 0x0008;
+    /** Poll event: hang up on the file descriptor. */
     public static final short POLLHUP = 0x0010;
+    /** Poll event: invalid file descriptor. */
     public static final short POLLNVAL = 0x0020;
 
-    // Signal numbers
+    /** Signal number for terminal window size change. */
     public static final int SIGWINCH = PlatformConstants.SIGWINCH;
 
     private static final Linker LINKER = Linker.nativeLinker();
@@ -117,11 +134,12 @@ public final class LibC {
     private static final MethodHandle SIGNAL;
     private static final MethodHandle SIGACTION;
 
-    // EINTR constant for handling interrupted system calls
+    /** Errno value indicating an interrupted system call. */
     public static final int EINTR = 4;
-    
-    // sigaction flags (macOS)
+
+    /** Sigaction flag: restart interrupted system calls. */
     public static final int SA_RESTART = 2;
+    /** Sigaction flag: reset signal handler to default after first signal. */
     public static final int SA_RESETHAND = 4;
 
     static {

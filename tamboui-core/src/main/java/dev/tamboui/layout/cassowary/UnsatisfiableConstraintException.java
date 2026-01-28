@@ -13,6 +13,7 @@ package dev.tamboui.layout.cassowary;
  */
 public final class UnsatisfiableConstraintException extends SolverException {
 
+    /** The constraint that cannot be satisfied. */
     private final CassowaryConstraint constraint;
 
     /**

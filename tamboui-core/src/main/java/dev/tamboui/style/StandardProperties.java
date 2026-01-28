@@ -31,14 +31,14 @@ import java.util.Set;
  * This class defines all properties understood by TamboUI, including their
  * inheritance behavior. Properties marked as inheritable are automatically
  * passed from parent to child elements if not explicitly set.
- * <p>
+ *
  * <h2>Inheritable properties:</h2>
  * <ul>
  *   <li>{@code color} - foreground/text color</li>
  *   <li>{@code text-style} - text modifiers (bold, italic, etc.)</li>
  *   <li>{@code border-type} - border style (for nested containers)</li>
  * </ul>
- * <p>
+ *
  * <h2>Non-inheritable properties:</h2>
  * <ul>
  *   <li>{@code background}, {@code background-color} - background color</li>
@@ -59,17 +59,29 @@ public final class StandardProperties {
     // Property name constants
     // ═══════════════════════════════════════════════════════════════
 
+    /** Property name for foreground/text color. */
     public static final String NAME_COLOR = "color";
+    /** Property name for background color. */
     public static final String NAME_BACKGROUND = "background";
+    /** Property name for background color (alias). */
     public static final String NAME_BACKGROUND_COLOR = "background-color";
+    /** Property name for text modifiers (bold, italic, etc.). */
     public static final String NAME_TEXT_STYLE = "text-style";
+    /** Property name for inner spacing. */
     public static final String NAME_PADDING = "padding";
+    /** Property name for outer spacing. */
     public static final String NAME_MARGIN = "margin";
+    /** Property name for text alignment. */
     public static final String NAME_TEXT_ALIGN = "text-align";
+    /** Property name for flex layout mode. */
     public static final String NAME_FLEX = "flex";
+    /** Property name for layout direction. */
     public static final String NAME_DIRECTION = "direction";
+    /** Property name for gap between elements. */
     public static final String NAME_SPACING = "spacing";
+    /** Property name for element width constraint. */
     public static final String NAME_WIDTH = "width";
+    /** Property name for element height constraint. */
     public static final String NAME_HEIGHT = "height";
 
     // ═══════════════════════════════════════════════════════════════

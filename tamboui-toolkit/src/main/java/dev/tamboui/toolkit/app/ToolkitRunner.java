@@ -226,6 +226,8 @@ public final class ToolkitRunner implements AutoCloseable {
 
     /**
      * Returns whether the runner is still running.
+     *
+     * @return true if the runner is running
      */
     public boolean isRunning() {
         return tuiRunner.isRunning();
@@ -321,6 +323,8 @@ public final class ToolkitRunner implements AutoCloseable {
 
         /**
          * Returns whether this action has been cancelled.
+         *
+         * @return true if cancelled
          */
         public boolean isCancelled() {
             return future.isCancelled();
@@ -331,6 +335,8 @@ public final class ToolkitRunner implements AutoCloseable {
          * <p>
          * For repeating actions, this only returns true if the action
          * was cancelled or encountered an error.
+         *
+         * @return true if completed
          */
         public boolean isDone() {
             return future.isDone();
@@ -339,6 +345,8 @@ public final class ToolkitRunner implements AutoCloseable {
 
     /**
      * Returns the focus manager.
+     *
+     * @return the focus manager
      */
     public FocusManager focusManager() {
         return focusManager;
@@ -346,6 +354,8 @@ public final class ToolkitRunner implements AutoCloseable {
 
     /**
      * Returns the event router.
+     *
+     * @return the event router
      */
     public EventRouter eventRouter() {
         return eventRouter;
@@ -376,6 +386,8 @@ public final class ToolkitRunner implements AutoCloseable {
      * <p>
      * The registry is populated during rendering and can be used
      * by effect systems to target elements by ID.
+     *
+     * @return the element registry
      */
     public ElementRegistry elementRegistry() {
         return elementRegistry;
@@ -387,6 +399,8 @@ public final class ToolkitRunner implements AutoCloseable {
      * The registry is populated during rendering when styled content with Tags
      * is written to the buffer. It can be used by effect systems to target
      * styled spans using CSS-like selectors.
+     *
+     * @return the styled area registry
      */
     public StyledAreaRegistry styledAreaRegistry() {
         return styledAreaRegistry;
@@ -407,6 +421,8 @@ public final class ToolkitRunner implements AutoCloseable {
 
     /**
      * Returns the underlying TuiRunner.
+     *
+     * @return the TuiRunner
      */
     public TuiRunner tuiRunner() {
         return tuiRunner;

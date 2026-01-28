@@ -20,6 +20,11 @@ public final class Capabilities {
         // utility
     }
 
+    /**
+     * Detects capabilities from all discovered providers.
+     *
+     * @return the aggregated capability report
+     */
     public static CapabilityReport detect() {
         List<CapabilityProvider> providers = new ArrayList<CapabilityProvider>();
         List<String> providerLoadErrors = new ArrayList<String>();
@@ -47,10 +52,20 @@ public final class Capabilities {
         return builder.build();
     }
 
+    /**
+     * Detects capabilities and prints the report to the given stream.
+     *
+     * @param out the output stream to print to
+     */
     public static void print(PrintStream out) {
         detect().print(out);
     }
 
+    /**
+     * Prints the capability report to standard output.
+     *
+     * @param args command-line arguments (ignored)
+     */
     public static void main(String[] args) {
         print(System.out);
     }

@@ -50,6 +50,10 @@ import dev.tamboui.tui.TuiConfig;
  */
 public abstract class ToolkitApp {
 
+    /** Creates a new ToolkitApp. */
+    protected ToolkitApp() {
+    }
+
     private ToolkitRunner runner;
 
     /**
@@ -105,6 +109,8 @@ public abstract class ToolkitApp {
 
     /**
      * Returns the current runner, or null if not running.
+     *
+     * @return the runner, or null
      */
     protected ToolkitRunner runner() {
         return runner;

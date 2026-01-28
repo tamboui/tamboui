@@ -68,20 +68,35 @@ public final class Panel extends ContainerElement<Panel> {
     private Integer spacing;
     private boolean fitToContent;
 
+    /** Creates an empty panel. */
     public Panel() {
     }
 
+    /**
+     * Creates a panel with a title and children.
+     *
+     * @param title the panel title
+     * @param children the child elements
+     */
     public Panel(String title, Element... children) {
         this.title = Line.from(title);
         this.children.addAll(Arrays.asList(children));
     }
 
+    /**
+     * Creates a panel with children.
+     *
+     * @param children the child elements
+     */
     public Panel(Element... children) {
         this.children.addAll(Arrays.asList(children));
     }
 
     /**
      * Sets the panel title.
+     *
+     * @param title the panel title text
+     * @return this panel for chaining
      */
     public Panel title(String title) {
         this.title = Line.from(title);
@@ -111,6 +126,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the bottom title.
+     *
+     * @param title the bottom title text
+     * @return this panel for chaining
      */
     public Panel bottomTitle(String title) {
         this.bottomTitle = Line.from(title);
@@ -130,6 +148,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the title overflow mode.
+     *
+     * @param overflow the overflow mode for the title
+     * @return this panel for chaining
      */
     public Panel titleOverflow(Overflow overflow) {
         this.titleOverflow = overflow;
@@ -138,6 +159,8 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Truncate title with ellipsis at end if it doesn't fit: "Long title..."
+     *
+     * @return this panel for chaining
      */
     public Panel titleEllipsis() {
         this.titleOverflow = Overflow.ELLIPSIS;
@@ -146,6 +169,8 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Truncate title with ellipsis at start if it doesn't fit: "...ong title"
+     *
+     * @return this panel for chaining
      */
     public Panel titleEllipsisStart() {
         this.titleOverflow = Overflow.ELLIPSIS_START;
@@ -166,6 +191,8 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the border type to rounded.
+     *
+     * @return this panel for chaining
      */
     public Panel rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -174,6 +201,8 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the border type to double.
+     *
+     * @return this panel for chaining
      */
     public Panel doubleBorder() {
         this.borderType = BorderType.DOUBLE;
@@ -182,6 +211,8 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the border type to thick.
+     *
+     * @return this panel for chaining
      */
     public Panel thick() {
         this.borderType = BorderType.THICK;
@@ -190,6 +221,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the border type.
+     *
+     * @param type the border type
+     * @return this panel for chaining
      */
     public Panel borderType(BorderType type) {
         this.borderType = type;
@@ -201,6 +235,8 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * This sets the border type to {@link BorderType#NONE}, which renders
      * no borders but still reserves space for them if borders are enabled.
+     *
+     * @return this panel for chaining
      */
     public Panel borderless() {
         this.borderType = BorderType.NONE;
@@ -209,6 +245,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this panel for chaining
      */
     public Panel borderColor(Color color) {
         this.borderColor = color;
@@ -217,6 +256,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the border color when focused.
+     *
+     * @param color the focused border color
+     * @return this panel for chaining
      */
     public Panel focusedBorderColor(Color color) {
         this.focusedBorderColor = color;
@@ -225,6 +267,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets uniform padding inside the panel.
+     *
+     * @param value the padding value for all sides
+     * @return this panel for chaining
      */
     public Panel padding(int value) {
         this.padding = Padding.uniform(value);
@@ -233,6 +278,9 @@ public final class Panel extends ContainerElement<Panel> {
 
     /**
      * Sets the padding inside the panel.
+     *
+     * @param padding the padding
+     * @return this panel for chaining
      */
     public Panel padding(Padding padding) {
         this.padding = padding;

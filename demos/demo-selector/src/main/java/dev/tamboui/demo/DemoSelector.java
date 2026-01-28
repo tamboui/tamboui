@@ -48,7 +48,7 @@ public class DemoSelector extends ToolkitApp {
     // Display list state
     private final List<DisplayItem> displayItems = new ArrayList<>();
 
-    public DemoSelector() {
+    private DemoSelector() {
         demoList = list()
             .highlightSymbol("> ")
             .highlightColor(Color.YELLOW)
@@ -57,6 +57,11 @@ public class DemoSelector extends ToolkitApp {
             .scrollbarThumbColor(Color.CYAN);
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var selector = new DemoSelector();
         selector.run();

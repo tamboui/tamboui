@@ -186,6 +186,10 @@ public class CodingAssistantDemo {
         new CodingAssistantDemo().run();
     }
 
+    private CodingAssistantDemo() {
+
+    }
+
     /**
      * Runs the demo application.
      *

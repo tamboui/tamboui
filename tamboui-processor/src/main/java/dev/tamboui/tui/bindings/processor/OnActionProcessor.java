@@ -48,6 +48,12 @@ import java.util.Set;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class OnActionProcessor extends AbstractProcessor {
 
+    /**
+     * Creates a new OnAction annotation processor.
+     */
+    public OnActionProcessor() {
+    }
+
     private Filer filer;
     private Messager messager;
     private Elements elementUtils;

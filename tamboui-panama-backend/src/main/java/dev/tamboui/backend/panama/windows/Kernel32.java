@@ -22,31 +22,40 @@ import java.lang.invoke.VarHandle;
  */
 public final class Kernel32 {
 
-    // Standard handles
+    /** Handle identifier for standard input. */
     public static final int STD_INPUT_HANDLE = -10;
+    /** Handle identifier for standard output. */
     public static final int STD_OUTPUT_HANDLE = -11;
 
-    // Console mode flags for input
+    /** Console input mode flag: enable processing of control keys (Ctrl+C, etc.). */
     public static final int ENABLE_PROCESSED_INPUT = 0x0001;
+    /** Console input mode flag: enable line-at-a-time input. */
     public static final int ENABLE_LINE_INPUT = 0x0002;
+    /** Console input mode flag: echo typed characters to the console. */
     public static final int ENABLE_ECHO_INPUT = 0x0004;
+    /** Console input mode flag: report window buffer size changes as input events. */
     public static final int ENABLE_WINDOW_INPUT = 0x0008;
+    /** Console input mode flag: enable virtual terminal input sequences. */
     public static final int ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
 
-    // Console mode flags for output
+    /** Console output mode flag: enable processing of output control sequences. */
     public static final int ENABLE_PROCESSED_OUTPUT = 0x0001;
+    /** Console output mode flag: enable virtual terminal processing of ANSI escape sequences. */
     public static final int ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
 
-    // Event types for INPUT_RECORD
+    /** Input record event type: keyboard event. */
     public static final short KEY_EVENT = 0x0001;
+    /** Input record event type: console window buffer size change. */
     public static final short WINDOW_BUFFER_SIZE_EVENT = 0x0004;
 
-    // Invalid handle value
+    /** Sentinel value returned by handle functions on failure. */
     public static final long INVALID_HANDLE_VALUE = -1L;
 
-    // WaitForSingleObject return values
+    /** WaitForSingleObject return value: the object is signaled. */
     public static final int WAIT_OBJECT_0 = 0x00000000;
+    /** WaitForSingleObject return value: the timeout interval elapsed. */
     public static final int WAIT_TIMEOUT = 0x00000102;
+    /** WaitForSingleObject return value: the function has failed. */
     public static final int WAIT_FAILED = 0xFFFFFFFF;
 
     private static final Linker LINKER = Linker.nativeLinker();
@@ -304,26 +313,31 @@ public final class Kernel32 {
             KEY_EVENT_RECORD_LAYOUT.withName("Event")
     );
 
-    // VarHandles for CONSOLE_SCREEN_BUFFER_INFO
+    /** VarHandle for the left coordinate of the console window rectangle. */
     public static final VarHandle CSBI_WINDOW_LEFT = CONSOLE_SCREEN_BUFFER_INFO_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("srWindow"),
             MemoryLayout.PathElement.groupElement("Left"));
+    /** VarHandle for the top coordinate of the console window rectangle. */
     public static final VarHandle CSBI_WINDOW_TOP = CONSOLE_SCREEN_BUFFER_INFO_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("srWindow"),
             MemoryLayout.PathElement.groupElement("Top"));
+    /** VarHandle for the right coordinate of the console window rectangle. */
     public static final VarHandle CSBI_WINDOW_RIGHT = CONSOLE_SCREEN_BUFFER_INFO_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("srWindow"),
             MemoryLayout.PathElement.groupElement("Right"));
+    /** VarHandle for the bottom coordinate of the console window rectangle. */
     public static final VarHandle CSBI_WINDOW_BOTTOM = CONSOLE_SCREEN_BUFFER_INFO_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("srWindow"),
             MemoryLayout.PathElement.groupElement("Bottom"));
 
-    // VarHandles for INPUT_RECORD
+    /** VarHandle for the event type field of an INPUT_RECORD. */
     public static final VarHandle IR_EVENT_TYPE = INPUT_RECORD_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("EventType"));
+    /** VarHandle for the key-down flag in a KEY_EVENT_RECORD. */
     public static final VarHandle IR_KEY_DOWN = INPUT_RECORD_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("Event"),
             MemoryLayout.PathElement.groupElement("bKeyDown"));
+    /** VarHandle for the Unicode character in a KEY_EVENT_RECORD. */
     public static final VarHandle IR_CHAR = INPUT_RECORD_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("Event"),
             MemoryLayout.PathElement.groupElement("uChar"));

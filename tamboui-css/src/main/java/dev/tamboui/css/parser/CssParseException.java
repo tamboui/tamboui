@@ -9,6 +9,7 @@ package dev.tamboui.css.parser;
  */
 public final class CssParseException extends RuntimeException {
 
+    /** The source position where the parse error occurred. */
     private final Token.Position position;
 
     /**

@@ -48,29 +48,60 @@ public final class BufferSvgExporter {
         private double fontAspectRatio = 0.61;
         private String uniqueId;
 
+        /** Creates default export options. */
         public Options() {
         }
 
+        /**
+         * Sets the window title.
+         *
+         * @param title the SVG window title
+         * @return this options instance
+         */
         public Options title(String title) {
             this.title = title;
             return this;
         }
 
+        /**
+         * Sets the color theme.
+         *
+         * @param theme the SVG color theme
+         * @return this options instance
+         */
         public Options theme(Theme theme) {
             this.theme = theme;
             return this;
         }
 
+        /**
+         * Sets the SVG template format string.
+         *
+         * @param codeFormat the SVG format template with placeholders
+         * @return this options instance
+         */
         public Options codeFormat(String codeFormat) {
             this.codeFormat = codeFormat;
             return this;
         }
 
+        /**
+         * Sets the font aspect ratio used for width calculations.
+         *
+         * @param fontAspectRatio the character width-to-height ratio
+         * @return this options instance
+         */
         public Options fontAspectRatio(double fontAspectRatio) {
             this.fontAspectRatio = fontAspectRatio;
             return this;
         }
 
+        /**
+         * Sets a custom unique ID prefix for CSS classes and clip paths.
+         *
+         * @param uniqueId the unique ID prefix, or {@code null} for auto-generated
+         * @return this options instance
+         */
         public Options uniqueId(String uniqueId) {
             this.uniqueId = uniqueId;
             return this;
@@ -84,21 +115,39 @@ public final class BufferSvgExporter {
         private final Color.Rgb background;
         private final Color.Rgb foreground;
 
+        /**
+         * Creates a theme with the given colors.
+         *
+         * @param background the background color
+         * @param foreground the foreground (text) color
+         */
         public Theme(Color.Rgb background, Color.Rgb foreground) {
             this.background = Objects.requireNonNull(background, "background");
             this.foreground = Objects.requireNonNull(foreground, "foreground");
         }
 
+        /**
+         * Returns the background color.
+         *
+         * @return the background color
+         */
         public Color.Rgb background() {
             return background;
         }
 
+        /**
+         * Returns the foreground color.
+         *
+         * @return the foreground color
+         */
         public Color.Rgb foreground() {
             return foreground;
         }
 
         /**
          * Default theme aligned with Rich's {@code SVG_EXPORT_THEME}.
+         *
+         * @return the default SVG export theme
          */
         public static Theme svgExportTheme() {
             return new Theme(new Color.Rgb(41, 41, 41), new Color.Rgb(197, 200, 198));
@@ -106,14 +155,21 @@ public final class BufferSvgExporter {
     }
 
     /**
-     * Exports the given buffer to SVG.
+     * Exports the given buffer to SVG with default options.
+     *
+     * @param buffer the buffer to export
+     * @return the SVG string
      */
     public static String exportSvg(Buffer buffer) {
         return exportSvg(buffer, new Options());
     }
 
     /**
-     * Exports the given buffer to SVG with options.
+     * Exports the given buffer to SVG with the specified options.
+     *
+     * @param buffer  the buffer to export
+     * @param options export options (title, theme, format, etc.)
+     * @return the SVG string
      */
     public static String exportSvg(Buffer buffer, Options options) {
         Objects.requireNonNull(buffer, "buffer");

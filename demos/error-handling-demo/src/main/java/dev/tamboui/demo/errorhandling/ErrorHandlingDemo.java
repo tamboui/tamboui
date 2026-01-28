@@ -31,6 +31,15 @@ public class ErrorHandlingDemo {
 
     private static boolean faultyPanelEnabled = false;
 
+    private ErrorHandlingDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         TuiConfig config = TuiConfig.builder()
                 .tickRate(Duration.ofMillis(100))

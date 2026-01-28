@@ -37,6 +37,12 @@ import java.time.Duration;
  */
 public class TuiMixin {
 
+    /**
+     * Creates a new TuiMixin with default option values.
+     */
+    public TuiMixin() {
+    }
+
     @Option(
         names = {"--no-alt-screen"},
         description = "Disable alternate screen mode",
@@ -94,6 +100,8 @@ public class TuiMixin {
 
     /**
      * Returns true if alternate screen mode is disabled.
+     *
+     * @return true if alternate screen is disabled
      */
     public boolean isNoAltScreen() {
         return noAltScreen;
@@ -101,6 +109,8 @@ public class TuiMixin {
 
     /**
      * Returns true if the cursor should be shown.
+     *
+     * @return true if cursor should be visible
      */
     public boolean isShowCursor() {
         return showCursor;
@@ -108,6 +118,8 @@ public class TuiMixin {
 
     /**
      * Returns true if mouse capture is enabled.
+     *
+     * @return true if mouse capture is enabled
      */
     public boolean isMouseCapture() {
         return mouseCapture;
@@ -115,6 +127,8 @@ public class TuiMixin {
 
     /**
      * Returns the tick rate in milliseconds, or 0 if ticks are disabled.
+     *
+     * @return the tick rate in milliseconds
      */
     public int getTickRateMs() {
         return tickRateMs;
@@ -122,6 +136,8 @@ public class TuiMixin {
 
     /**
      * Returns the poll timeout in milliseconds.
+     *
+     * @return the poll timeout in milliseconds
      */
     public int getPollTimeoutMs() {
         return pollTimeoutMs;

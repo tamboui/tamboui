@@ -73,7 +73,8 @@ public final class AnsiTerminalCapture extends OutputStream {
 
     /**
      * Uninstalls the capture and restores original System.out.
-     * Returns the captured raw frames, or empty list if not installed.
+     *
+     * @return the captured raw frames, or empty list if not installed
      */
     public static synchronized List<RawFrame> uninstall() {
         if (instance == null) {
@@ -93,6 +94,8 @@ public final class AnsiTerminalCapture extends OutputStream {
 
     /**
      * Returns true if capture is currently installed.
+     *
+     * @return true if capture is installed
      */
     public static synchronized boolean isInstalled() {
         return instance != null;
@@ -100,6 +103,8 @@ public final class AnsiTerminalCapture extends OutputStream {
 
     /**
      * Returns the configured width, or 80 if not installed.
+     *
+     * @return the terminal width in columns
      */
     public static synchronized int getWidth() {
         return instance != null ? instance.width : 80;
@@ -107,6 +112,8 @@ public final class AnsiTerminalCapture extends OutputStream {
 
     /**
      * Returns the configured height, or 24 if not installed.
+     *
+     * @return the terminal height in rows
      */
     public static synchronized int getHeight() {
         return instance != null ? instance.height : 24;

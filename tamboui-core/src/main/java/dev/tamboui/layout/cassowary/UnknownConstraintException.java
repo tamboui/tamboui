@@ -9,6 +9,7 @@ package dev.tamboui.layout.cassowary;
  */
 public final class UnknownConstraintException extends SolverException {
 
+    /** The constraint that was not found. */
     private final CassowaryConstraint constraint;
 
     /**

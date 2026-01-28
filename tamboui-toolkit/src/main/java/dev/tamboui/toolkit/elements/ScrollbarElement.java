@@ -64,11 +64,14 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     private Style beginStyle;
     private Style endStyle;
 
+    /** Creates a scrollbar element with default vertical right orientation. */
     public ScrollbarElement() {
     }
 
     /**
      * Sets vertical right-aligned orientation.
+     *
+     * @return this element
      */
     public ScrollbarElement vertical() {
         this.orientation = ScrollbarOrientation.VERTICAL_RIGHT;
@@ -77,6 +80,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets vertical left-aligned orientation.
+     *
+     * @return this element
      */
     public ScrollbarElement verticalLeft() {
         this.orientation = ScrollbarOrientation.VERTICAL_LEFT;
@@ -85,6 +90,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets horizontal bottom-aligned orientation.
+     *
+     * @return this element
      */
     public ScrollbarElement horizontal() {
         this.orientation = ScrollbarOrientation.HORIZONTAL_BOTTOM;
@@ -93,6 +100,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets horizontal top-aligned orientation.
+     *
+     * @return this element
      */
     public ScrollbarElement horizontalTop() {
         this.orientation = ScrollbarOrientation.HORIZONTAL_TOP;
@@ -101,6 +110,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the orientation.
+     *
+     * @param orientation the scrollbar orientation
+     * @return this element
      */
     public ScrollbarElement orientation(ScrollbarOrientation orientation) {
         this.orientation = orientation;
@@ -109,6 +121,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the scrollbar state.
+     *
+     * @param state the scrollbar state
+     * @return this element
      */
     public ScrollbarElement state(ScrollbarState state) {
         this.state = state;
@@ -117,6 +132,11 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Creates a new state with the given parameters.
+     *
+     * @param contentLength the total content length
+     * @param viewportLength the visible viewport length
+     * @param position the current scroll position
+     * @return this element
      */
     public ScrollbarElement state(int contentLength, int viewportLength, int position) {
         this.state = new ScrollbarState()
@@ -128,6 +148,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the symbol set.
+     *
+     * @param symbols the symbol set to use
+     * @return this element
      */
     public ScrollbarElement symbols(Scrollbar.SymbolSet symbols) {
         this.symbols = symbols;
@@ -136,6 +159,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Uses double-line symbols.
+     *
+     * @return this element
      */
     public ScrollbarElement doubleLine() {
         this.symbols = orientation.isVertical()
@@ -146,6 +171,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the thumb symbol.
+     *
+     * @param symbol the thumb symbol character
+     * @return this element
      */
     public ScrollbarElement thumbSymbol(String symbol) {
         this.thumbSymbol = symbol;
@@ -154,6 +182,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the track symbol.
+     *
+     * @param symbol the track symbol character
+     * @return this element
      */
     public ScrollbarElement trackSymbol(String symbol) {
         this.trackSymbol = symbol;
@@ -162,6 +193,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the begin marker symbol.
+     *
+     * @param symbol the begin marker symbol character
+     * @return this element
      */
     public ScrollbarElement beginSymbol(String symbol) {
         this.beginSymbol = symbol;
@@ -170,6 +204,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the end marker symbol.
+     *
+     * @param symbol the end marker symbol character
+     * @return this element
      */
     public ScrollbarElement endSymbol(String symbol) {
         this.endSymbol = symbol;
@@ -178,6 +215,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Hides the begin/end markers.
+     *
+     * @return this element
      */
     public ScrollbarElement hideMarkers() {
         this.beginSymbol = null;
@@ -187,6 +226,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the thumb style.
+     *
+     * @param style the thumb style
+     * @return this element
      */
     public ScrollbarElement thumbStyle(Style style) {
         this.thumbStyle = style;
@@ -195,6 +237,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the thumb color.
+     *
+     * @param color the thumb color
+     * @return this element
      */
     public ScrollbarElement thumbColor(Color color) {
         this.thumbStyle = Style.EMPTY.fg(color);
@@ -203,6 +248,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the track style.
+     *
+     * @param style the track style
+     * @return this element
      */
     public ScrollbarElement trackStyle(Style style) {
         this.trackStyle = style;
@@ -211,6 +259,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the track color.
+     *
+     * @param color the track color
+     * @return this element
      */
     public ScrollbarElement trackColor(Color color) {
         this.trackStyle = Style.EMPTY.fg(color);
@@ -219,6 +270,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the begin marker style.
+     *
+     * @param style the begin marker style
+     * @return this element
      */
     public ScrollbarElement beginStyle(Style style) {
         this.beginStyle = style;
@@ -227,6 +281,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
     /**
      * Sets the end marker style.
+     *
+     * @param style the end marker style
+     * @return this element
      */
     public ScrollbarElement endStyle(Style style) {
         this.endStyle = style;

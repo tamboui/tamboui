@@ -52,11 +52,16 @@ public class ChartDemo {
     private long frameCount = 0;
     private double time = 0;
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new ChartDemo().run();
     }
 
-    public ChartDemo() {
+    private ChartDemo() {
         // Initialize temperature data (two sine waves with noise)
         for (int i = 0; i < DATA_SIZE; i++) {
             double x = i * 0.2;
@@ -79,7 +84,12 @@ public class ChartDemo {
         }
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

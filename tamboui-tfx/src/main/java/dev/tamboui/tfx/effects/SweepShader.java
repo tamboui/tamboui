@@ -38,6 +38,13 @@ public final class SweepShader implements Shader {
     
     /**
      * Creates a sweep shader that sweeps in from a specified color.
+     *
+     * @param direction the direction of the sweep animation
+     * @param gradientLength the length of the gradient transition zone
+     * @param randomness the amount of randomness to apply to the sweep
+     * @param fadedColor the color to sweep in from
+     * @param timer the effect timer controlling the animation
+     * @return a new sweep shader
      */
     public static SweepShader sweepIn(Motion direction, int gradientLength, int randomness,
                                       Color fadedColor, EffectTimer timer) {

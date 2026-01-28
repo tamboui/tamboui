@@ -38,6 +38,8 @@ public final class CalendarEventStore implements DateStyler {
 
     /**
      * Creates an empty event store.
+     *
+     * @return an empty event store
      */
     public static CalendarEventStore empty() {
         return new CalendarEventStore(mapCopyOf());
@@ -106,6 +108,8 @@ public final class CalendarEventStore implements DateStyler {
 
     /**
      * Returns the number of styled dates.
+     *
+     * @return the number of styled dates
      */
     public int size() {
         return events.size();
@@ -113,6 +117,8 @@ public final class CalendarEventStore implements DateStyler {
 
     /**
      * Returns true if this store has no styled dates.
+     *
+     * @return {@code true} if this store is empty
      */
     public boolean isEmpty() {
         return events.isEmpty();
@@ -120,6 +126,9 @@ public final class CalendarEventStore implements DateStyler {
 
     /**
      * Returns true if the given date has a style.
+     *
+     * @param date the date to check
+     * @return {@code true} if the date has a style
      */
     public boolean contains(LocalDate date) {
         return events.containsKey(date);

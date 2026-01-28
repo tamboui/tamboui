@@ -60,6 +60,11 @@ public final class FadeShader implements Shader {
     
     /**
      * Creates a fade shader that transitions from one color to another.
+     *
+     * @param fromColor the starting color
+     * @param toColor the target color
+     * @param timer the effect timer controlling the fade duration
+     * @return a new fade shader
      */
     public static FadeShader fadeTo(Color fromColor, Color toColor, EffectTimer timer) {
         return new FadeShader(fromColor, toColor, timer);

@@ -22,15 +22,31 @@ public final class DescendantSelector implements Selector {
     private final Selector ancestor;
     private final Selector descendant;
 
+    /**
+     * Creates a descendant combinator selector.
+     *
+     * @param ancestor   the ancestor selector
+     * @param descendant the descendant selector
+     */
     public DescendantSelector(Selector ancestor, Selector descendant) {
         this.ancestor = Objects.requireNonNull(ancestor);
         this.descendant = Objects.requireNonNull(descendant);
     }
 
+    /**
+     * Returns the ancestor selector.
+     *
+     * @return the ancestor selector
+     */
     public Selector ancestor() {
         return ancestor;
     }
 
+    /**
+     * Returns the descendant selector.
+     *
+     * @return the descendant selector
+     */
     public Selector descendant() {
         return descendant;
     }

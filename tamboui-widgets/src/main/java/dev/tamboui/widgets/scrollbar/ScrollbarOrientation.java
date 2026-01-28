@@ -34,6 +34,8 @@ public enum ScrollbarOrientation {
 
     /**
      * Returns true if this orientation is vertical.
+     *
+     * @return true if vertical
      */
     public boolean isVertical() {
         return this == VERTICAL_RIGHT || this == VERTICAL_LEFT;
@@ -41,6 +43,8 @@ public enum ScrollbarOrientation {
 
     /**
      * Returns true if this orientation is horizontal.
+     *
+     * @return true if horizontal
      */
     public boolean isHorizontal() {
         return this == HORIZONTAL_BOTTOM || this == HORIZONTAL_TOP;

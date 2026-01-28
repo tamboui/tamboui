@@ -58,19 +58,35 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /**
+     * Creates a new gauge element with zero progress.
+     */
     public GaugeElement() {
     }
 
+    /**
+     * Creates a new gauge element with the given progress ratio.
+     *
+     * @param ratio the progress ratio between 0.0 and 1.0
+     */
     public GaugeElement(double ratio) {
         this.ratio = Math.max(0.0, Math.min(1.0, ratio));
     }
 
+    /**
+     * Creates a new gauge element with the given percentage.
+     *
+     * @param percent the progress percentage between 0 and 100
+     */
     public GaugeElement(int percent) {
         this.ratio = Math.max(0, Math.min(100, percent)) / 100.0;
     }
 
     /**
      * Sets the progress as a ratio (0.0-1.0).
+     *
+     * @param ratio the progress ratio
+     * @return this element
      */
     public GaugeElement ratio(double ratio) {
         this.ratio = Math.max(0.0, Math.min(1.0, ratio));
@@ -87,6 +103,9 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Sets the label displayed in the gauge.
+     *
+     * @param label the label text
+     * @return this element
      */
     public GaugeElement label(String label) {
         this.label = label;
@@ -95,6 +114,9 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Sets the style for the filled portion.
+     *
+     * @param style the gauge style
+     * @return this element
      */
     public GaugeElement gaugeStyle(Style style) {
         this.gaugeStyle = style;
@@ -103,6 +125,9 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Sets the color for the filled portion.
+     *
+     * @param color the gauge color
+     * @return this element
      */
     public GaugeElement gaugeColor(Color color) {
         this.gaugeStyle = Style.EMPTY.fg(color);
@@ -111,6 +136,9 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Enables or disables unicode block characters.
+     *
+     * @param useUnicode {@code true} to use unicode block characters
+     * @return this element
      */
     public GaugeElement useUnicode(boolean useUnicode) {
         this.useUnicode = useUnicode;
@@ -119,6 +147,9 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Sets the title for the gauge's border.
+     *
+     * @param title the gauge title
+     * @return this element
      */
     public GaugeElement title(String title) {
         this.title = title;
@@ -127,6 +158,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Sets rounded borders.
+     *
+     * @return this element
      */
     public GaugeElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -135,6 +168,9 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public GaugeElement borderColor(Color color) {
         this.borderColor = color;

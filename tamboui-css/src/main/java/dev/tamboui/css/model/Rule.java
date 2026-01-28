@@ -35,14 +35,29 @@ public final class Rule {
         this.sourceOrder = sourceOrder;
     }
 
+    /**
+     * Returns the selector that determines which elements this rule applies to.
+     *
+     * @return the selector
+     */
     public Selector selector() {
         return selector;
     }
 
+    /**
+     * Returns the property declarations of this rule.
+     *
+     * @return an unmodifiable map of property name to value
+     */
     public Map<String, PropertyValue> declarations() {
         return declarations;
     }
 
+    /**
+     * Returns the order in which this rule appeared in the stylesheet.
+     *
+     * @return the source order index
+     */
     public int sourceOrder() {
         return sourceOrder;
     }

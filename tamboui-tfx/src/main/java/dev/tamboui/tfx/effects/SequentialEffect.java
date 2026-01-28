@@ -56,6 +56,9 @@ public final class SequentialEffect implements Shader {
     
     /**
      * Creates a sequential effect that runs the given effects one after another.
+     *
+     * @param effects the list of effects to run sequentially
+     * @return a new sequential effect
      */
     public static SequentialEffect of(List<Effect> effects) {
         return new SequentialEffect(effects);
@@ -63,6 +66,9 @@ public final class SequentialEffect implements Shader {
     
     /**
      * Creates a sequential effect that runs the given effects one after another.
+     *
+     * @param effects the effects to run sequentially
+     * @return a new sequential effect
      */
     public static SequentialEffect of(Effect... effects) {
         List<Effect> effectList = new ArrayList<>();

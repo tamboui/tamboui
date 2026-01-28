@@ -31,6 +31,15 @@ public final class Rectangle implements Shape {
     private final double height;
     private final Color color;
 
+    /**
+     * Creates a rectangle at the given position with the given dimensions and color.
+     *
+     * @param x      the x coordinate of the bottom-left corner
+     * @param y      the y coordinate of the bottom-left corner
+     * @param width  the rectangle width
+     * @param height the rectangle height
+     * @param color  the rectangle color
+     */
     public Rectangle(double x, double y, double width, double height, Color color) {
         this.x = x;
         this.y = y;
@@ -41,6 +50,13 @@ public final class Rectangle implements Shape {
 
     /**
      * Creates a rectangle at (x, y) with the given dimensions and color.
+     *
+     * @param x      the x coordinate of the bottom-left corner
+     * @param y      the y coordinate of the bottom-left corner
+     * @param width  the rectangle width
+     * @param height the rectangle height
+     * @param color  the rectangle color
+     * @return a new Rectangle
      */
     public static Rectangle of(double x, double y, double width, double height, Color color) {
         return new Rectangle(x, y, width, height, color);
@@ -115,22 +131,47 @@ public final class Rectangle implements Shape {
         }
     }
 
+    /**
+     * Returns the x coordinate.
+     *
+     * @return the x coordinate
+     */
     public double x() {
         return x;
     }
 
+    /**
+     * Returns the y coordinate.
+     *
+     * @return the y coordinate
+     */
     public double y() {
         return y;
     }
 
+    /**
+     * Returns the width.
+     *
+     * @return the width
+     */
     public double width() {
         return width;
     }
 
+    /**
+     * Returns the height.
+     *
+     * @return the height
+     */
     public double height() {
         return height;
     }
 
+    /**
+     * Returns the color.
+     *
+     * @return the color
+     */
     public Color color() {
         return color;
     }

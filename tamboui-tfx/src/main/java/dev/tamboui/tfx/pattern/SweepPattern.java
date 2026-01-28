@@ -59,6 +59,9 @@ public final class SweepPattern implements Pattern {
     
     /**
      * Creates a left-to-right sweep pattern.
+     *
+     * @param transitionWidth width of the gradient transition zone in terminal cells
+     * @return a new left-to-right sweep pattern
      */
     public static SweepPattern leftToRight(float transitionWidth) {
         return new SweepPattern(Motion.LEFT_TO_RIGHT, transitionWidth);
@@ -66,6 +69,9 @@ public final class SweepPattern implements Pattern {
     
     /**
      * Creates a right-to-left sweep pattern.
+     *
+     * @param transitionWidth width of the gradient transition zone in terminal cells
+     * @return a new right-to-left sweep pattern
      */
     public static SweepPattern rightToLeft(float transitionWidth) {
         return new SweepPattern(Motion.RIGHT_TO_LEFT, transitionWidth);
@@ -73,6 +79,9 @@ public final class SweepPattern implements Pattern {
     
     /**
      * Creates an up-to-down sweep pattern.
+     *
+     * @param transitionWidth width of the gradient transition zone in terminal cells
+     * @return a new up-to-down sweep pattern
      */
     public static SweepPattern upToDown(float transitionWidth) {
         return new SweepPattern(Motion.UP_TO_DOWN, transitionWidth);
@@ -80,6 +89,9 @@ public final class SweepPattern implements Pattern {
     
     /**
      * Creates a down-to-up sweep pattern.
+     *
+     * @param transitionWidth width of the gradient transition zone in terminal cells
+     * @return a new down-to-up sweep pattern
      */
     public static SweepPattern downToUp(float transitionWidth) {
         return new SweepPattern(Motion.DOWN_TO_UP, transitionWidth);

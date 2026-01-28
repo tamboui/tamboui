@@ -43,6 +43,11 @@ public class JLineBackend implements Backend {
     private boolean mouseEnabled;
     private boolean mode2027Enabled;
 
+    /**
+     * Creates a new JLine 3 backend using the system terminal.
+     *
+     * @throws IOException if the terminal cannot be opened
+     */
     public JLineBackend() throws IOException {
         this.terminal = TerminalBuilder.builder()
             .system(true)
@@ -368,6 +373,8 @@ public class JLineBackend implements Backend {
 
     /**
      * Returns the underlying JLine terminal for advanced operations.
+     *
+     * @return the JLine terminal instance
      */
     public Terminal jlineTerminal() {
         return terminal;

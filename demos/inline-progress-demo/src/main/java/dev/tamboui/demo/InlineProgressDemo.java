@@ -39,6 +39,11 @@ public class InlineProgressDemo {
 
     private static final String[] SPINNER = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         // Initialize recording early to capture all System.out output
         BackendFactory.initRecording();
@@ -48,6 +53,10 @@ public class InlineProgressDemo {
             runDemo();
             restart = promptRestart();
         } while (restart);
+    }
+
+    private InlineProgressDemo() {
+
     }
 
     private static void runDemo() throws Exception {

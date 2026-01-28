@@ -28,6 +28,8 @@ public class Painter {
 
     /**
      * Creates a painter that draws on the given context.
+     *
+     * @param context the canvas context to draw on
      */
     public Painter(Context context) {
         this.context = context;
@@ -94,15 +96,31 @@ public class Painter {
         private final int x;
         private final int y;
 
+        /**
+         * Creates a new grid point.
+         *
+         * @param x the x coordinate
+         * @param y the y coordinate
+         */
         public GridPoint(int x, int y) {
             this.x = x;
             this.y = y;
         }
 
+        /**
+         * Returns the x coordinate.
+         *
+         * @return the x coordinate
+         */
         public int x() {
             return x;
         }
 
+        /**
+         * Returns the y coordinate.
+         *
+         * @return the y coordinate
+         */
         public int y() {
             return y;
         }

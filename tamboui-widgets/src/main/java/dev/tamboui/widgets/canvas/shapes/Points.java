@@ -23,6 +23,12 @@ public final class Points implements Shape {
     private final double[][] coords;
     private final Color color;
 
+    /**
+     * Creates a points shape from coordinate pairs and a color.
+     *
+     * @param coords the coordinate pairs (each sub-array is [x, y])
+     * @param color  the color for all points
+     */
     public Points(double[][] coords, Color color) {
         this.coords = coords;
         this.color = color;
@@ -30,6 +36,10 @@ public final class Points implements Shape {
 
     /**
      * Creates a points shape from coordinate pairs and a color.
+     *
+     * @param coords the coordinate pairs (each sub-array is [x, y])
+     * @param color  the color for all points
+     * @return a new Points shape
      */
     public static Points of(double[][] coords, Color color) {
         return new Points(coords, color);
@@ -69,10 +79,20 @@ public final class Points implements Shape {
         }
     }
 
+    /**
+     * Returns the coordinate pairs.
+     *
+     * @return the coordinate pairs
+     */
     public double[][] coords() {
         return coords;
     }
 
+    /**
+     * Returns the color for all points.
+     *
+     * @return the color
+     */
     public Color color() {
         return color;
     }

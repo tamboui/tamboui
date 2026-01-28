@@ -106,12 +106,20 @@ public final class LineGauge implements Widget {
         this.unfilledStyle = baseUnfilledStyle;
     }
 
+    /**
+     * Creates a new line gauge builder.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
      * Creates a line gauge with the given percentage (0-100).
+     *
+     * @param percent the progress percentage (0-100)
+     * @return a new line gauge
      */
     public static LineGauge percent(int percent) {
         return builder().percent(percent).build();
@@ -119,6 +127,9 @@ public final class LineGauge implements Widget {
 
     /**
      * Creates a line gauge with the given ratio (0.0-1.0).
+     *
+     * @param ratio the progress ratio (0.0-1.0)
+     * @return a new line gauge
      */
     public static LineGauge ratio(double ratio) {
         return builder().ratio(ratio).build();
@@ -168,6 +179,12 @@ public final class LineGauge implements Widget {
         private final String unfilled;
         private final String filled;
 
+        /**
+         * Creates a new line set with the given characters.
+         *
+         * @param unfilled the character for the unfilled portion
+         * @param filled the character for the filled portion
+         */
         public LineSet(String unfilled, String filled) {
             if (unfilled == null || unfilled.isEmpty()) {
                 throw new IllegalArgumentException("Unfilled character cannot be null or empty");
@@ -179,10 +196,20 @@ public final class LineGauge implements Widget {
             this.filled = filled;
         }
 
+        /**
+         * Returns the character used for the unfilled portion.
+         *
+         * @return the unfilled character
+         */
         public String unfilled() {
             return unfilled;
         }
 
+        /**
+         * Returns the character used for the filled portion.
+         *
+         * @return the filled character
+         */
         public String filled() {
             return filled;
         }
@@ -212,6 +239,9 @@ public final class LineGauge implements Widget {
         }
     }
 
+    /**
+     * Builder for {@link LineGauge}.
+     */
     public static final class Builder {
         private double ratio = 0.0;
         private Line label;
@@ -231,6 +261,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the progress as a percentage (0-100).
          *
+         * @param percent the progress percentage (0-100)
+         * @return this builder
          * @throws IllegalArgumentException if percent is not in range 0-100
          */
         public Builder percent(int percent) {
@@ -244,6 +276,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the progress as a ratio (0.0-1.0).
          *
+         * @param ratio the progress ratio (0.0-1.0)
+         * @return this builder
          * @throws IllegalArgumentException if ratio is not in range 0.0-1.0
          */
         public Builder ratio(double ratio) {
@@ -256,6 +290,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the label displayed before the gauge line.
+         *
+         * @param label the label text
+         * @return this builder
          */
         public Builder label(String label) {
             this.label = Line.from(label);
@@ -264,6 +301,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the label displayed before the gauge line.
+         *
+         * @param label the label as a styled line
+         * @return this builder
          */
         public Builder label(Line label) {
             this.label = label;
@@ -272,6 +312,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the label displayed before the gauge line.
+         *
+         * @param span the label as a styled span
+         * @return this builder
          */
         public Builder label(Span span) {
             this.label = Line.from(span);
@@ -280,6 +323,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the overall style for the widget.
+         *
+         * @param style the widget style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -288,6 +334,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the style for the filled portion of the gauge.
+         *
+         * @param filledStyle the filled portion style
+         * @return this builder
          */
         public Builder filledStyle(Style filledStyle) {
             this.filledStyle = filledStyle;
@@ -296,6 +345,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the style for the unfilled portion of the gauge.
+         *
+         * @param unfilledStyle the unfilled portion style
+         * @return this builder
          */
         public Builder unfilledStyle(Style unfilledStyle) {
             this.unfilledStyle = unfilledStyle;
@@ -304,6 +356,9 @@ public final class LineGauge implements Widget {
 
         /**
          * Sets the line character set to use.
+         *
+         * @param lineSet the line character set
+         * @return this builder
          */
         public Builder lineSet(LineSet lineSet) {
             this.lineSet = lineSet;
@@ -363,6 +418,11 @@ public final class LineGauge implements Widget {
             return this;
         }
 
+        /**
+         * Builds the line gauge.
+         *
+         * @return the new line gauge
+         */
         public LineGauge build() {
             return new LineGauge(this);
         }

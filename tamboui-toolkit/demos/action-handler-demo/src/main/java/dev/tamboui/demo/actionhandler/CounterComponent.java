@@ -28,6 +28,12 @@ public class CounterComponent extends Component<CounterComponent> {
     private final Consumer<String> logger;
     private int count = 0;
 
+    /**
+     * Creates a counter component.
+     * @param title the title
+     * @param color the color
+     * @param logger the logger consumer
+     */
     public CounterComponent(String title, Color color, Consumer<String> logger) {
         this.title = title;
         this.color = color;
@@ -58,10 +64,17 @@ public class CounterComponent extends Component<CounterComponent> {
         logger.accept(title + ": Right -> " + count);
     }
 
+    /**
+     * Gets the current count.
+     * @return the count
+     */
     public int count() {
         return count;
     }
 
+    /**
+     * Resets the counter to zero.
+     */
     public void reset() {
         count = 0;
     }

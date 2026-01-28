@@ -72,6 +72,8 @@ public final class Canvas implements Widget {
 
     /**
      * Creates a new canvas builder.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -280,6 +282,7 @@ public final class Canvas implements Widget {
          *
          * @param min the minimum x value
          * @param max the maximum x value
+         * @return this builder
          */
         public Builder xBounds(double min, double max) {
             this.xBounds = new double[] {min, max};
@@ -291,6 +294,7 @@ public final class Canvas implements Widget {
          *
          * @param min the minimum y value
          * @param max the maximum y value
+         * @return this builder
          */
         public Builder yBounds(double min, double max) {
             this.yBounds = new double[] {min, max};
@@ -299,6 +303,9 @@ public final class Canvas implements Widget {
 
         /**
          * Sets the marker type for rendering points.
+         *
+         * @param marker the marker type
+         * @return this builder
          */
         public Builder marker(Marker marker) {
             this.marker = marker != null ? marker : Marker.BRAILLE;
@@ -307,6 +314,9 @@ public final class Canvas implements Widget {
 
         /**
          * Wraps the canvas in a block.
+         *
+         * @param block the block to wrap the canvas in
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -315,6 +325,9 @@ public final class Canvas implements Widget {
 
         /**
          * Sets the background color.
+         *
+         * @param color the background color
+         * @return this builder
          */
         public Builder backgroundColor(Color color) {
             this.backgroundColor = color;
@@ -326,6 +339,9 @@ public final class Canvas implements Widget {
          * <p>
          * The callback receives a {@link Context} that can be used to
          * draw shapes and print text.
+         *
+         * @param callback the paint callback
+         * @return this builder
          */
         public Builder paint(Consumer<Context> callback) {
             this.paintCallback = callback;
@@ -334,6 +350,8 @@ public final class Canvas implements Widget {
 
         /**
          * Builds the canvas.
+         *
+         * @return a new canvas instance
          */
         public Canvas build() {
             return new Canvas(this);

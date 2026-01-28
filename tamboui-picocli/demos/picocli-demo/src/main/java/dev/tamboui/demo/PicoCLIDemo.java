@@ -99,6 +99,14 @@ public class PicoCLIDemo extends TuiCommand {
         };
     }
 
+    private PicoCLIDemo() {
+
+    }
+
+    /**
+     * Main entry point
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         int exitCode = new CommandLine(new PicoCLIDemo()).execute(args);
         System.exit(exitCode);

@@ -40,11 +40,21 @@ public class FileManagerView implements Element {
     private final FileManagerKeyHandler keyHandler;
     private DialogElement currentDialog;
 
+    /**
+     * Creates a new FileManagerView.
+     * @param manager the file manager controller
+     */
     public FileManagerView(FileManagerController manager) {
         this.manager = manager;
         this.keyHandler = new FileManagerKeyHandler(manager);
     }
 
+    /**
+     * Renders the file manager UI.
+     * @param frame the frame to render to
+     * @param area the area to render within
+     * @param context the render context providing focus and state information
+     */
     @Override
     public void render(Frame frame, Rect area, RenderContext context) {
 
@@ -149,11 +159,21 @@ public class FileManagerView implements Element {
                 .onCancel(manager::dismissDialog);
     }
 
+    /**
+     * Returns the layout constraint for this element.
+     * @return the constraint
+     */
     @Override
     public Constraint constraint() {
         return Constraint.fill();
     }
 
+    /**
+     * Handles a key event.
+     * @param event the key event
+     * @param focused whether this element is currently focused
+     * @return the event result
+     */
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Route to input dialog if one is present (modal behavior with text input)

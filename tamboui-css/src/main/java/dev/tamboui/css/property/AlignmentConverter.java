@@ -21,7 +21,14 @@ import java.util.Optional;
  */
 public final class AlignmentConverter implements PropertyConverter<Alignment> {
 
+    /**
+     * Singleton instance of the alignment converter.
+     */
     public static final AlignmentConverter INSTANCE = new AlignmentConverter();
+
+    private AlignmentConverter() {
+        // singleton
+    }
 
     @Override
     public Optional<Alignment> convert(String value, Map<String, String> variables) {

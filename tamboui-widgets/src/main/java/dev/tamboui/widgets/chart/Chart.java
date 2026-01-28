@@ -72,6 +72,8 @@ public final class Chart implements Widget {
 
     /**
      * Creates a new chart builder.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -79,6 +81,9 @@ public final class Chart implements Widget {
 
     /**
      * Creates a chart with the given datasets.
+     *
+     * @param datasets the datasets to plot
+     * @return a new chart
      */
     public static Chart of(Dataset... datasets) {
         return builder().datasets(datasets).build();
@@ -463,6 +468,9 @@ public final class Chart implements Widget {
 
         /**
          * Sets the datasets to plot.
+         *
+         * @param datasets the datasets to plot
+         * @return this builder
          */
         public Builder datasets(Dataset... datasets) {
             this.datasets.clear();
@@ -474,6 +482,9 @@ public final class Chart implements Widget {
 
         /**
          * Sets the datasets to plot.
+         *
+         * @param datasets the datasets to plot
+         * @return this builder
          */
         public Builder datasets(List<Dataset> datasets) {
             this.datasets.clear();
@@ -485,6 +496,9 @@ public final class Chart implements Widget {
 
         /**
          * Adds a dataset.
+         *
+         * @param dataset the dataset to add
+         * @return this builder
          */
         public Builder addDataset(Dataset dataset) {
             if (dataset != null) {
@@ -495,6 +509,9 @@ public final class Chart implements Widget {
 
         /**
          * Sets the X-axis configuration.
+         *
+         * @param xAxis the x-axis configuration
+         * @return this builder
          */
         public Builder xAxis(Axis xAxis) {
             this.xAxis = xAxis != null ? xAxis : Axis.defaults();
@@ -503,6 +520,9 @@ public final class Chart implements Widget {
 
         /**
          * Sets the Y-axis configuration.
+         *
+         * @param yAxis the y-axis configuration
+         * @return this builder
          */
         public Builder yAxis(Axis yAxis) {
             this.yAxis = yAxis != null ? yAxis : Axis.defaults();
@@ -511,6 +531,9 @@ public final class Chart implements Widget {
 
         /**
          * Wraps the chart in a block.
+         *
+         * @param block the block to wrap the chart in
+         * @return this builder
          */
         public Builder block(Block block) {
             this.block = block;
@@ -519,6 +542,9 @@ public final class Chart implements Widget {
 
         /**
          * Sets the chart style.
+         *
+         * @param style the style to apply to the chart
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -527,6 +553,9 @@ public final class Chart implements Widget {
 
         /**
          * Sets the legend position.
+         *
+         * @param position the legend position
+         * @return this builder
          */
         public Builder legendPosition(LegendPosition position) {
             this.legendPosition = position;
@@ -535,6 +564,8 @@ public final class Chart implements Widget {
 
         /**
          * Hides the legend.
+         *
+         * @return this builder
          */
         public Builder hideLegend() {
             this.legendPosition = null;
@@ -543,6 +574,8 @@ public final class Chart implements Widget {
 
         /**
          * Builds the chart.
+         *
+         * @return a new chart instance
          */
         public Chart build() {
             return new Chart(this);

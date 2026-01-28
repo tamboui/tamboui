@@ -57,11 +57,16 @@ public class CanvasDemo {
     // Stars for background
     private final double[][] stars = new double[50][2];
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new CanvasDemo().run();
     }
 
-    public CanvasDemo() {
+    private CanvasDemo() {
         // Initialize random stars
         for (int i = 0; i < stars.length; i++) {
             stars[i][0] = random.nextDouble() * 100;
@@ -69,7 +74,12 @@ public class CanvasDemo {
         }
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();

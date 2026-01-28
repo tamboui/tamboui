@@ -53,6 +53,15 @@ public class TfxTuiDemo {
     private TfxIntegration tfx;
     private String statusMessage = "Press 1-4 to trigger effects, Space to clear";
 
+    private TfxTuiDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new TfxTuiDemo().run();
     }

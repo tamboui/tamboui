@@ -53,10 +53,20 @@ public final class PropertyValue {
         return new PropertyValue(raw, true);
     }
 
+    /**
+     * Returns the raw value string.
+     *
+     * @return the raw value
+     */
     public String raw() {
         return raw;
     }
 
+    /**
+     * Returns whether this value has the {@code !important} flag.
+     *
+     * @return {@code true} if important
+     */
     public boolean important() {
         return important;
     }

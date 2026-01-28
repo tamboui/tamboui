@@ -52,19 +52,33 @@ public final class TabsElement extends StyledElement<TabsElement> {
     private BorderType borderType;
     private Color borderColor;
 
+    /** Creates a new empty tabs element. */
     public TabsElement() {
     }
 
+    /**
+     * Creates a new tabs element with the given titles.
+     *
+     * @param titles the tab titles
+     */
     public TabsElement(String... titles) {
         this.titles.addAll(Arrays.asList(titles));
     }
 
+    /**
+     * Creates a new tabs element with the given titles.
+     *
+     * @param titles the tab titles
+     */
     public TabsElement(List<String> titles) {
         this.titles.addAll(titles);
     }
 
     /**
      * Sets the tab titles.
+     *
+     * @param titles the tab titles
+     * @return this builder
      */
     public TabsElement titles(String... titles) {
         this.titles.clear();
@@ -74,6 +88,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the tab titles from a list.
+     *
+     * @param titles the tab titles
+     * @return this builder
      */
     public TabsElement titles(List<String> titles) {
         this.titles.clear();
@@ -83,6 +100,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Adds a tab.
+     *
+     * @param title the tab title to add
+     * @return this builder
      */
     public TabsElement add(String title) {
         this.titles.add(title);
@@ -91,6 +111,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the tabs state for selection tracking.
+     *
+     * @param state the tabs state
+     * @return this builder
      */
     public TabsElement state(TabsState state) {
         this.state = state;
@@ -99,6 +122,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the selected tab index.
+     *
+     * @param index the index of the selected tab
+     * @return this builder
      */
     public TabsElement selected(int index) {
         this.state = new TabsState(index);
@@ -107,6 +133,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the highlight style for the selected tab.
+     *
+     * @param style the highlight style
+     * @return this builder
      */
     public TabsElement highlightStyle(Style style) {
         this.highlightStyle = style;
@@ -115,6 +144,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the highlight color for the selected tab.
+     *
+     * @param color the highlight color
+     * @return this builder
      */
     public TabsElement highlightColor(Color color) {
         this.highlightStyle = Style.EMPTY.fg(color).bold();
@@ -123,6 +155,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the divider between tabs.
+     *
+     * @param divider the divider string
+     * @return this builder
      */
     public TabsElement divider(String divider) {
         this.divider = divider;
@@ -131,6 +166,10 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the padding around tab titles.
+     *
+     * @param left the left padding string
+     * @param right the right padding string
+     * @return this builder
      */
     public TabsElement padding(String left, String right) {
         this.paddingLeft = left;
@@ -140,6 +179,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the title for the border.
+     *
+     * @param title the border title
+     * @return this builder
      */
     public TabsElement title(String title) {
         this.title = title;
@@ -148,6 +190,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this builder
      */
     public TabsElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -156,6 +200,9 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this builder
      */
     public TabsElement borderColor(Color color) {
         this.borderColor = color;

@@ -32,6 +32,11 @@ public final class LazyElement implements Element {
     private final Supplier<? extends Element> supplier;
     private Element lastElement;
 
+    /**
+     * Creates a new lazy element with the given supplier.
+     *
+     * @param supplier the supplier that produces the element on each render
+     */
     public LazyElement(Supplier<? extends Element> supplier) {
         this.supplier = supplier;
     }

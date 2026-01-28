@@ -10,6 +10,10 @@ import java.util.Map;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
+/**
+ * Main entry point
+ * @throws Exception in case something goes wrong
+ */
 void main() throws Exception {
     try (var runner = InlineToolkitRunner.create()) {
         runner.println(columns(

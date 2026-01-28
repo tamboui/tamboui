@@ -13,8 +13,17 @@ package dev.tamboui.layout;
 public abstract class Spacing {
 
     /**
+     * Creates a new spacing instance.
+     */
+    Spacing() {
+    }
+
+    /**
      * Creates spacing from an integer value.
      * Negative values create overlap, non-negative values create space.
+     *
+     * @param value the spacing value
+     * @return a new spacing instance
      */
     public static Spacing from(int value) {
         if (value < 0) {
@@ -26,6 +35,9 @@ public abstract class Spacing {
 
     /**
      * Creates spacing with a fixed number of cells between segments.
+     *
+     * @param value the number of cells
+     * @return a new space spacing
      */
     public static Spacing space(int value) {
         return new Space(value);
@@ -33,6 +45,9 @@ public abstract class Spacing {
 
     /**
      * Creates overlap with a fixed number of overlapping cells.
+     *
+     * @param value the number of overlapping cells
+     * @return a new overlap spacing
      */
     public static Spacing overlap(int value) {
         return new Overlap(value);
@@ -41,6 +56,8 @@ public abstract class Spacing {
     /**
      * Returns the spacing value as an integer.
      * Positive for space, negative for overlap.
+     *
+     * @return the spacing value
      */
     public abstract int value();
 

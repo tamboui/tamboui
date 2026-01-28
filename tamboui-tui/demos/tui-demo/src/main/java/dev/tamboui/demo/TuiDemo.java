@@ -59,11 +59,25 @@ public class TuiDemo {
     private int mouseY = -1;
     private long tickCount = 0;
 
+    private TuiDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new TuiDemo().run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         // Configure with mouse capture and animation ticks at 10 fps
         TuiConfig config = TuiConfig.builder()
                 .mouseCapture(true)

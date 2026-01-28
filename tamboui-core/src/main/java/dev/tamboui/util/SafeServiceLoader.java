@@ -82,6 +82,10 @@ public final class SafeServiceLoader {
 
     /**
      * Loads providers for the given service, skipping broken providers and continuing to try other providers.
+     *
+     * @param service the SPI interface/class
+     * @param <S>     service type
+     * @return list of successfully instantiated providers
      */
     public static <S> List<S> load(Class<S> service) {
         return load(service, null);

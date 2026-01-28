@@ -21,7 +21,11 @@ import java.util.Optional;
  */
 public final class MarginConverter implements PropertyConverter<Margin> {
 
+    /** Singleton instance. */
     public static final MarginConverter INSTANCE = new MarginConverter();
+
+    private MarginConverter() {
+    }
 
     @Override
     public Optional<Margin> convert(String value, Map<String, String> variables) {

@@ -79,10 +79,20 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
     }
 
+    /**
+     * Creates a new list widget builder.
+     *
+     * @return a new Builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Returns the items in this list.
+     *
+     * @return the list items
+     */
     public List<ListItem> items() {
         return items;
     }
@@ -374,6 +384,9 @@ public final class ListWidget implements StatefulWidget<ListState> {
         return spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
     }
 
+    /**
+     * Builder for {@link ListWidget}.
+     */
     public static final class Builder {
         private List<ListItem> items = new ArrayList<>();
         private Block block;
@@ -392,36 +405,78 @@ public final class ListWidget implements StatefulWidget<ListState> {
 
         private Builder() {}
 
+        /**
+         * Sets the list items.
+         *
+         * @param items the items to display
+         * @return this builder
+         */
         public Builder items(List<ListItem> items) {
             this.items = new ArrayList<>(items);
             return this;
         }
 
+        /**
+         * Sets the list items.
+         *
+         * @param items the items to display
+         * @return this builder
+         */
         public Builder items(ListItem... items) {
             this.items = new ArrayList<>(Arrays.asList(items));
             return this;
         }
 
+        /**
+         * Adds an item to the list.
+         *
+         * @param item the item to add
+         * @return this builder
+         */
         public Builder addItem(ListItem item) {
             this.items.add(item);
             return this;
         }
 
+        /**
+         * Adds an item from a string.
+         *
+         * @param text the item text
+         * @return this builder
+         */
         public Builder addItem(String text) {
             this.items.add(ListItem.from(text));
             return this;
         }
 
+        /**
+         * Wraps the list in a block.
+         *
+         * @param block the block to wrap in
+         * @return this builder
+         */
         public Builder block(Block block) {
             this.block = block;
             return this;
         }
 
+        /**
+         * Sets the base style.
+         *
+         * @param style the base style
+         * @return this builder
+         */
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
+        /**
+         * Sets the style for the selected item.
+         *
+         * @param highlightStyle the highlight style
+         * @return this builder
+         */
         public Builder highlightStyle(Style highlightStyle) {
             this.highlightStyle = highlightStyle;
             return this;
@@ -504,6 +559,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
          * Sets the direction for rendering list items.
          *
          * @param direction the direction (default: TOP_TO_BOTTOM)
+         * @return this builder
          */
         public Builder direction(ListDirection direction) {
             this.direction = direction != null ? direction : ListDirection.TOP_TO_BOTTOM;
@@ -514,6 +570,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
          * Sets whether to repeat the highlight symbol on all lines of multiline items.
          *
          * @param repeatHighlightSymbol if true, repeat symbol on all lines (default: false)
+         * @return this builder
          */
         public Builder repeatHighlightSymbol(boolean repeatHighlightSymbol) {
             this.repeatHighlightSymbol = repeatHighlightSymbol;
@@ -540,6 +597,11 @@ public final class ListWidget implements StatefulWidget<ListState> {
             return this;
         }
 
+        /**
+         * Builds the list widget.
+         *
+         * @return a new ListWidget
+         */
         public ListWidget build() {
             return new ListWidget(this);
         }

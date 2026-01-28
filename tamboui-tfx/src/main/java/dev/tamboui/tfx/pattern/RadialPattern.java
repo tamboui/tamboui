@@ -53,6 +53,8 @@ public final class RadialPattern implements Pattern {
     
     /**
      * Creates a radial pattern centered at the middle of the area.
+     *
+     * @return a new radial pattern centered at (0.5, 0.5)
      */
     public static RadialPattern center() {
         return new RadialPattern(0.5f, 0.5f, 2.0f);
@@ -60,9 +62,10 @@ public final class RadialPattern implements Pattern {
     
     /**
      * Creates a radial pattern with custom center point (0.0-1.0 normalized coordinates).
-     * 
+     *
      * @param centerX Center X position (0.0-1.0)
      * @param centerY Center Y position (0.0-1.0)
+     * @return a new radial pattern with the specified center
      */
     public static RadialPattern newPattern(float centerX, float centerY) {
         return new RadialPattern(centerX, centerY, 2.0f);
@@ -70,10 +73,11 @@ public final class RadialPattern implements Pattern {
     
     /**
      * Creates a radial pattern with custom center and transition width.
-     * 
+     *
      * @param centerX Center X position (0.0-1.0)
      * @param centerY Center Y position (0.0-1.0)
      * @param transitionWidth Width of the gradient transition zone in terminal cells
+     * @return a new radial pattern with the specified center and transition width
      */
     public static RadialPattern withTransition(float centerX, float centerY, float transitionWidth) {
         return new RadialPattern(centerX, centerY, transitionWidth);
@@ -87,6 +91,9 @@ public final class RadialPattern implements Pattern {
     
     /**
      * Creates a new pattern with a different transition width.
+     *
+     * @param width the new transition width in terminal cells
+     * @return a new radial pattern with the specified transition width
      */
     public RadialPattern withTransitionWidth(float width) {
         return new RadialPattern(centerX, centerY, width);
@@ -94,6 +101,10 @@ public final class RadialPattern implements Pattern {
     
     /**
      * Creates a new pattern with a different center point.
+     *
+     * @param centerX the new center X position (0.0-1.0)
+     * @param centerY the new center Y position (0.0-1.0)
+     * @return a new radial pattern with the specified center point
      */
     public RadialPattern withCenter(float centerX, float centerY) {
         return new RadialPattern(centerX, centerY, transition.transitionWidth());

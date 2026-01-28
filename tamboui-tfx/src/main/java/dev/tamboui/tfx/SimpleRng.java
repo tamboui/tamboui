@@ -20,6 +20,8 @@ public final class SimpleRng {
     
     /**
      * Creates a new SimpleRng with the specified seed.
+     *
+     * @param seed the initial seed value
      */
     public SimpleRng(int seed) {
         this.state = seed;
@@ -27,6 +29,8 @@ public final class SimpleRng {
     
     /**
      * Creates a new SimpleRng with a seed based on the current system time.
+     *
+     * @return a new SimpleRng with a time-based seed
      */
     public static SimpleRng defaultRng() {
         long seed = System.currentTimeMillis();
@@ -91,6 +95,8 @@ public final class SimpleRng {
     
     /**
      * Returns the current state (for copying/debugging).
+     *
+     * @return the current internal state
      */
     public int state() {
         return state;

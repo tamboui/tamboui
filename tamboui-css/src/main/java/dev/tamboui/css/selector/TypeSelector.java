@@ -22,10 +22,20 @@ public final class TypeSelector implements Selector {
 
     private final String typeName;
 
+    /**
+     * Creates a type selector for the given type name.
+     *
+     * @param typeName the element type name
+     */
     public TypeSelector(String typeName) {
         this.typeName = Objects.requireNonNull(typeName);
     }
 
+    /**
+     * Returns the type name this selector matches.
+     *
+     * @return the element type name
+     */
     public String typeName() {
         return typeName;
     }

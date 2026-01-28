@@ -55,8 +55,7 @@ public enum MergeStrategy {
 
     /**
      * Checks if a symbol is a border symbol that can be merged.
-     * <p>
-    *
+     *
      * @param symbol the symbol to check
      * @return true if the symbol is a border symbol that can be merged, false otherwise
      */

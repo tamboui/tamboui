@@ -37,6 +37,11 @@ public class IdGenerator {
         return DEFAULT_INSTANCE.generateId(element);
     }
 
+    /**
+     * Creates a new ID generator instance with its own counter.
+     *
+     * @return a new ID generator
+     */
     public static IdGenerator create() {
         return new IdGenerator();
     }

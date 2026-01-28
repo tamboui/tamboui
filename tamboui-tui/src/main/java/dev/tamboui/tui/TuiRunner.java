@@ -520,6 +520,8 @@ public final class TuiRunner implements AutoCloseable {
 
     /**
      * Returns true if the runner is still running.
+     *
+     * @return true if the runner has not been stopped
      */
     public boolean isRunning() {
         return running.get();
@@ -583,6 +585,8 @@ public final class TuiRunner implements AutoCloseable {
 
     /**
      * Returns the underlying terminal.
+     *
+     * @return the terminal instance
      */
     public Terminal<Backend> terminal() {
         return terminal;
@@ -590,6 +594,8 @@ public final class TuiRunner implements AutoCloseable {
 
     /**
      * Returns the underlying backend.
+     *
+     * @return the backend instance
      */
     public Backend backend() {
         return backend;

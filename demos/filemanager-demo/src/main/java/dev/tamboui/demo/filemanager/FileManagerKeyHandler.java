@@ -19,10 +19,19 @@ public class FileManagerKeyHandler {
 
     private final FileManagerController manager;
 
+    /**
+     * Creates a new FileManagerKeyHandler.
+     * @param manager the file manager controller
+     */
     public FileManagerKeyHandler(FileManagerController manager) {
         this.manager = manager;
     }
 
+    /**
+     * Handles a key event.
+     * @param event the key event
+     * @return the event result
+     */
     public EventResult handle(KeyEvent event) {
         // Confirmation dialog mode (y/n dialogs)
         if (manager.hasDialog() && !manager.isInputDialog()) {

@@ -52,7 +52,7 @@ public class TextAreaDemo implements Element {
     private int lineCount = 0;
     private int charCount = 0;
 
-    public TextAreaDemo() {
+    private TextAreaDemo() {
         // Main editor with sample text
         mainEditorState = new TextAreaState("""
             Welcome to the TextArea Demo!
@@ -81,12 +81,22 @@ public class TextAreaDemo implements Element {
         updateCounts();
     }
 
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         var demo = new TextAreaDemo();
         demo.run();
     }
 
-    public void run() throws Exception {
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
+     public void run() throws Exception {
         var config = TuiConfig.builder()
             .mouseCapture(true)
             .noTick()

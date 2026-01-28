@@ -28,6 +28,9 @@ public final class DissolveShader implements Shader {
     
     /**
      * Creates a dissolve shader that dissolves text over time.
+     *
+     * @param timer the effect timer controlling the dissolve duration
+     * @return a new dissolve shader
      */
     public static DissolveShader dissolve(EffectTimer timer) {
         return new DissolveShader(timer, null);
@@ -35,6 +38,10 @@ public final class DissolveShader implements Shader {
     
     /**
      * Creates a dissolve shader that dissolves to a specific style.
+     *
+     * @param style the target style for dissolved cells
+     * @param timer the effect timer controlling the dissolve duration
+     * @return a new dissolve shader with the specified target style
      */
     public static DissolveShader dissolveTo(Style style, EffectTimer timer) {
         return new DissolveShader(timer, style);

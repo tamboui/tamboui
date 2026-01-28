@@ -9,6 +9,7 @@ package dev.tamboui.layout;
  */
 public final class Margin {
 
+    /** A margin with zero on all sides. */
     public static final Margin NONE = new Margin(0, 0, 0, 0);
 
     private final int top;

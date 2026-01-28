@@ -18,6 +18,12 @@ import java.util.Map;
  */
 public final class FocusManager {
 
+    /**
+     * Creates a new focus manager with no focused element.
+     */
+    public FocusManager() {
+    }
+
     private String focusedId;
     private final List<String> focusOrder = new ArrayList<>();
     private final Map<String, Rect> focusableAreas = new LinkedHashMap<>();

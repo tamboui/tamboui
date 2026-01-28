@@ -27,6 +27,10 @@ public class ModularDemo {
 
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+    private ModularDemo() {
+
+    }
+
     /**
      * Entry point for the modular demo application.
      *

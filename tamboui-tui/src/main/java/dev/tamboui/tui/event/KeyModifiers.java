@@ -25,6 +25,13 @@ public final class KeyModifiers {
     private final boolean alt;
     private final boolean shift;
 
+    /**
+     * Creates a new KeyModifiers instance with the specified modifier flags.
+     *
+     * @param ctrl  true if Ctrl is pressed
+     * @param alt   true if Alt is pressed
+     * @param shift true if Shift is pressed
+     */
     public KeyModifiers(boolean ctrl, boolean alt, boolean shift) {
         this.ctrl = ctrl;
         this.alt = alt;
@@ -33,6 +40,11 @@ public final class KeyModifiers {
 
     /**
      * Creates modifiers with the specified flags.
+     *
+     * @param ctrl  true if Ctrl is pressed
+     * @param alt   true if Alt is pressed
+     * @param shift true if Shift is pressed
+     * @return the key modifiers instance
      */
     public static KeyModifiers of(boolean ctrl, boolean alt, boolean shift) {
         if (!ctrl && !alt && !shift) {
@@ -41,20 +53,37 @@ public final class KeyModifiers {
         return new KeyModifiers(ctrl, alt, shift);
     }
 
+    /**
+     * Returns whether the Ctrl modifier is active.
+     *
+     * @return true if Ctrl is pressed
+     */
     public boolean ctrl() {
         return ctrl;
     }
 
+    /**
+     * Returns whether the Alt modifier is active.
+     *
+     * @return true if Alt is pressed
+     */
     public boolean alt() {
         return alt;
     }
 
+    /**
+     * Returns whether the Shift modifier is active.
+     *
+     * @return true if Shift is pressed
+     */
     public boolean shift() {
         return shift;
     }
 
     /**
      * Returns true if no modifiers are pressed.
+     *
+     * @return true if no modifiers are active
      */
     public boolean isEmpty() {
         return !ctrl && !alt && !shift;
@@ -62,6 +91,8 @@ public final class KeyModifiers {
 
     /**
      * Returns true if any modifier is pressed.
+     *
+     * @return true if at least one modifier is active
      */
     public boolean hasAny() {
         return ctrl || alt || shift;

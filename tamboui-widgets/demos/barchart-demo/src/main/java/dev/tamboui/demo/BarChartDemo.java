@@ -49,10 +49,24 @@ public class BarChartDemo {
     private final long[] q3Sales = {110, 170, 190};
     private final long[] q4Sales = {160, 180, 220};
 
+    private BarChartDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new BarChartDemo().run();
     }
 
+    /**
+     * Runs the demo application.
+     *
+     * @throws Exception if an error occurs
+     */
     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();

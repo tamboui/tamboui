@@ -52,6 +52,15 @@ public class TfxToolkitDemo {
     private final ToolkitEffects effects = new ToolkitEffects();
     private String statusMessage = "Press 1-7 to trigger effects, Space to clear";
 
+    private TfxToolkitDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new TfxToolkitDemo().run();
     }

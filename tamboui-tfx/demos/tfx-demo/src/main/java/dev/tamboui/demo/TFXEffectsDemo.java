@@ -74,7 +74,16 @@ public class TFXEffectsDemo {
     private static final Color ORANGE = Color.rgb(0xd6, 0x5d, 0x0e);
     private static final Color ORANGE_BRIGHT = Color.rgb(0xfe, 0x80, 0x19);
     private static final Color YELLOW_BRIGHT = Color.rgb(0xfa, 0xbd, 0x2f);
-    
+
+    private TFXEffectsDemo() {
+
+    }
+
+    /**
+     * Demo entry point.
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
+     */
     public static void main(String[] args) throws Exception {
         new TFXEffectsDemo().run();
     }

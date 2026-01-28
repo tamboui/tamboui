@@ -10,7 +10,9 @@ package dev.tamboui.css.cascade;
  */
 public class UnknownCssPropertyException extends RuntimeException {
 
+    /** The unknown CSS property name. */
     private final String propertyName;
+    /** The value associated with the unknown property. */
     private final String propertyValue;
 
     /**

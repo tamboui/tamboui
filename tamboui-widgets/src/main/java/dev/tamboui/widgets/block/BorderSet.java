@@ -23,6 +23,15 @@ public final class BorderSet {
      * Creates a border set with separate characters for each side.
      * Each character is sanitized to be at most a single character (or empty).
      * Multi-character strings are truncated to the first character.
+     *
+     * @param topHorizontal the top horizontal border character
+     * @param bottomHorizontal the bottom horizontal border character
+     * @param leftVertical the left vertical border character
+     * @param rightVertical the right vertical border character
+     * @param topLeft the top-left corner character
+     * @param topRight the top-right corner character
+     * @param bottomLeft the bottom-left corner character
+     * @param bottomRight the bottom-right corner character
      */
     public BorderSet(
         String topHorizontal,
@@ -57,34 +66,74 @@ public final class BorderSet {
         return value.substring(0, 1);
     }
 
+    /**
+     * Returns the top horizontal border character.
+     *
+     * @return the top horizontal character
+     */
     public String topHorizontal() {
         return topHorizontal;
     }
 
+    /**
+     * Returns the bottom horizontal border character.
+     *
+     * @return the bottom horizontal character
+     */
     public String bottomHorizontal() {
         return bottomHorizontal;
     }
 
+    /**
+     * Returns the left vertical border character.
+     *
+     * @return the left vertical character
+     */
     public String leftVertical() {
         return leftVertical;
     }
 
+    /**
+     * Returns the right vertical border character.
+     *
+     * @return the right vertical character
+     */
     public String rightVertical() {
         return rightVertical;
     }
 
+    /**
+     * Returns the top-left corner character.
+     *
+     * @return the top-left corner character
+     */
     public String topLeft() {
         return topLeft;
     }
 
+    /**
+     * Returns the top-right corner character.
+     *
+     * @return the top-right corner character
+     */
     public String topRight() {
         return topRight;
     }
 
+    /**
+     * Returns the bottom-left corner character.
+     *
+     * @return the bottom-left corner character
+     */
     public String bottomLeft() {
         return bottomLeft;
     }
 
+    /**
+     * Returns the bottom-right corner character.
+     *
+     * @return the bottom-right corner character
+     */
     public String bottomRight() {
         return bottomRight;
     }
@@ -157,6 +206,9 @@ public final class BorderSet {
 
         /**
          * Sets the top horizontal border character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder topHorizontal(String c) {
             this.topHorizontal = c;
@@ -165,6 +217,9 @@ public final class BorderSet {
 
         /**
          * Sets the bottom horizontal border character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder bottomHorizontal(String c) {
             this.bottomHorizontal = c;
@@ -173,6 +228,9 @@ public final class BorderSet {
 
         /**
          * Sets both horizontal border characters (top and bottom).
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder horizontal(String c) {
             this.topHorizontal = c;
@@ -182,6 +240,9 @@ public final class BorderSet {
 
         /**
          * Sets the left vertical border character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder leftVertical(String c) {
             this.leftVertical = c;
@@ -190,6 +251,9 @@ public final class BorderSet {
 
         /**
          * Sets the right vertical border character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder rightVertical(String c) {
             this.rightVertical = c;
@@ -198,6 +262,9 @@ public final class BorderSet {
 
         /**
          * Sets both vertical border characters (left and right).
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder vertical(String c) {
             this.leftVertical = c;
@@ -207,6 +274,9 @@ public final class BorderSet {
 
         /**
          * Sets the top-left corner character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder topLeft(String c) {
             this.topLeft = c;
@@ -215,6 +285,9 @@ public final class BorderSet {
 
         /**
          * Sets the top-right corner character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder topRight(String c) {
             this.topRight = c;
@@ -223,6 +296,9 @@ public final class BorderSet {
 
         /**
          * Sets the bottom-left corner character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder bottomLeft(String c) {
             this.bottomLeft = c;
@@ -231,6 +307,9 @@ public final class BorderSet {
 
         /**
          * Sets the bottom-right corner character.
+         *
+         * @param c the character
+         * @return this builder
          */
         public Builder bottomRight(String c) {
             this.bottomRight = c;

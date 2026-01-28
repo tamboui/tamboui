@@ -85,6 +85,14 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         private final String begin;
         private final String end;
 
+        /**
+         * Creates a new symbol set.
+         *
+         * @param track the track character
+         * @param thumb the thumb character
+         * @param begin the begin marker character, or null
+         * @param end   the end marker character, or null
+         */
         public SymbolSet(String track, String thumb, String begin, String end) {
             this.track = track;
             this.thumb = thumb;
@@ -113,6 +121,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Creates a symbol set without begin/end markers.
+         *
+         * @param track the track character
+         * @param thumb the thumb character
+         * @return a new SymbolSet
          */
         public static SymbolSet of(String track, String thumb) {
             return new SymbolSet(track, thumb, null, null);
@@ -120,6 +132,12 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Creates a symbol set with all components.
+         *
+         * @param track the track character
+         * @param thumb the thumb character
+         * @param begin the begin marker character
+         * @param end   the end marker character
+         * @return a new SymbolSet
          */
         public static SymbolSet of(String track, String thumb, String begin, String end) {
             return new SymbolSet(track, thumb, begin, end);
@@ -127,23 +145,45 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Returns whether this set has begin/end markers.
+         *
+         * @return true if both begin and end markers are present
          */
         public boolean hasMarkers() {
             return begin != null && end != null;
         }
 
+        /**
+         * Returns the track character.
+         *
+         * @return the track character
+         */
         public String track() {
             return track;
         }
 
+        /**
+         * Returns the thumb character.
+         *
+         * @return the thumb character
+         */
         public String thumb() {
             return thumb;
         }
 
+        /**
+         * Returns the begin marker character.
+         *
+         * @return the begin marker, or null
+         */
         public String begin() {
             return begin;
         }
 
+        /**
+         * Returns the end marker character.
+         *
+         * @return the end marker, or null
+         */
         public String end() {
             return end;
         }
@@ -224,6 +264,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
     /**
      * Creates a new scrollbar builder.
+     *
+     * @return a new Builder
      */
     public static Builder builder() {
         return new Builder();
@@ -231,6 +273,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
     /**
      * Creates a vertical right-aligned scrollbar with default settings.
+     *
+     * @return a new vertical Scrollbar
      */
     public static Scrollbar vertical() {
         return builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT).build();
@@ -238,6 +282,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
     /**
      * Creates a horizontal bottom-aligned scrollbar with default settings.
+     *
+     * @return a new horizontal Scrollbar
      */
     public static Scrollbar horizontal() {
         return builder().orientation(ScrollbarOrientation.HORIZONTAL_BOTTOM).build();
@@ -245,6 +291,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
     /**
      * Returns the orientation of this scrollbar.
+     *
+     * @return the orientation
      */
     public ScrollbarOrientation orientation() {
         return orientation;
@@ -437,6 +485,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the scrollbar orientation.
+         *
+         * @param orientation the scrollbar orientation
+         * @return this builder
          */
         public Builder orientation(ScrollbarOrientation orientation) {
             this.orientation = orientation;
@@ -447,6 +498,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * Sets the symbol set for this scrollbar.
          * <p>
          * This sets all symbols at once. Individual symbol setters override these.
+         *
+         * @param symbols the symbol set
+         * @return this builder
          */
         public Builder symbols(SymbolSet symbols) {
             this.symbols = symbols;
@@ -461,6 +515,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the thumb (position indicator) symbol.
+         *
+         * @param thumbSymbol the thumb symbol
+         * @return this builder
          */
         public Builder thumbSymbol(String thumbSymbol) {
             this.thumbSymbol = thumbSymbol;
@@ -469,6 +526,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the track (background) symbol.
+         *
+         * @param trackSymbol the track symbol
+         * @return this builder
          */
         public Builder trackSymbol(String trackSymbol) {
             this.trackSymbol = trackSymbol;
@@ -479,6 +539,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * Sets the begin marker symbol (e.g., up arrow for vertical scrollbar).
          * <p>
          * Set to null to disable the begin marker.
+         *
+         * @param beginSymbol the begin marker symbol, or null
+         * @return this builder
          */
         public Builder beginSymbol(String beginSymbol) {
             this.beginSymbol = beginSymbol;
@@ -489,6 +552,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * Sets the end marker symbol (e.g., down arrow for vertical scrollbar).
          * <p>
          * Set to null to disable the end marker.
+         *
+         * @param endSymbol the end marker symbol, or null
+         * @return this builder
          */
         public Builder endSymbol(String endSymbol) {
             this.endSymbol = endSymbol;
@@ -497,6 +563,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the base style applied to all scrollbar components.
+         *
+         * @param style the base style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -505,6 +574,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the style for the thumb (position indicator).
+         *
+         * @param thumbStyle the thumb style
+         * @return this builder
          */
         public Builder thumbStyle(Style thumbStyle) {
             this.thumbStyle = thumbStyle;
@@ -513,6 +585,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the style for the track (background).
+         *
+         * @param trackStyle the track style
+         * @return this builder
          */
         public Builder trackStyle(Style trackStyle) {
             this.trackStyle = trackStyle;
@@ -521,6 +596,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the style for the begin marker.
+         *
+         * @param beginStyle the begin marker style
+         * @return this builder
          */
         public Builder beginStyle(Style beginStyle) {
             this.beginStyle = beginStyle;
@@ -529,6 +607,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Sets the style for the end marker.
+         *
+         * @param endStyle the end marker style
+         * @return this builder
          */
         public Builder endStyle(Style endStyle) {
             this.endStyle = endStyle;
@@ -577,6 +658,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         /**
          * Builds the scrollbar.
+         *
+         * @return a new Scrollbar
          */
         public Scrollbar build() {
             return new Scrollbar(this);

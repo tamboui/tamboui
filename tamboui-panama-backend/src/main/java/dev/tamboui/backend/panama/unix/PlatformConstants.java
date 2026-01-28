@@ -63,33 +63,41 @@ public final class PlatformConstants {
         return !IS_WINDOWS;
     }
 
-    // ioctl requests
+    /** ioctl request code to get terminal window size. */
     public static final long TIOCGWINSZ = IS_MACOS ? 0x40087468L : 0x5413L;
 
-    // Local flags (c_lflag)
+    /** Local flag: enable echo of input characters. */
     public static final int ECHO = 0x00000008;  // Same on both
+    /** Local flag: enable canonical (line-by-line) input mode. */
     public static final int ICANON = IS_MACOS ? 0x00000100 : 0x00000002;
+    /** Local flag: enable signal generation for INTR, QUIT, SUSP characters. */
     public static final int ISIG = IS_MACOS ? 0x00000080 : 0x00000001;
+    /** Local flag: enable implementation-defined input processing. */
     public static final int IEXTEN = IS_MACOS ? 0x00000400 : 0x00008000;
 
-    // Input flags (c_iflag)
+    /** Input flag: enable XON/XOFF flow control on output. */
     public static final int IXON = IS_MACOS ? 0x00000200 : 0x00000400;
+    /** Input flag: translate carriage return to newline on input. */
     public static final int ICRNL = 0x00000100;  // Same on both
+    /** Input flag: signal interrupt on break. */
     public static final int BRKINT = 0x00000002;  // Same on both
+    /** Input flag: enable input parity check. */
     public static final int INPCK = 0x00000010;  // Same on both
+    /** Input flag: strip eighth bit off input characters. */
     public static final int ISTRIP = 0x00000020;  // Same on both
 
-    // Output flags (c_oflag)
+    /** Output flag: enable implementation-defined output processing. */
     public static final int OPOST = 0x00000001;  // Same on both
 
-    // Control flags (c_cflag)
+    /** Control flag: set character size to 8 bits. */
     public static final int CS8 = IS_MACOS ? 0x00000300 : 0x00000030;
 
-    // Control character indices
+    /** Control character index for minimum number of bytes for non-canonical read. */
     public static final int VMIN = IS_MACOS ? 16 : 6;
+    /** Control character index for timeout in deciseconds for non-canonical read. */
     public static final int VTIME = IS_MACOS ? 17 : 5;
 
-    // Signal numbers (same on both platforms)
+    /** Signal number for terminal window size change. */
     public static final int SIGWINCH = 28;
 
     /**

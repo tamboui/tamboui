@@ -48,6 +48,9 @@ public final class Bar {
 
     /**
      * Creates a bar with the given value.
+     *
+     * @param value the bar value
+     * @return a new bar
      */
     public static Bar of(long value) {
         return builder().value(value).build();
@@ -55,6 +58,10 @@ public final class Bar {
 
     /**
      * Creates a bar with the given value and label.
+     *
+     * @param value the bar value
+     * @param label the bar label
+     * @return a new bar
      */
     public static Bar of(long value, String label) {
         return builder().value(value).label(label).build();
@@ -62,6 +69,8 @@ public final class Bar {
 
     /**
      * Creates a new bar builder.
+     *
+     * @return a new builder
      */
     public static Builder builder() {
         return new Builder();
@@ -69,6 +78,8 @@ public final class Bar {
 
     /**
      * Returns the bar's value.
+     *
+     * @return the bar's value
      */
     public long value() {
         return value;
@@ -76,6 +87,8 @@ public final class Bar {
 
     /**
      * Returns the bar's label, if set.
+     *
+     * @return the bar's label
      */
     public Optional<Line> label() {
         return Optional.ofNullable(label);
@@ -83,6 +96,8 @@ public final class Bar {
 
     /**
      * Returns the custom text value, if set.
+     *
+     * @return the custom text value
      */
     public Optional<String> textValue() {
         return Optional.ofNullable(textValue);
@@ -90,6 +105,8 @@ public final class Bar {
 
     /**
      * Returns the bar's style, if set.
+     *
+     * @return the bar's style
      */
     public Optional<Style> style() {
         return Optional.ofNullable(style);
@@ -97,6 +114,8 @@ public final class Bar {
 
     /**
      * Returns the value's style, if set.
+     *
+     * @return the value's style
      */
     public Optional<Style> valueStyle() {
         return Optional.ofNullable(valueStyle);
@@ -104,6 +123,8 @@ public final class Bar {
 
     /**
      * Returns the display string for this bar's value.
+     *
+     * @return the display value
      */
     public String displayValue() {
         return textValue != null ? textValue : String.valueOf(value);
@@ -123,6 +144,9 @@ public final class Bar {
 
         /**
          * Sets the bar's value.
+         *
+         * @param value the value
+         * @return this builder
          */
         public Builder value(long value) {
             this.value = Math.max(0, value);
@@ -131,6 +155,9 @@ public final class Bar {
 
         /**
          * Sets the bar's label.
+         *
+         * @param label the label
+         * @return this builder
          */
         public Builder label(String label) {
             this.label = label != null ? Line.from(label) : null;
@@ -139,6 +166,9 @@ public final class Bar {
 
         /**
          * Sets the bar's label.
+         *
+         * @param label the label
+         * @return this builder
          */
         public Builder label(Line label) {
             this.label = label;
@@ -147,6 +177,9 @@ public final class Bar {
 
         /**
          * Sets a custom text value to display instead of the numeric value.
+         *
+         * @param textValue the text value
+         * @return this builder
          */
         public Builder textValue(String textValue) {
             this.textValue = textValue;
@@ -155,6 +188,9 @@ public final class Bar {
 
         /**
          * Sets the bar's style.
+         *
+         * @param style the style
+         * @return this builder
          */
         public Builder style(Style style) {
             this.style = style;
@@ -163,6 +199,9 @@ public final class Bar {
 
         /**
          * Sets the value's style.
+         *
+         * @param valueStyle the value style
+         * @return this builder
          */
         public Builder valueStyle(Style valueStyle) {
             this.valueStyle = valueStyle;
@@ -171,6 +210,8 @@ public final class Bar {
 
         /**
          * Builds the bar.
+         *
+         * @return the built bar
          */
         public Bar build() {
             return new Bar(this);

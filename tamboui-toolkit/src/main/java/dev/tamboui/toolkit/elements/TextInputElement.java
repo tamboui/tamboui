@@ -71,10 +71,16 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     private boolean cursorRequiresFocus = true;
     private Runnable onSubmit;
 
+    /** Creates a new text input element with a default state. */
     public TextInputElement() {
         this.state = new TextInputState();
     }
 
+    /**
+     * Creates a new text input element with the given state.
+     *
+     * @param state the text input state, or null for a default state
+     */
     public TextInputElement(TextInputState state) {
         this.state = state != null ? state : new TextInputState();
     }
@@ -91,6 +97,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the text input state.
+     *
+     * @param state the text input state
+     * @return this builder
      */
     public TextInputElement state(TextInputState state) {
         this.state = state != null ? state : new TextInputState();
@@ -99,6 +108,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the initial text.
+     *
+     * @param text the initial text content
+     * @return this builder
      */
     public TextInputElement text(String text) {
         if (state != null && text != null) {
@@ -109,6 +121,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the placeholder text.
+     *
+     * @param placeholder the placeholder text
+     * @return this builder
      */
     public TextInputElement placeholder(String placeholder) {
         this.placeholder = placeholder != null ? placeholder : "";
@@ -117,6 +132,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the placeholder style.
+     *
+     * @param style the placeholder style
+     * @return this builder
      */
     public TextInputElement placeholderStyle(Style style) {
         this.placeholderStyle = style;
@@ -125,6 +143,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the placeholder color.
+     *
+     * @param color the placeholder color
+     * @return this builder
      */
     public TextInputElement placeholderColor(Color color) {
         this.placeholderStyle = Style.EMPTY.fg(color);
@@ -133,6 +154,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the cursor style.
+     *
+     * @param style the cursor style
+     * @return this builder
      */
     public TextInputElement cursorStyle(Style style) {
         this.cursorStyle = style;
@@ -141,6 +165,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets whether to show the cursor.
+     *
+     * @param show true to show the cursor
+     * @return this builder
      */
     public TextInputElement showCursor(boolean show) {
         this.showCursor = show;
@@ -165,6 +192,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the title for the border.
+     *
+     * @param title the border title
+     * @return this builder
      */
     public TextInputElement title(String title) {
         this.title = title;
@@ -173,6 +203,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Uses rounded borders.
+     *
+     * @return this builder
      */
     public TextInputElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -181,6 +213,9 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this builder
      */
     public TextInputElement borderColor(Color color) {
         this.borderColor = color;

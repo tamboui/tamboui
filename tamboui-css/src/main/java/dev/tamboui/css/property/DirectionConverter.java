@@ -20,7 +20,11 @@ import java.util.Optional;
  */
 public final class DirectionConverter implements PropertyConverter<Direction> {
 
+    /** Singleton instance. */
     public static final DirectionConverter INSTANCE = new DirectionConverter();
+
+    private DirectionConverter() {
+    }
 
     @Override
     public Optional<Direction> convert(String value, Map<String, String> variables) {

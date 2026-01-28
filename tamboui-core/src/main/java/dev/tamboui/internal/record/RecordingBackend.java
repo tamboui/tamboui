@@ -38,6 +38,12 @@ public final class RecordingBackend implements Backend {
     private volatile boolean closed;
     private volatile boolean hasDrawn;  // Track if draw() was ever called
 
+    /**
+     * Creates a new recording backend wrapping the given delegate.
+     *
+     * @param delegate the delegate backend
+     * @param config   the recording configuration
+     */
     public RecordingBackend(Backend delegate, RecordingConfig config) {
         this.delegate = delegate;
         this.config = config;
@@ -95,6 +101,8 @@ public final class RecordingBackend implements Backend {
 
     /**
      * Returns true if recording is still active.
+     *
+     * @return true if recording
      */
     public boolean isRecording() {
         if (!recording) {

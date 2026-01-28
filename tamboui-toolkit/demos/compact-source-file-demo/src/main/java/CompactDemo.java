@@ -8,7 +8,10 @@ import static dev.tamboui.layout.Flex.END;
 import static dev.tamboui.layout.Flex.SPACE_BETWEEN;
 import static dev.tamboui.toolkit.Toolkit.*;
 
-
+/**
+ * Demo entry point
+ * @throws Exception in case something goes wrong
+ */
 void main() throws Exception {
     try (var runner = ToolkitRunner.create()) {
         runner.run(() ->

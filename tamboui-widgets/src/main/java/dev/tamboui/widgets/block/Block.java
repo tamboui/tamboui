@@ -175,20 +175,38 @@ public final class Block implements Widget {
         this.style = baseStyle;
     }
 
+    /**
+     * Creates a new block builder.
+     *
+     * @return a new builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Creates a block with all borders enabled.
+     *
+     * @return a bordered block
+     */
     public static Block bordered() {
         return builder().borders(Borders.ALL).build();
     }
 
+    /**
+     * Creates an empty block with no borders.
+     *
+     * @return an empty block
+     */
     public static Block empty() {
         return builder().build();
     }
 
     /**
      * Returns the inner area after accounting for borders, titles, and padding.
+     *
+     * @param area the outer area
+     * @return the inner area
      */
     public Rect inner(Rect area) {
         int x = area.x();
@@ -554,6 +572,9 @@ public final class Block implements Widget {
         }
     }
 
+    /**
+     * Builder for {@link Block}.
+     */
     public static final class Builder {
         private Title title;
         private Title titleBottom;
@@ -574,31 +595,67 @@ public final class Block implements Widget {
         private Builder() {
         }
 
+        /**
+         * Sets the top title from a string.
+         *
+         * @param title the title text
+         * @return this builder
+         */
         public Builder title(String title) {
             this.title = Title.from(title);
             return this;
         }
 
+        /**
+         * Sets the top title.
+         *
+         * @param title the title
+         * @return this builder
+         */
         public Builder title(Title title) {
             this.title = title;
             return this;
         }
 
+        /**
+         * Sets the bottom title from a string.
+         *
+         * @param title the title text
+         * @return this builder
+         */
         public Builder titleBottom(String title) {
             this.titleBottom = Title.from(title);
             return this;
         }
 
+        /**
+         * Sets the bottom title.
+         *
+         * @param title the title
+         * @return this builder
+         */
         public Builder titleBottom(Title title) {
             this.titleBottom = title;
             return this;
         }
 
+        /**
+         * Sets the borders to draw.
+         *
+         * @param borders the borders to draw
+         * @return this builder
+         */
         public Builder borders(EnumSet<Borders> borders) {
             this.borders = EnumSet.copyOf(borders);
             return this;
         }
 
+        /**
+         * Sets the border type.
+         *
+         * @param borderType the border type
+         * @return this builder
+         */
         public Builder borderType(BorderType borderType) {
             this.borderType = borderType;
             return this;
@@ -656,6 +713,12 @@ public final class Block implements Widget {
             return this;
         }
 
+        /**
+         * Sets the border style.
+         *
+         * @param borderStyle the border style
+         * @return this builder
+         */
         public Builder borderStyle(Style borderStyle) {
             this.borderStyle = borderStyle;
             return this;
@@ -675,16 +738,34 @@ public final class Block implements Widget {
             return this;
         }
 
+        /**
+         * Sets the block style.
+         *
+         * @param style the block style
+         * @return this builder
+         */
         public Builder style(Style style) {
             this.style = style;
             return this;
         }
 
+        /**
+         * Sets the block padding.
+         *
+         * @param padding the padding
+         * @return this builder
+         */
         public Builder padding(Padding padding) {
             this.padding = padding;
             return this;
         }
 
+        /**
+         * Sets uniform padding on all sides.
+         *
+         * @param value the padding value
+         * @return this builder
+         */
         public Builder padding(int value) {
             this.padding = Padding.uniform(value);
             return this;
@@ -704,6 +785,11 @@ public final class Block implements Widget {
             return this;
         }
 
+        /**
+         * Builds the block.
+         *
+         * @return the built block
+         */
         public Block build() {
             return new Block(this);
         }

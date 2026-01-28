@@ -32,16 +32,28 @@ public final class TextElement extends StyledElement<TextElement> {
     private Overflow overflow;
     private Alignment alignment;
 
+    /**
+     * Creates a new text element with the given string content.
+     *
+     * @param content the text content
+     */
     public TextElement(String content) {
         this.content = content != null ? content : "";
     }
 
+    /**
+     * Creates a new text element from any value using its string representation.
+     *
+     * @param value the value to display
+     */
     public TextElement(Object value) {
         this.content = value != null ? String.valueOf(value) : "";
     }
 
     /**
      * Returns the text content.
+     *
+     * @return the text content
      */
     public String content() {
         return content;

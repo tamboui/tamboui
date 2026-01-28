@@ -12,6 +12,7 @@ import dev.tamboui.symbols.merge.MergeStrategy;
  */
 public final class Cell {
 
+    /** An empty cell containing a single space with no style. */
     public static final Cell EMPTY = new Cell(" ", Style.EMPTY);
 
     /**
@@ -25,6 +26,12 @@ public final class Cell {
     private final Style style;
     private final int cachedHashCode;
 
+    /**
+     * Creates a cell with the given symbol and style.
+     *
+     * @param symbol the character or grapheme cluster displayed in this cell
+     * @param style  the visual style
+     */
     public Cell(String symbol, Style style) {
         this.symbol = symbol;
         this.style = style;
@@ -37,26 +44,59 @@ public final class Cell {
         return result;
     }
 
+    /**
+     * Returns the symbol displayed in this cell.
+     *
+     * @return the character or grapheme cluster
+     */
     public String symbol() {
         return symbol;
     }
 
+    /**
+     * Returns the visual style of this cell.
+     *
+     * @return the style
+     */
     public Style style() {
         return style;
     }
 
+    /**
+     * Returns the empty cell singleton.
+     *
+     * @return {@link #EMPTY}
+     */
     public Cell reset() {
         return EMPTY;
     }
 
+    /**
+     * Returns a new cell with the given symbol and this cell's style.
+     *
+     * @param symbol the new symbol
+     * @return a new cell
+     */
     public Cell symbol(String symbol) {
         return new Cell(symbol, this.style);
     }
 
+    /**
+     * Returns a new cell with the given style and this cell's symbol.
+     *
+     * @param style the new style
+     * @return a new cell
+     */
     public Cell style(Style style) {
         return new Cell(this.symbol, style);
     }
 
+    /**
+     * Returns a new cell with this cell's style patched by the given style.
+     *
+     * @param patch the style patch to apply
+     * @return a new cell with the patched style
+     */
     public Cell patchStyle(Style patch) {
         return new Cell(this.symbol, this.style.patch(patch));
     }
@@ -83,6 +123,11 @@ public final class Cell {
         return symbol.isEmpty();
     }
 
+    /**
+     * Returns whether this cell is empty (single space with no style).
+     *
+     * @return true if this cell equals {@link #EMPTY}
+     */
     public boolean isEmpty() {
         return " ".equals(symbol) && style.equals(Style.EMPTY);
     }

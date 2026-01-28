@@ -75,20 +75,37 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     private Runnable onConfirm;
     private Runnable onCancel;
 
+    /**
+     * Creates a new dialog element with default settings.
+     */
     public DialogElement() {
     }
 
+    /**
+     * Creates a new dialog element with the given title and children.
+     *
+     * @param title the dialog title
+     * @param children the child elements to display in the dialog
+     */
     public DialogElement(String title, Element... children) {
         this.title = title;
         this.children.addAll(Arrays.asList(children));
     }
 
+    /**
+     * Creates a new dialog element with the given children.
+     *
+     * @param children the child elements to display in the dialog
+     */
     public DialogElement(Element... children) {
         this.children.addAll(Arrays.asList(children));
     }
 
     /**
      * Sets the dialog title.
+     *
+     * @param title the dialog title
+     * @return this element
      */
     public DialogElement title(String title) {
         this.title = title;
@@ -97,6 +114,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets the border type to rounded.
+     *
+     * @return this element
      */
     public DialogElement rounded() {
         this.borderType = BorderType.ROUNDED;
@@ -105,6 +124,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets the border type to double.
+     *
+     * @return this element
      */
     public DialogElement doubleBorder() {
         this.borderType = BorderType.DOUBLE;
@@ -113,6 +134,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets the border type.
+     *
+     * @param type the border type
+     * @return this element
      */
     public DialogElement borderType(BorderType type) {
         this.borderType = type;
@@ -121,6 +145,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets the border color.
+     *
+     * @param color the border color
+     * @return this element
      */
     public DialogElement borderColor(Color color) {
         this.borderColor = color;
@@ -129,6 +156,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets a fixed width for the dialog.
+     *
+     * @param width the fixed width in cells
+     * @return this element
      */
     public DialogElement width(int width) {
         this.fixedWidth = width;
@@ -137,6 +167,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets a fixed height for the dialog.
+     *
+     * @param height the fixed height in cells
+     * @return this element
      */
     public DialogElement height(int height) {
         this.fixedHeight = height;
@@ -145,6 +178,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets the minimum width for the dialog.
+     *
+     * @param minWidth the minimum width in cells
+     * @return this element
      */
     public DialogElement minWidth(int minWidth) {
         this.minWidth = minWidth;
@@ -153,6 +189,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
 
     /**
      * Sets the padding around content for width calculation.
+     *
+     * @param padding the padding in cells
+     * @return this element
      */
     public DialogElement padding(int padding) {
         this.padding = padding;

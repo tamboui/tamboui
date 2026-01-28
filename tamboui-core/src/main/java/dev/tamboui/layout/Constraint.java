@@ -27,6 +27,11 @@ public interface Constraint {
             this.value = value;
         }
 
+        /**
+         * Returns the fixed size in cells.
+         *
+         * @return the length value
+         */
         public int value() {
             return value;
         }
@@ -72,6 +77,11 @@ public interface Constraint {
             this.value = value;
         }
 
+        /**
+         * Returns the percentage value.
+         *
+         * @return the percentage (0-100)
+         */
         public int value() {
             return value;
         }
@@ -123,10 +133,20 @@ public interface Constraint {
             this.denominator = denominator;
         }
 
+        /**
+         * Returns the numerator.
+         *
+         * @return the numerator
+         */
         public int numerator() {
             return numerator;
         }
 
+        /**
+         * Returns the denominator.
+         *
+         * @return the denominator
+         */
         public int denominator() {
             return denominator;
         }
@@ -183,6 +203,11 @@ public interface Constraint {
             this.value = value;
         }
 
+        /**
+         * Returns the minimum size.
+         *
+         * @return the minimum value
+         */
         public int value() {
             return value;
         }
@@ -228,6 +253,11 @@ public interface Constraint {
             this.value = value;
         }
 
+        /**
+         * Returns the maximum size.
+         *
+         * @return the maximum value
+         */
         public int value() {
             return value;
         }
@@ -308,6 +338,11 @@ public interface Constraint {
             this(1);
         }
 
+        /**
+         * Returns the fill weight.
+         *
+         * @return the weight for distributing remaining space
+         */
         public int weight() {
             return weight;
         }

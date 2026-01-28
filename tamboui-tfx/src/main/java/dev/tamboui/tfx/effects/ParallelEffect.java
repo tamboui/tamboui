@@ -66,6 +66,9 @@ public final class ParallelEffect implements Shader {
     
     /**
      * Creates a parallel effect that runs the given effects simultaneously.
+     *
+     * @param effects the list of effects to run in parallel
+     * @return a new parallel effect
      */
     public static ParallelEffect of(List<Effect> effects) {
         return new ParallelEffect(effects);
@@ -73,6 +76,9 @@ public final class ParallelEffect implements Shader {
     
     /**
      * Creates a parallel effect that runs the given effects simultaneously.
+     *
+     * @param effects the effects to run in parallel
+     * @return a new parallel effect
      */
     public static ParallelEffect of(Effect... effects) {
         List<Effect> effectList = new ArrayList<>();

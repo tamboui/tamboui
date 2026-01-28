@@ -81,6 +81,8 @@ public final class RecordingConfig {
 
     /**
      * Returns the active recording config, or null if not recording.
+     *
+     * @return the active config, or null
      */
     public static synchronized RecordingConfig active() {
         return activeConfig;
@@ -149,31 +151,68 @@ public final class RecordingConfig {
 
     /**
      * Creates a config with explicit values (used by TuiRunner for config file support).
+     *
+     * @param outputPath    the output file path
+     * @param fps           the frames per second
+     * @param maxDurationMs the maximum recording duration in milliseconds
+     * @param width         the recording width in columns
+     * @param height        the recording height in rows
+     * @return a new recording config
      */
     public static RecordingConfig of(Path outputPath, int fps, int maxDurationMs, int width, int height) {
         return new RecordingConfig(outputPath, fps, maxDurationMs, width, height, null);
     }
 
+    /**
+     * Returns the output file path.
+     *
+     * @return the output path
+     */
     public Path outputPath() {
         return outputPath;
     }
 
+    /**
+     * Returns the frames per second.
+     *
+     * @return the FPS
+     */
     public int fps() {
         return fps;
     }
 
+    /**
+     * Returns the maximum recording duration in milliseconds.
+     *
+     * @return the maximum duration
+     */
     public int maxDurationMs() {
         return maxDurationMs;
     }
 
+    /**
+     * Returns the recording width in columns.
+     *
+     * @return the width
+     */
     public int width() {
         return width;
     }
 
+    /**
+     * Returns the recording height in rows.
+     *
+     * @return the height
+     */
     public int height() {
         return height;
     }
 
+    /**
+     * Returns the config file path, or null if loaded from system properties.
+     *
+     * @return the config file path, or null
+     */
     public Path configFile() {
         return configFile;
     }
