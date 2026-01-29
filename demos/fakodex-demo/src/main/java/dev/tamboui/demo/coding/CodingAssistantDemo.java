@@ -21,6 +21,7 @@ import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.spinner.SpinnerState;
 import dev.tamboui.widgets.wavetext.WaveTextState;
 
 import java.io.IOException;
@@ -56,8 +57,6 @@ public class CodingAssistantDemo {
     private static final Color BRIGHT = Color.rgb(236, 240, 241);
 
     // Animation constants
-    private static final String[] SPINNER_FRAMES = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
-    private static final int SPINNER_FRAME_DIVISOR = 2;
     private static final long TICK_RATE_MS = 50;
     private static final long RESPONSE_DELAY_MS = 1500;
 
@@ -84,6 +83,9 @@ public class CodingAssistantDemo {
     // Active thinking indicator text (null when not thinking)
     private String activeThinkingText = null;
     private final WaveTextState thinkingWaveState = new WaveTextState();
+
+    // Spinner state for tool calls
+    private final SpinnerState toolSpinnerState = new SpinnerState();
 
     // Pending typing for AI responses
     private PendingTyping pendingTyping = null;
@@ -247,10 +249,10 @@ public class CodingAssistantDemo {
      */
     private Element render() {
         tickCount++;
-        var spinner = getSpinner();
+        toolSpinnerState.advance();
 
         // Update animations
-        updateToolCalls(spinner);
+        updateToolCalls();
         updateTyping();
 
         // Status indicator
@@ -296,7 +298,7 @@ public class CodingAssistantDemo {
             );
         }
 
-        // Active tool calls
+        // Active tool calls with spinner
         for (var tc : activeToolCalls) {
             var label = switch (tc.type) {
                 case READ_FILE -> "Read";
@@ -305,9 +307,12 @@ public class CodingAssistantDemo {
                 case BASH -> "Bash";
                 case SEARCH -> "Search";
             };
-            var toolText = "  [" + spinner + "] " + label + " " + tc.description;
             columnChildren.add(
-                    text(toolText).fg(YELLOW).constraint(Constraint.length(1))
+                    row(
+                            text("  [").fg(YELLOW),
+                            spinner().state(toolSpinnerState).fg(YELLOW),
+                            text("] " + label + " " + tc.description).fg(YELLOW)
+                    ).constraint(Constraint.length(1))
             );
         }
 
@@ -645,10 +650,8 @@ public class CodingAssistantDemo {
 
     /**
      * Updates tool call animations.
-     *
-     * @param spinner the current spinner (unused, kept for compatibility)
      */
-    private void updateToolCalls(String spinner) {
+    private void updateToolCalls() {
         var completed = new ArrayList<ActiveToolCall>();
 
         for (var tc : activeToolCalls) {
@@ -701,15 +704,6 @@ public class CodingAssistantDemo {
                 action.run();
             }
         }
-    }
-
-    /**
-     * Gets the current spinner character.
-     *
-     * @return the spinner character
-     */
-    private String getSpinner() {
-        return SPINNER_FRAMES[(int) ((tickCount / SPINNER_FRAME_DIVISOR) % SPINNER_FRAMES.length)];
     }
 
 }

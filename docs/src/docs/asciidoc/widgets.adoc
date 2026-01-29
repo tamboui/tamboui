@@ -63,6 +63,10 @@ include::_attributes.adoc[]
 |Stateless
 |Monthly calendar with date styling
 
+|<<spinner,Spinner>>
+|Stateful
+|Animated loading indicator
+
 |<<scrollbar,Scrollbar>>
 |Stateful
 |Visual scroll position indicator
@@ -473,6 +477,83 @@ Calendar calendar = Calendar.builder()
 calendar.render(area, buffer);
 ----
 
+== Animated Widgets
+
+=== Spinner
+
+An animated loading indicator that cycles through frame characters:
+
+[source,java]
+----
+// Create spinner with built-in style
+Spinner spinner = Spinner.builder()
+    .spinnerStyle(SpinnerStyle.DOTS)
+    .style(Style.EMPTY.fg(Color.CYAN))
+    .build();
+
+// Or with custom frames
+Spinner spinner = Spinner.builder()
+    .frames("*", "+", "x", "+")
+    .build();
+
+// Or with a custom frame set
+Spinner spinner = Spinner.builder()
+    .frameSet(SpinnerFrameSet.of("⠋", "⠙", "⠹", "⠸"))
+    .build();
+
+// Create state and render
+SpinnerState state = new SpinnerState();
+spinner.render(area, buffer, state);
+
+// Advance state on each tick
+state.advance();
+----
+
+Built-in styles:
+
+* `SpinnerStyle.DOTS` - Braille dot pattern
+* `SpinnerStyle.LINE` - Classic `-\|/`
+* `SpinnerStyle.ARC` - Quarter-circle characters
+* `SpinnerStyle.CIRCLE` - Clock-position circle
+* `SpinnerStyle.BOUNCING_BAR` - Bouncing bar `[=== ]`
+* `SpinnerStyle.TOGGLE` - Two-state toggle
+* `SpinnerStyle.GAUGE` - Horizontal block fill (`▏▎▍▌▋▊▉█`)
+* `SpinnerStyle.VERTICAL_GAUGE` - Vertical bar growth (`▁▂▃▄▅▆▇█`)
+* `SpinnerStyle.ARROWS` - Rotating arrow directions
+* `SpinnerStyle.CLOCK` - Clock face emoji (🕐🕑...)
+* `SpinnerStyle.MOON` - Moon phase emoji (🌑🌒...)
+* `SpinnerStyle.SQUARE_CORNERS` - Rotating square corners
+* `SpinnerStyle.GROWING_DOTS` - Braille dots filling
+* `SpinnerStyle.BOUNCING_BALL` - Bouncing ball in braille
+
+==== CSS Properties
+
+Spinner style and frames can be configured via CSS:
+
+[source,css]
+----
+/* Use a predefined style */
+.loading-spinner {
+    spinner-style: line;
+    color: cyan;
+}
+
+/* Use custom animation frames */
+.custom-spinner {
+    spinner-frames: "⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧";
+}
+
+/* spinner-frames overrides spinner-style when both are set */
+.fancy-spinner {
+    spinner-style: dots;
+    spinner-frames: "*" "+" "x" "+";  /* This takes precedence */
+}
+----
+
+NOTE: Programmatic styles set via `spinnerStyle()`, `frameSet()`, or `frames()` take precedence over CSS styles.
+
+NOTE: **For Toolkit DSL users**: Use `SpinnerElement` via `spinner()` factory methods. It manages state internally and advances automatically on each render. See <<toolkit-dsl>>.
+
 == Input Widgets
 
 === TextInput
@@ -545,6 +626,7 @@ state.position(scrollPosition);
 scrollbar.render(area, buffer, state);
 ----
 
+[[toolkit-dsl]]
 == Using Widgets with Toolkit DSL
 
 The Toolkit DSL provides fluent factories for all widgets:
@@ -573,6 +655,17 @@ gauge(0.75).label("Loading...").gaugeColor(Color.GREEN)
 
 // Sparkline
 sparkline(1, 4, 2, 8, 5).color(Color.CYAN)
+
+// Spinner (manages its own state, advances each render)
+spinner().cyan()
+spinner(SpinnerStyle.LINE, "Loading...").green()
+
+// Tree (expand/collapse, keyboard navigation, lazy loading)
+tree(
+    TreeNode.of("Root",
+        TreeNode.of("Child 1"),
+        TreeNode.of("Child 2"))
+).highlightColor(Color.CYAN).rounded().scrollbar()
 
 // TextInput
 textInput(inputState).placeholder("Enter name...")

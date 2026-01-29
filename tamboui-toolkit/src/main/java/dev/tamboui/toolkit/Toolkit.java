@@ -25,6 +25,7 @@ import dev.tamboui.toolkit.elements.Row;
 import dev.tamboui.toolkit.elements.ScrollbarElement;
 import dev.tamboui.toolkit.elements.Spacer;
 import dev.tamboui.toolkit.elements.SparklineElement;
+import dev.tamboui.toolkit.elements.SpinnerElement;
 import dev.tamboui.toolkit.elements.StackElement;
 import dev.tamboui.toolkit.elements.TableElement;
 import dev.tamboui.toolkit.elements.TabsElement;
@@ -43,6 +44,7 @@ import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
+import dev.tamboui.widgets.spinner.SpinnerStyle;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.tui.event.KeyEvent;
 
@@ -1049,6 +1051,48 @@ public final class Toolkit {
      */
     public static ScrollbarElement scrollbar() {
         return new ScrollbarElement();
+    }
+
+    // ==================== Spinner ====================
+
+    /**
+     * Creates a spinner with the default DOTS style.
+     *
+     * @return a new spinner element
+     */
+    public static SpinnerElement spinner() {
+        return new SpinnerElement();
+    }
+
+    /**
+     * Creates a spinner with the given style.
+     *
+     * @param style the spinner style
+     * @return a new spinner element
+     */
+    public static SpinnerElement spinner(SpinnerStyle style) {
+        return new SpinnerElement(style);
+    }
+
+    /**
+     * Creates a spinner with a label (DOTS style).
+     *
+     * @param label the label text
+     * @return a new spinner element
+     */
+    public static SpinnerElement spinner(String label) {
+        return new SpinnerElement(label);
+    }
+
+    /**
+     * Creates a spinner with the given style and label.
+     *
+     * @param style the spinner style
+     * @param label the label text
+     * @return a new spinner element
+     */
+    public static SpinnerElement spinner(SpinnerStyle style, String label) {
+        return new SpinnerElement(style, label);
     }
 
     // ==================== Generic Widget ====================

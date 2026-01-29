@@ -154,6 +154,9 @@
     "sparkline-demo": {
       "script-ref": "tamboui-widgets/demos/sparkline-demo/src/main/java/dev/tamboui/demo/SparklineDemo.java"
     },
+    "spinner-demo": {
+      "script-ref": "tamboui-widgets/demos/spinner-demo/src/main/java/dev/tamboui/demo/SpinnerDemo.java"
+    },
     "table-demo": {
       "script-ref": "tamboui-widgets/demos/table-demo/src/main/java/dev/tamboui/demo/TableDemo.java"
     },
