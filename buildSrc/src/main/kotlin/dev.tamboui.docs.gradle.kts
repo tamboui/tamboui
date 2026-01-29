@@ -1,6 +1,5 @@
 import dev.tamboui.build.GenerateDemosGalleryTask
 import dev.tamboui.build.JavadocAggregatorPlugin
-import gradle.kotlin.dsl.accessors._6b89262683f96a5e8a91c5e9184f335e.java
 
 plugins {
     id("org.asciidoctor.jvm.convert")

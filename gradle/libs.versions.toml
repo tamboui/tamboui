@@ -12,6 +12,7 @@ compile-testing = "0.21.0"
 gradle-tooling-api = "9.2.1"
 asciidoctor = "4.0.4"
 git-publish = "3.0.1"
+spotless = "8.2.1"
 
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }
@@ -30,6 +31,7 @@ compile-testing = { module = "com.google.testing.compile:compile-testing", versi
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle-tooling-api" }
 asciidoctor-plugin = { module = "org.asciidoctor:asciidoctor-gradle-jvm", version.ref = "asciidoctor" }
 git-publish-plugin = { module = "org.ajoberstar.git-publish:org.ajoberstar.git-publish.gradle.plugin", version.ref = "git-publish" }
+spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 
 [bundles]
 testing = ["junit-jupiter", "junit-platform-launcher", "assertj-core"]

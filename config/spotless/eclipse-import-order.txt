@@ -1,0 +1,15 @@
+#Organize Import Order
+# This file is used by Spotless `importOrderFile(...)`.
+#
+# Higher numbers are applied first. The empty value ("") matches any imports
+# not covered by earlier rules. "\#" matches static imports.
+#
+# Adjust these groups to match your preferred ordering.
+0=java
+1=javax
+2=jakarta
+3=org
+4=com
+5=dev
+6=dev.tamboui
+7=\#

@@ -1,7 +1,6 @@
 import dev.tamboui.build.DemoExtension
 import dev.tamboui.build.GenerateDemoMetadataTask
 import dev.tamboui.build.RecordDemoTask
-import gradle.kotlin.dsl.accessors._d7c1cb8291fcf7e869bfba85a0dc6ae2.java
 
 plugins {
     id("dev.tamboui.java-base")

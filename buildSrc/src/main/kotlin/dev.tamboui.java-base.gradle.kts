@@ -4,6 +4,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 
 plugins {
     java
+    id("com.diffplug.spotless")
 }
 
 repositories {
@@ -44,6 +45,17 @@ tasks.withType<Javadoc>().configureEach {
     (options as StandardJavadocDocletOptions).apply {
         addStringOption("Xmaxwarns", "10000")
         addBooleanOption("Xwerror", true)
+    }
+}
+
+spotless {
+    java {
+        // Import order is configurable via config/spotless/eclipse-import-order.txt
+        importOrderFile(rootProject.file("config/spotless/eclipse-import-order.txt"))
+        removeUnusedImports()
+
+        eclipse().configFile(rootProject.file("config/spotless/eclipse-format.xml"))
+        formatAnnotations()
     }
 }
 
