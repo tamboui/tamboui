@@ -431,6 +431,7 @@ public final class ToolkitRunner implements AutoCloseable {
     @Override
     public void close() {
         scheduler.shutdownNow();
+        eventRouter.close();
         tuiRunner.close();
     }
 
