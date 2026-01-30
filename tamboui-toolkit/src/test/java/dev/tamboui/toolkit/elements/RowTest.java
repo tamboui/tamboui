@@ -4,16 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.layout.Flex;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,10 +42,9 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() sums widths of multiple children")
     void preferredWidth_multipleChildren() {
-        Row row = row(
-            text("A"),      // 1
-            text("BB"),     // 2
-            text("CCC")     // 3
+        Row row = row(text("A"), // 1
+                text("BB"), // 2
+                text("CCC") // 3
         );
         // 1 + 2 + 3 = 6
         assertThat(row.preferredWidth()).isEqualTo(6);
@@ -53,10 +53,9 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() includes spacing")
     void preferredWidth_withSpacing() {
-        Row row = row(
-            text("A"),      // 1
-            text("B"),      // 1
-            text("C")       // 1
+        Row row = row(text("A"), // 1
+                text("B"), // 1
+                text("C") // 1
         ).spacing(2);
         // 1 + 2 + 1 + 2 + 1 = 7 (three children, two gaps of 2)
         assertThat(row.preferredWidth()).isEqualTo(7);
@@ -65,8 +64,7 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() includes margin")
     void preferredWidth_withMargin() {
-        Row row = row(
-            text("Hello")   // 5
+        Row row = row(text("Hello") // 5
         ).margin(new Margin(1, 2, 1, 3)); // top, right, bottom, left
         // 5 + 2 (right) + 3 (left) = 10
         assertThat(row.preferredWidth()).isEqualTo(10);
@@ -75,8 +73,7 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() with uniform margin")
     void preferredWidth_withUniformMargin() {
-        Row row = row(
-            text("Test")    // 4
+        Row row = row(text("Test") // 4
         ).margin(1);
         // 4 + 1 (left) + 1 (right) = 6
         assertThat(row.preferredWidth()).isEqualTo(6);
@@ -85,9 +82,8 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() with spacing and margin")
     void preferredWidth_withSpacingAndMargin() {
-        Row row = row(
-            text("A"),      // 1
-            text("B")       // 1
+        Row row = row(text("A"), // 1
+                text("B") // 1
         ).spacing(2).margin(1);
         // 1 + 2 + 1 + 1 (left) + 1 (right) = 6
         assertThat(row.preferredWidth()).isEqualTo(6);
@@ -96,18 +92,17 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() with nested rows")
     void preferredWidth_nested() {
-        Row innerRow = row(text("AB"), text("CD"));  // 2 + 2 = 4
-        Row outerRow = row(text("X"), innerRow);     // 1 + 4 = 5
+        Row innerRow = row(text("AB"), text("CD")); // 2 + 2 = 4
+        Row outerRow = row(text("X"), innerRow); // 1 + 4 = 5
         assertThat(outerRow.preferredWidth()).isEqualTo(5);
     }
 
     @Test
     @DisplayName("preferredWidth() with tabs element")
     void preferredWidth_withTabs() {
-        Row row = row(
-            text("Title"),                              // 5
-            tabs("App", "Logs").divider(" | "),        // 10
-            text("Status")                              // 6
+        Row row = row(text("Title"), // 5
+                tabs("App", "Logs").divider(" | "), // 10
+                text("Status") // 6
         );
         // 5 + 10 + 6 = 21
         assertThat(row.preferredWidth()).isEqualTo(21);
@@ -116,9 +111,8 @@ class RowTest {
     @Test
     @DisplayName("preferredWidth() with wave text")
     void preferredWidth_withWaveText() {
-        Row row = row(
-            waveText("Loading..."),     // 10
-            text(" Done")                // 5
+        Row row = row(waveText("Loading..."), // 10
+                text(" Done") // 5
         );
         // 10 + 5 = 15
         assertThat(row.preferredWidth()).isEqualTo(15);
@@ -131,9 +125,7 @@ class RowTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        row(text("A"), text("B"), text("C"))
-            .spacing(1)
-            .render(frame, area, RenderContext.empty());
+        row(text("A"), text("B"), text("C")).spacing(1).render(frame, area, RenderContext.empty());
 
         assertThat(buffer).isNotNull();
     }
@@ -145,9 +137,7 @@ class RowTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        row(text("A"), text("B"))
-            .flex(Flex.CENTER)
-            .render(frame, area, RenderContext.empty());
+        row(text("A"), text("B")).flex(Flex.CENTER).render(frame, area, RenderContext.empty());
 
         assertThat(buffer).isNotNull();
     }
@@ -188,10 +178,7 @@ class RowTest {
     @Test
     @DisplayName("Row fluent API chains correctly")
     void fluentApiChaining() {
-        Row row = row(text("A"), text("B"))
-            .spacing(1)
-            .flex(Flex.SPACE_BETWEEN)
-            .margin(2);
+        Row row = row(text("A"), text("B")).spacing(1).flex(Flex.SPACE_BETWEEN).margin(2);
 
         assertThat(row).isInstanceOf(Row.class);
     }

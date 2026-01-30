@@ -4,16 +4,16 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.layout.Rect;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 /**
  * Renders images using the Kitty Graphics Protocol.
@@ -24,17 +24,19 @@ import java.util.Base64;
  * Supported by: Kitty, WezTerm, Ghostty, Konsole (recent versions).
  *
  * <h2>Protocol Format</h2>
+ * 
  * <pre>
  * ESC _ G [control-data] ; [payload] ESC \
  * </pre>
  *
- * @see <a href="https://sw.kovidgoyal.net/kitty/graphics-protocol/">Kitty Graphics Protocol</a>
+ * @see <a href="https://sw.kovidgoyal.net/kitty/graphics-protocol/">Kitty
+ *      Graphics Protocol</a>
  */
 public final class KittyProtocol implements ImageProtocol {
 
-    private static final String APC = "\033_G";  // Application Program Command + 'G' for graphics
-    private static final String ST = "\033\\";    // String Terminator
-    private static final int CHUNK_SIZE = 4096;   // Maximum chunk size for transmission
+    private static final String APC = "\033_G"; // Application Program Command + 'G' for graphics
+    private static final String ST = "\033\\"; // String Terminator
+    private static final int CHUNK_SIZE = 4096; // Maximum chunk size for transmission
 
     /**
      * Creates a new Kitty protocol instance.
@@ -43,7 +45,8 @@ public final class KittyProtocol implements ImageProtocol {
     }
 
     @Override
-    public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput) throws IOException {
+    public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput)
+            throws IOException {
         if (rawOutput == null) {
             throw new RuntimeIOException("Kitty protocol requires raw output stream");
         }
@@ -57,7 +60,8 @@ public final class KittyProtocol implements ImageProtocol {
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
         // Encode image as PNG and then base64
-        // The image should already be scaled by Image.scaleImage() based on the scaling mode
+        // The image should already be scaled by Image.scaleImage() based on the scaling
+        // mode
         byte[] pngData = image.toPng();
         String base64Data = Base64.getEncoder().encodeToString(pngData);
 
@@ -93,7 +97,8 @@ public final class KittyProtocol implements ImageProtocol {
      * <p>
      * For large images, the data must be split into chunks of at most 4096 bytes.
      */
-    private void sendChunked(OutputStream out, String base64Data, int cols, int rows) throws IOException {
+    private void sendChunked(OutputStream out, String base64Data, int cols, int rows)
+            throws IOException {
         int offset = 0;
         int length = base64Data.length();
         boolean first = true;
@@ -114,7 +119,8 @@ public final class KittyProtocol implements ImageProtocol {
                 // c=cols: display width in cells
                 // r=rows: display height in cells
                 // m=0/1: more chunks follow
-                cmd.append(String.format("a=T,f=100,t=d,c=%d,r=%d,m=%d;", cols, rows, more ? 1 : 0));
+                cmd.append(
+                        String.format("a=T,f=100,t=d,c=%d,r=%d,m=%d;", cols, rows, more ? 1 : 0));
                 first = false;
             } else {
                 // Subsequent chunks only need the 'm' flag
@@ -135,13 +141,14 @@ public final class KittyProtocol implements ImageProtocol {
      * This is used for small images that fit in a single transmission.
      */
     @SuppressWarnings("unused")
-    private void sendSimple(OutputStream out, String base64Data, int cols, int rows) throws IOException {
+    private void sendSimple(OutputStream out, String base64Data, int cols, int rows)
+            throws IOException {
         // a=T: action = transmit and display
         // f=100: format = PNG
         // t=d: transmission = direct
         // c=cols, r=rows: display size in cells
-        String cmd = String.format("%sa=T,f=100,t=d,c=%d,r=%d;%s%s",
-            APC, cols, rows, base64Data, ST);
+        String cmd = String.format("%sa=T,f=100,t=d,c=%d,r=%d;%s%s", APC, cols, rows, base64Data,
+                ST);
         out.write(cmd.getBytes(StandardCharsets.US_ASCII));
     }
 }

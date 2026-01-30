@@ -4,20 +4,20 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StandardProperties;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.style.Overflow;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
@@ -35,7 +35,8 @@ public final class TextElement extends StyledElement<TextElement> {
     /**
      * Creates a new text element with the given string content.
      *
-     * @param content the text content
+     * @param content
+     *            the text content
      */
     public TextElement(String content) {
         this.content = content != null ? content : "";
@@ -44,7 +45,8 @@ public final class TextElement extends StyledElement<TextElement> {
     /**
      * Creates a new text element from any value using its string representation.
      *
-     * @param value the value to display
+     * @param value
+     *            the value to display
      */
     public TextElement(Object value) {
         this.content = value != null ? String.valueOf(value) : "";
@@ -62,7 +64,8 @@ public final class TextElement extends StyledElement<TextElement> {
     /**
      * Sets the overflow mode for text that doesn't fit.
      *
-     * @param overflow the overflow mode
+     * @param overflow
+     *            the overflow mode
      * @return this element for chaining
      */
     public TextElement overflow(Overflow overflow) {
@@ -103,7 +106,8 @@ public final class TextElement extends StyledElement<TextElement> {
     /**
      * Sets the text alignment.
      *
-     * @param alignment the alignment
+     * @param alignment
+     *            the alignment
      * @return this element for chaining
      */
     public TextElement alignment(Alignment alignment) {
@@ -137,10 +141,11 @@ public final class TextElement extends StyledElement<TextElement> {
      * If no explicit constraint is set, a sensible default is calculated based on
      * the content and overflow mode:
      * <ul>
-     *   <li>For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses {@code min(lineCount)}
-     *       to ensure at least minimum height while allowing growth for wrapped content.</li>
-     *   <li>For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to let
-     *       the container decide (typically using {@code fill()}).</li>
+     * <li>For wrapping modes (WRAP_WORD, WRAP_CHARACTER): uses
+     * {@code min(lineCount)} to ensure at least minimum height while allowing
+     * growth for wrapped content.</li>
+     * <li>For non-wrapping modes (CLIP, ELLIPSIS, etc.): returns {@code null} to
+     * let the container decide (typically using {@code fill()}).</li>
      * </ul>
      *
      * @return the constraint for this element
@@ -163,7 +168,8 @@ public final class TextElement extends StyledElement<TextElement> {
 
     /**
      * Calculates a height constraint based on content line count and overflow mode.
-     * Used by vertical containers (Column) to determine the height for this text element.
+     * Used by vertical containers (Column) to determine the height for this text
+     * element.
      *
      * @return height constraint based on line count
      */
@@ -187,13 +193,16 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     /**
-     * Calculates the height needed for this text when rendered with wrapping at the given width.
+     * Calculates the height needed for this text when rendered with wrapping at the
+     * given width.
      * <p>
-     * For non-wrapping modes, returns the natural line count.
-     * For wrapping modes, calculates how many lines will be produced after wrapping.
+     * For non-wrapping modes, returns the natural line count. For wrapping modes,
+     * calculates how many lines will be produced after wrapping.
      *
-     * @param width the available width for rendering
-     * @param effectiveOverflow the overflow mode to use
+     * @param width
+     *            the available width for rendering
+     * @param effectiveOverflow
+     *            the overflow mode to use
      * @return the number of lines needed
      */
     private int calculateWrappedHeight(int width, Overflow effectiveOverflow) {
@@ -201,7 +210,8 @@ public final class TextElement extends StyledElement<TextElement> {
             return 1;
         }
 
-        if (effectiveOverflow != Overflow.WRAP_CHARACTER && effectiveOverflow != Overflow.WRAP_WORD) {
+        if (effectiveOverflow != Overflow.WRAP_CHARACTER
+                && effectiveOverflow != Overflow.WRAP_WORD) {
             return countLines();
         }
 
@@ -253,7 +263,8 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     /**
-     * Resolves the overflow mode: programmatic value takes precedence, then CSS, then default.
+     * Resolves the overflow mode: programmatic value takes precedence, then CSS,
+     * then default.
      */
     private Overflow resolveOverflow(RenderContext context) {
         if (overflow != null) {
@@ -273,19 +284,18 @@ public final class TextElement extends StyledElement<TextElement> {
             return;
         }
 
-        // Get the current style from the context (already resolved by StyledElement.render)
+        // Get the current style from the context (already resolved by
+        // StyledElement.render)
         Style effectiveStyle = context.currentStyle();
 
         // Get the CSS resolver for this element
         StylePropertyResolver resolver = context.resolveStyle(this)
-                .map(r -> (StylePropertyResolver) r)
-                .orElse(StylePropertyResolver.empty());
+                .map(r -> (StylePropertyResolver) r).orElse(StylePropertyResolver.empty());
 
         // Build paragraph - CSS properties are resolved by the widget
         Paragraph.Builder paragraphBuilder = Paragraph.builder()
                 .text(Text.from(Line.from(Span.styled(content, effectiveStyle))))
-                .style(effectiveStyle)
-                .styleResolver(resolver);
+                .style(effectiveStyle).styleResolver(resolver);
 
         // Set programmatic overrides if specified
         if (alignment != null) {

@@ -4,8 +4,8 @@
  */
 package dev.tamboui.tui.error;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -38,9 +38,7 @@ class RenderErrorTest {
 
         RenderError error = RenderError.from(cause);
 
-        assertThat(error.formattedStackTrace())
-                .contains("RuntimeException")
-                .contains("Test error")
+        assertThat(error.formattedStackTrace()).contains("RuntimeException").contains("Test error")
                 .contains("at ");
     }
 
@@ -79,8 +77,7 @@ class RenderErrorTest {
     @Test
     @DisplayName("from() throws NullPointerException for null cause")
     void fromThrowsForNullCause() {
-        assertThatNullPointerException()
-                .isThrownBy(() -> RenderError.from(null));
+        assertThatNullPointerException().isThrownBy(() -> RenderError.from(null));
     }
 
     @Test
@@ -88,9 +85,7 @@ class RenderErrorTest {
     void toStringIncludesRelevantInfo() {
         RenderError error = RenderError.from(new RuntimeException("Test"));
 
-        assertThat(error.toString())
-                .contains("RenderError")
-                .contains("RuntimeException")
+        assertThat(error.toString()).contains("RenderError").contains("RuntimeException")
                 .contains("Test");
     }
 }

@@ -4,11 +4,6 @@
  */
 package dev.tamboui.text;
 
-import dev.tamboui.style.Color;
-import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.Style;
-import dev.tamboui.style.Tags;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,45 +15,55 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.Tags;
+
 /**
- * Parses BBCode-style markup text and converts it to styled {@link Text} objects.
+ * Parses BBCode-style markup text and converts it to styled {@link Text}
+ * objects.
  * <p>
  * The parser supports:
  * <ul>
- *   <li>Built-in modifier tags: {@code [bold]}, {@code [italic]}, {@code [underlined]},
- *       {@code [dim]}, {@code [reversed]}, {@code [crossed-out]}</li>
- *   <li>Built-in color tags: {@code [red]}, {@code [green]}, {@code [blue]}, {@code [yellow]},
- *       {@code [cyan]}, {@code [magenta]}, {@code [white]}, {@code [black]}, {@code [gray]}</li>
- *   <li>True color tokens: {@code [#RGB]}, {@code [#RRGGBB]}, {@code [rgb(r,g,b)]} (spaces allowed)</li>
- *   <li>Compound style specs: multiple tokens in a single tag, e.g.
- *       {@code [bold #ff5733 on rgb(10, 20, 30)]text[/]}. Foreground/background tokens are parsed
- *       using {@link dev.tamboui.style.ColorConverter} and modifiers are applied in addition to colors.</li>
- *   <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
- *   <li>Custom tags: resolved via a {@link StyleResolver}</li>
- *   <li>Escaped brackets: {@code [[} produces {@code [}, and {@code ]]} produces {@code ]}</li>
- *   <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
- *   <li>Emoji codes: {@code :smiley:}, {@code :warning:}, {@code :success:}, etc. (replaced with Unicode emoji)</li>
+ * <li>Built-in modifier tags: {@code [bold]}, {@code [italic]},
+ * {@code [underlined]}, {@code [dim]}, {@code [reversed]},
+ * {@code [crossed-out]}</li>
+ * <li>Built-in color tags: {@code [red]}, {@code [green]}, {@code [blue]},
+ * {@code [yellow]}, {@code [cyan]}, {@code [magenta]}, {@code [white]},
+ * {@code [black]}, {@code [gray]}</li>
+ * <li>True color tokens: {@code [#RGB]}, {@code [#RRGGBB]},
+ * {@code [rgb(r,g,b)]} (spaces allowed)</li>
+ * <li>Compound style specs: multiple tokens in a single tag, e.g.
+ * {@code [bold #ff5733 on rgb(10, 20, 30)]text[/]}. Foreground/background
+ * tokens are parsed using {@link dev.tamboui.style.ColorConverter} and
+ * modifiers are applied in addition to colors.</li>
+ * <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
+ * <li>Custom tags: resolved via a {@link StyleResolver}</li>
+ * <li>Escaped brackets: {@code [[} produces {@code [}, and {@code ]]} produces
+ * {@code ]}</li>
+ * <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
+ * <li>Emoji codes: {@code :smiley:}, {@code :warning:}, {@code :success:}, etc.
+ * (replaced with Unicode emoji)</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * // Simple parsing with built-in styles
  * Text text = MarkupParser.parse("This is [red]red[/red] and [bold]bold[/bold].");
  *
  * // With custom tag resolver
- * Text text = MarkupParser.parse(
- *     "This is [keyword]styled[/keyword].",
- *     tagName -> {
- *         if ("keyword".equals(tagName)) {
- *             return Style.EMPTY.fg(Color.CYAN).bold();
- *         }
- *         return null;
+ * Text text = MarkupParser.parse("This is [keyword]styled[/keyword].", tagName -> {
+ *     if ("keyword".equals(tagName)) {
+ *         return Style.EMPTY.fg(Color.CYAN).bold();
  *     }
- * );
+ *     return null;
+ * });
  * }</pre>
  * <p>
- * Unknown tags without a resolver are rendered as plain text (tags are preserved).
- * Unclosed tags apply their style to the remaining content.
+ * Unknown tags without a resolver are rendered as plain text (tags are
+ * preserved). Unclosed tags apply their style to the remaining content.
  */
 public final class MarkupParser {
 
@@ -110,7 +115,8 @@ public final class MarkupParser {
         /**
          * Resolves a style for the given tag name.
          *
-         * @param tagName the tag name (without brackets)
+         * @param tagName
+         *            the tag name (without brackets)
          * @return the style for this tag, or null if not recognized
          */
         Style resolve(String tagName);
@@ -124,21 +130,22 @@ public final class MarkupParser {
         /**
          * Resolves a string expansion for the given tag name.
          *
-         * @param string the string to expand
+         * @param string
+         *            the string to expand
          * @return the expanded string, or null if not recognized
          */
         String resolve(String string);
     }
 
-
-
     /**
      * Parses markup text using only built-in styles.
      * <p>
-     * Custom tags are rendered as plain text (the tag markers are preserved).
-     * Emoji codes (e.g. {@code :smiley:}, {@code :warning:}) are replaced with Unicode emoji characters.
+     * Custom tags are rendered as plain text (the tag markers are preserved). Emoji
+     * codes (e.g. {@code :smiley:}, {@code :warning:}) are replaced with Unicode
+     * emoji characters.
      *
-     * @param markup the markup text to parse
+     * @param markup
+     *            the markup text to parse
      * @return the parsed styled text
      */
     public static Text parse(String markup) {
@@ -146,11 +153,14 @@ public final class MarkupParser {
     }
 
     /**
-     * Parses markup text with custom style resolution.
-     * Emoji codes (e.g. {@code :smiley:}, {@code :warning:}) are replaced with Unicode emoji characters.
+     * Parses markup text with custom style resolution. Emoji codes (e.g.
+     * {@code :smiley:}, {@code :warning:}) are replaced with Unicode emoji
+     * characters.
      *
-     * @param markup the markup text to parse
-     * @param resolver optional resolver for custom tags
+     * @param markup
+     *            the markup text to parse
+     * @param resolver
+     *            optional resolver for custom tags
      * @return the parsed styled text
      */
     public static Text parse(String markup, StyleResolver resolver) {
@@ -158,11 +168,16 @@ public final class MarkupParser {
     }
 
     /**
-     * Parses markup text with custom style resolution and emoji replacement control.
+     * Parses markup text with custom style resolution and emoji replacement
+     * control.
      *
-     * @param markup the markup text to parse
-     * @param resolver optional resolver for custom tags
-     * @param emoji whether to replace emoji codes (e.g. {@code :smiley:}) with Unicode characters
+     * @param markup
+     *            the markup text to parse
+     * @param resolver
+     *            optional resolver for custom tags
+     * @param emoji
+     *            whether to replace emoji codes (e.g. {@code :smiley:}) with
+     *            Unicode characters
      * @return the parsed styled text
      */
     public static Text parse(String markup, StyleResolver resolver, boolean emoji) {
@@ -180,9 +195,12 @@ public final class MarkupParser {
     /**
      * Parses markup text with custom style and emoji resolution.
      *
-     * @param markup the markup text to parse
-     * @param resolver optional resolver for custom tags
-     * @param emojiResolver resolver for emoji codes
+     * @param markup
+     *            the markup text to parse
+     * @param resolver
+     *            optional resolver for custom tags
+     * @param emojiResolver
+     *            resolver for emoji codes
      * @return the parsed styled text
      */
     public static Text parse(String markup, StyleResolver resolver, EmojiResolver emojiResolver) {
@@ -358,22 +376,21 @@ public final class MarkupParser {
 
             // Parse all tokens for CSS class targeting
             String[] tokens = tokenizeStyleSpec(tagName);
-            String primaryTag = tokens[0];  // First token used for closing tag matching
+            String primaryTag = tokens[0]; // First token used for closing tag matching
 
-            // Collect all tokens as CSS class tags (excluding "on" keyword and explicit colors)
+            // Collect all tokens as CSS class tags (excluding "on" keyword and explicit
+            // colors)
             List<String> tagList = new ArrayList<>();
             for (String token : tokens) {
-                if (!token.isEmpty() && 
-                !"on".equals(token) && 
-                !token.startsWith("#")&& 
-                !token.startsWith("rgb(") &&
-                !token.startsWith("indexed(")) {
+                if (!token.isEmpty() && !"on".equals(token) && !token.startsWith("#")
+                        && !token.startsWith("rgb(") && !token.startsWith("indexed(")) {
                     tagList.add(token);
                 }
             }
 
             // Create a Tags extension with all tokens
-            Style tagStyle = Style.EMPTY.withExtension(Tags.class, Tags.of(tagList.toArray(new String[0])));
+            Style tagStyle = Style.EMPTY.withExtension(Tags.class,
+                    Tags.of(tagList.toArray(new String[0])));
 
             // Check for link tag
             if ("link".equals(primaryTag) && attribute != null) {
@@ -521,7 +538,8 @@ public final class MarkupParser {
         }
 
         private static String[] tokenizeStyleSpec(String spec) {
-            // Split on whitespace, but keep tokens like rgb(...) intact even if they contain spaces.
+            // Split on whitespace, but keep tokens like rgb(...) intact even if they
+            // contain spaces.
             if (spec == null || spec.isEmpty()) {
                 return new String[0];
             }
@@ -587,28 +605,34 @@ public final class MarkupParser {
     }
 
     /**
-     * Replaces emoji codes in text with Unicode emoji characters using the default resolver.
+     * Replaces emoji codes in text with Unicode emoji characters using the default
+     * resolver.
      *
-     * @param emoji text that may contain emoji codes
+     * @param emoji
+     *            text that may contain emoji codes
      * @return text with emoji codes replaced
      */
     public static String replaceEmoji(String emoji) {
         return replaceEmoji(emoji, DEFAULT_EMOJI_RESOLVER);
     }
 
-     /**
+    /**
      * Replaces emoji codes in text with Unicode emoji characters.
      *
-     * @param text text that may contain emoji codes
-     * @param resolver the emoji resolver to use
+     * @param text
+     *            text that may contain emoji codes
+     * @param resolver
+     *            the emoji resolver to use
      * @return text with emoji codes replaced
      */
-     public static String replaceEmoji(String text, EmojiResolver resolver) {
+    public static String replaceEmoji(String text, EmojiResolver resolver) {
         if (text == null || text.isEmpty() || text.indexOf(':') < 0) {
             return text == null ? "" : text;
         }
 
-        if(resolver == null) { return text; }
+        if (resolver == null) {
+            return text;
+        }
 
         Matcher matcher = emoji_PATTERN.matcher(text);
         StringBuffer result = new StringBuffer();
@@ -629,13 +653,14 @@ public final class MarkupParser {
         return result.toString();
     }
 
-     /**
+    /**
      * Returns true if the given text contains any emoji codes.
      *
-     * @param text text to check
+     * @param text
+     *            text to check
      * @return true if text contains emoji codes
      */
-     public static boolean containsEmojiCodes(String text) {
+    public static boolean containsEmojiCodes(String text) {
         return text != null && text.indexOf(':') >= 0 && emoji_PATTERN.matcher(text).find();
     }
 }

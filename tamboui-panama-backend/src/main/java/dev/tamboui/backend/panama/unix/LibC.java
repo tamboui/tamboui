@@ -10,11 +10,11 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
+
 import dev.tamboui.terminal.BackendException;
 
 /**
@@ -41,7 +41,10 @@ public final class LibC {
     public static final int TCSANOW = 0;
     /** Apply termios changes after all output has been transmitted. */
     public static final int TCSADRAIN = 1;
-    /** Apply termios changes after all output has been transmitted, discarding pending input. */
+    /**
+     * Apply termios changes after all output has been transmitted, discarding
+     * pending input.
+     */
     public static final int TCSAFLUSH = 2;
 
     /** ioctl request code to get terminal window size. */
@@ -73,9 +76,13 @@ public final class LibC {
     /** Control flag: set character size to 8 bits. */
     public static final int CS8 = PlatformConstants.CS8;
 
-    /** Control character index for minimum number of bytes for non-canonical read. */
+    /**
+     * Control character index for minimum number of bytes for non-canonical read.
+     */
     public static final int VMIN = PlatformConstants.VMIN;
-    /** Control character index for timeout in deciseconds for non-canonical read. */
+    /**
+     * Control character index for timeout in deciseconds for non-canonical read.
+     */
     public static final int VTIME = PlatformConstants.VTIME;
 
     /** Poll event: there is data to read. */
@@ -99,27 +106,27 @@ public final class LibC {
     // Capture errno state location for error reporting
     private static final Linker.Option CAPTURE_ERRNO = Linker.Option.captureCallState("errno");
     private static final MemoryLayout CALL_STATE_LAYOUT = Linker.Option.captureStateLayout();
-    private static final VarHandle ERRNO_HANDLE = CALL_STATE_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("errno"));
+    private static final VarHandle ERRNO_HANDLE = CALL_STATE_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("errno"));
 
     // Thread-local call state segment to avoid per-call Arena allocation
-    private static final ThreadLocal<MemorySegment> CALL_STATE_SEGMENT =
-            ThreadLocal.withInitial(() -> Arena.global().allocate(CALL_STATE_LAYOUT));
+    private static final ThreadLocal<MemorySegment> CALL_STATE_SEGMENT = ThreadLocal
+            .withInitial(() -> Arena.global().allocate(CALL_STATE_LAYOUT));
 
     // Canonical layouts (matching jextract pattern)
-    private static final ValueLayout.OfInt C_INT = 
-            (ValueLayout.OfInt) Linker.nativeLinker().canonicalLayouts().get("int");
-    private static final ValueLayout.OfLong C_LONG = 
-            (ValueLayout.OfLong) Linker.nativeLinker().canonicalLayouts().get("long");
-    private static final AddressLayout C_POINTER = 
-            ((AddressLayout) Linker.nativeLinker().canonicalLayouts().get("void*"))
-                    .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, 
-                            (ValueLayout.OfByte) Linker.nativeLinker().canonicalLayouts().get("char")));
-    
+    private static final ValueLayout.OfInt C_INT = (ValueLayout.OfInt) Linker.nativeLinker()
+            .canonicalLayouts().get("int");
+    private static final ValueLayout.OfLong C_LONG = (ValueLayout.OfLong) Linker.nativeLinker()
+            .canonicalLayouts().get("long");
+    private static final AddressLayout C_POINTER = ((AddressLayout) Linker.nativeLinker()
+            .canonicalLayouts().get("void*"))
+            .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE,
+                    (ValueLayout.OfByte) Linker.nativeLinker().canonicalLayouts().get("char")));
+
     // Function descriptor for signal handlers: void handler(int signum)
-    // Use canonical C_INT layout (same as jextract) for proper platform-specific handling
-    private static final FunctionDescriptor SIGNAL_HANDLER_DESC =
-            FunctionDescriptor.ofVoid(C_INT);
+    // Use canonical C_INT layout (same as jextract) for proper platform-specific
+    // handling
+    private static final FunctionDescriptor SIGNAL_HANDLER_DESC = FunctionDescriptor.ofVoid(C_INT);
 
     // Method handles for libc functions
     private static final MethodHandle TCGETATTR;
@@ -127,8 +134,8 @@ public final class LibC {
     private static final MethodHandle IOCTL;
     private static final MethodHandle READ;
     private static final MethodHandle WRITE;
-    private static final MethodHandle POLL_MACOS;  // nfds_t is unsigned int on macOS
-    private static final MethodHandle POLL_LINUX;  // nfds_t is unsigned long on Linux
+    private static final MethodHandle POLL_MACOS; // nfds_t is unsigned int on macOS
+    private static final MethodHandle POLL_LINUX; // nfds_t is unsigned long on Linux
     private static final MethodHandle ISATTY;
     private static final MethodHandle OPEN;
     private static final MethodHandle CLOSE;
@@ -145,82 +152,67 @@ public final class LibC {
 
     static {
         try {
-            TCGETATTR = LINKER.downcallHandle(
-                    LIBC.find("tcgetattr").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
+            TCGETATTR = LINKER.downcallHandle(LIBC.find("tcgetattr").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            ValueLayout.ADDRESS));
 
-            TCSETATTR = LINKER.downcallHandle(
-                    LIBC.find("tcsetattr").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
+            TCSETATTR = LINKER.downcallHandle(LIBC.find("tcsetattr").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             // ioctl(int fd, unsigned long request, ...) - variadic function
-            // Use canonical layouts matching jextract: C_INT return, C_INT fd, C_LONG request
+            // Use canonical layouts matching jextract: C_INT return, C_INT fd, C_LONG
+            // request
             // For TIOCGWINSZ, the variadic arg is a pointer to winsize struct
             // Use firstVariadicArg option to mark where variadic args start (after request)
             FunctionDescriptor ioctlDesc = FunctionDescriptor.of(C_INT, C_INT, C_LONG, C_POINTER);
-            Linker.Option firstVariadicArg = Linker.Option.firstVariadicArg(2); // variadic args start at index 2 (after fd and request)
-            IOCTL = LINKER.downcallHandle(
-                    LIBC.find("ioctl").orElseThrow(),
-                    ioctlDesc,
-                    firstVariadicArg,
-                    CAPTURE_ERRNO
-            );
+            Linker.Option firstVariadicArg = Linker.Option.firstVariadicArg(2); // variadic args
+                                                                                // start at index 2
+                                                                                // (after fd and
+                                                                                // request)
+            IOCTL = LINKER.downcallHandle(LIBC.find("ioctl").orElseThrow(), ioctlDesc,
+                    firstVariadicArg, CAPTURE_ERRNO);
 
-            READ = LINKER.downcallHandle(
-                    LIBC.find("read").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG)
-            );
+            READ = LINKER.downcallHandle(LIBC.find("read").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT,
+                            ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
 
             WRITE = LINKER.downcallHandle(
-                    LIBC.find("write").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG),
-                    CAPTURE_ERRNO
-            );
+                    LIBC.find("write").orElseThrow(), FunctionDescriptor.of(ValueLayout.JAVA_LONG,
+                            ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG),
+                    CAPTURE_ERRNO);
 
             // nfds_t is unsigned int (4 bytes) on macOS, unsigned long (8 bytes) on Linux
             // We need separate handles because invokeExact requires exact type matching
             POLL_MACOS = LINKER.downcallHandle(
-                    LIBC.find("poll").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT),
-                    CAPTURE_ERRNO
-            );
+                    LIBC.find("poll").orElseThrow(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT),
+                    CAPTURE_ERRNO);
             POLL_LINUX = LINKER.downcallHandle(
-                    LIBC.find("poll").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT),
-                    CAPTURE_ERRNO
-            );
+                    LIBC.find("poll").orElseThrow(), FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                            ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT),
+                    CAPTURE_ERRNO);
 
-            ISATTY = LINKER.downcallHandle(
-                    LIBC.find("isatty").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)
-            );
+            ISATTY = LINKER.downcallHandle(LIBC.find("isatty").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
-            OPEN = LINKER.downcallHandle(
-                    LIBC.find("open").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT),
-                    CAPTURE_ERRNO
-            );
+            OPEN = LINKER.downcallHandle(LIBC.find("open").orElseThrow(), FunctionDescriptor
+                    .of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT),
+                    CAPTURE_ERRNO);
 
-            CLOSE = LINKER.downcallHandle(
-                    LIBC.find("close").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)
-            );
+            CLOSE = LINKER.downcallHandle(LIBC.find("close").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
             // signal(int signum, void (*handler)(int)) returns previous handler
-            // Use canonical layouts matching jextract: C_POINTER return, C_INT signum, C_POINTER handler
-            SIGNAL = LINKER.downcallHandle(
-                    LIBC.find("signal").orElseThrow(),
-                    FunctionDescriptor.of(C_POINTER, C_INT, C_POINTER)
-            );
-            
+            // Use canonical layouts matching jextract: C_POINTER return, C_INT signum,
+            // C_POINTER handler
+            SIGNAL = LINKER.downcallHandle(LIBC.find("signal").orElseThrow(),
+                    FunctionDescriptor.of(C_POINTER, C_INT, C_POINTER));
+
             // sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
             // Returns 0 on success, -1 on error
-            SIGACTION = LINKER.downcallHandle(
-                    LIBC.find("sigaction").orElseThrow(),
-                    FunctionDescriptor.of(C_INT, C_INT, C_POINTER, C_POINTER)
-            );
+            SIGACTION = LINKER.downcallHandle(LIBC.find("sigaction").orElseThrow(),
+                    FunctionDescriptor.of(C_INT, C_INT, C_POINTER, C_POINTER));
         } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -232,8 +224,10 @@ public final class LibC {
     /**
      * Gets terminal attributes.
      *
-     * @param fd      file descriptor
-     * @param termios memory segment for termios struct
+     * @param fd
+     *            file descriptor
+     * @param termios
+     *            memory segment for termios struct
      * @return 0 on success, -1 on error
      */
     public static int tcgetattr(int fd, MemorySegment termios) {
@@ -247,9 +241,12 @@ public final class LibC {
     /**
      * Sets terminal attributes.
      *
-     * @param fd              file descriptor
-     * @param optionalActions when to apply changes (TCSANOW, TCSADRAIN, TCSAFLUSH)
-     * @param termios         memory segment for termios struct
+     * @param fd
+     *            file descriptor
+     * @param optionalActions
+     *            when to apply changes (TCSANOW, TCSADRAIN, TCSAFLUSH)
+     * @param termios
+     *            memory segment for termios struct
      * @return 0 on success, -1 on error
      */
     public static int tcsetattr(int fd, int optionalActions, MemorySegment termios) {
@@ -265,9 +262,12 @@ public final class LibC {
      * <p>
      * Uses a thread-local call state segment to avoid per-call Arena allocation.
      *
-     * @param fd      file descriptor
-     * @param request ioctl request code
-     * @param arg     argument (typically a memory segment)
+     * @param fd
+     *            file descriptor
+     * @param request
+     *            ioctl request code
+     * @param arg
+     *            argument (typically a memory segment)
      * @return 0 on success, -1 on error
      */
     public static int ioctl(int fd, long request, MemorySegment arg) {
@@ -297,9 +297,12 @@ public final class LibC {
     /**
      * Reads from a file descriptor.
      *
-     * @param fd    file descriptor
-     * @param buf   buffer to read into
-     * @param count maximum bytes to read
+     * @param fd
+     *            file descriptor
+     * @param buf
+     *            buffer to read into
+     * @param count
+     *            maximum bytes to read
      * @return number of bytes read, 0 for EOF, -1 on error
      */
     public static long read(int fd, MemorySegment buf, long count) {
@@ -315,9 +318,12 @@ public final class LibC {
      * <p>
      * Uses a thread-local call state segment to avoid per-call Arena allocation.
      *
-     * @param fd    file descriptor
-     * @param buf   buffer to write from
-     * @param count number of bytes to write
+     * @param fd
+     *            file descriptor
+     * @param buf
+     *            buffer to write from
+     * @param count
+     *            number of bytes to write
      * @return number of bytes written, -1 on error
      */
     public static long write(int fd, MemorySegment buf, long count) {
@@ -336,12 +342,15 @@ public final class LibC {
     /**
      * Waits for events on file descriptors.
      * <p>
-     * Uses a thread-local call state segment to capture errno.
-     * Check {@link #getLastErrno()} after a -1 return to determine the cause.
+     * Uses a thread-local call state segment to capture errno. Check
+     * {@link #getLastErrno()} after a -1 return to determine the cause.
      *
-     * @param fds     array of pollfd structures
-     * @param nfds    number of file descriptors
-     * @param timeout timeout in milliseconds (-1 for infinite)
+     * @param fds
+     *            array of pollfd structures
+     * @param nfds
+     *            number of file descriptors
+     * @param timeout
+     *            timeout in milliseconds (-1 for infinite)
      * @return number of descriptors with events, 0 for timeout, -1 on error
      */
     public static int poll(MemorySegment fds, int nfds, int timeout) {
@@ -365,7 +374,8 @@ public final class LibC {
     /**
      * Checks if a file descriptor refers to a terminal.
      *
-     * @param fd file descriptor
+     * @param fd
+     *            file descriptor
      * @return 1 if terminal, 0 otherwise
      */
     public static int isatty(int fd) {
@@ -379,8 +389,10 @@ public final class LibC {
     /**
      * Opens a file.
      *
-     * @param pathname path to the file
-     * @param flags    open flags (O_RDWR, etc.)
+     * @param pathname
+     *            path to the file
+     * @param flags
+     *            open flags (O_RDWR, etc.)
      * @return file descriptor on success, -1 on error
      */
     public static int open(String pathname, int flags) {
@@ -400,7 +412,8 @@ public final class LibC {
     /**
      * Closes a file descriptor.
      *
-     * @param fd file descriptor to close
+     * @param fd
+     *            file descriptor to close
      * @return 0 on success, -1 on error
      */
     public static int close(int fd) {
@@ -414,10 +427,13 @@ public final class LibC {
     /**
      * Installs a signal handler using signal().
      * <p>
-     * Note: This is deprecated on macOS. Use {@link #sigaction(int, MemorySegment, MemorySegment)} instead.
+     * Note: This is deprecated on macOS. Use
+     * {@link #sigaction(int, MemorySegment, MemorySegment)} instead.
      *
-     * @param signum  the signal number
-     * @param handler the handler function pointer (upcall stub)
+     * @param signum
+     *            the signal number
+     * @param handler
+     *            the handler function pointer (upcall stub)
      * @return the previous handler
      */
     public static MemorySegment signal(int signum, MemorySegment handler) {
@@ -427,15 +443,18 @@ public final class LibC {
             throw new BackendException("signal failed", t);
         }
     }
-    
+
     /**
      * Installs a signal handler using sigaction().
      * <p>
      * This is the preferred method on macOS as signal() is deprecated.
      *
-     * @param signum the signal number
-     * @param act    the new sigaction structure (can be null)
-     * @param oldact the old sigaction structure to save previous handler (can be null)
+     * @param signum
+     *            the signal number
+     * @param act
+     *            the new sigaction structure (can be null)
+     * @param oldact
+     *            the old sigaction structure to save previous handler (can be null)
      * @return 0 on success, -1 on error
      */
     public static int sigaction(int signum, MemorySegment act, MemorySegment oldact) {
@@ -445,22 +464,25 @@ public final class LibC {
             throw new BackendException("sigaction failed", t);
         }
     }
-    
+
     /**
      * Allocates a sigaction structure in the given arena.
      *
-     * @param arena the arena to allocate in
+     * @param arena
+     *            the arena to allocate in
      * @return a memory segment for the sigaction struct
      */
     public static MemorySegment allocateSigaction(Arena arena) {
         return arena.allocate(SIGACTION_LAYOUT);
     }
-    
+
     /**
      * Sets the handler pointer in a sigaction structure.
      *
-     * @param sigactionStruct the sigaction structure
-     * @param handler         the handler function pointer (upcall stub)
+     * @param sigactionStruct
+     *            the sigaction structure
+     * @param handler
+     *            the handler function pointer (upcall stub)
      */
     public static void setSigactionHandler(MemorySegment sigactionStruct, MemorySegment handler) {
         SIGACTION_HANDLER.set(sigactionStruct, 0L, handler);
@@ -471,8 +493,10 @@ public final class LibC {
      * <p>
      * Note: On Linux, sa_flags is a long (8 bytes), on macOS it's an int (4 bytes).
      *
-     * @param sigactionStruct the sigaction structure
-     * @param flags           the flags (e.g., SA_RESTART)
+     * @param sigactionStruct
+     *            the sigaction structure
+     * @param flags
+     *            the flags (e.g., SA_RESTART)
      */
     public static void setSigactionFlags(MemorySegment sigactionStruct, int flags) {
         if (PlatformConstants.isMacOS()) {
@@ -484,13 +508,15 @@ public final class LibC {
     }
 
     /**
-     * Sets the trampoline pointer in a sigaction structure.
-     * For simple signal handlers, this should be set to NULL.
+     * Sets the trampoline pointer in a sigaction structure. For simple signal
+     * handlers, this should be set to NULL.
      * <p>
      * Note: This is macOS-specific. On Linux, this method does nothing.
      *
-     * @param sigactionStruct the sigaction structure
-     * @param tramp           the trampoline function pointer (or NULL)
+     * @param sigactionStruct
+     *            the sigaction structure
+     * @param tramp
+     *            the trampoline function pointer (or NULL)
      */
     public static void setSigactionTramp(MemorySegment sigactionStruct, MemorySegment tramp) {
         if (SIGACTION_TRAMP != null) {
@@ -503,10 +529,13 @@ public final class LibC {
      * Sets the signal mask in a sigaction structure.
      * <p>
      * Note: On macOS, sa_mask is a simple int. On Linux, it's a 128-byte sigset_t.
-     * This method only sets the mask on macOS. On Linux, the mask is zeroed by default.
+     * This method only sets the mask on macOS. On Linux, the mask is zeroed by
+     * default.
      *
-     * @param sigactionStruct the sigaction structure
-     * @param mask            the signal mask (only used on macOS)
+     * @param sigactionStruct
+     *            the sigaction structure
+     * @param mask
+     *            the signal mask (only used on macOS)
      */
     public static void setSigactionMask(MemorySegment sigactionStruct, int mask) {
         if (SIGACTION_MASK_MACOS != null) {
@@ -518,7 +547,8 @@ public final class LibC {
     /**
      * Gets the handler pointer from a sigaction structure.
      *
-     * @param sigactionStruct the sigaction structure
+     * @param sigactionStruct
+     *            the sigaction structure
      * @return the handler function pointer
      */
     public static MemorySegment getSigactionHandler(MemorySegment sigactionStruct) {
@@ -531,19 +561,22 @@ public final class LibC {
      * The returned memory segment is valid for the lifetime of the provided arena.
      * The handler will be called with the signal number as parameter.
      * <p>
-     * This follows the jextract pattern: create unbound MethodHandle first,
-     * then bind when creating the upcall stub.
+     * This follows the jextract pattern: create unbound MethodHandle first, then
+     * bind when creating the upcall stub.
      *
-     * @param arena   the arena to allocate the stub in
-     * @param handler the Java handler to call (receives signal number)
+     * @param arena
+     *            the arena to allocate the stub in
+     * @param handler
+     *            the Java handler to call (receives signal number)
      * @return a memory segment that can be passed to signal()
      */
-    public static MemorySegment createSignalHandler(Arena arena, java.util.function.IntConsumer handler) {
+    public static MemorySegment createSignalHandler(Arena arena,
+            java.util.function.IntConsumer handler) {
         try {
             // Create unbound MethodHandle first (like jextract does)
-            MethodHandle unboundHandle = java.lang.invoke.MethodHandles.lookup()
-                    .findVirtual(java.util.function.IntConsumer.class, "accept",
-                            SIGNAL_HANDLER_DESC.toMethodType());
+            MethodHandle unboundHandle = java.lang.invoke.MethodHandles.lookup().findVirtual(
+                    java.util.function.IntConsumer.class, "accept",
+                    SIGNAL_HANDLER_DESC.toMethodType());
             // Bind handler when creating upcall stub (matches jextract pattern)
             return LINKER.upcallStub(unboundHandle.bindTo(handler), SIGNAL_HANDLER_DESC, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
@@ -562,35 +595,30 @@ public final class LibC {
      * Layout for the winsize structure.
      */
     public static final MemoryLayout WINSIZE_LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_SHORT.withName("ws_row"),
-            ValueLayout.JAVA_SHORT.withName("ws_col"),
+            ValueLayout.JAVA_SHORT.withName("ws_row"), ValueLayout.JAVA_SHORT.withName("ws_col"),
             ValueLayout.JAVA_SHORT.withName("ws_xpixel"),
-            ValueLayout.JAVA_SHORT.withName("ws_ypixel")
-    );
+            ValueLayout.JAVA_SHORT.withName("ws_ypixel"));
 
     /**
      * Layout for the pollfd structure.
      */
     public static final MemoryLayout POLLFD_LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_INT.withName("fd"),
-            ValueLayout.JAVA_SHORT.withName("events"),
-            ValueLayout.JAVA_SHORT.withName("revents")
-    );
-    
+            ValueLayout.JAVA_INT.withName("fd"), ValueLayout.JAVA_SHORT.withName("events"),
+            ValueLayout.JAVA_SHORT.withName("revents"));
+
     /**
-     * Layout for the __sigaction_u union (macOS).
-     * This union contains either __sa_handler or __sa_sigaction pointer.
-     * Both are at offset 0 since it's a union.
+     * Layout for the __sigaction_u union (macOS). This union contains either
+     * __sa_handler or __sa_sigaction pointer. Both are at offset 0 since it's a
+     * union.
      */
-    private static final MemoryLayout SIGACTION_U_LAYOUT_MACOS = MemoryLayout.unionLayout(
-            C_POINTER.withName("__sa_handler"),
-            C_POINTER.withName("__sa_sigaction")
-    );
+    private static final MemoryLayout SIGACTION_U_LAYOUT_MACOS = MemoryLayout
+            .unionLayout(C_POINTER.withName("__sa_handler"), C_POINTER.withName("__sa_sigaction"));
 
     /**
      * Layout for the sigaction structure.
      * <p>
      * macOS struct __sigaction (24 bytes):
+     * 
      * <pre>
      *     union __sigaction_u __sigaction_u;  // 8 bytes - handler pointer
      *     void (*sa_tramp)(...);              // 8 bytes - trampoline pointer
@@ -599,6 +627,7 @@ public final class LibC {
      * </pre>
      * <p>
      * Linux struct sigaction (152 bytes):
+     * 
      * <pre>
      *     void (*sa_handler)(int);            // 8 bytes - handler pointer
      *     unsigned long sa_flags;             // 8 bytes - flags
@@ -607,48 +636,37 @@ public final class LibC {
      * </pre>
      */
     public static final MemoryLayout SIGACTION_LAYOUT = PlatformConstants.isMacOS()
-            ? MemoryLayout.structLayout(
-                    SIGACTION_U_LAYOUT_MACOS.withName("__sigaction_u"),
-                    C_POINTER.withName("sa_tramp"),
-                    C_INT.withName("sa_mask"),
-                    C_INT.withName("sa_flags")
-            )
-            : MemoryLayout.structLayout(
-                    C_POINTER.withName("sa_handler"),
-                    ValueLayout.JAVA_LONG.withName("sa_flags"),
-                    C_POINTER.withName("sa_restorer"),
-                    MemoryLayout.sequenceLayout(128, ValueLayout.JAVA_BYTE).withName("sa_mask")
-            );
+            ? MemoryLayout.structLayout(SIGACTION_U_LAYOUT_MACOS.withName("__sigaction_u"),
+                    C_POINTER.withName("sa_tramp"), C_INT.withName("sa_mask"),
+                    C_INT.withName("sa_flags"))
+            : MemoryLayout.structLayout(C_POINTER.withName("sa_handler"),
+                    ValueLayout.JAVA_LONG.withName("sa_flags"), C_POINTER.withName("sa_restorer"),
+                    MemoryLayout.sequenceLayout(128, ValueLayout.JAVA_BYTE).withName("sa_mask"));
 
     // VarHandles for sigaction - platform specific
     private static final VarHandle SIGACTION_HANDLER = PlatformConstants.isMacOS()
-            ? SIGACTION_LAYOUT.varHandle(
-                    MemoryLayout.PathElement.groupElement("__sigaction_u"),
+            ? SIGACTION_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("__sigaction_u"),
                     MemoryLayout.PathElement.groupElement("__sa_handler"))
-            : SIGACTION_LAYOUT.varHandle(
-                    MemoryLayout.PathElement.groupElement("sa_handler"));
+            : SIGACTION_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("sa_handler"));
 
     private static final VarHandle SIGACTION_FLAGS = PlatformConstants.isMacOS()
-            ? SIGACTION_LAYOUT.varHandle(
-                    MemoryLayout.PathElement.groupElement("sa_flags"))
-            : SIGACTION_LAYOUT.varHandle(
-                    MemoryLayout.PathElement.groupElement("sa_flags"));
+            ? SIGACTION_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("sa_flags"))
+            : SIGACTION_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("sa_flags"));
 
     // macOS-only VarHandles
     private static final VarHandle SIGACTION_TRAMP = PlatformConstants.isMacOS()
-            ? SIGACTION_LAYOUT.varHandle(
-                    MemoryLayout.PathElement.groupElement("sa_tramp"))
+            ? SIGACTION_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("sa_tramp"))
             : null;
 
     private static final VarHandle SIGACTION_MASK_MACOS = PlatformConstants.isMacOS()
-            ? SIGACTION_LAYOUT.varHandle(
-                    MemoryLayout.PathElement.groupElement("sa_mask"))
+            ? SIGACTION_LAYOUT.varHandle(MemoryLayout.PathElement.groupElement("sa_mask"))
             : null;
 
     /**
      * Creates a new termios struct in the given arena.
      *
-     * @param arena the arena to allocate in
+     * @param arena
+     *            the arena to allocate in
      * @return a memory segment for the termios struct
      */
     public static MemorySegment allocateTermios(Arena arena) {
@@ -658,7 +676,8 @@ public final class LibC {
     /**
      * Creates a new winsize struct in the given arena.
      *
-     * @param arena the arena to allocate in
+     * @param arena
+     *            the arena to allocate in
      * @return a memory segment for the winsize struct
      */
     public static MemorySegment allocateWinsize(Arena arena) {
@@ -668,7 +687,8 @@ public final class LibC {
     /**
      * Creates a new pollfd struct in the given arena.
      *
-     * @param arena the arena to allocate in
+     * @param arena
+     *            the arena to allocate in
      * @return a memory segment for the pollfd struct
      */
     public static MemorySegment allocatePollfd(Arena arena) {

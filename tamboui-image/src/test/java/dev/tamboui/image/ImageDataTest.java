@@ -4,9 +4,9 @@
  */
 package dev.tamboui.image;
 
-import org.junit.jupiter.api.Test;
-
 import java.awt.image.BufferedImage;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,14 +42,10 @@ class ImageDataTest {
     void pixelAt_throws_for_invalid_coordinates() {
         ImageData data = ImageData.fromBufferedImage(createTestImage(5, 5, 0xFF000000));
 
-        assertThatThrownBy(() -> data.pixelAt(-1, 0))
-            .isInstanceOf(IndexOutOfBoundsException.class);
-        assertThatThrownBy(() -> data.pixelAt(5, 0))
-            .isInstanceOf(IndexOutOfBoundsException.class);
-        assertThatThrownBy(() -> data.pixelAt(0, -1))
-            .isInstanceOf(IndexOutOfBoundsException.class);
-        assertThatThrownBy(() -> data.pixelAt(0, 5))
-            .isInstanceOf(IndexOutOfBoundsException.class);
+        assertThatThrownBy(() -> data.pixelAt(-1, 0)).isInstanceOf(IndexOutOfBoundsException.class);
+        assertThatThrownBy(() -> data.pixelAt(5, 0)).isInstanceOf(IndexOutOfBoundsException.class);
+        assertThatThrownBy(() -> data.pixelAt(0, -1)).isInstanceOf(IndexOutOfBoundsException.class);
+        assertThatThrownBy(() -> data.pixelAt(0, 5)).isInstanceOf(IndexOutOfBoundsException.class);
     }
 
     @Test
@@ -113,12 +109,9 @@ class ImageDataTest {
     void resize_throws_for_invalid_dimensions() {
         ImageData data = ImageData.fromBufferedImage(createTestImage(10, 10, 0xFFFF0000));
 
-        assertThatThrownBy(() -> data.resize(0, 10))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> data.resize(10, 0))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> data.resize(-1, 10))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> data.resize(0, 10)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> data.resize(10, 0)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> data.resize(-1, 10)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -147,15 +140,15 @@ class ImageDataTest {
         ImageData data = ImageData.fromBufferedImage(createTestImage(10, 10, 0xFFFF0000));
 
         assertThatThrownBy(() -> data.crop(-1, 0, 5, 5))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> data.crop(0, -1, 5, 5))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> data.crop(0, 0, 0, 5))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> data.crop(0, 0, 5, 0))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> data.crop(5, 5, 10, 10))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -206,7 +199,7 @@ class ImageDataTest {
 
         int[] dims = data.scaledDimensionsToFill(50, 50);
         assertThat(dims[0]).isEqualTo(100); // Width overshoots
-        assertThat(dims[1]).isEqualTo(50);  // Height exactly fills
+        assertThat(dims[1]).isEqualTo(50); // Height exactly fills
     }
 
     @Test

@@ -4,17 +4,17 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.Optional;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Painter;
 import dev.tamboui.widgets.canvas.Shape;
 
-import java.util.Optional;
-
 /**
  * A rectangle defined by position and size.
  * <p>
- * The rectangle is positioned from its bottom-left corner in
- * canvas coordinate space (mathematical coordinates).
+ * The rectangle is positioned from its bottom-left corner in canvas coordinate
+ * space (mathematical coordinates).
  *
  * <pre>{@code
  * // Rectangle at (10, 20) with width 30 and height 15
@@ -32,13 +32,19 @@ public final class Rectangle implements Shape {
     private final Color color;
 
     /**
-     * Creates a rectangle at the given position with the given dimensions and color.
+     * Creates a rectangle at the given position with the given dimensions and
+     * color.
      *
-     * @param x      the x coordinate of the bottom-left corner
-     * @param y      the y coordinate of the bottom-left corner
-     * @param width  the rectangle width
-     * @param height the rectangle height
-     * @param color  the rectangle color
+     * @param x
+     *            the x coordinate of the bottom-left corner
+     * @param y
+     *            the y coordinate of the bottom-left corner
+     * @param width
+     *            the rectangle width
+     * @param height
+     *            the rectangle height
+     * @param color
+     *            the rectangle color
      */
     public Rectangle(double x, double y, double width, double height, Color color) {
         this.x = x;
@@ -51,11 +57,16 @@ public final class Rectangle implements Shape {
     /**
      * Creates a rectangle at (x, y) with the given dimensions and color.
      *
-     * @param x      the x coordinate of the bottom-left corner
-     * @param y      the y coordinate of the bottom-left corner
-     * @param width  the rectangle width
-     * @param height the rectangle height
-     * @param color  the rectangle color
+     * @param x
+     *            the x coordinate of the bottom-left corner
+     * @param y
+     *            the y coordinate of the bottom-left corner
+     * @param width
+     *            the rectangle width
+     * @param height
+     *            the rectangle height
+     * @param color
+     *            the rectangle color
      * @return a new Rectangle
      */
     public static Rectangle of(double x, double y, double width, double height, Color color) {
@@ -92,15 +103,14 @@ public final class Rectangle implements Shape {
             double dy = y2 - y1;
             double length = Math.sqrt(dx * dx + dy * dy);
             if (length == 0) {
-                painter.getPoint(x1, y1).ifPresent(p ->
-                    painter.paint(p.x(), p.y(), color));
+                painter.getPoint(x1, y1).ifPresent(p -> painter.paint(p.x(), p.y(), color));
                 return;
             }
             int steps = Math.max(1, (int) Math.ceil(length / 0.5));
             for (int i = 0; i <= steps; i++) {
                 double t = (double) i / steps;
-                painter.getPoint(x1 + t * dx, y1 + t * dy).ifPresent(p ->
-                    painter.paint(p.x(), p.y(), color));
+                painter.getPoint(x1 + t * dx, y1 + t * dy)
+                        .ifPresent(p -> painter.paint(p.x(), p.y(), color));
             }
         }
     }
@@ -185,11 +195,9 @@ public final class Rectangle implements Shape {
             return false;
         }
         Rectangle rectangle = (Rectangle) o;
-        return Double.compare(rectangle.x, x) == 0
-            && Double.compare(rectangle.y, y) == 0
-            && Double.compare(rectangle.width, width) == 0
-            && Double.compare(rectangle.height, height) == 0
-            && color.equals(rectangle.color);
+        return Double.compare(rectangle.x, x) == 0 && Double.compare(rectangle.y, y) == 0
+                && Double.compare(rectangle.width, width) == 0
+                && Double.compare(rectangle.height, height) == 0 && color.equals(rectangle.color);
     }
 
     @Override
@@ -204,8 +212,7 @@ public final class Rectangle implements Shape {
 
     @Override
     public String toString() {
-        return String.format(
-            "Rectangle[x=%s, y=%s, width=%s, height=%s, color=%s]",
-            x, y, width, height, color);
+        return String.format("Rectangle[x=%s, y=%s, width=%s, height=%s, color=%s]", x, y, width,
+                height, color);
     }
 }

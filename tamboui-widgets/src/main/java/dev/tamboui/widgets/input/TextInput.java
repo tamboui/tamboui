@@ -6,17 +6,16 @@ package dev.tamboui.widgets.input;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
-import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.text.CharWidth;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
 
@@ -30,16 +29,16 @@ public final class TextInput implements StatefulWidget<TextInputState> {
      * <p>
      * CSS property name: {@code cursor-color}
      */
-    public static final PropertyDefinition<Color> CURSOR_COLOR =
-            PropertyDefinition.of("cursor-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> CURSOR_COLOR = PropertyDefinition
+            .of("cursor-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the placeholder text color.
      * <p>
      * CSS property name: {@code placeholder-color}
      */
-    public static final PropertyDefinition<Color> PLACEHOLDER_COLOR =
-            PropertyDefinition.of("placeholder-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> PLACEHOLDER_COLOR = PropertyDefinition
+            .of("placeholder-color", ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(CURSOR_COLOR, PLACEHOLDER_COLOR);
@@ -118,7 +117,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         // Show placeholder if empty
         if (text.isEmpty() && !placeholder.isEmpty()) {
             String visiblePlaceholder = CharWidth.substringByWidth(placeholder, inputArea.width());
-            buffer.setString(inputArea.left(), inputArea.top(), visiblePlaceholder, placeholderStyle);
+            buffer.setString(inputArea.left(), inputArea.top(), visiblePlaceholder,
+                    placeholderStyle);
             return;
         }
 
@@ -160,13 +160,17 @@ public final class TextInput implements StatefulWidget<TextInputState> {
     }
 
     /**
-     * Renders the widget and sets the cursor position on the frame.
-     * Call this instead of render() when this input is focused.
+     * Renders the widget and sets the cursor position on the frame. Call this
+     * instead of render() when this input is focused.
      *
-     * @param area   the area to render in
-     * @param buffer the buffer to render to
-     * @param state  the text input state
-     * @param frame  the frame for cursor positioning
+     * @param area
+     *            the area to render in
+     * @param buffer
+     *            the buffer to render to
+     * @param state
+     *            the text input state
+     * @param frame
+     *            the frame for cursor positioning
      */
     public void renderWithCursor(Rect area, Buffer buffer, TextInputState state, Frame frame) {
         render(area, buffer, state);
@@ -187,7 +191,9 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         int widthBeforeCursor = CharWidth.of(textBeforeCursor);
 
         // Calculate scroll offset in display columns
-        int scrollDisplayOffset = widthBeforeCursor >= visibleWidth ? widthBeforeCursor - visibleWidth + 1 : 0;
+        int scrollDisplayOffset = widthBeforeCursor >= visibleWidth
+                ? widthBeforeCursor - visibleWidth + 1
+                : 0;
 
         // Cursor X position is the display width before cursor minus scroll offset
         int cursorX = inputArea.left() + (widthBeforeCursor - scrollDisplayOffset);
@@ -222,12 +228,14 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         private Color cursorColor;
         private Color placeholderColor;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Wraps the text input in a block.
          *
-         * @param block the block to wrap in
+         * @param block
+         *            the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -238,7 +246,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         /**
          * Sets the base style.
          *
-         * @param style the base style
+         * @param style
+         *            the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -249,7 +258,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         /**
          * Sets the cursor style.
          *
-         * @param cursorStyle the cursor style
+         * @param cursorStyle
+         *            the cursor style
          * @return this builder
          */
         public Builder cursorStyle(Style cursorStyle) {
@@ -260,7 +270,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         /**
          * Sets the placeholder text shown when the input is empty.
          *
-         * @param placeholder the placeholder text
+         * @param placeholder
+         *            the placeholder text
          * @return this builder
          */
         public Builder placeholder(String placeholder) {
@@ -271,7 +282,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         /**
          * Sets the placeholder text style.
          *
-         * @param placeholderStyle the placeholder style
+         * @param placeholderStyle
+         *            the placeholder style
          * @return this builder
          */
         public Builder placeholderStyle(Style placeholderStyle) {
@@ -283,10 +295,11 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * Sets the property resolver for style-aware properties.
          * <p>
          * When set, properties like {@code color}, {@code background},
-         * {@code cursor-color}, and {@code placeholder-color} will be
-         * resolved if not set programmatically.
+         * {@code cursor-color}, and {@code placeholder-color} will be resolved if not
+         * set programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -299,7 +312,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -312,7 +326,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the foreground color
+         * @param color
+         *            the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {
@@ -325,7 +340,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the cursor color
+         * @param color
+         *            the cursor color
          * @return this builder
          */
         public Builder cursorColor(Color color) {
@@ -338,7 +354,8 @@ public final class TextInput implements StatefulWidget<TextInputState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the placeholder color
+         * @param color
+         *            the placeholder color
          * @return this builder
          */
         public Builder placeholderColor(Color color) {

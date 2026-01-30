@@ -4,14 +4,15 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.tui.error.ErrorAction;
-import dev.tamboui.tui.error.RenderErrorHandlers;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.tui.error.ErrorAction;
+import dev.tamboui.tui.error.RenderErrorHandlers;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -26,7 +27,8 @@ class TuiConfigTest {
         assertThat(config.alternateScreen()).isTrue();
         assertThat(config.hideCursor()).isTrue();
         assertThat(config.mouseCapture()).isFalse();
-        assertThat(config.pollTimeout()).isEqualTo(Duration.ofMillis(TuiConfig.DEFAULT_POLL_TIMEOUT));
+        assertThat(config.pollTimeout())
+                .isEqualTo(Duration.ofMillis(TuiConfig.DEFAULT_POLL_TIMEOUT));
         assertThat(config.ticksEnabled()).isTrue();
         assertThat(config.tickRate()).isEqualTo(Duration.ofMillis(TuiConfig.DEFAULT_TICK_TIMEOUT));
         assertThat(config.shutdownHook()).isTrue();
@@ -44,14 +46,9 @@ class TuiConfigTest {
     @Test
     @DisplayName("builder creates config with custom values")
     void builderCreatesCustomConfig() {
-        TuiConfig config = TuiConfig.builder()
-                .rawMode(false)
-                .alternateScreen(false)
-                .hideCursor(false)
-                .mouseCapture(true)
-                .pollTimeout(Duration.ofMillis(50))
-                .tickRate(Duration.ofMillis(33))
-                .build();
+        TuiConfig config = TuiConfig.builder().rawMode(false).alternateScreen(false)
+                .hideCursor(false).mouseCapture(true).pollTimeout(Duration.ofMillis(50))
+                .tickRate(Duration.ofMillis(33)).build();
 
         assertThat(config.rawMode()).isFalse();
         assertThat(config.alternateScreen()).isFalse();
@@ -76,9 +73,7 @@ class TuiConfigTest {
     @Test
     @DisplayName("builder allows partial customization")
     void builderAllowsPartialCustomization() {
-        TuiConfig config = TuiConfig.builder()
-                .mouseCapture(true)
-                .build();
+        TuiConfig config = TuiConfig.builder().mouseCapture(true).build();
 
         assertThat(config.rawMode()).isTrue();
         assertThat(config.mouseCapture()).isTrue();
@@ -95,18 +90,14 @@ class TuiConfigTest {
     @Test
     @DisplayName("ticksEnabled returns true when tickRate is set")
     void ticksEnabledTrueWhenRateSet() {
-        TuiConfig config = TuiConfig.builder()
-                .tickRate(Duration.ofMillis(16))
-                .build();
+        TuiConfig config = TuiConfig.builder().tickRate(Duration.ofMillis(16)).build();
         assertThat(config.ticksEnabled()).isTrue();
     }
 
     @Test
     @DisplayName("shutdownHook can be disabled via builder")
     void shutdownHookCanBeDisabled() {
-        TuiConfig config = TuiConfig.builder()
-                .shutdownHook(false)
-                .build();
+        TuiConfig config = TuiConfig.builder().shutdownHook(false).build();
         assertThat(config.shutdownHook()).isFalse();
     }
 
@@ -135,8 +126,7 @@ class TuiConfigTest {
                     @Override
                     public void quit() {
                     }
-                }
-        );
+                });
         assertThat(action).isEqualTo(ErrorAction.DISPLAY_AND_QUIT);
     }
 
@@ -150,9 +140,7 @@ class TuiConfigTest {
     @Test
     @DisplayName("builder allows custom errorHandler")
     void builderAllowsCustomErrorHandler() {
-        TuiConfig config = TuiConfig.builder()
-                .errorHandler(RenderErrorHandlers.suppress())
-                .build();
+        TuiConfig config = TuiConfig.builder().errorHandler(RenderErrorHandlers.suppress()).build();
 
         assertThat(config.errorHandler()).isNotNull();
     }
@@ -161,9 +149,7 @@ class TuiConfigTest {
     @DisplayName("builder allows custom errorOutput")
     void builderAllowsCustomErrorOutput() {
         PrintStream customOutput = new PrintStream(new ByteArrayOutputStream());
-        TuiConfig config = TuiConfig.builder()
-                .errorOutput(customOutput)
-                .build();
+        TuiConfig config = TuiConfig.builder().errorOutput(customOutput).build();
 
         assertThat(config.errorOutput()).isSameAs(customOutput);
     }
@@ -171,9 +157,7 @@ class TuiConfigTest {
     @Test
     @DisplayName("builder defaults errorHandler when null is passed")
     void builderDefaultsErrorHandlerWhenNull() {
-        TuiConfig config = TuiConfig.builder()
-                .errorHandler(null)
-                .build();
+        TuiConfig config = TuiConfig.builder().errorHandler(null).build();
 
         assertThat(config.errorHandler()).isNotNull();
     }
@@ -181,9 +165,7 @@ class TuiConfigTest {
     @Test
     @DisplayName("builder defaults errorOutput when null is passed")
     void builderDefaultsErrorOutputWhenNull() {
-        TuiConfig config = TuiConfig.builder()
-                .errorOutput(null)
-                .build();
+        TuiConfig config = TuiConfig.builder().errorOutput(null).build();
 
         assertThat(config.errorOutput()).isSameAs(System.err);
     }

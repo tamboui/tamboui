@@ -4,11 +4,6 @@
  */
 package dev.tamboui.text;
 
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -17,6 +12,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * Multi-line styled text, composed of Lines.
@@ -29,8 +30,10 @@ public final class Text {
     /**
      * Creates a new text with the given lines and alignment.
      *
-     * @param lines     the lines of styled text
-     * @param alignment the text alignment, or null for default
+     * @param lines
+     *            the lines of styled text
+     * @param alignment
+     *            the text alignment, or null for default
      */
     public Text(List<Line> lines, Alignment alignment) {
         this.lines = listCopyOf(lines);
@@ -49,21 +52,21 @@ public final class Text {
     /**
      * Creates a text from a raw string, splitting on newlines.
      *
-     * @param text the raw text content
+     * @param text
+     *            the raw text content
      * @return a new text
      */
     public static Text raw(String text) {
-        List<Line> linesList = new BufferedReader(new StringReader(text))
-            .lines()
-            .map(Line::from)
-            .collect(Collectors.toList());
+        List<Line> linesList = new BufferedReader(new StringReader(text)).lines().map(Line::from)
+                .collect(Collectors.toList());
         return new Text(linesList, null);
     }
 
     /**
      * Creates a text from a string, splitting on newlines.
      *
-     * @param text the text content
+     * @param text
+     *            the text content
      * @return a new text
      */
     public static Text from(String text) {
@@ -73,7 +76,8 @@ public final class Text {
     /**
      * Creates a text containing a single line.
      *
-     * @param line the line
+     * @param line
+     *            the line
      * @return a new text
      */
     public static Text from(Line line) {
@@ -83,7 +87,8 @@ public final class Text {
     /**
      * Creates a text from one or more lines.
      *
-     * @param lines the lines
+     * @param lines
+     *            the lines
      * @return a new text
      */
     public static Text from(Line... lines) {
@@ -93,7 +98,8 @@ public final class Text {
     /**
      * Creates a text from a list of lines.
      *
-     * @param lines the lines
+     * @param lines
+     *            the lines
      * @return a new text
      */
     public static Text from(List<Line> lines) {
@@ -103,7 +109,8 @@ public final class Text {
     /**
      * Creates a text containing a single span on one line.
      *
-     * @param span the span
+     * @param span
+     *            the span
      * @return a new text
      */
     public static Text from(Span span) {
@@ -113,15 +120,15 @@ public final class Text {
     /**
      * Creates a styled text from a string, splitting on newlines.
      *
-     * @param text  the text content
-     * @param style the style to apply to all lines
+     * @param text
+     *            the text content
+     * @param style
+     *            the style to apply to all lines
      * @return a new styled text
      */
     public static Text styled(String text, Style style) {
-        List<Line> linesList = new BufferedReader(new StringReader(text))
-            .lines()
-            .map(line -> Line.styled(line, style))
-            .collect(Collectors.toList());
+        List<Line> linesList = new BufferedReader(new StringReader(text)).lines()
+                .map(line -> Line.styled(line, style)).collect(Collectors.toList());
         return new Text(linesList, null);
     }
 
@@ -140,10 +147,7 @@ public final class Text {
      * @return the maximum line width in terminal columns
      */
     public int width() {
-        return lines.stream()
-            .mapToInt(Line::width)
-            .max()
-            .orElse(0);
+        return lines.stream().mapToInt(Line::width).max().orElse(0);
     }
 
     /**
@@ -158,7 +162,8 @@ public final class Text {
     /**
      * Returns a new text with the given alignment.
      *
-     * @param alignment the alignment
+     * @param alignment
+     *            the alignment
      * @return a new text with the specified alignment
      */
     public Text alignment(Alignment alignment) {
@@ -195,20 +200,21 @@ public final class Text {
     /**
      * Applies a style patch to all lines.
      *
-     * @param style the style to apply
+     * @param style
+     *            the style to apply
      * @return a new text with the patched style
      */
     public Text patchStyle(Style style) {
-        List<Line> newLines = lines.stream()
-            .map(line -> line.patchStyle(style))
-            .collect(Collectors.toList());
+        List<Line> newLines = lines.stream().map(line -> line.patchStyle(style))
+                .collect(Collectors.toList());
         return new Text(newLines, alignment);
     }
 
     /**
      * Returns a new text with the given foreground color.
      *
-     * @param color the foreground color
+     * @param color
+     *            the foreground color
      * @return a new text with the foreground color applied
      */
     public Text fg(Color color) {
@@ -218,7 +224,8 @@ public final class Text {
     /**
      * Returns a new text with the given background color.
      *
-     * @param color the background color
+     * @param color
+     *            the background color
      * @return a new text with the background color applied
      */
     public Text bg(Color color) {
@@ -255,7 +262,8 @@ public final class Text {
     /**
      * Returns a new text with a hyperlink.
      *
-     * @param url the hyperlink URL
+     * @param url
+     *            the hyperlink URL
      * @return a new text with the hyperlink applied
      */
     public Text hyperlink(String url) {
@@ -265,8 +273,10 @@ public final class Text {
     /**
      * Returns a new text with a hyperlink and explicit ID.
      *
-     * @param url the hyperlink URL
-     * @param id  the hyperlink ID
+     * @param url
+     *            the hyperlink URL
+     * @param id
+     *            the hyperlink ID
      * @return a new text with the hyperlink applied
      */
     public Text hyperlink(String url, String id) {
@@ -292,7 +302,8 @@ public final class Text {
     /**
      * Appends another text's lines to this text.
      *
-     * @param other the text to append
+     * @param other
+     *            the text to append
      * @return a new text with the appended lines
      */
     public Text append(Text other) {
@@ -304,7 +315,8 @@ public final class Text {
     /**
      * Appends a line to this text.
      *
-     * @param line the line to append
+     * @param line
+     *            the line to append
      * @return a new text with the appended line
      */
     public Text append(Line line) {
@@ -316,7 +328,8 @@ public final class Text {
     /**
      * Extends the last line with the given span, or adds a new line if empty.
      *
-     * @param span the span to push
+     * @param span
+     *            the span to push
      * @return a new text with the span added to the last line
      */
     public Text push(Span span) {

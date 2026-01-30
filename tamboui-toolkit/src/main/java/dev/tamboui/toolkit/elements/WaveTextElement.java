@@ -16,8 +16,8 @@ import dev.tamboui.widgets.wavetext.WaveTextState;
 /**
  * An element that displays text with an animated wave brightness effect.
  * <p>
- * By default, a dark "shadow" moves through otherwise bright text.
- * This can be inverted to have a bright peak moving through dim text.
+ * By default, a dark "shadow" moves through otherwise bright text. This can be
+ * inverted to have a bright peak moving through dim text.
  *
  * <pre>{@code
  * // Dark shadow on bright text (default)
@@ -51,7 +51,8 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Creates a wave text element with the given text.
      *
-     * @param text the text to display
+     * @param text
+     *            the text to display
      */
     public WaveTextElement(String text) {
         this.text = text;
@@ -61,8 +62,10 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Creates a wave text element with the given text and color.
      *
-     * @param text the text to display
-     * @param color the base color
+     * @param text
+     *            the text to display
+     * @param color
+     *            the base color
      */
     public WaveTextElement(String text, Color color) {
         this.text = text;
@@ -73,7 +76,8 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Sets the text to display.
      *
-     * @param text the text
+     * @param text
+     *            the text
      * @return this element for chaining
      */
     public WaveTextElement text(String text) {
@@ -84,7 +88,8 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Sets the base color for the wave effect.
      *
-     * @param color the color
+     * @param color
+     *            the color
      * @return this element for chaining
      */
     public WaveTextElement color(Color color) {
@@ -95,10 +100,10 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Sets the dim factor for non-peak characters.
      * <p>
-     * A value of 0.0 means completely black, 1.0 means no dimming.
-     * Default is 0.3.
+     * A value of 0.0 means completely black, 1.0 means no dimming. Default is 0.3.
      *
-     * @param dimFactor the dim factor (0.0-1.0)
+     * @param dimFactor
+     *            the dim factor (0.0-1.0)
      * @return this element for chaining
      */
     public WaveTextElement dimFactor(double dimFactor) {
@@ -111,7 +116,8 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
      * <p>
      * Larger values create a wider bright area. Default is 3.
      *
-     * @param peakWidth the peak width
+     * @param peakWidth
+     *            the peak width
      * @return this element for chaining
      */
     public WaveTextElement peakWidth(int peakWidth) {
@@ -122,10 +128,11 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Sets the animation speed multiplier.
      * <p>
-     * Values greater than 1.0 speed up the animation,
-     * values less than 1.0 slow it down. Default is 1.0.
+     * Values greater than 1.0 speed up the animation, values less than 1.0 slow it
+     * down. Default is 1.0.
      *
-     * @param speed the speed multiplier
+     * @param speed
+     *            the speed multiplier
      * @return this element for chaining
      */
     public WaveTextElement speed(double speed) {
@@ -138,7 +145,8 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
      * <p>
      * Multiple peaks create a more dynamic effect. Default is 1.
      *
-     * @param peakCount the number of peaks
+     * @param peakCount
+     *            the number of peaks
      * @return this element for chaining
      */
     public WaveTextElement peakCount(int peakCount) {
@@ -150,10 +158,11 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
      * Sets the animation mode.
      * <p>
      * {@link WaveText.Mode#LOOP} creates continuous movement in one direction.
-     * {@link WaveText.Mode#OSCILLATE} creates back-and-forth movement.
-     * Default is LOOP.
+     * {@link WaveText.Mode#OSCILLATE} creates back-and-forth movement. Default is
+     * LOOP.
      *
-     * @param mode the animation mode
+     * @param mode
+     *            the animation mode
      * @return this element for chaining
      */
     public WaveTextElement mode(WaveText.Mode mode) {
@@ -176,10 +185,11 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
     /**
      * Sets whether the effect is inverted.
      * <p>
-     * When false (default), a dark shadow moves through bright text.
-     * When true, a bright peak moves through dim text.
+     * When false (default), a dark shadow moves through bright text. When true, a
+     * bright peak moves through dim text.
      *
-     * @param inverted true to invert the effect
+     * @param inverted
+     *            true to invert the effect
      * @return this element for chaining
      */
     public WaveTextElement inverted(boolean inverted) {
@@ -202,7 +212,8 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
      * <p>
      * If not set, an internal state is used and advanced automatically.
      *
-     * @param state the wave text state
+     * @param state
+     *            the wave text state
      * @return this element for chaining
      */
     public WaveTextElement state(WaveTextState state) {
@@ -226,20 +237,12 @@ public final class WaveTextElement extends StyledElement<WaveTextElement> {
 
         // Get the CSS resolver for this element
         StylePropertyResolver resolver = context.resolveStyle(this)
-                .map(r -> (StylePropertyResolver) r)
-                .orElse(StylePropertyResolver.empty());
+                .map(r -> (StylePropertyResolver) r).orElse(StylePropertyResolver.empty());
 
         // Build the widget
-        WaveText.Builder builder = WaveText.builder()
-                .text(text)
-                .styleResolver(resolver)
-                .dimFactor(dimFactor)
-                .peakWidth(peakWidth)
-                .peakCount(peakCount)
-                .speed(speed)
-                .mode(mode)
-                .inverted(inverted)
-                .style(context.currentStyle());
+        WaveText.Builder builder = WaveText.builder().text(text).styleResolver(resolver)
+                .dimFactor(dimFactor).peakWidth(peakWidth).peakCount(peakCount).speed(speed)
+                .mode(mode).inverted(inverted).style(context.currentStyle());
 
         // Only set color explicitly if it was programmatically specified
         if (color != null) {

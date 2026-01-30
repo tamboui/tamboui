@@ -4,10 +4,10 @@
  */
 package dev.tamboui.widgets.barchart;
 
+import java.util.Optional;
+
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
-
-import java.util.Optional;
 
 /**
  * A single bar in a {@link BarChart}.
@@ -22,12 +22,8 @@ import java.util.Optional;
  * Bar bar2 = Bar.of(75, "Sales");
  *
  * // Fully customized bar
- * Bar bar3 = Bar.builder()
- *     .value(75)
- *     .label("Sales")
- *     .textValue("75%")
- *     .style(Style.EMPTY.fg(Color.GREEN))
- *     .build();
+ * Bar bar3 = Bar.builder().value(75).label("Sales").textValue("75%")
+ *         .style(Style.EMPTY.fg(Color.GREEN)).build();
  * }</pre>
  */
 public final class Bar {
@@ -49,7 +45,8 @@ public final class Bar {
     /**
      * Creates a bar with the given value.
      *
-     * @param value the bar value
+     * @param value
+     *            the bar value
      * @return a new bar
      */
     public static Bar of(long value) {
@@ -59,8 +56,10 @@ public final class Bar {
     /**
      * Creates a bar with the given value and label.
      *
-     * @param value the bar value
-     * @param label the bar label
+     * @param value
+     *            the bar value
+     * @param label
+     *            the bar label
      * @return a new bar
      */
     public static Bar of(long value, String label) {
@@ -140,12 +139,14 @@ public final class Bar {
         private Style style;
         private Style valueStyle;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the bar's value.
          *
-         * @param value the value
+         * @param value
+         *            the value
          * @return this builder
          */
         public Builder value(long value) {
@@ -156,7 +157,8 @@ public final class Bar {
         /**
          * Sets the bar's label.
          *
-         * @param label the label
+         * @param label
+         *            the label
          * @return this builder
          */
         public Builder label(String label) {
@@ -167,7 +169,8 @@ public final class Bar {
         /**
          * Sets the bar's label.
          *
-         * @param label the label
+         * @param label
+         *            the label
          * @return this builder
          */
         public Builder label(Line label) {
@@ -178,7 +181,8 @@ public final class Bar {
         /**
          * Sets a custom text value to display instead of the numeric value.
          *
-         * @param textValue the text value
+         * @param textValue
+         *            the text value
          * @return this builder
          */
         public Builder textValue(String textValue) {
@@ -189,7 +193,8 @@ public final class Bar {
         /**
          * Sets the bar's style.
          *
-         * @param style the style
+         * @param style
+         *            the style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -200,7 +205,8 @@ public final class Bar {
         /**
          * Sets the value's style.
          *
-         * @param valueStyle the value style
+         * @param valueStyle
+         *            the value style
          * @return this builder
          */
         public Builder valueStyle(Style valueStyle) {

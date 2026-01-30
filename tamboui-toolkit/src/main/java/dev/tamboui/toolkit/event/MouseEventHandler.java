@@ -14,8 +14,10 @@ public interface MouseEventHandler {
     /**
      * Handles a mouse event.
      *
-     * @param event the mouse event
-     * @return HANDLED if the event was handled and should not propagate, UNHANDLED otherwise
+     * @param event
+     *            the mouse event
+     * @return HANDLED if the event was handled and should not propagate, UNHANDLED
+     *         otherwise
      */
     EventResult handle(MouseEvent event);
 }

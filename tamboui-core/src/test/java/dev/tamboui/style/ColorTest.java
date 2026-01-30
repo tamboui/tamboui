@@ -4,8 +4,8 @@
  */
 package dev.tamboui.style;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -197,7 +197,8 @@ class ColorTest {
     @Test
     @DisplayName("Named.toAnsiUnderline delegates to default value")
     void namedToAnsiUnderline() {
-        // Ansi colors don't support underline color, so Named wrapping Ansi returns empty
+        // Ansi colors don't support underline color, so Named wrapping Ansi returns
+        // empty
         assertThat(Color.RED.toAnsiUnderline()).isEmpty();
 
         // Named wrapping Rgb should delegate

@@ -4,22 +4,22 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Flex;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Flex;
 
 /**
  * Converts CSS flex values to Flex enum.
  * <p>
  * Supports the following values:
  * <ul>
- *   <li>{@code "start"} - items aligned at start</li>
- *   <li>{@code "center"} - items centered</li>
- *   <li>{@code "end"} - items aligned at end</li>
- *   <li>{@code "space-between"} - items distributed with space between</li>
- *   <li>{@code "space-around"} - items distributed with space around</li>
- *   <li>{@code "space-evenly"} - items distributed with equal space</li>
+ * <li>{@code "start"} - items aligned at start</li>
+ * <li>{@code "center"} - items centered</li>
+ * <li>{@code "end"} - items aligned at end</li>
+ * <li>{@code "space-between"} - items distributed with space between</li>
+ * <li>{@code "space-around"} - items distributed with space around</li>
+ * <li>{@code "space-evenly"} - items distributed with equal space</li>
  * </ul>
  */
 public final class FlexConverter implements PropertyConverter<Flex> {
@@ -39,19 +39,19 @@ public final class FlexConverter implements PropertyConverter<Flex> {
         String resolved = PropertyConverter.resolveVariables(value.trim(), variables).toLowerCase();
 
         switch (resolved) {
-            case "start":
+            case "start" :
                 return Optional.of(Flex.START);
-            case "center":
+            case "center" :
                 return Optional.of(Flex.CENTER);
-            case "end":
+            case "end" :
                 return Optional.of(Flex.END);
-            case "space-between":
+            case "space-between" :
                 return Optional.of(Flex.SPACE_BETWEEN);
-            case "space-around":
+            case "space-around" :
                 return Optional.of(Flex.SPACE_AROUND);
-            case "space-evenly":
+            case "space-evenly" :
                 return Optional.of(Flex.SPACE_EVENLY);
-            default:
+            default :
                 return Optional.empty();
         }
     }

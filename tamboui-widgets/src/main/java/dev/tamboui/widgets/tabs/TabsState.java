@@ -32,14 +32,16 @@ public final class TabsState {
     /**
      * Creates a new tabs state with the given selection.
      *
-     * @param selected the initial selected tab index
+     * @param selected
+     *            the initial selected tab index
      */
     public TabsState(int selected) {
         this.selected = Math.max(0, selected);
     }
 
     /**
-     * Returns the index of the currently selected tab, or null if nothing is selected.
+     * Returns the index of the currently selected tab, or null if nothing is
+     * selected.
      *
      * @return the selected tab index, or null if nothing is selected
      */
@@ -50,7 +52,8 @@ public final class TabsState {
     /**
      * Selects the tab at the given index.
      *
-     * @param index the tab index to select
+     * @param index
+     *            the tab index to select
      */
     public void select(int index) {
         this.selected = Math.max(0, index);
@@ -73,7 +76,8 @@ public final class TabsState {
     /**
      * Selects the last tab.
      *
-     * @param tabCount the total number of tabs
+     * @param tabCount
+     *            the total number of tabs
      */
     public void selectLast(int tabCount) {
         if (tabCount > 0) {
@@ -84,7 +88,8 @@ public final class TabsState {
     /**
      * Selects the next tab, wrapping to the first if at the end.
      *
-     * @param tabCount the total number of tabs
+     * @param tabCount
+     *            the total number of tabs
      */
     public void selectNext(int tabCount) {
         if (tabCount == 0) {
@@ -100,7 +105,8 @@ public final class TabsState {
     /**
      * Selects the previous tab, wrapping to the last if at the beginning.
      *
-     * @param tabCount the total number of tabs
+     * @param tabCount
+     *            the total number of tabs
      */
     public void selectPrevious(int tabCount) {
         if (tabCount == 0) {

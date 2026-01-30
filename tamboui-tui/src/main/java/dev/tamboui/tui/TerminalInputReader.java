@@ -4,24 +4,24 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.event.Event;
-import dev.tamboui.tui.event.EventParser;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.EventParser;
+
 /**
  * A dedicated thread for reading terminal input.
  * <p>
- * This class isolates terminal input reading from the main event loop,
- * ensuring that keyboard input remains responsive even when tick events
- * are being processed. It reads from the terminal using a blocking call
- * with the configured poll timeout, parses input into events, and queues
- * them for the main loop to consume.
+ * This class isolates terminal input reading from the main event loop, ensuring
+ * that keyboard input remains responsive even when tick events are being
+ * processed. It reads from the terminal using a blocking call with the
+ * configured poll timeout, parses input into events, and queues them for the
+ * main loop to consume.
  *
  * @see TuiRunner
  */
@@ -39,15 +39,19 @@ public final class TerminalInputReader implements Runnable {
     /**
      * Creates a new terminal input reader.
      *
-     * @param backend     the terminal backend to read from
-     * @param eventQueue  the queue to place parsed events into
-     * @param bindings    the bindings for event semantic action matching
-     * @param running     the shared running flag for shutdown coordination
-     * @param pollTimeout the timeout for reading terminal input
+     * @param backend
+     *            the terminal backend to read from
+     * @param eventQueue
+     *            the queue to place parsed events into
+     * @param bindings
+     *            the bindings for event semantic action matching
+     * @param running
+     *            the shared running flag for shutdown coordination
+     * @param pollTimeout
+     *            the timeout for reading terminal input
      */
-    public TerminalInputReader(Backend backend, BlockingQueue<Event> eventQueue,
-                               Bindings bindings, AtomicBoolean running,
-                               Duration pollTimeout) {
+    public TerminalInputReader(Backend backend, BlockingQueue<Event> eventQueue, Bindings bindings,
+            AtomicBoolean running, Duration pollTimeout) {
         this.backend = backend;
         this.eventQueue = eventQueue;
         this.bindings = bindings;
@@ -69,7 +73,8 @@ public final class TerminalInputReader implements Runnable {
     /**
      * Stops the input reader thread and waits for it to terminate.
      *
-     * @param timeoutMs maximum time to wait for thread termination in milliseconds
+     * @param timeoutMs
+     *            maximum time to wait for thread termination in milliseconds
      */
     public void stop(long timeoutMs) {
         Thread t = thread;

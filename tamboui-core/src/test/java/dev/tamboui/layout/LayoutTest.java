@@ -4,10 +4,10 @@
  */
 package dev.tamboui.layout;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -17,12 +17,8 @@ class LayoutTest {
     @DisplayName("Vertical layout with fixed lengths")
     void verticalFixedLengths() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .constraints(
-                Constraint.length(20),
-                Constraint.length(30),
-                Constraint.length(50)
-            );
+        Layout layout = Layout.vertical().constraints(Constraint.length(20), Constraint.length(30),
+                Constraint.length(50));
 
         List<Rect> rects = layout.split(area);
 
@@ -36,11 +32,8 @@ class LayoutTest {
     @DisplayName("Horizontal layout with fixed lengths")
     void horizontalFixedLengths() {
         Rect area = new Rect(0, 0, 100, 50);
-        Layout layout = Layout.horizontal()
-            .constraints(
-                Constraint.length(30),
-                Constraint.length(70)
-            );
+        Layout layout = Layout.horizontal().constraints(Constraint.length(30),
+                Constraint.length(70));
 
         List<Rect> rects = layout.split(area);
 
@@ -53,11 +46,8 @@ class LayoutTest {
     @DisplayName("Layout with percentages")
     void percentages() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .constraints(
-                Constraint.percentage(25),
-                Constraint.percentage(75)
-            );
+        Layout layout = Layout.vertical().constraints(Constraint.percentage(25),
+                Constraint.percentage(75));
 
         List<Rect> rects = layout.split(area);
 
@@ -70,11 +60,7 @@ class LayoutTest {
     @DisplayName("Layout with fill constraints")
     void fillConstraints() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .constraints(
-                Constraint.length(20),
-                Constraint.fill()
-            );
+        Layout layout = Layout.vertical().constraints(Constraint.length(20), Constraint.fill());
 
         List<Rect> rects = layout.split(area);
 
@@ -87,9 +73,7 @@ class LayoutTest {
     @DisplayName("Layout with margin")
     void withMargin() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .margin(Margin.uniform(10))
-            .constraints(Constraint.fill());
+        Layout layout = Layout.vertical().margin(Margin.uniform(10)).constraints(Constraint.fill());
 
         List<Rect> rects = layout.split(area);
 
@@ -101,12 +85,8 @@ class LayoutTest {
     @DisplayName("Layout with spacing")
     void withSpacing() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .spacing(10)
-            .constraints(
-                Constraint.length(40),
-                Constraint.length(40)
-            );
+        Layout layout = Layout.vertical().spacing(10).constraints(Constraint.length(40),
+                Constraint.length(40));
 
         List<Rect> rects = layout.split(area);
 
@@ -119,11 +99,7 @@ class LayoutTest {
     @DisplayName("Layout with min constraint")
     void minConstraint() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .constraints(
-                Constraint.min(30),
-                Constraint.fill()
-            );
+        Layout layout = Layout.vertical().constraints(Constraint.min(30), Constraint.fill());
 
         List<Rect> rects = layout.split(area);
 
@@ -135,11 +111,8 @@ class LayoutTest {
     @DisplayName("Layout with ratio constraint")
     void ratioConstraint() {
         Rect area = new Rect(0, 0, 100, 100);
-        Layout layout = Layout.vertical()
-            .constraints(
-                Constraint.ratio(1, 3),
-                Constraint.ratio(2, 3)
-            );
+        Layout layout = Layout.vertical().constraints(Constraint.ratio(1, 3),
+                Constraint.ratio(2, 3));
 
         List<Rect> rects = layout.split(area);
 
@@ -155,13 +128,8 @@ class LayoutTest {
     void fourFillConstraintsDoNotExceedBounds() {
         // Simulates Row in Panel: inner area (1, 1, 18, 1), 4 children with fill()
         Rect area = new Rect(1, 1, 18, 1);
-        Layout layout = Layout.horizontal()
-            .constraints(
-                Constraint.fill(),
-                Constraint.fill(),
-                Constraint.fill(),
-                Constraint.fill()
-            );
+        Layout layout = Layout.horizontal().constraints(Constraint.fill(), Constraint.fill(),
+                Constraint.fill(), Constraint.fill());
 
         List<Rect> rects = layout.split(area);
 

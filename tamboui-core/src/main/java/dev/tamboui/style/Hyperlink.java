@@ -10,16 +10,18 @@ import java.util.Optional;
 /**
  * Represents a hyperlink that can be attached to a Style.
  * <p>
- * Hyperlinks use the OSC8 protocol (https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda) to create
- * clickable links in terminal emulators that support it.
+ * Hyperlinks use the OSC8 protocol
+ * (https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda) to
+ * create clickable links in terminal emulators that support it.
  * <p>
  * The hyperlink consists of:
  * <ul>
- *   <li>A URL - the target of the link (required)</li>
- *   <li>An optional ID - used to group multiple cells into a single link</li>
+ * <li>A URL - the target of the link (required)</li>
+ * <li>An optional ID - used to group multiple cells into a single link</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * Style style = Style.create().hyperlink("https://example.com");
  * // Or with an ID to group multiple cells:
@@ -39,7 +41,8 @@ public final class Hyperlink {
     /**
      * Creates a hyperlink with just a URL.
      *
-     * @param url the URL for the hyperlink
+     * @param url
+     *            the URL for the hyperlink
      * @return a new Hyperlink instance
      */
     public static Hyperlink of(String url) {
@@ -47,18 +50,19 @@ public final class Hyperlink {
     }
 
     /**
-     * Creates a hyperlink with a URL and an ID.
-     * The ID can be used to group multiple cells into a single link.
+     * Creates a hyperlink with a URL and an ID. The ID can be used to group
+     * multiple cells into a single link.
      *
-     * @param url the URL for the hyperlink
-     * @param id the optional ID for grouping cells
+     * @param url
+     *            the URL for the hyperlink
+     * @param id
+     *            the optional ID for grouping cells
      * @return a new Hyperlink instance
      */
     public static Hyperlink of(String url, String id) {
         return new Hyperlink(url, id);
     }
 
-    
     /**
      * Returns the URL of this hyperlink.
      *

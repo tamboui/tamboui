@@ -47,8 +47,8 @@ public enum Modifier {
     /**
      * Returns the implicit style name for this modifier.
      * <p>
-     * Maps each modifier to the conventional style name used
-     * for style resolution (e.g., BOLD → "bold", CROSSED_OUT → "strikethrough").
+     * Maps each modifier to the conventional style name used for style resolution
+     * (e.g., BOLD → "bold", CROSSED_OUT → "strikethrough").
      *
      * @return the style name
      */

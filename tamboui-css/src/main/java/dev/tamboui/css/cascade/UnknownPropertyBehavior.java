@@ -12,20 +12,20 @@ package dev.tamboui.css.cascade;
  */
 public enum UnknownPropertyBehavior {
     /**
-     * Silently ignore unknown properties.
-     * This is the default behavior for production use.
+     * Silently ignore unknown properties. This is the default behavior for
+     * production use.
      */
     IGNORE,
 
     /**
-     * Log a warning for unknown properties.
-     * Useful for debugging CSS issues during development.
+     * Log a warning for unknown properties. Useful for debugging CSS issues during
+     * development.
      */
     WARN,
 
     /**
-     * Throw an exception when an unknown property is encountered.
-     * Useful for strict validation during testing.
+     * Throw an exception when an unknown property is encountered. Useful for strict
+     * validation during testing.
      */
     FAIL
 }

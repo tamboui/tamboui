@@ -4,30 +4,29 @@
  */
 package dev.tamboui.layout.stack;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.ContentAlignment;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
- * An overlapping layers widget where children render on top of each other
- * using a painter's algorithm (last child on top).
+ * An overlapping layers widget where children render on top of each other using
+ * a painter's algorithm (last child on top).
  * <p>
- * Essential for dialogs, popups, floating overlays, and any scenario
- * where UI elements need to overlap.
+ * Essential for dialogs, popups, floating overlays, and any scenario where UI
+ * elements need to overlap.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
- * Stack stack = Stack.builder()
- *     .children(backgroundWidget, contentWidget, dialogWidget)
- *     .alignment(ContentAlignment.CENTER)
- *     .build();
+ * Stack stack = Stack.builder().children(backgroundWidget, contentWidget, dialogWidget)
+ *         .alignment(ContentAlignment.CENTER).build();
  *
  * stack.render(area, buffer);
  * }</pre>
@@ -88,7 +87,8 @@ public final class Stack implements Widget {
         /**
          * Sets the children widgets.
          *
-         * @param children the child widgets
+         * @param children
+         *            the child widgets
          * @return this builder
          */
         public Builder children(Widget... children) {
@@ -100,7 +100,8 @@ public final class Stack implements Widget {
         /**
          * Sets the children widgets from a list.
          *
-         * @param children the child widgets
+         * @param children
+         *            the child widgets
          * @return this builder
          */
         public Builder children(List<Widget> children) {
@@ -112,10 +113,11 @@ public final class Stack implements Widget {
         /**
          * Sets how children are aligned within the stack.
          * <p>
-         * Default is {@link ContentAlignment#STRETCH} which fills
-         * children to the full area.
+         * Default is {@link ContentAlignment#STRETCH} which fills children to the full
+         * area.
          *
-         * @param alignment the alignment mode
+         * @param alignment
+         *            the alignment mode
          * @return this builder
          */
         public Builder alignment(ContentAlignment alignment) {

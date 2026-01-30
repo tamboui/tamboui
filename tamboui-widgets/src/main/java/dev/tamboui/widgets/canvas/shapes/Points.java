@@ -26,8 +26,10 @@ public final class Points implements Shape {
     /**
      * Creates a points shape from coordinate pairs and a color.
      *
-     * @param coords the coordinate pairs (each sub-array is [x, y])
-     * @param color  the color for all points
+     * @param coords
+     *            the coordinate pairs (each sub-array is [x, y])
+     * @param color
+     *            the color for all points
      */
     public Points(double[][] coords, Color color) {
         this.coords = coords;
@@ -37,8 +39,10 @@ public final class Points implements Shape {
     /**
      * Creates a points shape from coordinate pairs and a color.
      *
-     * @param coords the coordinate pairs (each sub-array is [x, y])
-     * @param color  the color for all points
+     * @param coords
+     *            the coordinate pairs (each sub-array is [x, y])
+     * @param color
+     *            the color for all points
      * @return a new Points shape
      */
     public static Points of(double[][] coords, Color color) {
@@ -48,11 +52,15 @@ public final class Points implements Shape {
     /**
      * Creates a points shape from x and y arrays.
      *
-     * @param x     array of x coordinates
-     * @param y     array of y coordinates
-     * @param color the color for all points
+     * @param x
+     *            array of x coordinates
+     * @param y
+     *            array of y coordinates
+     * @param color
+     *            the color for all points
      * @return a new Points shape
-     * @throws IllegalArgumentException if arrays have different lengths
+     * @throws IllegalArgumentException
+     *             if arrays have different lengths
      */
     public static Points of(double[] x, double[] y, Color color) {
         if (x.length != y.length) {
@@ -73,8 +81,8 @@ public final class Points implements Shape {
         }
         for (double[] coord : coords) {
             if (coord != null && coord.length >= 2) {
-                painter.getPoint(coord[0], coord[1]).ifPresent(p ->
-                    painter.paint(p.x(), p.y(), color));
+                painter.getPoint(coord[0], coord[1])
+                        .ifPresent(p -> painter.paint(p.x(), p.y(), color));
             }
         }
     }
@@ -151,6 +159,7 @@ public final class Points implements Shape {
 
     @Override
     public String toString() {
-        return String.format("Points[color=%s, count=%d]", color, coords != null ? coords.length : 0);
+        return String.format("Points[color=%s, count=%d]", color,
+                coords != null ? coords.length : 0);
     }
 }

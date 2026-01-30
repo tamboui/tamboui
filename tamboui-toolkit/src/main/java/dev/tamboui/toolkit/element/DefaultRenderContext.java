@@ -4,20 +4,6 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.event.EventRouter;
-import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.toolkit.elements.ErrorPlaceholder;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-import dev.tamboui.layout.Rect;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,18 +15,35 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.elements.ErrorPlaceholder;
+import dev.tamboui.toolkit.event.EventRouter;
+import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
+
 /**
  * Default implementation of RenderContext with internal framework methods.
  * <p>
- * <strong>INTERNAL USE ONLY</strong> - This class is used internally by the toolkit framework.
- * User code and element implementations should only interact with the {@link RenderContext} interface.
+ * <strong>INTERNAL USE ONLY</strong> - This class is used internally by the
+ * toolkit framework. User code and element implementations should only interact
+ * with the {@link RenderContext} interface.
  * <p>
- * <strong>CODE SMELL WARNING:</strong> If you find yourself casting {@code RenderContext} to
- * {@code DefaultRenderContext} in your code, this is a design problem. The only legitimate
- * user of this class's internal methods is {@link StyledElement#render}.
+ * <strong>CODE SMELL WARNING:</strong> If you find yourself casting
+ * {@code RenderContext} to {@code DefaultRenderContext} in your code, this is a
+ * design problem. The only legitimate user of this class's internal methods is
+ * {@link StyledElement#render}.
  * <p>
- * Methods like {@link #withElement}, {@link #registerElement}, and stack manipulation
- * are framework internals that should never be called directly from element implementations.
+ * Methods like {@link #withElement}, {@link #registerElement}, and stack
+ * manipulation are framework internals that should never be called directly
+ * from element implementations.
  */
 public final class DefaultRenderContext implements RenderContext {
 
@@ -61,8 +64,10 @@ public final class DefaultRenderContext implements RenderContext {
      * <p>
      * The ElementRegistry is obtained from the EventRouter.
      *
-     * @param focusManager the focus manager
-     * @param eventRouter  the event router (must have an ElementRegistry)
+     * @param focusManager
+     *            the focus manager
+     * @param eventRouter
+     *            the event router (must have an ElementRegistry)
      */
     public DefaultRenderContext(FocusManager focusManager, EventRouter eventRouter) {
         this.focusManager = focusManager;
@@ -84,7 +89,8 @@ public final class DefaultRenderContext implements RenderContext {
     /**
      * Sets the style engine for CSS resolution.
      *
-     * @param styleEngine the style engine, or null to disable CSS
+     * @param styleEngine
+     *            the style engine, or null to disable CSS
      */
     public void setStyleEngine(StyleEngine styleEngine) {
         this.styleEngine = styleEngine;
@@ -102,7 +108,8 @@ public final class DefaultRenderContext implements RenderContext {
     /**
      * Sets the bindings used for action matching.
      *
-     * @param bindings the bindings to use
+     * @param bindings
+     *            the bindings to use
      */
     public void setBindings(Bindings bindings) {
         this.bindings = bindings != null ? bindings : BindingSets.defaults();
@@ -120,10 +127,11 @@ public final class DefaultRenderContext implements RenderContext {
     /**
      * Enables or disables fault-tolerant rendering.
      * <p>
-     * When enabled, exceptions thrown during child rendering are caught
-     * and an error placeholder is displayed instead.
+     * When enabled, exceptions thrown during child rendering are caught and an
+     * error placeholder is displayed instead.
      *
-     * @param faultTolerant true to enable fault-tolerant rendering
+     * @param faultTolerant
+     *            true to enable fault-tolerant rendering
      */
     public void setFaultTolerant(boolean faultTolerant) {
         this.faultTolerant = faultTolerant;
@@ -173,7 +181,8 @@ public final class DefaultRenderContext implements RenderContext {
         CssStyleResolver resolved = styleEngine.resolve(element, state, ancestors);
 
         // If we have a parent resolver on the stack, create a merged resolver
-        // that inherits properties from the parent (e.g., border-type from Component to Panel)
+        // that inherits properties from the parent (e.g., border-type from Component to
+        // Panel)
         CssStyleResolver parentResolver = resolverStack.isEmpty() ? null : resolverStack.peek();
         if (parentResolver != null) {
             resolved = resolved.withFallback(parentResolver);
@@ -192,7 +201,8 @@ public final class DefaultRenderContext implements RenderContext {
                 ? new HashSet<>(Arrays.asList(cssClasses))
                 : Collections.emptySet();
         Styleable virtual = new VirtualStyleable(styleType, classes);
-        CssStyleResolver resolved = styleEngine.resolve(virtual, PseudoClassState.NONE, Collections.emptyList());
+        CssStyleResolver resolved = styleEngine.resolve(virtual, PseudoClassState.NONE,
+                Collections.emptyList());
         return resolved.hasProperties() ? Optional.of(resolved) : Optional.empty();
     }
 
@@ -260,7 +270,8 @@ public final class DefaultRenderContext implements RenderContext {
                     }
                 }
             } catch (Throwable t) {
-                // Render error placeholder instead of the failed child (no child context key active)
+                // Render error placeholder instead of the failed child (no child context key
+                // active)
                 ErrorPlaceholder placeholder = ErrorPlaceholder.from(t, childId);
                 try {
                     placeholder.render(frame, area, this);
@@ -276,8 +287,8 @@ public final class DefaultRenderContext implements RenderContext {
             frame.pushContextKey(childId);
         }
         try {
-                child.render(frame, area, this);
-                registerElement(child, area);
+            child.render(frame, area, this);
+            registerElement(child, area);
         } finally {
             if (childId != null) {
                 frame.popContextKey();
@@ -305,18 +316,14 @@ public final class DefaultRenderContext implements RenderContext {
         ancestors.add(parent);
 
         CssStyleResolver resolved = styleEngine.resolve(virtual, state, ancestors);
-        return resolved.hasProperties()
-            ? currentStyle().patch(resolved.toStyle())
-            : currentStyle();
+        return resolved.hasProperties() ? currentStyle().patch(resolved.toStyle()) : currentStyle();
     }
 
     @Override
     public Style childStyle(String childName, ChildPosition position, PseudoClassState state) {
         // Merge position-derived pseudo-classes with the provided state
-        PseudoClassState mergedState = state
-            .withFirstChild(position.isFirst())
-            .withLastChild(position.isLast())
-            .withNthChild(position.nthChild());
+        PseudoClassState mergedState = state.withFirstChild(position.isFirst())
+                .withLastChild(position.isLast()).withNthChild(position.nthChild());
 
         return childStyle(childName, mergedState);
     }
@@ -400,15 +407,18 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     /**
-     * Registers an element for event routing and focus management.
-     * Called by container elements after rendering children.
+     * Registers an element for event routing and focus management. Called by
+     * container elements after rendering children.
      * <p>
-     * The EventRouter handles registration in the ElementRegistry for ID-based lookups.
+     * The EventRouter handles registration in the ElementRegistry for ID-based
+     * lookups.
      * <p>
      * Internal use only.
      *
-     * @param element the element to register
-     * @param area the rendered area
+     * @param element
+     *            the element to register
+     * @param area
+     *            the rendered area
      */
     public void registerElement(Element element, Rect area) {
         // EventRouter handles both event routing and ElementRegistry population
@@ -419,7 +429,8 @@ public final class DefaultRenderContext implements RenderContext {
             if (id != null) {
                 focusManager.registerFocusable(id, area);
             } else {
-                // This should only happen if a subclass overrides isFocusable() without ensuring an ID
+                // This should only happen if a subclass overrides isFocusable() without
+                // ensuring an ID
                 LOGGER.warning("Focusable element of type " + element.getClass().getSimpleName()
                         + " has no ID and will not be registered in the focus chain. "
                         + "Ensure the element has an ID set.");
@@ -430,8 +441,8 @@ public final class DefaultRenderContext implements RenderContext {
     /**
      * Returns the element registry for ID-based area lookups.
      * <p>
-     * The registry is populated during rendering and can be used
-     * by effect systems to target elements by ID.
+     * The registry is populated during rendering and can be used by effect systems
+     * to target elements by ID.
      *
      * @return the element registry
      */
@@ -443,34 +454,43 @@ public final class DefaultRenderContext implements RenderContext {
      * Executes an action with an element and style pushed onto their stacks.
      * <p>
      * The style is merged with the current style. Both the element and merged style
-     * are available via {@link #currentElement()} and {@link #currentStyle()}.
-     * This enables {@link #childStyle(String)} to work without passing the parent.
+     * are available via {@link #currentElement()} and {@link #currentStyle()}. This
+     * enables {@link #childStyle(String)} to work without passing the parent.
      * <p>
      * Internal use only - called by StyledElement.render().
      *
-     * @param element the element being rendered
-     * @param style the element's resolved style
-     * @param action the action to execute
+     * @param element
+     *            the element being rendered
+     * @param style
+     *            the element's resolved style
+     * @param action
+     *            the action to execute
      */
     public void withElement(Styleable element, Style style, Runnable action) {
         withElement(element, style, null, action);
     }
 
     /**
-     * Executes an action with an element, style, and CSS resolver pushed onto their stacks.
+     * Executes an action with an element, style, and CSS resolver pushed onto their
+     * stacks.
      * <p>
-     * The style is merged with the current style. The element, merged style, and resolver
-     * are available via {@link #currentElement()}, {@link #currentStyle()}, and
-     * {@link #currentResolver()}.
+     * The style is merged with the current style. The element, merged style, and
+     * resolver are available via {@link #currentElement()},
+     * {@link #currentStyle()}, and {@link #currentResolver()}.
      * <p>
      * Internal use only - called by StyledElement.render().
      *
-     * @param element the element being rendered
-     * @param style the element's resolved style
-     * @param resolver the element's CSS resolver (may be null)
-     * @param action the action to execute
+     * @param element
+     *            the element being rendered
+     * @param style
+     *            the element's resolved style
+     * @param resolver
+     *            the element's CSS resolver (may be null)
+     * @param action
+     *            the action to execute
      */
-    public void withElement(Styleable element, Style style, CssStyleResolver resolver, Runnable action) {
+    public void withElement(Styleable element, Style style, CssStyleResolver resolver,
+            Runnable action) {
         Style merged = currentStyle().patch(style);
         styleStack.push(merged);
         elementStack.push(element);
@@ -500,8 +520,8 @@ public final class DefaultRenderContext implements RenderContext {
     /**
      * Returns the current CSS resolver from the resolver stack, if any.
      * <p>
-     * This allows child elements to access CSS properties from their parent elements
-     * that are not part of the Style cascade (e.g., border-type).
+     * This allows child elements to access CSS properties from their parent
+     * elements that are not part of the Style cascade (e.g., border-type).
      *
      * @return the current CSS resolver, or empty if none is active
      */

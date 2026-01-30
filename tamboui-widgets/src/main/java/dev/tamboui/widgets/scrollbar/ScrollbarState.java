@@ -7,25 +7,24 @@ package dev.tamboui.widgets.scrollbar;
 /**
  * State for a {@link Scrollbar} widget.
  * <p>
- * Tracks the scroll position and content dimensions for proper scrollbar rendering.
+ * Tracks the scroll position and content dimensions for proper scrollbar
+ * rendering.
  * <p>
  * <b>Important:</b> You must set {@link #contentLength(int)} before rendering,
  * otherwise the scrollbar will appear blank.
  *
  * <pre>{@code
  * // Create state for a list of 100 items
- * ScrollbarState state = new ScrollbarState()
- *     .contentLength(100)
- *     .position(0);
+ * ScrollbarState state = new ScrollbarState().contentLength(100).position(0);
  *
  * // Update position when scrolling
  * state.position(newScrollPosition);
  *
  * // Navigation helpers
- * state.next();     // Scroll down one item
- * state.prev();     // Scroll up one item
- * state.first();    // Jump to start
- * state.last();     // Jump to end
+ * state.next(); // Scroll down one item
+ * state.prev(); // Scroll up one item
+ * state.first(); // Jump to start
+ * state.last(); // Jump to end
  * }</pre>
  */
 public final class ScrollbarState {
@@ -37,8 +36,8 @@ public final class ScrollbarState {
     /**
      * Creates a new scrollbar state with default values.
      * <p>
-     * Content length defaults to 0, which will result in a blank scrollbar.
-     * You must call {@link #contentLength(int)} before rendering.
+     * Content length defaults to 0, which will result in a blank scrollbar. You
+     * must call {@link #contentLength(int)} before rendering.
      */
     public ScrollbarState() {
         this.contentLength = 0;
@@ -49,7 +48,8 @@ public final class ScrollbarState {
     /**
      * Creates a new scrollbar state with the given content length.
      *
-     * @param contentLength the total number of scrollable items
+     * @param contentLength
+     *            the total number of scrollable items
      */
     public ScrollbarState(int contentLength) {
         this.contentLength = Math.max(0, contentLength);
@@ -71,7 +71,8 @@ public final class ScrollbarState {
      * <p>
      * This is a fluent setter that returns this state for chaining.
      *
-     * @param contentLength the total number of scrollable items
+     * @param contentLength
+     *            the total number of scrollable items
      * @return this state for chaining
      */
     public ScrollbarState contentLength(int contentLength) {
@@ -95,10 +96,11 @@ public final class ScrollbarState {
     /**
      * Sets the current scroll position.
      * <p>
-     * This is a fluent setter that returns this state for chaining.
-     * The position is clamped to valid bounds.
+     * This is a fluent setter that returns this state for chaining. The position is
+     * clamped to valid bounds.
      *
-     * @param position the scroll position (0-based index)
+     * @param position
+     *            the scroll position (0-based index)
      * @return this state for chaining
      */
     public ScrollbarState position(int position) {
@@ -120,12 +122,13 @@ public final class ScrollbarState {
     /**
      * Sets the viewport content length.
      * <p>
-     * This represents the number of items visible in the viewport.
-     * If not set, the scrollbar will use the track size as the viewport length.
+     * This represents the number of items visible in the viewport. If not set, the
+     * scrollbar will use the track size as the viewport length.
      * <p>
      * This is a fluent setter that returns this state for chaining.
      *
-     * @param viewportContentLength the number of visible items
+     * @param viewportContentLength
+     *            the number of visible items
      * @return this state for chaining
      */
     public ScrollbarState viewportContentLength(int viewportContentLength) {
@@ -166,10 +169,11 @@ public final class ScrollbarState {
     /**
      * Scrolls by the given amount.
      * <p>
-     * Positive values scroll down/right, negative values scroll up/left.
-     * The position is clamped to valid bounds.
+     * Positive values scroll down/right, negative values scroll up/left. The
+     * position is clamped to valid bounds.
      *
-     * @param amount the number of items to scroll
+     * @param amount
+     *            the number of items to scroll
      */
     public void scrollBy(int amount) {
         this.position = clampPosition(this.position + amount);

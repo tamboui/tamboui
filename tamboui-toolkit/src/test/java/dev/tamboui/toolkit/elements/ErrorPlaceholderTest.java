@@ -4,12 +4,13 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -48,10 +49,8 @@ class ErrorPlaceholderTest {
         Frame frame = Frame.forTesting(buffer);
         RenderContext context = RenderContext.empty();
 
-        ErrorPlaceholder placeholder = ErrorPlaceholder.from(
-                new RuntimeException("Widget failed"),
-                "test-widget"
-        );
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("Widget failed"),
+                "test-widget");
 
         placeholder.render(frame, area, context);
 

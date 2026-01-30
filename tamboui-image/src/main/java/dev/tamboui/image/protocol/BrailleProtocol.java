@@ -4,6 +4,8 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.io.OutputStream;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
@@ -11,16 +13,16 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
-import java.io.OutputStream;
-
 /**
  * Renders images using Unicode Braille patterns.
  * <p>
  * Each terminal cell can display a 2x4 grid of Braille dots (8 dots total),
- * providing the highest character-based resolution at 2x4 virtual pixels per cell.
+ * providing the highest character-based resolution at 2x4 virtual pixels per
+ * cell.
  * <p>
- * Braille patterns use Unicode characters from U+2800 to U+28FF.
- * The 8 dots are mapped to bits as follows:
+ * Braille patterns use Unicode characters from U+2800 to U+28FF. The 8 dots are
+ * mapped to bits as follows:
+ * 
  * <pre>
  * Dot positions:  Bit values:
  *   1 4           0x01 0x08
@@ -29,8 +31,8 @@ import java.io.OutputStream;
  *   7 8           0x40 0x80
  * </pre>
  * <p>
- * Uses adaptive percentile-based thresholding to determine which pixels are "on".
- * By default, the brightest 75% of pixels are shown as dots.
+ * Uses adaptive percentile-based thresholding to determine which pixels are
+ * "on". By default, the brightest 75% of pixels are shown as dots.
  */
 public final class BrailleProtocol implements ImageProtocol {
 
@@ -42,9 +44,9 @@ public final class BrailleProtocol implements ImageProtocol {
      * <p>
      * Index [column][row] where column is 0-1 and row is 0-3.
      */
-    private static final int[][] BRAILLE_DOTS = {
-        {0x01, 0x02, 0x04, 0x40},  // Column 0: bits for rows 0-3
-        {0x08, 0x10, 0x20, 0x80}   // Column 1: bits for rows 0-3
+    private static final int[][] BRAILLE_DOTS = {{0x01, 0x02, 0x04, 0x40}, // Column 0: bits for
+                                                                           // rows 0-3
+            {0x08, 0x10, 0x20, 0x80} // Column 1: bits for rows 0-3
     };
 
     private static final Resolution RESOLUTION = new Resolution(2, 4);
@@ -64,7 +66,9 @@ public final class BrailleProtocol implements ImageProtocol {
     /**
      * Creates a new Braille protocol instance with a custom percentile threshold.
      *
-     * @param percentile percentile (0-100) - pixels with luminance above this percentile are "on"
+     * @param percentile
+     *            percentile (0-100) - pixels with luminance above this percentile
+     *            are "on"
      */
     public BrailleProtocol(int percentile) {
         this.percentile = Math.max(0, Math.min(100, percentile));
@@ -132,7 +136,8 @@ public final class BrailleProtocol implements ImageProtocol {
     /**
      * Calculates the luminance threshold based on the configured percentile.
      * <p>
-     * Builds a histogram of luminance values and finds the value at the given percentile.
+     * Builds a histogram of luminance values and finds the value at the given
+     * percentile.
      */
     private int calculatePercentileThreshold(ImageData image) {
         // Build luminance histogram (256 buckets)
@@ -201,8 +206,10 @@ public final class BrailleProtocol implements ImageProtocol {
     /**
      * Determines if a pixel should be rendered as "on" (dot visible).
      *
-     * @param argb the pixel color
-     * @param threshold the luminance threshold
+     * @param argb
+     *            the pixel color
+     * @param threshold
+     *            the luminance threshold
      * @return true if the pixel should be shown as a dot
      */
     private boolean isPixelOn(int argb, int threshold) {

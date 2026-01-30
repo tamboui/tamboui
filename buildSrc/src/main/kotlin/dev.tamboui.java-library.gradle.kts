@@ -25,6 +25,10 @@ val java11 by sourceSets.creating {
 }
 
 tasks.named<JavaCompile>("compileJava11Java") {
+    // The module descriptor exports packages from the main sources, so those
+    // classes must be compiled before we compile module-info.java.
+    dependsOn(tasks.named("compileJava"))
+
     options.release = 11
     // Remove -Werror for module-info compilation as it may have different warnings
     options.compilerArgs.remove("-Werror")
@@ -78,9 +82,16 @@ if (isIDEASync) {
 fun readModuleName() = file("src/main/java11/module-info.java")
     .run {
         if (exists()) {
-            useLines {
-                it.find { it.startsWith("module ") }?.substringAfter("module ")!!.substringBefore(" ")
-            }
+            val text = readText()
+            // Important: don't match "module ..." inside the header Javadoc.
+            // We only want the actual module declaration line, optionally preceded
+            // by annotations (which Spotless/Eclipse may place on the same line).
+            val match = Regex(
+                pattern = """(?m)^[ \t]*(?:@[\w.$]+(?:\([^)]*\))?[ \t]*)*(?:open[ \t]+)?module[ \t]+([A-Za-z0-9_.]+)[ \t]*\{"""
+            ).find(text)
+
+            match?.groupValues?.get(1)
+                ?: error("Could not determine module name from src/main/java11/module-info.java")
         } else {
             "<none>"
         }

@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.canvas;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -13,28 +16,20 @@ import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 /**
  * A widget for drawing arbitrary shapes on a terminal grid.
  * <p>
- * The Canvas widget provides a mathematical coordinate system where
- * shapes can be drawn using floating-point coordinates. The widget
- * handles the transformation from canvas space to terminal cells.
+ * The Canvas widget provides a mathematical coordinate system where shapes can
+ * be drawn using floating-point coordinates. The widget handles the
+ * transformation from canvas space to terminal cells.
  *
  * <pre>{@code
- * Canvas canvas = Canvas.builder()
- *     .xBounds(-180, 180)
- *     .yBounds(-90, 90)
- *     .marker(Marker.BRAILLE)
- *     .block(Block.bordered().title(Title.from("World Map")))
- *     .paint(ctx -> {
- *         ctx.draw(new Circle(0, 0, 50, Color.RED));
- *         ctx.draw(new Line(-50, -50, 50, 50, Color.GREEN));
- *         ctx.print(0, 0, "Center");
- *     })
- *     .build();
+ * Canvas canvas = Canvas.builder().xBounds(-180, 180).yBounds(-90, 90).marker(Marker.BRAILLE)
+ *         .block(Block.bordered().title(Title.from("World Map"))).paint(ctx -> {
+ *             ctx.draw(new Circle(0, 0, 50, Color.RED));
+ *             ctx.draw(new Line(-50, -50, 50, 50, Color.GREEN));
+ *             ctx.print(0, 0, "Center");
+ *         }).build();
  * }</pre>
  *
  * @see Shape
@@ -49,9 +44,9 @@ public final class Canvas implements Widget {
     // Braille dot positions (2x4 grid mapped to bits)
     // Column 0: dots 1,2,3,7 (bits 0,1,2,6)
     // Column 1: dots 4,5,6,8 (bits 3,4,5,7)
-    private static final int[][] BRAILLE_DOTS = {
-        {0x01, 0x02, 0x04, 0x40},  // Column 0: bits for rows 0-3
-        {0x08, 0x10, 0x20, 0x80}   // Column 1: bits for rows 0-3
+    private static final int[][] BRAILLE_DOTS = {{0x01, 0x02, 0x04, 0x40}, // Column 0: bits for
+                                                                           // rows 0-3
+            {0x08, 0x10, 0x20, 0x80} // Column 1: bits for rows 0-3
     };
 
     private final double[] xBounds;
@@ -102,13 +97,8 @@ public final class Canvas implements Widget {
         }
 
         // Create context and execute paint callback
-        Context ctx = new Context(
-            canvasArea.width(),
-            canvasArea.height(),
-            xBounds,
-            yBounds,
-            marker
-        );
+        Context ctx = new Context(canvasArea.width(), canvasArea.height(), xBounds, yBounds,
+                marker);
 
         if (paintCallback != null) {
             paintCallback.accept(ctx);
@@ -125,22 +115,22 @@ public final class Canvas implements Widget {
         List<Color[][]> layers = ctx.allLayers();
 
         switch (marker) {
-            case BRAILLE:
+            case BRAILLE :
                 renderBraille(buffer, area, layers);
                 break;
-            case HALF_BLOCK:
+            case HALF_BLOCK :
                 renderHalfBlock(buffer, area, layers);
                 break;
-            case DOT:
+            case DOT :
                 renderSimple(buffer, area, layers, "•");
                 break;
-            case BLOCK:
+            case BLOCK :
                 renderSimple(buffer, area, layers, "█");
                 break;
-            case BAR:
+            case BAR :
                 renderSimple(buffer, area, layers, "▄");
                 break;
-            default:
+            default :
                 break;
         }
     }
@@ -275,36 +265,42 @@ public final class Canvas implements Widget {
         private Color backgroundColor;
         private Consumer<Context> paintCallback;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the x-axis bounds.
          *
-         * @param min the minimum x value
-         * @param max the maximum x value
+         * @param min
+         *            the minimum x value
+         * @param max
+         *            the maximum x value
          * @return this builder
          */
         public Builder xBounds(double min, double max) {
-            this.xBounds = new double[] {min, max};
+            this.xBounds = new double[]{min, max};
             return this;
         }
 
         /**
          * Sets the y-axis bounds.
          *
-         * @param min the minimum y value
-         * @param max the maximum y value
+         * @param min
+         *            the minimum y value
+         * @param max
+         *            the maximum y value
          * @return this builder
          */
         public Builder yBounds(double min, double max) {
-            this.yBounds = new double[] {min, max};
+            this.yBounds = new double[]{min, max};
             return this;
         }
 
         /**
          * Sets the marker type for rendering points.
          *
-         * @param marker the marker type
+         * @param marker
+         *            the marker type
          * @return this builder
          */
         public Builder marker(Marker marker) {
@@ -315,7 +311,8 @@ public final class Canvas implements Widget {
         /**
          * Wraps the canvas in a block.
          *
-         * @param block the block to wrap the canvas in
+         * @param block
+         *            the block to wrap the canvas in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -326,7 +323,8 @@ public final class Canvas implements Widget {
         /**
          * Sets the background color.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder backgroundColor(Color color) {
@@ -337,10 +335,11 @@ public final class Canvas implements Widget {
         /**
          * Sets the paint callback for drawing shapes.
          * <p>
-         * The callback receives a {@link Context} that can be used to
-         * draw shapes and print text.
+         * The callback receives a {@link Context} that can be used to draw shapes and
+         * print text.
          *
-         * @param callback the paint callback
+         * @param callback
+         *            the paint callback
          * @return this builder
          */
         public Builder paint(Consumer<Context> callback) {

@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.animal.sniffer.plugin)
     implementation(libs.asciidoctor.plugin)
     implementation(libs.git.publish.plugin)
+    implementation(libs.spotless.gradle.plugin)
 }
 
 java {

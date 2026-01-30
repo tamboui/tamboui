@@ -10,16 +10,17 @@ import dev.tamboui.layout.Rect;
 /**
  * Identity pattern that returns the global alpha unchanged.
  * <p>
- * This is the default pattern - it allows effects to work without spatial patterns.
+ * This is the default pattern - it allows effects to work without spatial
+ * patterns.
  */
 public final class IdentityPattern implements Pattern {
-    
+
     /** Singleton instance of the identity pattern. */
     public static final IdentityPattern INSTANCE = new IdentityPattern();
-    
+
     private IdentityPattern() {
     }
-    
+
     @Override
     public float mapAlpha(float globalAlpha, Position position, Rect area) {
         return globalAlpha;
@@ -35,5 +36,3 @@ public final class IdentityPattern implements Pattern {
         return "identity";
     }
 }
-
-

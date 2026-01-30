@@ -4,25 +4,26 @@
  */
 package dev.tamboui.widgets.tabs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A horizontal set of tabs with a single tab selected.
@@ -31,12 +32,9 @@ import java.util.List;
  * The selected tab is highlighted using the highlight style.
  *
  * <pre>{@code
- * Tabs tabs = Tabs.builder()
- *     .titles("Home", "Settings", "About")
- *     .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
- *     .divider(" | ")
- *     .block(Block.bordered())
- *     .build();
+ * Tabs tabs = Tabs.builder().titles("Home", "Settings", "About")
+ *         .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold()).divider(" | ")
+ *         .block(Block.bordered()).build();
  *
  * TabsState state = new TabsState(0); // Select first tab
  * frame.renderStatefulWidget(tabs, area, state);
@@ -49,8 +47,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
      * <p>
      * CSS property name: {@code highlight-color}
      */
-    public static final PropertyDefinition<Color> HIGHLIGHT_COLOR =
-            PropertyDefinition.of("highlight-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> HIGHLIGHT_COLOR = PropertyDefinition
+            .of("highlight-color", ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.register(HIGHLIGHT_COLOR);
@@ -100,7 +98,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
     /**
      * Creates tabs from string titles.
      *
-     * @param titles the tab titles
+     * @param titles
+     *            the tab titles
      * @return a new Tabs
      */
     public static Tabs from(String... titles) {
@@ -110,7 +109,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
     /**
      * Creates tabs from line titles.
      *
-     * @param titles the tab titles
+     * @param titles
+     *            the tab titles
      * @return a new Tabs
      */
     public static Tabs from(Line... titles) {
@@ -231,12 +231,14 @@ public final class Tabs implements StatefulWidget<TabsState> {
         private Color background;
         private Color highlightColor;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the tab titles from strings.
          *
-         * @param titles the tab titles
+         * @param titles
+         *            the tab titles
          * @return this builder
          */
         public Builder titles(String... titles) {
@@ -250,7 +252,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the tab titles from lines.
          *
-         * @param titles the tab titles
+         * @param titles
+         *            the tab titles
          * @return this builder
          */
         public Builder titles(Line... titles) {
@@ -261,7 +264,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the tab titles from a list.
          *
-         * @param titles the tab titles
+         * @param titles
+         *            the tab titles
          * @return this builder
          */
         public Builder titles(List<Line> titles) {
@@ -272,7 +276,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Adds a tab title.
          *
-         * @param title the tab title
+         * @param title
+         *            the tab title
          * @return this builder
          */
         public Builder addTitle(String title) {
@@ -283,7 +288,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Adds a tab title.
          *
-         * @param title the tab title
+         * @param title
+         *            the tab title
          * @return this builder
          */
         public Builder addTitle(Line title) {
@@ -294,7 +300,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Wraps the tabs in a block.
          *
-         * @param block the block to wrap in
+         * @param block
+         *            the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -305,7 +312,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the base style for unselected tabs.
          *
-         * @param style the base style
+         * @param style
+         *            the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -316,7 +324,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the style for the selected tab.
          *
-         * @param style the highlight style
+         * @param style
+         *            the highlight style
          * @return this builder
          */
         public Builder highlightStyle(Style style) {
@@ -327,7 +336,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the divider between tabs.
          *
-         * @param divider the divider text
+         * @param divider
+         *            the divider text
          * @return this builder
          */
         public Builder divider(String divider) {
@@ -338,7 +348,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the divider between tabs.
          *
-         * @param divider the divider span
+         * @param divider
+         *            the divider span
          * @return this builder
          */
         public Builder divider(Span divider) {
@@ -349,8 +360,10 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the padding on both sides of each tab title.
          *
-         * @param left  the left padding
-         * @param right the right padding
+         * @param left
+         *            the left padding
+         * @param right
+         *            the right padding
          * @return this builder
          */
         public Builder padding(String left, String right) {
@@ -362,7 +375,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the left padding for each tab title.
          *
-         * @param padding the left padding
+         * @param padding
+         *            the left padding
          * @return this builder
          */
         public Builder paddingLeft(String padding) {
@@ -373,7 +387,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the right padding for each tab title.
          *
-         * @param padding the right padding
+         * @param padding
+         *            the right padding
          * @return this builder
          */
         public Builder paddingRight(String padding) {
@@ -384,10 +399,11 @@ public final class Tabs implements StatefulWidget<TabsState> {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code background} and {@code highlight-color}
-         * will be resolved if not set programmatically.
+         * When set, properties like {@code background} and {@code highlight-color} will
+         * be resolved if not set programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -400,7 +416,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -413,7 +430,8 @@ public final class Tabs implements StatefulWidget<TabsState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the highlight color
+         * @param color
+         *            the highlight color
          * @return this builder
          */
         public Builder highlightColor(Color color) {

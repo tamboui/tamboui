@@ -4,12 +4,13 @@
  */
 package dev.tamboui.tfx;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -80,7 +81,7 @@ class EffectTest {
         void copyPreservesArea() {
             Rect customArea = new Rect(5, 5, 20, 10);
             Effect original = Fx.fadeToFg(Color.CYAN, 500, Interpolation.Linear)
-                .withArea(customArea);
+                    .withArea(customArea);
 
             Effect copy = original.copy();
 

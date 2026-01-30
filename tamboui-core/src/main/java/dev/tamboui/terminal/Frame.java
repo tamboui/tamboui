@@ -4,6 +4,11 @@
  */
 package dev.tamboui.terminal;
 
+import java.io.OutputStream;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
@@ -13,14 +18,9 @@ import dev.tamboui.widget.RawOutputCapable;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widget.Widget;
 
-import java.io.OutputStream;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
-
 /**
- * A frame represents a single render cycle.
- * Widgets are rendered to the frame's buffer.
+ * A frame represents a single render cycle. Widgets are rendered to the frame's
+ * buffer.
  */
 public final class Frame {
 
@@ -40,10 +40,11 @@ public final class Frame {
     }
 
     /**
-     * Creates a frame for testing purposes.
-     * This allows tests to create frames without going through Terminal.
+     * Creates a frame for testing purposes. This allows tests to create frames
+     * without going through Terminal.
      *
-     * @param buffer the buffer to render to
+     * @param buffer
+     *            the buffer to render to
      * @return a new frame backed by the given buffer
      */
     public static Frame forTesting(Buffer buffer) {
@@ -89,11 +90,13 @@ public final class Frame {
     /**
      * Renders a widget to the given area.
      * <p>
-     * If the widget implements {@link RawOutputCapable}, the raw output stream
-     * will be passed to enable native terminal protocol rendering.
+     * If the widget implements {@link RawOutputCapable}, the raw output stream will
+     * be passed to enable native terminal protocol rendering.
      *
-     * @param widget the widget to render
-     * @param area the area to render within
+     * @param widget
+     *            the widget to render
+     * @param area
+     *            the area to render within
      */
     public void renderWidget(Widget widget, Rect area) {
         if (widget instanceof RawOutputCapable) {
@@ -106,20 +109,25 @@ public final class Frame {
     /**
      * Renders a stateful widget to the given area.
      *
-     * @param <S> the state type
-     * @param widget the stateful widget to render
-     * @param area the area to render within
-     * @param state the widget state
+     * @param <S>
+     *            the state type
+     * @param widget
+     *            the stateful widget to render
+     * @param area
+     *            the area to render within
+     * @param state
+     *            the widget state
      */
     public <S> void renderStatefulWidget(StatefulWidget<S> widget, Rect area, S state) {
         widget.render(area, buffer, state);
     }
 
     /**
-     * Sets the cursor position. The cursor will be shown at this position
-     * after the frame is drawn.
+     * Sets the cursor position. The cursor will be shown at this position after the
+     * frame is drawn.
      *
-     * @param position the cursor position
+     * @param position
+     *            the cursor position
      */
     public void setCursorPosition(Position position) {
         this.cursorPosition = position;
@@ -129,8 +137,10 @@ public final class Frame {
     /**
      * Sets the cursor position using x and y coordinates.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
      */
     public void setCursorPosition(int x, int y) {
         setCursorPosition(new Position(x, y));
@@ -179,7 +189,8 @@ public final class Frame {
      * When set, styled content written to the buffer with Tags will be
      * automatically registered in the registry for effect targeting.
      *
-     * @param registry the registry, or null to disable tracking
+     * @param registry
+     *            the registry, or null to disable tracking
      */
     public void setStyledAreaRegistry(StyledAreaRegistry registry) {
         if (registry == null) {
@@ -198,10 +209,11 @@ public final class Frame {
      * Pushes a context key onto the stack.
      * <p>
      * The context key is used to associate styled areas with a parent context.
-     * Typically, this is called when entering an element's render scope with
-     * the element's ID as the context key.
+     * Typically, this is called when entering an element's render scope with the
+     * element's ID as the context key.
      *
-     * @param contextKey the context key (typically an element ID)
+     * @param contextKey
+     *            the context key (typically an element ID)
      */
     public void pushContextKey(String contextKey) {
         if (contextKey != null) {

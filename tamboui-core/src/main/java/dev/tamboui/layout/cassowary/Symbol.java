@@ -9,9 +9,10 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Internal symbol type used in the simplex tableau.
  *
- * <p>Symbols represent variables in the internal tableau representation.
- * They can be external (user-defined variables), slack (for inequalities),
- * error (for non-required constraints), or dummy (temporary markers).
+ * <p>
+ * Symbols represent variables in the internal tableau representation. They can
+ * be external (user-defined variables), slack (for inequalities), error (for
+ * non-required constraints), or dummy (temporary markers).
  */
 final class Symbol {
 
@@ -113,15 +114,15 @@ final class Symbol {
     @Override
     public String toString() {
         switch (type) {
-            case EXTERNAL:
+            case EXTERNAL :
                 return "e" + id;
-            case SLACK:
+            case SLACK :
                 return "s" + id;
-            case ERROR:
+            case ERROR :
                 return "r" + id;
-            case DUMMY:
+            case DUMMY :
                 return "d" + id;
-            default:
+            default :
                 return "?" + id;
         }
     }

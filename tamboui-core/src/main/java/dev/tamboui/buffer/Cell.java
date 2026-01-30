@@ -16,9 +16,9 @@ public final class Cell {
     public static final Cell EMPTY = new Cell(" ", Style.EMPTY);
 
     /**
-     * A continuation cell placeholder for the trailing column(s) of a wide character.
-     * Wide characters (CJK, emoji) occupy 2 terminal columns; the second column
-     * is filled with this cell. Renderers must skip continuation cells.
+     * A continuation cell placeholder for the trailing column(s) of a wide
+     * character. Wide characters (CJK, emoji) occupy 2 terminal columns; the second
+     * column is filled with this cell. Renderers must skip continuation cells.
      */
     public static final Cell CONTINUATION = new Cell("", Style.EMPTY);
 
@@ -29,8 +29,10 @@ public final class Cell {
     /**
      * Creates a cell with the given symbol and style.
      *
-     * @param symbol the character or grapheme cluster displayed in this cell
-     * @param style  the visual style
+     * @param symbol
+     *            the character or grapheme cluster displayed in this cell
+     * @param style
+     *            the visual style
      */
     public Cell(String symbol, Style style) {
         this.symbol = symbol;
@@ -74,7 +76,8 @@ public final class Cell {
     /**
      * Returns a new cell with the given symbol and this cell's style.
      *
-     * @param symbol the new symbol
+     * @param symbol
+     *            the new symbol
      * @return a new cell
      */
     public Cell symbol(String symbol) {
@@ -84,7 +87,8 @@ public final class Cell {
     /**
      * Returns a new cell with the given style and this cell's symbol.
      *
-     * @param style the new style
+     * @param style
+     *            the new style
      * @return a new cell
      */
     public Cell style(Style style) {
@@ -94,7 +98,8 @@ public final class Cell {
     /**
      * Returns a new cell with this cell's style patched by the given style.
      *
-     * @param patch the style patch to apply
+     * @param patch
+     *            the style patch to apply
      * @return a new cell with the patched style
      */
     public Cell patchStyle(Style patch) {
@@ -105,8 +110,10 @@ public final class Cell {
      * Merges this cell's symbol with another symbol using the given merge strategy.
      * Returns a new cell with the merged symbol.
      *
-     * @param otherSymbol the symbol to merge with
-     * @param strategy the merge strategy to use
+     * @param otherSymbol
+     *            the symbol to merge with
+     * @param strategy
+     *            the merge strategy to use
      * @return a new cell with the merged symbol
      */
     public Cell mergeSymbol(String otherSymbol, MergeStrategy strategy) {

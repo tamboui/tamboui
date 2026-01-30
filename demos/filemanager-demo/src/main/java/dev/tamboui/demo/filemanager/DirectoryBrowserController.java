@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Manages browsing a directory: navigation, selection, and marking files for operations.
- * This is a pure state holder with no UI dependencies.
+ * Manages browsing a directory: navigation, selection, and marking files for
+ * operations. This is a pure state holder with no UI dependencies.
  */
 public final class DirectoryBrowserController {
 
@@ -34,13 +34,20 @@ public final class DirectoryBrowserController {
 
         /**
          * Creates a file entry
-         * @param name the file name
-         * @param isDirectory whether it's a directory
-         * @param size the file size
-         * @param isReadable readable flag
-         * @param isWritable writable flag
+         * 
+         * @param name
+         *            the file name
+         * @param isDirectory
+         *            whether it's a directory
+         * @param size
+         *            the file size
+         * @param isReadable
+         *            readable flag
+         * @param isWritable
+         *            writable flag
          */
-        public FileEntry(String name, boolean isDirectory, long size, boolean isReadable, boolean isWritable) {
+        public FileEntry(String name, boolean isDirectory, long size, boolean isReadable,
+                boolean isWritable) {
             this.name = name;
             this.isDirectory = isDirectory;
             this.size = size;
@@ -50,6 +57,7 @@ public final class DirectoryBrowserController {
 
         /**
          * Returns the file name as shown in the listing.
+         * 
          * @return the entry name
          */
         public String name() {
@@ -58,6 +66,7 @@ public final class DirectoryBrowserController {
 
         /**
          * Returns true when this entry represents a directory.
+         * 
          * @return true if directory
          */
         public boolean isDirectory() {
@@ -66,6 +75,7 @@ public final class DirectoryBrowserController {
 
         /**
          * Returns the size of the entry in bytes. For directories this is 0.
+         * 
          * @return size in bytes
          */
         public long size() {
@@ -74,6 +84,7 @@ public final class DirectoryBrowserController {
 
         /**
          * Returns whether the entry is readable.
+         * 
          * @return true if readable
          */
         public boolean isReadable() {
@@ -82,6 +93,7 @@ public final class DirectoryBrowserController {
 
         /**
          * Returns whether the entry is writable.
+         * 
          * @return true if writable
          */
         public boolean isWritable() {
@@ -90,6 +102,7 @@ public final class DirectoryBrowserController {
 
         /**
          * Creates a pseudo-entry representing the parent directory ("..").
+         * 
          * @return a FileEntry for the parent directory
          */
         public static FileEntry parentDir() {
@@ -106,7 +119,9 @@ public final class DirectoryBrowserController {
 
     /**
      * Creates a controller for a particular start directory
-     * @param startDirectory the start directory
+     * 
+     * @param startDirectory
+     *            the start directory
      */
     public DirectoryBrowserController(Path startDirectory) {
         this.currentDirectory = startDirectory.toAbsolutePath().normalize();
@@ -119,6 +134,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns the absolute current directory path the controller points to.
+     * 
      * @return current directory path
      */
     public Path currentDirectory() {
@@ -127,6 +143,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns an unmodifiable list of entries in the current directory.
+     * 
      * @return list of FileEntry objects
      */
     public List<FileEntry> entries() {
@@ -135,6 +152,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns the index of the currently selected entry within entries().
+     * 
      * @return cursor index, zero-based
      */
     public int cursorIndex() {
@@ -143,6 +161,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns the current vertical scroll offset (first visible row index).
+     * 
      * @return scroll offset
      */
     public int scrollOffset() {
@@ -151,6 +170,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns the currently selected entry or null if the directory is empty.
+     * 
      * @return selected FileEntry or null
      */
     public FileEntry selectedEntry() {
@@ -161,8 +181,9 @@ public final class DirectoryBrowserController {
     }
 
     /**
-     * Returns the resolved Path of the selected entry, or null when none is selected
-     * or when the selection is the parent-directory pseudo-entry ("..").
+     * Returns the resolved Path of the selected entry, or null when none is
+     * selected or when the selection is the parent-directory pseudo-entry ("..").
+     * 
      * @return Path of the selected entry or null
      */
     public Path selectedPath() {
@@ -175,7 +196,9 @@ public final class DirectoryBrowserController {
 
     /**
      * Checks whether the given entry name is marked.
-     * @param name the entry name to check
+     * 
+     * @param name
+     *            the entry name to check
      * @return true if marked
      */
     public boolean isMarked(String name) {
@@ -184,6 +207,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns an unmodifiable set of marked entry names.
+     * 
      * @return set of marked names
      */
     public Set<String> markedFiles() {
@@ -192,16 +216,17 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns a list of absolute Paths corresponding to marked entries.
+     * 
      * @return list of Paths for marked entries
      */
     public List<Path> markedPaths() {
-        return markedFiles.stream()
-            .map(name -> currentDirectory.resolve(name))
-            .collect(Collectors.toList());
+        return markedFiles.stream().map(name -> currentDirectory.resolve(name))
+                .collect(Collectors.toList());
     }
 
     /**
      * Returns true if any entries are currently marked.
+     * 
      * @return true when there is at least one mark
      */
     public boolean hasMarkedFiles() {
@@ -210,6 +235,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns the number of marked entries.
+     * 
      * @return count of marked entries
      */
     public int markedCount() {
@@ -218,6 +244,7 @@ public final class DirectoryBrowserController {
 
     /**
      * Returns the configured number of visible rows used for paging.
+     * 
      * @return visible row count
      */
     public int visibleRows() {
@@ -229,9 +256,11 @@ public final class DirectoryBrowserController {
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * Sets the maximum number of visible rows used for paging and scrolling.
-     * The value will be clamped to at least 1.
-     * @param rows row count
+     * Sets the maximum number of visible rows used for paging and scrolling. The
+     * value will be clamped to at least 1.
+     * 
+     * @param rows
+     *            row count
      */
     public void setVisibleRows(int rows) {
         this.visibleRows = Math.max(1, rows);
@@ -291,7 +320,8 @@ public final class DirectoryBrowserController {
     }
 
     /**
-     * Activates the selected entry: navigate into directories or up if selecting "..".
+     * Activates the selected entry: navigate into directories or up if selecting
+     * "..".
      */
     public void enter() {
         FileEntry entry = selectedEntry();
@@ -327,8 +357,11 @@ public final class DirectoryBrowserController {
     }
 
     /**
-     * Moves to a new directory if it is a readable directory. Clears marks and resets cursor/scroll.
-     * @param directory the target directory
+     * Moves to a new directory if it is a readable directory. Clears marks and
+     * resets cursor/scroll.
+     * 
+     * @param directory
+     *            the target directory
      */
     public void navigateTo(Path directory) {
         Path normalized = directory.toAbsolutePath().normalize();
@@ -342,8 +375,9 @@ public final class DirectoryBrowserController {
     }
 
     /**
-     * Refreshes the file listing for the current directory, including a parent entry if applicable.
-     * If the directory cannot be read, the listing will be left empty.
+     * Refreshes the file listing for the current directory, including a parent
+     * entry if applicable. If the directory cannot be read, the listing will be
+     * left empty.
      */
     public void refresh() {
         entries.clear();
@@ -354,12 +388,11 @@ public final class DirectoryBrowserController {
         }
 
         try (Stream<Path> stream = Files.list(currentDirectory)) {
-            List<FileEntry> fileEntries = stream
-                .map(this::createEntry)
-                .sorted(Comparator
-                    .comparing((FileEntry e) -> !e.isDirectory())  // Directories first
-                    .thenComparing(e -> e.name().toLowerCase()))   // Then alphabetically
-                .collect(Collectors.toList());
+            List<FileEntry> fileEntries = stream.map(this::createEntry)
+                    .sorted(Comparator.comparing((FileEntry e) -> !e.isDirectory()) // Directories
+                                                                                    // first
+                            .thenComparing(e -> e.name().toLowerCase())) // Then alphabetically
+                    .collect(Collectors.toList());
             entries.addAll(fileEntries);
         } catch (IOException e) {
             // Directory not readable, keep it empty

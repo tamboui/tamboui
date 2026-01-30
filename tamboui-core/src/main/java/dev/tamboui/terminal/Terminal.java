@@ -4,22 +4,23 @@
  */
 package dev.tamboui.terminal;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.function.Consumer;
-
 /**
- * The main terminal abstraction. Manages the rendering lifecycle and
- * buffer management for efficient updates.
+ * The main terminal abstraction. Manages the rendering lifecycle and buffer
+ * management for efficient updates.
  *
- * @param <B> the backend type
+ * @param <B>
+ *            the backend type
  */
 public final class Terminal<B extends Backend> implements AutoCloseable {
 
@@ -32,8 +33,10 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     /**
      * Creates a new terminal instance with the given backend.
      *
-     * @param backend the backend to use for terminal operations
-     * @throws RuntimeIOException if initialization fails
+     * @param backend
+     *            the backend to use for terminal operations
+     * @throws RuntimeIOException
+     *             if initialization fails
      */
     public Terminal(B backend) {
         this.backend = backend;
@@ -88,7 +91,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
      * Returns the current terminal size.
      *
      * @return the terminal size
-     * @throws RuntimeIOException if the size cannot be determined
+     * @throws RuntimeIOException
+     *             if the size cannot be determined
      */
     public Size size() {
         try {
@@ -99,12 +103,14 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     }
 
     /**
-     * Draws a frame using the provided rendering function.
-     * This is the main rendering entry point.
+     * Draws a frame using the provided rendering function. This is the main
+     * rendering entry point.
      *
-     * @param renderer the function that renders to the frame
+     * @param renderer
+     *            the function that renders to the frame
      * @return a completed frame containing the rendered buffer
-     * @throws RuntimeIOException if drawing fails
+     * @throws RuntimeIOException
+     *             if drawing fails
      */
     public CompletedFrame draw(Consumer<Frame> renderer) {
         try {
@@ -139,8 +145,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                             hiddenCursor = false;
                         }
                     } catch (IOException e) {
-                        throw new RuntimeIOException(
-                                String.format("Failed to set cursor position to %s: %s", pos, e.getMessage()), e);
+                        throw new RuntimeIOException(String.format(
+                                "Failed to set cursor position to %s: %s", pos, e.getMessage()), e);
                     }
                 });
             } else if (!hiddenCursor) {
@@ -169,8 +175,10 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     /**
      * Resizes the terminal buffers.
      *
-     * @param area the new terminal area
-     * @throws RuntimeIOException if resizing fails
+     * @param area
+     *            the new terminal area
+     * @throws RuntimeIOException
+     *             if resizing fails
      */
     private void resize(Rect area) {
         currentBuffer = Buffer.empty(area);
@@ -178,14 +186,16 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
         try {
             backend.clear();
         } catch (IOException e) {
-            throw new RuntimeIOException("Failed to clear terminal during resize: " + e.getMessage(), e);
+            throw new RuntimeIOException(
+                    "Failed to clear terminal during resize: " + e.getMessage(), e);
         }
     }
 
     /**
      * Clears the terminal and resets the buffers.
      *
-     * @throws RuntimeIOException if clearing fails
+     * @throws RuntimeIOException
+     *             if clearing fails
      */
     public void clear() {
         try {
@@ -201,7 +211,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     /**
      * Shows the cursor.
      *
-     * @throws RuntimeIOException if showing the cursor fails
+     * @throws RuntimeIOException
+     *             if showing the cursor fails
      */
     public void showCursor() {
         try {
@@ -215,7 +226,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     /**
      * Hides the cursor.
      *
-     * @throws RuntimeIOException if hiding the cursor fails
+     * @throws RuntimeIOException
+     *             if hiding the cursor fails
      */
     public void hideCursor() {
         try {
@@ -238,7 +250,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     /**
      * Closes the terminal and releases resources.
      *
-     * @throws RuntimeIOException if closing fails
+     * @throws RuntimeIOException
+     *             if closing fails
      */
     @Override
     public void close() {

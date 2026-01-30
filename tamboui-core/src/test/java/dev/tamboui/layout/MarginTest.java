@@ -4,8 +4,8 @@
  */
 package dev.tamboui.layout;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -56,7 +56,7 @@ class MarginTest {
     void totals() {
         Margin margin = new Margin(1, 2, 3, 4);
         assertThat(margin.horizontalTotal()).isEqualTo(6); // 2 + 4
-        assertThat(margin.verticalTotal()).isEqualTo(4);   // 1 + 3
+        assertThat(margin.verticalTotal()).isEqualTo(4); // 1 + 3
     }
 
     @Test

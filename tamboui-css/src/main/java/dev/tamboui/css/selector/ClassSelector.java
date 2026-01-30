@@ -4,11 +4,11 @@
  */
 package dev.tamboui.css.selector;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-
 import java.util.List;
 import java.util.Objects;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 
 /**
  * A class selector that matches elements by their CSS class.
@@ -22,7 +22,8 @@ public final class ClassSelector implements Selector {
     /**
      * Creates a class selector for the given CSS class name.
      *
-     * @param className the CSS class name
+     * @param className
+     *            the CSS class name
      */
     public ClassSelector(String className) {
         this.className = Objects.requireNonNull(className);

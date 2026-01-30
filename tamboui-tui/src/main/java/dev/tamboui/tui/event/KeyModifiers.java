@@ -28,9 +28,12 @@ public final class KeyModifiers {
     /**
      * Creates a new KeyModifiers instance with the specified modifier flags.
      *
-     * @param ctrl  true if Ctrl is pressed
-     * @param alt   true if Alt is pressed
-     * @param shift true if Shift is pressed
+     * @param ctrl
+     *            true if Ctrl is pressed
+     * @param alt
+     *            true if Alt is pressed
+     * @param shift
+     *            true if Shift is pressed
      */
     public KeyModifiers(boolean ctrl, boolean alt, boolean shift) {
         this.ctrl = ctrl;
@@ -41,9 +44,12 @@ public final class KeyModifiers {
     /**
      * Creates modifiers with the specified flags.
      *
-     * @param ctrl  true if Ctrl is pressed
-     * @param alt   true if Alt is pressed
-     * @param shift true if Shift is pressed
+     * @param ctrl
+     *            true if Ctrl is pressed
+     * @param alt
+     *            true if Alt is pressed
+     * @param shift
+     *            true if Shift is pressed
      * @return the key modifiers instance
      */
     public static KeyModifiers of(boolean ctrl, boolean alt, boolean shift) {

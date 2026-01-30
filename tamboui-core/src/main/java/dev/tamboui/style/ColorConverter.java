@@ -15,19 +15,21 @@ import java.util.regex.Pattern;
  * <p>
  * Supported formats:
  * <ul>
- *   <li>Named colors: red, green, blue, etc.</li>
- *   <li>Hex colors: #RGB, #RRGGBB</li>
- *   <li>RGB function: rgb(r, g, b)</li>
- *   <li>Indexed colors: indexed(0-255)</li>
+ * <li>Named colors: red, green, blue, etc.</li>
+ * <li>Hex colors: #RGB, #RRGGBB</li>
+ * <li>RGB function: rgb(r, g, b)</li>
+ * <li>Indexed colors: indexed(0-255)</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * // Standalone usage
  * Optional<Color> color = ColorConverter.INSTANCE.convert("#FF0000");
  *
  * // With PropertyDefinition
- * PropertyDefinition<Color> BORDER_COLOR = PropertyDefinition.of("border-color", ColorConverter.INSTANCE);
+ * PropertyDefinition<Color> BORDER_COLOR = PropertyDefinition.of("border-color",
+ *         ColorConverter.INSTANCE);
  * }</pre>
  */
 public final class ColorConverter implements PropertyConverter<Color> {
@@ -39,8 +41,10 @@ public final class ColorConverter implements PropertyConverter<Color> {
 
     private static final Map<String, Color> NAMED_COLORS = new HashMap<>();
     private static final Pattern HEX_PATTERN = Pattern.compile("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})");
-    private static final Pattern RGB_PATTERN = Pattern.compile("rgb\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)");
-    private static final Pattern INDEXED_PATTERN = Pattern.compile("indexed\\s*\\(\\s*(\\d+)\\s*\\)");
+    private static final Pattern RGB_PATTERN = Pattern
+            .compile("rgb\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)");
+    private static final Pattern INDEXED_PATTERN = Pattern
+            .compile("indexed\\s*\\(\\s*(\\d+)\\s*\\)");
 
     static {
         // Standard ANSI colors

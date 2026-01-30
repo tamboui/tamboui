@@ -7,8 +7,8 @@ package dev.tamboui.style;
 import java.util.Optional;
 
 /**
- * Identity converter for String properties.
- * Returns the input value unchanged (after trimming).
+ * Identity converter for String properties. Returns the input value unchanged
+ * (after trimming).
  */
 public final class StringConverter implements PropertyConverter<String> {
 

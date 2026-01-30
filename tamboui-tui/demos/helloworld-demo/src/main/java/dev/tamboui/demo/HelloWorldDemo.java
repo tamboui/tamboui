@@ -7,8 +7,8 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
-import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.text.Text;
+import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
  * Minimal Hello World demo using immediate mode rendering.
@@ -20,8 +20,11 @@ public class HelloWorldDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         try (Backend backend = BackendFactory.create()) {
@@ -58,10 +61,8 @@ public class HelloWorldDemo {
     }
 
     private static void render(Frame frame) {
-        var paragraph = Paragraph.builder()
-            .text(Text.from("Hello, TamboUI! Press 'q' to quit."))
-            .build();
+        var paragraph = Paragraph.builder().text(Text.from("Hello, TamboUI! Press 'q' to quit."))
+                .build();
         frame.renderWidget(paragraph, frame.area());
     }
 }
-

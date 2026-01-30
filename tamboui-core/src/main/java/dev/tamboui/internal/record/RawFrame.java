@@ -5,8 +5,8 @@
 package dev.tamboui.internal.record;
 
 /**
- * A raw captured frame containing the exact bytes written to stdout and its timestamp.
- * Used by AnsiTerminalCapture for raw byte stream capture.
+ * A raw captured frame containing the exact bytes written to stdout and its
+ * timestamp. Used by AnsiTerminalCapture for raw byte stream capture.
  */
 final class RawFrame {
     private final byte[] data;
@@ -25,7 +25,8 @@ final class RawFrame {
     }
 
     /**
-     * Returns the timestamp when this frame was captured (milliseconds since recording start).
+     * Returns the timestamp when this frame was captured (milliseconds since
+     * recording start).
      */
     long timestampMs() {
         return timestampMs;

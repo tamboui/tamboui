@@ -5,16 +5,18 @@
 package dev.tamboui.style;
 
 /**
- * State for managing scroll position and viewport information in scrollable text elements.
+ * State for managing scroll position and viewport information in scrollable
+ * text elements.
  * <p>
  * The state tracks:
  * <ul>
- *   <li>Scroll position (row and column offsets)</li>
- *   <li>Content dimensions (total lines and max line width)</li>
- *   <li>Viewport dimensions (visible area size)</li>
+ * <li>Scroll position (row and column offsets)</li>
+ * <li>Content dimensions (total lines and max line width)</li>
+ * <li>Viewport dimensions (visible area size)</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * RichTextState state = new RichTextState();
  *
@@ -44,7 +46,8 @@ public final class RichTextState {
     }
 
     /**
-     * Returns the current vertical scroll offset (number of lines scrolled from top).
+     * Returns the current vertical scroll offset (number of lines scrolled from
+     * top).
      *
      * @return the scroll row offset
      */
@@ -53,7 +56,8 @@ public final class RichTextState {
     }
 
     /**
-     * Returns the current horizontal scroll offset (number of columns scrolled from left).
+     * Returns the current horizontal scroll offset (number of columns scrolled from
+     * left).
      *
      * @return the scroll column offset
      */
@@ -100,7 +104,8 @@ public final class RichTextState {
     /**
      * Sets the content height. Called by the widget during rendering.
      *
-     * @param height the content height in lines
+     * @param height
+     *            the content height in lines
      */
     public void setContentHeight(int height) {
         this.contentHeight = Math.max(0, height);
@@ -110,7 +115,8 @@ public final class RichTextState {
     /**
      * Sets the content width. Called by the widget during rendering.
      *
-     * @param width the content width
+     * @param width
+     *            the content width
      */
     public void setContentWidth(int width) {
         this.contentWidth = Math.max(0, width);
@@ -120,7 +126,8 @@ public final class RichTextState {
     /**
      * Sets the viewport height. Called by the widget during rendering.
      *
-     * @param height the viewport height
+     * @param height
+     *            the viewport height
      */
     public void setViewportHeight(int height) {
         this.viewportHeight = Math.max(0, height);
@@ -130,7 +137,8 @@ public final class RichTextState {
     /**
      * Sets the viewport width. Called by the widget during rendering.
      *
-     * @param width the viewport width
+     * @param width
+     *            the viewport width
      */
     public void setViewportWidth(int width) {
         this.viewportWidth = Math.max(0, width);
@@ -147,7 +155,8 @@ public final class RichTextState {
     /**
      * Scrolls down by the specified number of lines.
      *
-     * @param lines the number of lines to scroll
+     * @param lines
+     *            the number of lines to scroll
      */
     public void scrollDown(int lines) {
         scrollRow += lines;
@@ -164,7 +173,8 @@ public final class RichTextState {
     /**
      * Scrolls up by the specified number of lines.
      *
-     * @param lines the number of lines to scroll
+     * @param lines
+     *            the number of lines to scroll
      */
     public void scrollUp(int lines) {
         scrollRow -= lines;
@@ -181,7 +191,8 @@ public final class RichTextState {
     /**
      * Scrolls right by the specified number of columns.
      *
-     * @param cols the number of columns to scroll
+     * @param cols
+     *            the number of columns to scroll
      */
     public void scrollRight(int cols) {
         scrollCol += cols;
@@ -198,7 +209,8 @@ public final class RichTextState {
     /**
      * Scrolls left by the specified number of columns.
      *
-     * @param cols the number of columns to scroll
+     * @param cols
+     *            the number of columns to scroll
      */
     public void scrollLeft(int cols) {
         scrollCol -= cols;
@@ -237,7 +249,8 @@ public final class RichTextState {
     /**
      * Scrolls to show the specified line.
      *
-     * @param line the line number (0-based)
+     * @param line
+     *            the line number (0-based)
      */
     public void scrollToLine(int line) {
         scrollRow = line;
@@ -247,7 +260,8 @@ public final class RichTextState {
     /**
      * Ensures the specified line is visible, scrolling if necessary.
      *
-     * @param line the line number (0-based)
+     * @param line
+     *            the line number (0-based)
      */
     public void ensureLineVisible(int line) {
         if (line < scrollRow) {

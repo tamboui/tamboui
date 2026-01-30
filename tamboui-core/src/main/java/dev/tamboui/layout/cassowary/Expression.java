@@ -4,33 +4,36 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dev.tamboui.layout.Fraction;
+
 /**
  * A linear expression of the form: constant + c1*v1 + c2*v2 + ... + cn*vn.
  *
- * <p>Expressions are immutable and support fluent operations for building
- * complex expressions. They can be combined using arithmetic operations
- * and converted to constraints.
+ * <p>
+ * Expressions are immutable and support fluent operations for building complex
+ * expressions. They can be combined using arithmetic operations and converted
+ * to constraints.
  *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
+ * <p>
+ * This implementation uses {@link Fraction} for exact arithmetic, avoiding the
+ * cumulative rounding errors that occur with floating-point.
  *
- * <p>Example usage:
+ * <p>
+ * Example usage:
+ * 
  * <pre>
  * Variable x = new Variable("x");
  * Variable y = new Variable("y");
  *
  * // Build: 2*x + 3*y + 10
- * Expression expr = Expression.variable(x).times(2)
- *     .plus(Expression.variable(y).times(3))
- *     .plus(Expression.constant(10));
+ * Expression expr = Expression.variable(x).times(2).plus(Expression.variable(y).times(3))
+ *         .plus(Expression.constant(10));
  *
  * // Create constraint: 2*x + 3*y + 10 == 0
  * CassowaryConstraint c = expr.equalTo(0, Strength.REQUIRED);
@@ -60,7 +63,8 @@ public final class Expression {
     /**
      * Creates an expression with only a constant value.
      *
-     * @param value the constant value
+     * @param value
+     *            the constant value
      * @return an expression representing the constant
      */
     public static Expression constant(Fraction value) {
@@ -73,7 +77,8 @@ public final class Expression {
     /**
      * Creates an expression with only a constant value.
      *
-     * @param value the constant value
+     * @param value
+     *            the constant value
      * @return an expression representing the constant
      */
     public static Expression constant(long value) {
@@ -83,17 +88,20 @@ public final class Expression {
     /**
      * Creates an expression containing a single variable with coefficient 1.
      *
-     * @param variable the variable
+     * @param variable
+     *            the variable
      * @return an expression representing the variable
      */
     public static Expression variable(Variable variable) {
-        return new Expression(Collections.singletonList(new Term(variable, Fraction.ONE)), Fraction.ZERO);
+        return new Expression(Collections.singletonList(new Term(variable, Fraction.ONE)),
+                Fraction.ZERO);
     }
 
     /**
      * Creates an expression containing a single term.
      *
-     * @param term the term
+     * @param term
+     *            the term
      * @return an expression containing the term
      */
     public static Expression term(Term term) {
@@ -130,7 +138,8 @@ public final class Expression {
     /**
      * Adds another expression to this one.
      *
-     * @param other the expression to add
+     * @param other
+     *            the expression to add
      * @return a new expression representing the sum
      */
     public Expression plus(Expression other) {
@@ -156,7 +165,8 @@ public final class Expression {
     /**
      * Adds a constant to this expression.
      *
-     * @param value the constant to add
+     * @param value
+     *            the constant to add
      * @return a new expression with the added constant
      */
     public Expression plus(Fraction value) {
@@ -166,7 +176,8 @@ public final class Expression {
     /**
      * Adds a constant to this expression.
      *
-     * @param value the constant to add
+     * @param value
+     *            the constant to add
      * @return a new expression with the added constant
      */
     public Expression plus(long value) {
@@ -176,7 +187,8 @@ public final class Expression {
     /**
      * Adds a variable to this expression.
      *
-     * @param variable the variable to add
+     * @param variable
+     *            the variable to add
      * @return a new expression with the added variable
      */
     public Expression plus(Variable variable) {
@@ -186,7 +198,8 @@ public final class Expression {
     /**
      * Adds a term to this expression.
      *
-     * @param term the term to add
+     * @param term
+     *            the term to add
      * @return a new expression with the added term
      */
     public Expression plus(Term term) {
@@ -196,7 +209,8 @@ public final class Expression {
     /**
      * Subtracts another expression from this one.
      *
-     * @param other the expression to subtract
+     * @param other
+     *            the expression to subtract
      * @return a new expression representing the difference
      */
     public Expression minus(Expression other) {
@@ -206,7 +220,8 @@ public final class Expression {
     /**
      * Subtracts a constant from this expression.
      *
-     * @param value the constant to subtract
+     * @param value
+     *            the constant to subtract
      * @return a new expression with the subtracted constant
      */
     public Expression minus(Fraction value) {
@@ -216,7 +231,8 @@ public final class Expression {
     /**
      * Subtracts a constant from this expression.
      *
-     * @param value the constant to subtract
+     * @param value
+     *            the constant to subtract
      * @return a new expression with the subtracted constant
      */
     public Expression minus(long value) {
@@ -226,7 +242,8 @@ public final class Expression {
     /**
      * Subtracts a variable from this expression.
      *
-     * @param variable the variable to subtract
+     * @param variable
+     *            the variable to subtract
      * @return a new expression with the subtracted variable
      */
     public Expression minus(Variable variable) {
@@ -236,7 +253,8 @@ public final class Expression {
     /**
      * Multiplies this expression by a scalar.
      *
-     * @param coefficient the scalar to multiply by
+     * @param coefficient
+     *            the scalar to multiply by
      * @return a new scaled expression
      */
     public Expression times(Fraction coefficient) {
@@ -257,7 +275,8 @@ public final class Expression {
     /**
      * Multiplies this expression by a scalar.
      *
-     * @param coefficient the scalar to multiply by
+     * @param coefficient
+     *            the scalar to multiply by
      * @return a new scaled expression
      */
     public Expression times(long coefficient) {
@@ -267,9 +286,11 @@ public final class Expression {
     /**
      * Divides this expression by a scalar.
      *
-     * @param divisor the scalar to divide by
+     * @param divisor
+     *            the scalar to divide by
      * @return a new divided expression
-     * @throws ArithmeticException if divisor is zero
+     * @throws ArithmeticException
+     *             if divisor is zero
      */
     public Expression divide(Fraction divisor) {
         if (divisor.isZero()) {
@@ -281,9 +302,11 @@ public final class Expression {
     /**
      * Divides this expression by a scalar.
      *
-     * @param divisor the scalar to divide by
+     * @param divisor
+     *            the scalar to divide by
      * @return a new divided expression
-     * @throws ArithmeticException if divisor is zero
+     * @throws ArithmeticException
+     *             if divisor is zero
      */
     public Expression divide(long divisor) {
         return divide(Fraction.of(divisor));
@@ -301,8 +324,10 @@ public final class Expression {
     /**
      * Creates an equality constraint: this == other.
      *
-     * @param other    the right-hand side expression
-     * @param strength the constraint strength
+     * @param other
+     *            the right-hand side expression
+     * @param strength
+     *            the constraint strength
      * @return a new equality constraint
      */
     public CassowaryConstraint equalTo(Expression other, Strength strength) {
@@ -312,8 +337,10 @@ public final class Expression {
     /**
      * Creates an equality constraint: this == value.
      *
-     * @param value    the right-hand side constant
-     * @param strength the constraint strength
+     * @param value
+     *            the right-hand side constant
+     * @param strength
+     *            the constraint strength
      * @return a new equality constraint
      */
     public CassowaryConstraint equalTo(Fraction value, Strength strength) {
@@ -323,8 +350,10 @@ public final class Expression {
     /**
      * Creates an equality constraint: this == value.
      *
-     * @param value    the right-hand side constant
-     * @param strength the constraint strength
+     * @param value
+     *            the right-hand side constant
+     * @param strength
+     *            the constraint strength
      * @return a new equality constraint
      */
     public CassowaryConstraint equalTo(long value, Strength strength) {
@@ -334,8 +363,10 @@ public final class Expression {
     /**
      * Creates a less-than-or-equal constraint: this &lt;= other.
      *
-     * @param other    the right-hand side expression
-     * @param strength the constraint strength
+     * @param other
+     *            the right-hand side expression
+     * @param strength
+     *            the constraint strength
      * @return a new inequality constraint
      */
     public CassowaryConstraint lessThanOrEqual(Expression other, Strength strength) {
@@ -345,8 +376,10 @@ public final class Expression {
     /**
      * Creates a less-than-or-equal constraint: this &lt;= value.
      *
-     * @param value    the right-hand side constant
-     * @param strength the constraint strength
+     * @param value
+     *            the right-hand side constant
+     * @param strength
+     *            the constraint strength
      * @return a new inequality constraint
      */
     public CassowaryConstraint lessThanOrEqual(Fraction value, Strength strength) {
@@ -356,8 +389,10 @@ public final class Expression {
     /**
      * Creates a less-than-or-equal constraint: this &lt;= value.
      *
-     * @param value    the right-hand side constant
-     * @param strength the constraint strength
+     * @param value
+     *            the right-hand side constant
+     * @param strength
+     *            the constraint strength
      * @return a new inequality constraint
      */
     public CassowaryConstraint lessThanOrEqual(long value, Strength strength) {
@@ -367,8 +402,10 @@ public final class Expression {
     /**
      * Creates a greater-than-or-equal constraint: this &gt;= other.
      *
-     * @param other    the right-hand side expression
-     * @param strength the constraint strength
+     * @param other
+     *            the right-hand side expression
+     * @param strength
+     *            the constraint strength
      * @return a new inequality constraint
      */
     public CassowaryConstraint greaterThanOrEqual(Expression other, Strength strength) {
@@ -378,8 +415,10 @@ public final class Expression {
     /**
      * Creates a greater-than-or-equal constraint: this &gt;= value.
      *
-     * @param value    the right-hand side constant
-     * @param strength the constraint strength
+     * @param value
+     *            the right-hand side constant
+     * @param strength
+     *            the constraint strength
      * @return a new inequality constraint
      */
     public CassowaryConstraint greaterThanOrEqual(Fraction value, Strength strength) {
@@ -389,8 +428,10 @@ public final class Expression {
     /**
      * Creates a greater-than-or-equal constraint: this &gt;= value.
      *
-     * @param value    the right-hand side constant
-     * @param strength the constraint strength
+     * @param value
+     *            the right-hand side constant
+     * @param strength
+     *            the constraint strength
      * @return a new inequality constraint
      */
     public CassowaryConstraint greaterThanOrEqual(long value, Strength strength) {
@@ -406,8 +447,7 @@ public final class Expression {
             return false;
         }
         Expression that = (Expression) o;
-        return constant.equals(that.constant)
-                && terms.equals(that.terms);
+        return constant.equals(that.constant) && terms.equals(that.terms);
     }
 
     @Override

@@ -4,9 +4,9 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Rect;
-
 import java.util.List;
+
+import dev.tamboui.layout.Rect;
 
 /**
  * Registry that stores information about styled areas rendered to a buffer.
@@ -15,9 +15,9 @@ import java.util.List;
  * within elements. While ElementRegistry tracks entire element areas,
  * StyledAreaRegistry tracks individual styled regions within those elements.
  * <p>
- * This is a CSS-unaware interface that stores areas with their associated
- * tags and styles. The toolkit layer (e.g., TFX) interprets tags as CSS
- * class names and context keys as element IDs to enable CSS selector support.
+ * This is a CSS-unaware interface that stores areas with their associated tags
+ * and styles. The toolkit layer (e.g., TFX) interprets tags as CSS class names
+ * and context keys as element IDs to enable CSS selector support.
  *
  * @see StyledAreaInfo
  * @see Tags
@@ -31,9 +31,12 @@ public interface StyledAreaRegistry {
      * The contextKey associates this area with a parent context (typically an
      * element ID) for hierarchical selector matching.
      *
-     * @param style      the style containing Tags and other properties
-     * @param area       the rectangular area
-     * @param contextKey the parent context key (may be null)
+     * @param style
+     *            the style containing Tags and other properties
+     * @param area
+     *            the rectangular area
+     * @param contextKey
+     *            the parent context key (may be null)
      */
     void register(Style style, Rect area, String contextKey);
 

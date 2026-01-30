@@ -14,19 +14,18 @@ import dev.tamboui.tui.InlineTuiConfig;
  * normal terminal flow (no alternate screen). State is managed through instance
  * fields, and events are handled by elements via their handlers.
  *
- * <pre>{@code
+ * <pre>
+ * {@code
  * import static dev.tamboui.toolkit.Toolkit.*;
  *
  * public class ProgressApp extends InlineApp {
  *     private double progress = 0.0;
  *
- *     @Override
+ *     &#64;Override
  *     protected Element render() {
- *         return column(
- *             waveText("Installing packages...").cyan(),
- *             gauge(progress).label(String.format("%.0f%%", progress * 100)),
- *             text("Press q to cancel").dim()
- *         );
+ *         return column(waveText("Installing packages...").cyan(),
+ *                 gauge(progress).label(String.format("%.0f%%", progress * 100)),
+ *                 text("Press q to cancel").dim());
  *     }
  *
  *     @Override
@@ -46,7 +45,8 @@ import dev.tamboui.tui.InlineTuiConfig;
  *         new ProgressApp().run();
  *     }
  * }
- * }</pre>
+ * }
+ * </pre>
  *
  * @see InlineToolkitRunner
  * @see ToolkitApp
@@ -64,9 +64,9 @@ public abstract class InlineApp {
     /**
      * Returns the initial height of the inline display in lines.
      * <p>
-     * The display will automatically grow beyond this if the content
-     * requires more space. Override this method to specify a starting height.
-     * The default is 1 line.
+     * The display will automatically grow beyond this if the content requires more
+     * space. Override this method to specify a starting height. The default is 1
+     * line.
      *
      * @return the initial display height
      */
@@ -77,9 +77,8 @@ public abstract class InlineApp {
     /**
      * Renders the application UI.
      * <p>
-     * Called each frame to get the current state.
-     * Add event handlers to elements using {@code onKeyEvent()} and
-     * {@code onMouseEvent()} methods.
+     * Called each frame to get the current state. Add event handlers to elements
+     * using {@code onKeyEvent()} and {@code onMouseEvent()} methods.
      *
      * @return the root element to render
      */
@@ -90,7 +89,8 @@ public abstract class InlineApp {
      * <p>
      * Override to customize tick rate, bindings, or other settings.
      *
-     * @param height the display height
+     * @param height
+     *            the display height
      * @return the configuration
      */
     protected InlineTuiConfig configure(int height) {
@@ -116,7 +116,8 @@ public abstract class InlineApp {
     /**
      * Runs the application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
     public void run() throws Exception {
         int h = height();
@@ -144,7 +145,8 @@ public abstract class InlineApp {
     /**
      * Prints an element above the viewport as a single line.
      *
-     * @param element the element to print
+     * @param element
+     *            the element to print
      */
     protected void println(Element element) {
         if (runner != null) {
@@ -155,7 +157,8 @@ public abstract class InlineApp {
     /**
      * Prints a plain text message above the viewport.
      *
-     * @param message the message to print
+     * @param message
+     *            the message to print
      */
     protected void println(String message) {
         if (runner != null) {

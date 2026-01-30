@@ -4,6 +4,13 @@
  */
 package dev.tamboui.tfx.toolkit;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -14,12 +21,6 @@ import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.focus.FocusManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,19 +61,21 @@ class ElementEffectRegistryTest {
 
         // Process once at initial position
         TFxDuration delta = TFxDuration.fromMillis(16);
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
+                styledAreaRegistry, focusManager);
 
         assertThat(processedAreas).hasSize(1);
         assertThat(processedAreas.get(0)).isEqualTo(initialArea);
 
         // Simulate resize: clear and re-register at NEW position
         styledAreaRegistry.clear();
-        Rect newArea = new Rect(15, 8, 25, 1);  // Different position and size
+        Rect newArea = new Rect(15, 8, 25, 1); // Different position and size
         styledAreaRegistry.register(taggedStyle, newArea, null);
 
         // Process again - should use NEW area
         processedAreas.clear();
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
+                styledAreaRegistry, focusManager);
 
         assertThat(processedAreas).hasSize(1);
         assertThat(processedAreas.get(0)).isEqualTo(newArea);
@@ -94,7 +97,8 @@ class ElementEffectRegistryTest {
 
         // Process once
         TFxDuration delta = TFxDuration.fromMillis(16);
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
+                styledAreaRegistry, focusManager);
         assertThat(processedAreas).hasSize(1);
 
         // Simulate resize where the region no longer exists
@@ -103,7 +107,8 @@ class ElementEffectRegistryTest {
 
         // Process again - should not process any effect (no matching areas)
         processedAreas.clear();
-        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry, styledAreaRegistry, focusManager);
+        effectRegistry.processEffects(delta, buffer, buffer.area(), elementRegistry,
+                styledAreaRegistry, focusManager);
 
         assertThat(processedAreas).isEmpty();
     }

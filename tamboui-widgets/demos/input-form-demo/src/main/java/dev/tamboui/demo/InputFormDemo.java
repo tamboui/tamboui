@@ -8,12 +8,13 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
@@ -21,33 +22,23 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.text.Text;
 import dev.tamboui.widgets.input.TextInputState;
-
-import java.io.IOException;
 
 /**
  * Demo TUI application showcasing input form with focus management.
  * <p>
- * Demonstrates:
- * - Multiple text input fields
- * - Focus management with Tab navigation
- * - Custom number input field (Age)
- * - Cursor positioning for focused field
- * - Form submission and cancellation
+ * Demonstrates: - Multiple text input fields - Focus management with Tab
+ * navigation - Custom number input field (Age) - Cursor positioning for focused
+ * field - Form submission and cancellation
  */
 public class InputFormDemo {
 
     private enum Focus {
-        FIRST_NAME,
-        LAST_NAME,
-        AGE
+        FIRST_NAME, LAST_NAME, AGE
     }
 
     private enum AppState {
-        RUNNING,
-        CANCELLED,
-        SUBMITTED
+        RUNNING, CANCELLED, SUBMITTED
     }
 
     private boolean running = true;
@@ -64,8 +55,11 @@ public class InputFormDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new InputFormDemo().run();
@@ -74,9 +68,10 @@ public class InputFormDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -105,7 +100,7 @@ public class InputFormDemo {
             backend.showCursor();
             backend.leaveAlternateScreen();
             backend.disableRawMode();
-            
+
             // Print result
             if (state == AppState.SUBMITTED) {
                 System.out.println("{");
@@ -228,14 +223,11 @@ public class InputFormDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(1),  // First Name
-                Constraint.length(1),  // Last Name
-                Constraint.length(1),  // Age
-                Constraint.fill()      // Spacer
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(1), // First Name
+                Constraint.length(1), // Last Name
+                Constraint.length(1), // Age
+                Constraint.fill() // Spacer
+        ).split(area);
 
         renderFirstNameField(frame, layout.get(0));
         renderLastNameField(frame, layout.get(1));
@@ -244,24 +236,21 @@ public class InputFormDemo {
 
     private void renderFirstNameField(Frame frame, Rect area) {
         boolean isFocused = focus == Focus.FIRST_NAME;
-        
+
         // Layout: label area and value area
-        var fieldLayout = Layout.horizontal()
-            .constraints(
-                Constraint.length(13),  // "First Name: " label
-                Constraint.fill()        // Value area
-            )
-            .split(area);
+        var fieldLayout = Layout.horizontal().constraints(Constraint.length(13), // "First Name: "
+                                                                                 // label
+                Constraint.fill() // Value area
+        ).split(area);
 
         // Render label
-        Line label = Line.from(
-            Span.raw("First Name: ").style(Style.EMPTY.bold())
-        );
+        Line label = Line.from(Span.raw("First Name: ").style(Style.EMPTY.bold()));
         frame.buffer().setLine(fieldLayout.get(0).left(), fieldLayout.get(0).top(), label);
 
         // Render value
         String value = firstNameState.text();
-        frame.buffer().setString(fieldLayout.get(1).left(), fieldLayout.get(1).top(), value, Style.EMPTY);
+        frame.buffer().setString(fieldLayout.get(1).left(), fieldLayout.get(1).top(), value,
+                Style.EMPTY);
 
         // Set cursor position if focused
         if (isFocused) {
@@ -269,7 +258,8 @@ public class InputFormDemo {
             int cursorY = fieldLayout.get(1).top();
             if (fieldLayout.get(1).contains(cursorX, cursorY)) {
                 Cell currentCell = frame.buffer().get(cursorX, cursorY);
-                frame.buffer().set(cursorX, cursorY, currentCell.patchStyle(Style.EMPTY.reversed()));
+                frame.buffer().set(cursorX, cursorY,
+                        currentCell.patchStyle(Style.EMPTY.reversed()));
                 frame.setCursorPosition(new Position(cursorX, cursorY));
             }
         }
@@ -277,24 +267,21 @@ public class InputFormDemo {
 
     private void renderLastNameField(Frame frame, Rect area) {
         boolean isFocused = focus == Focus.LAST_NAME;
-        
+
         // Layout: label area and value area
-        var fieldLayout = Layout.horizontal()
-            .constraints(
-                Constraint.length(13),  // "Last Name: " label
-                Constraint.fill()       // Value area
-            )
-            .split(area);
+        var fieldLayout = Layout.horizontal().constraints(Constraint.length(13), // "Last Name: "
+                                                                                 // label
+                Constraint.fill() // Value area
+        ).split(area);
 
         // Render label
-        Line label = Line.from(
-            Span.raw("Last Name: ").style(Style.EMPTY.bold())
-        );
+        Line label = Line.from(Span.raw("Last Name: ").style(Style.EMPTY.bold()));
         frame.buffer().setLine(fieldLayout.get(0).left(), fieldLayout.get(0).top(), label);
 
         // Render value
         String value = lastNameState.text();
-        frame.buffer().setString(fieldLayout.get(1).left(), fieldLayout.get(1).top(), value, Style.EMPTY);
+        frame.buffer().setString(fieldLayout.get(1).left(), fieldLayout.get(1).top(), value,
+                Style.EMPTY);
 
         // Set cursor position if focused
         if (isFocused) {
@@ -302,7 +289,8 @@ public class InputFormDemo {
             int cursorY = fieldLayout.get(1).top();
             if (fieldLayout.get(1).contains(cursorX, cursorY)) {
                 Cell currentCell = frame.buffer().get(cursorX, cursorY);
-                frame.buffer().set(cursorX, cursorY, currentCell.patchStyle(Style.EMPTY.reversed()));
+                frame.buffer().set(cursorX, cursorY,
+                        currentCell.patchStyle(Style.EMPTY.reversed()));
                 frame.setCursorPosition(new Position(cursorX, cursorY));
             }
         }
@@ -310,24 +298,20 @@ public class InputFormDemo {
 
     private void renderAgeField(Frame frame, Rect area) {
         boolean isFocused = focus == Focus.AGE;
-        
+
         // Layout: label area and value area
-        var fieldLayout = Layout.horizontal()
-            .constraints(
-                Constraint.length(6),   // "Age: " label
-                Constraint.fill()       // Value area
-            )
-            .split(area);
+        var fieldLayout = Layout.horizontal().constraints(Constraint.length(6), // "Age: " label
+                Constraint.fill() // Value area
+        ).split(area);
 
         // Render label
-        Line label = Line.from(
-            Span.raw("Age: ").style(Style.EMPTY.bold())
-        );
+        Line label = Line.from(Span.raw("Age: ").style(Style.EMPTY.bold()));
         frame.buffer().setLine(fieldLayout.get(0).left(), fieldLayout.get(0).top(), label);
 
         // Render age value
         String ageText = String.valueOf(age);
-        frame.buffer().setString(fieldLayout.get(1).left(), fieldLayout.get(1).top(), ageText, Style.EMPTY);
+        frame.buffer().setString(fieldLayout.get(1).left(), fieldLayout.get(1).top(), ageText,
+                Style.EMPTY);
 
         // Set cursor position if focused
         if (isFocused) {
@@ -335,10 +319,10 @@ public class InputFormDemo {
             int cursorY = fieldLayout.get(1).top();
             if (fieldLayout.get(1).contains(cursorX, cursorY)) {
                 Cell currentCell = frame.buffer().get(cursorX, cursorY);
-                frame.buffer().set(cursorX, cursorY, currentCell.patchStyle(Style.EMPTY.reversed()));
+                frame.buffer().set(cursorX, cursorY,
+                        currentCell.patchStyle(Style.EMPTY.reversed()));
                 frame.setCursorPosition(new Position(cursorX, cursorY));
             }
         }
     }
 }
-

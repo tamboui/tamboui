@@ -4,6 +4,19 @@
  */
 package dev.tamboui.widgets.block;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.layout.Alignment;
@@ -13,21 +26,9 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.text.Line;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class BlockTest {
 
@@ -61,10 +62,7 @@ class BlockTest {
     @Test
     @DisplayName("Block inner area with padding")
     void innerWithPadding() {
-        Block block = Block.builder()
-            .borders(Borders.ALL)
-            .padding(Padding.uniform(2))
-            .build();
+        Block block = Block.builder().borders(Borders.ALL).padding(Padding.uniform(2)).build();
         Rect area = new Rect(0, 0, 20, 20);
 
         Rect inner = block.inner(area);
@@ -79,9 +77,7 @@ class BlockTest {
     @Test
     @DisplayName("Block inner area reserves space for title even without borders")
     void innerWithTitleNoBorders() {
-        Block block = Block.builder()
-            .title("Title")
-            .build();
+        Block block = Block.builder().title("Title").build();
         Rect area = new Rect(0, 0, 20, 5);
 
         Rect inner = block.inner(area);
@@ -96,9 +92,7 @@ class BlockTest {
     @Test
     @DisplayName("Block inner area reserves space for bottom title even without borders")
     void innerWithBottomTitleNoBorders() {
-        Block block = Block.builder()
-            .titleBottom("Bottom")
-            .build();
+        Block block = Block.builder().titleBottom("Bottom").build();
         Rect area = new Rect(0, 0, 20, 5);
 
         Rect inner = block.inner(area);
@@ -114,17 +108,11 @@ class BlockTest {
     @DisplayName("Block with title but no borders renders title and reserves inner space")
     void titleWithoutBordersRendersCorrectly() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
-        Block block = Block.builder()
-            .title("Title")
-            .build();
+        Block block = Block.builder().title("Title").build();
         block.render(buffer.area(), buffer);
 
         // Title should be on line 0
-        Buffer expected = Buffer.withLines(
-            "Title     ",
-            "          ",
-            "          "
-        );
+        Buffer expected = Buffer.withLines("Title     ", "          ", "          ");
         assertThat(buffer).isEqualTo(expected);
 
         // Inner area should start at y=1
@@ -148,10 +136,7 @@ class BlockTest {
     @Test
     @DisplayName("Block with title")
     void withTitle() {
-        Block block = Block.builder()
-            .borders(Borders.ALL)
-            .title(Title.from("Test"))
-            .build();
+        Block block = Block.builder().borders(Borders.ALL).title(Title.from("Test")).build();
         Rect area = new Rect(0, 0, 20, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -168,10 +153,7 @@ class BlockTest {
     @DisplayName("Block with border style")
     void withBorderStyle() {
         Style style = Style.EMPTY.fg(Color.RED);
-        Block block = Block.builder()
-            .borders(Borders.ALL)
-            .borderStyle(style)
-            .build();
+        Block block = Block.builder().borders(Borders.ALL).borderStyle(style).build();
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -186,19 +168,15 @@ class BlockTest {
         Rect area = new Rect(0, 0, 5, 3);
 
         // Plain border
-        Block plainBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.PLAIN)
-            .build();
+        Block plainBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.PLAIN)
+                .build();
         Buffer plainBuffer = Buffer.empty(area);
         plainBlock.render(area, plainBuffer);
         assertThat(plainBuffer.get(0, 0).symbol()).isEqualTo("┌");
 
         // Double border
-        Block doubleBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.DOUBLE)
-            .build();
+        Block doubleBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.DOUBLE)
+                .build();
         Buffer doubleBuffer = Buffer.empty(area);
         doubleBlock.render(area, doubleBuffer);
         assertThat(doubleBuffer.get(0, 0).symbol()).isEqualTo("╔");
@@ -207,11 +185,8 @@ class BlockTest {
     @Test
     @DisplayName("Title inherits borderStyle")
     void titleInheritsBorderStyle() {
-        Block block = Block.builder()
-            .borders(Borders.ALL)
-            .borderStyle(Style.EMPTY.fg(Color.YELLOW))
-            .title(Title.from("Test"))
-            .build();
+        Block block = Block.builder().borders(Borders.ALL).borderStyle(Style.EMPTY.fg(Color.YELLOW))
+                .title(Title.from("Test")).build();
         Rect area = new Rect(0, 0, 20, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -226,17 +201,9 @@ class BlockTest {
     @DisplayName("Block with QUADRANT_INSIDE border renders correctly")
     void quadrantInsideBorder() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 7, 4));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.QUADRANT_INSIDE)
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "▗▄▄▄▄▄▖",
-            "▐     ▌",
-            "▐     ▌",
-            "▝▀▀▀▀▀▘"
-        );
+        Block.builder().borders(Borders.ALL).borderType(BorderType.QUADRANT_INSIDE).build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("▗▄▄▄▄▄▖", "▐     ▌", "▐     ▌", "▝▀▀▀▀▀▘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -244,17 +211,9 @@ class BlockTest {
     @DisplayName("Block with QUADRANT_OUTSIDE border renders correctly")
     void quadrantOutsideBorder() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 7, 4));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.QUADRANT_OUTSIDE)
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "▛▀▀▀▀▀▜",
-            "▌     ▐",
-            "▌     ▐",
-            "▙▄▄▄▄▄▟"
-        );
+        Block.builder().borders(Borders.ALL).borderType(BorderType.QUADRANT_OUTSIDE).build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("▛▀▀▀▀▀▜", "▌     ▐", "▌     ▐", "▙▄▄▄▄▄▟");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -265,19 +224,13 @@ class BlockTest {
         Buffer buffer = Buffer.empty(area);
 
         // Render first block with title on the left
-        Block leftBlock = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Left"))
-            .build();
+        Block leftBlock = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .title(Title.from("Left")).build();
         leftBlock.render(new Rect(0, 0, 10, 5), buffer);
 
         // Render second block with title on the right (overlapping area)
-        Block rightBlock = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Right"))
-            .build();
+        Block rightBlock = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .title(Title.from("Right")).build();
         rightBlock.render(new Rect(10, 0, 10, 5), buffer);
 
         // Both titles should be visible (they don't overlap in x position)
@@ -293,19 +246,13 @@ class BlockTest {
         Buffer buffer = Buffer.empty(area);
 
         // Render first block with title on the left
-        Block block1 = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Left"))
-            .build();
+        Block block1 = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .title(Title.from("Left")).build();
         block1.render(new Rect(0, 0, 15, 5), buffer);
 
         // Render second block with title on the right (different x position)
-        Block block2 = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Right"))
-            .build();
+        Block block2 = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .title(Title.from("Right")).build();
         block2.render(new Rect(15, 0, 15, 5), buffer);
 
         // Both titles should be visible at their respective positions
@@ -322,18 +269,14 @@ class BlockTest {
         Buffer buffer = Buffer.empty(area);
 
         // Render first block
-        Block block1 = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .build();
+        Block block1 = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .build();
         block1.render(new Rect(0, 0, 10, 5), buffer);
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("┌");
 
         // Render second block overlapping (should merge borders at intersection)
-        Block block2 = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .build();
+        Block block2 = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .build();
         block2.render(new Rect(5, 0, 10, 5), buffer);
 
         // The corner of the first block should still be "┌" (not merged at that point)
@@ -349,18 +292,13 @@ class BlockTest {
         Buffer buffer = Buffer.empty(area);
 
         // Render first block
-        Block block1 = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.REPLACE)
-            .build();
+        Block block1 = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.REPLACE)
+                .build();
         block1.render(area, buffer);
 
         // Render second block (should replace, not merge)
-        Block block2 = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.DOUBLE)
-            .mergeBorders(MergeStrategy.REPLACE)
-            .build();
+        Block block2 = Block.builder().borders(Borders.ALL).borderType(BorderType.DOUBLE)
+                .mergeBorders(MergeStrategy.REPLACE).build();
         block2.render(area, buffer);
 
         // Should be replaced with double border corner
@@ -377,19 +315,13 @@ class BlockTest {
         Buffer buffer = Buffer.empty(area);
 
         // Render left block with title
-        Block leftBlock = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Left Block"))
-            .build();
+        Block leftBlock = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .title(Title.from("Left Block")).build();
         leftBlock.render(new Rect(0, 0, 15, 5), buffer);
 
         // Render right block with title (on same line y=0)
-        Block rightBlock = Block.builder()
-            .borders(Borders.ALL)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Right Block"))
-            .build();
+        Block rightBlock = Block.builder().borders(Borders.ALL).mergeBorders(MergeStrategy.EXACT)
+                .title(Title.from("Right Block")).build();
         rightBlock.render(new Rect(15, 0, 15, 5), buffer);
 
         // Verify both titles are visible
@@ -397,18 +329,16 @@ class BlockTest {
         assertThat(buffer.get(16, 0).symbol()).isEqualTo("R"); // Right Block starts at x=16
 
         // Render top block with title (overlaps both, centered across full width)
-        Block topBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.THICK)
-            .mergeBorders(MergeStrategy.EXACT)
-            .title(Title.from("Top Block").centered())
-            .build();
+        Block topBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.THICK)
+                .mergeBorders(MergeStrategy.EXACT).title(Title.from("Top Block").centered())
+                .build();
         topBlock.render(new Rect(0, 0, 30, 5), buffer);
 
         // Both left and right titles should still be visible
         // "Top Block" is centered, so it's around x=10-18 (9 chars)
         // "Left Block" is at x=1-10 (10 chars), "Right Block" is at x=16-26 (10 chars)
-        // They might overlap partially, but non-overlapping characters should be preserved
+        // They might overlap partially, but non-overlapping characters should be
+        // preserved
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("L"); // Should still be there
         assertThat(buffer.get(16, 0).symbol()).isEqualTo("R"); // Should still be there
     }
@@ -417,16 +347,9 @@ class BlockTest {
     @DisplayName("Render plain border")
     void renderPlainBorder() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.PLAIN)
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "┌────────┐",
-            "│        │",
-            "└────────┘"
-        );
+        Block.builder().borders(Borders.ALL).borderType(BorderType.PLAIN).build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("┌────────┐", "│        │", "└────────┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -434,16 +357,9 @@ class BlockTest {
     @DisplayName("Render rounded border")
     void renderRoundedBorder() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "╭────────╮",
-            "│        │",
-            "╰────────╯"
-        );
+        Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED).build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("╭────────╮", "│        │", "╰────────╯");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -451,16 +367,9 @@ class BlockTest {
     @DisplayName("Render double border")
     void renderDoubleBorder() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.DOUBLE)
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "╔════════╗",
-            "║        ║",
-            "╚════════╝"
-        );
+        Block.builder().borders(Borders.ALL).borderType(BorderType.DOUBLE).build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("╔════════╗", "║        ║", "╚════════╝");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -468,16 +377,9 @@ class BlockTest {
     @DisplayName("Render thick border")
     void renderThickBorder() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.THICK)
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "┏━━━━━━━━┓",
-            "┃        ┃",
-            "┗━━━━━━━━┛"
-        );
+        Block.builder().borders(Borders.ALL).borderType(BorderType.THICK).build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("┏━━━━━━━━┓", "┃        ┃", "┗━━━━━━━━┛");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -485,16 +387,8 @@ class BlockTest {
     @DisplayName("Render block with title")
     void renderBlockWithTitle() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .title("test")
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "┌test────┐",
-            "│        │",
-            "└────────┘"
-        );
+        Block.builder().borders(Borders.ALL).title("test").build().render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("┌test────┐", "│        │", "└────────┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -502,17 +396,9 @@ class BlockTest {
     @DisplayName("Title top and bottom")
     void titleTopBottom() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 11, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .title("Top")
-            .titleBottom("Bottom")
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "┌Top──────┐",
-            "│         │",
-            "└Bottom───┘"
-        );
+        Block.builder().borders(Borders.ALL).title("Top").titleBottom("Bottom").build()
+                .render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("┌Top──────┐", "│         │", "└Bottom───┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -521,28 +407,22 @@ class BlockTest {
     void titleAlignment() {
         // Left aligned
         Buffer buffer = Buffer.empty(new Rect(0, 0, 8, 1));
-        Block.builder()
-            .title(Title.from("test").alignment(Alignment.LEFT))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().title(Title.from("test").alignment(Alignment.LEFT)).build()
+                .render(buffer.area(), buffer);
         Buffer expected = Buffer.withLines("test    ");
         assertThat(buffer).isEqualTo(expected);
 
         // Center aligned
         buffer = Buffer.empty(new Rect(0, 0, 8, 1));
-        Block.builder()
-            .title(Title.from("test").alignment(Alignment.CENTER))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().title(Title.from("test").alignment(Alignment.CENTER)).build()
+                .render(buffer.area(), buffer);
         expected = Buffer.withLines("  test  ");
         assertThat(buffer).isEqualTo(expected);
 
         // Right aligned
         buffer = Buffer.empty(new Rect(0, 0, 8, 1));
-        Block.builder()
-            .title(Title.from("test").alignment(Alignment.RIGHT))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().title(Title.from("test").alignment(Alignment.RIGHT)).build()
+                .render(buffer.area(), buffer);
         expected = Buffer.withLines("    test");
         assertThat(buffer).isEqualTo(expected);
     }
@@ -552,28 +432,22 @@ class BlockTest {
     void titleAlignmentWithLine() {
         // Left aligned
         Buffer buffer = Buffer.empty(new Rect(0, 0, 8, 1));
-        Block.builder()
-            .title(Title.from(Line.from("test")).left())
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().title(Title.from(Line.from("test")).left()).build().render(buffer.area(),
+                buffer);
         Buffer expected = Buffer.withLines("test    ");
         assertThat(buffer).isEqualTo(expected);
 
         // Center aligned
         buffer = Buffer.empty(new Rect(0, 0, 8, 1));
-        Block.builder()
-            .title(Title.from(Line.from("test")).centered())
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().title(Title.from(Line.from("test")).centered()).build()
+                .render(buffer.area(), buffer);
         expected = Buffer.withLines("  test  ");
         assertThat(buffer).isEqualTo(expected);
 
         // Right aligned
         buffer = Buffer.empty(new Rect(0, 0, 8, 1));
-        Block.builder()
-            .title(Title.from(Line.from("test")).right())
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().title(Title.from(Line.from("test")).right()).build().render(buffer.area(),
+                buffer);
         expected = Buffer.withLines("    test");
         assertThat(buffer).isEqualTo(expected);
     }
@@ -582,23 +456,15 @@ class BlockTest {
     @DisplayName("Title bottom position")
     void titleBottomPosition() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 4, 2));
-        Block.builder()
-            .titleBottom("test")
-            .build()
-            .render(buffer.area(), buffer);
-        Buffer expected = Buffer.withLines(
-            "    ",
-            "test"
-        );
+        Block.builder().titleBottom("test").build().render(buffer.area(), buffer);
+        Buffer expected = Buffer.withLines("    ", "test");
         assertThat(buffer).isEqualTo(expected);
     }
 
     static Stream<Arguments> mergeStrategyProvider() {
-        return Stream.of(
-            Arguments.of(MergeStrategy.REPLACE, "merge_replace.txt"),
-            Arguments.of(MergeStrategy.EXACT, "merge_exact.txt"),
-            Arguments.of(MergeStrategy.FUZZY, "merge_fuzzy.txt")
-        );
+        return Stream.of(Arguments.of(MergeStrategy.REPLACE, "merge_replace.txt"),
+                Arguments.of(MergeStrategy.EXACT, "merge_exact.txt"),
+                Arguments.of(MergeStrategy.FUZZY, "merge_fuzzy.txt"));
     }
 
     @ParameterizedTest
@@ -606,26 +472,19 @@ class BlockTest {
     @DisplayName("Render merged borders with different merge strategies")
     void renderMergedBorders(MergeStrategy strategy, String expectedFile) throws IOException {
         // Test with all border types that have expected output in the test files
-        // (The test files from Ratatui include Plain, Rounded, Thick, Double, and all dashed variants)
-        BorderType[] borderTypes = {
-            BorderType.PLAIN,
-            BorderType.ROUNDED,
-            BorderType.THICK,
-            BorderType.DOUBLE,
-            BorderType.LIGHT_DOUBLE_DASHED,
-            BorderType.HEAVY_DOUBLE_DASHED,
-            BorderType.LIGHT_TRIPLE_DASHED,
-            BorderType.HEAVY_TRIPLE_DASHED,
-            BorderType.LIGHT_QUADRUPLE_DASHED,
-            BorderType.HEAVY_QUADRUPLE_DASHED
-        };
+        // (The test files from Ratatui include Plain, Rounded, Thick, Double, and all
+        // dashed variants)
+        BorderType[] borderTypes = {BorderType.PLAIN, BorderType.ROUNDED, BorderType.THICK,
+                BorderType.DOUBLE, BorderType.LIGHT_DOUBLE_DASHED, BorderType.HEAVY_DOUBLE_DASHED,
+                BorderType.LIGHT_TRIPLE_DASHED, BorderType.HEAVY_TRIPLE_DASHED,
+                BorderType.LIGHT_QUADRUPLE_DASHED, BorderType.HEAVY_QUADRUPLE_DASHED};
 
-        // Test rects: touching at corners, overlapping, touching vertical edges, touching horizontal edges
-        Rect[][] rects = {
-            {new Rect(0, 0, 5, 5), new Rect(4, 4, 5, 5)},      // touching at corners
-            {new Rect(10, 0, 5, 5), new Rect(12, 2, 5, 5)},    // overlapping
-            {new Rect(18, 0, 5, 5), new Rect(22, 0, 5, 5)},   // touching vertical edges
-            {new Rect(28, 0, 5, 5), new Rect(28, 4, 5, 5)}     // touching horizontal edges
+        // Test rects: touching at corners, overlapping, touching vertical edges,
+        // touching horizontal edges
+        Rect[][] rects = {{new Rect(0, 0, 5, 5), new Rect(4, 4, 5, 5)}, // touching at corners
+                {new Rect(10, 0, 5, 5), new Rect(12, 2, 5, 5)}, // overlapping
+                {new Rect(18, 0, 5, 5), new Rect(22, 0, 5, 5)}, // touching vertical edges
+                {new Rect(28, 0, 5, 5), new Rect(28, 4, 5, 5)} // touching horizontal edges
         };
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 43, 1000));
@@ -634,34 +493,30 @@ class BlockTest {
         for (BorderType borderType1 : borderTypes) {
             for (BorderType borderType2 : borderTypes) {
                 // Render title (format: "Plain + Rounded" to match expected files)
-                String title = formatBorderTypeName(borderType1) + " + " + formatBorderTypeName(borderType2);
+                String title = formatBorderTypeName(borderType1) + " + "
+                        + formatBorderTypeName(borderType2);
                 buffer.setString(0, offsetY, title, Style.EMPTY);
                 offsetY += 1;
 
                 // Render blocks for each rect pair
                 for (Rect[] rectPair : rects) {
-                    Rect rect1 = new Rect(rectPair[0].x(), rectPair[0].y() + offsetY, rectPair[0].width(), rectPair[0].height());
-                    Rect rect2 = new Rect(rectPair[1].x(), rectPair[1].y() + offsetY, rectPair[1].width(), rectPair[1].height());
+                    Rect rect1 = new Rect(rectPair[0].x(), rectPair[0].y() + offsetY,
+                            rectPair[0].width(), rectPair[0].height());
+                    Rect rect2 = new Rect(rectPair[1].x(), rectPair[1].y() + offsetY,
+                            rectPair[1].width(), rectPair[1].height());
 
-                    Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(borderType1)
-                        .mergeBorders(strategy)
-                        .build()
-                        .render(rect1, buffer);
+                    Block.builder().borders(Borders.ALL).borderType(borderType1)
+                            .mergeBorders(strategy).build().render(rect1, buffer);
 
-                    Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(borderType2)
-                        .mergeBorders(strategy)
-                        .build()
-                        .render(rect2, buffer);
+                    Block.builder().borders(Borders.ALL).borderType(borderType2)
+                            .mergeBorders(strategy).build().render(rect2, buffer);
                 }
                 offsetY += 9;
             }
         }
 
-        // Load expected output from resource file and compare entire buffer (like Ratatui)
+        // Load expected output from resource file and compare entire buffer (like
+        // Ratatui)
         String resourceFile = expectedFile;
         try {
             String expectedContent = loadResourceFile("dev/tamboui/widgets/block/" + resourceFile);
@@ -689,24 +544,38 @@ class BlockTest {
     private String formatBorderTypeName(BorderType type) {
         // Format Java enum name to match Rust format in expected files
         switch (type) {
-            case PLAIN: return "Plain";
-            case ROUNDED: return "Rounded";
-            case THICK: return "Thick";
-            case DOUBLE: return "Double";
-            case LIGHT_DOUBLE_DASHED: return "LightDoubleDashed";
-            case HEAVY_DOUBLE_DASHED: return "HeavyDoubleDashed";
-            case LIGHT_TRIPLE_DASHED: return "LightTripleDashed";
-            case HEAVY_TRIPLE_DASHED: return "HeavyTripleDashed";
-            case LIGHT_QUADRUPLE_DASHED: return "LightQuadrupleDashed";
-            case HEAVY_QUADRUPLE_DASHED: return "HeavyQuadrupleDashed";
-            case QUADRANT_INSIDE: return "QuadrantInside";
-            case QUADRANT_OUTSIDE: return "QuadrantOutside";
-            default: return type.name();
+            case PLAIN :
+                return "Plain";
+            case ROUNDED :
+                return "Rounded";
+            case THICK :
+                return "Thick";
+            case DOUBLE :
+                return "Double";
+            case LIGHT_DOUBLE_DASHED :
+                return "LightDoubleDashed";
+            case HEAVY_DOUBLE_DASHED :
+                return "HeavyDoubleDashed";
+            case LIGHT_TRIPLE_DASHED :
+                return "LightTripleDashed";
+            case HEAVY_TRIPLE_DASHED :
+                return "HeavyTripleDashed";
+            case LIGHT_QUADRUPLE_DASHED :
+                return "LightQuadrupleDashed";
+            case HEAVY_QUADRUPLE_DASHED :
+                return "HeavyQuadrupleDashed";
+            case QUADRANT_INSIDE :
+                return "QuadrantInside";
+            case QUADRANT_OUTSIDE :
+                return "QuadrantOutside";
+            default :
+                return type.name();
         }
     }
 
     private Buffer parseExpectedBufferFromContent(String content) {
-        // Parse the entire expected content into a buffer, just like Ratatui's Buffer::with_lines()
+        // Parse the entire expected content into a buffer, just like Ratatui's
+        // Buffer::with_lines()
         // Normalize line endings (handle both \n and \r\n)
         content = content.replace("\r\n", "\n").replace("\r", "\n");
         String[] lines = content.split("\n");
@@ -736,7 +605,8 @@ class BlockTest {
                 if (lineWidth > buffer.area().width()) {
                     int codePointCount = 0;
                     int endIndex = 0;
-                    for (int i = 0; i < line.length() && codePointCount < buffer.area().width(); i++) {
+                    for (int i = 0; i < line.length()
+                            && codePointCount < buffer.area().width(); i++) {
                         if (Character.isHighSurrogate(line.charAt(i))) {
                             i++;
                         }
@@ -758,17 +628,11 @@ class BlockTest {
     @DisplayName("Custom border set with corners only")
     void customBorderSetCornersOnly() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘")).build()
+                .render(buffer.area(), buffer);
 
-        Buffer expected = Buffer.withLines(
-            "┌   ┐",
-            "     ",
-            "└   ┘"
-        );
+        Buffer expected = Buffer.withLines("┌   ┐", "     ", "└   ┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -776,17 +640,11 @@ class BlockTest {
     @DisplayName("Custom border set with horizontal only")
     void customBorderSetHorizontalOnly() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("─", "─", "", "", "", "", "", ""))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("─", "─", "", "", "", "", "", "")).build()
+                .render(buffer.area(), buffer);
 
-        Buffer expected = Buffer.withLines(
-            "─────",
-            "     ",
-            "─────"
-        );
+        Buffer expected = Buffer.withLines("─────", "     ", "─────");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -794,18 +652,11 @@ class BlockTest {
     @DisplayName("Custom border set overrides borderType")
     void customBorderSetOverridesBorderType() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .customBorderSet(new BorderSet("~", "~", "|", "|", "+", "+", "+", "+"))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .customBorderSet(new BorderSet("~", "~", "|", "|", "+", "+", "+", "+")).build()
+                .render(buffer.area(), buffer);
 
-        Buffer expected = Buffer.withLines(
-            "+~~~+",
-            "|   |",
-            "+~~~+"
-        );
+        Buffer expected = Buffer.withLines("+~~~+", "|   |", "+~~~+");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -813,27 +664,19 @@ class BlockTest {
     @DisplayName("Custom border set with diagonal corners only")
     void customBorderSetDiagonalCorners() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("", "", "", "", "┌", "", "", "┘"))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("", "", "", "", "┌", "", "", "┘")).build()
+                .render(buffer.area(), buffer);
 
-        Buffer expected = Buffer.withLines(
-            "┌    ",
-            "     ",
-            "    ┘"
-        );
+        Buffer expected = Buffer.withLines("┌    ", "     ", "    ┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
     @Test
     @DisplayName("Custom border set inner area still reserves space")
     void customBorderSetInnerArea() {
-        Block block = Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
-            .build();
+        Block block = Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘")).build();
 
         Rect inner = block.inner(new Rect(0, 0, 10, 10));
 
@@ -845,18 +688,12 @@ class BlockTest {
     @DisplayName("Custom border set works without borders enum")
     void customBorderSetWithoutBordersEnum() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.NONE)
-            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.NONE)
+                .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘")).build()
+                .render(buffer.area(), buffer);
 
         // Corners rendered because customBorderSet overrides corner logic
-        Buffer expected = Buffer.withLines(
-            "┌   ┐",
-            "     ",
-            "└   ┘"
-        );
+        Buffer expected = Buffer.withLines("┌   ┐", "     ", "└   ┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -864,17 +701,11 @@ class BlockTest {
     @DisplayName("Custom border set with vertical only")
     void customBorderSetVerticalOnly() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("", "", "│", "│", "", "", "", ""))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("", "", "│", "│", "", "", "", "")).build()
+                .render(buffer.area(), buffer);
 
-        Buffer expected = Buffer.withLines(
-            "│   │",
-            "│   │",
-            "│   │"
-        );
+        Buffer expected = Buffer.withLines("│   │", "│   │", "│   │");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -882,17 +713,11 @@ class BlockTest {
     @DisplayName("Custom border set with horizontal and corners")
     void customBorderSetHorizontalWithCorners() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 3));
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("─", "─", "", "", "┌", "┐", "└", "┘"))
-            .build()
-            .render(buffer.area(), buffer);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("─", "─", "", "", "┌", "┐", "└", "┘")).build()
+                .render(buffer.area(), buffer);
 
-        Buffer expected = Buffer.withLines(
-            "┌───┐",
-            "     ",
-            "└───┘"
-        );
+        Buffer expected = Buffer.withLines("┌───┐", "     ", "└───┘");
         assertThat(buffer).isEqualTo(expected);
     }
 
@@ -903,35 +728,22 @@ class BlockTest {
 
         // First render: regular PLAIN borders
         Buffer buffer1 = Buffer.empty(area);
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.PLAIN)
-            .build()
-            .render(area, buffer1);
+        Block.builder().borders(Borders.ALL).borderType(BorderType.PLAIN).build().render(area,
+                buffer1);
 
         // Verify initial state has full borders
-        Buffer expectedBefore = Buffer.withLines(
-            "┌───┐",
-            "│   │",
-            "└───┘"
-        );
+        Buffer expectedBefore = Buffer.withLines("┌───┐", "│   │", "└───┘");
         assertThat(buffer1).isEqualTo(expectedBefore);
 
         // Second render: custom borders with only left changed to "*"
         // Simulates what happens when CSS adds: border-left: "*"
         Buffer buffer2 = Buffer.empty(area);
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("─", "─", "*", "│", "┌", "┐", "└", "┘"))
-            .build()
-            .render(area, buffer2);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("─", "─", "*", "│", "┌", "┐", "└", "┘")).build()
+                .render(area, buffer2);
 
         // Verify custom state has left border as "*"
-        Buffer expectedAfter = Buffer.withLines(
-            "┌───┐",
-            "*   │",
-            "└───┘"
-        );
+        Buffer expectedAfter = Buffer.withLines("┌───┐", "*   │", "└───┘");
         assertThat(buffer2).isEqualTo(expectedAfter);
 
         // Now simulate what the Terminal does: diff the two buffers
@@ -979,35 +791,23 @@ class BlockTest {
 
         // First render: custom borders with corners only (empty sides)
         Buffer buffer1 = Buffer.empty(area);
-        Block.builder()
-            .borders(Borders.ALL)
-            .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
-            .build()
-            .render(area, buffer1);
+        Block.builder().borders(Borders.ALL)
+                .customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘")).build()
+                .render(area, buffer1);
 
-        Buffer expectedBefore = Buffer.withLines(
-            "┌   ┐",
-            "     ",
-            "└   ┘"
-        );
+        Buffer expectedBefore = Buffer.withLines("┌   ┐", "     ", "└   ┘");
         assertThat(buffer1).isEqualTo(expectedBefore);
 
         // Second render: regular PLAIN borders (all sides)
         Buffer buffer2 = Buffer.empty(area);
-        Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.PLAIN)
-            .build()
-            .render(area, buffer2);
+        Block.builder().borders(Borders.ALL).borderType(BorderType.PLAIN).build().render(area,
+                buffer2);
 
-        Buffer expectedAfter = Buffer.withLines(
-            "┌───┐",
-            "│   │",
-            "└───┘"
-        );
+        Buffer expectedAfter = Buffer.withLines("┌───┐", "│   │", "└───┘");
         assertThat(buffer2).isEqualTo(expectedAfter);
 
-        // Diff should show changes for top border (minus corners), left/right sides, bottom border
+        // Diff should show changes for top border (minus corners), left/right sides,
+        // bottom border
         java.util.List<dev.tamboui.buffer.CellUpdate> updates = buffer1.diff(buffer2);
 
         // Top row: positions 1,2,3 change from " " to "─"

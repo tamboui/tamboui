@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
+ * State for a TextArea widget, tracking multi-line text, cursor position, and
+ * scroll offset.
  */
 public final class TextAreaState {
 
@@ -31,7 +32,8 @@ public final class TextAreaState {
     /**
      * Creates a new text area state with the given initial text.
      *
-     * @param initialText the initial text content
+     * @param initialText
+     *            the initial text content
      */
     public TextAreaState(String initialText) {
         this();
@@ -68,7 +70,8 @@ public final class TextAreaState {
     /**
      * Returns the text of the line at the given row.
      *
-     * @param row the row index
+     * @param row
+     *            the row index
      * @return the line text, or empty string if out of range
      */
     public String getLine(int row) {
@@ -121,7 +124,8 @@ public final class TextAreaState {
     /**
      * Inserts a character at the cursor position.
      *
-     * @param c the character to insert
+     * @param c
+     *            the character to insert
      */
     public void insert(char c) {
         if (c == '\n') {
@@ -135,7 +139,8 @@ public final class TextAreaState {
     /**
      * Inserts a string at the cursor position.
      *
-     * @param s the string to insert
+     * @param s
+     *            the string to insert
      */
     public void insert(String s) {
         for (char c : s.toCharArray()) {
@@ -245,8 +250,10 @@ public final class TextAreaState {
     /**
      * Adjusts scroll offsets to keep the cursor visible.
      *
-     * @param visibleRows the number of visible rows
-     * @param visibleCols the number of visible columns
+     * @param visibleRows
+     *            the number of visible rows
+     * @param visibleCols
+     *            the number of visible columns
      */
     public void ensureCursorVisible(int visibleRows, int visibleCols) {
         // Vertical scrolling
@@ -267,7 +274,8 @@ public final class TextAreaState {
     /**
      * Scrolls up by the given amount of rows.
      *
-     * @param amount the number of rows to scroll up
+     * @param amount
+     *            the number of rows to scroll up
      */
     public void scrollUp(int amount) {
         scrollRow = Math.max(0, scrollRow - amount);
@@ -276,8 +284,10 @@ public final class TextAreaState {
     /**
      * Scrolls down by the given amount of rows.
      *
-     * @param amount      the number of rows to scroll down
-     * @param visibleRows the number of visible rows
+     * @param amount
+     *            the number of rows to scroll down
+     * @param visibleRows
+     *            the number of visible rows
      */
     public void scrollDown(int amount, int visibleRows) {
         int maxScroll = Math.max(0, lines.size() - visibleRows);
@@ -299,7 +309,8 @@ public final class TextAreaState {
     /**
      * Replaces the text content and moves the cursor to the end.
      *
-     * @param newText the new text content
+     * @param newText
+     *            the new text content
      */
     public void setText(String newText) {
         lines.clear();

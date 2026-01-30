@@ -4,9 +4,9 @@
  */
 package dev.tamboui.demo;
 
+import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.style.Color;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -16,12 +16,11 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 final class QuotePanel extends PanelContent {
     private static final String[] QUOTES = {
-        "The only way to do great work is to love what you do. - Steve Jobs",
-        "Code is like humor. When you have to explain it, it's bad. - Cory House",
-        "First, solve the problem. Then, write the code. - John Johnson",
-        "Experience is the name everyone gives to their mistakes. - Oscar Wilde",
-        "Java is to JavaScript what car is to carpet. - Chris Heilmann"
-    };
+            "The only way to do great work is to love what you do. - Steve Jobs",
+            "Code is like humor. When you have to explain it, it's bad. - Cory House",
+            "First, solve the problem. Then, write the code. - John Johnson",
+            "Experience is the name everyone gives to their mistakes. - Oscar Wilde",
+            "Java is to JavaScript what car is to carpet. - Chris Heilmann"};
 
     private int quoteIndex = 0;
 
@@ -32,10 +31,7 @@ final class QuotePanel extends PanelContent {
     @Override
     Element render(boolean focused) {
         var quote = QUOTES[quoteIndex];
-        return column(
-            text(quote).italic().yellow(),
-            text("[←/h] Prev  [→/l] Next").dim()
-        );
+        return column(text(quote).italic().yellow(), text("[←/h] Prev  [→/l] Next").dim());
     }
 
     @Override

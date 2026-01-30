@@ -13,8 +13,9 @@ import dev.tamboui.widget.Widget;
 /**
  * A widget that renders the Tamboui logo.
  *
- * <p>The Tamboui logo takes up two lines of text. This may be used in an application's help or about screen to show that
- * it is powered by Tamboui.
+ * <p>
+ * The Tamboui logo takes up two lines of text. This may be used in an
+ * application's help or about screen to show that it is powered by Tamboui.
  *
  * <h2>Examples</h2>
  *
@@ -25,7 +26,8 @@ import dev.tamboui.widget.Widget;
  * frame.renderWidget(logo, area);
  * }</pre>
  *
- * <p>Renders:
+ * <p>
+ * Renders:
  *
  * <pre>
  * ▜▘▗▀▖▛▜▜ ▙▄▖▗▀▖▌ ▌ ▜▘
@@ -37,7 +39,6 @@ public final class Logo implements Widget {
 
     private final Size size;
 
-
     private Logo(Size size) {
         this.size = size;
     }
@@ -45,7 +46,8 @@ public final class Logo implements Widget {
     /**
      * Create a new Tamboui logo widget.
      *
-     * @param size the size of the logo
+     * @param size
+     *            the size of the logo
      * @return a new Tamboui logo widget
      */
     public static Logo of(Size size) {
@@ -55,7 +57,8 @@ public final class Logo implements Widget {
     /**
      * Set the size of the logo.
      *
-     * @param size the size of the logo
+     * @param size
+     *            the size of the logo
      * @return a new Tamboui logo widget with the specified size
      */
     public Logo size(Size size) {
@@ -88,7 +91,7 @@ public final class Logo implements Widget {
 
         String logoText = size.getText();
         Text text = Text.raw(logoText);
-        
+
         // Render each line of the logo
         int y = area.top();
         for (int i = 0; i < text.lines().size() && y < area.bottom(); i++) {
@@ -114,8 +117,7 @@ public final class Logo implements Widget {
         TINY {
             @Override
             String getText() {
-                return  "▜▘▗▀▖▛▜▜ ▙▄▖▗▀▖▌ ▌ ▜▘\n" +
-                        "▐ ▐▀▌▌▐▐ ▙▄▘▝▄▘▝▄▘ ▟▖\n";
+                return "▜▘▗▀▖▛▜▜ ▙▄▖▗▀▖▌ ▌ ▜▘\n" + "▐ ▐▀▌▌▐▐ ▙▄▘▝▄▘▝▄▘ ▟▖\n";
             }
         };
 
@@ -127,4 +129,3 @@ public final class Logo implements Widget {
         abstract String getText();
     }
 }
-

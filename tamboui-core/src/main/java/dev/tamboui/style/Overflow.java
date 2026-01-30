@@ -5,8 +5,8 @@
 package dev.tamboui.style;
 
 /**
- * Text overflow handling mode.
- * Determines what happens when text doesn't fit in the available space.
+ * Text overflow handling mode. Determines what happens when text doesn't fit in
+ * the available space.
  */
 public enum Overflow {
     /**

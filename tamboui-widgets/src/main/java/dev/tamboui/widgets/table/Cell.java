@@ -12,8 +12,9 @@ import dev.tamboui.text.Text;
 /**
  * A cell in a {@link Table}.
  * <p>
- * A cell contains styled text content that can be a single line or multi-line text.
- * Cells can have their own style which takes precedence over row and table styles.
+ * A cell contains styled text content that can be a single line or multi-line
+ * text. Cells can have their own style which takes precedence over row and
+ * table styles.
  *
  * <pre>{@code
  * // Simple cell
@@ -39,7 +40,8 @@ public final class Cell {
     /**
      * Creates a cell from a string.
      *
-     * @param content the cell content
+     * @param content
+     *            the cell content
      * @return a new cell
      */
     public static Cell from(String content) {
@@ -49,7 +51,8 @@ public final class Cell {
     /**
      * Creates a cell from a span.
      *
-     * @param span the span to use as content
+     * @param span
+     *            the span to use as content
      * @return a new cell
      */
     public static Cell from(Span span) {
@@ -59,7 +62,8 @@ public final class Cell {
     /**
      * Creates a cell from a line.
      *
-     * @param line the line to use as content
+     * @param line
+     *            the line to use as content
      * @return a new cell
      */
     public static Cell from(Line line) {
@@ -69,7 +73,8 @@ public final class Cell {
     /**
      * Creates a cell from text.
      *
-     * @param text the text to use as content
+     * @param text
+     *            the text to use as content
      * @return a new cell
      */
     public static Cell from(Text text) {
@@ -106,7 +111,8 @@ public final class Cell {
     /**
      * Returns a new cell with the given style.
      *
-     * @param style the style to apply
+     * @param style
+     *            the style to apply
      * @return a new cell with the style
      */
     public Cell style(Style style) {

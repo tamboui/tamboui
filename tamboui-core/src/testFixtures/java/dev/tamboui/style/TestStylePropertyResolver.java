@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A simple StylePropertyResolver for testing purposes.
- * Allows setting property values by name.
+ * A simple StylePropertyResolver for testing purposes. Allows setting property
+ * values by name.
  */
 public final class TestStylePropertyResolver implements StylePropertyResolver {
 

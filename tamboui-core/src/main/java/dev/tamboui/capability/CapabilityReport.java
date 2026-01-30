@@ -13,27 +13,29 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Aggregated capability information from all discovered {@link CapabilityProvider}s.
+ * Aggregated capability information from all discovered
+ * {@link CapabilityProvider}s.
  */
 public final class CapabilityReport {
     private final Map<String, List<String>> environmentBySource;
     private final Map<String, List<String>> propertiesBySource;
     private final Map<String, Map<String, Object>> featuresBySource;
 
-    CapabilityReport(
-            Map<String, List<String>> environmentBySource,
+    CapabilityReport(Map<String, List<String>> environmentBySource,
             Map<String, List<String>> propertiesBySource,
-            Map<String, Map<String, Object>> featuresBySource
-    ) {
-        this.environmentBySource = Collections.unmodifiableMap(new LinkedHashMap<>(environmentBySource));
-        this.propertiesBySource = Collections.unmodifiableMap(new LinkedHashMap<>(propertiesBySource));
+            Map<String, Map<String, Object>> featuresBySource) {
+        this.environmentBySource = Collections
+                .unmodifiableMap(new LinkedHashMap<>(environmentBySource));
+        this.propertiesBySource = Collections
+                .unmodifiableMap(new LinkedHashMap<>(propertiesBySource));
         this.featuresBySource = Collections.unmodifiableMap(new LinkedHashMap<>(featuresBySource));
     }
 
     /**
      * Environment entries grouped by provider source.
      * <p>
-     * Each list entry is an environment variable name (value is resolved at print-time).
+     * Each list entry is an environment variable name (value is resolved at
+     * print-time).
      *
      * @return unmodifiable map of source to environment variable names
      */
@@ -55,7 +57,8 @@ public final class CapabilityReport {
     /**
      * Free-form capability/features map, grouped by provider source.
      * <p>
-     * Keys SHOULD use dotted notation to create stable namespaces, e.g. {@code image.protocol.kitty}.
+     * Keys SHOULD use dotted notation to create stable namespaces, e.g.
+     * {@code image.protocol.kitty}.
      *
      * @return unmodifiable map of source to feature key-value pairs
      */
@@ -66,8 +69,10 @@ public final class CapabilityReport {
     /**
      * Looks up a feature value by source and key.
      *
-     * @param source source id (e.g. {@code tamboui-core})
-     * @param key    key within the source feature map
+     * @param source
+     *            source id (e.g. {@code tamboui-core})
+     * @param key
+     *            key within the source feature map
      * @return the feature value if present
      */
     public Optional<Object> feature(String source, String key) {
@@ -82,12 +87,17 @@ public final class CapabilityReport {
     }
 
     /**
-     * Looks up a feature by source and key, and returns it if it matches the requested type.
+     * Looks up a feature by source and key, and returns it if it matches the
+     * requested type.
      *
-     * @param source source id (e.g. {@code tamboui-core})
-     * @param key    key within the source feature map (prefer dotted notation)
-     * @param type         desired value type
-     * @param <T>          value type
+     * @param source
+     *            source id (e.g. {@code tamboui-core})
+     * @param key
+     *            key within the source feature map (prefer dotted notation)
+     * @param type
+     *            desired value type
+     * @param <T>
+     *            value type
      * @return typed value if present and assignable to {@code type}
      */
     public <T> Optional<T> feature(String source, String key, Class<T> type) {
@@ -108,7 +118,8 @@ public final class CapabilityReport {
     /**
      * Prints this capability report to the given stream.
      *
-     * @param out the output stream
+     * @param out
+     *            the output stream
      */
     public void print(PrintStream out) {
         out.println("TamboUI capability report");
@@ -176,5 +187,3 @@ public final class CapabilityReport {
         }
     }
 }
-
-

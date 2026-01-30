@@ -4,12 +4,12 @@
  */
 package dev.tamboui.backend.panama.unix;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,15 +59,13 @@ class LibCTest {
     @Test
     void winsizeLayoutHasExpectedSize() {
         // winsize struct is exactly 8 bytes (4 shorts)
-        assertEquals(8, LibC.WINSIZE_LAYOUT.byteSize(),
-                "winsize layout should be 8 bytes");
+        assertEquals(8, LibC.WINSIZE_LAYOUT.byteSize(), "winsize layout should be 8 bytes");
     }
 
     @Test
     void pollfdLayoutHasExpectedSize() {
         // pollfd struct is exactly 8 bytes (int + 2 shorts)
-        assertEquals(8, LibC.POLLFD_LAYOUT.byteSize(),
-                "pollfd layout should be 8 bytes");
+        assertEquals(8, LibC.POLLFD_LAYOUT.byteSize(), "pollfd layout should be 8 bytes");
     }
 
     @Test
@@ -101,8 +99,7 @@ class LibCTest {
     void isattyWorksForStdin() {
         // isatty should return 0 or 1 without throwing
         int result = LibC.isatty(LibC.STDIN_FILENO);
-        assertTrue(result == 0 || result == 1,
-                "isatty should return 0 or 1");
+        assertTrue(result == 0 || result == 1, "isatty should return 0 or 1");
     }
 
     @Test
@@ -112,8 +109,7 @@ class LibCTest {
             MemorySegment winsize = LibC.allocateWinsize(arena);
             int result = LibC.ioctl(LibC.STDOUT_FILENO, LibC.TIOCGWINSZ, winsize);
             // Result can be 0 (success) or -1 (not a tty)
-            assertTrue(result == 0 || result == -1,
-                    "ioctl should return 0 or -1, got: " + result);
+            assertTrue(result == 0 || result == -1, "ioctl should return 0 or -1, got: " + result);
             if (result == -1) {
                 // errno should be set
                 int errno = LibC.getLastErrno();

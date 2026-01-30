@@ -4,21 +4,21 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
+import dev.tamboui.style.RichTextState;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.RichTextState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -32,11 +32,8 @@ class RichTextAreaElementTest {
     @Test
     @DisplayName("RichTextAreaElement fluent API chains correctly")
     void fluentApiChaining() {
-        RichTextAreaElement element = richTextArea("Hello, World!")
-            .bold()
-            .fg(Color.CYAN)
-            .wrapWord()
-            .showLineNumbers();
+        RichTextAreaElement element = richTextArea("Hello, World!").bold().fg(Color.CYAN).wrapWord()
+                .showLineNumbers();
 
         assertThat(element).isInstanceOf(RichTextAreaElement.class);
     }
@@ -51,10 +48,8 @@ class RichTextAreaElementTest {
     @Test
     @DisplayName("richTextArea(Text) creates element with styled text")
     void richTextWithText() {
-        Text styledText = Text.from(Line.from(
-            Span.styled("Red", Style.EMPTY.fg(Color.RED)),
-            Span.styled("Blue", Style.EMPTY.fg(Color.BLUE))
-        ));
+        Text styledText = Text.from(Line.from(Span.styled("Red", Style.EMPTY.fg(Color.RED)),
+                Span.styled("Blue", Style.EMPTY.fg(Color.BLUE))));
         RichTextAreaElement element = richTextArea(styledText);
         assertThat(element).isNotNull();
     }
@@ -73,8 +68,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Hello")
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Hello").render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("e");
@@ -90,13 +84,10 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        Text text = Text.from(Line.from(
-            Span.styled("Red", Style.EMPTY.fg(Color.RED)),
-            Span.styled("Blue", Style.EMPTY.fg(Color.BLUE))
-        ));
+        Text text = Text.from(Line.from(Span.styled("Red", Style.EMPTY.fg(Color.RED)),
+                Span.styled("Blue", Style.EMPTY.fg(Color.BLUE))));
 
-        richTextArea(text)
-            .render(frame, area, RenderContext.empty());
+        richTextArea(text).render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
         assertThat(buffer.get(3, 0).style().fg()).contains(Color.BLUE);
@@ -109,8 +100,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Line 1\nLine 2\nLine 3")
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Line 1\nLine 2\nLine 3").render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("L");
         assertThat(buffer.get(0, 1).symbol()).isEqualTo("L");
@@ -124,9 +114,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Hello World")
-            .wrapWord()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Hello World").wrapWord().render(frame, area, RenderContext.empty());
 
         Buffer expected = Buffer.empty(area);
         expected.setString(0, 0, "Hello", Style.EMPTY);
@@ -141,9 +129,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Hello World")
-            .ellipsis()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Hello World").ellipsis().render(frame, area, RenderContext.empty());
 
         Buffer expected = Buffer.empty(area);
         expected.setString(0, 0, "Hello...", Style.EMPTY);
@@ -231,9 +217,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Hi")
-            .centered()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Hi").centered().render(frame, area, RenderContext.empty());
 
         // "Hi" is 2 chars, centered in 10 chars = starts at position 4
         assertThat(buffer.get(4, 0).symbol()).isEqualTo("H");
@@ -247,9 +231,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Hi")
-            .right()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Hi").right().render(frame, area, RenderContext.empty());
 
         // "Hi" is 2 chars, right-aligned in 10 chars = starts at position 8
         assertThat(buffer.get(8, 0).symbol()).isEqualTo("H");
@@ -263,9 +245,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Content")
-            .title("Title")
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Content").title("Title").render(frame, area, RenderContext.empty());
 
         // Border should be rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("┌");
@@ -278,9 +258,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Content")
-            .rounded()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Content").rounded().render(frame, area, RenderContext.empty());
 
         // Rounded border should be rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -293,9 +271,8 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Line A\nLine B\nLine C")
-            .showLineNumbers()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Line A\nLine B\nLine C").showLineNumbers().render(frame, area,
+                RenderContext.empty());
 
         // Line numbers should be rendered (1, 2, 3) followed by content
         // Default separator is single space
@@ -315,9 +292,7 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Content")
-            .showLineNumbers()
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Content").showLineNumbers().render(frame, area, RenderContext.empty());
 
         // Line number "1" should have DIM modifier
         assertThat(buffer.get(0, 0).style().addModifiers()).contains(Modifier.DIM);
@@ -330,10 +305,8 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        richTextArea("Content")
-            .showLineNumbers()
-            .lineNumberStyle(Style.EMPTY.fg(Color.YELLOW))
-            .render(frame, area, RenderContext.empty());
+        richTextArea("Content").showLineNumbers().lineNumberStyle(Style.EMPTY.fg(Color.YELLOW))
+                .render(frame, area, RenderContext.empty());
 
         // Line number "1" should have YELLOW foreground
         assertThat(buffer).at(0, 0).hasSymbol("1").hasForeground(Color.YELLOW);
@@ -346,13 +319,9 @@ class RichTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        Text text = Text.from(Line.from(
-            Span.styled("Red", Style.EMPTY.fg(Color.RED))
-        ));
+        Text text = Text.from(Line.from(Span.styled("Red", Style.EMPTY.fg(Color.RED))));
 
-        richTextArea(text)
-            .showLineNumbers()
-            .render(frame, area, RenderContext.empty());
+        richTextArea(text).showLineNumbers().render(frame, area, RenderContext.empty());
 
         // Line number at 0, content "Red" starts at 2
         assertThat(buffer).at(0, 0).hasSymbol("1");

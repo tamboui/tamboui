@@ -4,16 +4,24 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
 import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.toolkit.element.ChildPosition;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.ChildPosition;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.error.TuiException;
 import dev.tamboui.tui.event.KeyEvent;
@@ -27,22 +35,15 @@ import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 /**
  * A scrollable container that displays a list of selectable items.
  * <p>
- * Unlike {@code ListWidget} (which only displays text), {@code ListElement}
- * can display any {@link StyledElement} as list items, including complex
- * layouts like rows with multiple styled children.
+ * Unlike {@code ListWidget} (which only displays text), {@code ListElement} can
+ * display any {@link StyledElement} as list items, including complex layouts
+ * like rows with multiple styled children.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * list("Item 1", "Item 2", "Item 3")
  *     .state(listState)
@@ -59,16 +60,18 @@ import java.util.function.Function;
  * <p>
  * CSS selectors:
  * <ul>
- *   <li>{@code ListElement} - styles the container (border, background)</li>
- *   <li>{@code ListElement-item} - styles each list item</li>
- *   <li>{@code ListElement-item:selected} - styles the selected item</li>
- *   <li>{@code ListElement-item:nth-child(odd/even)} - zebra striping</li>
- *   <li>{@code ListElement-scrollbar-thumb} - styles the scrollbar thumb</li>
- *   <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
+ * <li>{@code ListElement} - styles the container (border, background)</li>
+ * <li>{@code ListElement-item} - styles each list item</li>
+ * <li>{@code ListElement-item:selected} - styles the selected item</li>
+ * <li>{@code ListElement-item:nth-child(odd/even)} - zebra striping</li>
+ * <li>{@code ListElement-scrollbar-thumb} - styles the scrollbar thumb</li>
+ * <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
  * </ul>
  *
- * @param <T> the type of data items backing each list entry
- * @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
+ * @param <T>
+ *            the type of data items backing each list entry
+ * @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the
+ *      widget level
  */
 public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
@@ -92,8 +95,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     private Function<T, StyledElement<?>> itemRenderer;
     private int selectedIndex = 0;
     private int scrollOffset = 0;
-    private Style highlightStyle;  // null means "use CSS or default"
-    private String highlightSymbol;  // null means "use CSS or default"
+    private Style highlightStyle; // null means "use CSS or default"
+    private String highlightSymbol; // null means "use CSS or default"
     private String title;
     private BorderType borderType;
     private Color borderColor;
@@ -117,7 +120,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Creates a list element with the given string items.
      *
-     * @param items the text items
+     * @param items
+     *            the text items
      */
     public ListElement(String... items) {
         for (String item : items) {
@@ -128,7 +132,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Creates a list element with the given string items.
      *
-     * @param items the text items
+     * @param items
+     *            the text items
      */
     public ListElement(List<String> items) {
         for (String item : items) {
@@ -139,7 +144,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Creates a list container with styled element items.
      *
-     * @param items the list items as styled elements
+     * @param items
+     *            the list items as styled elements
      */
     public ListElement(StyledElement<?>... items) {
         this.items.addAll(Arrays.asList(items));
@@ -148,7 +154,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the list items from strings.
      *
-     * @param items the text items
+     * @param items
+     *            the text items
      * @return this element
      */
     public ListElement<T> items(String... items) {
@@ -162,7 +169,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the list items from a collection of strings.
      *
-     * @param items the text items
+     * @param items
+     *            the text items
      * @return this element
      */
     public ListElement<T> items(List<String> items) {
@@ -176,7 +184,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the list items from styled elements.
      *
-     * @param elements the styled element items
+     * @param elements
+     *            the styled element items
      * @return this element
      */
     public ListElement<T> elements(StyledElement<?>... elements) {
@@ -188,7 +197,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Adds a text item to the list.
      *
-     * @param item the text to add
+     * @param item
+     *            the text to add
      * @return this element
      */
     public ListElement<T> add(String item) {
@@ -199,7 +209,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Adds a styled element item to the list.
      *
-     * @param element the element to add
+     * @param element
+     *            the element to add
      * @return this element
      */
     public ListElement<T> add(StyledElement<?> element) {
@@ -210,7 +221,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the selected index.
      *
-     * @param index the index to select
+     * @param index
+     *            the index to select
      * @return this element
      */
     public ListElement<T> selected(int index) {
@@ -230,7 +242,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the highlight style for selected items.
      *
-     * @param style the highlight style
+     * @param style
+     *            the highlight style
      * @return this element
      */
     public ListElement<T> highlightStyle(Style style) {
@@ -241,7 +254,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the highlight color for selected items.
      *
-     * @param color the highlight color
+     * @param color
+     *            the highlight color
      * @return this element
      */
     public ListElement<T> highlightColor(Color color) {
@@ -252,7 +266,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the symbol displayed before the selected item.
      *
-     * @param symbol the highlight symbol
+     * @param symbol
+     *            the highlight symbol
      * @return this element
      */
     public ListElement<T> highlightSymbol(String symbol) {
@@ -263,7 +278,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the title.
      *
-     * @param title the list title
+     * @param title
+     *            the list title
      * @return this element
      */
     public ListElement<T> title(String title) {
@@ -284,7 +300,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element
      */
     public ListElement<T> borderColor(Color color) {
@@ -295,12 +312,16 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the data items and a renderer function.
      * <p>
-     * The renderer function is called at render time to convert each data item
-     * to a styled element. This allows the list to reflect the current state of your data.
+     * The renderer function is called at render time to convert each data item to a
+     * styled element. This allows the list to reflect the current state of your
+     * data.
      *
-     * @param data the list of data items
-     * @param renderer function to convert each item to a styled element
-     * @param <U> the data item type
+     * @param data
+     *            the list of data items
+     * @param renderer
+     *            function to convert each item to a styled element
+     * @param <U>
+     *            the data item type
      * @return this element
      */
     public <U> ListElement<U> data(List<U> data, Function<U, StyledElement<?>> renderer) {
@@ -317,7 +338,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
      * <p>
      * The renderer is called at render time for each data item.
      *
-     * @param renderer function to convert each item to a styled element
+     * @param renderer
+     *            function to convert each item to a styled element
      * @return this element
      */
     public ListElement<T> itemRenderer(Function<T, StyledElement<?>> renderer) {
@@ -328,13 +350,15 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Enables auto-scroll to keep the selected item visible.
      * <p>
-     * When enabled, the list automatically scrolls to show the selected item
-     * before rendering.
+     * When enabled, the list automatically scrolls to show the selected item before
+     * rendering.
      * <p>
-     * Note: Cannot be combined with {@link #scrollToEnd()} or {@link #stickyScroll()}.
+     * Note: Cannot be combined with {@link #scrollToEnd()} or
+     * {@link #stickyScroll()}.
      *
      * @return this element
-     * @throws IllegalStateException if another scroll mode is already enabled
+     * @throws IllegalStateException
+     *             if another scroll mode is already enabled
      */
     public ListElement<T> autoScroll() {
         checkScrollModeNotSet("autoScroll");
@@ -345,9 +369,11 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets whether auto-scroll is enabled.
      *
-     * @param enabled true to enable auto-scroll
+     * @param enabled
+     *            true to enable auto-scroll
      * @return this element
-     * @throws IllegalStateException if enabled and another scroll mode is already enabled
+     * @throws IllegalStateException
+     *             if enabled and another scroll mode is already enabled
      */
     public ListElement<T> autoScroll(boolean enabled) {
         if (enabled) {
@@ -360,18 +386,20 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Scrolls the list to show the last items.
      * <p>
-     * Unlike {@link #autoScroll()}, this scrolls to the end immediately
-     * without requiring a selection. Useful for chat messages, logs, or
-     * other content where you want to always show the most recent items.
+     * Unlike {@link #autoScroll()}, this scrolls to the end immediately without
+     * requiring a selection. Useful for chat messages, logs, or other content where
+     * you want to always show the most recent items.
      * <p>
-     * Note: This always forces scroll to end, overriding any user scrolling.
-     * For logs or chat where you want auto-scroll that pauses when the user
-     * scrolls up, use {@link #stickyScroll()} instead.
+     * Note: This always forces scroll to end, overriding any user scrolling. For
+     * logs or chat where you want auto-scroll that pauses when the user scrolls up,
+     * use {@link #stickyScroll()} instead.
      * <p>
-     * Note: Cannot be combined with {@link #autoScroll()} or {@link #stickyScroll()}.
+     * Note: Cannot be combined with {@link #autoScroll()} or
+     * {@link #stickyScroll()}.
      *
      * @return this element
-     * @throws IllegalStateException if another scroll mode is already enabled
+     * @throws IllegalStateException
+     *             if another scroll mode is already enabled
      */
     public ListElement<T> scrollToEnd() {
         checkScrollModeNotSet("scrollToEnd");
@@ -382,17 +410,19 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Enables sticky scroll behavior for the list.
      * <p>
-     * With sticky scroll, the list automatically scrolls to show new items
-     * at the bottom, but pauses auto-scrolling when the user scrolls up.
-     * Auto-scrolling resumes when the user scrolls back to the bottom.
+     * With sticky scroll, the list automatically scrolls to show new items at the
+     * bottom, but pauses auto-scrolling when the user scrolls up. Auto-scrolling
+     * resumes when the user scrolls back to the bottom.
      * <p>
-     * This is ideal for logs, chat messages, or activity feeds where you want
-     * to show the latest content but allow users to scroll back through history.
+     * This is ideal for logs, chat messages, or activity feeds where you want to
+     * show the latest content but allow users to scroll back through history.
      * <p>
-     * Note: Cannot be combined with {@link #autoScroll()} or {@link #scrollToEnd()}.
+     * Note: Cannot be combined with {@link #autoScroll()} or
+     * {@link #scrollToEnd()}.
      *
      * @return this element
-     * @throws IllegalStateException if another scroll mode is already enabled
+     * @throws IllegalStateException
+     *             if another scroll mode is already enabled
      */
     public ListElement<T> stickyScroll() {
         checkScrollModeNotSet("stickyScroll");
@@ -402,19 +432,19 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
     private void checkScrollModeNotSet(String requestedMode) {
         if (autoScroll && !"autoScroll".equals(requestedMode)) {
-            throw new TuiException(
-                    "Cannot enable " + requestedMode + ": autoScroll is already enabled. " +
-                    "Only one scroll mode (autoScroll, scrollToEnd, stickyScroll) can be active.");
+            throw new TuiException("Cannot enable " + requestedMode
+                    + ": autoScroll is already enabled. "
+                    + "Only one scroll mode (autoScroll, scrollToEnd, stickyScroll) can be active.");
         }
         if (autoScrollToEnd && !"scrollToEnd".equals(requestedMode)) {
-            throw new TuiException(
-                    "Cannot enable " + requestedMode + ": scrollToEnd is already enabled. " +
-                    "Only one scroll mode (autoScroll, scrollToEnd, stickyScroll) can be active.");
+            throw new TuiException("Cannot enable " + requestedMode
+                    + ": scrollToEnd is already enabled. "
+                    + "Only one scroll mode (autoScroll, scrollToEnd, stickyScroll) can be active.");
         }
         if (stickyScroll && !"stickyScroll".equals(requestedMode)) {
-            throw new TuiException(
-                    "Cannot enable " + requestedMode + ": stickyScroll is already enabled. " +
-                    "Only one scroll mode (autoScroll, scrollToEnd, stickyScroll) can be active.");
+            throw new TuiException("Cannot enable " + requestedMode
+                    + ": stickyScroll is already enabled. "
+                    + "Only one scroll mode (autoScroll, scrollToEnd, stickyScroll) can be active.");
         }
     }
 
@@ -431,7 +461,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the scrollbar policy.
      *
-     * @param policy the scrollbar display policy
+     * @param policy
+     *            the scrollbar display policy
      * @return this element
      */
     public ListElement<T> scrollbar(ScrollBarPolicy policy) {
@@ -457,7 +488,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the scrollbar thumb color.
      *
-     * @param color the thumb color
+     * @param color
+     *            the thumb color
      * @return this element
      */
     public ListElement<T> scrollbarThumbColor(Color color) {
@@ -468,7 +500,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Sets the scrollbar track color.
      *
-     * @param color the track color
+     * @param color
+     *            the track color
      * @return this element
      */
     public ListElement<T> scrollbarTrackColor(Color color) {
@@ -490,7 +523,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Selects the next item.
      *
-     * @param itemCount the total number of items
+     * @param itemCount
+     *            the total number of items
      */
     public void selectNext(int itemCount) {
         if (selectedIndex < itemCount - 1) {
@@ -509,7 +543,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Selects the last item.
      *
-     * @param itemCount the total number of items
+     * @param itemCount
+     *            the total number of items
      */
     public void selectLast(int itemCount) {
         selectedIndex = Math.max(0, itemCount - 1);
@@ -534,7 +569,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         }
 
         // Add highlight symbol width and border width if present
-        String effectiveSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
+        String effectiveSymbol = highlightSymbol != null
+                ? highlightSymbol
+                : DEFAULT_HIGHLIGHT_SYMBOL;
         int symbolWidth = effectiveSymbol.length();
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
 
@@ -593,8 +630,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         // Render border/block if needed
         Rect listArea = area;
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));
@@ -618,21 +654,24 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         this.lastViewportHeight = visibleHeight;
 
         // Resolve highlight style: explicit > CSS > default
-        Style effectiveHighlightStyle = resolveEffectiveStyle(
-            context, "item", PseudoClassState.ofSelected(),
-            highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
+        Style effectiveHighlightStyle = resolveEffectiveStyle(context, "item",
+                PseudoClassState.ofSelected(), highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
 
         // Resolve highlight symbol
-        String effectiveHighlightSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
+        String effectiveHighlightSymbol = highlightSymbol != null
+                ? highlightSymbol
+                : DEFAULT_HIGHLIGHT_SYMBOL;
         int symbolWidth = effectiveHighlightSymbol.length();
 
         // Determine if we should reserve space for scrollbar
-        // For AS_NEEDED, we use a heuristic: reserve space if items exceed viewport height
+        // For AS_NEEDED, we use a heuristic: reserve space if items exceed viewport
+        // height
         boolean reserveScrollbarSpace = scrollBarPolicy == ScrollBarPolicy.ALWAYS
                 || (scrollBarPolicy == ScrollBarPolicy.AS_NEEDED && totalItems > visibleHeight);
 
         // Calculate content area (reserve space for symbol and possibly scrollbar)
-        // This must be done before calculating item heights since wrapping depends on width
+        // This must be done before calculating item heights since wrapping depends on
+        // width
         int contentX = listArea.left() + symbolWidth;
         int contentWidth = listArea.width() - symbolWidth;
         if (reserveScrollbarSpace) {
@@ -670,7 +709,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             scrollOffset = Math.min(scrollOffset, maxScroll);
             scrollOffset = Math.max(0, scrollOffset);
 
-            // Check if at bottom - must be at or very near maxScroll, and maxScroll must be positive
+            // Check if at bottom - must be at or very near maxScroll, and maxScroll must be
+            // positive
             boolean atBottom = maxScroll > 0 && scrollOffset >= maxScroll;
 
             // Reset userScrolledAway if at bottom
@@ -727,7 +767,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
             // Draw highlight symbol for selected item
             if (isSelected && symbolWidth > 0) {
-                frame.buffer().setString(listArea.left(), y, effectiveHighlightSymbol, effectiveHighlightStyle);
+                frame.buffer().setString(listArea.left(), y, effectiveHighlightSymbol,
+                        effectiveHighlightStyle);
             }
 
             // Render the item element
@@ -736,7 +777,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             context.renderChild(item, frame, itemArea);
 
             // Apply row background AFTER child renders
-            // This ensures zebra/selection styling takes precedence over child's CSS background
+            // This ensures zebra/selection styling takes precedence over child's CSS
+            // background
             Color rowBg = posStyle.bg().orElse(null);
             if (isSelected && effectiveHighlightStyle.bg().isPresent()) {
                 rowBg = effectiveHighlightStyle.bg().get();
@@ -744,7 +786,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             if (rowBg != null) {
                 Style bgOnly = Style.EMPTY.bg(rowBg);
                 for (int row = 0; row < visibleItemHeight && y + row < listArea.bottom(); row++) {
-                    Rect rowArea = new Rect(listArea.left(), y + row, listArea.width() - (showScrollbar ? 1 : 0), 1);
+                    Rect rowArea = new Rect(listArea.left(), y + row,
+                            listArea.width() - (showScrollbar ? 1 : 0), 1);
                     frame.buffer().setStyle(rowArea, bgOnly);
                 }
             }
@@ -755,26 +798,26 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         // Render scrollbar if enabled
         if (showScrollbar && totalItems > 0) {
-            Rect scrollbarArea = new Rect(
-                listArea.right() - 1,
-                listArea.top(),
-                1,
-                listArea.height()
-            );
+            Rect scrollbarArea = new Rect(listArea.right() - 1, listArea.top(), 1,
+                    listArea.height());
 
-            ScrollbarState scrollbarState = new ScrollbarState()
-                .contentLength(totalHeight)
-                .viewportContentLength(visibleHeight)
-                .position(scrollOffset);
+            ScrollbarState scrollbarState = new ScrollbarState().contentLength(totalHeight)
+                    .viewportContentLength(visibleHeight).position(scrollOffset);
 
             // Resolve scrollbar styles: explicit > CSS > default
-            Style explicitThumbStyle = scrollbarThumbColor != null ? Style.EMPTY.fg(scrollbarThumbColor) : null;
-            Style explicitTrackStyle = scrollbarTrackColor != null ? Style.EMPTY.fg(scrollbarTrackColor) : null;
-            Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle, Style.EMPTY);
-            Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle, Style.EMPTY);
+            Style explicitThumbStyle = scrollbarThumbColor != null
+                    ? Style.EMPTY.fg(scrollbarThumbColor)
+                    : null;
+            Style explicitTrackStyle = scrollbarTrackColor != null
+                    ? Style.EMPTY.fg(scrollbarTrackColor)
+                    : null;
+            Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle,
+                    Style.EMPTY);
+            Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle,
+                    Style.EMPTY);
 
             Scrollbar.Builder scrollbarBuilder = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
+                    .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
             if (!thumbStyle.equals(Style.EMPTY)) {
                 scrollbarBuilder.thumbStyle(thumbStyle);
             }
@@ -789,12 +832,17 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     /**
      * Returns the height of an item (in rows) given the available content width.
      * <p>
-     * Uses {@link dev.tamboui.toolkit.element.Element#preferredHeight(int, RenderContext)} to allow
-     * elements like text to calculate wrapped height based on available width and CSS properties.
+     * Uses
+     * {@link dev.tamboui.toolkit.element.Element#preferredHeight(int, RenderContext)}
+     * to allow elements like text to calculate wrapped height based on available
+     * width and CSS properties.
      *
-     * @param item the item element
-     * @param contentWidth the available width for content
-     * @param context the render context for CSS resolution
+     * @param item
+     *            the item element
+     * @param contentWidth
+     *            the available width for content
+     * @param context
+     *            the render context for CSS resolution
      * @return the height in rows
      */
     private int itemHeightOf(StyledElement<?> item, int contentWidth, RenderContext context) {
@@ -924,7 +972,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         if (lastItemCount > 0) {
             if (event.kind() == MouseEventKind.SCROLL_UP) {
                 if (stickyScroll) {
-                    // Direct scroll for sticky mode - scrolling up always means user is scrolling away
+                    // Direct scroll for sticky mode - scrolling up always means user is scrolling
+                    // away
                     scrollOffset = Math.max(0, scrollOffset - 3);
                     userScrolledAway = true;
                 } else {

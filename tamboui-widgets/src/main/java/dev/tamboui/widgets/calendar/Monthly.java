@@ -4,32 +4,30 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Style;
-import dev.tamboui.widget.Widget;
-import dev.tamboui.widgets.block.Block;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
+import dev.tamboui.widget.Widget;
+import dev.tamboui.widgets.block.Block;
+
 /**
  * A calendar widget displaying a single month.
  * <p>
- * Renders a calendar grid for the month containing the display date,
- * with customizable styling for headers, weekdays, and individual dates.
+ * Renders a calendar grid for the month containing the display date, with
+ * customizable styling for headers, weekdays, and individual dates.
  *
  * <pre>{@code
  * CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold());
  *
- * Monthly calendar = Monthly.of(LocalDate.now(), events)
- *     .showMonthHeader(Style.EMPTY.bold())
- *     .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN))
- *     .showSurrounding(Style.EMPTY.dim())
- *     .block(Block.bordered());
+ * Monthly calendar = Monthly.of(LocalDate.now(), events).showMonthHeader(Style.EMPTY.bold())
+ *         .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN)).showSurrounding(Style.EMPTY.dim())
+ *         .block(Block.bordered());
  * }</pre>
  *
  * @see DateStyler
@@ -38,8 +36,8 @@ import java.util.Locale;
 public final class Monthly implements Widget {
 
     private static final String[] WEEKDAY_ABBREV = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"};
-    private static final int CELL_WIDTH = 3;  // Width per day cell (2 digits + space)
-    private static final int CALENDAR_WIDTH = CELL_WIDTH * 7 - 1;  // 7 days, minus trailing space
+    private static final int CELL_WIDTH = 3; // Width per day cell (2 digits + space)
+    private static final int CALENDAR_WIDTH = CELL_WIDTH * 7 - 1; // 7 days, minus trailing space
 
     private final LocalDate displayDate;
     private final DateStyler dateStyler;
@@ -64,8 +62,10 @@ public final class Monthly implements Widget {
     /**
      * Creates a calendar for the month containing the given date.
      *
-     * @param displayDate the date determining which month to display
-     * @param dateStyler  the styler for individual dates
+     * @param displayDate
+     *            the date determining which month to display
+     * @param dateStyler
+     *            the styler for individual dates
      * @return a new Monthly calendar
      */
     public static Monthly of(LocalDate displayDate, DateStyler dateStyler) {
@@ -84,8 +84,10 @@ public final class Monthly implements Widget {
     /**
      * Creates a builder for a calendar displaying the given month.
      *
-     * @param displayDate the date determining which month to display
-     * @param dateStyler  the styler for individual dates
+     * @param displayDate
+     *            the date determining which month to display
+     * @param dateStyler
+     *            the styler for individual dates
      * @return a new Builder
      */
     public static Builder builder(LocalDate displayDate, DateStyler dateStyler) {
@@ -95,7 +97,8 @@ public final class Monthly implements Widget {
     /**
      * Returns a new calendar with the month header shown.
      *
-     * @param style the style for the month header
+     * @param style
+     *            the style for the month header
      * @return a new Monthly with the month header enabled
      */
     public Monthly showMonthHeader(Style style) {
@@ -105,7 +108,8 @@ public final class Monthly implements Widget {
     /**
      * Returns a new calendar with the weekdays header shown.
      *
-     * @param style the style for the weekdays header
+     * @param style
+     *            the style for the weekdays header
      * @return a new Monthly with the weekdays header enabled
      */
     public Monthly showWeekdaysHeader(Style style) {
@@ -115,10 +119,11 @@ public final class Monthly implements Widget {
     /**
      * Returns a new calendar with surrounding days shown.
      * <p>
-     * Surrounding days are days from the previous/next month that
-     * appear in the calendar grid.
+     * Surrounding days are days from the previous/next month that appear in the
+     * calendar grid.
      *
-     * @param style the style for surrounding days
+     * @param style
+     *            the style for surrounding days
      * @return a new Monthly with surrounding days enabled
      */
     public Monthly showSurrounding(Style style) {
@@ -128,7 +133,8 @@ public final class Monthly implements Widget {
     /**
      * Returns a new calendar with the default date style.
      *
-     * @param style the default style for dates
+     * @param style
+     *            the default style for dates
      * @return a new Monthly with the given default style
      */
     public Monthly defaultStyle(Style style) {
@@ -138,7 +144,8 @@ public final class Monthly implements Widget {
     /**
      * Returns a new calendar wrapped in a block.
      *
-     * @param block the block to wrap the calendar in
+     * @param block
+     *            the block to wrap the calendar in
      * @return a new Monthly wrapped in the given block
      */
     public Monthly block(Block block) {
@@ -148,7 +155,8 @@ public final class Monthly implements Widget {
     /**
      * Returns a new calendar with the given first day of week.
      *
-     * @param dayOfWeek the first day of the week
+     * @param dayOfWeek
+     *            the first day of the week
      * @return a new Monthly with the given first day of week
      */
     public Monthly firstDayOfWeek(DayOfWeek dayOfWeek) {
@@ -156,13 +164,9 @@ public final class Monthly implements Widget {
     }
 
     private Builder toBuilder() {
-        return new Builder(displayDate, dateStyler)
-            .monthHeaderStyle(monthHeaderStyle)
-            .weekdaysHeaderStyle(weekdaysHeaderStyle)
-            .surroundingStyle(surroundingStyle)
-            .defaultStyle(defaultStyle)
-            .block(block)
-            .firstDayOfWeek(firstDayOfWeek);
+        return new Builder(displayDate, dateStyler).monthHeaderStyle(monthHeaderStyle)
+                .weekdaysHeaderStyle(weekdaysHeaderStyle).surroundingStyle(surroundingStyle)
+                .defaultStyle(defaultStyle).block(block).firstDayOfWeek(firstDayOfWeek);
     }
 
     @Override
@@ -240,7 +244,8 @@ public final class Monthly implements Widget {
         LocalDate lastOfMonth = yearMonth.atEndOfMonth();
 
         // Find the first day to display (may be from previous month)
-        int dayOffset = (firstOfMonth.getDayOfWeek().getValue() - firstDayOfWeek.getValue() + 7) % 7;
+        int dayOffset = (firstOfMonth.getDayOfWeek().getValue() - firstDayOfWeek.getValue() + 7)
+                % 7;
         LocalDate gridStart = firstOfMonth.minusDays(dayOffset);
 
         // Calculate number of weeks needed
@@ -333,7 +338,8 @@ public final class Monthly implements Widget {
         /**
          * Shows the month header with the given style.
          *
-         * @param style the month header style
+         * @param style
+         *            the month header style
          * @return this builder
          */
         public Builder monthHeaderStyle(Style style) {
@@ -344,7 +350,8 @@ public final class Monthly implements Widget {
         /**
          * Shows the weekdays header with the given style.
          *
-         * @param style the weekdays header style
+         * @param style
+         *            the weekdays header style
          * @return this builder
          */
         public Builder weekdaysHeaderStyle(Style style) {
@@ -355,7 +362,8 @@ public final class Monthly implements Widget {
         /**
          * Shows surrounding days with the given style.
          *
-         * @param style the surrounding days style
+         * @param style
+         *            the surrounding days style
          * @return this builder
          */
         public Builder surroundingStyle(Style style) {
@@ -366,7 +374,8 @@ public final class Monthly implements Widget {
         /**
          * Sets the default style for dates.
          *
-         * @param style the default date style
+         * @param style
+         *            the default date style
          * @return this builder
          */
         public Builder defaultStyle(Style style) {
@@ -377,7 +386,8 @@ public final class Monthly implements Widget {
         /**
          * Wraps the calendar in a block.
          *
-         * @param block the block to wrap in
+         * @param block
+         *            the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -388,7 +398,8 @@ public final class Monthly implements Widget {
         /**
          * Sets the first day of the week.
          *
-         * @param dayOfWeek the first day of the week
+         * @param dayOfWeek
+         *            the first day of the week
          * @return this builder
          */
         public Builder firstDayOfWeek(DayOfWeek dayOfWeek) {

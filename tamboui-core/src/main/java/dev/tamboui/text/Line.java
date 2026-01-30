@@ -4,17 +4,18 @@
  */
 package dev.tamboui.text;
 
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A single line of text composed of styled spans.
@@ -27,8 +28,10 @@ public final class Line {
     /**
      * Creates a new line with the given spans and alignment.
      *
-     * @param spans the spans composing this line
-     * @param alignment the alignment of this line, or null for default
+     * @param spans
+     *            the spans composing this line
+     * @param alignment
+     *            the alignment of this line, or null for default
      */
     public Line(List<Span> spans, Alignment alignment) {
         this.spans = listCopyOf(spans);
@@ -47,7 +50,8 @@ public final class Line {
     /**
      * Creates a line from a plain text string.
      *
-     * @param text the text content
+     * @param text
+     *            the text content
      * @return a new line containing the text
      */
     public static Line from(String text) {
@@ -57,7 +61,8 @@ public final class Line {
     /**
      * Creates a line from a single span.
      *
-     * @param span the span
+     * @param span
+     *            the span
      * @return a new line containing the span
      */
     public static Line from(Span span) {
@@ -67,7 +72,8 @@ public final class Line {
     /**
      * Creates a line from multiple spans.
      *
-     * @param spans the spans
+     * @param spans
+     *            the spans
      * @return a new line containing the spans
      */
     public static Line from(Span... spans) {
@@ -77,7 +83,8 @@ public final class Line {
     /**
      * Creates a line from a list of spans.
      *
-     * @param spans the spans
+     * @param spans
+     *            the spans
      * @return a new line containing the spans
      */
     public static Line from(List<Span> spans) {
@@ -87,8 +94,10 @@ public final class Line {
     /**
      * Creates a line from styled text.
      *
-     * @param text the text content
-     * @param style the style to apply
+     * @param text
+     *            the text content
+     * @param style
+     *            the style to apply
      * @return a new styled line
      */
     public static Line styled(String text, Style style) {
@@ -116,7 +125,8 @@ public final class Line {
     /**
      * Returns a new line with the given alignment.
      *
-     * @param alignment the alignment to apply
+     * @param alignment
+     *            the alignment to apply
      * @return a new line with the specified alignment
      */
     public Line alignment(Alignment alignment) {
@@ -153,20 +163,21 @@ public final class Line {
     /**
      * Applies a style patch to all spans.
      *
-     * @param style the style to patch onto each span
+     * @param style
+     *            the style to patch onto each span
      * @return a new line with the patched style applied
      */
     public Line patchStyle(Style style) {
-        List<Span> newSpans = spans.stream()
-            .map(span -> span.patchStyle(style))
-            .collect(Collectors.toList());
+        List<Span> newSpans = spans.stream().map(span -> span.patchStyle(style))
+                .collect(Collectors.toList());
         return new Line(newSpans, alignment);
     }
 
     /**
      * Returns a new line with the given foreground color applied to all spans.
      *
-     * @param color the foreground color
+     * @param color
+     *            the foreground color
      * @return a new line with the foreground color applied
      */
     public Line fg(Color color) {
@@ -176,7 +187,8 @@ public final class Line {
     /**
      * Returns a new line with the given background color applied to all spans.
      *
-     * @param color the background color
+     * @param color
+     *            the background color
      * @return a new line with the background color applied
      */
     public Line bg(Color color) {
@@ -213,7 +225,8 @@ public final class Line {
     /**
      * Returns a new line with a hyperlink applied to all spans.
      *
-     * @param url the hyperlink URL
+     * @param url
+     *            the hyperlink URL
      * @return a new line with the hyperlink applied
      */
     public Line hyperlink(String url) {
@@ -223,8 +236,10 @@ public final class Line {
     /**
      * Returns a new line with a hyperlink and ID applied to all spans.
      *
-     * @param url the hyperlink URL
-     * @param id the hyperlink ID for grouping
+     * @param url
+     *            the hyperlink URL
+     * @param id
+     *            the hyperlink ID for grouping
      * @return a new line with the hyperlink applied
      */
     public Line hyperlink(String url, String id) {
@@ -248,7 +263,8 @@ public final class Line {
     /**
      * Appends another line's spans to this line.
      *
-     * @param other the line whose spans to append
+     * @param other
+     *            the line whose spans to append
      * @return a new line with the combined spans
      */
     public Line append(Line other) {
@@ -260,7 +276,8 @@ public final class Line {
     /**
      * Appends a span to this line.
      *
-     * @param span the span to append
+     * @param span
+     *            the span to append
      * @return a new line with the span appended
      */
     public Line append(Span span) {

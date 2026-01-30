@@ -11,14 +11,14 @@ import java.util.Optional;
  * <p>
  * Border characters can be:
  * <ul>
- *   <li>Quoted strings (any content, including empty) - quotes are stripped</li>
- *   <li>Single characters or short unicode sequences (up to 4 chars)</li>
+ * <li>Quoted strings (any content, including empty) - quotes are stripped</li>
+ * <li>Single characters or short unicode sequences (up to 4 chars)</li>
  * </ul>
  * <p>
  * Invalid values are rejected:
  * <ul>
- *   <li>Empty unquoted strings</li>
- *   <li>Long strings that look like parser errors (e.g., "height: 3")</li>
+ * <li>Empty unquoted strings</li>
+ * <li>Long strings that look like parser errors (e.g., "height: 3")</li>
  * </ul>
  */
 public final class BorderCharConverter implements PropertyConverter<String> {

@@ -4,10 +4,6 @@
  */
 package dev.tamboui.backend.panama.windows;
 
-import dev.tamboui.backend.panama.PlatformTerminal;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.layout.Size;
-
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -15,11 +11,15 @@ import java.lang.foreign.ValueLayout;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import dev.tamboui.backend.panama.PlatformTerminal;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.layout.Size;
+
 /**
  * Windows terminal operations using Panama FFI.
  * <p>
- * This class provides higher-level terminal operations built on top of
- * the low-level Kernel32 bindings.
+ * This class provides higher-level terminal operations built on top of the
+ * low-level Kernel32 bindings.
  */
 public final class WindowsTerminal implements PlatformTerminal {
 
@@ -38,7 +38,8 @@ public final class WindowsTerminal implements PlatformTerminal {
     /**
      * Creates a new Windows terminal instance.
      *
-     * @throws IOException if the terminal cannot be initialized
+     * @throws IOException
+     *             if the terminal cannot be initialized
      */
     public WindowsTerminal() throws IOException {
         this.arena = Arena.ofShared();
@@ -46,8 +47,8 @@ public final class WindowsTerminal implements PlatformTerminal {
         inputHandle = Kernel32.getStdHandle(Kernel32.STD_INPUT_HANDLE);
         outputHandle = Kernel32.getStdHandle(Kernel32.STD_OUTPUT_HANDLE);
 
-        if (inputHandle.address() == Kernel32.INVALID_HANDLE_VALUE ||
-            outputHandle.address() == Kernel32.INVALID_HANDLE_VALUE) {
+        if (inputHandle.address() == Kernel32.INVALID_HANDLE_VALUE
+                || outputHandle.address() == Kernel32.INVALID_HANDLE_VALUE) {
             arena.close();
             throw new RuntimeIOException("Failed to get console handles");
         }
@@ -78,22 +79,26 @@ public final class WindowsTerminal implements PlatformTerminal {
             return;
         }
 
-        // Set input mode: disable line input, echo, and processed input; enable VT input
+        // Set input mode: disable line input, echo, and processed input; enable VT
+        // input
         var newInputMode = savedInputMode
-                & ~(Kernel32.ENABLE_LINE_INPUT | Kernel32.ENABLE_ECHO_INPUT | Kernel32.ENABLE_PROCESSED_INPUT)
+                & ~(Kernel32.ENABLE_LINE_INPUT | Kernel32.ENABLE_ECHO_INPUT
+                        | Kernel32.ENABLE_PROCESSED_INPUT)
                 | Kernel32.ENABLE_VIRTUAL_TERMINAL_INPUT | Kernel32.ENABLE_WINDOW_INPUT;
 
         if (Kernel32.setConsoleMode(inputHandle, newInputMode) == 0) {
-            throw new RuntimeIOException("Failed to set input console mode (error=" + Kernel32.getLastError() + ")");
+            throw new RuntimeIOException(
+                    "Failed to set input console mode (error=" + Kernel32.getLastError() + ")");
         }
 
         // Set output mode: enable VT processing
-        var newOutputMode = savedOutputMode
-                | Kernel32.ENABLE_VIRTUAL_TERMINAL_PROCESSING | Kernel32.ENABLE_PROCESSED_OUTPUT;
+        var newOutputMode = savedOutputMode | Kernel32.ENABLE_VIRTUAL_TERMINAL_PROCESSING
+                | Kernel32.ENABLE_PROCESSED_OUTPUT;
 
         if (Kernel32.setConsoleMode(outputHandle, newOutputMode) == 0) {
             Kernel32.setConsoleMode(inputHandle, savedInputMode);
-            throw new RuntimeIOException("Failed to set output console mode (error=" + Kernel32.getLastError() + ")");
+            throw new RuntimeIOException(
+                    "Failed to set output console mode (error=" + Kernel32.getLastError() + ")");
         }
 
         rawModeEnabled = true;
@@ -119,7 +124,8 @@ public final class WindowsTerminal implements PlatformTerminal {
     @Override
     public Size getSize() throws IOException {
         if (Kernel32.getConsoleScreenBufferInfo(outputHandle, screenBufferInfo) == 0) {
-            throw new RuntimeIOException("Failed to get console screen buffer info (error=" + Kernel32.getLastError() + ")");
+            throw new RuntimeIOException("Failed to get console screen buffer info (error="
+                    + Kernel32.getLastError() + ")");
         }
 
         var left = (short) Kernel32.CSBI_WINDOW_LEFT.get(screenBufferInfo, 0L);
@@ -152,7 +158,8 @@ public final class WindowsTerminal implements PlatformTerminal {
                 return -2; // Timeout, no data
             }
             if (waitResult == Kernel32.WAIT_FAILED) {
-                throw new RuntimeIOException("WaitForSingleObject failed (error=" + Kernel32.getLastError() + ")");
+                throw new RuntimeIOException(
+                        "WaitForSingleObject failed (error=" + Kernel32.getLastError() + ")");
             }
             // WAIT_OBJECT_0: input is available, proceed to read
         }
@@ -220,8 +227,10 @@ public final class WindowsTerminal implements PlatformTerminal {
             }
 
             var written = writeArena.allocate(ValueLayout.JAVA_INT);
-            if (Kernel32.writeConsole(outputHandle, buffer, chars.length, written, MemorySegment.NULL) == 0) {
-                throw new RuntimeIOException("Write failed (error=" + Kernel32.getLastError() + ")");
+            if (Kernel32.writeConsole(outputHandle, buffer, chars.length, written,
+                    MemorySegment.NULL) == 0) {
+                throw new RuntimeIOException(
+                        "Write failed (error=" + Kernel32.getLastError() + ")");
             }
         }
     }

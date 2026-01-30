@@ -4,6 +4,10 @@
  */
 package dev.tamboui.assertj;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
@@ -11,13 +15,9 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
 /**
- * Utility class for formatting buffer differences in a readable way,
- * similar to ratatui.rs assertion output.
+ * Utility class for formatting buffer differences in a readable way, similar to
+ * ratatui.rs assertion output.
  */
 final class BufferDiffFormatter {
 
@@ -28,8 +28,10 @@ final class BufferDiffFormatter {
     /**
      * Formats a diff between two buffers, showing both buffers side-by-side.
      *
-     * @param actual the actual buffer
-     * @param expected the expected buffer
+     * @param actual
+     *            the actual buffer
+     * @param expected
+     *            the expected buffer
      * @return a formatted string showing the difference
      */
     static String formatDiff(Buffer actual, Buffer expected) {
@@ -45,7 +47,8 @@ final class BufferDiffFormatter {
     /**
      * Formats a buffer for display, similar to ratatui.rs format.
      *
-     * @param buffer the buffer to format
+     * @param buffer
+     *            the buffer to format
      * @return a formatted string representation
      */
     static String formatBuffer(Buffer buffer) {
@@ -89,8 +92,8 @@ final class BufferDiffFormatter {
     }
 
     private static String formatRect(Rect rect) {
-        return String.format("Rect { x: %d, y: %d, width: %d, height: %d }",
-            rect.x(), rect.y(), rect.width(), rect.height());
+        return String.format("Rect { x: %d, y: %d, width: %d, height: %d }", rect.x(), rect.y(),
+                rect.width(), rect.height());
     }
 
     private static List<String> formatContentLines(Buffer buffer) {
@@ -120,26 +123,26 @@ final class BufferDiffFormatter {
             for (int x = area.left(); x < area.right(); x++) {
                 Cell cell = buffer.get(x, y);
                 Style style = cell.style();
-                
+
                 // Only include non-empty styles
                 if (!style.equals(Style.EMPTY)) {
                     StringBuilder styleLine = new StringBuilder();
                     styleLine.append("x: ").append(x).append(", y: ").append(y);
-                    
+
                     // Format foreground color
                     if (style.fg().isPresent()) {
                         styleLine.append(", fg: ").append(formatColor(style.fg().get()));
                     } else {
                         styleLine.append(", fg: Reset");
                     }
-                    
+
                     // Format background color
                     if (style.bg().isPresent()) {
                         styleLine.append(", bg: ").append(formatColor(style.bg().get()));
                     } else {
                         styleLine.append(", bg: Reset");
                     }
-                    
+
                     // Format modifiers
                     EnumSet<Modifier> modifiers = style.effectiveModifiers();
                     if (modifiers.isEmpty()) {
@@ -147,7 +150,7 @@ final class BufferDiffFormatter {
                     } else {
                         styleLine.append(", modifier: ").append(formatModifiers(modifiers));
                     }
-                    
+
                     styleLines.add(styleLine.toString());
                 }
             }
@@ -191,5 +194,3 @@ final class BufferDiffFormatter {
         return String.join(" | ", modifierNames);
     }
 }
-
-

@@ -10,16 +10,20 @@ import dev.tamboui.layout.Rect;
 /**
  * A widget that maintains state between renders.
  *
- * @param <S> the state type
+ * @param <S>
+ *            the state type
  */
 public interface StatefulWidget<S> {
 
     /**
      * Renders this widget to the given buffer area with the provided state.
      *
-     * @param area   the area to render into
-     * @param buffer the buffer to render to
-     * @param state  the widget state
+     * @param area
+     *            the area to render into
+     * @param buffer
+     *            the buffer to render to
+     * @param state
+     *            the widget state
      */
     void render(Rect area, Buffer buffer, S state);
 }

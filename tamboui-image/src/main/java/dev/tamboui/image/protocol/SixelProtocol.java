@@ -4,18 +4,18 @@
  */
 package dev.tamboui.image.protocol;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.image.ImageData;
-import dev.tamboui.image.capability.TerminalImageProtocol;
-import dev.tamboui.layout.Rect;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.image.ImageData;
+import dev.tamboui.image.capability.TerminalImageProtocol;
+import dev.tamboui.layout.Rect;
 
 /**
  * Renders images using the Sixel graphics protocol.
@@ -28,6 +28,7 @@ import java.util.Map;
  * Rio, Konsole (22+), and other terminals.
  *
  * <h2>Protocol Format</h2>
+ * 
  * <pre>
  * ESC P [params] q [data] ESC \
  * </pre>
@@ -36,12 +37,13 @@ import java.util.Map;
  */
 public final class SixelProtocol implements ImageProtocol {
 
-    private static final String DCS = "\033P";  // Device Control String
-    private static final String ST = "\033\\";   // String Terminator
+    private static final String DCS = "\033P"; // Device Control String
+    private static final String ST = "\033\\"; // String Terminator
     private static final int MAX_COLORS = 256;
     private static final int SIXEL_HEIGHT = 6;
 
-    // Sixel character offset - character '?' (63) represents all-zero, '~' (126) represents all-ones
+    // Sixel character offset - character '?' (63) represents all-zero, '~' (126)
+    // represents all-ones
     private static final int SIXEL_OFFSET = 63;
 
     private final int maxColors;
@@ -56,14 +58,16 @@ public final class SixelProtocol implements ImageProtocol {
     /**
      * Creates a Sixel protocol with a custom color limit.
      *
-     * @param maxColors maximum number of colors in the palette (1-256)
+     * @param maxColors
+     *            maximum number of colors in the palette (1-256)
      */
     public SixelProtocol(int maxColors) {
         this.maxColors = Math.max(1, Math.min(MAX_COLORS, maxColors));
     }
 
     @Override
-    public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput) throws IOException {
+    public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput)
+            throws IOException {
         if (rawOutput == null) {
             throw new RuntimeIOException("Sixel protocol requires raw output stream");
         }
@@ -77,7 +81,8 @@ public final class SixelProtocol implements ImageProtocol {
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
         // Generate and write Sixel data
-        // The image should already be scaled by Image.scaleImage() based on the scaling mode
+        // The image should already be scaled by Image.scaleImage() based on the scaling
+        // mode
         byte[] sixelData = encodeSixel(image);
         rawOutput.write(sixelData);
         rawOutput.flush();
@@ -240,11 +245,10 @@ public final class SixelProtocol implements ImageProtocol {
 
         // Sort by frequency and take top colors
         colorCounts.entrySet().stream()
-            .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
-            .limit(maxColors)
-            .forEach(entry -> {
-                // Use the map size as the index since we can't modify index directly
-            });
+                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue())).limit(maxColors)
+                .forEach(entry -> {
+                    // Use the map size as the index since we can't modify index directly
+                });
 
         for (Map.Entry<Integer, Integer> entry : colorCounts.entrySet()) {
             if (index >= maxColors) {
@@ -257,8 +261,8 @@ public final class SixelProtocol implements ImageProtocol {
     }
 
     /**
-     * Quantizes a color to reduce the number of unique colors.
-     * Uses 6-6-6 RGB cube (216 colors) plus grayscale levels.
+     * Quantizes a color to reduce the number of unique colors. Uses 6-6-6 RGB cube
+     * (216 colors) plus grayscale levels.
      */
     private static int quantizeColor(int argb) {
         int r = ImageData.red(argb);

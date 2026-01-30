@@ -4,11 +4,16 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -17,25 +22,15 @@ import dev.tamboui.widgets.canvas.Canvas;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
-
 /**
  * A DSL wrapper for the Canvas widget.
  * <p>
  * Draws arbitrary shapes on a coordinate system.
+ * 
  * <pre>{@code
- * canvas()
- *     .xBounds(-10, 10)
- *     .yBounds(-10, 10)
- *     .marker(Marker.BRAILLE)
- *     .paint(ctx -> {
- *         ctx.draw(new Circle(0, 0, 5, Color.RED));
- *     })
- *     .title("Drawing")
- *     .rounded()
+ * canvas().xBounds(-10, 10).yBounds(-10, 10).marker(Marker.BRAILLE).paint(ctx -> {
+ *     ctx.draw(new Circle(0, 0, 5, Color.RED));
+ * }).title("Drawing").rounded()
  * }</pre>
  */
 public final class CanvasElement extends StyledElement<CanvasElement> {
@@ -60,8 +55,10 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the X-axis bounds.
      *
-     * @param min the minimum X value
-     * @param max the maximum X value
+     * @param min
+     *            the minimum X value
+     * @param max
+     *            the maximum X value
      * @return this element
      */
     public CanvasElement xBounds(double min, double max) {
@@ -73,8 +70,10 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the Y-axis bounds.
      *
-     * @param min the minimum Y value
-     * @param max the maximum Y value
+     * @param min
+     *            the minimum Y value
+     * @param max
+     *            the maximum Y value
      * @return this element
      */
     public CanvasElement yBounds(double min, double max) {
@@ -86,10 +85,14 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets both axis bounds.
      *
-     * @param xMin the minimum X value
-     * @param xMax the maximum X value
-     * @param yMin the minimum Y value
-     * @param yMax the maximum Y value
+     * @param xMin
+     *            the minimum X value
+     * @param xMax
+     *            the maximum X value
+     * @param yMin
+     *            the minimum Y value
+     * @param yMax
+     *            the maximum Y value
      * @return this element
      */
     public CanvasElement bounds(double xMin, double xMax, double yMin, double yMax) {
@@ -103,7 +106,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the marker type for rendering points.
      *
-     * @param marker the marker type
+     * @param marker
+     *            the marker type
      * @return this element
      */
     public CanvasElement marker(Marker marker) {
@@ -154,7 +158,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the background color.
      *
-     * @param color the background color
+     * @param color
+     *            the background color
      * @return this element
      */
     public CanvasElement backgroundColor(Color color) {
@@ -165,7 +170,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the paint callback for drawing shapes.
      *
-     * @param callback the paint callback receiving a drawing context
+     * @param callback
+     *            the paint callback receiving a drawing context
      * @return this element
      */
     public CanvasElement paint(Consumer<Context> callback) {
@@ -176,7 +182,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the title.
      *
-     * @param title the canvas title
+     * @param title
+     *            the canvas title
      * @return this element
      */
     public CanvasElement title(String title) {
@@ -197,7 +204,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element
      */
     public CanvasElement borderColor(Color color) {
@@ -256,10 +264,8 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
             return;
         }
 
-        Canvas.Builder builder = Canvas.builder()
-            .xBounds(xMin, xMax)
-            .yBounds(yMin, yMax)
-            .marker(marker);
+        Canvas.Builder builder = Canvas.builder().xBounds(xMin, xMax).yBounds(yMin, yMax)
+                .marker(marker);
 
         if (backgroundColor != null) {
             builder.backgroundColor(backgroundColor);
@@ -270,8 +276,7 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
         }
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

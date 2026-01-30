@@ -4,13 +4,14 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Rect;
-
 import java.util.Collections;
 import java.util.List;
 
+import dev.tamboui.layout.Rect;
+
 /**
- * A no-op implementation of {@link StyledAreaRegistry} that ignores all operations.
+ * A no-op implementation of {@link StyledAreaRegistry} that ignores all
+ * operations.
  * <p>
  * This is useful when styled area tracking is not needed, as it avoids the
  * overhead of maintaining data structures.

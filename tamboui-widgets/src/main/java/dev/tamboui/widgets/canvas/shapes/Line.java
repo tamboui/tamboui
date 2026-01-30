@@ -4,11 +4,11 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.Optional;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Painter;
 import dev.tamboui.widgets.canvas.Shape;
-
-import java.util.Optional;
 
 /**
  * A line segment between two points.
@@ -32,11 +32,16 @@ public final class Line implements Shape {
     /**
      * Creates a line segment between two points.
      *
-     * @param x1 the x coordinate of the start point
-     * @param y1 the y coordinate of the start point
-     * @param x2 the x coordinate of the end point
-     * @param y2 the y coordinate of the end point
-     * @param color the line color
+     * @param x1
+     *            the x coordinate of the start point
+     * @param y1
+     *            the y coordinate of the start point
+     * @param x2
+     *            the x coordinate of the end point
+     * @param y2
+     *            the y coordinate of the end point
+     * @param color
+     *            the line color
      */
     public Line(double x1, double y1, double x2, double y2, Color color) {
         this.x1 = x1;
@@ -49,11 +54,16 @@ public final class Line implements Shape {
     /**
      * Creates a line from (x1, y1) to (x2, y2) with the given color.
      *
-     * @param x1 the x coordinate of the start point
-     * @param y1 the y coordinate of the start point
-     * @param x2 the x coordinate of the end point
-     * @param y2 the y coordinate of the end point
-     * @param color the line color
+     * @param x1
+     *            the x coordinate of the start point
+     * @param y1
+     *            the y coordinate of the start point
+     * @param x2
+     *            the x coordinate of the end point
+     * @param y2
+     *            the y coordinate of the end point
+     * @param color
+     *            the line color
      * @return a new line
      */
     public static Line of(double x1, double y1, double x2, double y2, Color color) {
@@ -81,8 +91,7 @@ public final class Line implements Shape {
         double length = Math.sqrt(dx * dx + dy * dy);
 
         if (length == 0) {
-            painter.getPoint(x1, y1).ifPresent(p ->
-                painter.paint(p.x(), p.y(), color));
+            painter.getPoint(x1, y1).ifPresent(p -> painter.paint(p.x(), p.y(), color));
             return;
         }
 
@@ -94,8 +103,7 @@ public final class Line implements Shape {
             double t = (double) i / steps;
             double x = x1 + t * dx;
             double y = y1 + t * dy;
-            painter.getPoint(x, y).ifPresent(p ->
-                painter.paint(p.x(), p.y(), color));
+            painter.getPoint(x, y).ifPresent(p -> painter.paint(p.x(), p.y(), color));
         }
     }
 
@@ -179,11 +187,9 @@ public final class Line implements Shape {
             return false;
         }
         Line line = (Line) o;
-        return Double.compare(line.x1, x1) == 0
-            && Double.compare(line.y1, y1) == 0
-            && Double.compare(line.x2, x2) == 0
-            && Double.compare(line.y2, y2) == 0
-            && color.equals(line.color);
+        return Double.compare(line.x1, x1) == 0 && Double.compare(line.y1, y1) == 0
+                && Double.compare(line.x2, x2) == 0 && Double.compare(line.y2, y2) == 0
+                && color.equals(line.color);
     }
 
     @Override

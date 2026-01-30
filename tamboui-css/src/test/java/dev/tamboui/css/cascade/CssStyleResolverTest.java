@@ -4,16 +4,17 @@
  */
 package dev.tamboui.css.cascade;
 
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Padding;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.layout.Padding;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,9 +22,7 @@ class CssStyleResolverTest {
 
     @Test
     void withFallbackReturnsThisWhenFallbackIsNull() {
-        CssStyleResolver resolver = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver resolver = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver result = resolver.withFallback(null);
 
@@ -32,15 +31,10 @@ class CssStyleResolverTest {
 
     @Test
     void withFallbackUsesParentPropertiesWhenChildDoesNotHaveThem() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .foreground(Color.BLUE)
-                .background(Color.WHITE)
-                .borderType(BorderType.DOUBLE)
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().foreground(Color.BLUE)
+                .background(Color.WHITE).borderType(BorderType.DOUBLE).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -54,21 +48,13 @@ class CssStyleResolverTest {
 
     @Test
     void withFallbackChildPropertiesTakePrecedence() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .foreground(Color.BLUE)
-                .background(Color.WHITE)
-                .alignment(Alignment.CENTER)
-                .borderType(BorderType.PLAIN)
-                .width(Constraint.fill())
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().foreground(Color.BLUE)
+                .background(Color.WHITE).alignment(Alignment.CENTER).borderType(BorderType.PLAIN)
+                .width(Constraint.fill()).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .background(Color.BLACK)
-                .alignment(Alignment.LEFT)
-                .borderType(BorderType.DOUBLE)
-                .width(Constraint.fit())
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED)
+                .background(Color.BLACK).alignment(Alignment.LEFT).borderType(BorderType.DOUBLE)
+                .width(Constraint.fit()).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -82,13 +68,9 @@ class CssStyleResolverTest {
 
     @Test
     void withFallbackMergesModifiersPreferringChild() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .addModifier(Modifier.BOLD)
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().addModifier(Modifier.BOLD).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .addModifier(Modifier.ITALIC)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().addModifier(Modifier.ITALIC).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -98,14 +80,10 @@ class CssStyleResolverTest {
 
     @Test
     void withFallbackInheritsModifiersWhenChildHasNone() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .addModifier(Modifier.BOLD)
-                .addModifier(Modifier.UNDERLINED)
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().addModifier(Modifier.BOLD)
+                .addModifier(Modifier.UNDERLINED).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -115,13 +93,9 @@ class CssStyleResolverTest {
 
     @Test
     void withFallbackHandlesEmptyModifiersOnBothSides() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .foreground(Color.BLUE)
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().foreground(Color.BLUE).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -133,13 +107,9 @@ class CssStyleResolverTest {
     void withFallbackDoesNotInheritPadding() {
         // Padding is NOT inherited per CSS spec
         Padding parentPadding = Padding.uniform(2);
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .padding(parentPadding)
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().padding(parentPadding).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -150,14 +120,10 @@ class CssStyleResolverTest {
     @Test
     void toStyleIncludesInheritedProperties() {
         // Only foreground (color) and modifiers (text-style) are inherited
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .foreground(Color.BLUE)
-                .addModifier(Modifier.BOLD)
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().foreground(Color.BLUE)
+                .addModifier(Modifier.BOLD).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -171,13 +137,10 @@ class CssStyleResolverTest {
     @Test
     void withFallbackDoesNotInheritHeightConstraint() {
         // Height constraint is NOT inherited (element-specific layout property)
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .heightConstraint(Constraint.fill())
+        CssStyleResolver parent = CssStyleResolver.builder().heightConstraint(Constraint.fill())
                 .build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -188,13 +151,10 @@ class CssStyleResolverTest {
     @Test
     void withFallbackDoesNotInheritWidthConstraint() {
         // Width constraint is NOT inherited (element-specific layout property)
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .width(Constraint.percentage(50))
+        CssStyleResolver parent = CssStyleResolver.builder().width(Constraint.percentage(50))
                 .build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -204,15 +164,11 @@ class CssStyleResolverTest {
 
     @Test
     void childConstraintsOverrideParent() {
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .heightConstraint(Constraint.fill())
-                .width(Constraint.fill())
-                .build();
+        CssStyleResolver parent = CssStyleResolver.builder().heightConstraint(Constraint.fill())
+                .width(Constraint.fill()).build();
 
-        CssStyleResolver child = CssStyleResolver.builder()
-                .heightConstraint(Constraint.length(5))
-                .width(Constraint.fit())
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().heightConstraint(Constraint.length(5))
+                .width(Constraint.fit()).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -229,14 +185,11 @@ class CssStyleResolverTest {
     void inheritKeywordCopiesParentTypedPropertyValue() {
         // Parent has text-overflow: ellipsis
         CssStyleResolver parent = CssStyleResolver.builder()
-                .set(StandardProperties.TEXT_OVERFLOW, Overflow.ELLIPSIS)
-                .build();
+                .set(StandardProperties.TEXT_OVERFLOW, Overflow.ELLIPSIS).build();
 
         // Child uses inherit keyword for text-overflow
-        CssStyleResolver child = CssStyleResolver.builder()
-                .markAsInherited("text-overflow")
-                .foreground(Color.RED)
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().markAsInherited("text-overflow")
+                .foreground(Color.RED).build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
@@ -249,20 +202,20 @@ class CssStyleResolverTest {
     @Test
     void inheritKeywordCopiesParentRawValue() {
         // Parent has a custom raw property
-        CssStyleResolver parent = CssStyleResolver.builder()
-                .setRaw("custom-prop", "custom-value")
+        CssStyleResolver parent = CssStyleResolver.builder().setRaw("custom-prop", "custom-value")
                 .build();
 
         // Child uses inherit keyword for the custom property
-        CssStyleResolver child = CssStyleResolver.builder()
-                .markAsInherited("custom-prop")
-                .build();
+        CssStyleResolver child = CssStyleResolver.builder().markAsInherited("custom-prop").build();
 
         CssStyleResolver merged = child.withFallback(parent);
 
-        // Child should have the raw value from parent (can be tested via get with PropertyDefinition)
-        // Since custom-prop is not in registry, we test inheritance worked by checking raw values
-        // The value should be accessible via lazy conversion if a PropertyDefinition is provided
+        // Child should have the raw value from parent (can be tested via get with
+        // PropertyDefinition)
+        // Since custom-prop is not in registry, we test inheritance worked by checking
+        // raw values
+        // The value should be accessible via lazy conversion if a PropertyDefinition is
+        // provided
     }
 
 }

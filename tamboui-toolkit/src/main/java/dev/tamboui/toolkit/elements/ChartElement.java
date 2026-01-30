@@ -4,11 +4,18 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -18,27 +25,16 @@ import dev.tamboui.widgets.chart.Chart;
 import dev.tamboui.widgets.chart.Dataset;
 import dev.tamboui.widgets.chart.LegendPosition;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * A DSL wrapper for the Chart widget.
  * <p>
  * Plots datasets in a cartesian coordinate system.
+ * 
  * <pre>{@code
- * chart()
- *     .dataset(Dataset.builder()
- *         .name("Series 1")
- *         .data(new double[][] {{0,1}, {1,3}, {2,2}})
- *         .build())
- *     .xAxis(Axis.builder().bounds(0, 4).build())
- *     .yAxis(Axis.builder().bounds(0, 5).build())
- *     .title("My Chart")
- *     .rounded()
+ * chart().dataset(
+ *         Dataset.builder().name("Series 1").data(new double[][]{{0, 1}, {1, 3}, {2, 2}}).build())
+ *         .xAxis(Axis.builder().bounds(0, 4).build()).yAxis(Axis.builder().bounds(0, 5).build())
+ *         .title("My Chart").rounded()
  * }</pre>
  */
 public final class ChartElement extends StyledElement<ChartElement> {
@@ -60,7 +56,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Adds a dataset.
      *
-     * @param dataset the dataset to add
+     * @param dataset
+     *            the dataset to add
      * @return this element
      */
     public ChartElement dataset(Dataset dataset) {
@@ -71,7 +68,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets all datasets.
      *
-     * @param datasets the datasets to set
+     * @param datasets
+     *            the datasets to set
      * @return this element
      */
     public ChartElement datasets(Dataset... datasets) {
@@ -83,7 +81,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets all datasets from a list.
      *
-     * @param datasets the datasets to set
+     * @param datasets
+     *            the datasets to set
      * @return this element
      */
     public ChartElement datasets(List<Dataset> datasets) {
@@ -95,7 +94,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets the X-axis configuration.
      *
-     * @param xAxis the X-axis configuration
+     * @param xAxis
+     *            the X-axis configuration
      * @return this element
      */
     public ChartElement xAxis(Axis xAxis) {
@@ -106,7 +106,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets the Y-axis configuration.
      *
-     * @param yAxis the Y-axis configuration
+     * @param yAxis
+     *            the Y-axis configuration
      * @return this element
      */
     public ChartElement yAxis(Axis yAxis) {
@@ -117,10 +118,14 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets both axis bounds.
      *
-     * @param xMin the minimum X value
-     * @param xMax the maximum X value
-     * @param yMin the minimum Y value
-     * @param yMax the maximum Y value
+     * @param xMin
+     *            the minimum X value
+     * @param xMax
+     *            the maximum X value
+     * @param yMin
+     *            the minimum Y value
+     * @param yMax
+     *            the maximum Y value
      * @return this element
      */
     public ChartElement bounds(double xMin, double xMax, double yMin, double yMax) {
@@ -132,7 +137,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets the legend position.
      *
-     * @param position the legend position
+     * @param position
+     *            the legend position
      * @return this element
      */
     public ChartElement legendPosition(LegendPosition position) {
@@ -153,7 +159,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets the title.
      *
-     * @param title the chart title
+     * @param title
+     *            the chart title
      * @return this element
      */
     public ChartElement title(String title) {
@@ -174,7 +181,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element
      */
     public ChartElement borderColor(Color color) {
@@ -211,11 +219,8 @@ public final class ChartElement extends StyledElement<ChartElement> {
             return;
         }
 
-        Chart.Builder builder = Chart.builder()
-            .datasets(datasets)
-            .xAxis(xAxis)
-            .yAxis(yAxis)
-            .style(context.currentStyle());
+        Chart.Builder builder = Chart.builder().datasets(datasets).xAxis(xAxis).yAxis(yAxis)
+                .style(context.currentStyle());
 
         if (legendPosition != null) {
             builder.legendPosition(legendPosition);
@@ -224,8 +229,7 @@ public final class ChartElement extends StyledElement<ChartElement> {
         }
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

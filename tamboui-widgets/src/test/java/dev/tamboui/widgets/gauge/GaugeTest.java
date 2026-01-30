@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.gauge;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
@@ -11,8 +14,6 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -27,7 +28,8 @@ class GaugeTest {
 
         gauge.render(area, buffer);
 
-        // Label "0%" should be centered - in 10 chars, "0%" (2 chars) starts at position 4
+        // Label "0%" should be centered - in 10 chars, "0%" (2 chars) starts at
+        // position 4
         assertThat(buffer.get(4, 0).symbol()).isEqualTo("0");
         assertThat(buffer.get(5, 0).symbol()).isEqualTo("%");
         // No filled blocks at 0%
@@ -51,10 +53,9 @@ class GaugeTest {
     @Test
     @DisplayName("Gauge renders at 50%")
     void rendersAtFiftyPercent() {
-        Gauge gauge = Gauge.builder()
-            .percent(50)
-            .label("") // Empty label to check fill without interference
-            .build();
+        Gauge gauge = Gauge.builder().percent(50).label("") // Empty label to check fill without
+                                                            // interference
+                .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -84,10 +85,7 @@ class GaugeTest {
     @Test
     @DisplayName("Gauge with custom label")
     void withCustomLabel() {
-        Gauge gauge = Gauge.builder()
-            .percent(50)
-            .label("Loading...")
-            .build();
+        Gauge gauge = Gauge.builder().percent(50).label("Loading...").build();
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -102,10 +100,7 @@ class GaugeTest {
     @DisplayName("Gauge with gauge style")
     void withGaugeStyle() {
         Style gaugeStyle = Style.EMPTY.fg(Color.GREEN);
-        Gauge gauge = Gauge.builder()
-            .percent(100)
-            .gaugeStyle(gaugeStyle)
-            .build();
+        Gauge gauge = Gauge.builder().percent(100).gaugeStyle(gaugeStyle).build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -117,10 +112,7 @@ class GaugeTest {
     @Test
     @DisplayName("Gauge with block")
     void withBlock() {
-        Gauge gauge = Gauge.builder()
-            .percent(50)
-            .block(Block.bordered())
-            .build();
+        Gauge gauge = Gauge.builder().percent(50).block(Block.bordered()).build();
         Rect area = new Rect(0, 0, 12, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -136,10 +128,8 @@ class GaugeTest {
     @Test
     @DisplayName("Gauge without unicode uses only full blocks")
     void withoutUnicode() {
-        Gauge gauge = Gauge.builder()
-            .ratio(0.15) // 15% of 10 = 1.5 cells
-            .useUnicode(false)
-            .build();
+        Gauge gauge = Gauge.builder().ratio(0.15) // 15% of 10 = 1.5 cells
+                .useUnicode(false).build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -154,11 +144,9 @@ class GaugeTest {
     @Test
     @DisplayName("Gauge with unicode uses partial blocks")
     void withUnicode() {
-        Gauge gauge = Gauge.builder()
-            .ratio(0.15) // 15% of 10 = 1.5 cells
-            .useUnicode(true)
-            .label("") // Empty label to not interfere
-            .build();
+        Gauge gauge = Gauge.builder().ratio(0.15) // 15% of 10 = 1.5 cells
+                .useUnicode(true).label("") // Empty label to not interfere
+                .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -174,18 +162,18 @@ class GaugeTest {
     @DisplayName("Gauge percent validation")
     void percentValidation() {
         assertThatThrownBy(() -> Gauge.builder().percent(-1))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> Gauge.builder().percent(101))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("Gauge ratio validation")
     void ratioValidation() {
         assertThatThrownBy(() -> Gauge.builder().ratio(-0.1))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> Gauge.builder().ratio(1.1))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -206,10 +194,8 @@ class GaugeTest {
     @Test
     @DisplayName("Gauge uses GAUGE_COLOR property from StylePropertyResolver")
     void usesGaugeColorProperty() {
-        Gauge gauge = Gauge.builder()
-                .percent(100)
-                .styleResolver(TestStylePropertyResolver.of("gauge-color", Color.MAGENTA))
-                .build();
+        Gauge gauge = Gauge.builder().percent(100)
+                .styleResolver(TestStylePropertyResolver.of("gauge-color", Color.MAGENTA)).build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 

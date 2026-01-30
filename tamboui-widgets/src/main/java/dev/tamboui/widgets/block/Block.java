@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.block;
 
+import java.util.EnumSet;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Padding;
@@ -24,9 +27,6 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 
-import java.util.EnumSet;
-import java.util.List;
-
 /**
  * A block is a container widget with optional borders and titles.
  * <p>
@@ -35,106 +35,92 @@ import java.util.List;
  */
 public final class Block implements Widget {
     /**
-     * The {@code border-type} property for border style.
-     * This property is inheritable - nested panels inherit border type.
-     * Default: {@link BorderType#PLAIN}
+     * The {@code border-type} property for border style. This property is
+     * inheritable - nested panels inherit border type. Default:
+     * {@link BorderType#PLAIN}
      */
-    public static final PropertyDefinition<BorderType> BORDER_TYPE =
-            PropertyDefinition.builder("border-type", BorderTypeConverter.INSTANCE)
-                    .inheritable()
-                    .defaultValue(BorderType.PLAIN)
-                    .build();
+    public static final PropertyDefinition<BorderType> BORDER_TYPE = PropertyDefinition
+            .builder("border-type", BorderTypeConverter.INSTANCE).inheritable()
+            .defaultValue(BorderType.PLAIN).build();
 
     /**
-     * The {@code border-color} property.
-     * This property is NOT inheritable.
+     * The {@code border-color} property. This property is NOT inheritable.
      */
-    public static final PropertyDefinition<Color> BORDER_COLOR =
-            PropertyDefinition.of("border-color", ColorConverter.INSTANCE);
-
+    public static final PropertyDefinition<Color> BORDER_COLOR = PropertyDefinition
+            .of("border-color", ColorConverter.INSTANCE);
 
     // ═══════════════════════════════════════════════════════════════
     // Border character properties (strings)
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * The {@code border-chars} property for custom border character sets.
-     * Format: 8 quoted strings (top-h, bottom-h, left-v, right-v, tl, tr, bl, br).
-     * This property is NOT inheritable.
+     * The {@code border-chars} property for custom border character sets. Format: 8
+     * quoted strings (top-h, bottom-h, left-v, right-v, tl, tr, bl, br). This
+     * property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_CHARS =
-            PropertyDefinition.of("border-chars", StringConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_CHARS = PropertyDefinition
+            .of("border-chars", StringConverter.INSTANCE);
 
     /**
-     * The {@code border-top} property for the top horizontal border character.
-     * This property is NOT inheritable.
+     * The {@code border-top} property for the top horizontal border character. This
+     * property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_TOP =
-            PropertyDefinition.of("border-top", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_TOP = PropertyDefinition.of("border-top",
+            BorderCharConverter.INSTANCE);
 
     /**
-     * The {@code border-bottom} property for the bottom horizontal border character.
-     * This property is NOT inheritable.
+     * The {@code border-bottom} property for the bottom horizontal border
+     * character. This property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_BOTTOM =
-            PropertyDefinition.of("border-bottom", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_BOTTOM = PropertyDefinition
+            .of("border-bottom", BorderCharConverter.INSTANCE);
 
     /**
-     * The {@code border-left} property for the left vertical border character.
-     * This property is NOT inheritable.
+     * The {@code border-left} property for the left vertical border character. This
+     * property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_LEFT =
-            PropertyDefinition.of("border-left", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_LEFT = PropertyDefinition
+            .of("border-left", BorderCharConverter.INSTANCE);
 
     /**
      * The {@code border-right} property for the right vertical border character.
      * This property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_RIGHT =
-            PropertyDefinition.of("border-right", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_RIGHT = PropertyDefinition
+            .of("border-right", BorderCharConverter.INSTANCE);
 
     /**
-     * The {@code border-top-left} property for the top-left corner character.
-     * This property is NOT inheritable.
+     * The {@code border-top-left} property for the top-left corner character. This
+     * property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_TOP_LEFT =
-            PropertyDefinition.of("border-top-left", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_TOP_LEFT = PropertyDefinition
+            .of("border-top-left", BorderCharConverter.INSTANCE);
 
     /**
      * The {@code border-top-right} property for the top-right corner character.
      * This property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_TOP_RIGHT =
-            PropertyDefinition.of("border-top-right", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_TOP_RIGHT = PropertyDefinition
+            .of("border-top-right", BorderCharConverter.INSTANCE);
 
     /**
      * The {@code border-bottom-left} property for the bottom-left corner character.
      * This property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_BOTTOM_LEFT =
-            PropertyDefinition.of("border-bottom-left", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_BOTTOM_LEFT = PropertyDefinition
+            .of("border-bottom-left", BorderCharConverter.INSTANCE);
 
     /**
-     * The {@code border-bottom-right} property for the bottom-right corner character.
-     * This property is NOT inheritable.
+     * The {@code border-bottom-right} property for the bottom-right corner
+     * character. This property is NOT inheritable.
      */
-    public static final PropertyDefinition<String> BORDER_BOTTOM_RIGHT =
-            PropertyDefinition.of("border-bottom-right", BorderCharConverter.INSTANCE);
+    public static final PropertyDefinition<String> BORDER_BOTTOM_RIGHT = PropertyDefinition
+            .of("border-bottom-right", BorderCharConverter.INSTANCE);
 
     static {
-        PropertyRegistry.registerAll(
-                BORDER_TYPE,
-                BORDER_COLOR,
-                BORDER_CHARS,
-                BORDER_TOP,
-                BORDER_BOTTOM,
-                BORDER_LEFT,
-                BORDER_RIGHT,
-                BORDER_TOP_LEFT,
-                BORDER_TOP_RIGHT,
-                BORDER_BOTTOM_LEFT,
-                BORDER_BOTTOM_RIGHT
-        );
+        PropertyRegistry.registerAll(BORDER_TYPE, BORDER_COLOR, BORDER_CHARS, BORDER_TOP,
+                BORDER_BOTTOM, BORDER_LEFT, BORDER_RIGHT, BORDER_TOP_LEFT, BORDER_TOP_RIGHT,
+                BORDER_BOTTOM_LEFT, BORDER_BOTTOM_RIGHT);
     }
 
     private final Title title;
@@ -205,7 +191,8 @@ public final class Block implements Widget {
     /**
      * Returns the inner area after accounting for borders, titles, and padding.
      *
-     * @param area the outer area
+     * @param area
+     *            the outer area
      * @return the inner area
      */
     public Rect inner(Rect area) {
@@ -277,13 +264,15 @@ public final class Block implements Widget {
             return;
         }
 
-        // When merge strategy is not REPLACE, skip corner positions when rendering sides
+        // When merge strategy is not REPLACE, skip corner positions when rendering
+        // sides
         // This prevents corners from being merged with side characters incorrectly
         boolean isReplace = mergeStrategy == MergeStrategy.REPLACE;
         int leftInset = area.left() + (isReplace || !borders.contains(Borders.LEFT) ? 0 : 1);
         int topInset = area.top() + (isReplace || !borders.contains(Borders.TOP) ? 0 : 1);
         int rightInset = area.right() - 1 - (isReplace || !borders.contains(Borders.RIGHT) ? 0 : 1);
-        int bottomInset = area.bottom() - 1 - (isReplace || !borders.contains(Borders.BOTTOM) ? 0 : 1);
+        int bottomInset = area.bottom() - 1
+                - (isReplace || !borders.contains(Borders.BOTTOM) ? 0 : 1);
 
         // Top border (skip corners if not REPLACE, skip if character is empty)
         String topChar = set.topHorizontal();
@@ -317,8 +306,10 @@ public final class Block implements Widget {
             }
         }
 
-        // Corners - with customBorderSet, render if character is not empty (allows corners-only).
-        // Without customBorderSet, require both adjacent sides to be enabled (original behavior).
+        // Corners - with customBorderSet, render if character is not empty (allows
+        // corners-only).
+        // Without customBorderSet, require both adjacent sides to be enabled (original
+        // behavior).
         boolean hasTop = borders.contains(Borders.TOP);
         boolean hasBottom = borders.contains(Borders.BOTTOM);
         boolean hasLeft = borders.contains(Borders.LEFT);
@@ -334,12 +325,15 @@ public final class Block implements Widget {
             setBorderCell(buffer, area.right() - 1, area.top(), topRightChar, borderStyle);
         }
         String bottomLeftChar = set.bottomLeft();
-        if (!bottomLeftChar.isEmpty() && area.height() > 1 && (hasCustomSet || (hasBottom && hasLeft))) {
+        if (!bottomLeftChar.isEmpty() && area.height() > 1
+                && (hasCustomSet || (hasBottom && hasLeft))) {
             setBorderCell(buffer, area.left(), area.bottom() - 1, bottomLeftChar, borderStyle);
         }
         String bottomRightChar = set.bottomRight();
-        if (!bottomRightChar.isEmpty() && area.width() > 1 && area.height() > 1 && (hasCustomSet || (hasBottom && hasRight))) {
-            setBorderCell(buffer, area.right() - 1, area.bottom() - 1, bottomRightChar, borderStyle);
+        if (!bottomRightChar.isEmpty() && area.width() > 1 && area.height() > 1
+                && (hasCustomSet || (hasBottom && hasRight))) {
+            setBorderCell(buffer, area.right() - 1, area.bottom() - 1, bottomRightChar,
+                    borderStyle);
         }
     }
 
@@ -349,16 +343,17 @@ public final class Block implements Widget {
         // - fg = content color (filled part)
         // - bg = terminal default (empty part to blend with terminal background)
         // So we should NOT preserve existing background for these borders.
-        // For regular borders, preserving background allows content background to show through.
+        // For regular borders, preserving background allows content background to show
+        // through.
         Style mergedStyle;
         if (borderType == BorderType.QUADRANT_OUTSIDE) {
             // Don't preserve background - let border style control both fg and bg
             mergedStyle = borderStyle;
         } else {
-            // Preserve only the background color from existing style, not text modifiers like italic.
+            // Preserve only the background color from existing style, not text modifiers
+            // like italic.
             // Text modifiers should only apply to text content, not border characters.
-            Style baseStyle = existing.style().bg()
-                    .map(bg -> Style.EMPTY.bg(bg))
+            Style baseStyle = existing.style().bg().map(bg -> Style.EMPTY.bg(bg))
                     .orElse(Style.EMPTY);
             mergedStyle = baseStyle.patch(borderStyle);
         }
@@ -375,7 +370,8 @@ public final class Block implements Widget {
             }
 
             // Check if existing cell contains non-border text (like titles)
-            // If we're trying to draw a border over non-border text, preserve the text but update style
+            // If we're trying to draw a border over non-border text, preserve the text but
+            // update style
             if (existingIsText && newIsBorder) {
                 // Preserve existing non-border text (like titles) when drawing borders
                 // But update the style to match the new cell's style
@@ -425,14 +421,14 @@ public final class Block implements Widget {
         // Calculate x position based on alignment
         int x;
         switch (title.alignment()) {
-            case LEFT:
+            case LEFT :
                 x = startX;
                 break;
-            case CENTER:
+            case CENTER :
                 x = startX + (availableWidth - titleWidth) / 2;
                 break;
-            case RIGHT:
-            default:
+            case RIGHT :
+            default :
                 x = startX + availableWidth - titleWidth;
                 break;
         }
@@ -446,7 +442,8 @@ public final class Block implements Widget {
             titleLine = titleLine.patchStyle(borderStyle);
         }
 
-        // When merge strategy is active, only render title if cells are empty or borders
+        // When merge strategy is active, only render title if cells are empty or
+        // borders
         // This prevents overwriting titles from overlapping blocks
         if (mergeStrategy != MergeStrategy.REPLACE) {
             renderTitleWithMerge(x, y, titleLine, buffer);
@@ -456,7 +453,8 @@ public final class Block implements Widget {
     }
 
     private Line applyTitleOverflow(Line line, int maxWidth, Overflow overflow) {
-        if (overflow == Overflow.CLIP || overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
+        if (overflow == Overflow.CLIP || overflow == Overflow.WRAP_CHARACTER
+                || overflow == Overflow.WRAP_WORD) {
             // CLIP: just let it be clipped by the buffer
             // WRAP modes don't make sense for titles, treat as CLIP
             return line;
@@ -473,16 +471,16 @@ public final class Block implements Widget {
 
         String truncated;
         switch (overflow) {
-            case ELLIPSIS:
+            case ELLIPSIS :
                 truncated = truncateEnd(fullText, maxWidth);
                 break;
-            case ELLIPSIS_START:
+            case ELLIPSIS_START :
                 truncated = truncateStart(fullText, maxWidth);
                 break;
-            case ELLIPSIS_MIDDLE:
+            case ELLIPSIS_MIDDLE :
                 truncated = truncateMiddle(fullText, maxWidth);
                 break;
-            default:
+            default :
                 return line;
         }
 
@@ -503,7 +501,8 @@ public final class Block implements Widget {
         int availableWidth = maxWidth - CharWidth.of(ELLIPSIS);
         int leftWidth = (availableWidth + 1) / 2;
         int rightWidth = availableWidth / 2;
-        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS + CharWidth.substringByWidthFromEnd(text, rightWidth);
+        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS
+                + CharWidth.substringByWidthFromEnd(text, rightWidth);
     }
 
     private String lineToString(Line line) {
@@ -524,7 +523,7 @@ public final class Block implements Widget {
         int col = x;
         for (Span span : spans) {
             String content = span.content();
-            for (int i = 0; i < content.length(); ) {
+            for (int i = 0; i < content.length();) {
                 int codePoint = content.codePointAt(i);
                 String symbol = new String(Character.toChars(codePoint));
 
@@ -598,7 +597,8 @@ public final class Block implements Widget {
         /**
          * Sets the top title from a string.
          *
-         * @param title the title text
+         * @param title
+         *            the title text
          * @return this builder
          */
         public Builder title(String title) {
@@ -609,7 +609,8 @@ public final class Block implements Widget {
         /**
          * Sets the top title.
          *
-         * @param title the title
+         * @param title
+         *            the title
          * @return this builder
          */
         public Builder title(Title title) {
@@ -620,7 +621,8 @@ public final class Block implements Widget {
         /**
          * Sets the bottom title from a string.
          *
-         * @param title the title text
+         * @param title
+         *            the title text
          * @return this builder
          */
         public Builder titleBottom(String title) {
@@ -631,7 +633,8 @@ public final class Block implements Widget {
         /**
          * Sets the bottom title.
          *
-         * @param title the title
+         * @param title
+         *            the title
          * @return this builder
          */
         public Builder titleBottom(Title title) {
@@ -642,7 +645,8 @@ public final class Block implements Widget {
         /**
          * Sets the borders to draw.
          *
-         * @param borders the borders to draw
+         * @param borders
+         *            the borders to draw
          * @return this builder
          */
         public Builder borders(EnumSet<Borders> borders) {
@@ -653,7 +657,8 @@ public final class Block implements Widget {
         /**
          * Sets the border type.
          *
-         * @param borderType the border type
+         * @param borderType
+         *            the border type
          * @return this builder
          */
         public Builder borderType(BorderType borderType) {
@@ -668,11 +673,13 @@ public final class Block implements Widget {
          * Characters can be empty strings ({@code ""}) to skip rendering that element.
          * <p>
          * Example for corners-only rendering:
+         * 
          * <pre>{@code
          * customBorderSet(new BorderSet("", "", "", "", "┌", "┐", "└", "┘"))
          * }</pre>
          *
-         * @param borderSet the custom border set, or null to use borderType
+         * @param borderSet
+         *            the custom border set, or null to use borderType
          * @return this builder
          */
         public Builder customBorderSet(BorderSet borderSet) {
@@ -683,7 +690,8 @@ public final class Block implements Widget {
         /**
          * Sets the border color.
          *
-         * @param color the border color
+         * @param color
+         *            the border color
          * @return this builder
          */
         public Builder borderColor(Color color) {
@@ -694,7 +702,8 @@ public final class Block implements Widget {
         /**
          * Sets the background color.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -705,7 +714,8 @@ public final class Block implements Widget {
         /**
          * Sets the foreground (text) color.
          *
-         * @param color the foreground color
+         * @param color
+         *            the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {
@@ -716,7 +726,8 @@ public final class Block implements Widget {
         /**
          * Sets the border style.
          *
-         * @param borderStyle the border style
+         * @param borderStyle
+         *            the border style
          * @return this builder
          */
         public Builder borderStyle(Style borderStyle) {
@@ -727,10 +738,11 @@ public final class Block implements Widget {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code border-type} and {@code border-color}
-         * will fall back to resolved values if not set programmatically.
+         * When set, properties like {@code border-type} and {@code border-color} will
+         * fall back to resolved values if not set programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -741,7 +753,8 @@ public final class Block implements Widget {
         /**
          * Sets the block style.
          *
-         * @param style the block style
+         * @param style
+         *            the block style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -752,7 +765,8 @@ public final class Block implements Widget {
         /**
          * Sets the block padding.
          *
-         * @param padding the padding
+         * @param padding
+         *            the padding
          * @return this builder
          */
         public Builder padding(Padding padding) {
@@ -763,7 +777,8 @@ public final class Block implements Widget {
         /**
          * Sets uniform padding on all sides.
          *
-         * @param value the padding value
+         * @param value
+         *            the padding value
          * @return this builder
          */
         public Builder padding(int value) {
@@ -777,7 +792,8 @@ public final class Block implements Widget {
          * When blocks are rendered with overlapping borders, this strategy determines
          * how the borders are merged. See {@link MergeStrategy} for details.
          *
-         * @param mergeStrategy the merge strategy to use
+         * @param mergeStrategy
+         *            the merge strategy to use
          * @return this builder
          */
         public Builder mergeBorders(MergeStrategy mergeStrategy) {

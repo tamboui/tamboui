@@ -4,6 +4,22 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.TamboUIException;
 import dev.tamboui.layout.Rect;
@@ -18,8 +34,8 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.error.ErrorContext;
 import dev.tamboui.tui.error.RenderError;
@@ -35,40 +51,21 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-
 /**
  * Main entry point for running TUI applications.
  * <p>
- * TuiRunner handles the terminal lifecycle (raw mode, alternate screen, cursor),
- * event parsing, and the main event loop.
+ * TuiRunner handles the terminal lifecycle (raw mode, alternate screen,
+ * cursor), event parsing, and the main event loop.
  *
  * <pre>{@code
  * try (var tui = TuiRunner.create()) {
- *     tui.run(
- *         (event, runner) -> {
- *             if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
- *                 runner.quit();
- *                 return false;
- *             }
- *             return handleEvent(event);
- *         },
- *         frame -> renderUI(frame)
- *     );
+ *     tui.run((event, runner) -> {
+ *         if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
+ *             runner.quit();
+ *             return false;
+ *         }
+ *         return handleEvent(event);
+ *     }, frame -> renderUI(frame));
  * }
  * }</pre>
  *
@@ -113,7 +110,7 @@ public final class TuiRunner implements AutoCloseable {
         this.frameCount = new AtomicLong(0);
         this.lastTick = new AtomicReference<>(Instant.now());
         this.nextTickTime = new AtomicReference<>(
-            config.tickRate() != null ? Instant.now().plus(config.tickRate()) : null);
+                config.tickRate() != null ? Instant.now().plus(config.tickRate()) : null);
         this.errorHandler = config.errorHandler();
         this.errorOutput = config.errorOutput();
 
@@ -148,17 +145,20 @@ public final class TuiRunner implements AutoCloseable {
                 return t;
             });
             long periodMs = schedulerPeriod.toMillis();
-            scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
+            scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs,
+                    TimeUnit.MILLISECONDS);
         } else {
             this.scheduler = null;
         }
 
         // Create and start the input reader thread
-        this.inputReader = new TerminalInputReader(backend, eventQueue, config.bindings(), running, config.pollTimeout());
+        this.inputReader = new TerminalInputReader(backend, eventQueue, config.bindings(), running,
+                config.pollTimeout());
         this.inputReader.start();
 
         // Create debug overlay
-        this.debugOverlay = new DebugOverlay(backend.getClass().getSimpleName(), config.pollTimeout(), config.tickRate());
+        this.debugOverlay = new DebugOverlay(backend.getClass().getSimpleName(),
+                config.pollTimeout(), config.tickRate());
 
         // Store post-render processors
         this.postRenderProcessors = config.postRenderProcessors();
@@ -176,7 +176,8 @@ public final class TuiRunner implements AutoCloseable {
      * Creates a TuiRunner with default configuration.
      *
      * @return a new TuiRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static TuiRunner create() throws Exception {
         return create(TuiConfig.defaults());
@@ -185,9 +186,11 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Creates a TuiRunner with the specified configuration.
      *
-     * @param config the configuration to use
+     * @param config
+     *            the configuration to use
      * @return a new TuiRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static TuiRunner create(TuiConfig config) throws Exception {
         Backend backend = BackendFactory.create();
@@ -217,13 +220,16 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Runs the main event loop with the given handler and renderer.
      * <p>
-     * Exceptions thrown during rendering are caught and handled according to
-     * the configured {@link RenderErrorHandler}. By default, errors are displayed
-     * in the UI and the application waits for user dismissal before quitting.
+     * Exceptions thrown during rendering are caught and handled according to the
+     * configured {@link RenderErrorHandler}. By default, errors are displayed in
+     * the UI and the application waits for user dismissal before quitting.
      *
-     * @param handler  the event handler
-     * @param renderer the UI renderer
-     * @throws Exception if an error occurs during execution that cannot be handled
+     * @param handler
+     *            the event handler
+     * @param renderer
+     *            the UI renderer
+     * @throws Exception
+     *             if an error occurs during execution that cannot be handled
      */
     public void run(EventHandler handler, Renderer renderer) throws Exception {
         // Mark this thread as the render thread
@@ -329,14 +335,14 @@ public final class TuiRunner implements AutoCloseable {
         ErrorAction action = errorHandler.handle(lastError, context);
 
         switch (action) {
-            case DISPLAY_AND_QUIT:
+            case DISPLAY_AND_QUIT :
                 inErrorState = true;
                 renderErrorDisplay();
                 break;
-            case QUIT_IMMEDIATELY:
+            case QUIT_IMMEDIATELY :
                 quit();
                 break;
-            case SUPPRESS:
+            case SUPPRESS :
                 // Continue - error was logged by handler
                 break;
         }
@@ -358,12 +364,14 @@ public final class TuiRunner implements AutoCloseable {
             }
 
             // Scroll handling
-            if (keyEvent.code() == KeyCode.UP || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'k') {
+            if (keyEvent.code() == KeyCode.UP
+                    || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'k') {
                 if (errorScroll > 0) {
                     errorScroll--;
                     renderErrorDisplay();
                 }
-            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'j') {
+            } else if (keyEvent.code() == KeyCode.DOWN
+                    || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'j') {
                 errorScroll++;
                 renderErrorDisplay();
             } else if (keyEvent.code() == KeyCode.PAGE_UP) {
@@ -394,9 +402,11 @@ public final class TuiRunner implements AutoCloseable {
 
                 // Build the error message content
                 List<Line> lines = new ArrayList<Line>();
-                lines.add(Line.from(new Span(lastError.fullExceptionType(), Style.EMPTY.fg(Color.RED).bold())));
+                lines.add(Line.from(
+                        new Span(lastError.fullExceptionType(), Style.EMPTY.fg(Color.RED).bold())));
                 lines.add(Line.from(Span.raw("")));
-                lines.add(Line.from(new Span("Message: ", Style.EMPTY.bold()), Span.raw(lastError.message())));
+                lines.add(Line.from(new Span("Message: ", Style.EMPTY.bold()),
+                        Span.raw(lastError.message())));
                 lines.add(Line.from(Span.raw("")));
                 lines.add(Line.from(new Span("Stack trace:", Style.EMPTY.bold())));
 
@@ -407,13 +417,9 @@ public final class TuiRunner implements AutoCloseable {
                 }
 
                 // Create the block with border
-                Block block = Block.builder()
-                        .title(" ERROR ")
-                        .titleBottom(" Press 'q' to quit, arrows to scroll ")
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderColor(Color.RED)
-                        .build();
+                Block block = Block.builder().title(" ERROR ")
+                        .titleBottom(" Press 'q' to quit, arrows to scroll ").borders(Borders.ALL)
+                        .borderType(BorderType.ROUNDED).borderColor(Color.RED).build();
 
                 // Render the block
                 block.render(area, buffer);
@@ -446,14 +452,15 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Polls for the next event with the specified timeout.
      * <p>
-     * Events are read from the unified event queue, which receives events
-     * from both the dedicated input reader thread (keyboard/mouse) and
-     * the scheduler thread (ticks/resize).
+     * Events are read from the unified event queue, which receives events from both
+     * the dedicated input reader thread (keyboard/mouse) and the scheduler thread
+     * (ticks/resize).
      * <p>
-     * Input events (key/mouse) are prioritized over tick events to ensure
-     * UI responsiveness even when rendering is slow.
+     * Input events (key/mouse) are prioritized over tick events to ensure UI
+     * responsiveness even when rendering is slow.
      *
-     * @param timeout the maximum time to wait
+     * @param timeout
+     *            the maximum time to wait
      * @return the next event, or null if timeout expires
      */
     public Event pollEvent(Duration timeout) {
@@ -512,8 +519,10 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Draws the UI using the given renderer.
      *
-     * @param renderer the render function
-     * @throws TamboUIException if a terminal error occurs
+     * @param renderer
+     *            the render function
+     * @throws TamboUIException
+     *             if a terminal error occurs
      */
     public void draw(Consumer<Frame> renderer) {
         terminal.draw(renderer);
@@ -538,11 +547,12 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Executes an action on the render thread.
      * <p>
-     * If called from the render thread, the action is executed immediately.
-     * If called from another thread, the action is queued for execution
-     * on the render thread.
+     * If called from the render thread, the action is executed immediately. If
+     * called from another thread, the action is queued for execution on the render
+     * thread.
      * <p>
      * This is the primary API for safely updating UI state from background threads:
+     * 
      * <pre>{@code
      * // From a background thread:
      * runner.runOnRenderThread(() -> {
@@ -551,7 +561,8 @@ public final class TuiRunner implements AutoCloseable {
      * });
      * }</pre>
      *
-     * @param action the action to execute on the render thread
+     * @param action
+     *            the action to execute on the render thread
      */
     public void runOnRenderThread(Runnable action) {
         if (RenderThread.isRenderThread()) {
@@ -564,12 +575,12 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Queues an action to be executed on the render thread.
      * <p>
-     * Unlike {@link #runOnRenderThread(Runnable)}, this method always queues
-     * the action even if called from the render thread. This is useful when
-     * you want to defer execution until after the current event handling
-     * completes.
+     * Unlike {@link #runOnRenderThread(Runnable)}, this method always queues the
+     * action even if called from the render thread. This is useful when you want to
+     * defer execution until after the current event handling completes.
      *
-     * @param action the action to execute on the render thread
+     * @param action
+     *            the action to execute on the render thread
      */
     public void runLater(Runnable action) {
         eventQueue.offer(new UiRunnable(action));
@@ -605,7 +616,8 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Computes the scheduler period based on tick rate and resize grace period.
      *
-     * @param config the TUI configuration
+     * @param config
+     *            the TUI configuration
      * @return the scheduler period, or null if no scheduling is needed
      */
     private static Duration computeSchedulerPeriod(TuiConfig config) {
@@ -626,10 +638,11 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
-     * Scheduler callback that handles both tick events and resize-triggered redraws.
+     * Scheduler callback that handles both tick events and resize-triggered
+     * redraws.
      * <p>
-     * When a resize is detected, this posts a ResizeEvent to the event queue
-     * to be processed on the render thread.
+     * When a resize is detected, this posts a ResizeEvent to the event queue to be
+     * processed on the render thread.
      */
     private void schedulerCallback() {
         if (!running.get()) {
@@ -675,7 +688,8 @@ public final class TuiRunner implements AutoCloseable {
             inputReader.stop(config.pollTimeout().toMillis() * 2);
         }
 
-        // Remove shutdown hook if it was registered (prevents it from running during normal close)
+        // Remove shutdown hook if it was registered (prevents it from running during
+        // normal close)
         if (shutdownHook != null) {
             try {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
@@ -699,8 +713,8 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
-     * Performs terminal cleanup. This is idempotent and safe to call multiple times.
-     * Called both from close() and from the shutdown hook.
+     * Performs terminal cleanup. This is idempotent and safe to call multiple
+     * times. Called both from close() and from the shutdown hook.
      */
     private void cleanup() {
         // Ensure cleanup only runs once
@@ -733,17 +747,12 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Returns a new builder for constructing TuiRunner instances.
      * <p>
-     * The builder provides a fluent API for configuring all aspects of the
-     * TUI application including bindings and auto-registration of action handlers.
+     * The builder provides a fluent API for configuring all aspects of the TUI
+     * application including bindings and auto-registration of action handlers.
      *
      * <pre>{@code
-     * TuiRunner.builder()
-     *     .bindings(BindingSets.vim())
-     *     .eventHandler(app)
-     *     .renderer(app::render)
-     *     .autoBindingRegistration(true)
-     *     .build()
-     *     .run();
+     * TuiRunner.builder().bindings(BindingSets.vim()).eventHandler(app).renderer(app::render)
+     *         .autoBindingRegistration(true).build().run();
      * }</pre>
      *
      * @return a new builder
@@ -755,9 +764,9 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * Builder for {@link TuiRunner} instances.
      * <p>
-     * Provides a fluent API for configuring the TUI application including
-     * bindings, event handlers, renderers, and auto-registration of annotated
-     * action handlers.
+     * Provides a fluent API for configuring the TUI application including bindings,
+     * event handlers, renderers, and auto-registration of annotated action
+     * handlers.
      */
     public static final class Builder {
         private TuiConfig.Builder configBuilder = TuiConfig.builder();
@@ -772,7 +781,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets the bindings to use for action matching.
          *
-         * @param bindings the bindings
+         * @param bindings
+         *            the bindings
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
@@ -783,7 +793,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets the event handler for the application.
          *
-         * @param eventHandler the event handler
+         * @param eventHandler
+         *            the event handler
          * @return this builder
          */
         public Builder eventHandler(EventHandler eventHandler) {
@@ -794,7 +805,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets the renderer for the application.
          *
-         * @param renderer the renderer
+         * @param renderer
+         *            the renderer
          * @return this builder
          */
         public Builder renderer(Renderer renderer) {
@@ -805,10 +817,11 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Enables or disables automatic registration of action handlers.
          * <p>
-         * When enabled, methods annotated with {@code @OnAction} on the
-         * event handler object are automatically registered.
+         * When enabled, methods annotated with {@code @OnAction} on the event handler
+         * object are automatically registered.
          *
-         * @param enabled true to enable auto-registration
+         * @param enabled
+         *            true to enable auto-registration
          * @return this builder
          */
         public Builder autoBindingRegistration(boolean enabled) {
@@ -830,7 +843,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets whether to enable raw mode.
          *
-         * @param rawMode true to enable raw mode
+         * @param rawMode
+         *            true to enable raw mode
          * @return this builder
          */
         public Builder rawMode(boolean rawMode) {
@@ -841,7 +855,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets whether to use alternate screen buffer.
          *
-         * @param alternateScreen true to use alternate screen
+         * @param alternateScreen
+         *            true to use alternate screen
          * @return this builder
          */
         public Builder alternateScreen(boolean alternateScreen) {
@@ -852,7 +867,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets whether to hide the cursor.
          *
-         * @param hideCursor true to hide the cursor
+         * @param hideCursor
+         *            true to hide the cursor
          * @return this builder
          */
         public Builder hideCursor(boolean hideCursor) {
@@ -863,7 +879,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets whether to capture mouse events.
          *
-         * @param mouseCapture true to enable mouse capture
+         * @param mouseCapture
+         *            true to enable mouse capture
          * @return this builder
          */
         public Builder mouseCapture(boolean mouseCapture) {
@@ -874,7 +891,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets the timeout for polling events.
          *
-         * @param pollTimeout poll timeout duration
+         * @param pollTimeout
+         *            poll timeout duration
          * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
@@ -885,7 +903,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets the interval between tick events.
          *
-         * @param tickRate the tick interval
+         * @param tickRate
+         *            the tick interval
          * @return this builder
          */
         public Builder tickRate(Duration tickRate) {
@@ -906,11 +925,12 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets the resize grace period.
          * <p>
-         * This defines the maximum time before resize events are processed,
-         * ensuring the UI redraws promptly on terminal resize even when
-         * ticks are disabled or have a long interval.
+         * This defines the maximum time before resize events are processed, ensuring
+         * the UI redraws promptly on terminal resize even when ticks are disabled or
+         * have a long interval.
          *
-         * @param resizeGracePeriod the grace period, or null to disable automatic resize handling
+         * @param resizeGracePeriod
+         *            the grace period, or null to disable automatic resize handling
          * @return this builder
          */
         public Builder resizeGracePeriod(Duration resizeGracePeriod) {
@@ -921,7 +941,8 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Sets whether to register a JVM shutdown hook for cleanup.
          *
-         * @param shutdownHook true to register a shutdown hook
+         * @param shutdownHook
+         *            true to register a shutdown hook
          * @return this builder
          */
         public Builder shutdownHook(boolean shutdownHook) {
@@ -933,7 +954,8 @@ public final class TuiRunner implements AutoCloseable {
          * Builds the TuiRunner and returns an instance ready to run.
          *
          * @return a configured TuiRunner
-         * @throws Exception if terminal initialization fails
+         * @throws Exception
+         *             if terminal initialization fails
          */
         public ConfiguredRunner build() throws Exception {
             TuiConfig config = configBuilder.build();
@@ -941,8 +963,7 @@ public final class TuiRunner implements AutoCloseable {
 
             ActionHandler actionHandler = null;
             if (autoBindingRegistration && eventHandler != null) {
-                actionHandler = new ActionHandler(bindings)
-                        .registerAnnotated(eventHandler);
+                actionHandler = new ActionHandler(bindings).registerAnnotated(eventHandler);
             }
 
             return new ConfiguredRunner(runner, eventHandler, renderer, actionHandler);
@@ -952,8 +973,8 @@ public final class TuiRunner implements AutoCloseable {
     /**
      * A fully configured TuiRunner ready to execute.
      * <p>
-     * Created by {@link Builder#build()}, this class wraps a TuiRunner
-     * with its event handler, renderer, and optional action handler.
+     * Created by {@link Builder#build()}, this class wraps a TuiRunner with its
+     * event handler, renderer, and optional action handler.
      */
     public static final class ConfiguredRunner implements AutoCloseable {
         private final TuiRunner runner;
@@ -961,8 +982,8 @@ public final class TuiRunner implements AutoCloseable {
         private final Renderer renderer;
         private final ActionHandler actionHandler;
 
-        private ConfiguredRunner(TuiRunner runner, EventHandler eventHandler,
-                                 Renderer renderer, ActionHandler actionHandler) {
+        private ConfiguredRunner(TuiRunner runner, EventHandler eventHandler, Renderer renderer,
+                ActionHandler actionHandler) {
             this.runner = runner;
             this.eventHandler = eventHandler;
             this.renderer = renderer;
@@ -972,10 +993,11 @@ public final class TuiRunner implements AutoCloseable {
         /**
          * Runs the TUI application.
          * <p>
-         * If an action handler is configured, events are first dispatched
-         * to it before being passed to the event handler.
+         * If an action handler is configured, events are first dispatched to it before
+         * being passed to the event handler.
          *
-         * @throws Exception if an error occurs during execution
+         * @throws Exception
+         *             if an error occurs during execution
          */
         public void run() throws Exception {
             if (eventHandler == null || renderer == null) {

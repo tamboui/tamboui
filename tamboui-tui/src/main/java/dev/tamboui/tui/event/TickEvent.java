@@ -4,9 +4,9 @@
  */
 package dev.tamboui.tui.event;
 
-import dev.tamboui.tui.TuiConfig;
-
 import java.time.Duration;
+
+import dev.tamboui.tui.TuiConfig;
 
 /**
  * Represents an animation timer tick event.
@@ -22,8 +22,10 @@ public final class TickEvent implements Event {
     /**
      * Creates a tick event with the given frame count and elapsed time.
      *
-     * @param frameCount the total number of frames elapsed
-     * @param elapsed    the time elapsed since the last tick
+     * @param frameCount
+     *            the total number of frames elapsed
+     * @param elapsed
+     *            the time elapsed since the last tick
      */
     public TickEvent(long frameCount, Duration elapsed) {
         this.frameCount = frameCount;
@@ -33,8 +35,10 @@ public final class TickEvent implements Event {
     /**
      * Creates a tick event with the given frame count and elapsed time.
      *
-     * @param frameCount the total number of frames elapsed
-     * @param elapsed    the time elapsed since the last tick
+     * @param frameCount
+     *            the total number of frames elapsed
+     * @param elapsed
+     *            the time elapsed since the last tick
      * @return a new tick event
      */
     public static TickEvent of(long frameCount, Duration elapsed) {

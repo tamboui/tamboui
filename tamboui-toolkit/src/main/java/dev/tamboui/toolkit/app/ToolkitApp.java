@@ -10,9 +10,9 @@ import dev.tamboui.tui.TuiConfig;
 /**
  * Base class for DSL-based TUI applications.
  * <p>
- * Extend this class to create a TUI application. State is managed
- * through instance fields, and events are handled by elements via
- * their {@code onKeyEvent()} and {@code onMouseEvent()} handlers.
+ * Extend this class to create a TUI application. State is managed through
+ * instance fields, and events are handled by elements via their
+ * {@code onKeyEvent()} and {@code onMouseEvent()} handlers.
  *
  * <pre>{@code
  * import static toolkit.dev.tamboui.Toolkit.*;
@@ -22,24 +22,19 @@ import dev.tamboui.tui.TuiConfig;
  *
  *     @Override
  *     protected Element render() {
- *         return panel("Counter",
- *             text("Count: " + count).bold().cyan(),
- *             text("[Up/Down] to change").dim()
- *         )
- *         .rounded()
- *         .id("main")
- *         .focusable()
- *         .onKeyEvent(event -> {
- *             if (event.isUp()) {
- *                 count++;
- *                 return EventResult.HANDLED;
- *             }
- *             if (event.isDown()) {
- *                 count--;
- *                 return EventResult.HANDLED;
- *             }
- *             return EventResult.UNHANDLED;
- *         });
+ *         return panel("Counter", text("Count: " + count).bold().cyan(),
+ *                 text("[Up/Down] to change").dim()).rounded().id("main").focusable()
+ *                 .onKeyEvent(event -> {
+ *                     if (event.isUp()) {
+ *                         count++;
+ *                         return EventResult.HANDLED;
+ *                     }
+ *                     if (event.isDown()) {
+ *                         count--;
+ *                         return EventResult.HANDLED;
+ *                     }
+ *                     return EventResult.UNHANDLED;
+ *                 });
  *     }
  *
  *     public static void main(String[] args) throws Exception {
@@ -57,8 +52,7 @@ public abstract class ToolkitApp {
     private ToolkitRunner runner;
 
     /**
-     * Returns the TUI configuration for this application.
-     * Override to customize.
+     * Returns the TUI configuration for this application. Override to customize.
      *
      * @return the configuration
      */
@@ -67,8 +61,7 @@ public abstract class ToolkitApp {
     }
 
     /**
-     * Renders the application UI.
-     * Called each frame to get the current state.
+     * Renders the application UI. Called each frame to get the current state.
      * <p>
      * Add event handlers to elements using {@code onKeyEvent()} and
      * {@code onMouseEvent()} methods.
@@ -78,15 +71,14 @@ public abstract class ToolkitApp {
     protected abstract Element render();
 
     /**
-     * Called when the application starts, before the first render.
-     * Override to perform initialization.
+     * Called when the application starts, before the first render. Override to
+     * perform initialization.
      */
     protected void onStart() {
     }
 
     /**
-     * Called when the application is about to stop.
-     * Override to perform cleanup.
+     * Called when the application is about to stop. Override to perform cleanup.
      */
     protected void onStop() {
     }
@@ -94,7 +86,8 @@ public abstract class ToolkitApp {
     /**
      * Runs the application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
     public void run() throws Exception {
         try (ToolkitRunner r = ToolkitRunner.create(configure())) {

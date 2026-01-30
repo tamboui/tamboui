@@ -20,8 +20,10 @@ public interface EventHandler {
     /**
      * Handles an event.
      *
-     * @param event  the event to handle
-     * @param runner the TUI runner (can be used to call {@link TuiRunner#quit()})
+     * @param event
+     *            the event to handle
+     * @param runner
+     *            the TUI runner (can be used to call {@link TuiRunner#quit()})
      * @return {@code true} if the UI should be redrawn, {@code false} otherwise
      */
     boolean handle(Event event, TuiRunner runner);

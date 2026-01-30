@@ -5,9 +5,9 @@
 package dev.tamboui.widgets.block;
 
 /**
- * Characters used to draw a border.
- * Supports asymmetric borders where top/bottom horizontal and left/right vertical
- * characters can differ (e.g., for QUADRANT border types).
+ * Characters used to draw a border. Supports asymmetric borders where
+ * top/bottom horizontal and left/right vertical characters can differ (e.g.,
+ * for QUADRANT border types).
  */
 public final class BorderSet {
     private final String topHorizontal;
@@ -20,29 +20,30 @@ public final class BorderSet {
     private final String bottomRight;
 
     /**
-     * Creates a border set with separate characters for each side.
-     * Each character is sanitized to be at most a single character (or empty).
-     * Multi-character strings are truncated to the first character.
+     * Creates a border set with separate characters for each side. Each character
+     * is sanitized to be at most a single character (or empty). Multi-character
+     * strings are truncated to the first character.
      *
-     * @param topHorizontal the top horizontal border character
-     * @param bottomHorizontal the bottom horizontal border character
-     * @param leftVertical the left vertical border character
-     * @param rightVertical the right vertical border character
-     * @param topLeft the top-left corner character
-     * @param topRight the top-right corner character
-     * @param bottomLeft the bottom-left corner character
-     * @param bottomRight the bottom-right corner character
+     * @param topHorizontal
+     *            the top horizontal border character
+     * @param bottomHorizontal
+     *            the bottom horizontal border character
+     * @param leftVertical
+     *            the left vertical border character
+     * @param rightVertical
+     *            the right vertical border character
+     * @param topLeft
+     *            the top-left corner character
+     * @param topRight
+     *            the top-right corner character
+     * @param bottomLeft
+     *            the bottom-left corner character
+     * @param bottomRight
+     *            the bottom-right corner character
      */
-    public BorderSet(
-        String topHorizontal,
-        String bottomHorizontal,
-        String leftVertical,
-        String rightVertical,
-        String topLeft,
-        String topRight,
-        String bottomLeft,
-        String bottomRight
-    ) {
+    public BorderSet(String topHorizontal, String bottomHorizontal, String leftVertical,
+            String rightVertical, String topLeft, String topRight, String bottomLeft,
+            String bottomRight) {
         this.topHorizontal = sanitize(topHorizontal);
         this.bottomHorizontal = sanitize(bottomHorizontal);
         this.leftVertical = sanitize(leftVertical);
@@ -54,9 +55,9 @@ public final class BorderSet {
     }
 
     /**
-     * Sanitizes a border character to be at most a single character.
-     * Empty strings are preserved (they indicate "don't render").
-     * Multi-character strings are truncated to the first character.
+     * Sanitizes a border character to be at most a single character. Empty strings
+     * are preserved (they indicate "don't render"). Multi-character strings are
+     * truncated to the first character.
      */
     private static String sanitize(String value) {
         if (value == null || value.isEmpty()) {
@@ -148,13 +149,11 @@ public final class BorderSet {
         }
         BorderSet that = (BorderSet) o;
         return topHorizontal.equals(that.topHorizontal)
-            && bottomHorizontal.equals(that.bottomHorizontal)
-            && leftVertical.equals(that.leftVertical)
-            && rightVertical.equals(that.rightVertical)
-            && topLeft.equals(that.topLeft)
-            && topRight.equals(that.topRight)
-            && bottomLeft.equals(that.bottomLeft)
-            && bottomRight.equals(that.bottomRight);
+                && bottomHorizontal.equals(that.bottomHorizontal)
+                && leftVertical.equals(that.leftVertical)
+                && rightVertical.equals(that.rightVertical) && topLeft.equals(that.topLeft)
+                && topRight.equals(that.topRight) && bottomLeft.equals(that.bottomLeft)
+                && bottomRight.equals(that.bottomRight);
     }
 
     @Override
@@ -173,13 +172,13 @@ public final class BorderSet {
     @Override
     public String toString() {
         return String.format(
-            "BorderSet[topHorizontal=%s, bottomHorizontal=%s, leftVertical=%s, rightVertical=%s, topLeft=%s, topRight=%s, bottomLeft=%s, bottomRight=%s]",
-            topHorizontal, bottomHorizontal, leftVertical, rightVertical, topLeft, topRight, bottomLeft, bottomRight);
+                "BorderSet[topHorizontal=%s, bottomHorizontal=%s, leftVertical=%s, rightVertical=%s, topLeft=%s, topRight=%s, bottomLeft=%s, bottomRight=%s]",
+                topHorizontal, bottomHorizontal, leftVertical, rightVertical, topLeft, topRight,
+                bottomLeft, bottomRight);
     }
 
     /**
-     * Creates a new builder for BorderSet.
-     * All characters default to empty strings.
+     * Creates a new builder for BorderSet. All characters default to empty strings.
      *
      * @return a new builder
      */
@@ -188,8 +187,8 @@ public final class BorderSet {
     }
 
     /**
-     * Builder for BorderSet.
-     * All characters default to empty strings, allowing partial border definitions.
+     * Builder for BorderSet. All characters default to empty strings, allowing
+     * partial border definitions.
      */
     public static final class Builder {
         private String topHorizontal = "";
@@ -207,7 +206,8 @@ public final class BorderSet {
         /**
          * Sets the top horizontal border character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder topHorizontal(String c) {
@@ -218,7 +218,8 @@ public final class BorderSet {
         /**
          * Sets the bottom horizontal border character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder bottomHorizontal(String c) {
@@ -229,7 +230,8 @@ public final class BorderSet {
         /**
          * Sets both horizontal border characters (top and bottom).
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder horizontal(String c) {
@@ -241,7 +243,8 @@ public final class BorderSet {
         /**
          * Sets the left vertical border character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder leftVertical(String c) {
@@ -252,7 +255,8 @@ public final class BorderSet {
         /**
          * Sets the right vertical border character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder rightVertical(String c) {
@@ -263,7 +267,8 @@ public final class BorderSet {
         /**
          * Sets both vertical border characters (left and right).
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder vertical(String c) {
@@ -275,7 +280,8 @@ public final class BorderSet {
         /**
          * Sets the top-left corner character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder topLeft(String c) {
@@ -286,7 +292,8 @@ public final class BorderSet {
         /**
          * Sets the top-right corner character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder topRight(String c) {
@@ -297,7 +304,8 @@ public final class BorderSet {
         /**
          * Sets the bottom-left corner character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder bottomLeft(String c) {
@@ -308,7 +316,8 @@ public final class BorderSet {
         /**
          * Sets the bottom-right corner character.
          *
-         * @param c the character
+         * @param c
+         *            the character
          * @return this builder
          */
         public Builder bottomRight(String c) {
@@ -322,11 +331,8 @@ public final class BorderSet {
          * @return the configured BorderSet
          */
         public BorderSet build() {
-            return new BorderSet(
-                topHorizontal, bottomHorizontal,
-                leftVertical, rightVertical,
-                topLeft, topRight, bottomLeft, bottomRight
-            );
+            return new BorderSet(topHorizontal, bottomHorizontal, leftVertical, rightVertical,
+                    topLeft, topRight, bottomLeft, bottomRight);
         }
     }
 }

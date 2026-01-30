@@ -4,13 +4,14 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Padding;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Padding;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,7 +74,8 @@ class SpacingConverterTest {
         assertThat(converter.convert("invalid", Collections.emptyMap())).isEmpty();
         assertThat(converter.convert("", Collections.emptyMap())).isEmpty();
         assertThat(converter.convert(null, Collections.emptyMap())).isEmpty();
-        assertThat(converter.convert("1 2 3", Collections.emptyMap())).isEmpty(); // 3 values not supported
+        assertThat(converter.convert("1 2 3", Collections.emptyMap())).isEmpty(); // 3 values not
+                                                                                  // supported
     }
 
     @Test

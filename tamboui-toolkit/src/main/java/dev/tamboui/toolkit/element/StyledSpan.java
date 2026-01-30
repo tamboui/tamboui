@@ -4,29 +4,31 @@
  */
 package dev.tamboui.toolkit.element;
 
+import java.util.Optional;
+import java.util.Set;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.StyledAreaInfo;
 
-import java.util.Optional;
-import java.util.Set;
-
 /**
  * A styled span that can be targeted by CSS selectors.
  * <p>
- * This adapter interprets the core layer's CSS-unaware data types in
- * CSS terms:
+ * This adapter interprets the core layer's CSS-unaware data types in CSS terms:
  * <ul>
- *   <li>{@link dev.tamboui.style.Tags} are exposed as CSS classes</li>
- *   <li>{@code contextKey} is interpreted as an element ID for parent resolution</li>
- *   <li>{@code styleType()} returns "Span" for selector matching</li>
+ * <li>{@link dev.tamboui.style.Tags} are exposed as CSS classes</li>
+ * <li>{@code contextKey} is interpreted as an element ID for parent
+ * resolution</li>
+ * <li>{@code styleType()} returns "Span" for selector matching</li>
  * </ul>
  * <p>
  * This enables CSS selectors like:
  * <ul>
- *   <li>{@code .highlight} - matches all spans with the "highlight" tag</li>
- *   <li>{@code #myPanel .highlight} - matches "highlight" spans inside #myPanel</li>
- *   <li>{@code Span.error} - matches spans with type "Span" and class "error"</li>
+ * <li>{@code .highlight} - matches all spans with the "highlight" tag</li>
+ * <li>{@code #myPanel .highlight} - matches "highlight" spans inside
+ * #myPanel</li>
+ * <li>{@code Span.error} - matches spans with type "Span" and class
+ * "error"</li>
  * </ul>
  *
  * @see StyledAreaInfo
@@ -42,8 +44,10 @@ public final class StyledSpan implements Styleable {
     /**
      * Creates a new styled span wrapping the given StyledAreaInfo.
      *
-     * @param info            the styled area info to wrap
-     * @param elementRegistry the element registry for resolving context keys to elements
+     * @param info
+     *            the styled area info to wrap
+     * @param elementRegistry
+     *            the element registry for resolving context keys to elements
      */
     public StyledSpan(StyledAreaInfo info, ElementRegistry elementRegistry) {
         if (info == null) {
@@ -85,14 +89,14 @@ public final class StyledSpan implements Styleable {
             return Optional.empty();
         }
 
-        // Interpret contextKey as element ID, resolve to ElementInfo (which is Styleable)
-        return elementRegistry.query("#" + contextKey)
-                .map(ei -> (Styleable) ei);
+        // Interpret contextKey as element ID, resolve to ElementInfo (which is
+        // Styleable)
+        return elementRegistry.query("#" + contextKey).map(ei -> (Styleable) ei);
     }
 
     @Override
     public String toString() {
-        return String.format("StyledSpan[tags=%s, area=%s, parent=%s]",
-                cssClasses(), area(), info.contextKey());
+        return String.format("StyledSpan[tags=%s, area=%s, parent=%s]", cssClasses(), area(),
+                info.contextKey());
     }
 }

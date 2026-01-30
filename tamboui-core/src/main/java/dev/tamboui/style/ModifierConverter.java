@@ -15,15 +15,15 @@ import java.util.Set;
  * <p>
  * Supported values (case-insensitive, space-separated for multiple):
  * <ul>
- *   <li>{@code bold}</li>
- *   <li>{@code dim}</li>
- *   <li>{@code italic}</li>
- *   <li>{@code underlined} or {@code underline}</li>
- *   <li>{@code reversed} or {@code reverse}</li>
- *   <li>{@code crossed-out} or {@code strikethrough}</li>
- *   <li>{@code hidden}</li>
- *   <li>{@code blink} or {@code slow-blink}</li>
- *   <li>{@code rapid-blink}</li>
+ * <li>{@code bold}</li>
+ * <li>{@code dim}</li>
+ * <li>{@code italic}</li>
+ * <li>{@code underlined} or {@code underline}</li>
+ * <li>{@code reversed} or {@code reverse}</li>
+ * <li>{@code crossed-out} or {@code strikethrough}</li>
+ * <li>{@code hidden}</li>
+ * <li>{@code blink} or {@code slow-blink}</li>
+ * <li>{@code rapid-blink}</li>
  * </ul>
  * Multiple values can be space-separated: "bold italic underlined"
  */

@@ -4,18 +4,21 @@
  */
 package dev.tamboui.terminal;
 
+import java.util.EnumSet;
+
 import dev.tamboui.style.Hyperlink;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 
-import java.util.EnumSet;
-
 /**
- * Utility class for building ANSI-escaped strings from styled content.
- * This class provides methods to convert TamboUI styles to ANSI escape sequences
- * that can be used for direct terminal output without requiring the full TUI system.
+ * Utility class for building ANSI-escaped strings from styled content. This
+ * class provides methods to convert TamboUI styles to ANSI escape sequences
+ * that can be used for direct terminal output without requiring the full TUI
+ * system.
  *
- * <p>Example usage:
+ * <p>
+ * Example usage:
+ * 
  * <pre>{@code
  * Style style = Style.create().fg(Color.GREEN).bold();
  * String ansi = AnsiStringBuilder.styleToAnsi(style);
@@ -44,16 +47,17 @@ public final class AnsiStringBuilder {
     }
 
     /**
-     * Converts a {@link Style} to an ANSI SGR (Select Graphic Rendition) escape sequence.
-     * The returned string includes the complete escape sequence including the reset prefix
-     * and the 'm' terminator.
+     * Converts a {@link Style} to an ANSI SGR (Select Graphic Rendition) escape
+     * sequence. The returned string includes the complete escape sequence including
+     * the reset prefix and the 'm' terminator.
      *
-     * @param style the style to convert
+     * @param style
+     *            the style to convert
      * @return an ANSI escape sequence representing the style
      */
     public static String styleToAnsi(Style style) {
         StringBuilder sb = new StringBuilder();
-        sb.append(CSI).append("0");  // Reset first
+        sb.append(CSI).append("0"); // Reset first
 
         // Foreground color
         if (style.fg().isPresent()) {
@@ -88,10 +92,11 @@ public final class AnsiStringBuilder {
     /**
      * Generates an OSC8 hyperlink escape sequence to start a hyperlink.
      * <p>
-     * OSC8 format: {@code \033]8;id=<id>;<url>\033\\}
-     * If no ID is provided, the format is: {@code \033]8;;<url>\033\\}
+     * OSC8 format: {@code \033]8;id=<id>;<url>\033\\} If no ID is provided, the
+     * format is: {@code \033]8;;<url>\033\\}
      *
-     * @param hyperlink the hyperlink to generate a sequence for
+     * @param hyperlink
+     *            the hyperlink to generate a sequence for
      * @return the OSC8 escape sequence to start the hyperlink
      */
     public static String hyperlinkStart(Hyperlink hyperlink) {
@@ -120,9 +125,11 @@ public final class AnsiStringBuilder {
     /**
      * Escapes special characters in OSC parameter values.
      * <p>
-     * According to the OSC8 specification, semicolons and backslashes need to be escaped.
+     * According to the OSC8 specification, semicolons and backslashes need to be
+     * escaped.
      *
-     * @param param the parameter value to escape
+     * @param param
+     *            the parameter value to escape
      * @return the escaped parameter value
      */
     private static String escapeOscParam(String param) {

@@ -7,6 +7,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.Random;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -30,14 +32,11 @@ import dev.tamboui.widgets.chart.GraphType;
 import dev.tamboui.widgets.chart.LegendPosition;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-import java.util.Random;
-
 /**
  * Demo TUI application showcasing the Chart widget.
  * <p>
- * Demonstrates line charts, scatter plots, and bar charts
- * with animated data updates.
+ * Demonstrates line charts, scatter plots, and bar charts with animated data
+ * updates.
  */
 public class ChartDemo {
 
@@ -54,8 +53,11 @@ public class ChartDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new ChartDemo().run();
@@ -87,9 +89,10 @@ public class ChartDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -149,13 +152,10 @@ public class ChartDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Header
-                Constraint.fill(),     // Main content
-                Constraint.length(3)   // Footer
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Main content
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderMainContent(frame, layout.get(1));
@@ -163,17 +163,11 @@ public class ChartDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Chart Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("Chart Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -181,156 +175,88 @@ public class ChartDemo {
     private void renderMainContent(Frame frame, Rect area) {
         // Split into top (line chart) and bottom (scatter + bar)
         var rows = Layout.vertical()
-            .constraints(
-                Constraint.percentage(60),
-                Constraint.percentage(40)
-            )
-            .split(area);
+                .constraints(Constraint.percentage(60), Constraint.percentage(40)).split(area);
 
         renderLineChart(frame, rows.get(0));
 
         var bottomCols = Layout.horizontal()
-            .constraints(
-                Constraint.percentage(50),
-                Constraint.percentage(50)
-            )
-            .split(rows.get(1));
+                .constraints(Constraint.percentage(50), Constraint.percentage(50))
+                .split(rows.get(1));
 
         renderScatterPlot(frame, bottomCols.get(0));
         renderBarChart(frame, bottomCols.get(1));
     }
 
     private void renderLineChart(Frame frame, Rect area) {
-        var dataset1 = Dataset.builder()
-            .name("Sensor 1")
-            .data(tempData1)
-            .graphType(GraphType.LINE)
-            .marker(Dataset.Marker.DOT)
-            .style(Style.EMPTY.fg(Color.CYAN))
-            .build();
+        var dataset1 = Dataset.builder().name("Sensor 1").data(tempData1).graphType(GraphType.LINE)
+                .marker(Dataset.Marker.DOT).style(Style.EMPTY.fg(Color.CYAN)).build();
 
-        var dataset2 = Dataset.builder()
-            .name("Sensor 2")
-            .data(tempData2)
-            .graphType(GraphType.LINE)
-            .marker(Dataset.Marker.DOT)
-            .style(Style.EMPTY.fg(Color.MAGENTA))
-            .build();
+        var dataset2 = Dataset.builder().name("Sensor 2").data(tempData2).graphType(GraphType.LINE)
+                .marker(Dataset.Marker.DOT).style(Style.EMPTY.fg(Color.MAGENTA)).build();
 
-        var chart = Chart.builder()
-            .datasets(dataset1, dataset2)
-            .xAxis(Axis.builder()
-                .title("Time")
-                .bounds(0, 10)
-                .labels("0", "2", "4", "6", "8", "10")
-                .style(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .yAxis(Axis.builder()
-                .title("Temp")
-                .bounds(0, 100)
-                .labels("0", "25", "50", "75", "100")
-                .style(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .legendPosition(LegendPosition.TOP_RIGHT)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.BLUE))
-                .title(Title.from(Line.from(
-                    Span.raw(" Temperature Over Time ").blue()
-                )))
-                .build())
-            .build();
+        var chart = Chart.builder().datasets(dataset1, dataset2)
+                .xAxis(Axis.builder().title("Time").bounds(0, 10)
+                        .labels("0", "2", "4", "6", "8", "10")
+                        .style(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .yAxis(Axis
+                        .builder().title("Temp").bounds(0, 100).labels("0", "25", "50", "75", "100")
+                        .style(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .legendPosition(LegendPosition.TOP_RIGHT)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.BLUE))
+                        .title(Title.from(Line.from(Span.raw(" Temperature Over Time ").blue())))
+                        .build())
+                .build();
 
         frame.renderWidget(chart, area);
     }
 
     private void renderScatterPlot(Frame frame, Rect area) {
-        var dataset = Dataset.builder()
-            .name("Cluster")
-            .data(scatterData)
-            .graphType(GraphType.SCATTER)
-            .marker(Dataset.Marker.BRAILLE)
-            .style(Style.EMPTY.fg(Color.GREEN))
-            .build();
+        var dataset = Dataset.builder().name("Cluster").data(scatterData)
+                .graphType(GraphType.SCATTER).marker(Dataset.Marker.BRAILLE)
+                .style(Style.EMPTY.fg(Color.GREEN)).build();
 
-        var chart = Chart.builder()
-            .datasets(dataset)
-            .xAxis(Axis.builder()
-                .bounds(0, 100)
-                .labels("0", "50", "100")
-                .style(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .yAxis(Axis.builder()
-                .bounds(0, 100)
-                .labels("0", "50", "100")
-                .style(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .legendPosition(LegendPosition.TOP_LEFT)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.GREEN))
-                .title(Title.from(Line.from(
-                    Span.raw(" Scatter Plot ").green()
-                )))
-                .build())
-            .build();
+        var chart = Chart.builder().datasets(dataset)
+                .xAxis(Axis.builder().bounds(0, 100).labels("0", "50", "100")
+                        .style(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .yAxis(Axis.builder().bounds(0, 100).labels("0", "50", "100")
+                        .style(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .legendPosition(LegendPosition.TOP_LEFT)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.GREEN))
+                        .title(Title.from(Line.from(Span.raw(" Scatter Plot ").green()))).build())
+                .build();
 
         frame.renderWidget(chart, area);
     }
 
     private void renderBarChart(Frame frame, Rect area) {
-        var dataset = Dataset.builder()
-            .name("Values")
-            .data(barData)
-            .graphType(GraphType.BAR)
-            .style(Style.EMPTY.fg(Color.YELLOW))
-            .build();
+        var dataset = Dataset.builder().name("Values").data(barData).graphType(GraphType.BAR)
+                .style(Style.EMPTY.fg(Color.YELLOW)).build();
 
-        var chart = Chart.builder()
-            .datasets(dataset)
-            .xAxis(Axis.builder()
-                .bounds(0, 9)
-                .labels("0", "3", "6", "9")
-                .style(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .yAxis(Axis.builder()
-                .bounds(0, 100)
-                .labels("0", "50", "100")
-                .style(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .hideLegend()
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.YELLOW))
-                .title(Title.from(Line.from(
-                    Span.raw(" Bar Chart ").yellow()
-                )))
-                .build())
-            .build();
+        var chart = Chart.builder().datasets(dataset)
+                .xAxis(Axis.builder().bounds(0, 9).labels("0", "3", "6", "9")
+                        .style(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .yAxis(Axis.builder().bounds(0, 100).labels("0", "50", "100")
+                        .style(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .hideLegend()
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.YELLOW))
+                        .title(Title.from(Line.from(Span.raw(" Bar Chart ").yellow()))).build())
+                .build();
 
         frame.renderWidget(chart, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-            Span.raw(" Frame: ").dim(),
-            Span.raw(String.valueOf(frameCount)).bold().cyan(),
-            Span.raw("   "),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" Frame: ").dim(),
+                Span.raw(String.valueOf(frameCount)).bold().cyan(), Span.raw("   "),
+                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

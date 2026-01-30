@@ -4,24 +4,25 @@
  */
 package dev.tamboui.tfx.effects;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.TFxColorSpace;
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.Effect;
-import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Shader;
-import dev.tamboui.layout.Rect;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.tfx.CellFilter;
+import dev.tamboui.tfx.Effect;
+import dev.tamboui.tfx.EffectTimer;
+import dev.tamboui.tfx.Shader;
+import dev.tamboui.tfx.TFxColorSpace;
+import dev.tamboui.tfx.TFxDuration;
+
 /**
- * Shader implementation that runs multiple effects sequentially, one after another.
+ * Shader implementation that runs multiple effects sequentially, one after
+ * another.
  * <p>
- * SequentialEffect composes multiple effects into a chain, where each effect runs
- * to completion before the next one begins. This allows creating complex animations
- * by combining simple effects.
+ * SequentialEffect composes multiple effects into a chain, where each effect
+ * runs to completion before the next one begins. This allows creating complex
+ * animations by combining simple effects.
  * <p>
  * <b>Design Philosophy:</b>
  * <p>
@@ -31,43 +32,44 @@ import java.util.List;
  * <p>
  * <b>Behavior:</b>
  * <ul>
- *   <li>Effects run in the order they are provided</li>
- *   <li>Each effect must complete before the next begins</li>
- *   <li>Overflow time from completed effects is passed to the next effect</li>
- *   <li>The sequence completes when all effects have completed</li>
+ * <li>Effects run in the order they are provided</li>
+ * <li>Each effect must complete before the next begins</li>
+ * <li>Overflow time from completed effects is passed to the next effect</li>
+ * <li>The sequence completes when all effects have completed</li>
  * </ul>
  * <p>
  * <b>Usage Pattern:</b>
+ * 
  * <pre>{@code
  * // Chain fade-in followed by dissolve
- * Effect sequence = Fx.sequence(
- *     Fx.fadeFromFg(Color.BLACK, 500, Interpolation.QuadOut),
- *     Fx.dissolve(800, Interpolation.Linear)
- * );
+ * Effect sequence = Fx.sequence(Fx.fadeFromFg(Color.BLACK, 500, Interpolation.QuadOut),
+ *         Fx.dissolve(800, Interpolation.Linear));
  * }</pre>
  * <p>
- * This shader is typically created through {@link dev.tamboui.tfx.Fx#sequence(Effect...)}
- * rather than directly.
+ * This shader is typically created through
+ * {@link dev.tamboui.tfx.Fx#sequence(Effect...)} rather than directly.
  */
 public final class SequentialEffect implements Shader {
-    
+
     private final List<Effect> effects;
     private int current;
-    
+
     /**
      * Creates a sequential effect that runs the given effects one after another.
      *
-     * @param effects the list of effects to run sequentially
+     * @param effects
+     *            the list of effects to run sequentially
      * @return a new sequential effect
      */
     public static SequentialEffect of(List<Effect> effects) {
         return new SequentialEffect(effects);
     }
-    
+
     /**
      * Creates a sequential effect that runs the given effects one after another.
      *
-     * @param effects the effects to run sequentially
+     * @param effects
+     *            the effects to run sequentially
      * @return a new sequential effect
      */
     public static SequentialEffect of(Effect... effects) {
@@ -77,50 +79,50 @@ public final class SequentialEffect implements Shader {
         }
         return new SequentialEffect(effectList);
     }
-    
+
     private SequentialEffect(List<Effect> effects) {
         this.effects = new ArrayList<>(effects);
         this.current = 0;
     }
-    
+
     @Override
     public String name() {
         return "sequence";
     }
-    
+
     @Override
     public TFxDuration process(TFxDuration duration, Buffer buffer, Rect area) {
         TFxDuration remaining = duration;
-        
+
         while (remaining != null && !done()) {
             Effect effect = effects.get(current);
-            
+
             remaining = effect.process(remaining, buffer, area);
-            
+
             if (effect.done()) {
                 current++;
             }
         }
-        
+
         return remaining;
     }
-    
+
     @Override
     public boolean done() {
         return current >= effects.size();
     }
-    
+
     @Override
     public Rect area() {
         return null; // Sequential effects don't have a fixed area
     }
-    
+
     @Override
     public void setArea(Rect area) {
         // Effects are immutable, so we can't modify them
         // Area should be set when creating the effects
     }
-    
+
     @Override
     public EffectTimer timer() {
         // Sum up all effect durations
@@ -128,34 +130,34 @@ public final class SequentialEffect implements Shader {
         // The timer will be managed by individual effects
         return null;
     }
-    
+
     @Override
     public EffectTimer mutableTimer() {
         return timer();
     }
-    
+
     @Override
     public CellFilter cellFilter() {
         return null; // Sequential effects don't have a single filter
     }
-    
+
     @Override
     public void setCellFilter(CellFilter filter) {
         // Effects are immutable, so we can't modify them
         // Filter should be set when creating the effects
     }
-    
+
     @Override
     public TFxColorSpace colorSpace() {
         return null; // Sequential effects don't have a single color space
     }
-    
+
     @Override
     public void setColorSpace(TFxColorSpace colorSpace) {
         // Effects are immutable, so we can't modify them
         // ColorSpace should be set when creating the effects
     }
-    
+
     @Override
     public Shader copy() {
         List<Effect> copiedEffects = new ArrayList<>();
@@ -168,4 +170,3 @@ public final class SequentialEffect implements Shader {
         return copy;
     }
 }
-

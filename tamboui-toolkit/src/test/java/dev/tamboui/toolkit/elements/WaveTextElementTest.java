@@ -4,14 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.wavetext.WaveTextState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,13 +25,8 @@ class WaveTextElementTest {
     @Test
     @DisplayName("WaveTextElement fluent API chains correctly")
     void fluentApiChaining() {
-        WaveTextElement element = waveText("Loading...")
-            .color(Color.CYAN)
-            .dimFactor(0.5)
-            .peakWidth(5)
-            .speed(1.5)
-            .oscillate()
-            .inverted();
+        WaveTextElement element = waveText("Loading...").color(Color.CYAN).dimFactor(0.5)
+                .peakWidth(5).speed(1.5).oscillate().inverted();
 
         assertThat(element).isInstanceOf(WaveTextElement.class);
     }
@@ -94,9 +90,7 @@ class WaveTextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        waveText("Test")
-            .color(Color.CYAN)
-            .render(frame, area, RenderContext.empty());
+        waveText("Test").color(Color.CYAN).render(frame, area, RenderContext.empty());
 
         // Should render without error
         assertThat(buffer).isNotNull();

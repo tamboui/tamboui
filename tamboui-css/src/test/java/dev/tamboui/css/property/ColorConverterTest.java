@@ -4,14 +4,12 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.style.Color;
-import dev.tamboui.style.ColorConverter;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -84,7 +82,8 @@ class ColorConverterTest {
 
     @Test
     void variableResolutionHappensAtCssLevel() {
-        // The core ColorConverter doesn't handle variables - that happens in the CSS layer
+        // The core ColorConverter doesn't handle variables - that happens in the CSS
+        // layer
         // When a variable is pre-resolved, the value is passed directly
         assertThat(converter.convert("blue")).hasValue(Color.BLUE);
     }

@@ -4,12 +4,13 @@
  */
 package dev.tamboui.backend.panama;
 
-import dev.tamboui.terminal.BackendProvider;
+import java.util.ServiceLoader;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
-import java.util.ServiceLoader;
+import dev.tamboui.terminal.BackendProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -12,8 +12,8 @@ import dev.tamboui.tui.event.Event;
  * Input triggers define what keyboard or mouse input activates an action.
  * Implementations include:
  * <ul>
- *   <li>{@link KeyTrigger} - Triggers on keyboard events</li>
- *   <li>{@link MouseTrigger} - Triggers on mouse events</li>
+ * <li>{@link KeyTrigger} - Triggers on keyboard events</li>
+ * <li>{@link MouseTrigger} - Triggers on mouse events</li>
  * </ul>
  *
  * @see KeyTrigger
@@ -24,7 +24,8 @@ public interface InputTrigger {
     /**
      * Returns true if this trigger matches the given event.
      *
-     * @param event the event to match against
+     * @param event
+     *            the event to match against
      * @return true if the trigger matches
      */
     boolean matches(Event event);

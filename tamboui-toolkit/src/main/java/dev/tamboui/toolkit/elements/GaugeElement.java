@@ -4,48 +4,47 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.gauge.Gauge;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * A DSL wrapper for the Gauge widget.
  * <p>
  * Displays a progress bar filled according to the progress value.
+ * 
  * <pre>{@code
- * gauge(0.75)
- *     .label("75% complete")
- *     .gaugeColor(Color.GREEN)
- *     .title("Progress")
+ * gauge(0.75).label("75% complete").gaugeColor(Color.GREEN).title("Progress")
  * }</pre>
  *
  * <h2>CSS Child Selectors</h2>
  * <p>
  * The following child selectors can be used to style sub-components:
  * <ul>
- *   <li>{@code GaugeElement-filled} - The filled portion of the gauge</li>
+ * <li>{@code GaugeElement-filled} - The filled portion of the gauge</li>
  * </ul>
  * <p>
  * Example CSS:
+ * 
  * <pre>{@code
  * GaugeElement-filled { color: green; }
  * }</pre>
  * <p>
- * Note: Programmatic styles set via {@link #gaugeStyle(Style)} or {@link #gaugeColor(Color)}
- * take precedence over CSS styles.
+ * Note: Programmatic styles set via {@link #gaugeStyle(Style)} or
+ * {@link #gaugeColor(Color)} take precedence over CSS styles.
  */
 public final class GaugeElement extends StyledElement<GaugeElement> {
 
@@ -68,7 +67,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Creates a new gauge element with the given progress ratio.
      *
-     * @param ratio the progress ratio between 0.0 and 1.0
+     * @param ratio
+     *            the progress ratio between 0.0 and 1.0
      */
     public GaugeElement(double ratio) {
         this.ratio = Math.max(0.0, Math.min(1.0, ratio));
@@ -77,7 +77,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Creates a new gauge element with the given percentage.
      *
-     * @param percent the progress percentage between 0 and 100
+     * @param percent
+     *            the progress percentage between 0 and 100
      */
     public GaugeElement(int percent) {
         this.ratio = Math.max(0, Math.min(100, percent)) / 100.0;
@@ -86,7 +87,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Sets the progress as a ratio (0.0-1.0).
      *
-     * @param ratio the progress ratio
+     * @param ratio
+     *            the progress ratio
      * @return this element
      */
     public GaugeElement ratio(double ratio) {
@@ -105,7 +107,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Sets the label displayed in the gauge.
      *
-     * @param label the label text
+     * @param label
+     *            the label text
      * @return this element
      */
     public GaugeElement label(String label) {
@@ -116,7 +119,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Sets the style for the filled portion.
      *
-     * @param style the gauge style
+     * @param style
+     *            the gauge style
      * @return this element
      */
     public GaugeElement gaugeStyle(Style style) {
@@ -127,7 +131,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Sets the color for the filled portion.
      *
-     * @param color the gauge color
+     * @param color
+     *            the gauge color
      * @return this element
      */
     public GaugeElement gaugeColor(Color color) {
@@ -138,7 +143,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Enables or disables unicode block characters.
      *
-     * @param useUnicode {@code true} to use unicode block characters
+     * @param useUnicode
+     *            {@code true} to use unicode block characters
      * @return this element
      */
     public GaugeElement useUnicode(boolean useUnicode) {
@@ -149,7 +155,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Sets the title for the gauge's border.
      *
-     * @param title the gauge title
+     * @param title
+     *            the gauge title
      * @return this element
      */
     public GaugeElement title(String title) {
@@ -170,7 +177,8 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element
      */
     public GaugeElement borderColor(Color color) {
@@ -212,21 +220,18 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
         Style effectiveStyle = context.currentStyle();
 
         // Resolve filled style with priority: explicit > CSS > default
-        Style effectiveGaugeStyle = resolveEffectiveStyle(context, "filled", gaugeStyle, DEFAULT_FILLED_STYLE);
+        Style effectiveGaugeStyle = resolveEffectiveStyle(context, "filled", gaugeStyle,
+                DEFAULT_FILLED_STYLE);
 
-        Gauge.Builder builder = Gauge.builder()
-            .ratio(ratio)
-            .gaugeStyle(effectiveGaugeStyle)
-            .style(effectiveStyle)
-            .useUnicode(useUnicode);
+        Gauge.Builder builder = Gauge.builder().ratio(ratio).gaugeStyle(effectiveGaugeStyle)
+                .style(effectiveStyle).useUnicode(useUnicode);
 
         if (label != null) {
             builder.label(label);
         }
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

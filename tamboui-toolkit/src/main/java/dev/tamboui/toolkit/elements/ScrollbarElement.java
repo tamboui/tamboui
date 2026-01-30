@@ -4,12 +4,12 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
@@ -18,24 +18,24 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  * A DSL wrapper for the Scrollbar widget.
  * <p>
  * Displays a scrollbar for scroll position indication.
+ * 
  * <pre>{@code
- * scrollbar()
- *     .vertical()
- *     .state(scrollbarState)
- *     .thumbColor(Color.YELLOW)
+ * scrollbar().vertical().state(scrollbarState).thumbColor(Color.YELLOW)
  * }</pre>
  *
  * <h2>CSS Child Selectors</h2>
  * <p>
  * The following child selectors can be used to style sub-components:
  * <ul>
- *   <li>{@code ScrollbarElement-thumb} - The thumb/handle of the scrollbar</li>
- *   <li>{@code ScrollbarElement-track} - The track/background of the scrollbar</li>
- *   <li>{@code ScrollbarElement-begin} - The begin marker (up/left arrow)</li>
- *   <li>{@code ScrollbarElement-end} - The end marker (down/right arrow)</li>
+ * <li>{@code ScrollbarElement-thumb} - The thumb/handle of the scrollbar</li>
+ * <li>{@code ScrollbarElement-track} - The track/background of the
+ * scrollbar</li>
+ * <li>{@code ScrollbarElement-begin} - The begin marker (up/left arrow)</li>
+ * <li>{@code ScrollbarElement-end} - The end marker (down/right arrow)</li>
  * </ul>
  * <p>
  * Example CSS:
+ * 
  * <pre>{@code
  * ScrollbarElement-thumb { color: yellow; }
  * ScrollbarElement-track { color: gray; }
@@ -43,7 +43,8 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  * ScrollbarElement-end { color: white; }
  * }</pre>
  * <p>
- * Note: Programmatic styles set via the corresponding setter methods take precedence over CSS styles.
+ * Note: Programmatic styles set via the corresponding setter methods take
+ * precedence over CSS styles.
  */
 public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
 
@@ -111,7 +112,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the orientation.
      *
-     * @param orientation the scrollbar orientation
+     * @param orientation
+     *            the scrollbar orientation
      * @return this element
      */
     public ScrollbarElement orientation(ScrollbarOrientation orientation) {
@@ -122,7 +124,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the scrollbar state.
      *
-     * @param state the scrollbar state
+     * @param state
+     *            the scrollbar state
      * @return this element
      */
     public ScrollbarElement state(ScrollbarState state) {
@@ -133,23 +136,25 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Creates a new state with the given parameters.
      *
-     * @param contentLength the total content length
-     * @param viewportLength the visible viewport length
-     * @param position the current scroll position
+     * @param contentLength
+     *            the total content length
+     * @param viewportLength
+     *            the visible viewport length
+     * @param position
+     *            the current scroll position
      * @return this element
      */
     public ScrollbarElement state(int contentLength, int viewportLength, int position) {
-        this.state = new ScrollbarState()
-            .contentLength(contentLength)
-            .viewportContentLength(viewportLength)
-            .position(position);
+        this.state = new ScrollbarState().contentLength(contentLength)
+                .viewportContentLength(viewportLength).position(position);
         return this;
     }
 
     /**
      * Sets the symbol set.
      *
-     * @param symbols the symbol set to use
+     * @param symbols
+     *            the symbol set to use
      * @return this element
      */
     public ScrollbarElement symbols(Scrollbar.SymbolSet symbols) {
@@ -164,15 +169,16 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
      */
     public ScrollbarElement doubleLine() {
         this.symbols = orientation.isVertical()
-            ? Scrollbar.SymbolSet.DOUBLE_VERTICAL
-            : Scrollbar.SymbolSet.DOUBLE_HORIZONTAL;
+                ? Scrollbar.SymbolSet.DOUBLE_VERTICAL
+                : Scrollbar.SymbolSet.DOUBLE_HORIZONTAL;
         return this;
     }
 
     /**
      * Sets the thumb symbol.
      *
-     * @param symbol the thumb symbol character
+     * @param symbol
+     *            the thumb symbol character
      * @return this element
      */
     public ScrollbarElement thumbSymbol(String symbol) {
@@ -183,7 +189,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the track symbol.
      *
-     * @param symbol the track symbol character
+     * @param symbol
+     *            the track symbol character
      * @return this element
      */
     public ScrollbarElement trackSymbol(String symbol) {
@@ -194,7 +201,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the begin marker symbol.
      *
-     * @param symbol the begin marker symbol character
+     * @param symbol
+     *            the begin marker symbol character
      * @return this element
      */
     public ScrollbarElement beginSymbol(String symbol) {
@@ -205,7 +213,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the end marker symbol.
      *
-     * @param symbol the end marker symbol character
+     * @param symbol
+     *            the end marker symbol character
      * @return this element
      */
     public ScrollbarElement endSymbol(String symbol) {
@@ -227,7 +236,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the thumb style.
      *
-     * @param style the thumb style
+     * @param style
+     *            the thumb style
      * @return this element
      */
     public ScrollbarElement thumbStyle(Style style) {
@@ -238,7 +248,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the thumb color.
      *
-     * @param color the thumb color
+     * @param color
+     *            the thumb color
      * @return this element
      */
     public ScrollbarElement thumbColor(Color color) {
@@ -249,7 +260,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the track style.
      *
-     * @param style the track style
+     * @param style
+     *            the track style
      * @return this element
      */
     public ScrollbarElement trackStyle(Style style) {
@@ -260,7 +272,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the track color.
      *
-     * @param color the track color
+     * @param color
+     *            the track color
      * @return this element
      */
     public ScrollbarElement trackColor(Color color) {
@@ -271,7 +284,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the begin marker style.
      *
-     * @param style the begin marker style
+     * @param style
+     *            the begin marker style
      * @return this element
      */
     public ScrollbarElement beginStyle(Style style) {
@@ -282,7 +296,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     /**
      * Sets the end marker style.
      *
-     * @param style the end marker style
+     * @param style
+     *            the end marker style
      * @return this element
      */
     public ScrollbarElement endStyle(Style style) {
@@ -293,7 +308,8 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     @Override
     public int preferredWidth() {
         // Scrollbar is 1 cell wide for vertical orientation
-        // For horizontal, use viewport length (visible area) capped at a reasonable size
+        // For horizontal, use viewport length (visible area) capped at a reasonable
+        // size
         if (orientation.isVertical()) {
             return 1;
         }
@@ -319,14 +335,17 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
         }
 
         // Resolve styles with priority: explicit > CSS > default
-        Style effectiveThumbStyle = resolveEffectiveStyle(context, "thumb", thumbStyle, DEFAULT_THUMB_STYLE);
-        Style effectiveTrackStyle = resolveEffectiveStyle(context, "track", trackStyle, DEFAULT_TRACK_STYLE);
-        Style effectiveBeginStyle = resolveEffectiveStyle(context, "begin", beginStyle, DEFAULT_BEGIN_STYLE);
-        Style effectiveEndStyle = resolveEffectiveStyle(context, "end", endStyle, DEFAULT_END_STYLE);
+        Style effectiveThumbStyle = resolveEffectiveStyle(context, "thumb", thumbStyle,
+                DEFAULT_THUMB_STYLE);
+        Style effectiveTrackStyle = resolveEffectiveStyle(context, "track", trackStyle,
+                DEFAULT_TRACK_STYLE);
+        Style effectiveBeginStyle = resolveEffectiveStyle(context, "begin", beginStyle,
+                DEFAULT_BEGIN_STYLE);
+        Style effectiveEndStyle = resolveEffectiveStyle(context, "end", endStyle,
+                DEFAULT_END_STYLE);
 
-        Scrollbar.Builder builder = Scrollbar.builder()
-            .orientation(orientation)
-            .style(context.currentStyle());
+        Scrollbar.Builder builder = Scrollbar.builder().orientation(orientation)
+                .style(context.currentStyle());
 
         if (symbols != null) {
             builder.symbols(symbols);
@@ -366,7 +385,9 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
         }
 
         Scrollbar widget = builder.build();
-        ScrollbarState effectiveState = state != null ? state : new ScrollbarState().contentLength(100);
+        ScrollbarState effectiveState = state != null
+                ? state
+                : new ScrollbarState().contentLength(100);
         frame.renderStatefulWidget(widget, area, effectiveState);
     }
 }

@@ -4,9 +4,10 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Fraction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -93,8 +94,7 @@ class ExpressionTest {
     @DisplayName("Division by zero throws")
     void divisionByZeroThrows() {
         Expression expr = Expression.constant(10);
-        assertThatThrownBy(() -> expr.divide(0))
-                .isInstanceOf(ArithmeticException.class);
+        assertThatThrownBy(() -> expr.divide(0)).isInstanceOf(ArithmeticException.class);
     }
 
     @Test
@@ -111,8 +111,7 @@ class ExpressionTest {
     @DisplayName("Create equality constraint")
     void createEqualityConstraint() {
         Variable x = new Variable("x");
-        CassowaryConstraint c = Expression.variable(x)
-                .equalTo(100, Strength.REQUIRED);
+        CassowaryConstraint c = Expression.variable(x).equalTo(100, Strength.REQUIRED);
 
         assertThat(c.relation()).isEqualTo(Relation.EQ);
         assertThat(c.strength()).isEqualTo(Strength.REQUIRED);
@@ -122,8 +121,7 @@ class ExpressionTest {
     @DisplayName("Create less than or equal constraint")
     void createLessThanOrEqualConstraint() {
         Variable x = new Variable("x");
-        CassowaryConstraint c = Expression.variable(x)
-                .lessThanOrEqual(100, Strength.STRONG);
+        CassowaryConstraint c = Expression.variable(x).lessThanOrEqual(100, Strength.STRONG);
 
         assertThat(c.relation()).isEqualTo(Relation.LE);
         assertThat(c.strength()).isEqualTo(Strength.STRONG);
@@ -133,8 +131,7 @@ class ExpressionTest {
     @DisplayName("Create greater than or equal constraint")
     void createGreaterThanOrEqualConstraint() {
         Variable x = new Variable("x");
-        CassowaryConstraint c = Expression.variable(x)
-                .greaterThanOrEqual(50, Strength.MEDIUM);
+        CassowaryConstraint c = Expression.variable(x).greaterThanOrEqual(50, Strength.MEDIUM);
 
         assertThat(c.relation()).isEqualTo(Relation.GE);
         assertThat(c.strength()).isEqualTo(Strength.MEDIUM);

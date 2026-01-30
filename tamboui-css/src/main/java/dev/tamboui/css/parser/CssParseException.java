@@ -15,8 +15,10 @@ public final class CssParseException extends RuntimeException {
     /**
      * Creates a new parse exception with a message and position.
      *
-     * @param message  the error message
-     * @param position the position in the source where the error occurred
+     * @param message
+     *            the error message
+     * @param position
+     *            the position in the source where the error occurred
      */
     public CssParseException(String message, Token.Position position) {
         super(formatMessage(message, position));
@@ -26,8 +28,10 @@ public final class CssParseException extends RuntimeException {
     /**
      * Creates a new parse exception with a message and cause.
      *
-     * @param message the error message
-     * @param cause   the underlying cause
+     * @param message
+     *            the error message
+     * @param cause
+     *            the underlying cause
      */
     public CssParseException(String message, Throwable cause) {
         super(message, cause);
@@ -45,8 +49,8 @@ public final class CssParseException extends RuntimeException {
 
     private static String formatMessage(String message, Token.Position position) {
         if (position.line() > 0) {
-            return String.format("CSS parse error at line %d, column %d: %s",
-                    position.line(), position.column(), message);
+            return String.format("CSS parse error at line %d, column %d: %s", position.line(),
+                    position.column(), message);
         }
         return "CSS parse error: " + message;
     }

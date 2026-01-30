@@ -28,19 +28,17 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.wavetext.WaveText;
 import dev.tamboui.widgets.wavetext.WaveTextState;
 
-import java.io.IOException;
-
 /**
  * Demo TUI application showcasing the WaveText widget.
  * <p>
  * Demonstrates various configuration options:
  * <ul>
- *   <li>Default mode (dark shadow on bright text)</li>
- *   <li>Inverted mode (bright peak on dim text)</li>
- *   <li>Different speeds</li>
- *   <li>Different peak widths</li>
- *   <li>Multiple peaks</li>
- *   <li>Loop vs oscillate modes</li>
+ * <li>Default mode (dark shadow on bright text)</li>
+ * <li>Inverted mode (bright peak on dim text)</li>
+ * <li>Different speeds</li>
+ * <li>Different peak widths</li>
+ * <li>Multiple peaks</li>
+ * <li>Loop vs oscillate modes</li>
  * </ul>
  */
 public class WaveTextDemo {
@@ -71,8 +69,11 @@ public class WaveTextDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new WaveTextDemo().run();
@@ -81,7 +82,8 @@ public class WaveTextDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
@@ -124,13 +126,10 @@ public class WaveTextDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Header
-                Constraint.fill(),     // Main content
-                Constraint.length(3)   // Footer
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Main content
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderMainContent(frame, layout.get(1));
@@ -138,126 +137,79 @@ public class WaveTextDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("WaveText Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("WaveText Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
 
     private void renderMainContent(Frame frame, Rect area) {
         // Split into rows for each example
-        var rows = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Default
-                Constraint.length(3),  // Inverted
-                Constraint.length(3),  // Slow speed
-                Constraint.length(3),  // Fast speed
-                Constraint.length(3),  // Narrow peak
-                Constraint.length(3),  // Wide peak
-                Constraint.length(3),  // Multiple peaks
-                Constraint.length(3)   // Oscillate
-            )
-            .split(area);
+        var rows = Layout.vertical().constraints(Constraint.length(3), // Default
+                Constraint.length(3), // Inverted
+                Constraint.length(3), // Slow speed
+                Constraint.length(3), // Fast speed
+                Constraint.length(3), // Narrow peak
+                Constraint.length(3), // Wide peak
+                Constraint.length(3), // Multiple peaks
+                Constraint.length(3) // Oscillate
+        ).split(area);
 
         renderExample(frame, rows.get(0), "Default (dark shadow on bright text)",
-            WaveText.builder()
-                .text("Loading resources...")
-                .color(CYAN)
-                .build(),
-            defaultState);
+                WaveText.builder().text("Loading resources...").color(CYAN).build(), defaultState);
 
         renderExample(frame, rows.get(1), "Inverted (bright peak on dim text)",
-            WaveText.builder()
-                .text("Processing data...")
-                .color(GREEN)
-                .inverted(true)
-                .build(),
-            invertedState);
+                WaveText.builder().text("Processing data...").color(GREEN).inverted(true).build(),
+                invertedState);
 
         renderExample(frame, rows.get(2), "Slow speed (0.5x)",
-            WaveText.builder()
-                .text("Slow wave effect...")
-                .color(YELLOW)
-                .speed(0.5)
-                .build(),
-            slowState);
+                WaveText.builder().text("Slow wave effect...").color(YELLOW).speed(0.5).build(),
+                slowState);
 
         renderExample(frame, rows.get(3), "Fast speed (3.0x)",
-            WaveText.builder()
-                .text("Fast wave effect...")
-                .color(MAGENTA)
-                .speed(3.0)
-                .build(),
-            fastState);
+                WaveText.builder().text("Fast wave effect...").color(MAGENTA).speed(3.0).build(),
+                fastState);
 
         renderExample(frame, rows.get(4), "Narrow peak (width=1)",
-            WaveText.builder()
-                .text("Narrow shadow peak...")
-                .color(ORANGE)
-                .peakWidth(1)
-                .build(),
-            narrowState);
+                WaveText.builder().text("Narrow shadow peak...").color(ORANGE).peakWidth(1).build(),
+                narrowState);
 
-        renderExample(frame, rows.get(5), "Wide peak (width=8)",
-            WaveText.builder()
-                .text("Wide shadow peak effect...")
-                .color(PINK)
-                .peakWidth(8)
-                .build(),
-            wideState);
+        renderExample(
+                frame, rows.get(5), "Wide peak (width=8)", WaveText.builder()
+                        .text("Wide shadow peak effect...").color(PINK).peakWidth(8).build(),
+                wideState);
 
-        renderExample(frame, rows.get(6), "Multiple peaks (count=3)",
-            WaveText.builder()
-                .text("Multiple waves moving through text...")
-                .color(CYAN)
-                .peakCount(3)
-                .build(),
-            multiPeakState);
+        renderExample(frame, rows.get(6), "Multiple peaks (count=3)", WaveText.builder()
+                .text("Multiple waves moving through text...").color(CYAN).peakCount(3).build(),
+                multiPeakState);
 
-        renderExample(frame, rows.get(7), "Oscillate mode (back and forth)",
-            WaveText.builder()
-                .text("Bouncing wave effect...")
-                .color(GREEN)
-                .mode(WaveText.Mode.OSCILLATE)
-                .build(),
-            oscillateState);
+        renderExample(frame, rows.get(7), "Oscillate mode (back and forth)", WaveText.builder()
+                .text("Bouncing wave effect...").color(GREEN).mode(WaveText.Mode.OSCILLATE).build(),
+                oscillateState);
     }
 
-    private void renderExample(Frame frame, Rect area, String label, WaveText waveText, WaveTextState state) {
+    private void renderExample(Frame frame, Rect area, String label, WaveText waveText,
+            WaveTextState state) {
         // Split into label and wave text areas
-        var cols = Layout.horizontal()
-            .constraints(
-                Constraint.length(45),  // Label
-                Constraint.fill()       // Wave text
-            )
-            .split(area);
+        var cols = Layout.horizontal().constraints(Constraint.length(45), // Label
+                Constraint.fill() // Wave text
+        ).split(area);
 
         // Render label
-        Block labelBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-            .build();
+        Block labelBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build();
         frame.renderWidget(labelBlock, cols.get(0));
 
         Rect labelInner = labelBlock.inner(cols.get(0));
-        frame.buffer().setString(labelInner.x(), labelInner.y(), label, Style.EMPTY.fg(Color.WHITE));
+        frame.buffer().setString(labelInner.x(), labelInner.y(), label,
+                Style.EMPTY.fg(Color.WHITE));
 
         // Render wave text
-        Block waveBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.BLUE))
-            .build();
+        Block waveBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.BLUE)).build();
         frame.renderWidget(waveBlock, cols.get(1));
 
         Rect waveInner = waveBlock.inner(cols.get(1));
@@ -265,22 +217,14 @@ public class WaveTextDemo {
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-            Span.raw(" Frame: ").dim(),
-            Span.raw(String.valueOf(frameCount)).bold().cyan(),
-            Span.raw("   "),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" Frame: ").dim(),
+                Span.raw(String.valueOf(frameCount)).bold().cyan(), Span.raw("   "),
+                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

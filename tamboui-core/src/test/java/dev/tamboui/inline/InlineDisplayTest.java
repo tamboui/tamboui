@@ -4,6 +4,14 @@
  */
 package dev.tamboui.inline;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
@@ -13,13 +21,6 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -124,9 +125,7 @@ class InlineDisplayTest {
         InlineDisplay display = new InlineDisplay(2, 40, mockBackend, printWriter);
         display.setLine(0, "Status");
 
-        display.println(Text.from(Line.from(
-            Span.styled("colored", Style.EMPTY.fg(Color.RED))
-        )));
+        display.println(Text.from(Line.from(Span.styled("colored", Style.EMPTY.fg(Color.RED)))));
 
         String output = stringWriter.toString();
         // Should contain ANSI color code for red
@@ -180,9 +179,8 @@ class InlineDisplayTest {
     void setLineTextRendersStyledText() {
         InlineDisplay display = new InlineDisplay(2, 40, mockBackend, printWriter);
 
-        display.setLine(0, Text.from(Line.from(
-            Span.styled("styled", Style.EMPTY.fg(Color.GREEN))
-        )));
+        display.setLine(0,
+                Text.from(Line.from(Span.styled("styled", Style.EMPTY.fg(Color.GREEN)))));
 
         String output = stringWriter.toString();
         assertThat(output).contains("styled");

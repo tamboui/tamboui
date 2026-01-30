@@ -7,9 +7,10 @@ package dev.tamboui.layout.cassowary;
 /**
  * Thrown when a required constraint cannot be satisfied.
  *
- * <p>This exception indicates that the constraint system is inconsistent.
- * The conflicting constraint cannot be added without violating other
- * required constraints.
+ * <p>
+ * This exception indicates that the constraint system is inconsistent. The
+ * conflicting constraint cannot be added without violating other required
+ * constraints.
  */
 public final class UnsatisfiableConstraintException extends SolverException {
 
@@ -19,7 +20,8 @@ public final class UnsatisfiableConstraintException extends SolverException {
     /**
      * Creates a new exception for the unsatisfiable constraint.
      *
-     * @param constraint the constraint that cannot be satisfied
+     * @param constraint
+     *            the constraint that cannot be satisfied
      */
     public UnsatisfiableConstraintException(CassowaryConstraint constraint) {
         super("Required constraint cannot be satisfied: " + constraint);

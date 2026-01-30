@@ -21,7 +21,8 @@ import dev.tamboui.terminal.BackendException;
  * Panama FFI bindings to Windows Kernel32 functions for console operations.
  * <p>
  * This class provides low-level access to Windows console control functions
- * including console mode manipulation, screen buffer operations, and input handling.
+ * including console mode manipulation, screen buffer operations, and input
+ * handling.
  */
 public final class Kernel32 {
 
@@ -30,20 +31,27 @@ public final class Kernel32 {
     /** Handle identifier for standard output. */
     public static final int STD_OUTPUT_HANDLE = -11;
 
-    /** Console input mode flag: enable processing of control keys (Ctrl+C, etc.). */
+    /**
+     * Console input mode flag: enable processing of control keys (Ctrl+C, etc.).
+     */
     public static final int ENABLE_PROCESSED_INPUT = 0x0001;
     /** Console input mode flag: enable line-at-a-time input. */
     public static final int ENABLE_LINE_INPUT = 0x0002;
     /** Console input mode flag: echo typed characters to the console. */
     public static final int ENABLE_ECHO_INPUT = 0x0004;
-    /** Console input mode flag: report window buffer size changes as input events. */
+    /**
+     * Console input mode flag: report window buffer size changes as input events.
+     */
     public static final int ENABLE_WINDOW_INPUT = 0x0008;
     /** Console input mode flag: enable virtual terminal input sequences. */
     public static final int ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
 
     /** Console output mode flag: enable processing of output control sequences. */
     public static final int ENABLE_PROCESSED_OUTPUT = 0x0001;
-    /** Console output mode flag: enable virtual terminal processing of ANSI escape sequences. */
+    /**
+     * Console output mode flag: enable virtual terminal processing of ANSI escape
+     * sequences.
+     */
     public static final int ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
 
     /** Input record event type: keyboard event. */
@@ -79,52 +87,42 @@ public final class Kernel32 {
         KERNEL32 = SymbolLookup.libraryLookup("kernel32", Arena.global());
 
         try {
-            GET_STD_HANDLE = LINKER.downcallHandle(
-                    KERNEL32.find("GetStdHandle").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
-            );
+            GET_STD_HANDLE = LINKER.downcallHandle(KERNEL32.find("GetStdHandle").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
-            GET_CONSOLE_MODE = LINKER.downcallHandle(
-                    KERNEL32.find("GetConsoleMode").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-            );
+            GET_CONSOLE_MODE = LINKER.downcallHandle(KERNEL32.find("GetConsoleMode").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                            ValueLayout.ADDRESS));
 
-            SET_CONSOLE_MODE = LINKER.downcallHandle(
-                    KERNEL32.find("SetConsoleMode").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
-            );
+            SET_CONSOLE_MODE = LINKER.downcallHandle(KERNEL32.find("SetConsoleMode").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                            ValueLayout.JAVA_INT));
 
             GET_CONSOLE_SCREEN_BUFFER_INFO = LINKER.downcallHandle(
-                    KERNEL32.find("GetConsoleScreenBufferInfo").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-            );
+                    KERNEL32.find("GetConsoleScreenBufferInfo").orElseThrow(), FunctionDescriptor
+                            .of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
-            WRITE_CONSOLE = LINKER.downcallHandle(
-                    KERNEL32.find("WriteConsoleW").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-            );
+            WRITE_CONSOLE = LINKER.downcallHandle(KERNEL32.find("WriteConsoleW").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                            ValueLayout.ADDRESS));
 
-            READ_CONSOLE_INPUT = LINKER.downcallHandle(
-                    KERNEL32.find("ReadConsoleInputW").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-            );
+            READ_CONSOLE_INPUT = LINKER
+                    .downcallHandle(KERNEL32.find("ReadConsoleInputW").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS));
 
             GET_NUMBER_OF_CONSOLE_INPUT_EVENTS = LINKER.downcallHandle(
-                    KERNEL32.find("GetNumberOfConsoleInputEvents").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-            );
+                    KERNEL32.find("GetNumberOfConsoleInputEvents").orElseThrow(), FunctionDescriptor
+                            .of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
-            GET_LAST_ERROR = LINKER.downcallHandle(
-                    KERNEL32.find("GetLastError").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT)
-            );
+            GET_LAST_ERROR = LINKER.downcallHandle(KERNEL32.find("GetLastError").orElseThrow(),
+                    FunctionDescriptor.of(ValueLayout.JAVA_INT));
 
             WAIT_FOR_SINGLE_OBJECT = LINKER.downcallHandle(
-                    KERNEL32.find("WaitForSingleObject").orElseThrow(),
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)
-            );
+                    KERNEL32.find("WaitForSingleObject").orElseThrow(), FunctionDescriptor
+                            .of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -136,7 +134,8 @@ public final class Kernel32 {
     /**
      * Gets a handle to the specified standard device.
      *
-     * @param stdHandle STD_INPUT_HANDLE or STD_OUTPUT_HANDLE
+     * @param stdHandle
+     *            STD_INPUT_HANDLE or STD_OUTPUT_HANDLE
      * @return the handle, or INVALID_HANDLE_VALUE on error
      */
     public static MemorySegment getStdHandle(int stdHandle) {
@@ -148,10 +147,13 @@ public final class Kernel32 {
     }
 
     /**
-     * Gets the current input mode of a console's input buffer or output mode of a screen buffer.
+     * Gets the current input mode of a console's input buffer or output mode of a
+     * screen buffer.
      *
-     * @param handle  console handle
-     * @param modePtr pointer to receive the mode
+     * @param handle
+     *            console handle
+     * @param modePtr
+     *            pointer to receive the mode
      * @return non-zero on success
      */
     public static int getConsoleMode(MemorySegment handle, MemorySegment modePtr) {
@@ -163,10 +165,13 @@ public final class Kernel32 {
     }
 
     /**
-     * Sets the input mode of a console's input buffer or output mode of a screen buffer.
+     * Sets the input mode of a console's input buffer or output mode of a screen
+     * buffer.
      *
-     * @param handle console handle
-     * @param mode   the mode to set
+     * @param handle
+     *            console handle
+     * @param mode
+     *            the mode to set
      * @return non-zero on success
      */
     public static int setConsoleMode(MemorySegment handle, int mode) {
@@ -180,8 +185,10 @@ public final class Kernel32 {
     /**
      * Gets information about the specified console screen buffer.
      *
-     * @param handle  console output handle
-     * @param infoPtr pointer to CONSOLE_SCREEN_BUFFER_INFO structure
+     * @param handle
+     *            console output handle
+     * @param infoPtr
+     *            pointer to CONSOLE_SCREEN_BUFFER_INFO structure
      * @return non-zero on success
      */
     public static int getConsoleScreenBufferInfo(MemorySegment handle, MemorySegment infoPtr) {
@@ -195,15 +202,20 @@ public final class Kernel32 {
     /**
      * Writes a character string to a console screen buffer.
      *
-     * @param handle     console output handle
-     * @param buffer     buffer containing characters to write (UTF-16)
-     * @param numChars   number of characters to write
-     * @param numWritten pointer to receive count of characters written
-     * @param reserved   reserved, must be null
+     * @param handle
+     *            console output handle
+     * @param buffer
+     *            buffer containing characters to write (UTF-16)
+     * @param numChars
+     *            number of characters to write
+     * @param numWritten
+     *            pointer to receive count of characters written
+     * @param reserved
+     *            reserved, must be null
      * @return non-zero on success
      */
-    public static int writeConsole(MemorySegment handle, MemorySegment buffer,
-                                   int numChars, MemorySegment numWritten, MemorySegment reserved) {
+    public static int writeConsole(MemorySegment handle, MemorySegment buffer, int numChars,
+            MemorySegment numWritten, MemorySegment reserved) {
         try {
             return (int) WRITE_CONSOLE.invokeExact(handle, buffer, numChars, numWritten, reserved);
         } catch (Throwable t) {
@@ -214,14 +226,18 @@ public final class Kernel32 {
     /**
      * Reads data from a console input buffer.
      *
-     * @param handle  console input handle
-     * @param buffer  pointer to INPUT_RECORD array
-     * @param length  size of the array
-     * @param numRead pointer to receive count of records read
+     * @param handle
+     *            console input handle
+     * @param buffer
+     *            pointer to INPUT_RECORD array
+     * @param length
+     *            size of the array
+     * @param numRead
+     *            pointer to receive count of records read
      * @return non-zero on success
      */
-    public static int readConsoleInput(MemorySegment handle, MemorySegment buffer,
-                                       int length, MemorySegment numRead) {
+    public static int readConsoleInput(MemorySegment handle, MemorySegment buffer, int length,
+            MemorySegment numRead) {
         try {
             return (int) READ_CONSOLE_INPUT.invokeExact(handle, buffer, length, numRead);
         } catch (Throwable t) {
@@ -232,8 +248,10 @@ public final class Kernel32 {
     /**
      * Gets the number of unread input records in the console's input buffer.
      *
-     * @param handle    console input handle
-     * @param numEvents pointer to receive the count
+     * @param handle
+     *            console input handle
+     * @param numEvents
+     *            pointer to receive the count
      * @return non-zero on success
      */
     public static int getNumberOfConsoleInputEvents(MemorySegment handle, MemorySegment numEvents) {
@@ -258,12 +276,15 @@ public final class Kernel32 {
     }
 
     /**
-     * Waits until the specified object is in the signaled state or the timeout interval elapses.
+     * Waits until the specified object is in the signaled state or the timeout
+     * interval elapses.
      *
-     * @param handle    handle to the object
-     * @param timeoutMs timeout interval in milliseconds, or -1 (INFINITE) for no timeout
-     * @return WAIT_OBJECT_0 if the object is signaled, WAIT_TIMEOUT if timeout elapsed,
-     *         or WAIT_FAILED on error
+     * @param handle
+     *            handle to the object
+     * @param timeoutMs
+     *            timeout interval in milliseconds, or -1 (INFINITE) for no timeout
+     * @return WAIT_OBJECT_0 if the object is signaled, WAIT_TIMEOUT if timeout
+     *         elapsed, or WAIT_FAILED on error
      */
     public static int waitForSingleObject(MemorySegment handle, int timeoutMs) {
         try {
@@ -276,27 +297,19 @@ public final class Kernel32 {
     // Structure layouts
 
     private static final MemoryLayout COORD_LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_SHORT.withName("X"),
-            ValueLayout.JAVA_SHORT.withName("Y")
-    );
+            ValueLayout.JAVA_SHORT.withName("X"), ValueLayout.JAVA_SHORT.withName("Y"));
 
     private static final MemoryLayout SMALL_RECT_LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_SHORT.withName("Left"),
-            ValueLayout.JAVA_SHORT.withName("Top"),
-            ValueLayout.JAVA_SHORT.withName("Right"),
-            ValueLayout.JAVA_SHORT.withName("Bottom")
-    );
+            ValueLayout.JAVA_SHORT.withName("Left"), ValueLayout.JAVA_SHORT.withName("Top"),
+            ValueLayout.JAVA_SHORT.withName("Right"), ValueLayout.JAVA_SHORT.withName("Bottom"));
 
     /**
      * Layout for CONSOLE_SCREEN_BUFFER_INFO structure.
      */
     public static final MemoryLayout CONSOLE_SCREEN_BUFFER_INFO_LAYOUT = MemoryLayout.structLayout(
-            COORD_LAYOUT.withName("dwSize"),
-            COORD_LAYOUT.withName("dwCursorPosition"),
-            ValueLayout.JAVA_SHORT.withName("wAttributes"),
-            SMALL_RECT_LAYOUT.withName("srWindow"),
-            COORD_LAYOUT.withName("dwMaximumWindowSize")
-    );
+            COORD_LAYOUT.withName("dwSize"), COORD_LAYOUT.withName("dwCursorPosition"),
+            ValueLayout.JAVA_SHORT.withName("wAttributes"), SMALL_RECT_LAYOUT.withName("srWindow"),
+            COORD_LAYOUT.withName("dwMaximumWindowSize"));
 
     private static final MemoryLayout KEY_EVENT_RECORD_LAYOUT = MemoryLayout.structLayout(
             ValueLayout.JAVA_INT.withName("bKeyDown"),
@@ -304,17 +317,14 @@ public final class Kernel32 {
             ValueLayout.JAVA_SHORT.withName("wVirtualKeyCode"),
             ValueLayout.JAVA_SHORT.withName("wVirtualScanCode"),
             ValueLayout.JAVA_SHORT.withName("uChar"),
-            ValueLayout.JAVA_INT.withName("dwControlKeyState")
-    );
+            ValueLayout.JAVA_INT.withName("dwControlKeyState"));
 
     /**
      * Layout for INPUT_RECORD structure.
      */
     public static final MemoryLayout INPUT_RECORD_LAYOUT = MemoryLayout.structLayout(
-            ValueLayout.JAVA_SHORT.withName("EventType"),
-            MemoryLayout.paddingLayout(2),
-            KEY_EVENT_RECORD_LAYOUT.withName("Event")
-    );
+            ValueLayout.JAVA_SHORT.withName("EventType"), MemoryLayout.paddingLayout(2),
+            KEY_EVENT_RECORD_LAYOUT.withName("Event"));
 
     /** VarHandle for the left coordinate of the console window rectangle. */
     public static final VarHandle CSBI_WINDOW_LEFT = CONSOLE_SCREEN_BUFFER_INFO_LAYOUT.varHandle(
@@ -334,8 +344,8 @@ public final class Kernel32 {
             MemoryLayout.PathElement.groupElement("Bottom"));
 
     /** VarHandle for the event type field of an INPUT_RECORD. */
-    public static final VarHandle IR_EVENT_TYPE = INPUT_RECORD_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("EventType"));
+    public static final VarHandle IR_EVENT_TYPE = INPUT_RECORD_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("EventType"));
     /** VarHandle for the key-down flag in a KEY_EVENT_RECORD. */
     public static final VarHandle IR_KEY_DOWN = INPUT_RECORD_LAYOUT.varHandle(
             MemoryLayout.PathElement.groupElement("Event"),
@@ -348,7 +358,8 @@ public final class Kernel32 {
     /**
      * Allocates a CONSOLE_SCREEN_BUFFER_INFO structure.
      *
-     * @param arena the arena to allocate in
+     * @param arena
+     *            the arena to allocate in
      * @return the allocated memory segment
      */
     public static MemorySegment allocateConsoleScreenBufferInfo(Arena arena) {
@@ -358,7 +369,8 @@ public final class Kernel32 {
     /**
      * Allocates an INPUT_RECORD structure.
      *
-     * @param arena the arena to allocate in
+     * @param arena
+     *            the arena to allocate in
      * @return the allocated memory segment
      */
     public static MemorySegment allocateInputRecord(Arena arena) {

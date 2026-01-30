@@ -4,19 +4,20 @@
  */
 package dev.tamboui.backend.panama;
 
-import dev.tamboui.buffer.Cell;
-import dev.tamboui.buffer.CellUpdate;
-import dev.tamboui.layout.Size;
-import dev.tamboui.style.Style;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.buffer.Cell;
+import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.layout.Size;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -55,10 +56,8 @@ class PanamaBackendHyperlinkTest {
         PanamaBackend backend = new PanamaBackend(terminal);
 
         Style linkStyle = Style.EMPTY.hyperlink("https://example.com", "link-1");
-        List<CellUpdate> updates = Arrays.asList(
-            new CellUpdate(0, 0, new Cell("A", linkStyle)),
-            new CellUpdate(1, 0, new Cell("B", Style.EMPTY))
-        );
+        List<CellUpdate> updates = Arrays.asList(new CellUpdate(0, 0, new Cell("A", linkStyle)),
+                new CellUpdate(1, 0, new Cell("B", Style.EMPTY)));
 
         backend.draw(updates);
         backend.flush();

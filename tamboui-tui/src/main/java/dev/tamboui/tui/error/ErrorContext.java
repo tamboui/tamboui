@@ -16,8 +16,8 @@ public interface ErrorContext {
     /**
      * Returns the output stream for logging fatal errors.
      * <p>
-     * This stream is configured via {@code TuiConfig.errorOutput()} and defaults
-     * to {@code System.err} (captured at config creation time). When the TUI has
+     * This stream is configured via {@code TuiConfig.errorOutput()} and defaults to
+     * {@code System.err} (captured at config creation time). When the TUI has
      * captured standard streams, this provides a way to log errors to an external
      * destination.
      *
@@ -28,8 +28,8 @@ public interface ErrorContext {
     /**
      * Signals the runner to stop.
      * <p>
-     * Call this when the error handler determines the application should quit.
-     * The runner will perform cleanup and exit the main loop.
+     * Call this when the error handler determines the application should quit. The
+     * runner will perform cleanup and exit the main loop.
      */
     void quit();
 }

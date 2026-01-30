@@ -13,11 +13,12 @@ import java.util.Set;
 /**
  * A collection of tag names associated with a Style.
  * <p>
- * Tags are preserved from markup parsing and can be used as CSS class names
- * for TFX effects targeting. When styles are patched together, tags are
+ * Tags are preserved from markup parsing and can be used as CSS class names for
+ * TFX effects targeting. When styles are patched together, tags are
  * automatically merged (unioned) due to the {@link Patchable} implementation.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * // Create a style with tags
  * Style style = Style.EMPTY.withExtension(Tags.class, Tags.of("bold", "highlight"));
@@ -54,7 +55,8 @@ public final class Tags implements Patchable<Tags> {
     /**
      * Creates a Tags instance with a single tag.
      *
-     * @param tag the tag name
+     * @param tag
+     *            the tag name
      * @return a new Tags instance
      */
     public static Tags of(String tag) {
@@ -67,7 +69,8 @@ public final class Tags implements Patchable<Tags> {
     /**
      * Creates a Tags instance with multiple tags.
      *
-     * @param tags the tag names
+     * @param tags
+     *            the tag names
      * @return a new Tags instance
      */
     public static Tags of(String... tags) {
@@ -86,7 +89,8 @@ public final class Tags implements Patchable<Tags> {
     /**
      * Creates a Tags instance from a set of tags.
      *
-     * @param tags the tag names
+     * @param tags
+     *            the tag names
      * @return a new Tags instance
      */
     public static Tags of(Set<String> tags) {
@@ -123,7 +127,8 @@ public final class Tags implements Patchable<Tags> {
     /**
      * Returns whether this Tags instance contains the given tag.
      *
-     * @param tag the tag to check for
+     * @param tag
+     *            the tag to check for
      * @return true if the tag is present
      */
     public boolean contains(String tag) {

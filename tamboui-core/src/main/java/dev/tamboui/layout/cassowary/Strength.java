@@ -9,19 +9,22 @@ import dev.tamboui.layout.Fraction;
 /**
  * Constraint strength representing priority in the constraint hierarchy.
  *
- * <p>Cassowary uses a hierarchical constraint system where higher-strength
+ * <p>
+ * Cassowary uses a hierarchical constraint system where higher-strength
  * constraints take absolute precedence over lower-strength ones. The strength
  * is computed using three weight levels that are combined into a single value.
  *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
+ * <p>
+ * This implementation uses {@link Fraction} for exact arithmetic, avoiding the
+ * cumulative rounding errors that occur with floating-point.
  *
- * <p>Predefined strengths in decreasing order of priority:
+ * <p>
+ * Predefined strengths in decreasing order of priority:
  * <ul>
- *   <li>{@link #REQUIRED} - Must be satisfied; failure throws an exception</li>
- *   <li>{@link #STRONG} - High priority preference</li>
- *   <li>{@link #MEDIUM} - Medium priority preference</li>
- *   <li>{@link #WEAK} - Low priority preference</li>
+ * <li>{@link #REQUIRED} - Must be satisfied; failure throws an exception</li>
+ * <li>{@link #STRONG} - High priority preference</li>
+ * <li>{@link #MEDIUM} - Medium priority preference</li>
+ * <li>{@link #WEAK} - Low priority preference</li>
  * </ul>
  */
 public final class Strength {
@@ -30,8 +33,8 @@ public final class Strength {
     private static final Fraction MILLION = Fraction.of(1_000_000);
 
     /**
-     * Required constraints must be satisfied. Adding an unsatisfiable
-     * required constraint will throw an exception.
+     * Required constraints must be satisfied. Adding an unsatisfiable required
+     * constraint will throw an exception.
      */
     public static final Strength REQUIRED = new Strength(THOUSAND, THOUSAND, THOUSAND);
 
@@ -63,12 +66,16 @@ public final class Strength {
     /**
      * Creates a custom strength with the given weights.
      *
-     * <p>The weights are combined using a polynomial scheme where the strong
-     * weight has the highest significance, followed by medium, then weak.
+     * <p>
+     * The weights are combined using a polynomial scheme where the strong weight
+     * has the highest significance, followed by medium, then weak.
      *
-     * @param strong the strong weight (highest priority)
-     * @param medium the medium weight
-     * @param weak   the weak weight (lowest priority)
+     * @param strong
+     *            the strong weight (highest priority)
+     * @param medium
+     *            the medium weight
+     * @param weak
+     *            the weak weight (lowest priority)
      * @return a new strength with the given weights
      */
     public static Strength create(Fraction strong, Fraction medium, Fraction weak) {
@@ -78,12 +85,16 @@ public final class Strength {
     /**
      * Creates a custom strength with the given weights.
      *
-     * <p>The weights are combined using a polynomial scheme where the strong
-     * weight has the highest significance, followed by medium, then weak.
+     * <p>
+     * The weights are combined using a polynomial scheme where the strong weight
+     * has the highest significance, followed by medium, then weak.
      *
-     * @param strong the strong weight (highest priority)
-     * @param medium the medium weight
-     * @param weak   the weak weight (lowest priority)
+     * @param strong
+     *            the strong weight (highest priority)
+     * @param medium
+     *            the medium weight
+     * @param weak
+     *            the weak weight (lowest priority)
      * @return a new strength with the given weights
      */
     public static Strength create(long strong, long medium, long weak) {
@@ -93,8 +104,9 @@ public final class Strength {
     /**
      * Computes the numeric value of this strength for use in the simplex objective.
      *
-     * <p>Uses a polynomial scheme to ensure hierarchical ordering:
-     * strong weights dominate medium weights which dominate weak weights.
+     * <p>
+     * Uses a polynomial scheme to ensure hierarchical ordering: strong weights
+     * dominate medium weights which dominate weak weights.
      *
      * @return the computed strength value
      */
@@ -108,8 +120,7 @@ public final class Strength {
      * @return true if this constraint is required
      */
     public boolean isRequired() {
-        return strong.compareTo(THOUSAND) >= 0
-                && medium.compareTo(THOUSAND) >= 0
+        return strong.compareTo(THOUSAND) >= 0 && medium.compareTo(THOUSAND) >= 0
                 && weak.compareTo(THOUSAND) >= 0;
     }
 
@@ -149,8 +160,7 @@ public final class Strength {
             return false;
         }
         Strength strength = (Strength) o;
-        return strong.equals(strength.strong)
-                && medium.equals(strength.medium)
+        return strong.equals(strength.strong) && medium.equals(strength.medium)
                 && weak.equals(strength.weak);
     }
 

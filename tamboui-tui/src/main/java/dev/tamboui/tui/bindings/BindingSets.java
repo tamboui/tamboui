@@ -4,12 +4,6 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.tui.error.TuiException;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.MouseButton;
-import dev.tamboui.tui.event.MouseEventKind;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -18,16 +12,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.MouseButton;
+import dev.tamboui.tui.event.MouseEventKind;
+
 /**
  * Factory for predefined binding sets.
  * <p>
  * Available binding sets:
  * <ul>
- *   <li>{@link #standard()} - Arrow keys only, no vim/emacs bindings (default)</li>
- *   <li>{@link #vim()} - Vim-style navigation (hjkl, g/G, Ctrl+u/d)</li>
- *   <li>{@link #emacs()} - Emacs-style navigation (Ctrl+n/p/f/b, etc.)</li>
- *   <li>{@link #intellij()} - IntelliJ IDEA-style bindings</li>
- *   <li>{@link #vscode()} - Visual Studio Code-style bindings</li>
+ * <li>{@link #standard()} - Arrow keys only, no vim/emacs bindings
+ * (default)</li>
+ * <li>{@link #vim()} - Vim-style navigation (hjkl, g/G, Ctrl+u/d)</li>
+ * <li>{@link #emacs()} - Emacs-style navigation (Ctrl+n/p/f/b, etc.)</li>
+ * <li>{@link #intellij()} - IntelliJ IDEA-style bindings</li>
+ * <li>{@link #vscode()} - Visual Studio Code-style bindings</li>
  * </ul>
  *
  * <pre>{@code
@@ -35,18 +36,16 @@ import java.util.Properties;
  * Bindings bindings = BindingSets.vim();
  *
  * // Customize a predefined set
- * Bindings custom = BindingSets.standard()
- *     .toBuilder()
- *     .bind(KeyTrigger.ch('x'), Actions.QUIT)
- *     .bind(MouseTrigger.rightClick(), "contextMenu")
- *     .build();
+ * Bindings custom = BindingSets.standard().toBuilder().bind(KeyTrigger.ch('x'), Actions.QUIT)
+ *         .bind(MouseTrigger.rightClick(), "contextMenu").build();
  * }</pre>
  */
 public final class BindingSets {
 
     private static final String BINDINGS_RESOURCE_PATH = "dev/tamboui/tui/bindings/";
 
-    // Key name to KeyCode mapping for parsing - must be initialized before binding sets
+    // Key name to KeyCode mapping for parsing - must be initialized before binding
+    // sets
     private static final Map<String, KeyCode> KEY_NAMES = createKeyNameMap();
     private static final Map<String, MouseButton> MOUSE_BUTTONS = createMouseButtonMap();
     private static final Map<String, MouseEventKind> MOUSE_KINDS = createMouseKindMap();
@@ -76,8 +75,8 @@ public final class BindingSets {
     /**
      * Standard binding set using only arrow keys and standard keys.
      * <p>
-     * No vim or emacs-style bindings. This is the default set,
-     * safe for use with text input (no letter keys bound to navigation).
+     * No vim or emacs-style bindings. This is the default set, safe for use with
+     * text input (no letter keys bound to navigation).
      *
      * @return the standard bindings
      */
@@ -90,9 +89,9 @@ public final class BindingSets {
      * <p>
      * Includes:
      * <ul>
-     *   <li>hjkl for directional navigation</li>
-     *   <li>g/G for home/end</li>
-     *   <li>Ctrl+u/d for page up/down</li>
+     * <li>hjkl for directional navigation</li>
+     * <li>g/G for home/end</li>
+     * <li>Ctrl+u/d for page up/down</li>
      * </ul>
      *
      * @return the vim bindings
@@ -106,10 +105,10 @@ public final class BindingSets {
      * <p>
      * Includes:
      * <ul>
-     *   <li>Ctrl+n/p/f/b for directional navigation</li>
-     *   <li>Alt+v/Ctrl+v for page up/down</li>
-     *   <li>Ctrl+a/e for home/end (line-level)</li>
-     *   <li>Ctrl+g as cancel</li>
+     * <li>Ctrl+n/p/f/b for directional navigation</li>
+     * <li>Alt+v/Ctrl+v for page up/down</li>
+     * <li>Ctrl+a/e for home/end (line-level)</li>
+     * <li>Ctrl+g as cancel</li>
      * </ul>
      *
      * @return the emacs bindings
@@ -212,6 +211,7 @@ public final class BindingSets {
      * Loads bindings from a properties file.
      * <p>
      * The file format uses standard Java properties:
+     * 
      * <pre>{@code
      * # Navigation
      * moveUp = Up, k, K
@@ -227,23 +227,26 @@ public final class BindingSets {
      * <p>
      * Key binding syntax:
      * <ul>
-     *   <li>Key names: Up, Down, Enter, Tab, Escape, Backspace, Delete, Home, End, PageUp, PageDown, F1-F12</li>
-     *   <li>Characters: Single character like k, q</li>
-     *   <li>Modifiers: Ctrl+c, Alt+x, Shift+Tab</li>
-     *   <li>Space: Use the word "Space"</li>
+     * <li>Key names: Up, Down, Enter, Tab, Escape, Backspace, Delete, Home, End,
+     * PageUp, PageDown, F1-F12</li>
+     * <li>Characters: Single character like k, q</li>
+     * <li>Modifiers: Ctrl+c, Alt+x, Shift+Tab</li>
+     * <li>Space: Use the word "Space"</li>
      * </ul>
      * <p>
      * Mouse binding syntax:
      * <ul>
-     *   <li>Format: [Modifiers+]Mouse.Button.Kind</li>
-     *   <li>Buttons: Left, Right, Middle</li>
-     *   <li>Kinds: Press, Release, Drag, ScrollUp, ScrollDown</li>
-     *   <li>Example: Ctrl+Mouse.Left.Press</li>
+     * <li>Format: [Modifiers+]Mouse.Button.Kind</li>
+     * <li>Buttons: Left, Right, Middle</li>
+     * <li>Kinds: Press, Release, Drag, ScrollUp, ScrollDown</li>
+     * <li>Example: Ctrl+Mouse.Left.Press</li>
      * </ul>
      *
-     * @param path the path to the properties file
+     * @param path
+     *            the path to the properties file
      * @return the loaded bindings
-     * @throws IOException if the file cannot be read or parsed
+     * @throws IOException
+     *             if the file cannot be read or parsed
      */
     public static Bindings load(Path path) throws IOException {
         try (InputStream in = Files.newInputStream(path)) {
@@ -254,12 +257,14 @@ public final class BindingSets {
     /**
      * Loads bindings from an input stream containing properties.
      * <p>
-     * The loaded bindings will be based on the standard bindings,
-     * with properties overriding/adding to them.
+     * The loaded bindings will be based on the standard bindings, with properties
+     * overriding/adding to them.
      *
-     * @param input the input stream
+     * @param input
+     *            the input stream
      * @return the loaded bindings
-     * @throws IOException if the stream cannot be read or parsed
+     * @throws IOException
+     *             if the stream cannot be read or parsed
      * @see #load(Path)
      */
     public static Bindings load(InputStream input) throws IOException {
@@ -269,10 +274,13 @@ public final class BindingSets {
     /**
      * Loads bindings from an input stream, starting with the given base bindings.
      *
-     * @param input the input stream
-     * @param base  the base bindings to extend (null for empty)
+     * @param input
+     *            the input stream
+     * @param base
+     *            the base bindings to extend (null for empty)
      * @return the loaded bindings
-     * @throws IOException if the stream cannot be read or parsed
+     * @throws IOException
+     *             if the stream cannot be read or parsed
      */
     public static Bindings load(InputStream input, Bindings base) throws IOException {
         Properties props = new Properties();
@@ -283,9 +291,11 @@ public final class BindingSets {
     /**
      * Loads bindings from a classpath resource.
      *
-     * @param resourcePath the resource path (e.g., "/bindings/custom.properties")
+     * @param resourcePath
+     *            the resource path (e.g., "/bindings/custom.properties")
      * @return the loaded bindings
-     * @throws IOException if the resource cannot be found or parsed
+     * @throws IOException
+     *             if the resource cannot be found or parsed
      * @see #load(Path)
      */
     public static Bindings loadResource(String resourcePath) throws IOException {
@@ -295,12 +305,16 @@ public final class BindingSets {
     /**
      * Loads bindings from a classpath resource using the specified class loader.
      *
-     * @param resourcePath the resource path
-     * @param classLoader  the class loader to use
+     * @param resourcePath
+     *            the resource path
+     * @param classLoader
+     *            the class loader to use
      * @return the loaded bindings
-     * @throws IOException if the resource cannot be found or parsed
+     * @throws IOException
+     *             if the resource cannot be found or parsed
      */
-    public static Bindings loadResource(String resourcePath, ClassLoader classLoader) throws IOException {
+    public static Bindings loadResource(String resourcePath, ClassLoader classLoader)
+            throws IOException {
         try (InputStream in = classLoader.getResourceAsStream(
                 resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath)) {
             if (in == null) {
@@ -425,7 +439,8 @@ public final class BindingSets {
 
         // Should start with "Mouse."
         if (!remaining.toLowerCase().startsWith("mouse.")) {
-            throw new RuntimeIOException("Invalid mouse trigger (expected Mouse.Button.Kind): " + text);
+            throw new RuntimeIOException(
+                    "Invalid mouse trigger (expected Mouse.Button.Kind): " + text);
         }
         remaining = remaining.substring(6); // Remove "Mouse."
 

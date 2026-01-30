@@ -28,10 +28,14 @@ public final class Circle implements Shape {
     /**
      * Creates a circle centered at (x, y) with the given radius and color.
      *
-     * @param x      the x coordinate of the center
-     * @param y      the y coordinate of the center
-     * @param radius the radius of the circle
-     * @param color  the color to draw with
+     * @param x
+     *            the x coordinate of the center
+     * @param y
+     *            the y coordinate of the center
+     * @param radius
+     *            the radius of the circle
+     * @param color
+     *            the color to draw with
      */
     public Circle(double x, double y, double radius, Color color) {
         this.x = x;
@@ -43,10 +47,14 @@ public final class Circle implements Shape {
     /**
      * Creates a circle centered at (x, y) with the given radius and color.
      *
-     * @param x      the x coordinate of the center
-     * @param y      the y coordinate of the center
-     * @param radius the radius of the circle
-     * @param color  the color to draw with
+     * @param x
+     *            the x coordinate of the center
+     * @param y
+     *            the y coordinate of the center
+     * @param radius
+     *            the radius of the circle
+     * @param color
+     *            the color to draw with
      * @return a new circle
      */
     public static Circle of(double x, double y, double radius, Color color) {
@@ -61,17 +69,15 @@ public final class Circle implements Shape {
 
         // Draw circle using Midpoint circle algorithm (Bresenham's for circles)
         // Sample points around the circumference
-        double step = 0.5 / radius;  // Smaller step for larger circles
+        double step = 0.5 / radius; // Smaller step for larger circles
         for (double angle = 0; angle < 2 * Math.PI; angle += step) {
             double px = x + radius * Math.cos(angle);
             double py = y + radius * Math.sin(angle);
-            painter.getPoint(px, py).ifPresent(p ->
-                painter.paint(p.x(), p.y(), color));
+            painter.getPoint(px, py).ifPresent(p -> painter.paint(p.x(), p.y(), color));
         }
 
         // Ensure we close the circle by drawing the final point
-        painter.getPoint(x + radius, y).ifPresent(p ->
-            painter.paint(p.x(), p.y(), color));
+        painter.getPoint(x + radius, y).ifPresent(p -> painter.paint(p.x(), p.y(), color));
     }
 
     /**
@@ -119,10 +125,8 @@ public final class Circle implements Shape {
             return false;
         }
         Circle circle = (Circle) o;
-        return Double.compare(circle.x, x) == 0
-            && Double.compare(circle.y, y) == 0
-            && Double.compare(circle.radius, radius) == 0
-            && color.equals(circle.color);
+        return Double.compare(circle.x, x) == 0 && Double.compare(circle.y, y) == 0
+                && Double.compare(circle.radius, radius) == 0 && color.equals(circle.color);
     }
 
     @Override

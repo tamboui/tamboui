@@ -4,10 +4,11 @@
  */
 package dev.tamboui.image.capability;
 
-import dev.tamboui.capability.CapabilityProvider;
+import java.util.ServiceLoader;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.ServiceLoader;
+import dev.tamboui.capability.CapabilityProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,5 +27,3 @@ class ImageCapabilityProviderTest {
         assertThat(found).isTrue();
     }
 }
-
-

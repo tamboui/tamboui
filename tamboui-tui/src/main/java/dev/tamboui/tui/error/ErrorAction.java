@@ -18,16 +18,16 @@ public enum ErrorAction {
      * Display the error in the UI, wait for user dismissal, then quit.
      * <p>
      * This is the default behavior. The error display shows the exception type,
-     * message, and a scrollable stack trace. Users can press 'q' to quit or
-     * use arrow keys to scroll through the stack trace.
+     * message, and a scrollable stack trace. Users can press 'q' to quit or use
+     * arrow keys to scroll through the stack trace.
      */
     DISPLAY_AND_QUIT,
 
     /**
      * Clean up the terminal and quit immediately without displaying the error.
      * <p>
-     * Use this when you want to log the error elsewhere (e.g., to a file) and
-     * exit cleanly without user interaction.
+     * Use this when you want to log the error elsewhere (e.g., to a file) and exit
+     * cleanly without user interaction.
      */
     QUIT_IMMEDIATELY,
 

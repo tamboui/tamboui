@@ -24,13 +24,16 @@ public class LogoDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        Logo.Size size = args.length > 0 && "small".equals(args[0]) 
-            ? Logo.Size.TINY  // Note: SMALL not yet implemented
-            : Logo.Size.TINY;
+        Logo.Size size = args.length > 0 && "small".equals(args[0])
+                ? Logo.Size.TINY // Note: SMALL not yet implemented
+                : Logo.Size.TINY;
 
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
@@ -50,12 +53,10 @@ public class LogoDemo {
     }
 
     private static void render(Frame frame, Logo.Size size) {
-        var layout = Layout.vertical()
-            .constraints(Constraint.length(1), Constraint.fill(1));
+        var layout = Layout.vertical().constraints(Constraint.length(1), Constraint.fill(1));
         var areas = layout.split(frame.area());
 
         frame.renderWidget(Paragraph.from(Text.from("Powered by")), areas.get(0));
         frame.renderWidget(Logo.of(size), areas.get(1));
     }
 }
-

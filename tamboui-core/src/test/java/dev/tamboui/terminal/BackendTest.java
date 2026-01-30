@@ -4,16 +4,17 @@
  */
 package dev.tamboui.terminal;
 
-import dev.tamboui.buffer.CellUpdate;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Size;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.layout.Position;
+import dev.tamboui.layout.Size;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -113,10 +114,10 @@ class BackendTest {
         backend.moveCursorDown(1);
         backend.eraseToEndOfLine();
 
-        String expected = "\u001b[3A" +  // Move up 3
-                         "\u001b[2L" +   // Insert 2 lines
-                         "\u001b[1B" +   // Move down 1
-                         "\u001b[K";     // Erase to EOL
+        String expected = "\u001b[3A" + // Move up 3
+                "\u001b[2L" + // Insert 2 lines
+                "\u001b[1B" + // Move down 1
+                "\u001b[K"; // Erase to EOL
 
         assertThat(output.toString(StandardCharsets.UTF_8.name())).isEqualTo(expected);
     }

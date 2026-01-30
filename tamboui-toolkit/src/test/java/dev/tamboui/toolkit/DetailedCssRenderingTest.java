@@ -4,6 +4,15 @@
  */
 package dev.tamboui.toolkit;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.css.engine.StyleEngine;
@@ -15,21 +24,14 @@ import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.Panel;
 import dev.tamboui.toolkit.elements.Row;
 import dev.tamboui.toolkit.elements.TextElement;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DetailedCssRenderingTest {
 
     // Path to the demo's theme resources (single source of truth)
-    private static final Path THEMES_DIR = Paths.get("../tamboui-css/demos/css-demo/src/main/resources/themes");
+    private static final Path THEMES_DIR = Paths
+            .get("../tamboui-css/demos/css-demo/src/main/resources/themes");
 
     private StyleEngine styleEngine;
     private DefaultRenderContext context;
@@ -192,7 +194,8 @@ class DetailedCssRenderingTest {
 
             // Find the title "S" character
             Cell titleCell = buffer.get(1, 0);
-            System.out.println("Dark Panel title cell: symbol='" + titleCell.symbol() + "' style=" + titleCell.style());
+            System.out.println("Dark Panel title cell: symbol='" + titleCell.symbol() + "' style="
+                    + titleCell.style());
             assertThat(titleCell.symbol()).isEqualTo("S");
             assertThat(titleCell.style().fg()).hasValue(Color.DARK_GRAY);
         }
@@ -431,7 +434,8 @@ class DetailedCssRenderingTest {
 
             // Find the title "S" character
             Cell titleCell = buffer.get(1, 0);
-            System.out.println("Light Panel title cell: symbol='" + titleCell.symbol() + "' style=" + titleCell.style());
+            System.out.println("Light Panel title cell: symbol='" + titleCell.symbol() + "' style="
+                    + titleCell.style());
             assertThat(titleCell.symbol()).isEqualTo("S");
             assertThat(titleCell.style().fg()).isPresent();
             // Title inherits foreground from border-color: #888888
@@ -516,10 +520,7 @@ class DetailedCssRenderingTest {
 
             // This is the exact structure from CssDemo
             Column column = new Column(
-                new Row(
-                    new Panel(new TextElement("Content")).title("Style Classes")
-                )
-            );
+                    new Row(new Panel(new TextElement("Content")).title("Style Classes")));
 
             column.render(frame, new Rect(0, 0, 40, 10), context);
 
@@ -528,12 +529,12 @@ class DetailedCssRenderingTest {
             Cell borderCell = buffer.get(0, 0);
             System.out.println("LIGHT nested panel border: " + borderCell.style());
 
-            // Border should be #888888 (CSS: Panel { border-color: $border-color } where $border-color: #888888)
+            // Border should be #888888 (CSS: Panel { border-color: $border-color } where
+            // $border-color: #888888)
             assertThat(borderCell.style().fg()).isPresent();
             Color.Rgb borderColor = (Color.Rgb) borderCell.style().fg().get();
-            assertThat(borderColor.r())
-                .describedAs("Light theme panel border should be #888888")
-                .isEqualTo(0x88);
+            assertThat(borderColor.r()).describedAs("Light theme panel border should be #888888")
+                    .isEqualTo(0x88);
         }
 
         @Test
@@ -542,23 +543,20 @@ class DetailedCssRenderingTest {
             styleEngine.setActiveStylesheet("light");
 
             Column column = new Column(
-                new Row(
-                    new Panel(new TextElement("Content")).title("Style Classes")
-                )
-            );
+                    new Row(new Panel(new TextElement("Content")).title("Style Classes")));
 
             column.render(frame, new Rect(0, 0, 40, 10), context);
 
             // Find the title "S" character
             Cell titleCell = buffer.get(1, 0);
-            System.out.println("LIGHT nested panel title: symbol='" + titleCell.symbol() + "' style=" + titleCell.style());
+            System.out.println("LIGHT nested panel title: symbol='" + titleCell.symbol()
+                    + "' style=" + titleCell.style());
 
             assertThat(titleCell.symbol()).isEqualTo("S");
             assertThat(titleCell.style().fg()).isPresent();
             Color.Rgb titleColor = (Color.Rgb) titleCell.style().fg().get();
-            assertThat(titleColor.r())
-                .describedAs("Light theme panel title should be #888888")
-                .isEqualTo(0x88);
+            assertThat(titleColor.r()).describedAs("Light theme panel title should be #888888")
+                    .isEqualTo(0x88);
         }
 
         @Test
@@ -567,10 +565,7 @@ class DetailedCssRenderingTest {
             styleEngine.setActiveStylesheet("dark");
 
             Column column = new Column(
-                new Row(
-                    new Panel(new TextElement("Content")).title("Style Classes")
-                )
-            );
+                    new Row(new Panel(new TextElement("Content")).title("Style Classes")));
 
             column.render(frame, new Rect(0, 0, 40, 10), context);
 
@@ -578,8 +573,8 @@ class DetailedCssRenderingTest {
             System.out.println("DARK nested panel border: " + borderCell.style());
 
             assertThat(borderCell.style().fg())
-                .describedAs("Dark theme panel border should be DARK_GRAY")
-                .hasValue(Color.DARK_GRAY);
+                    .describedAs("Dark theme panel border should be DARK_GRAY")
+                    .hasValue(Color.DARK_GRAY);
         }
 
         @Test
@@ -587,16 +582,10 @@ class DetailedCssRenderingTest {
         void light_exactDemoStructure_borderRendersGray() {
             styleEngine.setActiveStylesheet("light");
 
-            Column outerColumn = new Column(
-                new Row(
-                    new Panel(
-                        new Column(
-                            new TextElement("Primary Action").addClass("primary"),
-                            new TextElement("Secondary Info").addClass("secondary")
-                        )
-                    ).title("Style Classes").rounded()
-                )
-            );
+            Column outerColumn = new Column(new Row(
+                    new Panel(new Column(new TextElement("Primary Action").addClass("primary"),
+                            new TextElement("Secondary Info").addClass("secondary")))
+                            .title("Style Classes").rounded()));
 
             outerColumn.render(frame, new Rect(0, 0, 40, 10), context);
 
@@ -606,9 +595,8 @@ class DetailedCssRenderingTest {
             assertThat(borderCell.style().fg()).isPresent();
             // Demo CSS: Panel { border-color: $border-color } where $border-color: #888888
             Color.Rgb borderColor = (Color.Rgb) borderCell.style().fg().get();
-            assertThat(borderColor.r())
-                .describedAs("Light theme border should be #888888")
-                .isEqualTo(0x88);
+            assertThat(borderColor.r()).describedAs("Light theme border should be #888888")
+                    .isEqualTo(0x88);
         }
 
         @Test
@@ -617,20 +605,15 @@ class DetailedCssRenderingTest {
             styleEngine.setActiveStylesheet("light");
 
             Column outerColumn = new Column(
-                new Row(
-                    new Panel(
-                        new Column(
-                            new TextElement("Content")
-                        )
-                    ).title("Style Classes").rounded()
-                )
-            );
+                    new Row(new Panel(new Column(new TextElement("Content"))).title("Style Classes")
+                            .rounded()));
 
             outerColumn.render(frame, new Rect(0, 0, 40, 10), context);
 
             // Title "S" is at position (1, 0) - right after the corner
             Cell titleCell = buffer.get(1, 0);
-            System.out.println("LIGHT title cell: symbol='" + titleCell.symbol() + "' style=" + titleCell.style());
+            System.out.println("LIGHT title cell: symbol='" + titleCell.symbol() + "' style="
+                    + titleCell.style());
             System.out.println("Title fg: " + titleCell.style().fg().orElse(null));
             System.out.println("Title bg: " + titleCell.style().bg().orElse(null));
 
@@ -639,19 +622,15 @@ class DetailedCssRenderingTest {
             // Title foreground should be #888888 (border-color)
             assertThat(titleCell.style().fg()).isPresent();
             Color.Rgb titleColor = (Color.Rgb) titleCell.style().fg().get();
-            assertThat(titleColor.r())
-                .describedAs("Title fg should be #888888")
-                .isEqualTo(0x88);
+            assertThat(titleColor.r()).describedAs("Title fg should be #888888").isEqualTo(0x88);
 
             // Title background should be #eeeeee (Panel background) - NOT null/absent!
             assertThat(titleCell.style().bg())
-                .describedAs("Title bg should be present (Panel background #eeeeee)")
-                .isPresent();
+                    .describedAs("Title bg should be present (Panel background #eeeeee)")
+                    .isPresent();
 
             Color.Rgb expectedBg = (Color.Rgb) titleCell.style().bg().get();
-            assertThat(expectedBg.r())
-                .describedAs("Title bg should be #eeeeee")
-                .isEqualTo(0xee);
+            assertThat(expectedBg.r()).describedAs("Title bg should be #eeeeee").isEqualTo(0xee);
         }
 
         @Test
@@ -660,10 +639,7 @@ class DetailedCssRenderingTest {
             // Dark theme
             styleEngine.setActiveStylesheet("dark");
             Column darkColumn = new Column(
-                new Row(
-                    new Panel(new TextElement("Content")).title("Test")
-                )
-            );
+                    new Row(new Panel(new TextElement("Content")).title("Test")));
             darkColumn.render(frame, new Rect(0, 0, 40, 10), context);
             Cell darkBorder = buffer.get(0, 0);
             Color darkFg = darkBorder.style().fg().orElse(null);
@@ -673,19 +649,15 @@ class DetailedCssRenderingTest {
             resetBuffer();
             styleEngine.setActiveStylesheet("light");
             Column lightColumn = new Column(
-                new Row(
-                    new Panel(new TextElement("Content")).title("Test")
-                )
-            );
+                    new Row(new Panel(new TextElement("Content")).title("Test")));
             lightColumn.render(frame, new Rect(0, 0, 40, 10), context);
             Cell lightBorder = buffer.get(0, 0);
             Color lightFg = lightBorder.style().fg().orElse(null);
             System.out.println("Light nested border fg: " + lightFg);
 
             // They should be different colors
-            assertThat(darkFg)
-                .describedAs("Dark and light border colors should be different")
-                .isNotEqualTo(lightFg);
+            assertThat(darkFg).describedAs("Dark and light border colors should be different")
+                    .isNotEqualTo(lightFg);
         }
     }
 
@@ -730,14 +702,16 @@ class DetailedCssRenderingTest {
             styleEngine.setActiveStylesheet("dark");
             panel.render(frame, new Rect(0, 0, 20, 5), context);
             Cell darkTitle = buffer.get(1, 0);
-            System.out.println("Dark title: symbol='" + darkTitle.symbol() + "' " + darkTitle.style());
+            System.out.println(
+                    "Dark title: symbol='" + darkTitle.symbol() + "' " + darkTitle.style());
 
             // Reset and switch to light
             resetBuffer();
             styleEngine.setActiveStylesheet("light");
             panel.render(frame, new Rect(0, 0, 20, 5), context);
             Cell lightTitle = buffer.get(1, 0);
-            System.out.println("Light title: symbol='" + lightTitle.symbol() + "' " + lightTitle.style());
+            System.out.println(
+                    "Light title: symbol='" + lightTitle.symbol() + "' " + lightTitle.style());
 
             // Colors should be different
             assertThat(darkTitle.style().fg()).isNotEqualTo(lightTitle.style().fg());

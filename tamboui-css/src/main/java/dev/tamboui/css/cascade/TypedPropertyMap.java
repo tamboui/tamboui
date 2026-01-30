@@ -4,23 +4,22 @@
  */
 package dev.tamboui.css.cascade;
 
-import dev.tamboui.style.PropertyDefinition;
-
 import java.util.*;
+
+import dev.tamboui.style.PropertyDefinition;
 
 /**
  * A type-safe heterogeneous map for CSS property values.
  * <p>
- * This map uses {@link PropertyDefinition} objects as keys and stores values
- * of the corresponding types. The type safety is enforced at compile time
- * through the generic type parameter on PropertyDefinition.
+ * This map uses {@link PropertyDefinition} objects as keys and stores values of
+ * the corresponding types. The type safety is enforced at compile time through
+ * the generic type parameter on PropertyDefinition.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
- * TypedPropertyMap props = TypedPropertyMap.builder()
- *     .put(StandardProperties.COLOR, Color.RED)
- *     .put(StandardProperties.PADDING, Padding.of(1))
- *     .build();
+ * TypedPropertyMap props = TypedPropertyMap.builder().put(StandardProperties.COLOR, Color.RED)
+ *         .put(StandardProperties.PADDING, Padding.of(1)).build();
  *
  * Optional<Color> color = props.get(StandardProperties.COLOR);
  * }</pre>
@@ -36,8 +35,8 @@ public final class TypedPropertyMap {
     }
 
     /**
-     * Package-private constructor for creating a TypedPropertyMap from a pre-built map.
-     * Used by CssStyleResolver for advanced inheritance scenarios.
+     * Package-private constructor for creating a TypedPropertyMap from a pre-built
+     * map. Used by CssStyleResolver for advanced inheritance scenarios.
      */
     TypedPropertyMap(Map<PropertyDefinition<?>, Object> values, boolean packagePrivate) {
         this.values = Collections.unmodifiableMap(values);
@@ -64,8 +63,10 @@ public final class TypedPropertyMap {
     /**
      * Retrieves the value for the given property definition.
      *
-     * @param property the property definition
-     * @param <T>      the type of the property value
+     * @param property
+     *            the property definition
+     * @param <T>
+     *            the type of the property value
      * @return the property value, or empty if not set
      */
     @SuppressWarnings("unchecked")
@@ -77,7 +78,8 @@ public final class TypedPropertyMap {
     /**
      * Returns true if this map contains a value for the given property.
      *
-     * @param property the property definition
+     * @param property
+     *            the property definition
      * @return true if a value is present
      */
     public boolean contains(PropertyDefinition<?> property) {
@@ -112,13 +114,14 @@ public final class TypedPropertyMap {
     }
 
     /**
-     * Creates a new property map that uses this map's values, falling back to
-     * the given fallback map for inherited properties that are not set in this map.
+     * Creates a new property map that uses this map's values, falling back to the
+     * given fallback map for inherited properties that are not set in this map.
      * <p>
      * Only properties marked as {@link PropertyDefinition#isInheritable()} are
      * inherited from the fallback. Non-inheritable properties are not inherited.
      *
-     * @param fallback the fallback map (typically from parent element)
+     * @param fallback
+     *            the fallback map (typically from parent element)
      * @return a new map with fallback behavior for inheritable properties
      */
     public TypedPropertyMap withFallback(TypedPropertyMap fallback) {
@@ -198,9 +201,12 @@ public final class TypedPropertyMap {
         /**
          * Puts a property value into the map.
          *
-         * @param property the property definition
-         * @param value    the property value
-         * @param <T>      the type of the property value
+         * @param property
+         *            the property definition
+         * @param value
+         *            the property value
+         * @param <T>
+         *            the type of the property value
          * @return this builder
          */
         public <T> Builder put(PropertyDefinition<T> property, T value) {

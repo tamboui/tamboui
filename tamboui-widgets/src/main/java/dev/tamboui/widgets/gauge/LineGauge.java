@@ -11,9 +11,9 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
@@ -21,16 +21,13 @@ import dev.tamboui.widget.Widget;
 /**
  * A progress indicator that renders as a horizontal line.
  * <p>
- * Unlike {@link Gauge}, LineGauge renders on a single line and uses line-drawing
- * characters to show progress. It's more compact and suitable for status bars.
+ * Unlike {@link Gauge}, LineGauge renders on a single line and uses
+ * line-drawing characters to show progress. It's more compact and suitable for
+ * status bars.
  *
  * <pre>{@code
- * LineGauge gauge = LineGauge.builder()
- *     .ratio(0.75)
- *     .label("Progress: ")
- *     .lineSet(LineGauge.THICK)
- *     .filledStyle(Style.EMPTY.fg(Color.GREEN))
- *     .build();
+ * LineGauge gauge = LineGauge.builder().ratio(0.75).label("Progress: ").lineSet(LineGauge.THICK)
+ *         .filledStyle(Style.EMPTY.fg(Color.GREEN)).build();
  * }</pre>
  */
 public final class LineGauge implements Widget {
@@ -55,16 +52,16 @@ public final class LineGauge implements Widget {
      * <p>
      * CSS property name: {@code filled-color}
      */
-    public static final PropertyDefinition<Color> FILLED_COLOR =
-            PropertyDefinition.of("filled-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> FILLED_COLOR = PropertyDefinition
+            .of("filled-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the unfilled portion color.
      * <p>
      * CSS property name: {@code unfilled-color}
      */
-    public static final PropertyDefinition<Color> UNFILLED_COLOR =
-            PropertyDefinition.of("unfilled-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> UNFILLED_COLOR = PropertyDefinition
+            .of("unfilled-color", ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(FILLED_COLOR, UNFILLED_COLOR);
@@ -118,7 +115,8 @@ public final class LineGauge implements Widget {
     /**
      * Creates a line gauge with the given percentage (0-100).
      *
-     * @param percent the progress percentage (0-100)
+     * @param percent
+     *            the progress percentage (0-100)
      * @return a new line gauge
      */
     public static LineGauge percent(int percent) {
@@ -128,7 +126,8 @@ public final class LineGauge implements Widget {
     /**
      * Creates a line gauge with the given ratio (0.0-1.0).
      *
-     * @param ratio the progress ratio (0.0-1.0)
+     * @param ratio
+     *            the progress ratio (0.0-1.0)
      * @return a new line gauge
      */
     public static LineGauge ratio(double ratio) {
@@ -173,7 +172,8 @@ public final class LineGauge implements Widget {
     }
 
     /**
-     * Defines the characters used for filled and unfilled portions of the line gauge.
+     * Defines the characters used for filled and unfilled portions of the line
+     * gauge.
      */
     public static final class LineSet {
         private final String unfilled;
@@ -182,8 +182,10 @@ public final class LineGauge implements Widget {
         /**
          * Creates a new line set with the given characters.
          *
-         * @param unfilled the character for the unfilled portion
-         * @param filled the character for the filled portion
+         * @param unfilled
+         *            the character for the unfilled portion
+         * @param filled
+         *            the character for the filled portion
          */
         public LineSet(String unfilled, String filled) {
             if (unfilled == null || unfilled.isEmpty()) {
@@ -256,18 +258,22 @@ public final class LineGauge implements Widget {
         private Color filledColor;
         private Color unfilledColor;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the progress as a percentage (0-100).
          *
-         * @param percent the progress percentage (0-100)
+         * @param percent
+         *            the progress percentage (0-100)
          * @return this builder
-         * @throws IllegalArgumentException if percent is not in range 0-100
+         * @throws IllegalArgumentException
+         *             if percent is not in range 0-100
          */
         public Builder percent(int percent) {
             if (percent < 0 || percent > 100) {
-                throw new IllegalArgumentException("Percent must be between 0 and 100, got: " + percent);
+                throw new IllegalArgumentException(
+                        "Percent must be between 0 and 100, got: " + percent);
             }
             this.ratio = percent / 100.0;
             return this;
@@ -276,13 +282,16 @@ public final class LineGauge implements Widget {
         /**
          * Sets the progress as a ratio (0.0-1.0).
          *
-         * @param ratio the progress ratio (0.0-1.0)
+         * @param ratio
+         *            the progress ratio (0.0-1.0)
          * @return this builder
-         * @throws IllegalArgumentException if ratio is not in range 0.0-1.0
+         * @throws IllegalArgumentException
+         *             if ratio is not in range 0.0-1.0
          */
         public Builder ratio(double ratio) {
             if (ratio < 0.0 || ratio > 1.0) {
-                throw new IllegalArgumentException("Ratio must be between 0.0 and 1.0, got: " + ratio);
+                throw new IllegalArgumentException(
+                        "Ratio must be between 0.0 and 1.0, got: " + ratio);
             }
             this.ratio = ratio;
             return this;
@@ -291,7 +300,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the label displayed before the gauge line.
          *
-         * @param label the label text
+         * @param label
+         *            the label text
          * @return this builder
          */
         public Builder label(String label) {
@@ -302,7 +312,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the label displayed before the gauge line.
          *
-         * @param label the label as a styled line
+         * @param label
+         *            the label as a styled line
          * @return this builder
          */
         public Builder label(Line label) {
@@ -313,7 +324,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the label displayed before the gauge line.
          *
-         * @param span the label as a styled span
+         * @param span
+         *            the label as a styled span
          * @return this builder
          */
         public Builder label(Span span) {
@@ -324,7 +336,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the overall style for the widget.
          *
-         * @param style the widget style
+         * @param style
+         *            the widget style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -335,7 +348,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the style for the filled portion of the gauge.
          *
-         * @param filledStyle the filled portion style
+         * @param filledStyle
+         *            the filled portion style
          * @return this builder
          */
         public Builder filledStyle(Style filledStyle) {
@@ -346,7 +360,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the style for the unfilled portion of the gauge.
          *
-         * @param unfilledStyle the unfilled portion style
+         * @param unfilledStyle
+         *            the unfilled portion style
          * @return this builder
          */
         public Builder unfilledStyle(Style unfilledStyle) {
@@ -357,7 +372,8 @@ public final class LineGauge implements Widget {
         /**
          * Sets the line character set to use.
          *
-         * @param lineSet the line character set
+         * @param lineSet
+         *            the line character set
          * @return this builder
          */
         public Builder lineSet(LineSet lineSet) {
@@ -368,10 +384,11 @@ public final class LineGauge implements Widget {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code filled-color}, {@code unfilled-color},
-         * and {@code background} will be resolved if not set programmatically.
+         * When set, properties like {@code filled-color}, {@code unfilled-color}, and
+         * {@code background} will be resolved if not set programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -384,7 +401,8 @@ public final class LineGauge implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -397,7 +415,8 @@ public final class LineGauge implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the filled color
+         * @param color
+         *            the filled color
          * @return this builder
          */
         public Builder filledColor(Color color) {
@@ -410,7 +429,8 @@ public final class LineGauge implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the unfilled color
+         * @param color
+         *            the unfilled color
          * @return this builder
          */
         public Builder unfilledColor(Color color) {

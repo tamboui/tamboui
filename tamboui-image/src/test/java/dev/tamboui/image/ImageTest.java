@@ -4,14 +4,15 @@
  */
 package dev.tamboui.image;
 
+import java.awt.image.BufferedImage;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widgets.block.Block;
-import org.junit.jupiter.api.Test;
-
-import java.awt.image.BufferedImage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,9 +21,7 @@ class ImageTest {
     @Test
     void builder_creates_image() {
         ImageData data = createTestImage(10, 10, 0xFFFF0000);
-        Image image = Image.builder()
-            .data(data)
-            .build();
+        Image image = Image.builder().data(data).build();
 
         assertThat(image).isNotNull();
         assertThat(image.data()).isSameAs(data);
@@ -39,29 +38,23 @@ class ImageTest {
 
     @Test
     void builder_defaults_to_fit_scaling() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000)).build();
 
         assertThat(image.scaling()).isEqualTo(ImageScaling.FIT);
     }
 
     @Test
     void builder_accepts_scaling() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .scaling(ImageScaling.STRETCH)
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000))
+                .scaling(ImageScaling.STRETCH).build();
 
         assertThat(image.scaling()).isEqualTo(ImageScaling.STRETCH);
     }
 
     @Test
     void builder_accepts_null_scaling_defaults_to_fit() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .scaling(null)
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000)).scaling(null)
+                .build();
 
         assertThat(image.scaling()).isEqualTo(ImageScaling.FIT);
     }
@@ -69,10 +62,8 @@ class ImageTest {
     @Test
     void builder_accepts_block() {
         Block block = Block.bordered();
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .block(block)
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000)).block(block)
+                .build();
 
         assertThat(image.block()).isSameAs(block);
     }
@@ -80,19 +71,15 @@ class ImageTest {
     @Test
     void builder_accepts_protocol() {
         HalfBlockProtocol protocol = new HalfBlockProtocol();
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .protocol(protocol)
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000)).protocol(protocol)
+                .build();
 
         assertThat(image.protocol()).isSameAs(protocol);
     }
 
     @Test
     void render_empty_area_does_nothing() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000)).build();
 
         Rect area = new Rect(0, 0, 0, 0);
         Buffer buffer = Buffer.empty(area);
@@ -114,10 +101,8 @@ class ImageTest {
 
     @Test
     void render_with_half_block_protocol() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .protocol(new HalfBlockProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000))
+                .protocol(new HalfBlockProtocol()).build();
 
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -140,10 +125,8 @@ class ImageTest {
 
     @Test
     void render_with_braille_protocol() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFFFFFF))
-            .protocol(new BrailleProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFFFFFF))
+                .protocol(new BrailleProtocol()).build();
 
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -167,11 +150,8 @@ class ImageTest {
 
     @Test
     void render_with_block_renders_border() {
-        Image image = Image.builder()
-            .data(createTestImage(10, 10, 0xFFFF0000))
-            .block(Block.bordered())
-            .protocol(new HalfBlockProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(10, 10, 0xFFFF0000))
+                .block(Block.bordered()).protocol(new HalfBlockProtocol()).build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -188,11 +168,8 @@ class ImageTest {
     @Test
     void render_fit_scaling_maintains_aspect_ratio() {
         // Create wide image (20x10) to render in square area (10x10)
-        Image image = Image.builder()
-            .data(createTestImage(20, 10, 0xFFFF0000))
-            .scaling(ImageScaling.FIT)
-            .protocol(new HalfBlockProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(20, 10, 0xFFFF0000))
+                .scaling(ImageScaling.FIT).protocol(new HalfBlockProtocol()).build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -203,11 +180,8 @@ class ImageTest {
 
     @Test
     void render_stretch_scaling_fills_area() {
-        Image image = Image.builder()
-            .data(createTestImage(5, 5, 0xFFFF0000))
-            .scaling(ImageScaling.STRETCH)
-            .protocol(new HalfBlockProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(5, 5, 0xFFFF0000))
+                .scaling(ImageScaling.STRETCH).protocol(new HalfBlockProtocol()).build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -218,11 +192,8 @@ class ImageTest {
 
     @Test
     void render_none_scaling_preserves_original_size() {
-        Image image = Image.builder()
-            .data(createTestImage(5, 5, 0xFFFF0000))
-            .scaling(ImageScaling.NONE)
-            .protocol(new HalfBlockProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(5, 5, 0xFFFF0000))
+                .scaling(ImageScaling.NONE).protocol(new HalfBlockProtocol()).build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);
@@ -233,11 +204,8 @@ class ImageTest {
 
     @Test
     void render_fill_scaling_covers_area() {
-        Image image = Image.builder()
-            .data(createTestImage(20, 10, 0xFFFF0000))
-            .scaling(ImageScaling.FILL)
-            .protocol(new HalfBlockProtocol())
-            .build();
+        Image image = Image.builder().data(createTestImage(20, 10, 0xFFFF0000))
+                .scaling(ImageScaling.FILL).protocol(new HalfBlockProtocol()).build();
 
         Rect area = new Rect(0, 0, 10, 10);
         Buffer buffer = Buffer.empty(area);

@@ -4,39 +4,34 @@
  */
 package dev.tamboui.layout.dock;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * A 5-region dock layout widget that arranges children into top, bottom,
- * left, right, and center regions — the most common TUI application structure
- * (header + sidebar + content + footer).
+ * A 5-region dock layout widget that arranges children into top, bottom, left,
+ * right, and center regions — the most common TUI application structure (header
+ * + sidebar + content + footer).
  * <p>
  * The layout algorithm works in two steps:
  * <ol>
- *   <li>Vertical split: {@code [topHeight, fill(), bottomHeight]} to get
- *       topRect, middleRect, bottomRect (skipping null regions)</li>
- *   <li>Horizontal split of middleRect: {@code [leftWidth, fill(), rightWidth]}
- *       to get leftRect, centerRect, rightRect (skipping null regions)</li>
+ * <li>Vertical split: {@code [topHeight, fill(), bottomHeight]} to get topRect,
+ * middleRect, bottomRect (skipping null regions)</li>
+ * <li>Horizontal split of middleRect: {@code [leftWidth, fill(), rightWidth]}
+ * to get leftRect, centerRect, rightRect (skipping null regions)</li>
  * </ol>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
- * Dock dock = Dock.builder()
- *     .top(headerWidget)
- *     .bottom(footerWidget)
- *     .left(sidebarWidget)
- *     .center(contentWidget)
- *     .topHeight(Constraint.length(3))
- *     .bottomHeight(Constraint.length(1))
- *     .leftWidth(Constraint.length(20))
- *     .build();
+ * Dock dock = Dock.builder().top(headerWidget).bottom(footerWidget).left(sidebarWidget)
+ *         .center(contentWidget).topHeight(Constraint.length(3)).bottomHeight(Constraint.length(1))
+ *         .leftWidth(Constraint.length(20)).build();
  *
  * dock.render(area, buffer);
  * }</pre>
@@ -97,9 +92,7 @@ public final class Dock implements Widget {
             vConstraints.add(bottomHeight);
         }
 
-        List<Rect> vAreas = Layout.vertical()
-            .constraints(vConstraints)
-            .split(area);
+        List<Rect> vAreas = Layout.vertical().constraints(vConstraints).split(area);
 
         int idx = 0;
         if (top != null) {
@@ -132,9 +125,7 @@ public final class Dock implements Widget {
                 hConstraints.add(rightWidth);
             }
 
-            List<Rect> hAreas = Layout.horizontal()
-                .constraints(hConstraints)
-                .split(middleRect);
+            List<Rect> hAreas = Layout.horizontal().constraints(hConstraints).split(middleRect);
 
             int hIdx = 0;
             if (left != null) {
@@ -186,7 +177,8 @@ public final class Dock implements Widget {
         /**
          * Sets the top region widget.
          *
-         * @param widget the top widget (e.g., a header bar)
+         * @param widget
+         *            the top widget (e.g., a header bar)
          * @return this builder
          */
         public Builder top(Widget widget) {
@@ -197,7 +189,8 @@ public final class Dock implements Widget {
         /**
          * Sets the bottom region widget.
          *
-         * @param widget the bottom widget (e.g., a status bar)
+         * @param widget
+         *            the bottom widget (e.g., a status bar)
          * @return this builder
          */
         public Builder bottom(Widget widget) {
@@ -208,7 +201,8 @@ public final class Dock implements Widget {
         /**
          * Sets the left region widget.
          *
-         * @param widget the left widget (e.g., a sidebar)
+         * @param widget
+         *            the left widget (e.g., a sidebar)
          * @return this builder
          */
         public Builder left(Widget widget) {
@@ -219,7 +213,8 @@ public final class Dock implements Widget {
         /**
          * Sets the right region widget.
          *
-         * @param widget the right widget (e.g., a side panel)
+         * @param widget
+         *            the right widget (e.g., a side panel)
          * @return this builder
          */
         public Builder right(Widget widget) {
@@ -230,7 +225,8 @@ public final class Dock implements Widget {
         /**
          * Sets the center region widget.
          *
-         * @param widget the center widget (e.g., main content)
+         * @param widget
+         *            the center widget (e.g., main content)
          * @return this builder
          */
         public Builder center(Widget widget) {
@@ -241,7 +237,8 @@ public final class Dock implements Widget {
         /**
          * Sets the height constraint for the top region.
          *
-         * @param constraint the height constraint (default: {@code length(1)})
+         * @param constraint
+         *            the height constraint (default: {@code length(1)})
          * @return this builder
          */
         public Builder topHeight(Constraint constraint) {
@@ -252,7 +249,8 @@ public final class Dock implements Widget {
         /**
          * Sets the height constraint for the bottom region.
          *
-         * @param constraint the height constraint (default: {@code length(1)})
+         * @param constraint
+         *            the height constraint (default: {@code length(1)})
          * @return this builder
          */
         public Builder bottomHeight(Constraint constraint) {
@@ -263,7 +261,8 @@ public final class Dock implements Widget {
         /**
          * Sets the width constraint for the left region.
          *
-         * @param constraint the width constraint (default: {@code length(10)})
+         * @param constraint
+         *            the width constraint (default: {@code length(10)})
          * @return this builder
          */
         public Builder leftWidth(Constraint constraint) {
@@ -274,7 +273,8 @@ public final class Dock implements Widget {
         /**
          * Sets the width constraint for the right region.
          *
-         * @param constraint the width constraint (default: {@code length(10)})
+         * @param constraint
+         *            the width constraint (default: {@code length(10)})
          * @return this builder
          */
         public Builder rightWidth(Constraint constraint) {

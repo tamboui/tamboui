@@ -1,14 +1,14 @@
 package dev.tamboui.toolkit.id;
 
-import dev.tamboui.toolkit.element.Element;
-
 import java.util.concurrent.atomic.AtomicLong;
+
+import dev.tamboui.toolkit.element.Element;
 
 /**
  * Generates unique IDs for elements and components.
  * <p>
- * IDs are formed by combining the class name with a unique counter.
- * This ensures that each instance receives a distinct identifier.
+ * IDs are formed by combining the class name with a unique counter. This
+ * ensures that each instance receives a distinct identifier.
  */
 public class IdGenerator {
     private static final IdGenerator DEFAULT_INSTANCE = new IdGenerator();
@@ -21,7 +21,9 @@ public class IdGenerator {
 
     /**
      * Generates a unique ID for the given element.
-     * @param element the element to generate an ID for
+     * 
+     * @param element
+     *            the element to generate an ID for
      * @return a unique ID string
      */
     public String generateId(Element element) {
@@ -30,7 +32,9 @@ public class IdGenerator {
 
     /**
      * Generates a new unique ID for the given element using the default instance.
-     * @param element the element to generate an ID for
+     * 
+     * @param element
+     *            the element to generate an ID for
      * @return a unique ID string
      */
     public static String newId(Element element) {

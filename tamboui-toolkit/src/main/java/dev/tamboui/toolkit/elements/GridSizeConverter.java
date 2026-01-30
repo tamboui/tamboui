@@ -4,17 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.Optional;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts CSS string values to {@link GridSize} objects.
  * <p>
  * Supported formats:
  * <ul>
- *   <li>{@code "3"} — 3 columns, auto rows</li>
- *   <li>{@code "3 4"} — 3 columns, 4 rows</li>
+ * <li>{@code "3"} — 3 columns, auto rows</li>
+ * <li>{@code "3 4"} — 3 columns, 4 rows</li>
  * </ul>
  */
 public final class GridSizeConverter implements PropertyConverter<GridSize> {

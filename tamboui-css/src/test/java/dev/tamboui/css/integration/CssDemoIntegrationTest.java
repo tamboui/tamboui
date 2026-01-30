@@ -4,30 +4,30 @@
  */
 package dev.tamboui.css.integration;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Modifier;
-import dev.tamboui.style.Style;
-import dev.tamboui.layout.Padding;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
+import dev.tamboui.style.Style;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Comprehensive integration tests for CSS styling.
- * Tests EVERY element type with expected colors, backgrounds, borders, and modifiers.
+ * Comprehensive integration tests for CSS styling. Tests EVERY element type
+ * with expected colors, backgrounds, borders, and modifiers.
  */
 class CssDemoIntegrationTest {
 
@@ -64,11 +64,13 @@ class CssDemoIntegrationTest {
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
-            // Expected: color: white (background is NOT set on * to allow children to be transparent)
+            // Expected: color: white (background is NOT set on * to allow children to be
+            // transparent)
             assertThat(style.fg()).isPresent();
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
 
-            // Background should NOT be set - children should be transparent over parent backgrounds
+            // Background should NOT be set - children should be transparent over parent
+            // backgrounds
             assertThat(style.bg()).isEmpty();
         }
 
@@ -87,7 +89,8 @@ class CssDemoIntegrationTest {
             assertThat(style.fg()).isPresent();
             assertThat(style.fg().get()).isEqualTo(Color.WHITE);
 
-            // Expected: border-color: dark-gray (from Panel rule via $border-color variable)
+            // Expected: border-color: dark-gray (from Panel rule via $border-color
+            // variable)
             assertThat(resolved.borderColor()).isPresent();
             assertThat(resolved.borderColor().get()).isEqualTo(Color.DARK_GRAY);
         }
@@ -117,7 +120,8 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel:focus - has bold text-style")
         void panelFocus_hasBoldModifier() {
             Styleable panel = createStyleable("Panel", "my-panel", Collections.emptySet());
-            CssStyleResolver resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(), Collections.emptyList());
+            CssStyleResolver resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(),
+                    Collections.emptyList());
 
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
@@ -254,7 +258,8 @@ class CssDemoIntegrationTest {
         @Test
         @DisplayName("#theme-indicator - cyan bold")
         void themeIndicatorId_hasCyanBold() {
-            Styleable element = createStyleable("TextElement", "theme-indicator", Collections.emptySet());
+            Styleable element = createStyleable("TextElement", "theme-indicator",
+                    Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 
@@ -321,7 +326,8 @@ class CssDemoIntegrationTest {
             Color.Rgb fg = (Color.Rgb) style.fg().get();
             assertThat(fg.r()).isEqualTo(0x1a);
 
-            // Background should NOT be set - children should be transparent over parent backgrounds
+            // Background should NOT be set - children should be transparent over parent
+            // backgrounds
             assertThat(style.bg()).isEmpty();
         }
 
@@ -374,7 +380,8 @@ class CssDemoIntegrationTest {
         @DisplayName("Panel:focus - has bold text-style")
         void panelFocus_hasBoldModifier() {
             Styleable panel = createStyleable("Panel", "my-panel", Collections.emptySet());
-            CssStyleResolver resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(), Collections.emptyList());
+            CssStyleResolver resolved = styleEngine.resolve(panel, PseudoClassState.ofFocused(),
+                    Collections.emptyList());
 
             // Expected: text-style: bold
             assertThat(resolved.modifiers()).contains(Modifier.BOLD);
@@ -547,7 +554,8 @@ class CssDemoIntegrationTest {
         @Test
         @DisplayName("#theme-indicator - #0066cc bold")
         void themeIndicatorId_hasBlueBold() {
-            Styleable element = createStyleable("TextElement", "theme-indicator", Collections.emptySet());
+            Styleable element = createStyleable("TextElement", "theme-indicator",
+                    Collections.emptySet());
             CssStyleResolver resolved = styleEngine.resolve(element);
             Style style = resolved.toStyle();
 

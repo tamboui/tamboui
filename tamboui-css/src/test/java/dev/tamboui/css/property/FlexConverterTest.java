@@ -4,12 +4,13 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Flex;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Flex;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,52 +20,47 @@ class FlexConverterTest {
 
     @Test
     void convertsStart() {
-        assertThat(converter.convert("start", Collections.emptyMap()))
-            .hasValue(Flex.START);
+        assertThat(converter.convert("start", Collections.emptyMap())).hasValue(Flex.START);
     }
 
     @Test
     void convertsCenter() {
-        assertThat(converter.convert("center", Collections.emptyMap()))
-            .hasValue(Flex.CENTER);
+        assertThat(converter.convert("center", Collections.emptyMap())).hasValue(Flex.CENTER);
     }
 
     @Test
     void convertsEnd() {
-        assertThat(converter.convert("end", Collections.emptyMap()))
-            .hasValue(Flex.END);
+        assertThat(converter.convert("end", Collections.emptyMap())).hasValue(Flex.END);
     }
 
     @Test
     void convertsSpaceBetween() {
         assertThat(converter.convert("space-between", Collections.emptyMap()))
-            .hasValue(Flex.SPACE_BETWEEN);
+                .hasValue(Flex.SPACE_BETWEEN);
     }
 
     @Test
     void convertsSpaceAround() {
         assertThat(converter.convert("space-around", Collections.emptyMap()))
-            .hasValue(Flex.SPACE_AROUND);
+                .hasValue(Flex.SPACE_AROUND);
     }
 
     @Test
     void convertsSpaceEvenly() {
         assertThat(converter.convert("space-evenly", Collections.emptyMap()))
-            .hasValue(Flex.SPACE_EVENLY);
+                .hasValue(Flex.SPACE_EVENLY);
     }
 
     @Test
     void caseInsensitive() {
-        assertThat(converter.convert("START", Collections.emptyMap()))
-            .hasValue(Flex.START);
+        assertThat(converter.convert("START", Collections.emptyMap())).hasValue(Flex.START);
         assertThat(converter.convert("Space-Between", Collections.emptyMap()))
-            .hasValue(Flex.SPACE_BETWEEN);
+                .hasValue(Flex.SPACE_BETWEEN);
     }
 
     @Test
     void handlesWhitespace() {
-        assertThat(converter.convert("  center  ", Collections.emptyMap()))
-            .hasValue(Flex.CENTER);
+        assertThat(converter.convert("  center  ", Collections.emptyMap())).hasValue(Flex.CENTER);
     }
 
     @Test
@@ -72,8 +68,7 @@ class FlexConverterTest {
         Map<String, String> variables = new HashMap<>();
         variables.put("flex-mode", "space-evenly");
 
-        assertThat(converter.convert("$flex-mode", variables))
-            .hasValue(Flex.SPACE_EVENLY);
+        assertThat(converter.convert("$flex-mode", variables)).hasValue(Flex.SPACE_EVENLY);
     }
 
     @Test

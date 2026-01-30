@@ -4,25 +4,29 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import dev.tamboui.layout.Fraction;
 
 /**
  * Cassowary constraint solver using the dual simplex method.
  *
- * <p>The solver maintains a tableau of linear equations and supports:
+ * <p>
+ * The solver maintains a tableau of linear equations and supports:
  * <ul>
- *   <li>Adding and removing constraints dynamically</li>
- *   <li>Suggesting values for edit variables</li>
- *   <li>Hierarchical constraint priorities</li>
+ * <li>Adding and removing constraints dynamically</li>
+ * <li>Suggesting values for edit variables</li>
+ * <li>Hierarchical constraint priorities</li>
  * </ul>
  *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
+ * <p>
+ * This implementation uses {@link Fraction} for exact arithmetic, avoiding the
+ * cumulative rounding errors that occur with floating-point.
  *
- * <p>Example usage:
+ * <p>
+ * Example usage:
+ * 
  * <pre>
  * Solver solver = new Solver();
  * Variable left = new Variable("left");
@@ -30,15 +34,11 @@ import java.util.Map;
  * Variable right = new Variable("right");
  *
  * // right == left + width (required)
- * solver.addConstraint(
- *     Expression.variable(right)
- *         .equalTo(Expression.variable(left).plus(Expression.variable(width)),
- *                  Strength.REQUIRED));
+ * solver.addConstraint(Expression.variable(right)
+ *         .equalTo(Expression.variable(left).plus(Expression.variable(width)), Strength.REQUIRED));
  *
  * // width >= 100 (required)
- * solver.addConstraint(
- *     Expression.variable(width)
- *         .greaterThanOrEqual(100, Strength.REQUIRED));
+ * solver.addConstraint(Expression.variable(width).greaterThanOrEqual(100, Strength.REQUIRED));
  *
  * solver.updateVariables();
  * Fraction resolvedWidth = solver.valueOf(width);
@@ -51,8 +51,8 @@ import java.util.Map;
 public final class Solver {
 
     /**
-     * Tag associated with a constraint in the solver.
-     * Contains marker and other symbols created for the constraint.
+     * Tag associated with a constraint in the solver. Contains marker and other
+     * symbols created for the constraint.
      */
     private static final class Tag {
         Symbol marker;
@@ -99,9 +99,12 @@ public final class Solver {
     /**
      * Adds a constraint to the solver.
      *
-     * @param constraint the constraint to add
-     * @throws DuplicateConstraintException     if the constraint already exists
-     * @throws UnsatisfiableConstraintException if required and unsatisfiable
+     * @param constraint
+     *            the constraint to add
+     * @throws DuplicateConstraintException
+     *             if the constraint already exists
+     * @throws UnsatisfiableConstraintException
+     *             if required and unsatisfiable
      */
     public void addConstraint(CassowaryConstraint constraint) {
         addConstraintInternal(constraint);
@@ -111,9 +114,12 @@ public final class Solver {
     /**
      * Adds multiple constraints to the solver.
      *
-     * @param constraintList the constraints to add
-     * @throws DuplicateConstraintException     if any constraint already exists
-     * @throws UnsatisfiableConstraintException if any required constraint is unsatisfiable
+     * @param constraintList
+     *            the constraints to add
+     * @throws DuplicateConstraintException
+     *             if any constraint already exists
+     * @throws UnsatisfiableConstraintException
+     *             if any required constraint is unsatisfiable
      */
     public void addConstraints(Iterable<CassowaryConstraint> constraintList) {
         for (CassowaryConstraint constraint : constraintList) {
@@ -154,8 +160,10 @@ public final class Solver {
     /**
      * Removes a constraint from the solver.
      *
-     * @param constraint the constraint to remove
-     * @throws UnknownConstraintException if the constraint is not present
+     * @param constraint
+     *            the constraint to remove
+     * @throws UnknownConstraintException
+     *             if the constraint is not present
      */
     public void removeConstraint(CassowaryConstraint constraint) {
         Tag tag = constraints.remove(constraint);
@@ -172,8 +180,7 @@ public final class Solver {
             // The marker is not basic - find the row that contains it
             Symbol leaving = findLeavingSymbolForMarker(tag.marker);
             if (leaving == null) {
-                throw new InternalSolverException(
-                        "Failed to find leaving variable for marker");
+                throw new InternalSolverException("Failed to find leaving variable for marker");
             }
             row = rows.remove(leaving);
             row.solveFor(leaving, tag.marker);
@@ -186,7 +193,8 @@ public final class Solver {
     /**
      * Checks if the solver contains a constraint.
      *
-     * @param constraint the constraint to check
+     * @param constraint
+     *            the constraint to check
      * @return true if the constraint is in the solver
      */
     public boolean hasConstraint(CassowaryConstraint constraint) {
@@ -196,22 +204,23 @@ public final class Solver {
     /**
      * Adds an edit variable for interactive updates.
      *
-     * @param variable the variable to make editable
-     * @param strength the strength of the edit constraint (must not be REQUIRED)
-     * @throws IllegalArgumentException if strength is REQUIRED
+     * @param variable
+     *            the variable to make editable
+     * @param strength
+     *            the strength of the edit constraint (must not be REQUIRED)
+     * @throws IllegalArgumentException
+     *             if strength is REQUIRED
      */
     public void addEditVariable(Variable variable, Strength strength) {
         if (edits.containsKey(variable)) {
             throw new SolverException("Edit variable already exists: " + variable);
         }
         if (strength.isRequired()) {
-            throw new IllegalArgumentException(
-                    "Edit variable strength cannot be REQUIRED");
+            throw new IllegalArgumentException("Edit variable strength cannot be REQUIRED");
         }
 
         // Create a stay constraint: variable == currentValue
-        CassowaryConstraint constraint = Expression.variable(variable)
-                .equalTo(0, strength);
+        CassowaryConstraint constraint = Expression.variable(variable).equalTo(0, strength);
 
         addConstraint(constraint);
 
@@ -225,8 +234,10 @@ public final class Solver {
     /**
      * Removes an edit variable.
      *
-     * @param variable the variable to remove
-     * @throws SolverException if the variable is not an edit variable
+     * @param variable
+     *            the variable to remove
+     * @throws SolverException
+     *             if the variable is not an edit variable
      */
     public void removeEditVariable(Variable variable) {
         EditInfo info = edits.remove(variable);
@@ -239,7 +250,8 @@ public final class Solver {
     /**
      * Checks if a variable is an edit variable.
      *
-     * @param variable the variable to check
+     * @param variable
+     *            the variable to check
      * @return true if the variable is editable
      */
     public boolean hasEditVariable(Variable variable) {
@@ -249,11 +261,15 @@ public final class Solver {
     /**
      * Suggests a new value for an edit variable.
      *
-     * <p>Call {@link #updateVariables()} after suggesting values.
+     * <p>
+     * Call {@link #updateVariables()} after suggesting values.
      *
-     * @param variable the edit variable
-     * @param value    the suggested value
-     * @throws SolverException if the variable is not an edit variable
+     * @param variable
+     *            the edit variable
+     * @param value
+     *            the suggested value
+     * @throws SolverException
+     *             if the variable is not an edit variable
      */
     public void suggestValue(Variable variable, Fraction value) {
         EditInfo info = edits.get(variable);
@@ -281,10 +297,9 @@ public final class Solver {
         // The symbol is not basic - update all rows that contain it
         for (Map.Entry<Symbol, Row> entry : rows.entrySet()) {
             Fraction coeff = entry.getValue().coefficientFor(info.tag.marker);
-            if (!coeff.isZero()
-                    && entry.getKey().type() != Symbol.Type.EXTERNAL) {
-                entry.getValue().setConstant(
-                        entry.getValue().constant().add(delta.multiply(coeff)));
+            if (!coeff.isZero() && entry.getKey().type() != Symbol.Type.EXTERNAL) {
+                entry.getValue()
+                        .setConstant(entry.getValue().constant().add(delta.multiply(coeff)));
             }
         }
 
@@ -294,7 +309,8 @@ public final class Solver {
     /**
      * Updates all variable values after constraint changes.
      *
-     * <p>Must be called before reading variable values.
+     * <p>
+     * Must be called before reading variable values.
      */
     public void updateVariables() {
         for (Map.Entry<Variable, Symbol> entry : vars.entrySet()) {
@@ -312,7 +328,8 @@ public final class Solver {
     /**
      * Returns the current value of a variable.
      *
-     * @param variable the variable to query
+     * @param variable
+     *            the variable to query
      * @return the computed value, or 0 if not in the system
      */
     public Fraction valueOf(Variable variable) {
@@ -357,9 +374,11 @@ public final class Solver {
 
         // Handle constraint type
         switch (constraint.relation()) {
-            case LE:
-            case GE: {
-                Fraction coeff = constraint.relation() == Relation.LE ? Fraction.ONE : Fraction.NEG_ONE;
+            case LE :
+            case GE : {
+                Fraction coeff = constraint.relation() == Relation.LE
+                        ? Fraction.ONE
+                        : Fraction.NEG_ONE;
                 Symbol slack = Symbol.slack();
                 tag.marker = slack;
                 row.insertSymbol(slack, coeff);
@@ -371,7 +390,7 @@ public final class Solver {
                 }
                 break;
             }
-            case EQ: {
+            case EQ : {
                 if (constraint.strength().isRequired()) {
                     Symbol dummy = Symbol.dummy();
                     tag.marker = dummy;
@@ -411,15 +430,13 @@ public final class Solver {
         }
 
         // Second choice: a slack or error from the tag
-        if (tag.marker != null
-                && (tag.marker.type() == Symbol.Type.SLACK
+        if (tag.marker != null && (tag.marker.type() == Symbol.Type.SLACK
                 || tag.marker.type() == Symbol.Type.ERROR)) {
             if (row.coefficientFor(tag.marker).isNegative()) {
                 return tag.marker;
             }
         }
-        if (tag.other != null
-                && (tag.other.type() == Symbol.Type.SLACK
+        if (tag.other != null && (tag.other.type() == Symbol.Type.SLACK
                 || tag.other.type() == Symbol.Type.ERROR)) {
             if (row.coefficientFor(tag.other).isNegative()) {
                 return tag.other;

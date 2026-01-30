@@ -4,9 +4,9 @@
  */
 package dev.tamboui.internal.record;
 
-import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import dev.tamboui.export.BufferSvgExporter;
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.export.BufferSvgExporter;
 /**
- * Plays back scripted interactions for demo recording.
- * Supports VHS tape format (charmbracelet/vhs).
- * This is an internal API and not part of the public contract.
+ * Plays back scripted interactions for demo recording. Supports VHS tape format
+ * (charmbracelet/vhs). This is an internal API and not part of the public
+ * contract.
  */
 final class InteractionPlayer {
 
@@ -41,8 +41,10 @@ final class InteractionPlayer {
     /**
      * Loads interactions from a VHS tape file.
      *
-     * @param path the tape file path
-     * @return list of interactions, empty if file doesn't exist or has no interactions
+     * @param path
+     *            the tape file path
+     * @return list of interactions, empty if file doesn't exist or has no
+     *         interactions
      */
     static List<Interaction> loadFromFile(Path path, Path outputPath) {
         List<Interaction> interactions = new ArrayList<>();
@@ -71,16 +73,16 @@ final class InteractionPlayer {
             Interaction current = interactions.get(i);
 
             // Look for pattern: KeyPress("escape") + KeyPress("[") + KeyPress("A/B/C/D")
-            if (current instanceof Interaction.KeyPress &&
-                    "escape".equals(((Interaction.KeyPress) current).key()) &&
-                    i + 2 < interactions.size()) {
+            if (current instanceof Interaction.KeyPress
+                    && "escape".equals(((Interaction.KeyPress) current).key())
+                    && i + 2 < interactions.size()) {
 
                 Interaction next1 = interactions.get(i + 1);
                 Interaction next2 = interactions.get(i + 2);
 
-                if (next1 instanceof Interaction.KeyPress &&
-                        "[".equals(((Interaction.KeyPress) next1).key()) &&
-                        next2 instanceof Interaction.KeyPress) {
+                if (next1 instanceof Interaction.KeyPress
+                        && "[".equals(((Interaction.KeyPress) next1).key())
+                        && next2 instanceof Interaction.KeyPress) {
 
                     String finalChar = ((Interaction.KeyPress) next2).key();
                     String arrowKey;
@@ -117,7 +119,8 @@ final class InteractionPlayer {
         return result;
     }
 
-    private static void loadTapeFile(Path path, Path outputPath, List<Interaction> interactions) throws IOException {
+    private static void loadTapeFile(Path path, Path outputPath, List<Interaction> interactions)
+            throws IOException {
         List<String> lines = Files.readAllLines(path);
         boolean visible = true; // Track Show/Hide state
 
@@ -167,7 +170,8 @@ final class InteractionPlayer {
         }
     }
 
-    private static void parseVhsCommand(Path outputPath, String line, List<Interaction> interactions) {
+    private static void parseVhsCommand(Path outputPath, String line,
+            List<Interaction> interactions) {
         // Check for timing suffix: Command@duration count
         // e.g., "Right@2.5s 3" means press Right 3 times with 2.5s between each
         String cmd = line;
@@ -196,14 +200,14 @@ final class InteractionPlayer {
         String args = parts.length > 1 ? parts[1] : "";
 
         switch (command) {
-            case "sleep":
+            case "sleep" :
                 interactions.add(new Interaction.Wait(parseDuration(args)));
                 break;
-            case "screenshot":
+            case "screenshot" :
                 // Resolve screenshot path relative to the .cast file's directory (same folder)
                 interactions.add(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
                 break;
-            case "type":
+            case "type" :
                 // Type "text" - parse quoted string and type each character
                 String text = parseQuotedString(args);
                 for (char c : text.toCharArray()) {
@@ -211,67 +215,67 @@ final class InteractionPlayer {
                 }
                 break;
 
-            case "enter":
+            case "enter" :
                 addRepeatedKey("enter", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "tab":
+            case "tab" :
                 addRepeatedKey("tab", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "space":
+            case "space" :
                 addRepeatedKey("space", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "backspace":
+            case "backspace" :
                 addRepeatedKey("backspace", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "delete":
+            case "delete" :
                 addRepeatedKey("delete", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "escape":
+            case "escape" :
                 addRepeatedKey("escape", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "up":
+            case "up" :
                 addRepeatedKey("up", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "down":
+            case "down" :
                 addRepeatedKey("down", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "left":
+            case "left" :
                 addRepeatedKey("left", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "right":
+            case "right" :
                 addRepeatedKey("right", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "home":
+            case "home" :
                 addRepeatedKey("home", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "end":
+            case "end" :
                 addRepeatedKey("end", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "pageup":
+            case "pageup" :
                 addRepeatedKey("pageup", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "pagedown":
+            case "pagedown" :
                 addRepeatedKey("pagedown", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            case "ctrl+c":
+            case "ctrl+c" :
                 addRepeatedKey("ctrl+c", repeatCount, repeatDelayMs, interactions);
                 break;
 
-            default:
+            default :
                 // Check for Ctrl+key patterns
                 if (command.startsWith("ctrl+")) {
                     addRepeatedKey(command, repeatCount, repeatDelayMs, interactions);
@@ -280,7 +284,8 @@ final class InteractionPlayer {
         }
     }
 
-    private static void addRepeatedKey(String key, int count, int delayMs, List<Interaction> interactions) {
+    private static void addRepeatedKey(String key, int count, int delayMs,
+            List<Interaction> interactions) {
         for (int i = 0; i < count; i++) {
             if (i > 0 && delayMs > 0) {
                 interactions.add(new Interaction.Wait(delayMs));
@@ -295,7 +300,8 @@ final class InteractionPlayer {
             if (duration.endsWith("ms")) {
                 return Integer.parseInt(duration.substring(0, duration.length() - 2));
             } else if (duration.endsWith("s")) {
-                return (int) (Double.parseDouble(duration.substring(0, duration.length() - 1)) * 1000);
+                return (int) (Double.parseDouble(duration.substring(0, duration.length() - 1))
+                        * 1000);
             } else if (duration.contains(".")) {
                 // Bare decimal like "0.5" means seconds
                 return (int) (Double.parseDouble(duration) * 1000);
@@ -320,19 +326,19 @@ final class InteractionPlayer {
             if (c == '\\' && i + 1 < s.length()) {
                 char next = s.charAt(i + 1);
                 switch (next) {
-                    case 'n':
+                    case 'n' :
                         result.append('\n');
                         i++;
                         break;
-                    case 't':
+                    case 't' :
                         result.append('\t');
                         i++;
                         break;
-                    case 'r':
+                    case 'r' :
                         result.append('\r');
                         i++;
                         break;
-                    case 'x':
+                    case 'x' :
                         // Hex escape \x01 etc.
                         if (i + 3 < s.length()) {
                             try {
@@ -346,15 +352,15 @@ final class InteractionPlayer {
                             result.append(c);
                         }
                         break;
-                    case '"':
+                    case '"' :
                         result.append('"');
                         i++;
                         break;
-                    case '\\':
+                    case '\\' :
                         result.append('\\');
                         i++;
                         break;
-                    default:
+                    default :
                         result.append(c);
                         break;
                 }
@@ -396,10 +402,11 @@ final class InteractionPlayer {
     }
 
     /**
-     * Gets the next byte to return from read(), or -2 for timeout.
-     * This method handles wait commands by sleeping.
+     * Gets the next byte to return from read(), or -2 for timeout. This method
+     * handles wait commands by sleeping.
      *
-     * @param maxWaitMs maximum time to wait
+     * @param maxWaitMs
+     *            maximum time to wait
      * @return the next byte, or -2 for timeout, or 'q' if finished
      */
     int nextByte(int maxWaitMs) {
@@ -447,7 +454,8 @@ final class InteractionPlayer {
                     Files.createDirectories(screenshot.path().getParent());
                     Files.write(screenshot.path(), svg.getBytes(StandardCharsets.UTF_8));
                 } catch (IOException e) {
-                    throw new UncheckedIOException("Warning: Failed to write screenshot: " + e.getMessage(),e);
+                    throw new UncheckedIOException(
+                            "Warning: Failed to write screenshot: " + e.getMessage(), e);
                 }
                 return -2; // Timeout to trigger redraw
             }
@@ -470,91 +478,91 @@ final class InteractionPlayer {
             lower = lower.substring(plusIdx + 1);
 
             switch (prefix) {
-                case "ctrl":
-                case "control":
+                case "ctrl" :
+                case "control" :
                     ctrl = true;
                     break;
-                case "shift":
+                case "shift" :
                     shift = true;
                     break;
-                default:
+                default :
                     break;
             }
         }
 
         // Convert key name to bytes
         switch (lower) {
-            case "up":
-            case "arrow_up":
+            case "up" :
+            case "arrow_up" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) 'A');
                 break;
-            case "down":
-            case "arrow_down":
+            case "down" :
+            case "arrow_down" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) 'B');
                 break;
-            case "right":
-            case "arrow_right":
+            case "right" :
+            case "arrow_right" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) 'C');
                 break;
-            case "left":
-            case "arrow_left":
+            case "left" :
+            case "arrow_left" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) 'D');
                 break;
-            case "enter":
-            case "return":
+            case "enter" :
+            case "return" :
                 pendingBytes.add((int) '\r');
                 break;
-            case "esc":
-            case "escape":
+            case "esc" :
+            case "escape" :
                 pendingBytes.add(ESC);
                 break;
-            case "tab":
+            case "tab" :
                 pendingBytes.add((int) '\t');
                 break;
-            case "space":
+            case "space" :
                 pendingBytes.add((int) ' ');
                 break;
-            case "backspace":
-            case "back":
+            case "backspace" :
+            case "back" :
                 pendingBytes.add(127);
                 break;
-            case "home":
+            case "home" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) 'H');
                 break;
-            case "end":
+            case "end" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) 'F');
                 break;
-            case "delete":
+            case "delete" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) '3');
                 pendingBytes.add((int) '~');
                 break;
-            case "pageup":
+            case "pageup" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) '5');
                 pendingBytes.add((int) '~');
                 break;
-            case "pagedown":
+            case "pagedown" :
                 pendingBytes.add(ESC);
                 pendingBytes.add((int) '[');
                 pendingBytes.add((int) '6');
                 pendingBytes.add((int) '~');
                 break;
-            default:
+            default :
                 // Single character - use original keySpec to preserve case
                 if (keySpec.length() == 1) {
                     char c = keySpec.charAt(0);

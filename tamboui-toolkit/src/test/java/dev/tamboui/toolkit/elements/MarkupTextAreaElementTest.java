@@ -4,26 +4,24 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.ElementRegistry;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledSpan;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
+import dev.tamboui.style.RichTextState;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StyledAreaInfo;
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.RichTextState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -37,9 +35,8 @@ class MarkupTextAreaElementTest {
     @Test
     @DisplayName("MarkupTextAreaElement fluent API chains correctly")
     void fluentApiChaining() {
-        MarkupTextAreaElement element = markupTextArea("[bold]Hello[/bold]")
-            .wrapWord()
-            .showLineNumbers();
+        MarkupTextAreaElement element = markupTextArea("[bold]Hello[/bold]").wrapWord()
+                .showLineNumbers();
 
         assertThat(element).isInstanceOf(MarkupTextAreaElement.class);
     }
@@ -65,8 +62,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Hello")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Hello").render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("e");
@@ -82,8 +78,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("[bold]Hello[/bold]")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("[bold]Hello[/bold]").render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
         assertThat(buffer.get(0, 0).style().addModifiers()).contains(Modifier.BOLD);
@@ -96,8 +91,8 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("[red]Red[/red] and [blue]Blue[/blue]")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("[red]Red[/red] and [blue]Blue[/blue]").render(frame, area,
+                RenderContext.empty());
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
         assertThat(buffer.get(8, 0).style().fg()).contains(Color.BLUE);
@@ -110,8 +105,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("[red][bold]Both[/bold][/red]")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("[red][bold]Both[/bold][/red]").render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
         assertThat(buffer.get(0, 0).style().addModifiers()).contains(Modifier.BOLD);
@@ -124,8 +118,8 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Normal\n[bold]Bold[/bold]\n[red]Red[/red]")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Normal\n[bold]Bold[/bold]\n[red]Red[/red]").render(frame, area,
+                RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("N");
         assertThat(buffer.get(0, 1).style().addModifiers()).contains(Modifier.BOLD);
@@ -139,9 +133,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Hello World")
-            .wrapWord()
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Hello World").wrapWord().render(frame, area, RenderContext.empty());
 
         Buffer expected = Buffer.empty(area);
         expected.setString(0, 0, "Hello", Style.EMPTY);
@@ -156,9 +148,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Hello World")
-            .ellipsis()
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Hello World").ellipsis().render(frame, area, RenderContext.empty());
 
         Buffer expected = Buffer.empty(area);
         expected.setString(0, 0, "Hello...", Style.EMPTY);
@@ -219,7 +209,8 @@ class MarkupTextAreaElementTest {
         Text parsedText = element.parsedText();
         assertThat(parsedText.lines()).hasSize(1);
         assertThat(parsedText.lines().get(0).spans().get(0).content()).isEqualTo("Hello");
-        assertThat(parsedText.lines().get(0).spans().get(0).style().addModifiers()).contains(Modifier.BOLD);
+        assertThat(parsedText.lines().get(0).spans().get(0).style().addModifiers())
+                .contains(Modifier.BOLD);
     }
 
     @Test
@@ -229,9 +220,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Content")
-            .title("Title")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Content").title("Title").render(frame, area, RenderContext.empty());
 
         // Border should be rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("┌");
@@ -244,9 +233,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Content")
-            .rounded()
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Content").rounded().render(frame, area, RenderContext.empty());
 
         // Rounded border should be rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -264,7 +251,8 @@ class MarkupTextAreaElementTest {
 
         Text second = element.parsedText();
         assertThat(second.lines().get(0).spans().get(0).content()).isEqualTo("Second");
-        assertThat(second.lines().get(0).spans().get(0).style().addModifiers()).contains(Modifier.ITALIC);
+        assertThat(second.lines().get(0).spans().get(0).style().addModifiers())
+                .contains(Modifier.ITALIC);
     }
 
     @Test
@@ -274,9 +262,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Hi")
-            .centered()
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Hi").centered().render(frame, area, RenderContext.empty());
 
         // "Hi" is 2 chars, centered in 10 chars = starts at position 4
         assertThat(buffer.get(4, 0).symbol()).isEqualTo("H");
@@ -301,8 +287,7 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("Use [[tag]] for brackets")
-            .render(frame, area, RenderContext.empty());
+        markupTextArea("Use [[tag]] for brackets").render(frame, area, RenderContext.empty());
 
         // Should render literal bracket
         assertThat(buffer.get(4, 0).symbol()).isEqualTo("[");
@@ -314,10 +299,7 @@ class MarkupTextAreaElementTest {
         // Set up StyleEngine with CSS defining .keyword class
         StyleEngine styleEngine = StyleEngine.create();
         styleEngine.addStylesheet("test",
-            ".keyword {\n" +
-            "    color: magenta;\n" +
-            "    text-style: bold;\n" +
-            "}");
+                ".keyword {\n" + "    color: magenta;\n" + "    text-style: bold;\n" + "}");
         styleEngine.setActiveStylesheet("test");
 
         // Create context with StyleEngine
@@ -329,12 +311,10 @@ class MarkupTextAreaElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupTextArea("[keyword]function[/keyword]")
-            .render(frame, area, context);
+        markupTextArea("[keyword]function[/keyword]").render(frame, area, context);
 
         // The text "function" should be styled with magenta color and bold
-        assertThat(buffer)
-            .at(0, 0).hasSymbol("f").hasForeground(Color.MAGENTA);
+        assertThat(buffer).at(0, 0).hasSymbol("f").hasForeground(Color.MAGENTA);
     }
 
     @Test
@@ -351,13 +331,12 @@ class MarkupTextAreaElementTest {
         frame.setStyledAreaRegistry(styledAreaRegistry);
 
         // Render markup with custom tags
-        markupTextArea("[looping]animated[/looping] text")
-            .render(frame, area, context);
+        markupTextArea("[looping]animated[/looping] text").render(frame, area, context);
 
         // Query the styled area registry for spans with the "looping" tag
         List<StyledAreaInfo> allAreas = styledAreaRegistry.all();
         boolean hasLoopingTag = allAreas.stream()
-            .anyMatch(info -> info.tags().values().contains("looping"));
+                .anyMatch(info -> info.tags().values().contains("looping"));
 
         // Should have a styled area with the "looping" tag
         assertThat(hasLoopingTag).isTrue();
@@ -377,17 +356,16 @@ class MarkupTextAreaElementTest {
         frame.setStyledAreaRegistry(styledAreaRegistry);
 
         // Render markup with nested custom tags
-        markupTextArea("[effect1][effect2]styled[/effect2][/effect1]")
-            .render(frame, area, context);
+        markupTextArea("[effect1][effect2]styled[/effect2][/effect1]").render(frame, area, context);
 
         // Query the styled area registry for spans with the effect tags
         List<StyledAreaInfo> allAreas = styledAreaRegistry.all();
 
         // With nested tags, the styled span should have both tags
         boolean hasEffect1 = allAreas.stream()
-            .anyMatch(info -> info.tags().values().contains("effect1"));
+                .anyMatch(info -> info.tags().values().contains("effect1"));
         boolean hasEffect2 = allAreas.stream()
-            .anyMatch(info -> info.tags().values().contains("effect2"));
+                .anyMatch(info -> info.tags().values().contains("effect2"));
 
         // Should have styled areas with both CSS classes
         assertThat(hasEffect1).isTrue();

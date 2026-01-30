@@ -39,7 +39,8 @@ public enum EventResult {
     /**
      * Combines two results, returning HANDLED if either is HANDLED.
      *
-     * @param other the other result
+     * @param other
+     *            the other result
      * @return HANDLED if either is HANDLED, UNHANDLED otherwise
      */
     public EventResult or(EventResult other) {

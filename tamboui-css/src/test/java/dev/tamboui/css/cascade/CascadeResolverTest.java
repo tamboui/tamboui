@@ -4,13 +4,14 @@
  */
 package dev.tamboui.css.cascade;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.style.Style;
+import java.util.*;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.style.Style;
+import dev.tamboui.widgets.block.BorderType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,9 +41,8 @@ class CascadeResolverTest {
 
     @Test
     void universalSelectorWithVariables() {
-        String css = "$bg-primary: #eeeeee;\n" +
-                     "$fg-primary: black;\n" +
-                     "* { color: $fg-primary; background: $bg-primary; }";
+        String css = "$bg-primary: #eeeeee;\n" + "$fg-primary: black;\n"
+                + "* { color: $fg-primary; background: $bg-primary; }";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
@@ -58,14 +58,13 @@ class CascadeResolverTest {
 
     @Test
     void classSelectorOverridesUniversalSelector() {
-        String css = "* { color: black; background: white; }\n" +
-                     ".error { color: red; }";
+        String css = "* { color: black; background: white; }\n" + ".error { color: red; }";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("TextElement", null,
-            new HashSet<>(Collections.singletonList("error")));
+                new HashSet<>(Collections.singletonList("error")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -77,10 +76,9 @@ class CascadeResolverTest {
     @Test
     void classSelectorInheritsBackgroundFromUniversalSelector() {
         // This simulates the CSS Demo's light theme
-        String css = "$bg-primary: #eeeeee;\n" +
-                     "$fg-primary: black;\n" +
-                     "* { color: $fg-primary; background: $bg-primary; }\n" +
-                     ".primary { color: blue; text-style: bold; }";
+        String css = "$bg-primary: #eeeeee;\n" + "$fg-primary: black;\n"
+                + "* { color: $fg-primary; background: $bg-primary; }\n"
+                + ".primary { color: blue; text-style: bold; }";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
@@ -90,7 +88,7 @@ class CascadeResolverTest {
         // - background: #eeeeee (inherited from *)
         // - text-style: bold (from .primary)
         Styleable element = createStyleable("TextElement", null,
-            new HashSet<>(Collections.singletonList("primary")));
+                new HashSet<>(Collections.singletonList("primary")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -136,13 +134,13 @@ class CascadeResolverTest {
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("custom-border")));
+                new HashSet<>(Collections.singletonList("custom-border")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
         assertThat(resolved.borderChars()).isPresent();
         assertThat(resolved.borderChars().get())
-            .isEqualTo("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"");
+                .isEqualTo("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"");
     }
 
     @Test
@@ -153,33 +151,27 @@ class CascadeResolverTest {
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("corners-only")));
+                new HashSet<>(Collections.singletonList("corners-only")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
         assertThat(resolved.borderChars()).isPresent();
         assertThat(resolved.borderChars().get())
-            .isEqualTo("\"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"");
+                .isEqualTo("\"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"");
     }
 
     @Test
     void individualBorderPropertiesAreResolved() {
-        String css = ".custom {\n" +
-                     "  border-top: 'x';\n" +
-                     "  border-bottom: 'y';\n" +
-                     "  border-left: '|';\n" +
-                     "  border-right: '|';\n" +
-                     "  border-top-left: '+';\n" +
-                     "  border-top-right: '+';\n" +
-                     "  border-bottom-left: '+';\n" +
-                     "  border-bottom-right: '+';\n" +
-                     "}";
+        String css = ".custom {\n" + "  border-top: 'x';\n" + "  border-bottom: 'y';\n"
+                + "  border-left: '|';\n" + "  border-right: '|';\n" + "  border-top-left: '+';\n"
+                + "  border-top-right: '+';\n" + "  border-bottom-left: '+';\n"
+                + "  border-bottom-right: '+';\n" + "}";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("custom")));
+                new HashSet<>(Collections.singletonList("custom")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -197,16 +189,14 @@ class CascadeResolverTest {
     @Test
     void borderTypeWithBorderCharsOverride() {
         // Verify both border-type and border-chars can be used together
-        String css = ".panel {\n" +
-                     "  border-type: plain;\n" +
-                     "  border-chars: \"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\";\n" +
-                     "}";
+        String css = ".panel {\n" + "  border-type: plain;\n"
+                + "  border-chars: \"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\";\n" + "}";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("panel")));
+                new HashSet<>(Collections.singletonList("panel")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -221,15 +211,14 @@ class CascadeResolverTest {
         // When CSS has "border-left:" with no value (e.g., while typing),
         // the property should NOT be stored as an empty string, which would
         // cause the left border to disappear.
-        String css = ".panel {\n" +
-                     "  border-left:\n" +  // Empty value - user is still typing
-                     "}";
+        String css = ".panel {\n" + "  border-left:\n" + // Empty value - user is still typing
+                "}";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("panel")));
+                new HashSet<>(Collections.singletonList("panel")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -240,15 +229,14 @@ class CascadeResolverTest {
     @Test
     void borderLeftWithEmptyQuotedValueIsResolvedAsEmpty() {
         // When CSS has explicit empty quotes, it IS intentional
-        String css = ".panel {\n" +
-                     "  border-left: \"\";\n" +  // Explicit empty - intentional
-                     "}";
+        String css = ".panel {\n" + "  border-left: \"\";\n" + // Explicit empty - intentional
+                "}";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("panel")));
+                new HashSet<>(Collections.singletonList("panel")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -261,16 +249,15 @@ class CascadeResolverTest {
         // When CSS has "border-left:" without semicolon, the parser may consume
         // the next property as the value (e.g., "height: 3"). This should NOT
         // be stored as a border character since it's clearly a parser error.
-        String css = ".panel {\n" +
-                     "  border-left:\n" +  // Missing value and semicolon
-                     "  height: 3;\n" +    // Parser consumes this as border-left's value
-                     "}";
+        String css = ".panel {\n" + "  border-left:\n" + // Missing value and semicolon
+                "  height: 3;\n" + // Parser consumes this as border-left's value
+                "}";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("panel")));
+                new HashSet<>(Collections.singletonList("panel")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -282,15 +269,13 @@ class CascadeResolverTest {
     @Test
     void borderLeftWithSingleUnquotedCharIsResolved() {
         // Single unquoted character should be valid
-        String css = ".panel {\n" +
-                     "  border-left: *;\n" +
-                     "}";
+        String css = ".panel {\n" + "  border-left: *;\n" + "}";
         StyleEngine engine = StyleEngine.create();
         engine.addStylesheet("test", css);
         engine.setActiveStylesheet("test");
 
         Styleable element = createStyleable("Panel", null,
-            new HashSet<>(Collections.singletonList("panel")));
+                new HashSet<>(Collections.singletonList("panel")));
 
         CssStyleResolver resolved = engine.resolve(element);
 
@@ -309,8 +294,7 @@ class CascadeResolverTest {
 
         // Resolve child with panel as ancestor
         CssStyleResolver resolved = engine.resolve(child,
-                dev.tamboui.css.cascade.PseudoClassState.NONE,
-                Collections.singletonList(panel));
+                dev.tamboui.css.cascade.PseudoClassState.NONE, Collections.singletonList(panel));
 
         assertThat(resolved.hasProperties()).isTrue();
         assertThat(resolved.textOverflow()).isPresent();
@@ -329,8 +313,7 @@ class CascadeResolverTest {
 
         // Direct child should match
         CssStyleResolver directResolved = engine.resolve(directChild,
-                dev.tamboui.css.cascade.PseudoClassState.NONE,
-                Collections.singletonList(panel));
+                dev.tamboui.css.cascade.PseudoClassState.NONE, Collections.singletonList(panel));
         assertThat(directResolved.textOverflow()).isPresent();
 
         // Grandchild should NOT match

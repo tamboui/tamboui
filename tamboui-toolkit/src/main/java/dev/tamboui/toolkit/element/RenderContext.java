@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit.element;
 
+import java.util.Optional;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Rect;
@@ -11,20 +13,20 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 
-import java.util.Optional;
-
 /**
- * Context provided during rendering, giving access to focus state and CSS styling.
+ * Context provided during rendering, giving access to focus state and CSS
+ * styling.
  * <p>
- * This interface exposes only what user code needs during rendering.
- * Internal framework functionality is handled automatically.
+ * This interface exposes only what user code needs during rendering. Internal
+ * framework functionality is handled automatically.
  */
 public interface RenderContext {
 
     /**
      * Returns whether the element with the given ID is currently focused.
      *
-     * @param elementId the element ID to check
+     * @param elementId
+     *            the element ID to check
      * @return true if focused, false otherwise
      */
     boolean isFocused(String elementId);
@@ -42,7 +44,8 @@ public interface RenderContext {
      * Returns the resolved CSS style if a StyleEngine is configured and matching
      * rules are found, or empty if no CSS styling is applicable.
      *
-     * @param element the element to resolve styles for
+     * @param element
+     *            the element to resolve styles for
      * @return the resolved style, or empty if no CSS is applicable
      */
     default Optional<CssStyleResolver> resolveStyle(Styleable element) {
@@ -52,11 +55,13 @@ public interface RenderContext {
     /**
      * Resolves the CSS style for a virtual element with the given type and classes.
      * <p>
-     * This is useful for resolving styles for sub-elements (like list items)
-     * that aren't full Element instances but need CSS styling.
+     * This is useful for resolving styles for sub-elements (like list items) that
+     * aren't full Element instances but need CSS styling.
      *
-     * @param styleType the element type (e.g., "ListItem")
-     * @param cssClasses the CSS classes to apply
+     * @param styleType
+     *            the element type (e.g., "ListItem")
+     * @param cssClasses
+     *            the CSS classes to apply
      * @return the resolved style, or empty if no CSS is applicable
      */
     default Optional<CssStyleResolver> resolveStyle(String styleType, String... cssClasses) {
@@ -69,7 +74,8 @@ public interface RenderContext {
      * Supports named colors (e.g., "red", "blue"), hex colors (e.g., "#ff0000"),
      * and RGB notation (e.g., "rgb(255,0,0)").
      *
-     * @param colorValue the CSS color value string
+     * @param colorValue
+     *            the CSS color value string
      * @return the parsed color, or empty if parsing fails
      */
     default Optional<Color> parseColor(String colorValue) {
@@ -79,8 +85,8 @@ public interface RenderContext {
     /**
      * Returns the current style from the style stack.
      * <p>
-     * This style represents the accumulated styles from parent elements
-     * and should be used as the base for rendering operations.
+     * This style represents the accumulated styles from parent elements and should
+     * be used as the base for rendering operations.
      *
      * @return the current style, or {@link Style#EMPTY} if no style is active
      */
@@ -95,19 +101,22 @@ public interface RenderContext {
      * (e.g., for a ListElement rendering, "item" becomes "ListElement-item").
      * <p>
      * Example usage:
+     * 
      * <pre>{@code
      * Style itemStyle = context.childStyle("item");
      * Style selectedStyle = context.childStyle("item", PseudoClassState.ofSelected());
      * }</pre>
      * <p>
      * This enables CSS selectors like:
+     * 
      * <pre>{@code
      * ListElement-item { color: white; }
      * ListElement-item:selected { color: cyan; text-style: bold; }
      * #nav ListElement ListElement-item:selected { color: green; }
      * }</pre>
      *
-     * @param childName the child name (e.g., "item", "header", "tab")
+     * @param childName
+     *            the child name (e.g., "item", "header", "tab")
      * @return the resolved style, merged with the current context style
      */
     default Style childStyle(String childName) {
@@ -119,12 +128,14 @@ public interface RenderContext {
      * <p>
      * Use this for stateful children like selected items or focused tabs.
      *
-     * @param childName the child name (e.g., "item", "row", "tab")
-     * @param state the pseudo-class state (e.g., selected, hover, disabled)
+     * @param childName
+     *            the child name (e.g., "item", "row", "tab")
+     * @param state
+     *            the pseudo-class state (e.g., selected, hover, disabled)
      * @return the resolved style, merged with the current context style
      */
     default Style childStyle(String childName, dev.tamboui.css.cascade.PseudoClassState state) {
-        return currentStyle();  // fallback when no CSS engine
+        return currentStyle(); // fallback when no CSS engine
     }
 
     /**
@@ -134,6 +145,7 @@ public interface RenderContext {
      * {@code :last-child}, and {@code :nth-child(even/odd)}.
      * <p>
      * Example usage:
+     * 
      * <pre>{@code
      * for (int i = 0; i < rows.size(); i++) {
      *     ChildPosition pos = ChildPosition.of(i, rows.size());
@@ -142,8 +154,10 @@ public interface RenderContext {
      * }
      * }</pre>
      *
-     * @param childName the child name (e.g., "row", "cell")
-     * @param position the position of the child within its siblings
+     * @param childName
+     *            the child name (e.g., "row", "cell")
+     * @param position
+     *            the position of the child within its siblings
      * @return the resolved style, merged with the current context style
      */
     default Style childStyle(String childName, ChildPosition position) {
@@ -151,49 +165,62 @@ public interface RenderContext {
     }
 
     /**
-     * Resolves CSS style for a child element at a specific position with additional state.
+     * Resolves CSS style for a child element at a specific position with additional
+     * state.
      * <p>
-     * Combines positional pseudo-classes ({@code :first-child}, {@code :last-child},
-     * {@code :nth-child}) with state pseudo-classes ({@code :selected}, {@code :hover}).
+     * Combines positional pseudo-classes ({@code :first-child},
+     * {@code :last-child}, {@code :nth-child}) with state pseudo-classes
+     * ({@code :selected}, {@code :hover}).
      * <p>
      * Example usage:
+     * 
      * <pre>{@code
      * for (int i = 0; i < rows.size(); i++) {
      *     ChildPosition pos = ChildPosition.of(i, rows.size());
      *     boolean isSelected = (i == selectedIndex);
-     *     PseudoClassState state = isSelected ? PseudoClassState.ofSelected() : PseudoClassState.NONE;
+     *     PseudoClassState state = isSelected
+     *             ? PseudoClassState.ofSelected()
+     *             : PseudoClassState.NONE;
      *     Style rowStyle = context.childStyle("row", pos, state);
      * }
      * }</pre>
      *
-     * @param childName the child name (e.g., "row", "cell")
-     * @param position the position of the child within its siblings
-     * @param state additional pseudo-class state (e.g., selected, hover)
+     * @param childName
+     *            the child name (e.g., "row", "cell")
+     * @param position
+     *            the position of the child within its siblings
+     * @param state
+     *            additional pseudo-class state (e.g., selected, hover)
      * @return the resolved style, merged with the current context style
      */
-    default Style childStyle(String childName, ChildPosition position, dev.tamboui.css.cascade.PseudoClassState state) {
-        return currentStyle();  // fallback when no CSS engine
+    default Style childStyle(String childName, ChildPosition position,
+            dev.tamboui.css.cascade.PseudoClassState state) {
+        return currentStyle(); // fallback when no CSS engine
     }
 
     /**
      * Renders a child element within the given area.
      * <p>
      * Container elements should use this method instead of calling
-     * {@code child.render()} directly. This allows the infrastructure
-     * to handle errors gracefully when fault-tolerant mode is enabled,
-     * and ensures that all rendered elements are properly registered with
-     * the event router, enabling them to receive key and mouse events.
+     * {@code child.render()} directly. This allows the infrastructure to handle
+     * errors gracefully when fault-tolerant mode is enabled, and ensures that all
+     * rendered elements are properly registered with the event router, enabling
+     * them to receive key and mouse events.
      * <p>
      * Example usage in a container element:
+     * 
      * <pre>{@code
      * for (Element child : children) {
      *     context.renderChild(child, frame, childArea);
      * }
      * }</pre>
      *
-     * @param child the child element to render
-     * @param frame the frame to render into
-     * @param area the area allocated for the child
+     * @param child
+     *            the child element to render
+     * @param frame
+     *            the frame to render into
+     * @param area
+     *            the area allocated for the child
      */
     default void renderChild(Element child, Frame frame, Rect area) {
         child.render(frame, area, this);

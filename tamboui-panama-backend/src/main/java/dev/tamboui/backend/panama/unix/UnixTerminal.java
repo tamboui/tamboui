@@ -4,11 +4,6 @@
  */
 package dev.tamboui.backend.panama.unix;
 
-import dev.tamboui.terminal.BackendException;
-import dev.tamboui.backend.panama.PlatformTerminal;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.layout.Size;
-
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
@@ -21,34 +16,39 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
+import dev.tamboui.backend.panama.PlatformTerminal;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.layout.Size;
+import dev.tamboui.terminal.BackendException;
+
 /**
  * Unix terminal operations using Panama FFI.
  * <p>
- * This class provides higher-level terminal operations built on top of
- * the low-level libc bindings in {@link LibC}.
+ * This class provides higher-level terminal operations built on top of the
+ * low-level libc bindings in {@link LibC}.
  */
 public final class UnixTerminal implements PlatformTerminal {
 
-    private static final VarHandle WS_ROW = LibC.WINSIZE_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("ws_row"));
-    private static final VarHandle WS_COL = LibC.WINSIZE_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("ws_col"));
+    private static final VarHandle WS_ROW = LibC.WINSIZE_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("ws_row"));
+    private static final VarHandle WS_COL = LibC.WINSIZE_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("ws_col"));
 
-    private static final VarHandle POLLFD_FD = LibC.POLLFD_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("fd"));
-    private static final VarHandle POLLFD_EVENTS = LibC.POLLFD_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("events"));
-    private static final VarHandle POLLFD_REVENTS = LibC.POLLFD_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("revents"));
+    private static final VarHandle POLLFD_FD = LibC.POLLFD_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("fd"));
+    private static final VarHandle POLLFD_EVENTS = LibC.POLLFD_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("events"));
+    private static final VarHandle POLLFD_REVENTS = LibC.POLLFD_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("revents"));
 
-    private static final VarHandle TERMIOS_IFLAG = LibC.TERMIOS_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("c_iflag"));
-    private static final VarHandle TERMIOS_OFLAG = LibC.TERMIOS_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("c_oflag"));
-    private static final VarHandle TERMIOS_CFLAG = LibC.TERMIOS_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("c_cflag"));
-    private static final VarHandle TERMIOS_LFLAG = LibC.TERMIOS_LAYOUT.varHandle(
-            MemoryLayout.PathElement.groupElement("c_lflag"));
+    private static final VarHandle TERMIOS_IFLAG = LibC.TERMIOS_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("c_iflag"));
+    private static final VarHandle TERMIOS_OFLAG = LibC.TERMIOS_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("c_oflag"));
+    private static final VarHandle TERMIOS_CFLAG = LibC.TERMIOS_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("c_cflag"));
+    private static final VarHandle TERMIOS_LFLAG = LibC.TERMIOS_LAYOUT
+            .varHandle(MemoryLayout.PathElement.groupElement("c_lflag"));
 
     private static final String DEV_TTY = "/dev/tty";
 
@@ -76,13 +76,14 @@ public final class UnixTerminal implements PlatformTerminal {
     private final ReentrantLock resizeLock = new ReentrantLock();
     private Runnable resizeHandler;
     private boolean resizePending;
-    private MemorySegment previousSigaction;  // Previous sigaction struct (for restoration)
+    private MemorySegment previousSigaction; // Previous sigaction struct (for restoration)
     private Arena signalArena;
 
     /**
      * Creates a new Unix terminal instance.
      *
-     * @throws IOException if the terminal cannot be initialized
+     * @throws IOException
+     *             if the terminal cannot be initialized
      */
     public UnixTerminal() throws IOException {
         // On macOS, use stdin directly for input (poll doesn't work well with /dev/tty)
@@ -93,7 +94,8 @@ public final class UnixTerminal implements PlatformTerminal {
         } else {
             fd = LibC.open(DEV_TTY, LibC.O_RDWR);
             if (fd < 0) {
-                throw new RuntimeIOException("Failed to open " + DEV_TTY + " (errno=" + LibC.getLastErrno() + ")");
+                throw new RuntimeIOException(
+                        "Failed to open " + DEV_TTY + " (errno=" + LibC.getLastErrno() + ")");
             }
         }
         this.ttyFd = fd;
@@ -123,9 +125,8 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Detects the terminal charset from environment variables.
      * <p>
-     * Checks LC_ALL, LC_CTYPE, and LANG in order of precedence.
-     * Falls back to UTF-8 if no encoding is detected or if the
-     * detected encoding is not supported.
+     * Checks LC_ALL, LC_CTYPE, and LANG in order of precedence. Falls back to UTF-8
+     * if no encoding is detected or if the detected encoding is not supported.
      *
      * @return the detected charset, or UTF-8 as default
      */
@@ -147,7 +148,8 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Parses a charset from a locale string like "en_US.UTF-8" or "C.UTF-8".
      *
-     * @param locale the locale string
+     * @param locale
+     *            the locale string
      * @return the parsed charset, or null if not found or not supported
      */
     private static Charset parseCharsetFromLocale(String locale) {
@@ -185,10 +187,11 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Enables raw mode on the terminal.
      * <p>
-     * Raw mode disables line buffering, echo, and signal processing,
-     * allowing direct character-by-character input.
+     * Raw mode disables line buffering, echo, and signal processing, allowing
+     * direct character-by-character input.
      *
-     * @throws IOException if raw mode cannot be enabled
+     * @throws IOException
+     *             if raw mode cannot be enabled
      */
     public void enableRawMode() throws IOException {
         if (rawModeEnabled) {
@@ -238,7 +241,8 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Disables raw mode and restores original terminal attributes.
      *
-     * @throws IOException if raw mode cannot be disabled
+     * @throws IOException
+     *             if raw mode cannot be disabled
      */
     public void disableRawMode() throws IOException {
         if (!rawModeEnabled) {
@@ -256,7 +260,8 @@ public final class UnixTerminal implements PlatformTerminal {
      * Gets the current terminal size.
      *
      * @return the terminal size
-     * @throws IOException if the size cannot be determined
+     * @throws IOException
+     *             if the size cannot be determined
      */
     public Size getSize() throws IOException {
         int ioctlResult = LibC.ioctl(ttyFd, LibC.TIOCGWINSZ, winsize);
@@ -267,19 +272,22 @@ public final class UnixTerminal implements PlatformTerminal {
                 return new Size(cols, rows);
             }
         }
-        throw new RuntimeIOException("Failed to get terminal size (errno=" + LibC.getLastErrno() + ")");
+        throw new RuntimeIOException(
+                "Failed to get terminal size (errno=" + LibC.getLastErrno() + ")");
     }
 
     /**
      * Reads a single character from the terminal with timeout.
      * <p>
-     * This method also checks for and dispatches pending resize events,
-     * ensuring resize handlers are called from the main event loop context
-     * rather than from signal handler context.
+     * This method also checks for and dispatches pending resize events, ensuring
+     * resize handlers are called from the main event loop context rather than from
+     * signal handler context.
      *
-     * @param timeoutMs timeout in milliseconds (-1 for infinite, 0 for non-blocking)
+     * @param timeoutMs
+     *            timeout in milliseconds (-1 for infinite, 0 for non-blocking)
      * @return the character read, -1 for EOF, or -2 for timeout
-     * @throws IOException if reading fails
+     * @throws IOException
+     *             if reading fails
      */
     public int read(int timeoutMs) throws IOException {
         // Check for pending resize events (set by signal handler)
@@ -298,9 +306,11 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Peeks at the next character without consuming it.
      *
-     * @param timeoutMs timeout in milliseconds
+     * @param timeoutMs
+     *            timeout in milliseconds
      * @return the character peeked, -1 for EOF, or -2 for timeout
-     * @throws IOException if reading fails
+     * @throws IOException
+     *             if reading fails
      */
     public int peek(int timeoutMs) throws IOException {
         if (peekedChar != -2) {
@@ -314,8 +324,10 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Writes data to the terminal.
      *
-     * @param data the data to write
-     * @throws IOException if writing fails
+     * @param data
+     *            the data to write
+     * @throws IOException
+     *             if writing fails
      */
     public void write(byte[] data) throws IOException {
         write(data, 0, data.length);
@@ -324,13 +336,17 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Writes a portion of a byte array to the terminal.
      * <p>
-     * This method uses a reusable buffer to avoid per-call memory allocation.
-     * For large writes exceeding the buffer size, data is written in chunks.
+     * This method uses a reusable buffer to avoid per-call memory allocation. For
+     * large writes exceeding the buffer size, data is written in chunks.
      *
-     * @param buffer the byte array containing data
-     * @param offset the start offset in the buffer
-     * @param length the number of bytes to write
-     * @throws IOException if writing fails
+     * @param buffer
+     *            the byte array containing data
+     * @param offset
+     *            the start offset in the buffer
+     * @param length
+     *            the number of bytes to write
+     * @throws IOException
+     *             if writing fails
      */
     public void write(byte[] buffer, int offset, int length) throws IOException {
         if (length == 0) {
@@ -342,13 +358,15 @@ public final class UnixTerminal implements PlatformTerminal {
 
         while (remaining > 0) {
             int chunkSize = Math.min(remaining, WRITE_BUFFER_SIZE);
-            MemorySegment.copy(buffer, currentOffset, writeBuffer, ValueLayout.JAVA_BYTE, 0, chunkSize);
+            MemorySegment.copy(buffer, currentOffset, writeBuffer, ValueLayout.JAVA_BYTE, 0,
+                    chunkSize);
 
             long written = 0;
             while (written < chunkSize) {
                 long result = LibC.write(ttyFd, writeBuffer.asSlice(written), chunkSize - written);
                 if (result < 0) {
-                    throw new RuntimeIOException("Write failed (errno=" + LibC.getLastErrno() + ")");
+                    throw new RuntimeIOException(
+                            "Write failed (errno=" + LibC.getLastErrno() + ")");
                 }
                 written += result;
             }
@@ -361,8 +379,10 @@ public final class UnixTerminal implements PlatformTerminal {
     /**
      * Writes a string to the terminal.
      *
-     * @param s the string to write
-     * @throws IOException if writing fails
+     * @param s
+     *            the string to write
+     * @throws IOException
+     *             if writing fails
      */
     public void write(String s) throws IOException {
         write(s.getBytes(charset));
@@ -390,13 +410,14 @@ public final class UnixTerminal implements PlatformTerminal {
      * Registers a handler to be called when the terminal is resized.
      * <p>
      * On Unix systems, this installs a SIGWINCH signal handler using Panama FFI.
-     * The signal handler sets a flag which is checked from the main event loop
-     * (via {@link #read(int)}), ensuring the handler is called from a safe context.
+     * The signal handler sets a flag which is checked from the main event loop (via
+     * {@link #read(int)}), ensuring the handler is called from a safe context.
      * <p>
-     * Only one handler can be registered at a time; subsequent calls
-     * will replace the previous handler.
+     * Only one handler can be registered at a time; subsequent calls will replace
+     * the previous handler.
      *
-     * @param handler the handler to call on resize, or null to remove
+     * @param handler
+     *            the handler to call on resize, or null to remove
      */
     public void onResize(Runnable handler) {
         resizeLock.lock();
@@ -422,20 +443,24 @@ public final class UnixTerminal implements PlatformTerminal {
                 // Allocate sigaction structs
                 MemorySegment newSigaction = LibC.allocateSigaction(signalArena);
                 MemorySegment oldSigaction = LibC.allocateSigaction(signalArena);
-                
-                // Set up new sigaction: handler pointer, NULL trampoline, empty mask, SA_RESTART flag
+
+                // Set up new sigaction: handler pointer, NULL trampoline, empty mask,
+                // SA_RESTART flag
                 LibC.setSigactionHandler(newSigaction, signalHandlerStub);
-                LibC.setSigactionTramp(newSigaction, MemorySegment.NULL);  // NULL for simple handlers
+                LibC.setSigactionTramp(newSigaction, MemorySegment.NULL); // NULL for simple
+                                                                          // handlers
                 LibC.setSigactionMask(newSigaction, 0);
                 LibC.setSigactionFlags(newSigaction, LibC.SA_RESTART);
-                
+
                 // Install the signal handler and save the previous one
                 int sigactionResult = LibC.sigaction(LibC.SIGWINCH, newSigaction, oldSigaction);
-                
+
                 if (sigactionResult != 0) {
-                    throw new BackendException("Failed to install signal handler for Unix terminal (errno=" + LibC.getLastErrno() + ")");
+                    throw new BackendException(
+                            "Failed to install signal handler for Unix terminal (errno="
+                                    + LibC.getLastErrno() + ")");
                 }
-                
+
                 // Save the old sigaction for restoration on close
                 previousSigaction = oldSigaction;
             }

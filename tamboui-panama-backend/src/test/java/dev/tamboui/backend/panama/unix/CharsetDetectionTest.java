@@ -4,13 +4,11 @@
  */
 package dev.tamboui.backend.panama.unix;
 
+import java.nio.charset.Charset;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -51,8 +49,8 @@ class CharsetDetectionTest {
     }
 
     /**
-     * Assumes a terminal is available for the test.
-     * Skips the test if /dev/tty cannot be opened.
+     * Assumes a terminal is available for the test. Skips the test if /dev/tty
+     * cannot be opened.
      */
     private void assumeTerminalAvailable() {
         int fd = LibC.open("/dev/tty", LibC.O_RDWR);

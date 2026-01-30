@@ -4,13 +4,14 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.BorderSet;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.widgets.block.BorderSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,10 +21,8 @@ class BorderSetConverterTest {
 
     @Test
     void convertsFullBorderSet() {
-        Optional<BorderSet> result = converter.convert(
-            "\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"",
-            Collections.emptyMap()
-        );
+        Optional<BorderSet> result = converter
+                .convert("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\"", Collections.emptyMap());
 
         assertThat(result).hasValueSatisfying(borderSet -> {
             assertThat(borderSet.topHorizontal()).isEqualTo("─");
@@ -39,10 +38,8 @@ class BorderSetConverterTest {
 
     @Test
     void convertsCornersOnlyWithEmptyStrings() {
-        Optional<BorderSet> result = converter.convert(
-            "\"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"",
-            Collections.emptyMap()
-        );
+        Optional<BorderSet> result = converter
+                .convert("\"\" \"\" \"\" \"\" \"┌\" \"┐\" \"└\" \"┘\"", Collections.emptyMap());
 
         assertThat(result).hasValueSatisfying(borderSet -> {
             assertThat(borderSet.topHorizontal()).isEmpty();
@@ -58,10 +55,8 @@ class BorderSetConverterTest {
 
     @Test
     void convertsHorizontalOnlyBorders() {
-        Optional<BorderSet> result = converter.convert(
-            "\"─\" \"─\" \"\" \"\" \"\" \"\" \"\" \"\"",
-            Collections.emptyMap()
-        );
+        Optional<BorderSet> result = converter.convert("\"─\" \"─\" \"\" \"\" \"\" \"\" \"\" \"\"",
+                Collections.emptyMap());
 
         assertThat(result).hasValueSatisfying(borderSet -> {
             assertThat(borderSet.topHorizontal()).isEqualTo("─");
@@ -77,10 +72,8 @@ class BorderSetConverterTest {
 
     @Test
     void convertsCustomCharacters() {
-        Optional<BorderSet> result = converter.convert(
-            "\"~\" \"~\" \"|\" \"|\" \"+\" \"+\" \"+\" \"+\"",
-            Collections.emptyMap()
-        );
+        Optional<BorderSet> result = converter
+                .convert("\"~\" \"~\" \"|\" \"|\" \"+\" \"+\" \"+\" \"+\"", Collections.emptyMap());
 
         assertThat(result).hasValueSatisfying(borderSet -> {
             assertThat(borderSet.topHorizontal()).isEqualTo("~");
@@ -96,10 +89,8 @@ class BorderSetConverterTest {
 
     @Test
     void supportsSingleQuotes() {
-        Optional<BorderSet> result = converter.convert(
-            "'-' '-' '|' '|' '+' '+' '+' '+'",
-            Collections.emptyMap()
-        );
+        Optional<BorderSet> result = converter.convert("'-' '-' '|' '|' '+' '+' '+' '+'",
+                Collections.emptyMap());
 
         assertThat(result).hasValueSatisfying(borderSet -> {
             assertThat(borderSet.topHorizontal()).isEqualTo("-");
@@ -136,23 +127,16 @@ class BorderSetConverterTest {
     @Test
     void returnsEmptyForWrongNumberOfStrings() {
         // Only 4 strings instead of 8
-        assertThat(converter.convert(
-            "\"─\" \"─\" \"│\" \"│\"",
-            Collections.emptyMap()
-        )).isEmpty();
+        assertThat(converter.convert("\"─\" \"─\" \"│\" \"│\"", Collections.emptyMap())).isEmpty();
 
         // 9 strings
-        assertThat(converter.convert(
-            "\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\" \"extra\"",
-            Collections.emptyMap()
-        )).isEmpty();
+        assertThat(converter.convert("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘\" \"extra\"",
+                Collections.emptyMap())).isEmpty();
     }
 
     @Test
     void returnsEmptyForUnterminatedQuote() {
-        assertThat(converter.convert(
-            "\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘",
-            Collections.emptyMap()
-        )).isEmpty();
+        assertThat(converter.convert("\"─\" \"─\" \"│\" \"│\" \"┌\" \"┐\" \"└\" \"┘",
+                Collections.emptyMap())).isEmpty();
     }
 }

@@ -8,6 +8,10 @@
  */
 package dev.tamboui.demo;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -32,23 +36,19 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Demo showcasing the TuiRunner framework.
  * <p>
  * This demo shows:
  * <ul>
- *   <li>Keyboard handling with vim-style keys and arrows</li>
- *   <li>Mouse event handling (clicks, scroll, drag)</li>
- *   <li>Animation with tick events</li>
- *   <li>Window resize handling</li>
+ * <li>Keyboard handling with vim-style keys and arrows</li>
+ * <li>Mouse event handling (clicks, scroll, drag)</li>
+ * <li>Animation with tick events</li>
+ * <li>Window resize handling</li>
  * </ul>
  * <p>
- * Note how much simpler this is compared to basic-demo - no manual
- * escape sequence parsing, no raw mode management, no event loop boilerplate.
+ * Note how much simpler this is compared to basic-demo - no manual escape
+ * sequence parsing, no raw mode management, no event loop boilerplate.
  */
 public class TuiDemo {
 
@@ -65,8 +65,11 @@ public class TuiDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new TuiDemo().run();
@@ -75,13 +78,15 @@ public class TuiDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         // Configure with mouse capture and animation ticks at 10 fps
-        TuiConfig config = TuiConfig.builder()
-                .mouseCapture(true)
-                .tickRate(Duration.ofMillis(100))  // 10 fps for animation
+        TuiConfig config = TuiConfig.builder().mouseCapture(true).tickRate(Duration.ofMillis(100)) // 10
+                                                                                                   // fps
+                                                                                                   // for
+                                                                                                   // animation
                 .build();
 
         try (TuiRunner tui = TuiRunner.create(config)) {
@@ -150,29 +155,52 @@ public class TuiDemo {
 
     private static boolean isFunctionKey(KeyEvent k) {
         switch (k.code()) {
-            case F1: case F2: case F3: case F4: case F5: case F6:
-            case F7: case F8: case F9: case F10: case F11: case F12:
+            case F1 :
+            case F2 :
+            case F3 :
+            case F4 :
+            case F5 :
+            case F6 :
+            case F7 :
+            case F8 :
+            case F9 :
+            case F10 :
+            case F11 :
+            case F12 :
                 return true;
-            default:
+            default :
                 return false;
         }
     }
 
     private static int functionKeyNumber(KeyEvent k) {
         switch (k.code()) {
-            case F1: return 1;
-            case F2: return 2;
-            case F3: return 3;
-            case F4: return 4;
-            case F5: return 5;
-            case F6: return 6;
-            case F7: return 7;
-            case F8: return 8;
-            case F9: return 9;
-            case F10: return 10;
-            case F11: return 11;
-            case F12: return 12;
-            default: return -1;
+            case F1 :
+                return 1;
+            case F2 :
+                return 2;
+            case F3 :
+                return 3;
+            case F4 :
+                return 4;
+            case F5 :
+                return 5;
+            case F6 :
+                return 6;
+            case F7 :
+                return 7;
+            case F8 :
+                return 8;
+            case F9 :
+                return 9;
+            case F10 :
+                return 10;
+            case F11 :
+                return 11;
+            case F12 :
+                return 12;
+            default :
+                return -1;
         }
     }
 
@@ -224,11 +252,7 @@ public class TuiDemo {
 
         // Split into header, main content, and footer
         List<Rect> layout = Layout.vertical()
-                .constraints(
-                        Constraint.length(3),
-                        Constraint.fill(),
-                        Constraint.length(3)
-                )
+                .constraints(Constraint.length(3), Constraint.fill(), Constraint.length(3))
                 .split(area);
 
         renderHeader(frame, layout.get(0));
@@ -245,17 +269,11 @@ public class TuiDemo {
             default -> "⠸";
         };
 
-        Block header = Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
+        Block header = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
                 .borderStyle(Style.EMPTY.fg(Color.CYAN))
-                .title(Title.from(
-                        Line.from(
-                                Span.raw(" " + animation + " ").cyan(),
-                                Span.raw("TuiRunner Demo ").bold().cyan(),
-                                Span.raw(animation + " ").cyan()
-                        )
-                ).centered())
+                .title(Title.from(Line.from(Span.raw(" " + animation + " ").cyan(),
+                        Span.raw("TuiRunner Demo ").bold().cyan(),
+                        Span.raw(animation + " ").cyan())).centered())
                 .build();
 
         frame.renderWidget(header, area);
@@ -264,13 +282,8 @@ public class TuiDemo {
     private void renderMain(Frame frame, Rect area) {
         // Split into 3 panels
         List<Rect> panels = Layout.horizontal()
-                .constraints(
-                        Constraint.ratio(1, 3),
-                        Constraint.ratio(1, 3),
-                        Constraint.ratio(1, 3)
-                )
-                .spacing(1)
-                .split(area);
+                .constraints(Constraint.ratio(1, 3), Constraint.ratio(1, 3), Constraint.ratio(1, 3))
+                .spacing(1).split(area);
 
         renderStatsPanel(frame, panels.get(0), selectedPanel == 0);
         renderMousePanel(frame, panels.get(1), selectedPanel == 1);
@@ -283,27 +296,22 @@ public class TuiDemo {
         Text content = Text.from(
                 Line.from(Span.raw("Counter: ").bold(), Span.raw(String.valueOf(counter)).yellow()),
                 Line.empty(),
-                Line.from(Span.raw("Selected Panel: ").bold(), Span.raw(String.valueOf(selectedPanel + 1)).cyan()),
+                Line.from(Span.raw("Selected Panel: ").bold(),
+                        Span.raw(String.valueOf(selectedPanel + 1)).cyan()),
                 Line.empty(),
                 Line.from(Span.raw("Tick: ").bold(), Span.raw(String.valueOf(tickCount)).magenta()),
                 Line.empty(),
-                Line.from(Span.raw("Press ").dim(), Span.raw("Enter/Space").yellow(), Span.raw(" to increment").dim()),
-                Line.from(Span.raw("or scroll mouse wheel").dim())
-        );
+                Line.from(Span.raw("Press ").dim(), Span.raw("Enter/Space").yellow(),
+                        Span.raw(" to increment").dim()),
+                Line.from(Span.raw("or scroll mouse wheel").dim()));
 
-        Paragraph panel = Paragraph.builder()
-                .text(content)
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(borderColor))
-                        .title(Title.from(
-                                Line.from(
-                                        Span.raw("Stats "),
-                                        Span.raw(focused ? "●" : "○").fg(borderColor)
-                                )
-                        ))
-                        .build())
+        Paragraph panel = Paragraph
+                .builder().text(content).block(
+                        Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                                .borderStyle(Style.EMPTY.fg(borderColor))
+                                .title(Title.from(Line.from(Span.raw("Stats "),
+                                        Span.raw(focused ? "●" : "○").fg(borderColor))))
+                                .build())
                 .build();
 
         frame.renderWidget(panel, area);
@@ -314,28 +322,18 @@ public class TuiDemo {
 
         String posText = mouseX >= 0 ? "(" + mouseX + ", " + mouseY + ")" : "Move mouse here";
 
-        Text content = Text.from(
-                Line.from(Span.raw("Mouse Position:").bold()),
-                Line.empty(),
-                Line.from(Span.raw("  " + posText).cyan()),
-                Line.empty(),
+        Text content = Text.from(Line.from(Span.raw("Mouse Position:").bold()), Line.empty(),
+                Line.from(Span.raw("  " + posText).cyan()), Line.empty(),
                 Line.from(Span.raw("Click, drag, or scroll").dim()),
-                Line.from(Span.raw("to see mouse events").dim())
-        );
+                Line.from(Span.raw("to see mouse events").dim()));
 
-        Paragraph panel = Paragraph.builder()
-                .text(content)
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(borderColor))
-                        .title(Title.from(
-                                Line.from(
-                                        Span.raw("Mouse "),
-                                        Span.raw(focused ? "●" : "○").fg(borderColor)
-                                )
-                        ))
-                        .build())
+        Paragraph panel = Paragraph
+                .builder().text(content).block(
+                        Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                                .borderStyle(Style.EMPTY.fg(borderColor))
+                                .title(Title.from(Line.from(Span.raw("Mouse "),
+                                        Span.raw(focused ? "●" : "○").fg(borderColor))))
+                                .build())
                 .build();
 
         frame.renderWidget(panel, area);
@@ -358,43 +356,28 @@ public class TuiDemo {
             }
         }
 
-        Paragraph panel = Paragraph.builder()
-                .text(Text.from(lines))
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(borderColor))
-                        .title(Title.from(
-                                Line.from(
-                                        Span.raw("Events "),
-                                        Span.raw(focused ? "●" : "○").fg(borderColor)
-                                )
-                        ))
-                        .build())
+        Paragraph panel = Paragraph
+                .builder().text(Text.from(lines)).block(
+                        Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                                .borderStyle(Style.EMPTY.fg(borderColor))
+                                .title(Title.from(Line.from(Span.raw("Events "),
+                                        Span.raw(focused ? "●" : "○").fg(borderColor))))
+                                .build())
                 .build();
 
         frame.renderWidget(panel, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-                Span.raw(" h/j/k/l/←↑↓→").bold().yellow(),
-                Span.raw(" Navigate  ").dim(),
-                Span.raw("Enter/Space").bold().yellow(),
-                Span.raw(" Select  ").dim(),
-                Span.raw("Scroll").bold().yellow(),
-                Span.raw(" Counter  ").dim(),
-                Span.raw("q/Ctrl+C").bold().yellow(),
-                Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" h/j/k/l/←↑↓→").bold().yellow(),
+                Span.raw(" Navigate  ").dim(), Span.raw("Enter/Space").bold().yellow(),
+                Span.raw(" Select  ").dim(), Span.raw("Scroll").bold().yellow(),
+                Span.raw(" Counter  ").dim(), Span.raw("q/Ctrl+C").bold().yellow(),
+                Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-                .text(Text.from(helpLine))
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                        .build())
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
                 .build();
 
         frame.renderWidget(footer, area);

@@ -14,7 +14,9 @@ public enum BorderType {
     NONE(null),
     /** Plain border using single-line box-drawing characters. */
     PLAIN(new BorderSet("─", "─", "│", "│", "┌", "┐", "└", "┘")),
-    /** Rounded border using single-line box-drawing characters with rounded corners. */
+    /**
+     * Rounded border using single-line box-drawing characters with rounded corners.
+     */
     ROUNDED(new BorderSet("─", "─", "│", "│", "╭", "╮", "╰", "╯")),
     /** Double-line border using double-line box-drawing characters. */
     DOUBLE(new BorderSet("═", "═", "║", "║", "╔", "╗", "╚", "╝")),
@@ -33,8 +35,7 @@ public enum BorderType {
     /** Heavy quadruple-dashed border. */
     HEAVY_QUADRUPLE_DASHED(new BorderSet("┉", "┉", "┋", "┋", "┏", "┓", "┗", "┛")),
     /** Quadrant border rendered inside the content area. */
-    QUADRANT_INSIDE(new BorderSet("▄", "▀", "▐",
-     "▌", "▗", "▖", "▝", "▘")),
+    QUADRANT_INSIDE(new BorderSet("▄", "▀", "▐", "▌", "▗", "▖", "▝", "▘")),
     /** Quadrant border rendered outside the content area. */
     QUADRANT_OUTSIDE(new BorderSet("▀", "▄", "▌", "▐", "▛", "▜", "▙", "▟"));
 

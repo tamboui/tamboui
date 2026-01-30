@@ -19,8 +19,10 @@ public final class Span {
     /**
      * Creates a new span with the given content and style.
      *
-     * @param content the text content
-     * @param style   the style to apply
+     * @param content
+     *            the text content
+     * @param style
+     *            the style to apply
      */
     public Span(String content, Style style) {
         this.content = content;
@@ -37,7 +39,8 @@ public final class Span {
     /**
      * Creates an unstyled span from the given content.
      *
-     * @param content the text content
+     * @param content
+     *            the text content
      * @return a new unstyled span
      */
     public static Span raw(String content) {
@@ -47,8 +50,10 @@ public final class Span {
     /**
      * Creates a styled span from the given content.
      *
-     * @param content the text content
-     * @param style   the style to apply
+     * @param content
+     *            the text content
+     * @param style
+     *            the style to apply
      * @return a new styled span
      */
     public static Span styled(String content, Style style) {
@@ -56,10 +61,11 @@ public final class Span {
     }
 
     /**
-     * Creates a span from a masked string.
-     * The masked value will be used as the content.
+     * Creates a span from a masked string. The masked value will be used as the
+     * content.
      *
-     * @param masked the masked string
+     * @param masked
+     *            the masked string
      * @return a new unstyled span
      */
     public static Span from(Masked masked) {
@@ -67,11 +73,13 @@ public final class Span {
     }
 
     /**
-     * Creates a styled span from a masked string.
-     * The masked value will be used as the content.
+     * Creates a styled span from a masked string. The masked value will be used as
+     * the content.
      *
-     * @param masked the masked string
-     * @param style  the style to apply
+     * @param masked
+     *            the masked string
+     * @param style
+     *            the style to apply
      * @return a new styled span
      */
     public static Span styled(Masked masked, Style style) {
@@ -79,8 +87,8 @@ public final class Span {
     }
 
     /**
-     * Returns the display width of this span in terminal columns.
-     * Wide characters (CJK, emoji) count as 2, combining marks as 0.
+     * Returns the display width of this span in terminal columns. Wide characters
+     * (CJK, emoji) count as 2, combining marks as 0.
      *
      * @return the display width in terminal columns
      */
@@ -102,7 +110,8 @@ public final class Span {
     /**
      * Returns a new span with the given style replacing the current one.
      *
-     * @param newStyle the new style
+     * @param newStyle
+     *            the new style
      * @return a new span with the given style
      */
     public Span style(Style newStyle) {
@@ -112,7 +121,8 @@ public final class Span {
     /**
      * Returns a new span with the given style patch applied.
      *
-     * @param patch the style patch to apply
+     * @param patch
+     *            the style patch to apply
      * @return a new span with the patched style
      */
     public Span patchStyle(Style patch) {
@@ -122,7 +132,8 @@ public final class Span {
     /**
      * Returns a new span with the given foreground color.
      *
-     * @param color the foreground color
+     * @param color
+     *            the foreground color
      * @return a new span with the foreground color applied
      */
     public Span fg(Color color) {
@@ -132,7 +143,8 @@ public final class Span {
     /**
      * Returns a new span with the given background color.
      *
-     * @param color the background color
+     * @param color
+     *            the background color
      * @return a new span with the background color applied
      */
     public Span bg(Color color) {
@@ -196,7 +208,8 @@ public final class Span {
     /**
      * Returns a new span with a hyperlink.
      *
-     * @param url the hyperlink URL
+     * @param url
+     *            the hyperlink URL
      * @return a new span with the hyperlink applied
      */
     public Span hyperlink(String url) {
@@ -206,8 +219,10 @@ public final class Span {
     /**
      * Returns a new span with a hyperlink and explicit ID.
      *
-     * @param url the hyperlink URL
-     * @param id  the hyperlink ID
+     * @param url
+     *            the hyperlink URL
+     * @param id
+     *            the hyperlink ID
      * @return a new span with the hyperlink applied
      */
     public Span hyperlink(String url, String id) {

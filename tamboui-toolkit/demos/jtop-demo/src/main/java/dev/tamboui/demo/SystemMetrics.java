@@ -4,12 +4,6 @@
  */
 package dev.tamboui.demo;
 
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.software.os.OSProcess;
-import oshi.software.os.OperatingSystem;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,12 +14,18 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.software.os.OSProcess;
+import oshi.software.os.OperatingSystem;
+
 /**
- * Reads system metrics using OSHI (cross-platform).
- * Separates system monitoring logic from UI rendering.
+ * Reads system metrics using OSHI (cross-platform). Separates system monitoring
+ * logic from UI rendering.
  * <p>
- * Thread-safe: uses a ReentrantReadWriteLock for safe concurrent access
- * between the update thread and render thread.
+ * Thread-safe: uses a ReentrantReadWriteLock for safe concurrent access between
+ * the update thread and render thread.
  */
 final class SystemMetrics {
 
@@ -65,14 +65,9 @@ final class SystemMetrics {
     /**
      * Information about a running process.
      */
-    record ProcessInfo(
-        int pid,
-        String name,
-        char state,
-        double cpuPercent,
-        long memoryKb,
-        String user
-    ) {}
+    record ProcessInfo(int pid, String name, char state, double cpuPercent, long memoryKb,
+            String user) {
+    }
 
     /**
      * Sort modes for the process list.
@@ -100,10 +95,10 @@ final class SystemMetrics {
     }
 
     /**
-     * Updates all metrics.
-     * This method should be called from a background thread.
+     * Updates all metrics. This method should be called from a background thread.
      *
-     * @param sortMode the sort mode for the process list
+     * @param sortMode
+     *            the sort mode for the process list
      */
     void update(SortMode sortMode) {
         lock.writeLock().lock();
@@ -120,8 +115,10 @@ final class SystemMetrics {
     /**
      * Executes a read operation under the read lock.
      *
-     * @param reader the read operation to execute
-     * @param <T> the return type
+     * @param reader
+     *            the read operation to execute
+     * @param <T>
+     *            the return type
      * @return the result of the read operation
      */
     <T> T read(Supplier<T> reader) {
@@ -133,7 +130,8 @@ final class SystemMetrics {
         }
     }
 
-    // ==================== Accessors (must be called within read()) ====================
+    // ==================== Accessors (must be called within read())
+    // ====================
 
     int numCpus() {
         return numCpus;
@@ -309,14 +307,8 @@ final class SystemMetrics {
                 name = "?";
             }
 
-            newProcesses.add(new ProcessInfo(
-                pid,
-                name,
-                mapState(p.getState()),
-                Math.max(0, cpuPercent),
-                Math.max(0, memoryKb),
-                user
-            ));
+            newProcesses.add(new ProcessInfo(pid, name, mapState(p.getState()),
+                    Math.max(0, cpuPercent), Math.max(0, memoryKb), user));
 
             newByPid.put(pid, p);
         }

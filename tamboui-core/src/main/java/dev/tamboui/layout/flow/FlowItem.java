@@ -9,10 +9,10 @@ import dev.tamboui.widget.Widget;
 /**
  * An item in a {@link Flow} layout with explicit width and height.
  * <p>
- * At the widget level, explicit sizing is required because the
- * {@link Widget} interface has no {@code preferredWidth()} method.
- * At the element level, {@code FlowElement} auto-measures children
- * via {@code Element.preferredWidth()}.
+ * At the widget level, explicit sizing is required because the {@link Widget}
+ * interface has no {@code preferredWidth()} method. At the element level,
+ * {@code FlowElement} auto-measures children via
+ * {@code Element.preferredWidth()}.
  */
 public final class FlowItem {
 
@@ -29,8 +29,10 @@ public final class FlowItem {
     /**
      * Creates a flow item with the given widget and width (height defaults to 1).
      *
-     * @param widget the widget to render
-     * @param width  the width in cells
+     * @param widget
+     *            the widget to render
+     * @param width
+     *            the width in cells
      * @return a new flow item
      */
     public static FlowItem of(Widget widget, int width) {
@@ -40,9 +42,12 @@ public final class FlowItem {
     /**
      * Creates a flow item with the given widget, width, and height.
      *
-     * @param widget the widget to render
-     * @param width  the width in cells
-     * @param height the height in cells
+     * @param widget
+     *            the widget to render
+     * @param width
+     *            the width in cells
+     * @param height
+     *            the height in cells
      * @return a new flow item
      */
     public static FlowItem of(Widget widget, int width, int height) {

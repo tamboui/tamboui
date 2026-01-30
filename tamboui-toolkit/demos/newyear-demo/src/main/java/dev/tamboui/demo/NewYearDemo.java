@@ -8,23 +8,6 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.text.Line;
-import dev.tamboui.text.Span;
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.widgets.canvas.Context;
-import dev.tamboui.widgets.canvas.Marker;
-import dev.tamboui.widgets.canvas.shapes.Points;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,17 +23,34 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
+
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.toolkit.app.ToolkitApp;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.widgets.canvas.Context;
+import dev.tamboui.widgets.canvas.Marker;
+import dev.tamboui.widgets.canvas.shapes.Points;
+
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * New Year countdown demo inspired by https://github.com/willmcgugan/ny2026, adapted to TamboUI.
+ * New Year countdown demo inspired by https://github.com/willmcgugan/ny2026,
+ * adapted to TamboUI.
  *
- * - Big digital countdown clock to local New Year (Jan 1st 00:00 local time)
- * - Firework rockets + particle explosions (triggered at midnight or Space)
- * - 3D perspective projection with camera movement
- * - Procedural stereo audio system
- * - 60 FPS rendering
- * - Braille dot rendering for clock digits
+ * - Big digital countdown clock to local New Year (Jan 1st 00:00 local time) -
+ * Firework rockets + particle explosions (triggered at midnight or Space) - 3D
+ * perspective projection with camera movement - Procedural stereo audio system
+ * - 60 FPS rendering - Braille dot rendering for clock digits
  */
 public final class NewYearDemo extends ToolkitApp {
 
@@ -77,8 +77,11 @@ public final class NewYearDemo extends ToolkitApp {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new NewYearDemo().run();
@@ -86,10 +89,7 @@ public final class NewYearDemo extends ToolkitApp {
 
     @Override
     protected TuiConfig configure() {
-        return TuiConfig.builder()
-            .tickRate(TICK)
-            .mouseCapture(false)
-            .build();
+        return TuiConfig.builder().tickRate(TICK).mouseCapture(false).build();
     }
 
     @Override
@@ -123,7 +123,7 @@ public final class NewYearDemo extends ToolkitApp {
         }
         // Keep target updated to current time when simulating to maintain 00:00:00
         if (simulating) {
-           // target = now;
+            // target = now;
             remaining = Duration.ZERO;
         }
 
@@ -131,10 +131,10 @@ public final class NewYearDemo extends ToolkitApp {
         long nowNanos = System.nanoTime();
         double dt = Math.max(0.0, Math.min(0.2, (nowNanos - lastUpdateNanos) / 1_000_000_000.0));
         lastUpdateNanos = nowNanos;
-        
+
         // Animate camera moving forward through Z-space
         cameraZ += CAMERA_SPEED * dt;
-        
+
         fireworks.update(dt, innerW, innerH, cameraZ, soundManager, null);
 
         String bottomHelp = " [Space] Fireworks   [s] Simulate   [q] Quit ";
@@ -143,43 +143,33 @@ public final class NewYearDemo extends ToolkitApp {
         final int innerWFinal = innerW;
         final int innerHFinal = innerH;
 
-        return panel(
-            canvas(0, innerWFinal, 0, innerHFinal)
-                .marker(Marker.BRAILLE)
-                .paint(ctx -> {
-                    // Background fireworks (points/lines) with 3D perspective
-                    fireworks.render(ctx, cameraZ, innerWFinal, innerHFinal);
+        return panel(canvas(0, innerWFinal, 0, innerHFinal).marker(Marker.BRAILLE).paint(ctx -> {
+            // Background fireworks (points/lines) with 3D perspective
+            fireworks.render(ctx, cameraZ, innerWFinal, innerHFinal);
 
-                    // Foreground clock + labels (rendered above points)
-                    renderOverlay(ctx, innerWFinal, innerHFinal, nowFinal, remainingFinal);
-                })
-                .fill()
-        )
-            .id("root")
-            .focusable()
-            .rounded()
-            .borderColor(Color.DARK_GRAY)
-            .focusedBorderColor(Color.CYAN)
-            .bottomTitle(bottomHelp)
-            .onKeyEvent(e -> {
-                if (e != null) {
-                    if (e.isChar(' ')) {
-                        // Launch a single firework on space press
-                        fireworks.launchSingleFirework(innerWFinal, innerHFinal, cameraZ, soundManager);
-                        return EventResult.HANDLED;
-                    } else if (e.isChar('s') || e.isChar('S')) {
-                        // Simulate New Year: trigger midnight show and set countdown to zero
-                        simulating = true;
-                        if (!midnightTriggered) {
-                            midnightTriggered = true;
-                            fireworks.startShow(MIDNIGHT_SHOW_DURATION);
-                           
+            // Foreground clock + labels (rendered above points)
+            renderOverlay(ctx, innerWFinal, innerHFinal, nowFinal, remainingFinal);
+        }).fill()).id("root").focusable().rounded().borderColor(Color.DARK_GRAY)
+                .focusedBorderColor(Color.CYAN).bottomTitle(bottomHelp).onKeyEvent(e -> {
+                    if (e != null) {
+                        if (e.isChar(' ')) {
+                            // Launch a single firework on space press
+                            fireworks.launchSingleFirework(innerWFinal, innerHFinal, cameraZ,
+                                    soundManager);
+                            return EventResult.HANDLED;
+                        } else if (e.isChar('s') || e.isChar('S')) {
+                            // Simulate New Year: trigger midnight show and set countdown to zero
+                            simulating = true;
+                            if (!midnightTriggered) {
+                                midnightTriggered = true;
+                                fireworks.startShow(MIDNIGHT_SHOW_DURATION);
+
+                            }
+                            return EventResult.HANDLED;
                         }
-                        return EventResult.HANDLED;
                     }
-                }
-                return EventResult.UNHANDLED;
-            });
+                    return EventResult.UNHANDLED;
+                });
     }
 
     private void renderOverlay(Context ctx, int w, int h, ZonedDateTime now, Duration remaining) {
@@ -205,7 +195,7 @@ public final class NewYearDemo extends ToolkitApp {
         double topY = Math.max(0, h * 0.72);
 
         Color clockColor = fireworks.isShowActive() ? Color.YELLOW : Color.CYAN;
-        
+
         // Render clock as braille dots (points) instead of text
         // Pack points closely together to form solid-looking braille patterns
         List<double[]> clockPoints = new ArrayList<>();
@@ -224,13 +214,13 @@ public final class NewYearDemo extends ToolkitApp {
                             // Small offsets to pack into braille cells
                             double x = baseX + dx * 0.4;
                             double y = baseY + dy * 0.3;
-                            clockPoints.add(new double[] {x, y});
+                            clockPoints.add(new double[]{x, y});
                         }
                     }
                 }
             }
         }
-        
+
         if (!clockPoints.isEmpty()) {
             double[][] coords = new double[clockPoints.size()][2];
             for (int i = 0; i < clockPoints.size(); i++) {
@@ -276,8 +266,8 @@ public final class NewYearDemo extends ToolkitApp {
     }
 
     /**
-     * Manages sound generation and playback for fireworks explosions.
-     * Generates procedural explosion sounds with stereo panning.
+     * Manages sound generation and playback for fireworks explosions. Generates
+     * procedural explosion sounds with stereo panning.
      */
     static final class SoundManager {
         private static final int SAMPLE_RATE = 22050;
@@ -295,10 +285,10 @@ public final class NewYearDemo extends ToolkitApp {
         SoundManager() {
             // Generate mono explosion sound
             monoExplosionSound = generateExplosionSound();
-            
+
             // Pre-generate stereo variations at different pan positions
             generateStereoCache();
-            
+
             // Start audio thread
             startAudioThread();
         }
@@ -307,45 +297,46 @@ public final class NewYearDemo extends ToolkitApp {
             int samples = (int) (SAMPLE_RATE * DURATION);
             float[] wave = new float[samples];
             Random rng = new Random();
-            
+
             // Generate time array
             for (int i = 0; i < samples; i++) {
                 double t = (double) i / SAMPLE_RATE;
-                
+
                 // White noise
                 double noise = (rng.nextGaussian() * 0.5);
-                
+
                 // Low-frequency rumble
                 double rumbleFreq = 60.0;
                 double rumble = Math.sin(2 * Math.PI * rumbleFreq * t);
                 rumble += 0.5 * Math.sin(2 * Math.PI * rumbleFreq * 2 * t);
-                
+
                 // Combine noise and rumble
                 wave[i] = (float) (0.7 * noise + 0.3 * rumble);
-                
+
                 // Apply exponential decay envelope
                 double envelope = Math.exp(-3 * t / DURATION);
                 wave[i] *= (float) envelope;
-                
+
                 // Add crackle (short bursts)
                 if (rng.nextDouble() < 0.05) {
                     wave[i] += (float) (rng.nextGaussian() * 0.5 * envelope);
                 }
             }
-            
+
             // Apply simple low-pass filter (moving average)
             int windowSize = 15;
             float[] filtered = new float[samples];
             for (int i = 0; i < samples; i++) {
                 double sum = 0;
                 int count = 0;
-                for (int j = Math.max(0, i - windowSize / 2); j < Math.min(samples, i + windowSize / 2 + 1); j++) {
+                for (int j = Math.max(0, i - windowSize / 2); j < Math.min(samples,
+                        i + windowSize / 2 + 1); j++) {
                     sum += wave[j];
                     count++;
                 }
                 filtered[i] = (float) (sum / count);
             }
-            
+
             // Normalize and convert to bytes (16-bit PCM)
             byte[] result = new byte[samples * 2];
             float max = 0;
@@ -360,7 +351,7 @@ public final class NewYearDemo extends ToolkitApp {
                     result[i * 2 + 1] = (byte) ((sample >> 8) & 0xFF);
                 }
             }
-            
+
             return result;
         }
 
@@ -368,34 +359,34 @@ public final class NewYearDemo extends ToolkitApp {
             if (monoExplosionSound == null) {
                 return;
             }
-            
+
             int samples = monoExplosionSound.length / 2; // 16-bit samples
-            
+
             for (int i = 0; i < PAN_POSITIONS; i++) {
                 double pan = -1.0 + (i * 0.125); // -1.0 to 1.0
-                
+
                 // Constant power panning
                 double panAngle = (pan + 1) * (Math.PI / 4); // Map -1..1 to 0..pi/2
                 double leftGain = Math.cos(panAngle);
                 double rightGain = Math.sin(panAngle);
-                
+
                 // Create stereo audio
                 byte[] stereo = new byte[samples * 4]; // 2 channels * 2 bytes per sample
                 for (int j = 0; j < samples; j++) {
                     int monoIdx = j * 2;
-                    short monoSample = (short) ((monoExplosionSound[monoIdx] & 0xFF) | 
-                                                ((monoExplosionSound[monoIdx + 1] & 0xFF) << 8));
-                    
+                    short monoSample = (short) ((monoExplosionSound[monoIdx] & 0xFF)
+                            | ((monoExplosionSound[monoIdx + 1] & 0xFF) << 8));
+
                     short leftSample = (short) (monoSample * leftGain);
                     short rightSample = (short) (monoSample * rightGain);
-                    
+
                     int stereoIdx = j * 4;
                     stereo[stereoIdx] = (byte) (leftSample & 0xFF);
                     stereo[stereoIdx + 1] = (byte) ((leftSample >> 8) & 0xFF);
                     stereo[stereoIdx + 2] = (byte) (rightSample & 0xFF);
                     stereo[stereoIdx + 3] = (byte) ((rightSample >> 8) & 0xFF);
                 }
-                
+
                 stereoCache[i] = stereo;
             }
         }
@@ -404,15 +395,15 @@ public final class NewYearDemo extends ToolkitApp {
             try {
                 AudioFormat format = new AudioFormat(SAMPLE_RATE, 16, 2, true, false);
                 DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-                
+
                 if (!AudioSystem.isLineSupported(info)) {
                     return; // Audio not supported, silently fail
                 }
-                
+
                 audioLine = (SourceDataLine) AudioSystem.getLine(info);
                 audioLine.open(format);
                 audioLine.start();
-                
+
                 running.set(true);
                 audioThread = new Thread(this::audioPlaybackLoop, "FireworksAudio");
                 audioThread.setDaemon(true);
@@ -424,7 +415,7 @@ public final class NewYearDemo extends ToolkitApp {
 
         private void audioPlaybackLoop() {
             byte[] buffer = new byte[4096];
-            
+
             while (running.get() && audioLine != null && audioLine.isOpen()) {
                 try {
                     // Mix all active sounds
@@ -434,50 +425,52 @@ public final class NewYearDemo extends ToolkitApp {
                         for (int i = 0; i < bytesToWrite; i++) {
                             buffer[i] = 0;
                         }
-                        
+
                         // Mix sounds (16-bit stereo: L, R, L, R...)
                         Iterator<SoundClip> it = activeSounds.iterator();
                         while (it.hasNext()) {
                             SoundClip clip = it.next();
-                            
+
                             int remaining = clip.data.length - clip.position;
                             int toMix = Math.min(remaining, bytesToWrite);
-                            
+
                             // Mix 16-bit stereo samples (4 bytes per sample)
                             for (int i = 0; i < toMix; i += 4) {
                                 if (clip.position + i + 3 >= clip.data.length) {
                                     break;
                                 }
-                                
+
                                 // Left channel
-                                short clipLeft = (short) ((clip.data[clip.position + i] & 0xFF) | 
-                                                           ((clip.data[clip.position + i + 1] & 0xFF) << 8));
-                                short bufferLeft = (short) ((buffer[i] & 0xFF) | 
-                                                             ((buffer[i + 1] & 0xFF) << 8));
+                                short clipLeft = (short) ((clip.data[clip.position + i] & 0xFF)
+                                        | ((clip.data[clip.position + i + 1] & 0xFF) << 8));
+                                short bufferLeft = (short) ((buffer[i] & 0xFF)
+                                        | ((buffer[i + 1] & 0xFF) << 8));
                                 int mixedLeft = bufferLeft + clipLeft;
-                                mixedLeft = Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, mixedLeft));
+                                mixedLeft = Math.max(Short.MIN_VALUE,
+                                        Math.min(Short.MAX_VALUE, mixedLeft));
                                 buffer[i] = (byte) (mixedLeft & 0xFF);
                                 buffer[i + 1] = (byte) ((mixedLeft >> 8) & 0xFF);
-                                
+
                                 // Right channel
-                                short clipRight = (short) ((clip.data[clip.position + i + 2] & 0xFF) | 
-                                                            ((clip.data[clip.position + i + 3] & 0xFF) << 8));
-                                short bufferRight = (short) ((buffer[i + 2] & 0xFF) | 
-                                                              ((buffer[i + 3] & 0xFF) << 8));
+                                short clipRight = (short) ((clip.data[clip.position + i + 2] & 0xFF)
+                                        | ((clip.data[clip.position + i + 3] & 0xFF) << 8));
+                                short bufferRight = (short) ((buffer[i + 2] & 0xFF)
+                                        | ((buffer[i + 3] & 0xFF) << 8));
                                 int mixedRight = bufferRight + clipRight;
-                                mixedRight = Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, mixedRight));
+                                mixedRight = Math.max(Short.MIN_VALUE,
+                                        Math.min(Short.MAX_VALUE, mixedRight));
                                 buffer[i + 2] = (byte) (mixedRight & 0xFF);
                                 buffer[i + 3] = (byte) ((mixedRight >> 8) & 0xFF);
                             }
-                            
+
                             clip.position += toMix;
-                            
+
                             // Remove when finished
                             if (clip.position >= clip.data.length) {
                                 it.remove();
                             }
                         }
-                        
+
                         // Write to audio line
                         audioLine.write(buffer, 0, bytesToWrite);
                     } else {
@@ -497,25 +490,24 @@ public final class NewYearDemo extends ToolkitApp {
             if (monoExplosionSound == null || stereoCache[0] == null) {
                 return;
             }
-            
+
             if (activeSounds.size() >= MAX_CONCURRENT_SOUNDS) {
                 return; // Too many sounds playing
             }
-            
+
             // Calculate pan position: -1 (left) to 1 (right)
             double pan = (x / screenWidth) * 2.0 - 1.0;
             pan = Math.max(-1.0, Math.min(1.0, pan));
-            
+
             // Quantize to nearest cached position
             int panIndex = (int) Math.round((pan + 1.0) / 0.125);
             panIndex = Math.max(0, Math.min(PAN_POSITIONS - 1, panIndex));
-            
+
             byte[] stereoData = stereoCache[panIndex];
             if (stereoData != null) {
                 activeSounds.offer(new SoundClip(stereoData));
             }
         }
-
 
         void stop() {
             running.set(false);
@@ -545,11 +537,12 @@ public final class NewYearDemo extends ToolkitApp {
     }
 
     /**
-     * Simple fireworks show: rockets fly up, then explode into particles which fall and fade.
-     * Coordinates are in 3D space with perspective projection.
+     * Simple fireworks show: rockets fly up, then explode into particles which fall
+     * and fade. Coordinates are in 3D space with perspective projection.
      */
     static final class FireworksShow {
-        private static final double GRAVITY = -100.0; // units / s^2 (negative = downward, since y increases upward)
+        private static final double GRAVITY = -100.0; // units / s^2 (negative = downward, since y
+                                                      // increases upward)
         private static final double DRAG = 0.97; // Air resistance (matching Python)
 
         private final Random rng;
@@ -573,12 +566,14 @@ public final class NewYearDemo extends ToolkitApp {
             rocketSpawnCooldown = 0.0;
         }
 
-        void launchSingleFirework(int width, int height, double cameraZ, SoundManager soundManager) {
+        void launchSingleFirework(int width, int height, double cameraZ,
+                SoundManager soundManager) {
             // Launch just one firework immediately
             spawnRocket(width, height, cameraZ, soundManager);
         }
 
-        void update(double dt, int width, int height, double cameraZ, SoundManager soundManager, Runnable onExplosion) {
+        void update(double dt, int width, int height, double cameraZ, SoundManager soundManager,
+                Runnable onExplosion) {
             if (dt <= 0) {
                 return;
             }
@@ -595,12 +590,12 @@ public final class NewYearDemo extends ToolkitApp {
             }
 
             // Update rockets (and explode if needed).
-            for (Iterator<Rocket> it = rockets.iterator(); it.hasNext(); ) {
+            for (Iterator<Rocket> it = rockets.iterator(); it.hasNext();) {
                 Rocket r = it.next();
                 r.update(dt, width, height, GRAVITY);
 
                 // Store trail position for launch phase
-                r.trail.add(new double[] {r.x, r.y, r.z});
+                r.trail.add(new double[]{r.x, r.y, r.z});
                 if (r.trail.size() > 15) {
                     r.trail.remove(0);
                 }
@@ -615,7 +610,7 @@ public final class NewYearDemo extends ToolkitApp {
 
             // Update particles with lighter gravity for explosion (matching Python)
             double particleGravity = -50.0; // Lighter than rocket gravity
-            for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
+            for (Iterator<Particle> it = particles.iterator(); it.hasNext();) {
                 Particle p = it.next();
                 p.update(dt, particleGravity, DRAG);
                 // Remove if dead or fallen below bottom
@@ -643,7 +638,7 @@ public final class NewYearDemo extends ToolkitApp {
                             double sx = centerX + (point[0] - centerX) * scale;
                             double sy = centerY + (point[1] - centerY) * scale;
                             if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
-                                screenPoints.add(new double[] {sx, sy});
+                                screenPoints.add(new double[]{sx, sy});
                             }
                         }
                     }
@@ -652,7 +647,8 @@ public final class NewYearDemo extends ToolkitApp {
                         for (int i = 0; i < screenPoints.size() - 1; i++) {
                             double[] p1 = screenPoints.get(i);
                             double[] p2 = screenPoints.get(i + 1);
-                            ctx.draw(dev.tamboui.widgets.canvas.shapes.Line.of(p1[0], p1[1], p2[0], p2[1], r.fireworkColor));
+                            ctx.draw(dev.tamboui.widgets.canvas.shapes.Line.of(p1[0], p1[1], p2[0],
+                                    p2[1], r.fireworkColor));
                         }
                     }
                 }
@@ -672,7 +668,7 @@ public final class NewYearDemo extends ToolkitApp {
                 if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
                     Color color = p.color;
                     List<double[]> list = buckets.computeIfAbsent(color, k -> new ArrayList<>());
-                    list.add(new double[] {sx, sy});
+                    list.add(new double[]{sx, sy});
                 }
             }
             for (Map.Entry<Color, List<double[]>> e : buckets.entrySet()) {
@@ -701,11 +697,11 @@ public final class NewYearDemo extends ToolkitApp {
             double x = width * 0.2 + rng.nextDouble() * (width * 0.6);
             double y = 0.0; // Start at absolute bottom
             double z = cameraZ + 50.0 + rng.nextDouble() * 250.0; // Spawn ahead of camera
-            
+
             // Calculate target explosion height - should peak well above clock level
             // Clock is at ~72% from bottom, so target 80-98% from bottom (well above clock)
             double targetY = height * 0.80 + rng.nextDouble() * (height * 0.18);
-            
+
             // Calculate required launch velocity to reach target height
             // Using kinematic equation: v² = u² + 2as
             // At apex: v = 0, so u² = -2as
@@ -714,38 +710,37 @@ public final class NewYearDemo extends ToolkitApp {
             // GRAVITY is negative, so -2 * GRAVITY is positive
             // Keep original velocity calculation (no reduction) to reach the higher peak
             double requiredVelocity = Math.sqrt(-2 * GRAVITY * distanceToTarget);
-            
+
             double vx = (rng.nextDouble() - 0.5) * 40.0;
             double vy = requiredVelocity; // Positive because upward (y increases upward)
             double vz = 0.0;
             double fuse = 0.9 + rng.nextDouble() * 0.8;
-            
+
             // Generate random firework color matching Python palette
             Color fireworkColor = randomFireworkColor(rng);
             rockets.add(new Rocket(x, y, z, vx, vy, vz, fuse, fireworkColor));
         }
-        
+
         private Color randomFireworkColor(Random rng) {
             // Python firework colors - realistic pyrotechnic colors
-            int[][] colors = {
-                {255, 50, 50},      // Red (Strontium)
-                {255, 140, 0},       // Orange (Calcium)
-                {255, 215, 0},       // Gold/Yellow (Sodium, Iron)
-                {240, 240, 240},     // White/Silver (Aluminum, Magnesium)
-                {50, 255, 50},       // Green (Barium)
-                {100, 150, 255},     // Blue (Copper)
-                {200, 100, 255},     // Purple (Strontium + Copper)
-                {255, 192, 203},     // Pink (Strontium + Titanium)
-                {0, 255, 255},       // Cyan/Turquoise (Copper compounds)
-                {220, 20, 60},       // Deep Red/Crimson (Lithium)
-                {200, 255, 0},       // Lime Green (Barium with additives)
-                {80, 200, 255},      // Electric Blue (Copper chloride)
-                {180, 140, 255},     // Lavender (Potassium/Rubidium)
-                {255, 180, 120},     // Peach (Calcium + Strontium)
-                {255, 191, 0},       // Amber (Iron + Charcoal)
-                {255, 250, 200},     // Golden White (Titanium sparkles)
-                {255, 0, 255},       // Magenta (Strontium + Copper)
-                {150, 255, 200},     // Mint Green (Barium + Copper)
+            int[][] colors = {{255, 50, 50}, // Red (Strontium)
+                    {255, 140, 0}, // Orange (Calcium)
+                    {255, 215, 0}, // Gold/Yellow (Sodium, Iron)
+                    {240, 240, 240}, // White/Silver (Aluminum, Magnesium)
+                    {50, 255, 50}, // Green (Barium)
+                    {100, 150, 255}, // Blue (Copper)
+                    {200, 100, 255}, // Purple (Strontium + Copper)
+                    {255, 192, 203}, // Pink (Strontium + Titanium)
+                    {0, 255, 255}, // Cyan/Turquoise (Copper compounds)
+                    {220, 20, 60}, // Deep Red/Crimson (Lithium)
+                    {200, 255, 0}, // Lime Green (Barium with additives)
+                    {80, 200, 255}, // Electric Blue (Copper chloride)
+                    {180, 140, 255}, // Lavender (Potassium/Rubidium)
+                    {255, 180, 120}, // Peach (Calcium + Strontium)
+                    {255, 191, 0}, // Amber (Iron + Charcoal)
+                    {255, 250, 200}, // Golden White (Titanium sparkles)
+                    {255, 0, 255}, // Magenta (Strontium + Copper)
+                    {150, 255, 200}, // Mint Green (Barium + Copper)
             };
             int[] rgb = colors[rng.nextInt(colors.length)];
             return Color.rgb(rgb[0], rgb[1], rgb[2]);
@@ -756,7 +751,7 @@ public final class NewYearDemo extends ToolkitApp {
             if (soundManager != null) {
                 soundManager.playExplosion(r.x, width);
             }
-            
+
             // Trigger camera pulse on explosion
             if (onExplosion != null) {
                 onExplosion.run();
@@ -767,7 +762,7 @@ public final class NewYearDemo extends ToolkitApp {
             int count = 450 + rng.nextInt(301);
             // Smaller, more contained explosion - half the speed for tighter circle
             double speed = 50.0 + rng.nextDouble() * 25.0; // 50-75 (half of previous)
-            
+
             for (int i = 0; i < count; i++) {
                 // Generate particles in a 2D circle in X-Y plane (perpendicular to camera)
                 // This ensures circular appearance when viewed from front
@@ -775,13 +770,13 @@ public final class NewYearDemo extends ToolkitApp {
                 double radius = rng.nextDouble(); // Random distance from center (0 to 1)
                 // Use sqrt for uniform distribution in circle area
                 radius = Math.sqrt(radius);
-                
+
                 // Convert to Cartesian coordinates in X-Y plane
                 double vx = speed * radius * Math.cos(angle);
                 double vy = speed * radius * Math.sin(angle);
                 // Small random Z component for slight depth variation
                 double vz = (rng.nextDouble() - 0.5) * speed * 0.3;
-                
+
                 // Random lifetime: 1.8-2.5 seconds (matching Python)
                 double life = 1.8 + rng.nextDouble() * 0.7;
                 // 20% white sparkles, 80% base color
@@ -805,7 +800,8 @@ public final class NewYearDemo extends ToolkitApp {
         final List<double[]> trail = new ArrayList<>(); // [x, y, z] points
         final Color fireworkColor; // Color for this firework (used for trail and explosion)
 
-        Rocket(double x, double y, double z, double vx, double vy, double vz, double fuse, Color fireworkColor) {
+        Rocket(double x, double y, double z, double vx, double vy, double vz, double fuse,
+                Color fireworkColor) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -859,7 +855,8 @@ public final class NewYearDemo extends ToolkitApp {
         double life;
         final Color color;
 
-        Particle(double x, double y, double z, double vx, double vy, double vz, double life, Color color) {
+        Particle(double x, double y, double z, double vx, double vy, double vz, double life,
+                Color color) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -891,106 +888,38 @@ public final class NewYearDemo extends ToolkitApp {
         static final SevenSegFont DEFAULT = new SevenSegFont();
 
         private final Map<Character, String[]> glyphs = Map.ofEntries(
-            Map.entry('0', new String[] {
-                "█████",
-                "█   █",
-                "█   █",
-                "█   █",
-                "█   █",
-                "█   █",
-                "█████"
-            }),
-            Map.entry('1', new String[] {
-                "    █",
-                "    █",
-                "    █",
-                "    █",
-                "    █",
-                "    █",
-                "    █"
-            }),
-            Map.entry('2', new String[] {
-                "█████",
-                "    █",
-                "    █",
-                "█████",
-                "█    ",
-                "█    ",
-                "█████"
-            }),
-            Map.entry('3', new String[] {
-                "█████",
-                "    █",
-                "    █",
-                "█████",
-                "    █",
-                "    █",
-                "█████"
-            }),
-            Map.entry('4', new String[] {
-                "█   █",
-                "█   █",
-                "█   █",
-                "█████",
-                "    █",
-                "    █",
-                "    █"
-            }),
-            Map.entry('5', new String[] {
-                "█████",
-                "█    ",
-                "█    ",
-                "█████",
-                "    █",
-                "    █",
-                "█████"
-            }),
-            Map.entry('6', new String[] {
-                "█████",
-                "█    ",
-                "█    ",
-                "█████",
-                "█   █",
-                "█   █",
-                "█████"
-            }),
-            Map.entry('7', new String[] {
-                "█████",
-                "    █",
-                "    █",
-                "    █",
-                "    █",
-                "    █",
-                "    █"
-            }),
-            Map.entry('8', new String[] {
-                "█████",
-                "█   █",
-                "█   █",
-                "█████",
-                "█   █",
-                "█   █",
-                "█████"
-            }),
-            Map.entry('9', new String[] {
-                "█████",
-                "█   █",
-                "█   █",
-                "█████",
-                "    █",
-                "    █",
-                "█████"
-            }),
-            Map.entry(':', new String[] {
-                "     ",
-                "  █  ",
-                "  █  ",
-                "     ",
-                "  █  ",
-                "  █  ",
-                "     "
-            })
-        );
+                Map.entry('0',
+                        new String[]{"█████", "█   █", "█   █", "█   █", "█   █", "█   █",
+                                "█████"}),
+                Map.entry('1',
+                        new String[]{"    █", "    █", "    █", "    █", "    █", "    █",
+                                "    █"}),
+                Map.entry('2',
+                        new String[]{"█████", "    █", "    █", "█████", "█    ", "█    ",
+                                "█████"}),
+                Map.entry('3',
+                        new String[]{"█████", "    █", "    █", "█████", "    █", "    █",
+                                "█████"}),
+                Map.entry('4',
+                        new String[]{"█   █", "█   █", "█   █", "█████", "    █", "    █",
+                                "    █"}),
+                Map.entry('5',
+                        new String[]{"█████", "█    ", "█    ", "█████", "    █", "    █",
+                                "█████"}),
+                Map.entry('6',
+                        new String[]{"█████", "█    ", "█    ", "█████", "█   █", "█   █",
+                                "█████"}),
+                Map.entry('7',
+                        new String[]{"█████", "    █", "    █", "    █", "    █", "    █",
+                                "    █"}),
+                Map.entry('8',
+                        new String[]{"█████", "█   █", "█   █", "█████", "█   █", "█   █",
+                                "█████"}),
+                Map.entry('9',
+                        new String[]{"█████", "█   █", "█   █", "█████", "    █", "    █",
+                                "█████"}),
+                Map.entry(':', new String[]{"     ", "  █  ", "  █  ", "     ", "  █  ", "  █  ",
+                        "     "}));
 
         List<String> render(String text) {
             String s = text != null ? text : "";
@@ -1035,4 +964,3 @@ public final class NewYearDemo extends ToolkitApp {
         }
     }
 }
-

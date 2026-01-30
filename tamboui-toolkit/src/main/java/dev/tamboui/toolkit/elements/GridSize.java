@@ -7,7 +7,8 @@ package dev.tamboui.toolkit.elements;
 /**
  * Immutable value object holding grid dimensions (columns and rows).
  * <p>
- * A rows value of 0 means the row count is auto-derived from the number of children.
+ * A rows value of 0 means the row count is auto-derived from the number of
+ * children.
  */
 public final class GridSize {
 
@@ -28,8 +29,10 @@ public final class GridSize {
     /**
      * Creates a grid size with explicit columns and rows.
      *
-     * @param columns the number of columns (must be &gt;= 1)
-     * @param rows    the number of rows (must be &gt;= 0; 0 means auto)
+     * @param columns
+     *            the number of columns (must be &gt;= 1)
+     * @param rows
+     *            the number of rows (must be &gt;= 0; 0 means auto)
      * @return a new grid size
      */
     public static GridSize of(int columns, int rows) {
@@ -39,7 +42,8 @@ public final class GridSize {
     /**
      * Creates a grid size with explicit columns and auto rows.
      *
-     * @param columns the number of columns (must be &gt;= 1)
+     * @param columns
+     *            the number of columns (must be &gt;= 1)
      * @return a new grid size with auto row count
      */
     public static GridSize columns(int columns) {

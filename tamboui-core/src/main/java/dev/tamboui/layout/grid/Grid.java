@@ -4,6 +4,12 @@
  */
 package dev.tamboui.layout.grid;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
@@ -12,51 +18,39 @@ import dev.tamboui.layout.LayoutException;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
- * A CSS Grid-inspired layout widget that arranges children into a grid
- * with explicit control over grid dimensions, per-column/per-row sizing
- * constraints, and gutter spacing.
+ * A CSS Grid-inspired layout widget that arranges children into a grid with
+ * explicit control over grid dimensions, per-column/per-row sizing constraints,
+ * and gutter spacing.
  * <p>
  * Grid supports two mutually exclusive modes:
  * <ul>
- *   <li><b>Children mode</b>: Sequential placement using {@code children()} and {@code columnCount()}</li>
- *   <li><b>Area mode</b>: Template-based placement using {@code gridAreas()} and {@code area()}</li>
+ * <li><b>Children mode</b>: Sequential placement using {@code children()} and
+ * {@code columnCount()}</li>
+ * <li><b>Area mode</b>: Template-based placement using {@code gridAreas()} and
+ * {@code area()}</li>
  * </ul>
  * <p>
- * The staged builder pattern ensures compile-time safety - you cannot mix modes.
+ * The staged builder pattern ensures compile-time safety - you cannot mix
+ * modes.
  *
  * <h2>Children Mode Example</h2>
+ * 
  * <pre>{@code
- * Grid grid = Grid.builder()
- *     .children(widget1, widget2, widget3, widget4)
- *     .columnCount(2)
- *     .horizontalGutter(1)
- *     .verticalGutter(1)
- *     .build();
+ * Grid grid = Grid.builder().children(widget1, widget2, widget3, widget4).columnCount(2)
+ *         .horizontalGutter(1).verticalGutter(1).build();
  * }</pre>
  *
  * <h2>Area Mode Example</h2>
+ * 
  * <pre>{@code
  * Grid grid = Grid.builder()
- *     .gridAreas("header header header",
- *                "nav    main   main",
- *                "nav    main   main",
- *                "footer footer footer")
- *     .area("header", headerWidget)
- *     .area("nav", navWidget)
- *     .area("main", mainWidget)
- *     .area("footer", footerWidget)
- *     .horizontalGutter(1)
- *     .verticalGutter(1)
- *     .build();
+ *         .gridAreas("header header header", "nav    main   main", "nav    main   main",
+ *                 "footer footer footer")
+ *         .area("header", headerWidget).area("nav", navWidget).area("main", mainWidget)
+ *         .area("footer", footerWidget).horizontalGutter(1).verticalGutter(1).build();
  * }</pre>
  */
 public final class Grid implements Widget {
@@ -77,10 +71,9 @@ public final class Grid implements Widget {
     private final List<Constraint> columnConstraints;
     private final List<Constraint> rowConstraints;
 
-    private Grid(List<Widget> children, int columnCount, int[] rowHeights,
-                 GridArea gridArea, Map<String, Widget> areaWidgets,
-                 int horizontalGutter, int verticalGutter, Flex flex,
-                 List<Constraint> columnConstraints, List<Constraint> rowConstraints) {
+    private Grid(List<Widget> children, int columnCount, int[] rowHeights, GridArea gridArea,
+            Map<String, Widget> areaWidgets, int horizontalGutter, int verticalGutter, Flex flex,
+            List<Constraint> columnConstraints, List<Constraint> rowConstraints) {
         this.children = children;
         this.columnCount = columnCount;
         this.rowHeights = rowHeights;
@@ -125,10 +118,7 @@ public final class Grid implements Widget {
         // Build horizontal constraints with gutter gaps
         List<Constraint> hConstraints = buildHorizontalConstraints(cols);
 
-        List<Rect> colAreas = Layout.horizontal()
-            .constraints(hConstraints)
-            .flex(flex)
-            .split(area);
+        List<Rect> colAreas = Layout.horizontal().constraints(hConstraints).flex(flex).split(area);
 
         // Extract only column areas (skip gutter areas)
         List<Rect> columnRects = extractColumnRects(colAreas);
@@ -153,10 +143,7 @@ public final class Grid implements Widget {
         // Build horizontal constraints with gutter gaps
         List<Constraint> hConstraints = buildHorizontalConstraintsForAreas(cols);
 
-        List<Rect> colAreas = Layout.horizontal()
-            .constraints(hConstraints)
-            .flex(flex)
-            .split(area);
+        List<Rect> colAreas = Layout.horizontal().constraints(hConstraints).flex(flex).split(area);
 
         // Extract only column areas (skip gutter areas)
         List<Rect> columnRects = extractColumnRects(colAreas);
@@ -213,10 +200,7 @@ public final class Grid implements Widget {
             }
         }
 
-        List<Rect> allRowAreas = Layout.vertical()
-            .constraints(vConstraints)
-            .flex(flex)
-            .split(area);
+        List<Rect> allRowAreas = Layout.vertical().constraints(vConstraints).flex(flex).split(area);
 
         // Extract row heights (skip gutter areas)
         int[] heights = new int[rows];
@@ -253,8 +237,8 @@ public final class Grid implements Widget {
         return positions;
     }
 
-    private Rect computeMergedCellRect(GridArea.AreaBounds bounds,
-            List<Rect> columnRects, int[] rowYPositions, int[] rowHeights) {
+    private Rect computeMergedCellRect(GridArea.AreaBounds bounds, List<Rect> columnRects,
+            int[] rowYPositions, int[] rowHeights) {
 
         int startCol = bounds.column();
         int endCol = bounds.endColumn() - 1;
@@ -271,7 +255,8 @@ public final class Grid implements Widget {
         // X position from first column
         int x = columnRects.get(startCol).x();
 
-        // Width spans from first column start to last column end (includes gutters between)
+        // Width spans from first column start to last column end (includes gutters
+        // between)
         int endX = columnRects.get(endCol).right();
         int width = endX - x;
 
@@ -291,8 +276,9 @@ public final class Grid implements Widget {
     }
 
     private void renderWithRowConstraints(Rect area, Buffer buffer, int rows, int cols,
-                                          List<Rect> columnRects) {
-        // Build row constraints: cycle rowConstraints over rows, interleave with vertical gutter
+            List<Rect> columnRects) {
+        // Build row constraints: cycle rowConstraints over rows, interleave with
+        // vertical gutter
         List<Constraint> vConstraints = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
             vConstraints.add(rowConstraints.get(r % rowConstraints.size()));
@@ -301,10 +287,7 @@ public final class Grid implements Widget {
             }
         }
 
-        List<Rect> allRowAreas = Layout.vertical()
-            .constraints(vConstraints)
-            .flex(flex)
-            .split(area);
+        List<Rect> allRowAreas = Layout.vertical().constraints(vConstraints).flex(flex).split(area);
 
         // Extract only row areas (skip gutter areas)
         List<Rect> rowRects = new ArrayList<>();
@@ -322,7 +305,8 @@ public final class Grid implements Widget {
                 int childIndex = row * cols + col;
                 if (childIndex < children.size()) {
                     Rect colRect = columnRects.get(col);
-                    Rect cellArea = new Rect(colRect.x(), rowRect.y(), colRect.width(), rowRect.height());
+                    Rect cellArea = new Rect(colRect.x(), rowRect.y(), colRect.width(),
+                            rowRect.height());
                     children.get(childIndex).render(cellArea, buffer);
                 }
             }
@@ -330,13 +314,13 @@ public final class Grid implements Widget {
     }
 
     private void renderWithExplicitRowHeights(Rect area, Buffer buffer, int rows, int cols,
-                                              List<Rect> columnRects) {
+            List<Rect> columnRects) {
         int[] heights = computeRowHeights(rows, area.height());
         renderRows(area, buffer, rows, cols, columnRects, heights);
     }
 
     private void renderWithEqualRowHeights(Rect area, Buffer buffer, int rows, int cols,
-                                           List<Rect> columnRects) {
+            List<Rect> columnRects) {
         int availableHeight = area.height() - verticalGutter * (rows - 1);
         int baseHeight = Math.max(0, availableHeight) / rows;
         int remainder = Math.max(0, availableHeight) % rows;
@@ -347,8 +331,8 @@ public final class Grid implements Widget {
         renderRows(area, buffer, rows, cols, columnRects, heights);
     }
 
-    private void renderRows(Rect area, Buffer buffer, int rows, int cols,
-                            List<Rect> columnRects, int[] heights) {
+    private void renderRows(Rect area, Buffer buffer, int rows, int cols, List<Rect> columnRects,
+            int[] heights) {
         int currentY = area.y();
         for (int row = 0; row < rows; row++) {
             if (currentY >= area.bottom()) {
@@ -422,12 +406,14 @@ public final class Grid implements Widget {
         /**
          * Creates an area-based grid layout using CSS grid-template-areas style.
          * <p>
-         * Each string represents a row; tokens are space-separated area names.
-         * Use "." for empty cells. Named areas must form contiguous rectangles.
+         * Each string represents a row; tokens are space-separated area names. Use "."
+         * for empty cells. Named areas must form contiguous rectangles.
          *
-         * @param rowTemplates the row templates (e.g., "A A B", "A A C")
+         * @param rowTemplates
+         *            the row templates (e.g., "A A B", "A A C")
          * @return an AreaBuilder for further configuration
-         * @throws LayoutException if the template is invalid
+         * @throws LayoutException
+         *             if the template is invalid
          */
         public AreaBuilder gridAreas(String... rowTemplates) {
             GridArea gridArea = GridArea.parse(rowTemplates);
@@ -437,7 +423,8 @@ public final class Grid implements Widget {
         /**
          * Creates a children-based grid layout with sequential placement.
          *
-         * @param children the child widgets
+         * @param children
+         *            the child widgets
          * @return a ChildrenBuilder for further configuration
          */
         public ChildrenBuilder children(Widget... children) {
@@ -447,7 +434,8 @@ public final class Grid implements Widget {
         /**
          * Creates a children-based grid layout with sequential placement.
          *
-         * @param children the child widgets
+         * @param children
+         *            the child widgets
          * @return a ChildrenBuilder for further configuration
          */
         public ChildrenBuilder children(List<Widget> children) {
@@ -476,10 +464,13 @@ public final class Grid implements Widget {
          * <p>
          * Areas without assigned widgets render as empty space.
          *
-         * @param areaName the area name from the template
-         * @param widget the widget to place in that area
+         * @param areaName
+         *            the area name from the template
+         * @param widget
+         *            the widget to place in that area
          * @return this builder
-         * @throws LayoutException if the area name is not defined in the template
+         * @throws LayoutException
+         *             if the area name is not defined in the template
          */
         public AreaBuilder area(String areaName, Widget widget) {
             if (gridArea.boundsFor(areaName) == null) {
@@ -492,7 +483,8 @@ public final class Grid implements Widget {
         /**
          * Sets the horizontal gutter between columns.
          *
-         * @param gutter the horizontal gutter in cells
+         * @param gutter
+         *            the horizontal gutter in cells
          * @return this builder
          */
         public AreaBuilder horizontalGutter(int gutter) {
@@ -503,7 +495,8 @@ public final class Grid implements Widget {
         /**
          * Sets the vertical gutter between rows.
          *
-         * @param gutter the vertical gutter in cells
+         * @param gutter
+         *            the vertical gutter in cells
          * @return this builder
          */
         public AreaBuilder verticalGutter(int gutter) {
@@ -514,7 +507,8 @@ public final class Grid implements Widget {
         /**
          * Sets how remaining space is distributed.
          *
-         * @param flex the flex mode
+         * @param flex
+         *            the flex mode
          * @return this builder
          */
         public AreaBuilder flex(Flex flex) {
@@ -527,7 +521,8 @@ public final class Grid implements Widget {
          * <p>
          * Constraints cycle when fewer than the column count.
          *
-         * @param constraints the column width constraints
+         * @param constraints
+         *            the column width constraints
          * @return this builder
          */
         public AreaBuilder columnConstraints(Constraint... constraints) {
@@ -538,7 +533,8 @@ public final class Grid implements Widget {
         /**
          * Sets the width constraints for columns from a list.
          *
-         * @param constraints the column width constraints
+         * @param constraints
+         *            the column width constraints
          * @return this builder
          */
         public AreaBuilder columnConstraints(List<Constraint> constraints) {
@@ -551,7 +547,8 @@ public final class Grid implements Widget {
          * <p>
          * Constraints cycle when fewer than the row count.
          *
-         * @param constraints the row height constraints
+         * @param constraints
+         *            the row height constraints
          * @return this builder
          */
         public AreaBuilder rowConstraints(Constraint... constraints) {
@@ -562,7 +559,8 @@ public final class Grid implements Widget {
         /**
          * Sets the height constraints for rows from a list.
          *
-         * @param constraints the row height constraints
+         * @param constraints
+         *            the row height constraints
          * @return this builder
          */
         public AreaBuilder rowConstraints(List<Constraint> constraints) {
@@ -576,13 +574,10 @@ public final class Grid implements Widget {
          * @return a new Grid widget
          */
         public Grid build() {
-            return new Grid(
-                null, 0, null,
-                gridArea, new LinkedHashMap<>(areaWidgets),
-                horizontalGutter, verticalGutter, flex,
-                columnConstraints != null ? listCopyOf(columnConstraints) : null,
-                rowConstraints != null ? listCopyOf(rowConstraints) : null
-            );
+            return new Grid(null, 0, null, gridArea, new LinkedHashMap<>(areaWidgets),
+                    horizontalGutter, verticalGutter, flex,
+                    columnConstraints != null ? listCopyOf(columnConstraints) : null,
+                    rowConstraints != null ? listCopyOf(rowConstraints) : null);
         }
     }
 
@@ -607,7 +602,8 @@ public final class Grid implements Widget {
         /**
          * Sets the number of columns.
          *
-         * @param count the column count (must be at least 1)
+         * @param count
+         *            the column count (must be at least 1)
          * @return this builder
          */
         public ChildrenBuilder columnCount(int count) {
@@ -618,10 +614,11 @@ public final class Grid implements Widget {
         /**
          * Sets the number of rows.
          * <p>
-         * When set, validates that children fit within columns × rows cells.
-         * When not set, rows expand automatically to fit all children.
+         * When set, validates that children fit within columns × rows cells. When not
+         * set, rows expand automatically to fit all children.
          *
-         * @param count the row count (must be at least 1)
+         * @param count
+         *            the row count (must be at least 1)
          * @return this builder
          */
         public ChildrenBuilder rowCount(int count) {
@@ -632,7 +629,8 @@ public final class Grid implements Widget {
         /**
          * Sets the horizontal gutter between columns.
          *
-         * @param gutter the horizontal gutter in cells
+         * @param gutter
+         *            the horizontal gutter in cells
          * @return this builder
          */
         public ChildrenBuilder horizontalGutter(int gutter) {
@@ -643,7 +641,8 @@ public final class Grid implements Widget {
         /**
          * Sets the vertical gutter between rows.
          *
-         * @param gutter the vertical gutter in cells
+         * @param gutter
+         *            the vertical gutter in cells
          * @return this builder
          */
         public ChildrenBuilder verticalGutter(int gutter) {
@@ -654,7 +653,8 @@ public final class Grid implements Widget {
         /**
          * Sets how remaining space is distributed.
          *
-         * @param flex the flex mode
+         * @param flex
+         *            the flex mode
          * @return this builder
          */
         public ChildrenBuilder flex(Flex flex) {
@@ -667,7 +667,8 @@ public final class Grid implements Widget {
          * <p>
          * Constraints cycle when fewer than the column count.
          *
-         * @param constraints the column width constraints
+         * @param constraints
+         *            the column width constraints
          * @return this builder
          */
         public ChildrenBuilder columnConstraints(Constraint... constraints) {
@@ -678,7 +679,8 @@ public final class Grid implements Widget {
         /**
          * Sets the width constraints for columns from a list.
          *
-         * @param constraints the column width constraints
+         * @param constraints
+         *            the column width constraints
          * @return this builder
          */
         public ChildrenBuilder columnConstraints(List<Constraint> constraints) {
@@ -689,11 +691,12 @@ public final class Grid implements Widget {
         /**
          * Sets the height constraints for rows.
          * <p>
-         * When set, row heights are determined by the layout solver
-         * rather than by children preferred heights or equal distribution.
-         * Constraints cycle when fewer than the row count.
+         * When set, row heights are determined by the layout solver rather than by
+         * children preferred heights or equal distribution. Constraints cycle when
+         * fewer than the row count.
          *
-         * @param constraints the row height constraints
+         * @param constraints
+         *            the row height constraints
          * @return this builder
          */
         public ChildrenBuilder rowConstraints(Constraint... constraints) {
@@ -704,7 +707,8 @@ public final class Grid implements Widget {
         /**
          * Sets the height constraints for rows from a list.
          *
-         * @param constraints the row height constraints
+         * @param constraints
+         *            the row height constraints
          * @return this builder
          */
         public ChildrenBuilder rowConstraints(List<Constraint> constraints) {
@@ -715,10 +719,12 @@ public final class Grid implements Widget {
         /**
          * Sets explicit row heights.
          * <p>
-         * If not set and no row constraints are set, rows share the available height equally.
-         * If fewer heights than rows are provided, remaining rows default to 1.
+         * If not set and no row constraints are set, rows share the available height
+         * equally. If fewer heights than rows are provided, remaining rows default to
+         * 1.
          *
-         * @param heights the row heights
+         * @param heights
+         *            the row heights
          * @return this builder
          */
         public ChildrenBuilder rowHeights(int... heights) {
@@ -730,7 +736,8 @@ public final class Grid implements Widget {
          * Builds the {@link Grid} widget.
          *
          * @return a new Grid widget
-         * @throws LayoutException if rowCount is set and children exceed available cells
+         * @throws LayoutException
+         *             if rowCount is set and children exceed available cells
          */
         public Grid build() {
             // Validate children fit within grid when rowCount is set
@@ -738,19 +745,16 @@ public final class Grid implements Widget {
                 int maxCells = columnCount * rowCount;
                 if (children.size() > maxCells) {
                     throw new LayoutException(String.format(
-                        "Grid has %d children but only %d cells (%d columns * %d rows)",
-                        children.size(), maxCells, columnCount, rowCount));
+                            "Grid has %d children but only %d cells (%d columns * %d rows)",
+                            children.size(), maxCells, columnCount, rowCount));
                 }
             }
 
-            return new Grid(
-                listCopyOf(children), columnCount,
-                rowHeights != null ? rowHeights.clone() : null,
-                null, null,
-                horizontalGutter, verticalGutter, flex,
-                columnConstraints != null ? listCopyOf(columnConstraints) : null,
-                rowConstraints != null ? listCopyOf(rowConstraints) : null
-            );
+            return new Grid(listCopyOf(children), columnCount,
+                    rowHeights != null ? rowHeights.clone() : null, null, null, horizontalGutter,
+                    verticalGutter, flex,
+                    columnConstraints != null ? listCopyOf(columnConstraints) : null,
+                    rowConstraints != null ? listCopyOf(rowConstraints) : null);
         }
     }
 }

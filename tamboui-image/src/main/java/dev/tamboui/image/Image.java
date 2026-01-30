@@ -4,6 +4,10 @@
  */
 package dev.tamboui.image;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
@@ -13,23 +17,17 @@ import dev.tamboui.widget.RawOutputCapable;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Path;
-
 /**
  * A widget for displaying images in the terminal.
  * <p>
- * The Image widget automatically detects terminal capabilities and uses the best
- * available rendering method: native protocols (Kitty, iTerm2, Sixel) when supported,
- * or character-based fallbacks (half-blocks, Braille) for universal compatibility.
+ * The Image widget automatically detects terminal capabilities and uses the
+ * best available rendering method: native protocols (Kitty, iTerm2, Sixel) when
+ * supported, or character-based fallbacks (half-blocks, Braille) for universal
+ * compatibility.
  *
  * <pre>{@code
- * Image image = Image.builder()
- *     .data(ImageData.fromPath(Path.of("photo.png")))
- *     .scaling(ImageScaling.FIT)
- *     .block(Block.bordered().title(Title.from("Photo")))
- *     .build();
+ * Image image = Image.builder().data(ImageData.fromPath(Path.of("photo.png")))
+ *         .scaling(ImageScaling.FIT).block(Block.bordered().title(Title.from("Photo"))).build();
  *
  * frame.renderWidget(image, area);
  * }</pre>
@@ -50,8 +48,8 @@ public final class Image implements Widget, RawOutputCapable {
         this.scaling = builder.scaling;
         this.block = builder.block;
         this.protocol = builder.protocol != null
-            ? builder.protocol
-            : TerminalImageCapabilities.detect().bestProtocol();
+                ? builder.protocol
+                : TerminalImageCapabilities.detect().bestProtocol();
     }
 
     /**
@@ -66,7 +64,8 @@ public final class Image implements Widget, RawOutputCapable {
     /**
      * Creates an image widget from the given image data.
      *
-     * @param data the image data
+     * @param data
+     *            the image data
      * @return an image widget
      */
     public static Image of(ImageData data) {
@@ -76,9 +75,11 @@ public final class Image implements Widget, RawOutputCapable {
     /**
      * Creates an image widget from a file path.
      *
-     * @param path the path to the image file
+     * @param path
+     *            the path to the image file
      * @return an image widget
-     * @throws IOException if the file cannot be read
+     * @throws IOException
+     *             if the file cannot be read
      */
     public static Image fromPath(Path path) throws IOException {
         return builder().data(ImageData.fromPath(path)).build();
@@ -87,9 +88,11 @@ public final class Image implements Widget, RawOutputCapable {
     /**
      * Creates an image widget from a classpath resource.
      *
-     * @param resourcePath the resource path
+     * @param resourcePath
+     *            the resource path
      * @return an image widget
-     * @throws IOException if the resource cannot be read
+     * @throws IOException
+     *             if the resource cannot be read
      */
     public static Image fromResource(String resourcePath) throws IOException {
         return builder().data(ImageData.fromResource(resourcePath)).build();
@@ -103,12 +106,16 @@ public final class Image implements Widget, RawOutputCapable {
     /**
      * Renders the image to the given area with optional raw output support.
      * <p>
-     * For native protocols (Sixel, Kitty, iTerm2), the rawOutput stream must be provided.
-     * If rawOutput is null and the protocol requires it, the image will not be rendered.
+     * For native protocols (Sixel, Kitty, iTerm2), the rawOutput stream must be
+     * provided. If rawOutput is null and the protocol requires it, the image will
+     * not be rendered.
      *
-     * @param area      the area to render into
-     * @param buffer    the buffer for character-based rendering
-     * @param rawOutput the output stream for native protocols (may be null)
+     * @param area
+     *            the area to render into
+     * @param buffer
+     *            the buffer for character-based rendering
+     * @param rawOutput
+     *            the output stream for native protocols (may be null)
      */
     @Override
     public void render(Rect area, Buffer buffer, OutputStream rawOutput) {
@@ -144,7 +151,8 @@ public final class Image implements Widget, RawOutputCapable {
         try {
             protocol.render(scaledData, imageArea, buffer, rawOutput);
         } catch (IOException e) {
-            throw new RuntimeIOException("Failed to render image using protocol " + protocol.name(), e);
+            throw new RuntimeIOException("Failed to render image using protocol " + protocol.name(),
+                    e);
         }
     }
 
@@ -153,35 +161,31 @@ public final class Image implements Widget, RawOutputCapable {
      */
     private ImageData scaleImage(ImageData source, int targetWidth, int targetHeight) {
         switch (scaling) {
-            case FIT: {
+            case FIT : {
                 int[] dims = source.scaledDimensionsToFit(targetWidth, targetHeight);
                 return source.resize(dims[0], dims[1]);
             }
-            case FILL: {
+            case FILL : {
                 int[] dims = source.scaledDimensionsToFill(targetWidth, targetHeight);
                 ImageData scaled = source.resize(dims[0], dims[1]);
                 // Crop to target dimensions
                 int offsetX = (dims[0] - targetWidth) / 2;
                 int offsetY = (dims[1] - targetHeight) / 2;
                 if (offsetX > 0 || offsetY > 0) {
-                    return scaled.crop(
-                        Math.max(0, offsetX),
-                        Math.max(0, offsetY),
-                        Math.min(scaled.width(), targetWidth),
-                        Math.min(scaled.height(), targetHeight)
-                    );
+                    return scaled.crop(Math.max(0, offsetX), Math.max(0, offsetY),
+                            Math.min(scaled.width(), targetWidth),
+                            Math.min(scaled.height(), targetHeight));
                 }
                 return scaled;
             }
-            case STRETCH:
+            case STRETCH :
                 return source.resize(targetWidth, targetHeight);
-            case NONE:
-            default:
+            case NONE :
+            default :
                 if (source.width() > targetWidth || source.height() > targetHeight) {
                     // Crop to fit
-                    return source.crop(0, 0,
-                        Math.min(source.width(), targetWidth),
-                        Math.min(source.height(), targetHeight));
+                    return source.crop(0, 0, Math.min(source.width(), targetWidth),
+                            Math.min(source.height(), targetHeight));
                 }
                 return source;
         }
@@ -238,7 +242,8 @@ public final class Image implements Widget, RawOutputCapable {
         /**
          * Sets the image data.
          *
-         * @param data the image data
+         * @param data
+         *            the image data
          * @return this builder
          */
         public Builder data(ImageData data) {
@@ -249,7 +254,8 @@ public final class Image implements Widget, RawOutputCapable {
         /**
          * Sets the scaling mode.
          *
-         * @param scaling the scaling mode
+         * @param scaling
+         *            the scaling mode
          * @return this builder
          */
         public Builder scaling(ImageScaling scaling) {
@@ -260,7 +266,8 @@ public final class Image implements Widget, RawOutputCapable {
         /**
          * Wraps the image in a block (for borders, titles, etc.).
          *
-         * @param block the block wrapper
+         * @param block
+         *            the block wrapper
          * @return this builder
          */
         public Builder block(Block block) {
@@ -273,7 +280,8 @@ public final class Image implements Widget, RawOutputCapable {
          * <p>
          * By default, the best available protocol is auto-detected.
          *
-         * @param protocol the protocol to use
+         * @param protocol
+         *            the protocol to use
          * @return this builder
          */
         public Builder protocol(ImageProtocol protocol) {

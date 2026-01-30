@@ -4,8 +4,8 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.style.Color;
+import dev.tamboui.toolkit.element.Element;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -39,14 +39,10 @@ final class ProgressPanel extends PanelContent {
 
     @Override
     Element render(boolean focused) {
-        var barColor = progressValue < 30 ? Color.RED :
-                      (progressValue < 70 ? Color.YELLOW : Color.GREEN);
-        return column(
-            lineGauge(progressValue)
-                .label("Progress: ")
-                .filledColor(barColor)
-                .thick(),
-            text("Auto-animating...").dim()
-        );
+        var barColor = progressValue < 30
+                ? Color.RED
+                : (progressValue < 70 ? Color.YELLOW : Color.GREEN);
+        return column(lineGauge(progressValue).label("Progress: ").filledColor(barColor).thick(),
+                text("Auto-animating...").dim());
     }
 }

@@ -4,12 +4,12 @@
  */
 package dev.tamboui.widgets.chart;
 
-import dev.tamboui.style.Style;
-import dev.tamboui.text.Line;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.style.Style;
+import dev.tamboui.text.Line;
 
 /**
  * A dataset to be plotted in a {@link Chart}.
@@ -17,13 +17,9 @@ import java.util.Optional;
  * Contains data points (x, y coordinates) and rendering configuration.
  *
  * <pre>{@code
- * Dataset dataset = Dataset.builder()
- *     .name("Temperature")
- *     .data(new double[][] {{0, 20}, {1, 22}, {2, 25}, {3, 23}})
- *     .graphType(GraphType.LINE)
- *     .marker(Dataset.Marker.BRAILLE)
- *     .style(Style.EMPTY.fg(Color.RED))
- *     .build();
+ * Dataset dataset = Dataset.builder().name("Temperature")
+ *         .data(new double[][]{{0, 20}, {1, 22}, {2, 25}, {3, 23}}).graphType(GraphType.LINE)
+ *         .marker(Dataset.Marker.BRAILLE).style(Style.EMPTY.fg(Color.RED)).build();
  * }</pre>
  */
 public final class Dataset {
@@ -83,7 +79,8 @@ public final class Dataset {
     /**
      * Creates a dataset with just data points.
      *
-     * @param data the data points as [x, y] pairs
+     * @param data
+     *            the data points as [x, y] pairs
      * @return a new dataset
      */
     public static Dataset of(double[][] data) {
@@ -93,8 +90,10 @@ public final class Dataset {
     /**
      * Creates a named dataset with data points.
      *
-     * @param name the dataset name
-     * @param data the data points as [x, y] pairs
+     * @param name
+     *            the dataset name
+     * @param data
+     *            the data points as [x, y] pairs
      * @return a new dataset
      */
     public static Dataset of(String name, double[][] data) {
@@ -174,12 +173,14 @@ public final class Dataset {
         private GraphType graphType = GraphType.SCATTER;
         private Style style;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the dataset name (for legend).
          *
-         * @param name the dataset name
+         * @param name
+         *            the dataset name
          * @return this builder
          */
         public Builder name(String name) {
@@ -190,7 +191,8 @@ public final class Dataset {
         /**
          * Sets the dataset name.
          *
-         * @param name the dataset name as a styled line
+         * @param name
+         *            the dataset name as a styled line
          * @return this builder
          */
         public Builder name(Line name) {
@@ -201,7 +203,8 @@ public final class Dataset {
         /**
          * Sets the data points as [x, y] pairs.
          *
-         * @param data the data points as [x, y] pairs
+         * @param data
+         *            the data points as [x, y] pairs
          * @return this builder
          */
         public Builder data(double[][] data) {
@@ -219,7 +222,8 @@ public final class Dataset {
         /**
          * Sets the data points from a list of [x, y] pairs.
          *
-         * @param data the data points as a list of [x, y] pairs
+         * @param data
+         *            the data points as a list of [x, y] pairs
          * @return this builder
          */
         public Builder data(List<double[]> data) {
@@ -237,13 +241,15 @@ public final class Dataset {
         /**
          * Adds a single data point.
          *
-         * @param x the x coordinate
-         * @param y the y coordinate
+         * @param x
+         *            the x coordinate
+         * @param y
+         *            the y coordinate
          * @return this builder
          */
         public Builder addPoint(double x, double y) {
             double[][] newData = Arrays.copyOf(this.data, this.data.length + 1);
-            newData[this.data.length] = new double[] {x, y};
+            newData[this.data.length] = new double[]{x, y};
             this.data = newData;
             return this;
         }
@@ -251,7 +257,8 @@ public final class Dataset {
         /**
          * Sets the marker type for data points.
          *
-         * @param marker the marker type
+         * @param marker
+         *            the marker type
          * @return this builder
          */
         public Builder marker(Marker marker) {
@@ -262,7 +269,8 @@ public final class Dataset {
         /**
          * Sets the graph type.
          *
-         * @param graphType the graph type
+         * @param graphType
+         *            the graph type
          * @return this builder
          */
         public Builder graphType(GraphType graphType) {
@@ -273,7 +281,8 @@ public final class Dataset {
         /**
          * Sets the dataset style.
          *
-         * @param style the style
+         * @param style
+         *            the style
          * @return this builder
          */
         public Builder style(Style style) {

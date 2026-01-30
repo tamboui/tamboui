@@ -15,13 +15,13 @@ import java.util.List;
 import dev.tamboui.error.RuntimeIOException;
 
 /**
- * Captures raw bytes written to System.out for recording inline demos.
- * Instead of parsing ANSI sequences into a virtual buffer, this captures
- * the raw byte stream and replays it directly in the cast file.
+ * Captures raw bytes written to System.out for recording inline demos. Instead
+ * of parsing ANSI sequences into a virtual buffer, this captures the raw byte
+ * stream and replays it directly in the cast file.
  * <p>
- * This approach provides perfect fidelity - the cast file contains exactly
- * what was written to stdout, and the asciinema player interprets the
- * ANSI sequences correctly.
+ * This approach provides perfect fidelity - the cast file contains exactly what
+ * was written to stdout, and the asciinema player interprets the ANSI sequences
+ * correctly.
  * <p>
  * This is an internal API and not part of the public contract.
  */
@@ -55,10 +55,11 @@ public final class AnsiTerminalCapture extends OutputStream {
     }
 
     /**
-     * Installs the capture by replacing System.out.
-     * Does nothing if already installed or if config is null.
+     * Installs the capture by replacing System.out. Does nothing if already
+     * installed or if config is null.
      *
-     * @param config the recording configuration
+     * @param config
+     *            the recording configuration
      */
     public static synchronized void install(RecordingConfig config) {
         if (instance != null || config == null) {

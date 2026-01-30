@@ -21,10 +21,14 @@ public final class Margin {
     /**
      * Creates a margin.
      *
-     * @param top    top margin
-     * @param right  right margin
-     * @param bottom bottom margin
-     * @param left   left margin
+     * @param top
+     *            top margin
+     * @param right
+     *            right margin
+     * @param bottom
+     *            bottom margin
+     * @param left
+     *            left margin
      */
     public Margin(int top, int right, int bottom, int left) {
         this.top = top;
@@ -45,7 +49,8 @@ public final class Margin {
     /**
      * Returns a uniform margin on all sides.
      *
-     * @param value margin in cells
+     * @param value
+     *            margin in cells
      * @return a margin with equal values on all sides
      */
     public static Margin uniform(int value) {
@@ -55,8 +60,10 @@ public final class Margin {
     /**
      * Returns a margin with vertical and horizontal values.
      *
-     * @param vertical    top/bottom margin
-     * @param horizontal  left/right margin
+     * @param vertical
+     *            top/bottom margin
+     * @param horizontal
+     *            left/right margin
      * @return a margin with the given symmetric values
      */
     public static Margin symmetric(int vertical, int horizontal) {
@@ -66,7 +73,8 @@ public final class Margin {
     /**
      * Returns a margin applied horizontally only.
      *
-     * @param value left/right margin
+     * @param value
+     *            left/right margin
      * @return a margin with horizontal values set
      */
     public static Margin horizontal(int value) {
@@ -76,7 +84,8 @@ public final class Margin {
     /**
      * Returns a margin applied vertically only.
      *
-     * @param value top/bottom margin
+     * @param value
+     *            top/bottom margin
      * @return a margin with vertical values set
      */
     public static Margin vertical(int value) {
@@ -140,10 +149,11 @@ public final class Margin {
     /**
      * Returns the inner area after applying this margin.
      * <p>
-     * The returned rect is inset by the margin values on each side.
-     * If the margin would result in negative dimensions, returns an empty rect.
+     * The returned rect is inset by the margin values on each side. If the margin
+     * would result in negative dimensions, returns an empty rect.
      *
-     * @param area the outer area
+     * @param area
+     *            the outer area
      * @return the inner area with margin applied
      */
     public Rect inner(Rect area) {
@@ -166,10 +176,8 @@ public final class Margin {
         if (cachedHashCode != margin.cachedHashCode) {
             return false;
         }
-        return top == margin.top
-            && right == margin.right
-            && bottom == margin.bottom
-            && left == margin.left;
+        return top == margin.top && right == margin.right && bottom == margin.bottom
+                && left == margin.left;
     }
 
     @Override
@@ -179,6 +187,7 @@ public final class Margin {
 
     @Override
     public String toString() {
-        return String.format("Margin[top=%d, right=%d, bottom=%d, left=%d]", top, right, bottom, left);
+        return String.format("Margin[top=%d, right=%d, bottom=%d, left=%d]", top, right, bottom,
+                left);
     }
 }

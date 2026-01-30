@@ -6,6 +6,8 @@
  */
 package dev.tamboui.demo.errorhandling;
 
+import java.time.Duration;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
@@ -16,16 +18,14 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 
-import java.time.Duration;
-
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
  * Demo application showcasing TamboUI's error handling features.
  * <p>
- * This demo demonstrates fault-tolerant rendering where individual
- * widgets that fail to render are replaced with error placeholders
- * while the rest of the UI continues to work normally.
+ * This demo demonstrates fault-tolerant rendering where individual widgets that
+ * fail to render are replaced with error placeholders while the rest of the UI
+ * continues to work normally.
  */
 public class ErrorHandlingDemo {
 
@@ -37,68 +37,56 @@ public class ErrorHandlingDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        TuiConfig config = TuiConfig.builder()
-                .tickRate(Duration.ofMillis(100))
-                .build();
+        TuiConfig config = TuiConfig.builder().tickRate(Duration.ofMillis(100)).build();
 
-        try (ToolkitRunner runner = ToolkitRunner.builder()
-                .config(config)
-                .faultTolerant(true)
+        try (ToolkitRunner runner = ToolkitRunner.builder().config(config).faultTolerant(true)
                 .build()) {
 
             runner.run(() -> column(
                     // Header panel
-                    panel(() -> row(
-                            text(" Error Handling Demo ").bold().cyan(),
-                            spacer(),
-                            text(" [Fault-Tolerant Mode] ").green(),
-                            text(" [q] Quit ").dim()
-                    )).rounded().borderColor(Color.DARK_GRAY).length(3),
+                    panel(() -> row(text(" Error Handling Demo ").bold().cyan(), spacer(),
+                            text(" [Fault-Tolerant Mode] ").green(), text(" [q] Quit ").dim()))
+                            .rounded().borderColor(Color.DARK_GRAY).length(3),
 
                     // Main content - two panels side by side
                     row(
                             // Left panel - Info (always works)
-                            panel(() -> column(
-                                    text("About This Demo").bold().yellow(),
-                                    text(""),
+                            panel(() -> column(text("About This Demo").bold().yellow(), text(""),
                                     text("In fault-tolerant mode, when a"),
                                     text("widget fails to render, it is"),
-                                    text("replaced with an error placeholder."),
-                                    text(""),
-                                    text("The rest of the UI continues to"),
-                                    text("work normally."),
-                                    text(""),
-                                    text("Press [e] to toggle the faulty"),
-                                    text("panel on the right.")
-                            )).title("Info").rounded().borderColor(Color.BLUE).fill(),
+                                    text("replaced with an error placeholder."), text(""),
+                                    text("The rest of the UI continues to"), text("work normally."),
+                                    text(""), text("Press [e] to toggle the faulty"),
+                                    text("panel on the right."))).title("Info").rounded()
+                                    .borderColor(Color.BLUE).fill(),
 
                             // Right panel - may be faulty
                             faultyPanelEnabled
                                     ? faultyPanel()
-                                    : panel(() -> column(
-                                            text("Normal Panel").bold().green(),
-                                            text(""),
-                                            text("This panel renders correctly."),
-                                            text(""),
-                                            text("Press [e] to make this panel"),
-                                            text("throw an exception during render.")
-                                    )).title("Controls").rounded().borderColor(Color.GREEN).fill()
-                    ).fill(),
+                                    : panel(() -> column(text("Normal Panel").bold().green(),
+                                            text(""), text("This panel renders correctly."),
+                                            text(""), text("Press [e] to make this panel"),
+                                            text("throw an exception during render.")))
+                                            .title("Controls").rounded().borderColor(Color.GREEN)
+                                            .fill())
+                            .fill(),
 
                     // Footer
-                    panel(() -> row(
-                            text(" Status: ").dim(),
+                    panel(() -> row(text(" Status: ").dim(),
                             faultyPanelEnabled
-                                    ? text("Faulty panel ENABLED - see error placeholder above").red()
+                                    ? text("Faulty panel ENABLED - see error placeholder above")
+                                            .red()
                                     : text("Normal operation").green(),
-                            spacer(),
-                            text(" [e] Toggle faulty panel ").yellow()
-                    )).rounded().borderColor(Color.DARK_GRAY).length(3)
-            ).id("root").focusable().onKeyEvent(ErrorHandlingDemo::handleKeyEvent));
+                            spacer(), text(" [e] Toggle faulty panel ").yellow())).rounded()
+                            .borderColor(Color.DARK_GRAY).length(3))
+                    .id("root").focusable().onKeyEvent(ErrorHandlingDemo::handleKeyEvent));
         }
     }
 
@@ -120,9 +108,7 @@ public class ErrorHandlingDemo {
         return new Element() {
             @Override
             public void render(Frame frame, Rect area, RenderContext context) {
-                throw new NullPointerException(
-                        "Cannot render: data is null"
-                );
+                throw new NullPointerException("Cannot render: data is null");
             }
 
             @Override

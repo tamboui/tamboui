@@ -4,6 +4,14 @@
  */
 package dev.tamboui.toolkit.app;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
@@ -18,19 +26,11 @@ import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.InlineTuiConfig;
 import dev.tamboui.tui.InlineTuiRunner;
-import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.TickEvent;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 /**
  * Element-based inline runner - no manual rendering.
@@ -38,12 +38,12 @@ import java.util.function.Supplier;
  * InlineToolkitRunner combines the element-based DSL of {@link ToolkitRunner}
  * with the inline display semantics of {@link InlineTuiRunner}. It provides:
  * <ul>
- *   <li>Element-based rendering (no manual widget composition)</li>
- *   <li>Automatic event routing to elements</li>
- *   <li>Focus management</li>
- *   <li>CSS styling support</li>
- *   <li>Tick events for animations (WaveText, etc.)</li>
- *   <li>Inline display (no alternate screen)</li>
+ * <li>Element-based rendering (no manual widget composition)</li>
+ * <li>Automatic event routing to elements</li>
+ * <li>Focus management</li>
+ * <li>CSS styling support</li>
+ * <li>Tick events for animations (WaveText, etc.)</li>
+ * <li>Inline display (no alternate screen)</li>
  * </ul>
  *
  * <pre>{@code
@@ -89,7 +89,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
      * Creates an InlineToolkitRunner with an initial height of 1.
      *
      * @return a new InlineToolkitRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static InlineToolkitRunner create() throws Exception {
         return create(InlineTuiConfig.defaults(1));
@@ -98,9 +99,11 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Creates an InlineToolkitRunner with the specified height.
      *
-     * @param height the number of lines for the inline display
+     * @param height
+     *            the number of lines for the inline display
      * @return a new InlineToolkitRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static InlineToolkitRunner create(int height) throws Exception {
         return create(InlineTuiConfig.defaults(height));
@@ -109,9 +112,11 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Creates an InlineToolkitRunner with the specified configuration.
      *
-     * @param config the configuration to use
+     * @param config
+     *            the configuration to use
      * @return a new InlineToolkitRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static InlineToolkitRunner create(InlineTuiConfig config) throws Exception {
         InlineTuiRunner tuiRunner = InlineTuiRunner.create(config);
@@ -121,7 +126,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Returns a builder for configuring an InlineToolkitRunner.
      *
-     * @param height the number of lines for the inline display
+     * @param height
+     *            the number of lines for the inline display
      * @return a new builder
      */
     public static Builder builder(int height) {
@@ -131,50 +137,49 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Runs the application with the given element supplier.
      * <p>
-     * The supplier is called each frame to get the current UI state.
-     * Events are routed to elements based on their handlers.
+     * The supplier is called each frame to get the current UI state. Events are
+     * routed to elements based on their handlers.
      *
-     * @param elementSupplier provides the root element for each render
-     * @throws Exception if an error occurs during execution
+     * @param elementSupplier
+     *            provides the root element for each render
+     * @throws Exception
+     *             if an error occurs during execution
      */
     public void run(Supplier<Element> elementSupplier) throws Exception {
-        tuiRunner.run(
-            (event, runner) -> handleEvent(event),
-            frame -> {
-                // Clear state before each render
-                focusManager.clearFocusables();
-                eventRouter.clear();
-                elementRegistry.clear();
+        tuiRunner.run((event, runner) -> handleEvent(event), frame -> {
+            // Clear state before each render
+            focusManager.clearFocusables();
+            eventRouter.clear();
+            elementRegistry.clear();
 
-                // Get the current element tree
-                Element root = elementSupplier.get();
+            // Get the current element tree
+            Element root = elementSupplier.get();
 
-                // Calculate and set content height for dynamic resizing.
-                // A preferredHeight of 0 means the element doesn't report a known
-                // height (e.g. TableElement), so keep the configured viewport height.
-                if (root != null) {
-                    int preferredHeight = root.preferredHeight(frame.area().width(), renderContext);
-                    if (preferredHeight > 0) {
-                        tuiRunner.setContentHeight(preferredHeight);
-                    }
-                }
-
-                // Render the element tree and register root for events
-                if (root != null) {
-                    root.render(frame, frame.area(), renderContext);
-                    renderContext.registerElement(root, frame.area());
-                }
-
-                // Auto-focus first focusable element if nothing is focused or focus is stale
-                String currentFocus = focusManager.focusedId();
-                List<String> focusOrder = focusManager.focusOrder();
-                if (!focusOrder.isEmpty()) {
-                    if (currentFocus == null || !focusOrder.contains(currentFocus)) {
-                        focusManager.setFocus(focusOrder.get(0));
-                    }
+            // Calculate and set content height for dynamic resizing.
+            // A preferredHeight of 0 means the element doesn't report a known
+            // height (e.g. TableElement), so keep the configured viewport height.
+            if (root != null) {
+                int preferredHeight = root.preferredHeight(frame.area().width(), renderContext);
+                if (preferredHeight > 0) {
+                    tuiRunner.setContentHeight(preferredHeight);
                 }
             }
-        );
+
+            // Render the element tree and register root for events
+            if (root != null) {
+                root.render(frame, frame.area(), renderContext);
+                renderContext.registerElement(root, frame.area());
+            }
+
+            // Auto-focus first focusable element if nothing is focused or focus is stale
+            String currentFocus = focusManager.focusedId();
+            List<String> focusOrder = focusManager.focusOrder();
+            if (!focusOrder.isEmpty()) {
+                if (currentFocus == null || !focusOrder.contains(currentFocus)) {
+                    focusManager.setFocus(focusOrder.get(0));
+                }
+            }
+        });
     }
 
     private boolean handleEvent(Event event) {
@@ -203,10 +208,11 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Prints an element above the viewport.
      * <p>
-     * The element is rendered to a temporary buffer sized to the element's preferred height
-     * and converted to an ANSI string.
+     * The element is rendered to a temporary buffer sized to the element's
+     * preferred height and converted to an ANSI string.
      *
-     * @param element the element to print
+     * @param element
+     *            the element to print
      */
     public void println(Element element) {
         int width = tuiRunner.width();
@@ -220,7 +226,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Prints a plain text message above the viewport.
      *
-     * @param message the message to print
+     * @param message
+     *            the message to print
      */
     public void println(String message) {
         tuiRunner.println(message);
@@ -229,7 +236,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Prints styled text above the viewport.
      *
-     * @param text the styled text to print
+     * @param text
+     *            the styled text to print
      */
     public void println(Text text) {
         tuiRunner.println(text);
@@ -238,35 +246,41 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Schedules an action to run after a delay.
      * <p>
-     * The action runs on the scheduler thread. If the action modifies UI state,
-     * use {@link #runOnRenderThread(Runnable)} to ensure thread safety.
+     * The action runs on the scheduler thread. If the action modifies UI state, use
+     * {@link #runOnRenderThread(Runnable)} to ensure thread safety.
      *
-     * @param action the action to run
-     * @param delay the delay before running
+     * @param action
+     *            the action to run
+     * @param delay
+     *            the delay before running
      * @return a handle that can be used to cancel the scheduled action
      */
     public ToolkitRunner.ScheduledAction schedule(Runnable action, Duration delay) {
-        ScheduledFuture<?> future = scheduler.schedule(action, delay.toMillis(), TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = scheduler.schedule(action, delay.toMillis(),
+                TimeUnit.MILLISECONDS);
         return new ToolkitRunner.ScheduledAction(future);
     }
 
     /**
      * Schedules an action to run repeatedly at a fixed interval.
      *
-     * @param action the action to run
-     * @param interval the interval between runs
+     * @param action
+     *            the action to run
+     * @param interval
+     *            the interval between runs
      * @return a handle that can be used to cancel the scheduled action
      */
     public ToolkitRunner.ScheduledAction scheduleRepeating(Runnable action, Duration interval) {
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
-                action, interval.toMillis(), interval.toMillis(), TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(action, interval.toMillis(),
+                interval.toMillis(), TimeUnit.MILLISECONDS);
         return new ToolkitRunner.ScheduledAction(future);
     }
 
     /**
      * Executes an action on the render thread.
      *
-     * @param action the action to execute
+     * @param action
+     *            the action to execute
      */
     public void runOnRenderThread(Runnable action) {
         tuiRunner.runOnRenderThread(action);
@@ -318,7 +332,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
     /**
      * Sets the style engine for CSS styling.
      *
-     * @param styleEngine the style engine to use, or null to disable CSS styling
+     * @param styleEngine
+     *            the style engine to use, or null to disable CSS styling
      * @return this runner for chaining
      */
     public InlineToolkitRunner styleEngine(StyleEngine styleEngine) {
@@ -359,7 +374,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
         /**
          * Sets the tick interval for animations.
          *
-         * @param tickRate the tick interval
+         * @param tickRate
+         *            the tick interval
          * @return this builder
          */
         public Builder tickRate(Duration tickRate) {
@@ -380,7 +396,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
         /**
          * Sets the poll timeout.
          *
-         * @param pollTimeout the poll timeout
+         * @param pollTimeout
+         *            the poll timeout
          * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
@@ -391,7 +408,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
         /**
          * Configures whether to clear the display when closed.
          *
-         * @param clearOnClose true to clear on close
+         * @param clearOnClose
+         *            true to clear on close
          * @return this builder
          */
         public Builder clearOnClose(boolean clearOnClose) {
@@ -402,7 +420,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
         /**
          * Sets the key bindings.
          *
-         * @param bindings the bindings to use
+         * @param bindings
+         *            the bindings to use
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
@@ -413,7 +432,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
         /**
          * Sets the style engine for CSS styling.
          *
-         * @param styleEngine the style engine
+         * @param styleEngine
+         *            the style engine
          * @return this builder
          */
         public Builder styleEngine(StyleEngine styleEngine) {
@@ -425,15 +445,12 @@ public final class InlineToolkitRunner implements AutoCloseable {
          * Builds and returns a configured InlineToolkitRunner.
          *
          * @return a new InlineToolkitRunner
-         * @throws Exception if terminal initialization fails
+         * @throws Exception
+         *             if terminal initialization fails
          */
         public InlineToolkitRunner build() throws Exception {
-            InlineTuiConfig config = InlineTuiConfig.builder(height)
-                    .tickRate(tickRate)
-                    .pollTimeout(pollTimeout)
-                    .clearOnClose(clearOnClose)
-                    .bindings(bindings)
-                    .build();
+            InlineTuiConfig config = InlineTuiConfig.builder(height).tickRate(tickRate)
+                    .pollTimeout(pollTimeout).clearOnClose(clearOnClose).bindings(bindings).build();
 
             InlineToolkitRunner runner = InlineToolkitRunner.create(config);
 

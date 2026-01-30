@@ -4,6 +4,10 @@
  */
 package dev.tamboui.backend.panama;
 
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Objects;
+
 import dev.tamboui.backend.panama.unix.PlatformConstants;
 import dev.tamboui.backend.panama.unix.UnixTerminal;
 import dev.tamboui.backend.panama.windows.WindowsTerminal;
@@ -19,17 +23,12 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.Mode2027Status;
 import dev.tamboui.terminal.Mode2027Support;
 
-import java.io.IOException;
-import java.util.EnumSet;
-import java.util.Objects;
-
 /**
  * Terminal backend implementation using Panama FFI.
  * <p>
- * This backend provides direct native access to terminal operations
- * without requiring external dependencies like JLine. It uses the
- * Java Foreign Function and Memory API (Panama FFI) to call native
- * platform functions directly.
+ * This backend provides direct native access to terminal operations without
+ * requiring external dependencies like JLine. It uses the Java Foreign Function
+ * and Memory API (Panama FFI) to call native platform functions directly.
  * <p>
  * Supports Unix-like systems (Linux and macOS) and Windows.
  */
@@ -46,10 +45,11 @@ public class PanamaBackend implements Backend {
     /**
      * Creates a new Panama backend.
      * <p>
-     * Automatically detects the platform and creates the appropriate
-     * terminal implementation.
+     * Automatically detects the platform and creates the appropriate terminal
+     * implementation.
      *
-     * @throws IOException if the terminal cannot be initialized
+     * @throws IOException
+     *             if the terminal cannot be initialized
      */
     public PanamaBackend() throws IOException {
         this.terminal = createPlatformTerminal();
@@ -131,8 +131,8 @@ public class PanamaBackend implements Backend {
 
     @Override
     public void clear() throws IOException {
-        outputBuffer.csi().appendAscii("2J");  // Clear entire screen
-        outputBuffer.csi().appendAscii("H");   // Move cursor to home
+        outputBuffer.csi().appendAscii("2J"); // Clear entire screen
+        outputBuffer.csi().appendAscii("H"); // Move cursor to home
         flush();
     }
 
@@ -207,10 +207,10 @@ public class PanamaBackend implements Backend {
     @Override
     public void enableMouseCapture() throws IOException {
         // Enable mouse tracking modes
-        outputBuffer.csi().appendAscii("?1000h");  // Normal tracking
-        outputBuffer.csi().appendAscii("?1002h");  // Button event tracking
-        outputBuffer.csi().appendAscii("?1015h");  // urxvt style
-        outputBuffer.csi().appendAscii("?1006h");  // SGR extended mode
+        outputBuffer.csi().appendAscii("?1000h"); // Normal tracking
+        outputBuffer.csi().appendAscii("?1002h"); // Button event tracking
+        outputBuffer.csi().appendAscii("?1015h"); // urxvt style
+        outputBuffer.csi().appendAscii("?1006h"); // SGR extended mode
         flush();
         mouseEnabled = true;
     }
@@ -324,7 +324,7 @@ public class PanamaBackend implements Backend {
     public void close() throws IOException {
         try {
             // Reset state
-            outputBuffer.csi().appendAscii("0m");  // Reset style
+            outputBuffer.csi().appendAscii("0m"); // Reset style
 
             if (mouseEnabled) {
                 disableMouseCapture();
@@ -343,15 +343,11 @@ public class PanamaBackend implements Backend {
 
     private void moveCursor(int x, int y) {
         // ANSI uses 1-based coordinates
-        outputBuffer.csi()
-                .appendInt(y + 1)
-                .append((byte) ';')
-                .appendInt(x + 1)
-                .append((byte) 'H');
+        outputBuffer.csi().appendInt(y + 1).append((byte) ';').appendInt(x + 1).append((byte) 'H');
     }
 
     private void applyStyle(Style style) {
-        outputBuffer.csi().append((byte) '0');  // Reset first
+        outputBuffer.csi().append((byte) '0'); // Reset first
 
         // Foreground color
         style.fg().ifPresent(color -> {

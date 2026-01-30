@@ -4,15 +4,16 @@
  */
 package dev.tamboui.backend.panama;
 
+import java.io.IOException;
+
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendProvider;
-
-import java.io.IOException;
 
 /**
  * {@link BackendProvider} implementation for Panama FFI backend.
  * <p>
- * This provider is registered via the Java {@link java.util.ServiceLoader} mechanism.
+ * This provider is registered via the Java {@link java.util.ServiceLoader}
+ * mechanism.
  */
 public class PanamaBackendProvider implements BackendProvider {
 

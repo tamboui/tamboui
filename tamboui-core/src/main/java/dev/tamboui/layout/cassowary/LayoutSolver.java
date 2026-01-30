@@ -4,25 +4,28 @@
  */
 package dev.tamboui.layout.cassowary;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Fraction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Bridge between TamboUI layout constraints and the Cassowary solver.
  *
- * <p>This class translates TamboUI's constraint types and Flex modes into
+ * <p>
+ * This class translates TamboUI's constraint types and Flex modes into
  * Cassowary constraints and solves them using the simplex method.
  *
- * <p>The solver creates variables for each segment's position and size,
- * then adds constraints based on the TamboUI constraint types and the
- * selected Flex distribution mode.
+ * <p>
+ * The solver creates variables for each segment's position and size, then adds
+ * constraints based on the TamboUI constraint types and the selected Flex
+ * distribution mode.
  *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
+ * <p>
+ * This implementation uses {@link Fraction} for exact arithmetic, avoiding the
+ * cumulative rounding errors that occur with floating-point.
  *
  * @see Solver
  * @see dev.tamboui.layout.Layout
@@ -31,13 +34,14 @@ public final class LayoutSolver {
 
     // Constraint strengths matching ratatui's hierarchy (higher = more important)
     // These ensure consistent priority ordering for constraint resolution
-    private static final Strength LENGTH_SIZE_EQ = Strength.create(10, 0, 0);      // Fixed length
-    private static final Strength PERCENTAGE_SIZE_EQ = Strength.STRONG;             // Percentage
-    private static final Strength RATIO_SIZE_EQ = Strength.create(
-            Fraction.of(1, 10), Fraction.ZERO, Fraction.ZERO);                      // Ratio
-    private static final Strength MAX_SIZE_EQ = Strength.create(0, 10, 0);         // Max tries to reach value
-    private static final Strength FILL_GROW = Strength.MEDIUM;                      // Fill/Min growth
-    private static final Strength ALL_SEGMENT_GROW = Strength.WEAK;                 // Equal-size tiebreaker
+    private static final Strength LENGTH_SIZE_EQ = Strength.create(10, 0, 0); // Fixed length
+    private static final Strength PERCENTAGE_SIZE_EQ = Strength.STRONG; // Percentage
+    private static final Strength RATIO_SIZE_EQ = Strength.create(Fraction.of(1, 10), Fraction.ZERO,
+            Fraction.ZERO); // Ratio
+    private static final Strength MAX_SIZE_EQ = Strength.create(0, 10, 0); // Max tries to reach
+                                                                           // value
+    private static final Strength FILL_GROW = Strength.MEDIUM; // Fill/Min growth
+    private static final Strength ALL_SEGMENT_GROW = Strength.WEAK; // Equal-size tiebreaker
 
     private final Solver solver;
 
@@ -51,10 +55,14 @@ public final class LayoutSolver {
     /**
      * Solves layout constraints and returns the computed sizes.
      *
-     * @param constraints TamboUI constraints for each segment
-     * @param available   total available space
-     * @param spacing     space between elements
-     * @param flex        flex distribution mode
+     * @param constraints
+     *            TamboUI constraints for each segment
+     * @param available
+     *            total available space
+     * @param spacing
+     *            space between elements
+     * @param flex
+     *            flex distribution mode
      * @return array of computed sizes for each constraint
      */
     public int[] solve(List<Constraint> constraints, int available, int spacing, Flex flex) {
@@ -89,7 +97,8 @@ public final class LayoutSolver {
         // Add fill proportionality constraints
         collectFillProportionalityConstraints(allConstraints, constraints, sizes);
 
-        // Add equal-size tiebreaker constraints (all segments weakly prefer to be equal)
+        // Add equal-size tiebreaker constraints (all segments weakly prefer to be
+        // equal)
         collectEqualSizeTendency(allConstraints, sizes);
 
         // Add all constraints in batch (single optimization pass)
@@ -110,92 +119,80 @@ public final class LayoutSolver {
     }
 
     /**
-     * Collects structural constraints that define the relationship between positions and sizes.
+     * Collects structural constraints that define the relationship between
+     * positions and sizes.
      */
-    private void collectStructuralConstraints(List<CassowaryConstraint> dest,
-                                              Variable[] positions, Variable[] sizes,
-                                              int n, int spacing, int available) {
+    private void collectStructuralConstraints(List<CassowaryConstraint> dest, Variable[] positions,
+            Variable[] sizes, int n, int spacing, int available) {
         // All sizes must be non-negative
         for (int i = 0; i < n; i++) {
-            dest.add(Expression.variable(sizes[i])
-                    .greaterThanOrEqual(0, Strength.REQUIRED));
+            dest.add(Expression.variable(sizes[i]).greaterThanOrEqual(0, Strength.REQUIRED));
         }
 
-        dest.add(Expression.variable(positions[0])
-                .equalTo(0, Strength.REQUIRED));
+        dest.add(Expression.variable(positions[0]).equalTo(0, Strength.REQUIRED));
 
         // Position relationships: pos[i+1] = pos[i] + size[i] + spacing
         for (int i = 0; i < n; i++) {
             int gap = (i < n - 1) ? spacing : 0;
-            dest.add(Expression.variable(positions[i + 1])
-                    .equalTo(Expression.variable(positions[i])
-                                    .plus(Expression.variable(sizes[i]))
-                                    .plus(gap),
-                            Strength.REQUIRED));
+            dest.add(Expression.variable(positions[i + 1]).equalTo(
+                    Expression.variable(positions[i]).plus(Expression.variable(sizes[i])).plus(gap),
+                    Strength.REQUIRED));
         }
 
         // Total space constraint: last position <= available
-        dest.add(Expression.variable(positions[n])
-                .lessThanOrEqual(available, Strength.REQUIRED));
+        dest.add(Expression.variable(positions[n]).lessThanOrEqual(available, Strength.REQUIRED));
     }
 
     /**
      * Collects Cassowary constraints for a TamboUI constraint.
      */
-    private void collectConstraintFor(List<CassowaryConstraint> dest, Constraint c, Variable size, int available) {
+    private void collectConstraintFor(List<CassowaryConstraint> dest, Constraint c, Variable size,
+            int available) {
         if (c instanceof Constraint.Length) {
             // Fixed size: size == value (strong)
             int value = ((Constraint.Length) c).value();
-            dest.add(Expression.variable(size)
-                    .equalTo(value, LENGTH_SIZE_EQ));
+            dest.add(Expression.variable(size).equalTo(value, LENGTH_SIZE_EQ));
 
         } else if (c instanceof Constraint.Percentage) {
             // Percentage: size == available * percent / 100
             // Use exact Fraction arithmetic: available * percent / 100
             int percent = ((Constraint.Percentage) c).value();
             Fraction target = Fraction.of(available).multiply(Fraction.of(percent, 100));
-            dest.add(Expression.variable(size)
-                    .equalTo(target, PERCENTAGE_SIZE_EQ));
+            dest.add(Expression.variable(size).equalTo(target, PERCENTAGE_SIZE_EQ));
 
         } else if (c instanceof Constraint.Ratio) {
             // Ratio: size == available * ratio
             Constraint.Ratio ratio = (Constraint.Ratio) c;
             Fraction target = Fraction.of(available).multiply(ratio.toFraction());
-            dest.add(Expression.variable(size)
-                    .equalTo(target, RATIO_SIZE_EQ));
+            dest.add(Expression.variable(size).equalTo(target, RATIO_SIZE_EQ));
 
         } else if (c instanceof Constraint.Min) {
             // Minimum: size >= value (hard constraint)
             int value = ((Constraint.Min) c).value();
-            dest.add(Expression.variable(size)
-                    .greaterThanOrEqual(value, Strength.REQUIRED));
+            dest.add(Expression.variable(size).greaterThanOrEqual(value, Strength.REQUIRED));
             // Min tries to GROW to fill available space (like Fill)
-            dest.add(Expression.variable(size)
-                    .equalTo(available, FILL_GROW));
+            dest.add(Expression.variable(size).equalTo(available, FILL_GROW));
 
         } else if (c instanceof Constraint.Max) {
             // Maximum: size <= value (hard constraint)
             int value = ((Constraint.Max) c).value();
-            dest.add(Expression.variable(size)
-                    .lessThanOrEqual(value, Strength.REQUIRED));
+            dest.add(Expression.variable(size).lessThanOrEqual(value, Strength.REQUIRED));
             // Max tries to REACH its maximum value
-            dest.add(Expression.variable(size)
-                    .equalTo(value, MAX_SIZE_EQ));
+            dest.add(Expression.variable(size).equalTo(value, MAX_SIZE_EQ));
 
         } else if (c instanceof Constraint.Fill) {
             // Fill: try to grow to fill available space
             // Proportionality is handled by collectFillProportionalityConstraints
-            dest.add(Expression.variable(size)
-                    .equalTo(available, FILL_GROW));
+            dest.add(Expression.variable(size).equalTo(available, FILL_GROW));
         }
     }
 
     /**
-     * Collects proportionality constraints between Fill segments.
-     * Makes Fill(2) twice as large as Fill(1), etc.
+     * Collects proportionality constraints between Fill segments. Makes Fill(2)
+     * twice as large as Fill(1), etc.
      */
     private void collectFillProportionalityConstraints(List<CassowaryConstraint> dest,
-                                                       List<Constraint> constraints, Variable[] sizes) {
+            List<Constraint> constraints, Variable[] sizes) {
         int n = constraints.size();
 
         // Find all Fill and Min constraints (Min behaves like Fill in non-legacy mode)
@@ -215,7 +212,8 @@ public final class LayoutSolver {
     }
 
     /**
-     * Returns the fill scale for a constraint, or 0 if it's not a fill-like constraint.
+     * Returns the fill scale for a constraint, or 0 if it's not a fill-like
+     * constraint.
      */
     private Fraction getFillScale(Constraint c) {
         if (c instanceof Constraint.Fill) {
@@ -230,31 +228,36 @@ public final class LayoutSolver {
     }
 
     /**
-     * Collects weak constraints that make all segments tend toward equal size.
-     * This serves as a tiebreaker when other constraints don't fully determine sizes.
+     * Collects weak constraints that make all segments tend toward equal size. This
+     * serves as a tiebreaker when other constraints don't fully determine sizes.
      */
     private void collectEqualSizeTendency(List<CassowaryConstraint> dest, Variable[] sizes) {
         int n = sizes.length;
         for (int i = 0; i < n - 1; i++) {
             // Each segment weakly prefers to be equal to the next
-            dest.add(Expression.variable(sizes[i])
-                    .equalTo(Expression.variable(sizes[i + 1]), ALL_SEGMENT_GROW));
+            dest.add(Expression.variable(sizes[i]).equalTo(Expression.variable(sizes[i + 1]),
+                    ALL_SEGMENT_GROW));
         }
     }
 
     /**
      * Converts Fraction sizes to integers using the largest remainder method.
      *
-     * <p>This method is necessary because simple rounding (Math.round on each value)
+     * <p>
+     * This method is necessary because simple rounding (Math.round on each value)
      * can produce totals that don't match the available space. For example, with
      * constraints [1/3, 2/3] of 100, naive rounding gives [33, 67] = 100, but
      * [0.333..., 0.666...] might round to [33, 66] = 99, losing a pixel.
      *
-     * <p>The largest remainder method (also known as Hamilton's method) ensures fair
-     * distribution: floor all values, then give +1 to those with the largest remainders.
+     * <p>
+     * The largest remainder method (also known as Hamilton's method) ensures fair
+     * distribution: floor all values, then give +1 to those with the largest
+     * remainders.
      *
-     * @param fractionSizes the exact Fraction sizes from the solver
-     * @param target        the maximum sum (available space)
+     * @param fractionSizes
+     *            the exact Fraction sizes from the solver
+     * @param target
+     *            the maximum sum (available space)
      * @return integer sizes that sum to at most target
      */
     private int[] roundWithConstraint(Fraction[] fractionSizes, int target) {

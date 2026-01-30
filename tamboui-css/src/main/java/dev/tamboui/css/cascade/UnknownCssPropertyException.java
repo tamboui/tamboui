@@ -5,8 +5,8 @@
 package dev.tamboui.css.cascade;
 
 /**
- * Exception thrown when an unknown CSS property is encountered
- * and {@link UnknownPropertyBehavior#FAIL} is configured.
+ * Exception thrown when an unknown CSS property is encountered and
+ * {@link UnknownPropertyBehavior#FAIL} is configured.
  */
 public class UnknownCssPropertyException extends RuntimeException {
 
@@ -18,8 +18,10 @@ public class UnknownCssPropertyException extends RuntimeException {
     /**
      * Creates a new exception for an unknown CSS property.
      *
-     * @param propertyName  the unknown property name
-     * @param propertyValue the property value
+     * @param propertyName
+     *            the unknown property name
+     * @param propertyValue
+     *            the property value
      */
     public UnknownCssPropertyException(String propertyName, String propertyValue) {
         super("Unknown CSS property: " + propertyName + " with value: " + propertyValue);

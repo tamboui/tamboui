@@ -5,8 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 /**
- * Immutable value object holding horizontal and vertical gutter spacing
- * for grid layouts.
+ * Immutable value object holding horizontal and vertical gutter spacing for
+ * grid layouts.
  */
 public final class Gutter {
 
@@ -15,7 +15,8 @@ public final class Gutter {
 
     private Gutter(int horizontal, int vertical) {
         if (horizontal < 0) {
-            throw new IllegalArgumentException("horizontal gutter cannot be negative: " + horizontal);
+            throw new IllegalArgumentException(
+                    "horizontal gutter cannot be negative: " + horizontal);
         }
         if (vertical < 0) {
             throw new IllegalArgumentException("vertical gutter cannot be negative: " + vertical);
@@ -27,8 +28,10 @@ public final class Gutter {
     /**
      * Creates a gutter with different horizontal and vertical spacing.
      *
-     * @param horizontal the horizontal gutter between columns
-     * @param vertical   the vertical gutter between rows
+     * @param horizontal
+     *            the horizontal gutter between columns
+     * @param vertical
+     *            the vertical gutter between rows
      * @return a new gutter
      */
     public static Gutter of(int horizontal, int vertical) {
@@ -38,7 +41,8 @@ public final class Gutter {
     /**
      * Creates a gutter with uniform spacing in both directions.
      *
-     * @param value the gutter value for both horizontal and vertical
+     * @param value
+     *            the gutter value for both horizontal and vertical
      * @return a new uniform gutter
      */
     public static Gutter uniform(int value) {

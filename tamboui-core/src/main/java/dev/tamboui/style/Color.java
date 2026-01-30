@@ -5,7 +5,8 @@
 package dev.tamboui.style;
 
 /**
- * Terminal colors supporting ANSI 16, 256-color indexed, and RGB true color modes.
+ * Terminal colors supporting ANSI 16, 256-color indexed, and RGB true color
+ * modes.
  */
 public interface Color {
 
@@ -57,7 +58,8 @@ public interface Color {
         /**
          * Creates an ANSI color.
          *
-         * @param color the ANSI palette entry
+         * @param color
+         *            the ANSI palette entry
          */
         public Ansi(AnsiColor color) {
             this.color = color;
@@ -119,7 +121,8 @@ public interface Color {
         /**
          * Creates an indexed color.
          *
-         * @param index palette index (0-255)
+         * @param index
+         *            palette index (0-255)
          */
         public Indexed(int index) {
             if (index < 0 || index > 255) {
@@ -183,8 +186,9 @@ public interface Color {
     /**
      * A named color reference that maps to a style resolver class.
      * <p>
-     * When used with {@code .fg(Color.RED)}, the element automatically gets the style resolver class "red",
-     * allowing themes to override the color via standard class selectors like {@code .red { color: #FF5555; }}.
+     * When used with {@code .fg(Color.RED)}, the element automatically gets the
+     * style resolver class "red", allowing themes to override the color via
+     * standard class selectors like {@code .red { color: #FF5555; }}.
      */
     final class Named implements Color {
         private final String name;
@@ -193,8 +197,10 @@ public interface Color {
         /**
          * Creates a named color.
          *
-         * @param name the CSS class name (e.g., "red", "blue")
-         * @param defaultValue the fallback color when no CSS rule matches
+         * @param name
+         *            the CSS class name (e.g., "red", "blue")
+         * @param defaultValue
+         *            the fallback color when no CSS rule matches
          */
         public Named(String name, Color defaultValue) {
             this.name = name;
@@ -273,14 +279,17 @@ public interface Color {
         /**
          * Creates an RGB color.
          *
-         * @param r red component (0-255)
-         * @param g green component (0-255)
-         * @param b blue component (0-255)
+         * @param r
+         *            red component (0-255)
+         * @param g
+         *            green component (0-255)
+         * @param b
+         *            blue component (0-255)
          */
         public Rgb(int r, int g, int b) {
             if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
                 throw new IllegalArgumentException(
-                    String.format("RGB values must be 0-255: (%d, %d, %d)", r, g, b));
+                        String.format("RGB values must be 0-255: (%d, %d, %d)", r, g, b));
             }
             this.r = r;
             this.g = g;
@@ -335,9 +344,11 @@ public interface Color {
         }
 
         /**
-         * Creates an RGB color from a hex string (e.g. {@code #112233} or {@code 112233}).
+         * Creates an RGB color from a hex string (e.g. {@code #112233} or
+         * {@code 112233}).
          *
-         * @param hex the hex color string with or without leading {@code #}
+         * @param hex
+         *            the hex color string with or without leading {@code #}
          * @return the parsed RGB color
          */
         public static Rgb fromHex(String hex) {
@@ -420,7 +431,8 @@ public interface Color {
     /**
      * Creates an ANSI 16 color.
      *
-     * @param color the ANSI color
+     * @param color
+     *            the ANSI color
      * @return a color instance
      */
     static Color ansi(AnsiColor color) {
@@ -430,7 +442,8 @@ public interface Color {
     /**
      * Creates a 256-color indexed value.
      *
-     * @param index palette index (0-255)
+     * @param index
+     *            palette index (0-255)
      * @return a color instance
      */
     static Color indexed(int index) {
@@ -440,9 +453,12 @@ public interface Color {
     /**
      * Creates an RGB true-color value.
      *
-     * @param r red component (0-255)
-     * @param g green component (0-255)
-     * @param b blue component (0-255)
+     * @param r
+     *            red component (0-255)
+     * @param g
+     *            green component (0-255)
+     * @param b
+     *            blue component (0-255)
      * @return a color instance
      */
     static Color rgb(int r, int g, int b) {
@@ -452,7 +468,8 @@ public interface Color {
     /**
      * Creates an RGB true-color value from a {@code #rrggbb} string.
      *
-     * @param hex the hex color string with or without leading {@code #}
+     * @param hex
+     *            the hex color string with or without leading {@code #}
      * @return a color instance
      */
     static Color hex(String hex) {
@@ -462,8 +479,8 @@ public interface Color {
     /**
      * Converts this color to an ANSI foreground color code.
      *
-     * @return the ANSI code string (without CSI prefix or 'm' suffix),
-     *         or empty string if not applicable
+     * @return the ANSI code string (without CSI prefix or 'm' suffix), or empty
+     *         string if not applicable
      */
     default String toAnsiForeground() {
         return "";
@@ -472,19 +489,19 @@ public interface Color {
     /**
      * Converts this color to an ANSI background color code.
      *
-     * @return the ANSI code string (without CSI prefix or 'm' suffix),
-     *         or empty string if not applicable
+     * @return the ANSI code string (without CSI prefix or 'm' suffix), or empty
+     *         string if not applicable
      */
     default String toAnsiBackground() {
         return "";
     }
 
     /**
-     * Converts this color to an ANSI underline color code.
-     * Note that underline colors are only supported by some terminal emulators.
+     * Converts this color to an ANSI underline color code. Note that underline
+     * colors are only supported by some terminal emulators.
      *
-     * @return the ANSI code string (without CSI prefix or 'm' suffix),
-     *         or empty string if the color type doesn't support underline coloring
+     * @return the ANSI code string (without CSI prefix or 'm' suffix), or empty
+     *         string if the color type doesn't support underline coloring
      */
     default String toAnsiUnderline() {
         return "";
@@ -505,28 +522,46 @@ public interface Color {
     /**
      * Converts an ANSI color to RGB using standard terminal colors.
      *
-     * @param ansi the ANSI color
+     * @param ansi
+     *            the ANSI color
      * @return the RGB representation
      */
     static Rgb ansiToRgb(AnsiColor ansi) {
         switch (ansi) {
-            case BLACK: return new Rgb(0, 0, 0);
-            case RED: return new Rgb(170, 0, 0);
-            case GREEN: return new Rgb(0, 170, 0);
-            case YELLOW: return new Rgb(170, 85, 0);
-            case BLUE: return new Rgb(0, 0, 170);
-            case MAGENTA: return new Rgb(170, 0, 170);
-            case CYAN: return new Rgb(0, 170, 170);
-            case WHITE: return new Rgb(170, 170, 170);
-            case BRIGHT_BLACK: return new Rgb(85, 85, 85);
-            case BRIGHT_RED: return new Rgb(255, 85, 85);
-            case BRIGHT_GREEN: return new Rgb(85, 255, 85);
-            case BRIGHT_YELLOW: return new Rgb(255, 255, 85);
-            case BRIGHT_BLUE: return new Rgb(85, 85, 255);
-            case BRIGHT_MAGENTA: return new Rgb(255, 85, 255);
-            case BRIGHT_CYAN: return new Rgb(85, 255, 255);
-            case BRIGHT_WHITE: return new Rgb(255, 255, 255);
-            default: return new Rgb(255, 255, 255);
+            case BLACK :
+                return new Rgb(0, 0, 0);
+            case RED :
+                return new Rgb(170, 0, 0);
+            case GREEN :
+                return new Rgb(0, 170, 0);
+            case YELLOW :
+                return new Rgb(170, 85, 0);
+            case BLUE :
+                return new Rgb(0, 0, 170);
+            case MAGENTA :
+                return new Rgb(170, 0, 170);
+            case CYAN :
+                return new Rgb(0, 170, 170);
+            case WHITE :
+                return new Rgb(170, 170, 170);
+            case BRIGHT_BLACK :
+                return new Rgb(85, 85, 85);
+            case BRIGHT_RED :
+                return new Rgb(255, 85, 85);
+            case BRIGHT_GREEN :
+                return new Rgb(85, 255, 85);
+            case BRIGHT_YELLOW :
+                return new Rgb(255, 255, 85);
+            case BRIGHT_BLUE :
+                return new Rgb(85, 85, 255);
+            case BRIGHT_MAGENTA :
+                return new Rgb(255, 85, 255);
+            case BRIGHT_CYAN :
+                return new Rgb(85, 255, 255);
+            case BRIGHT_WHITE :
+                return new Rgb(255, 255, 255);
+            default :
+                return new Rgb(255, 255, 255);
         }
     }
 
@@ -535,12 +570,13 @@ public interface Color {
      * <p>
      * The 256-color palette is:
      * <ul>
-     *   <li>0-15: Standard ANSI colors</li>
-     *   <li>16-231: 6x6x6 color cube</li>
-     *   <li>232-255: Grayscale ramp</li>
+     * <li>0-15: Standard ANSI colors</li>
+     * <li>16-231: 6x6x6 color cube</li>
+     * <li>232-255: Grayscale ramp</li>
      * </ul>
      *
-     * @param index the palette index (0-255)
+     * @param index
+     *            the palette index (0-255)
      * @return the RGB representation
      */
     static Rgb indexedToRgb(int index) {
@@ -554,11 +590,8 @@ public interface Color {
             int g = (i / 6) % 6;
             int b = i % 6;
             // Each component: 0, 95, 135, 175, 215, 255
-            return new Rgb(
-                    r == 0 ? 0 : 55 + r * 40,
-                    g == 0 ? 0 : 55 + g * 40,
-                    b == 0 ? 0 : 55 + b * 40
-            );
+            return new Rgb(r == 0 ? 0 : 55 + r * 40, g == 0 ? 0 : 55 + g * 40,
+                    b == 0 ? 0 : 55 + b * 40);
         } else {
             // Grayscale ramp (indices 232-255)
             int gray = 8 + (index - 232) * 10;

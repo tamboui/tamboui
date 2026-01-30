@@ -11,10 +11,10 @@ import java.util.Objects;
  * <p>
  * Supports the following values:
  * <ul>
- *   <li>{@code fill} - element fills the available container width</li>
- *   <li>{@code fit} - element width fits its content</li>
- *   <li>Percentage values like {@code 50%} or {@code 0.5}</li>
- *   <li>Fixed character counts like {@code 20}</li>
+ * <li>{@code fill} - element fills the available container width</li>
+ * <li>{@code fit} - element width fits its content</li>
+ * <li>Percentage values like {@code 50%} or {@code 0.5}</li>
+ * <li>Fixed character counts like {@code 20}</li>
  * </ul>
  */
 public final class Width {
@@ -40,7 +40,8 @@ public final class Width {
     /**
      * Creates a percentage-based width.
      *
-     * @param percent the percentage (0.0 to 1.0, or 0 to 100)
+     * @param percent
+     *            the percentage (0.0 to 1.0, or 0 to 100)
      * @return a percentage width
      */
     public static Width percent(double percent) {
@@ -52,7 +53,8 @@ public final class Width {
     /**
      * Creates a fixed character width.
      *
-     * @param chars the number of characters
+     * @param chars
+     *            the number of characters
      * @return a fixed width
      */
     public static Width fixed(int chars) {
@@ -96,8 +98,8 @@ public final class Width {
     }
 
     /**
-     * Returns the percentage value (0.0 to 1.0).
-     * Only meaningful if {@link #isPercent()} returns true.
+     * Returns the percentage value (0.0 to 1.0). Only meaningful if
+     * {@link #isPercent()} returns true.
      *
      * @return the percentage value
      */
@@ -106,8 +108,8 @@ public final class Width {
     }
 
     /**
-     * Returns the fixed character count.
-     * Only meaningful if {@link #isFixed()} returns true.
+     * Returns the fixed character count. Only meaningful if {@link #isFixed()}
+     * returns true.
      *
      * @return the character count
      */
@@ -118,29 +120,33 @@ public final class Width {
     /**
      * Computes the actual width in characters given a container width.
      *
-     * @param containerWidth the available container width
-     * @param contentWidth the content width (used for FIT)
+     * @param containerWidth
+     *            the available container width
+     * @param contentWidth
+     *            the content width (used for FIT)
      * @return the computed width in characters
      */
     public int compute(int containerWidth, int contentWidth) {
         switch (type) {
-            case FILL:
+            case FILL :
                 return containerWidth;
-            case FIT:
+            case FIT :
                 return contentWidth;
-            case PERCENT:
+            case PERCENT :
                 return (int) Math.round(containerWidth * value);
-            case FIXED:
+            case FIXED :
                 return (int) value;
-            default:
+            default :
                 return contentWidth;
         }
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Width width = (Width) o;
         return Double.compare(width.value, value) == 0 && type == width.type;
     }
@@ -153,23 +159,20 @@ public final class Width {
     @Override
     public String toString() {
         switch (type) {
-            case FILL:
+            case FILL :
                 return "fill";
-            case FIT:
+            case FIT :
                 return "fit";
-            case PERCENT:
+            case PERCENT :
                 return (int) (value * 100) + "%";
-            case FIXED:
+            case FIXED :
                 return (int) value + "ch";
-            default:
+            default :
                 return "unknown";
         }
     }
 
     private enum Type {
-        FILL,
-        FIT,
-        PERCENT,
-        FIXED
+        FILL, FIT, PERCENT, FIXED
     }
 }

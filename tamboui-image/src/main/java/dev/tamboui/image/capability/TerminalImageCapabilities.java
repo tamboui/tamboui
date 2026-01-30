@@ -4,6 +4,9 @@
  */
 package dev.tamboui.image.capability;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
@@ -11,14 +14,11 @@ import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 /**
  * Detects and caches terminal image capabilities.
  * <p>
- * Detection is performed using environment variables to identify the terminal emulator.
- * This approach is fast (no I/O) and works in most cases.
+ * Detection is performed using environment variables to identify the terminal
+ * emulator. This approach is fast (no I/O) and works in most cases.
  *
  * <pre>{@code
  * TerminalImageCapabilities caps = TerminalImageCapabilities.detect();
@@ -27,16 +27,43 @@ import java.util.Set;
  *
  * <h2>Terminal Detection</h2>
  * <table>
- *   <caption>Environment variable to protocol mapping</caption>
- *   <tr><th>Environment</th><th>Protocol</th></tr>
- *   <tr><td>KITTY_WINDOW_ID</td><td>Kitty</td></tr>
- *   <tr><td>TERM=xterm-kitty</td><td>Kitty</td></tr>
- *   <tr><td>TERM=xterm-ghostty</td><td>Kitty</td></tr>
- *   <tr><td>WEZTERM_PANE</td><td>Kitty</td></tr>
- *   <tr><td>ITERM_SESSION_ID</td><td>iTerm2</td></tr>
- *   <tr><td>TERM=rio</td><td>iTerm2, Sixel</td></tr>
- *   <tr><td>KONSOLE_VERSION</td><td>Sixel</td></tr>
- *   <tr><td>TERM contains mlterm</td><td>Sixel</td></tr>
+ * <caption>Environment variable to protocol mapping</caption>
+ * <tr>
+ * <th>Environment</th>
+ * <th>Protocol</th>
+ * </tr>
+ * <tr>
+ * <td>KITTY_WINDOW_ID</td>
+ * <td>Kitty</td>
+ * </tr>
+ * <tr>
+ * <td>TERM=xterm-kitty</td>
+ * <td>Kitty</td>
+ * </tr>
+ * <tr>
+ * <td>TERM=xterm-ghostty</td>
+ * <td>Kitty</td>
+ * </tr>
+ * <tr>
+ * <td>WEZTERM_PANE</td>
+ * <td>Kitty</td>
+ * </tr>
+ * <tr>
+ * <td>ITERM_SESSION_ID</td>
+ * <td>iTerm2</td>
+ * </tr>
+ * <tr>
+ * <td>TERM=rio</td>
+ * <td>iTerm2, Sixel</td>
+ * </tr>
+ * <tr>
+ * <td>KONSOLE_VERSION</td>
+ * <td>Sixel</td>
+ * </tr>
+ * <tr>
+ * <td>TERM contains mlterm</td>
+ * <td>Sixel</td>
+ * </tr>
  * </table>
  */
 public final class TerminalImageCapabilities {
@@ -88,10 +115,12 @@ public final class TerminalImageCapabilities {
      * <p>
      * Useful for testing or when environment detection is unreliable.
      *
-     * @param supportedProtocols the set of supported protocols
+     * @param supportedProtocols
+     *            the set of supported protocols
      * @return capabilities with the specified support
      */
-    public static TerminalImageCapabilities withSupport(Set<TerminalImageProtocol> supportedProtocols) {
+    public static TerminalImageCapabilities withSupport(
+            Set<TerminalImageProtocol> supportedProtocols) {
         return new TerminalImageCapabilities(supportedProtocols);
     }
 
@@ -107,7 +136,8 @@ public final class TerminalImageCapabilities {
     /**
      * Returns true if the specified protocol is supported.
      *
-     * @param support the support level to check
+     * @param support
+     *            the support level to check
      * @return true if supported
      */
     public boolean supports(TerminalImageProtocol support) {
@@ -131,9 +161,8 @@ public final class TerminalImageCapabilities {
      * @return true if Kitty, iTerm2, or Sixel is available
      */
     public boolean supportsNativeImages() {
-        return supports(TerminalImageProtocol.KITTY)
-            || supports(TerminalImageProtocol.ITERM2)
-            || supports(TerminalImageProtocol.SIXEL);
+        return supports(TerminalImageProtocol.KITTY) || supports(TerminalImageProtocol.ITERM2)
+                || supports(TerminalImageProtocol.SIXEL);
     }
 
     /**
@@ -143,17 +172,17 @@ public final class TerminalImageCapabilities {
      */
     public ImageProtocol bestProtocol() {
         switch (bestSupport) {
-            case KITTY:
+            case KITTY :
                 return new KittyProtocol();
-            case ITERM2:
+            case ITERM2 :
                 return new ITermProtocol();
-            case SIXEL:
+            case SIXEL :
                 return new SixelProtocol();
-            case HALF_BLOCK:
+            case HALF_BLOCK :
                 return new HalfBlockProtocol();
-            case BRAILLE:
+            case BRAILLE :
                 return new BrailleProtocol();
-            default:
+            default :
                 return new HalfBlockProtocol();
         }
     }
@@ -161,22 +190,23 @@ public final class TerminalImageCapabilities {
     /**
      * Returns a protocol implementation for the specified support level.
      *
-     * @param support the support level
+     * @param support
+     *            the support level
      * @return the protocol implementation, or null if not available
      */
     public ImageProtocol protocolFor(TerminalImageProtocol support) {
         switch (support) {
-            case KITTY:
+            case KITTY :
                 return new KittyProtocol();
-            case ITERM2:
+            case ITERM2 :
                 return new ITermProtocol();
-            case SIXEL:
+            case SIXEL :
                 return new SixelProtocol();
-            case HALF_BLOCK:
+            case HALF_BLOCK :
                 return new HalfBlockProtocol();
-            case BRAILLE:
+            case BRAILLE :
                 return new BrailleProtocol();
-            default:
+            default :
                 return null;
         }
     }
@@ -246,12 +276,11 @@ public final class TerminalImageCapabilities {
         return new TerminalImageCapabilities(supported);
     }
 
-    private static TerminalImageProtocol determineBestSupport(Set<TerminalImageProtocol> supported) {
+    private static TerminalImageProtocol determineBestSupport(
+            Set<TerminalImageProtocol> supported) {
         // EnumSet iterates in enum declaration order (which is our priority order)
-        return supported.stream()
-            .filter(p -> p != TerminalImageProtocol.NONE)
-            .findFirst()
-            .orElse(TerminalImageProtocol.NONE);
+        return supported.stream().filter(p -> p != TerminalImageProtocol.NONE).findFirst()
+                .orElse(TerminalImageProtocol.NONE);
     }
 
     private static String getEnv(String name) {
@@ -264,6 +293,7 @@ public final class TerminalImageCapabilities {
 
     @Override
     public String toString() {
-        return String.format("TerminalImageCapabilities[best=%s, supported=%s]", bestSupport, supportedProtocols);
+        return String.format("TerminalImageCapabilities[best=%s, supported=%s]", bestSupport,
+                supportedProtocols);
     }
 }

@@ -4,6 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -12,9 +16,6 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widget.Widget;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,16 +87,11 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Fluent API chains correctly")
         void fluentApiChaining() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
-            GenericWidgetElement<?> element = widget(testWidget)
-                    .bold()
-                    .italic()
-                    .fg(Color.CYAN)
-                    .bg(Color.BLACK)
-                    .id("my-element")
-                    .addClass("custom-class")
-                    .fill();
+            GenericWidgetElement<?> element = widget(testWidget).bold().italic().fg(Color.CYAN)
+                    .bg(Color.BLACK).id("my-element").addClass("custom-class").fill();
 
             assertThat(element).isInstanceOf(GenericWidgetElement.class);
             assertThat(element.id()).isEqualTo("my-element");
@@ -106,29 +102,25 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Constraint methods work")
         void constraintMethods() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
-            assertThat(widget(testWidget).length(10).constraint())
-                    .isEqualTo(Constraint.length(10));
+            assertThat(widget(testWidget).length(10).constraint()).isEqualTo(Constraint.length(10));
             assertThat(widget(testWidget).percent(50).constraint())
                     .isEqualTo(Constraint.percentage(50));
-            assertThat(widget(testWidget).fill().constraint())
-                    .isEqualTo(Constraint.fill());
-            assertThat(widget(testWidget).fill(2).constraint())
-                    .isEqualTo(Constraint.fill(2));
-            assertThat(widget(testWidget).min(5).constraint())
-                    .isEqualTo(Constraint.min(5));
-            assertThat(widget(testWidget).max(20).constraint())
-                    .isEqualTo(Constraint.max(20));
+            assertThat(widget(testWidget).fill().constraint()).isEqualTo(Constraint.fill());
+            assertThat(widget(testWidget).fill(2).constraint()).isEqualTo(Constraint.fill(2));
+            assertThat(widget(testWidget).min(5).constraint()).isEqualTo(Constraint.min(5));
+            assertThat(widget(testWidget).max(20).constraint()).isEqualTo(Constraint.max(20));
         }
 
         @Test
         @DisplayName("Focusable and event handlers work")
         void focusableAndEventHandlers() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
-            GenericWidgetElement<?> element = widget(testWidget)
-                    .focusable()
+            GenericWidgetElement<?> element = widget(testWidget).focusable()
                     .onKeyEvent(event -> dev.tamboui.toolkit.event.EventResult.HANDLED)
                     .onMouseEvent(event -> dev.tamboui.toolkit.event.EventResult.HANDLED);
 
@@ -207,8 +199,7 @@ class GenericWidgetElementTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Element styling doesn't override widget's internal styling
-            widget(testWidget)
-                    .fg(Color.RED)  // This won't affect widget's internal rendering
+            widget(testWidget).fg(Color.RED) // This won't affect widget's internal rendering
                     .render(frame, area, RenderContext.empty());
 
             // Widget renders with its own style (GREEN)
@@ -224,17 +215,17 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Works inside row")
         void worksInsideRow() {
-            Widget leftWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "L", Style.EMPTY);
-            Widget rightWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "R", Style.EMPTY);
+            Widget leftWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "L",
+                    Style.EMPTY);
+            Widget rightWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "R",
+                    Style.EMPTY);
 
             Rect area = new Rect(0, 0, 20, 1);
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            row(
-                    widget(leftWidget).fill(),
-                    widget(rightWidget).fill()
-            ).render(frame, area, RenderContext.empty());
+            row(widget(leftWidget).fill(), widget(rightWidget).fill()).render(frame, area,
+                    RenderContext.empty());
 
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("L");
             assertThat(buffer.get(10, 0).symbol()).isEqualTo("R");
@@ -243,17 +234,17 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Works inside column")
         void worksInsideColumn() {
-            Widget topWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "T", Style.EMPTY);
-            Widget bottomWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "B", Style.EMPTY);
+            Widget topWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "T",
+                    Style.EMPTY);
+            Widget bottomWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "B",
+                    Style.EMPTY);
 
             Rect area = new Rect(0, 0, 10, 4);
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            column(
-                    widget(topWidget).length(2),
-                    widget(bottomWidget).length(2)
-            ).render(frame, area, RenderContext.empty());
+            column(widget(topWidget).length(2), widget(bottomWidget).length(2)).render(frame, area,
+                    RenderContext.empty());
 
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("T");
             assertThat(buffer.get(0, 2).symbol()).isEqualTo("B");
@@ -262,15 +253,14 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Works inside panel")
         void worksInsidePanel() {
-            Widget contentWidget = (area, buffer) ->
-                    buffer.setString(area.x(), area.y(), "Content", Style.EMPTY);
+            Widget contentWidget = (area, buffer) -> buffer.setString(area.x(), area.y(), "Content",
+                    Style.EMPTY);
 
             Rect area = new Rect(0, 0, 20, 5);
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            panel("Title", widget(contentWidget))
-                    .render(frame, area, RenderContext.empty());
+            panel("Title", widget(contentWidget)).render(frame, area, RenderContext.empty());
 
             // Content should be inside the panel (after border)
             assertThat(buffer.get(1, 1).symbol()).isEqualTo("C");
@@ -279,7 +269,8 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Default constraint is null")
         void defaultConstraintIsNull() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
             assertThat(widget(testWidget).constraint()).isNull();
         }
@@ -292,7 +283,8 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Style type is GenericWidgetElement")
         void styleType() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
             GenericWidgetElement<?> element = widget(testWidget);
 
@@ -302,10 +294,10 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("CSS classes can be added")
         void cssClasses() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
-            GenericWidgetElement<?> element = widget(testWidget)
-                    .addClass("primary", "highlighted");
+            GenericWidgetElement<?> element = widget(testWidget).addClass("primary", "highlighted");
 
             assertThat(element.cssClasses()).containsExactlyInAnyOrder("primary", "highlighted");
         }
@@ -313,7 +305,8 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("CSS ID can be set")
         void cssId() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
             GenericWidgetElement<?> element = widget(testWidget).id("my-widget");
 
@@ -323,14 +316,13 @@ class GenericWidgetElementTest {
         @Test
         @DisplayName("Style attributes can be set")
         void styleAttributes() {
-            Widget testWidget = (area, buffer) -> {};
+            Widget testWidget = (area, buffer) -> {
+            };
 
-            GenericWidgetElement<?> element = widget(testWidget)
-                    .attr("data-type", "custom")
+            GenericWidgetElement<?> element = widget(testWidget).attr("data-type", "custom")
                     .attr("data-index", "5");
 
-            assertThat(element.styleAttributes())
-                    .containsEntry("data-type", "custom")
+            assertThat(element.styleAttributes()).containsEntry("data-type", "custom")
                     .containsEntry("data-index", "5");
         }
     }

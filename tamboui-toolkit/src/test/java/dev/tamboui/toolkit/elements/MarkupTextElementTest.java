@@ -4,18 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
-import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.Text;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -33,15 +32,10 @@ class MarkupTextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupText("Hello")
-            .render(frame, area, RenderContext.empty());
+        markupText("Hello").render(frame, area, RenderContext.empty());
 
-        assertThat(buffer)
-            .hasSymbolAt(0, 0, "H")
-            .hasSymbolAt(1, 0, "e")
-            .hasSymbolAt(2, 0, "l")
-            .hasSymbolAt(3, 0, "l")
-            .hasSymbolAt(4, 0, "o");
+        assertThat(buffer).hasSymbolAt(0, 0, "H").hasSymbolAt(1, 0, "e").hasSymbolAt(2, 0, "l")
+                .hasSymbolAt(3, 0, "l").hasSymbolAt(4, 0, "o");
     }
 
     @Test
@@ -51,8 +45,7 @@ class MarkupTextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupText("[bold]Hello[/bold]")
-            .render(frame, area, RenderContext.empty());
+        markupText("[bold]Hello[/bold]").render(frame, area, RenderContext.empty());
 
         assertThat(buffer).at(0, 0).hasSymbol("H");
         assertThat(buffer.get(0, 0).style().addModifiers()).contains(Modifier.BOLD);
@@ -65,8 +58,7 @@ class MarkupTextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupText("[red]Red[/red]")
-            .render(frame, area, RenderContext.empty());
+        markupText("[red]Red[/red]").render(frame, area, RenderContext.empty());
 
         assertThat(buffer).at(0, 0).hasSymbol("R").hasForeground(Color.RED);
     }
@@ -77,10 +69,7 @@ class MarkupTextElementTest {
         // Set up StyleEngine with CSS defining .keyword class
         StyleEngine styleEngine = StyleEngine.create();
         styleEngine.addStylesheet("test",
-            ".keyword {\n" +
-            "    color: magenta;\n" +
-            "    text-style: bold;\n" +
-            "}");
+                ".keyword {\n" + "    color: magenta;\n" + "    text-style: bold;\n" + "}");
         styleEngine.setActiveStylesheet("test");
 
         // Create context with StyleEngine
@@ -92,12 +81,10 @@ class MarkupTextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        markupText("[keyword]function[/keyword]")
-            .render(frame, area, context);
+        markupText("[keyword]function[/keyword]").render(frame, area, context);
 
         // The text "function" should be styled with magenta color
-        assertThat(buffer)
-            .at(0, 0).hasSymbol("f").hasForeground(Color.MAGENTA);
+        assertThat(buffer).at(0, 0).hasSymbol("f").hasForeground(Color.MAGENTA);
     }
 
     @Test
@@ -112,10 +99,8 @@ class MarkupTextElementTest {
         context.setStyleEngine(styleEngine);
 
         // Mimic the demo: markupText followed by dim text elements
-        row(
-            markupText("Rich [red]live[/red] editor").cyan(),
-            text(" Help ").dim()
-        ).render(frame, area, context);
+        row(markupText("Rich [red]live[/red] editor").cyan(), text(" Help ").dim()).render(frame,
+                area, context);
 
         // "R" in "Rich" should be cyan and NOT dim
         assertThat(buffer).at(0, 0).hasSymbol("R").hasForeground(Color.CYAN);

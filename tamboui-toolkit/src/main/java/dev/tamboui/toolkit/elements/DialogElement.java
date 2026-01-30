@@ -4,12 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Flex;
@@ -19,6 +22,10 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.Clear;
@@ -27,37 +34,30 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * A dialog element that auto-centers in its parent area.
  * <p>
  * DialogElement simplifies creating modal dialogs by automatically:
  * <ul>
- *   <li>Centering the dialog in the parent area</li>
- *   <li>Clearing the background before rendering</li>
- *   <li>Calculating dimensions from content (or using fixed dimensions)</li>
+ * <li>Centering the dialog in the parent area</li>
+ * <li>Clearing the background before rendering</li>
+ * <li>Calculating dimensions from content (or using fixed dimensions)</li>
  * </ul>
  * <p>
  * Layout properties for dialog content can be set via CSS or programmatically:
  * <ul>
- *   <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
- *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
- *   <li>{@code spacing} - Gap between children in cells</li>
+ * <li>{@code direction} - Layout direction: "horizontal"/"row" or
+ * "vertical"/"column"</li>
+ * <li>{@code flex} - Flex positioning mode: "start", "center", "end",
+ * "space-between", "space-around", "space-evenly"</li>
+ * <li>{@code spacing} - Gap between children in cells</li>
  * </ul>
  * <p>
  * Programmatic values override CSS values when both are set.
  *
  * <pre>{@code
- * dialog("Confirm Delete",
- *     text("Delete 3 files?"),
- *     text("[y] Yes  [n] No").dim()
- * ).rounded().borderColor(Color.YELLOW)
+ * dialog("Confirm Delete", text("Delete 3 files?"), text("[y] Yes  [n] No").dim()).rounded()
+ *         .borderColor(Color.YELLOW)
  * }</pre>
  */
 public final class DialogElement extends ContainerElement<DialogElement> {
@@ -84,8 +84,10 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Creates a new dialog element with the given title and children.
      *
-     * @param title the dialog title
-     * @param children the child elements to display in the dialog
+     * @param title
+     *            the dialog title
+     * @param children
+     *            the child elements to display in the dialog
      */
     public DialogElement(String title, Element... children) {
         this.title = title;
@@ -95,7 +97,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Creates a new dialog element with the given children.
      *
-     * @param children the child elements to display in the dialog
+     * @param children
+     *            the child elements to display in the dialog
      */
     public DialogElement(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -104,7 +107,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the dialog title.
      *
-     * @param title the dialog title
+     * @param title
+     *            the dialog title
      * @return this element
      */
     public DialogElement title(String title) {
@@ -135,7 +139,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the border type.
      *
-     * @param type the border type
+     * @param type
+     *            the border type
      * @return this element
      */
     public DialogElement borderType(BorderType type) {
@@ -146,7 +151,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element
      */
     public DialogElement borderColor(Color color) {
@@ -157,7 +163,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets a fixed width for the dialog.
      *
-     * @param width the fixed width in cells
+     * @param width
+     *            the fixed width in cells
      * @return this element
      */
     public DialogElement width(int width) {
@@ -168,7 +175,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets a fixed height for the dialog.
      *
-     * @param height the fixed height in cells
+     * @param height
+     *            the fixed height in cells
      * @return this element
      */
     public DialogElement height(int height) {
@@ -179,7 +187,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the minimum width for the dialog.
      *
-     * @param minWidth the minimum width in cells
+     * @param minWidth
+     *            the minimum width in cells
      * @return this element
      */
     public DialogElement minWidth(int minWidth) {
@@ -190,7 +199,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the padding around content for width calculation.
      *
-     * @param padding the padding in cells
+     * @param padding
+     *            the padding in cells
      * @return this element
      */
     public DialogElement padding(int padding) {
@@ -203,7 +213,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
      * <p>
      * Can also be set via CSS {@code direction} property.
      *
-     * @param direction the layout direction
+     * @param direction
+     *            the layout direction
      * @return this dialog for chaining
      */
     public DialogElement direction(Direction direction) {
@@ -236,7 +247,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
      * <p>
      * Can also be set via CSS {@code flex} property.
      *
-     * @param flex the flex mode
+     * @param flex
+     *            the flex mode
      * @return this dialog for chaining
      */
     public DialogElement flex(Flex flex) {
@@ -249,7 +261,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
      * <p>
      * Can also be set via CSS {@code spacing} property.
      *
-     * @param spacing the spacing in cells
+     * @param spacing
+     *            the spacing in cells
      * @return this dialog for chaining
      */
     public DialogElement spacing(int spacing) {
@@ -260,7 +273,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the callback to run when the dialog is confirmed (Enter key).
      *
-     * @param callback the callback to run on confirmation
+     * @param callback
+     *            the callback to run on confirmation
      * @return this element
      */
     public DialogElement onConfirm(Runnable callback) {
@@ -271,7 +285,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Sets the callback to run when the dialog is cancelled (Escape key).
      *
-     * @param callback the callback to run on cancellation
+     * @param callback
+     *            the callback to run on cancellation
      * @return this element
      */
     public DialogElement onCancel(Runnable callback) {
@@ -282,9 +297,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     /**
      * Handles key events for the dialog.
      * <p>
-     * Routes events to children first (via ContainerElement).
-     * Then handles Enter for confirm and Escape for cancel.
-     * Being modal, the dialog consumes all key events.
+     * Routes events to children first (via ContainerElement). Then handles Enter
+     * for confirm and Escape for cancel. Being modal, the dialog consumes all key
+     * events.
      */
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
@@ -328,7 +343,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         // Calculate based on children, title, and minimum
         int childrenWidth = 0;
         if (!children.isEmpty()) {
-            Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
+            Direction effectiveDirection = this.direction != null
+                    ? this.direction
+                    : Direction.VERTICAL;
 
             if (effectiveDirection == Direction.HORIZONTAL) {
                 // Horizontal: sum widths of all children
@@ -389,11 +406,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         frame.renderWidget(Clear.INSTANCE, dialogArea);
 
         // Build the block
-        Block.Builder blockBuilder = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(borderType)
-            .style(context.currentStyle())
-            .styleResolver(styleResolver(context));
+        Block.Builder blockBuilder = Block.builder().borders(Borders.ALL).borderType(borderType)
+                .style(context.currentStyle()).styleResolver(styleResolver(context));
 
         if (borderColor != null) {
             blockBuilder.borderColor(borderColor);
@@ -444,7 +458,8 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         boolean isHorizontal = effectiveDirection == Direction.HORIZONTAL;
         for (Element child : children) {
             Constraint c = child.constraint();
-            // Check CSS constraint if programmatic is null (width for horizontal, height for vertical)
+            // Check CSS constraint if programmatic is null (width for horizontal, height
+            // for vertical)
             if (c == null && child instanceof Styleable) {
                 CssStyleResolver childCss = context.resolveStyle((Styleable) child).orElse(null);
                 if (childCss != null) {
@@ -457,11 +472,10 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         }
 
         Layout layout = effectiveDirection == Direction.HORIZONTAL
-            ? Layout.horizontal()
-            : Layout.vertical();
+                ? Layout.horizontal()
+                : Layout.vertical();
 
-        layout = layout.constraints(constraints.toArray(new Constraint[0]))
-            .flex(effectiveFlex);
+        layout = layout.constraints(constraints.toArray(new Constraint[0])).flex(effectiveFlex);
 
         if (effectiveSpacing > 0) {
             layout = layout.spacing(effectiveSpacing);

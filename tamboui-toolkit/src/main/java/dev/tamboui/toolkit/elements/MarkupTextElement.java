@@ -8,16 +8,17 @@ import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.style.Overflow;
 
 /**
- * A simple inline element that parses BBCode-style markup and displays styled text.
+ * A simple inline element that parses BBCode-style markup and displays styled
+ * text.
  * <p>
  * This element is similar to {@link TextElement} but accepts markup syntax like
  * {@code [bold]text[/bold]} for styling.
@@ -26,17 +27,21 @@ import dev.tamboui.style.Overflow;
  * <p>
  * Supported markup:
  * <ul>
- *   <li>Built-in modifiers: {@code [bold]}, {@code [italic]}, {@code [underlined]},
- *       {@code [dim]}, {@code [reversed]}, {@code [crossed-out]}</li>
- *   <li>Built-in colors: {@code [red]}, {@code [green]}, {@code [blue]}, {@code [yellow]},
- *       {@code [cyan]}, {@code [magenta]}, {@code [white]}, {@code [black]}, {@code [gray]}</li>
- *   <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
- *   <li>Custom tags: unknown tags are resolved as CSS class names via TCSS</li>
- *   <li>Escaped brackets: {@code [[} produces {@code [}, and {@code ]]} produces {@code ]}</li>
- *   <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
+ * <li>Built-in modifiers: {@code [bold]}, {@code [italic]},
+ * {@code [underlined]}, {@code [dim]}, {@code [reversed]},
+ * {@code [crossed-out]}</li>
+ * <li>Built-in colors: {@code [red]}, {@code [green]}, {@code [blue]},
+ * {@code [yellow]}, {@code [cyan]}, {@code [magenta]}, {@code [white]},
+ * {@code [black]}, {@code [gray]}</li>
+ * <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
+ * <li>Custom tags: unknown tags are resolved as CSS class names via TCSS</li>
+ * <li>Escaped brackets: {@code [[} produces {@code [}, and {@code ]]} produces
+ * {@code ]}</li>
+ * <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * import static dev.tamboui.toolkit.Toolkit.*;
  *
@@ -69,7 +74,8 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     /**
      * Creates a markup text element with the specified content.
      *
-     * @param markup the markup text to parse and display
+     * @param markup
+     *            the markup text to parse and display
      */
     public MarkupTextElement(String markup) {
         this.markup = markup != null ? markup : "";
@@ -79,7 +85,8 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     /**
      * Sets the markup content.
      *
-     * @param markup the markup text to parse and display
+     * @param markup
+     *            the markup text to parse and display
      * @return this element for chaining
      */
     public MarkupTextElement markup(String markup) {
@@ -110,7 +117,8 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     /**
      * Sets a custom style resolver for tags not covered by built-in styles.
      *
-     * @param resolver the custom resolver
+     * @param resolver
+     *            the custom resolver
      * @return this element for chaining
      */
     public MarkupTextElement customResolver(MarkupParser.StyleResolver resolver) {
@@ -122,7 +130,8 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     /**
      * Sets the overflow mode.
      *
-     * @param overflow the overflow mode
+     * @param overflow
+     *            the overflow mode
      * @return this element for chaining
      */
     public MarkupTextElement overflow(Overflow overflow) {
@@ -163,7 +172,8 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     /**
      * Sets the text alignment.
      *
-     * @param alignment the alignment
+     * @param alignment
+     *            the alignment
      * @return this element for chaining
      */
     public MarkupTextElement alignment(Alignment alignment) {
@@ -240,9 +250,7 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
 
             // Check TCSS via context (unknown tags are treated as CSS class names)
             // Use resolveStyle with the tag name as a CSS class
-            return context.resolveStyle(null, tagName)
-                    .map(CssStyleResolver::toStyle)
-                    .orElse(null);
+            return context.resolveStyle(null, tagName).map(CssStyleResolver::toStyle).orElse(null);
         };
     }
 

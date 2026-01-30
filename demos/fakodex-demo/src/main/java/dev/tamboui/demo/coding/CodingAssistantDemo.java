@@ -8,6 +8,12 @@
  */
 package dev.tamboui.demo.coding;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
@@ -23,25 +29,21 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.wavetext.WaveTextState;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * A Codex/Claude Code-like AI coding assistant demo with linear conversation flow.
+ * A Codex/Claude Code-like AI coding assistant demo with linear conversation
+ * flow.
  * <p>
- * This demo showcases a terminal UI similar to modern AI coding assistants with:
+ * This demo showcases a terminal UI similar to modern AI coding assistants
+ * with:
  * <ul>
- *   <li>Linear conversation flow with inline tool calls</li>
- *   <li>Animated spinners for active operations</li>
- *   <li>Code blocks and diffs displayed inline</li>
- *   <li>CSS styling with the toolkit module</li>
- *   <li>Key bindings for navigation</li>
- *   <li>Modern Java constructs (records, var, switch expressions)</li>
+ * <li>Linear conversation flow with inline tool calls</li>
+ * <li>Animated spinners for active operations</li>
+ * <li>Code blocks and diffs displayed inline</li>
+ * <li>CSS styling with the toolkit module</li>
+ * <li>Key bindings for navigation</li>
+ * <li>Modern Java constructs (records, var, switch expressions)</li>
  * </ul>
  */
 public class CodingAssistantDemo {
@@ -56,7 +58,8 @@ public class CodingAssistantDemo {
     private static final Color BRIGHT = Color.rgb(236, 240, 241);
 
     // Animation constants
-    private static final String[] SPINNER_FRAMES = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
+    private static final String[] SPINNER_FRAMES = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇",
+            "⠏"};
     private static final int SPINNER_FRAME_DIVISOR = 2;
     private static final long TICK_RATE_MS = 50;
     private static final long RESPONSE_DELAY_MS = 1500;
@@ -132,9 +135,10 @@ public class CodingAssistantDemo {
         final int durationTicks;
         final String completedText;
         final ToolType type;
-        final String description;  // Store description to avoid parsing
+        final String description; // Store description to avoid parsing
 
-        ActiveToolCall(int lineIndex, int startTick, int durationTicks, String completedText, ToolType type, String description) {
+        ActiveToolCall(int lineIndex, int startTick, int durationTicks, String completedText,
+                ToolType type, String description) {
             this.lineIndex = lineIndex;
             this.startTick = startTick;
             this.durationTicks = durationTicks;
@@ -175,12 +179,13 @@ public class CodingAssistantDemo {
         }
     }
 
-
     /**
      * Main entry point.
      *
-     * @param args command line arguments
-     * @throws Exception if an error occurs
+     * @param args
+     *            command line arguments
+     * @throws Exception
+     *             if an error occurs
      */
     public static void main(String[] args) throws Exception {
         new CodingAssistantDemo().run();
@@ -193,22 +198,18 @@ public class CodingAssistantDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
     public void run() throws Exception {
         var styleEngine = createStyleEngine();
-        var config = TuiConfig.builder()
-                .mouseCapture(true)
-                .tickRate(Duration.ofMillis(TICK_RATE_MS))
-                .build();
+        var config = TuiConfig.builder().mouseCapture(true)
+                .tickRate(Duration.ofMillis(TICK_RATE_MS)).build();
 
         // Add welcome message
         addWelcomeMessage();
 
-        try (var runner = ToolkitRunner.builder()
-                .config(config)
-                .styleEngine(styleEngine)
-                .build()) {
+        try (var runner = ToolkitRunner.builder().config(config).styleEngine(styleEngine).build()) {
             this.runner = runner;
             runner.run(this::render);
         }
@@ -232,7 +233,8 @@ public class CodingAssistantDemo {
      * Creates and configures the style engine.
      *
      * @return the configured style engine
-     * @throws IOException if stylesheet loading fails
+     * @throws IOException
+     *             if stylesheet loading fails
      */
     private StyleEngine createStyleEngine() throws IOException {
         var engine = StyleEngine.create();
@@ -269,31 +271,18 @@ public class CodingAssistantDemo {
 
         // Header line
         columnChildren.add(
-                row(
-                        text(headerText).fg(DIM),
-                        spacer(),
-                        text("[" + status + "] ").fg(statusColor)
-                ).constraint(Constraint.length(1))
-        );
+                row(text(headerText).fg(DIM), spacer(), text("[" + status + "] ").fg(statusColor))
+                        .constraint(Constraint.length(1)));
 
         // Conversation area
-        columnChildren.add(
-                list()
-                        .data(lines, StyledLine::toElement)
-                        .displayOnly()
-                        .scrollToEnd()
-                        .constraint(Constraint.fill())
-        );
+        columnChildren.add(list().data(lines, StyledLine::toElement).displayOnly().scrollToEnd()
+                .constraint(Constraint.fill()));
 
         // Active thinking indicator with wave effect (shown below list, above input)
         if (activeThinkingText != null && pendingTyping == null) {
-            columnChildren.add(
-                    waveText(activeThinkingText, CYAN)
-                            .speed(THINKING_WAVE_SPEED)
-                            .peakWidth(THINKING_WAVE_PEAK_WIDTH)
-                            .state(thinkingWaveState)
-                            .constraint(Constraint.length(1))
-            );
+            columnChildren.add(waveText(activeThinkingText, CYAN).speed(THINKING_WAVE_SPEED)
+                    .peakWidth(THINKING_WAVE_PEAK_WIDTH).state(thinkingWaveState)
+                    .constraint(Constraint.length(1)));
         }
 
         // Active tool calls
@@ -306,34 +295,25 @@ public class CodingAssistantDemo {
                 case SEARCH -> "Search";
             };
             var toolText = "  [" + spinner + "] " + label + " " + tc.description;
-            columnChildren.add(
-                    text(toolText).fg(YELLOW).constraint(Constraint.length(1))
-            );
+            columnChildren.add(text(toolText).fg(YELLOW).constraint(Constraint.length(1)));
         }
 
         // Input line
-        columnChildren.add(
-                row(
-                        text(prompt).fg(isProcessing ? YELLOW : GREEN).bold(),
-                        textInput(inputState)
-                                .placeholder(isProcessing ? "" : "Ask anything...")
-                                .showCursor(!isProcessing)
-                                .cursorRequiresFocus(false)
-                                .onSubmit(this::submitInput)
-                                .constraint(Constraint.fill())
-                ).constraint(Constraint.length(1))
-        );
+        columnChildren.add(row(text(prompt).fg(isProcessing ? YELLOW : GREEN).bold(),
+                textInput(inputState).placeholder(isProcessing ? "" : "Ask anything...")
+                        .showCursor(!isProcessing).cursorRequiresFocus(false)
+                        .onSubmit(this::submitInput).constraint(Constraint.fill()))
+                .constraint(Constraint.length(1)));
 
-        return panel(
-                column(columnChildren.toArray(new Element[0]))
-        ).id("main").focusable().onKeyEvent(this::handleKey);
+        return panel(column(columnChildren.toArray(new Element[0]))).id("main").focusable()
+                .onKeyEvent(this::handleKey);
     }
-
 
     /**
      * Handles key events.
      *
-     * @param event the key event
+     * @param event
+     *            the key event
      * @return the event result
      */
     private EventResult handleKey(KeyEvent event) {
@@ -405,7 +385,8 @@ public class CodingAssistantDemo {
     /**
      * Processes user input and generates a response.
      *
-     * @param input the user's input
+     * @param input
+     *            the user's input
      */
     private void processUserInput(String input) {
         var lowerInput = input.toLowerCase();
@@ -428,7 +409,8 @@ public class CodingAssistantDemo {
     /**
      * Sets the thinking indicator with wave effect.
      *
-     * @param text the thinking text (e.g., "Thinking...", "Analyzing...")
+     * @param text
+     *            the thinking text (e.g., "Thinking...", "Analyzing...")
      */
     private void setThinkingIndicator(String text) {
         lines.add(StyledLine.of(""));
@@ -480,11 +462,11 @@ public class CodingAssistantDemo {
 
         var explanation = """
                 This code implements a caching layer:
-                
+
                 1. Cache lookup - checks if data exists in memory
                 2. Fallback - fetches from database if not cached
                 3. Storage - stores result for future requests
-                
+
                 The TTL ensures stale data is refreshed.""";
 
         scheduleResponse(explanation);
@@ -502,7 +484,7 @@ public class CodingAssistantDemo {
 
         var response = """
                 Found these configuration files:
-                
+
                 - config/settings.yaml - Main settings
                 - config/database.yaml - DB connection
                 - .env - Environment variables
@@ -523,7 +505,7 @@ public class CodingAssistantDemo {
 
         var response = """
                 All tests passing!
-                
+
                 Test Suites: 3 passed
                 Tests: 12 passed
                 Time: 2.34s""";
@@ -541,13 +523,13 @@ public class CodingAssistantDemo {
 
         var response = """
                 I can help with:
-                
+
                 - Create code - write functions/classes
                 - Fix bugs - analyze and repair issues
                 - Explain - break down how code works
                 - Search - find files and patterns
                 - Run - execute tests or commands
-                
+
                 What would you like me to do?""";
 
         scheduleResponse(response);
@@ -556,10 +538,14 @@ public class CodingAssistantDemo {
     /**
      * Adds a tool call with animation.
      *
-     * @param type        the tool type
-     * @param description the tool description
-     * @param duration    the animation duration in ticks
-     * @param result      the result to show when complete
+     * @param type
+     *            the tool type
+     * @param description
+     *            the tool description
+     * @param duration
+     *            the animation duration in ticks
+     * @param result
+     *            the result to show when complete
      */
     private void addToolCall(ToolType type, String description, int duration, String result) {
         var label = switch (type) {
@@ -577,7 +563,8 @@ public class CodingAssistantDemo {
     /**
      * Schedules an AI response to start typing after a delay.
      *
-     * @param response the response text
+     * @param response
+     *            the response text
      */
     private void scheduleResponse(String response) {
         // Start typing after tool calls have had time to show
@@ -610,7 +597,8 @@ public class CodingAssistantDemo {
         lines.add(StyledLine.of(""));
         lines.add(StyledLine.bold("  Service.java (diff)", MAGENTA));
         lines.add(StyledLine.of("  - String result = data.process();", RED));
-        lines.add(StyledLine.of("  + String result = data != null ? data.process() : \"\";", GREEN));
+        lines.add(
+                StyledLine.of("  + String result = data != null ? data.process() : \"\";", GREEN));
         lines.add(StyledLine.of("    return result;", DIM));
         addToolCall(ToolType.EDIT_FILE, "src/main/java/Service.java", 15, "Applied fix");
     }
@@ -646,7 +634,8 @@ public class CodingAssistantDemo {
     /**
      * Updates tool call animations.
      *
-     * @param spinner the current spinner (unused, kept for compatibility)
+     * @param spinner
+     *            the current spinner (unused, kept for compatibility)
      */
     private void updateToolCalls(String spinner) {
         var completed = new ArrayList<ActiveToolCall>();

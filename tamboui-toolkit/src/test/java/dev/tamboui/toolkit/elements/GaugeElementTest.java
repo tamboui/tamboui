@@ -4,15 +4,16 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
@@ -25,13 +26,8 @@ class GaugeElementTest {
     @Test
     @DisplayName("GaugeElement fluent API chains correctly")
     void fluentApiChaining() {
-        GaugeElement element = gauge(0.5)
-            .label("Loading...")
-            .gaugeColor(Color.GREEN)
-            .useUnicode(true)
-            .title("Progress")
-            .rounded()
-            .borderColor(Color.CYAN);
+        GaugeElement element = gauge(0.5).label("Loading...").gaugeColor(Color.GREEN)
+                .useUnicode(true).title("Progress").rounded().borderColor(Color.CYAN);
 
         assertThat(element).isInstanceOf(GaugeElement.class);
     }
@@ -66,11 +62,8 @@ class GaugeElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        gauge(0.5)
-            .label("50%")
-            .title("Progress")
-            .rounded()
-            .render(frame, area, RenderContext.empty());
+        gauge(0.5).label("50%").title("Progress").rounded().render(frame, area,
+                RenderContext.empty());
 
         // Check border is rendered (rounded corner)
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -84,9 +77,7 @@ class GaugeElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        gauge(1.0)
-            .label("")
-            .render(frame, area, RenderContext.empty());
+        gauge(1.0).label("").render(frame, area, RenderContext.empty());
 
         // At 100%, first cells should be filled blocks
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("█");
@@ -111,10 +102,7 @@ class GaugeElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        gauge(1.0)
-            .label("")
-            .gaugeColor(Color.RED)
-            .render(frame, area, RenderContext.empty());
+        gauge(1.0).label("").gaugeColor(Color.RED).render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
     }
@@ -122,7 +110,8 @@ class GaugeElementTest {
     @Test
     @DisplayName("styleAttributes exposes title")
     void styleAttributes_exposesTitle() {
-        assertThat(gauge(0.5).title("Progress").styleAttributes()).containsEntry("title", "Progress");
+        assertThat(gauge(0.5).title("Progress").styleAttributes()).containsEntry("title",
+                "Progress");
     }
 
     @Test
@@ -135,7 +124,8 @@ class GaugeElementTest {
     @DisplayName("Attribute selector [title] affects Gauge border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test", "GaugeElement[title=\"Progress\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test",
+                "GaugeElement[title=\"Progress\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

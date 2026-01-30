@@ -4,16 +4,16 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-import dev.tamboui.tui.error.RenderErrorHandler;
-import dev.tamboui.tui.error.RenderErrorHandlers;
-
 import java.io.PrintStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.error.RenderErrorHandler;
+import dev.tamboui.tui.error.RenderErrorHandlers;
 
 /**
  * Configuration options for {@link TuiRunner}.
@@ -25,8 +25,8 @@ public final class TuiConfig {
     /** Default tick rate in milliseconds. */
     public static final int DEFAULT_TICK_TIMEOUT = 40;
     /**
-     * Default grace period for resize events (250ms).
-     * This ensures resize events are processed within a reasonable time even when ticks are disabled.
+     * Default grace period for resize events (250ms). This ensures resize events
+     * are processed within a reasonable time even when ticks are disabled.
      */
     public static final int DEFAULT_RESIZE_GRACE_PERIOD = 250;
     private final boolean rawMode;
@@ -46,37 +46,41 @@ public final class TuiConfig {
     /**
      * Creates a new TUI configuration with the specified options.
      * <p>
-     * Prefer using {@link #builder()} or {@link #defaults()} instead of this constructor.
+     * Prefer using {@link #builder()} or {@link #defaults()} instead of this
+     * constructor.
      *
-     * @param rawMode whether to enable raw terminal mode
-     * @param alternateScreen whether to use the alternate screen buffer
-     * @param hideCursor whether to hide the cursor
-     * @param mouseCapture whether to capture mouse events
-     * @param pollTimeout timeout for polling events
-     * @param tickRate interval between tick events, or null to disable
-     * @param resizeGracePeriod grace period for resize events, or null to disable
-     * @param shutdownHook whether to register a JVM shutdown hook
-     * @param bindings the key/mouse bindings for semantic actions
-     * @param errorHandler the handler for render errors
-     * @param errorOutput the output stream for error logging
-     * @param fpsOverlayEnabled whether to show the FPS overlay
-     * @param postRenderProcessors list of post-render processors
+     * @param rawMode
+     *            whether to enable raw terminal mode
+     * @param alternateScreen
+     *            whether to use the alternate screen buffer
+     * @param hideCursor
+     *            whether to hide the cursor
+     * @param mouseCapture
+     *            whether to capture mouse events
+     * @param pollTimeout
+     *            timeout for polling events
+     * @param tickRate
+     *            interval between tick events, or null to disable
+     * @param resizeGracePeriod
+     *            grace period for resize events, or null to disable
+     * @param shutdownHook
+     *            whether to register a JVM shutdown hook
+     * @param bindings
+     *            the key/mouse bindings for semantic actions
+     * @param errorHandler
+     *            the handler for render errors
+     * @param errorOutput
+     *            the output stream for error logging
+     * @param fpsOverlayEnabled
+     *            whether to show the FPS overlay
+     * @param postRenderProcessors
+     *            list of post-render processors
      */
-    public TuiConfig(
-            boolean rawMode,
-            boolean alternateScreen,
-            boolean hideCursor,
-            boolean mouseCapture,
-            Duration pollTimeout,
-            Duration tickRate,
-            Duration resizeGracePeriod,
-            boolean shutdownHook,
-            Bindings bindings,
-            RenderErrorHandler errorHandler,
-            PrintStream errorOutput,
-            boolean fpsOverlayEnabled,
-            List<PostRenderProcessor> postRenderProcessors
-    ) {
+    public TuiConfig(boolean rawMode, boolean alternateScreen, boolean hideCursor,
+            boolean mouseCapture, Duration pollTimeout, Duration tickRate,
+            Duration resizeGracePeriod, boolean shutdownHook, Bindings bindings,
+            RenderErrorHandler errorHandler, PrintStream errorOutput, boolean fpsOverlayEnabled,
+            List<PostRenderProcessor> postRenderProcessors) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
         this.hideCursor = hideCursor;
@@ -97,33 +101,34 @@ public final class TuiConfig {
     /**
      * Returns the default configuration.
      * <p>
-     * By default, tick events are generated every 100ms to ensure periodic UI refresh.
-     * Use {@link Builder#noTick()} to disable automatic ticking.
+     * By default, tick events are generated every 100ms to ensure periodic UI
+     * refresh. Use {@link Builder#noTick()} to disable automatic ticking.
      *
      * @return the default TUI configuration
      */
     public static TuiConfig defaults() {
-        return new TuiConfig(
-                true,                        // rawMode
-                true,                        // alternateScreen
-                true,                        // hideCursor
-                false,                       // mouseCapture
-                Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
-                Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
-                Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD),  // resizeGracePeriod
-                true,                        // shutdownHook
-                BindingSets.defaults(),      // bindings
-                RenderErrorHandlers.displayAndQuit(),  // errorHandler
-                System.err,                  // errorOutput
-                false,                       // fpsOverlayEnabled
-                Collections.emptyList()      // postRenderProcessors
+        return new TuiConfig(true, // rawMode
+                true, // alternateScreen
+                true, // hideCursor
+                false, // mouseCapture
+                Duration.ofMillis(DEFAULT_POLL_TIMEOUT), // pollTimeout
+                Duration.ofMillis(DEFAULT_TICK_TIMEOUT), // tickRate
+                Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD), // resizeGracePeriod
+                true, // shutdownHook
+                BindingSets.defaults(), // bindings
+                RenderErrorHandlers.displayAndQuit(), // errorHandler
+                System.err, // errorOutput
+                false, // fpsOverlayEnabled
+                Collections.emptyList() // postRenderProcessors
         );
     }
 
     /**
      * Returns a configuration suitable for animated applications.
      *
-     * @param tickRate the interval between tick events (e.g., Duration.ofMillis(16) for ~60fps)
+     * @param tickRate
+     *            the interval between tick events (e.g., Duration.ofMillis(16) for
+     *            ~60fps)
      * @return configuration with ticks enabled
      */
     public static TuiConfig withAnimation(Duration tickRate) {
@@ -205,9 +210,9 @@ public final class TuiConfig {
     /**
      * Returns the resize grace period.
      * <p>
-     * This defines the maximum time before resize events are processed,
-     * ensuring the UI redraws promptly on terminal resize even when
-     * ticks are disabled or have a long interval.
+     * This defines the maximum time before resize events are processed, ensuring
+     * the UI redraws promptly on terminal resize even when ticks are disabled or
+     * have a long interval.
      *
      * @return the resize grace period, or null to use the poll timeout
      */
@@ -247,8 +252,8 @@ public final class TuiConfig {
     /**
      * Returns the output stream for error logging.
      * <p>
-     * This stream is used to log fatal errors when the TUI has captured
-     * standard streams and stack traces would otherwise be invisible.
+     * This stream is used to log fatal errors when the TUI has captured standard
+     * streams and stack traces would otherwise be invisible.
      *
      * @return the error output stream
      */
@@ -285,15 +290,14 @@ public final class TuiConfig {
             return false;
         }
         TuiConfig that = (TuiConfig) o;
-        return rawMode == that.rawMode
-                && alternateScreen == that.alternateScreen
-                && hideCursor == that.hideCursor
-                && mouseCapture == that.mouseCapture
+        return rawMode == that.rawMode && alternateScreen == that.alternateScreen
+                && hideCursor == that.hideCursor && mouseCapture == that.mouseCapture
                 && pollTimeout.equals(that.pollTimeout)
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
-                && (resizeGracePeriod != null ? resizeGracePeriod.equals(that.resizeGracePeriod) : that.resizeGracePeriod == null)
-                && bindings.equals(that.bindings)
-                && fpsOverlayEnabled == that.fpsOverlayEnabled;
+                && (resizeGracePeriod != null
+                        ? resizeGracePeriod.equals(that.resizeGracePeriod)
+                        : that.resizeGracePeriod == null)
+                && bindings.equals(that.bindings) && fpsOverlayEnabled == that.fpsOverlayEnabled;
     }
 
     @Override
@@ -314,17 +318,8 @@ public final class TuiConfig {
     public String toString() {
         return String.format(
                 "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
-                rawMode,
-                alternateScreen,
-                hideCursor,
-                mouseCapture,
-                pollTimeout,
-                tickRate,
-                resizeGracePeriod,
-                shutdownHook,
-                bindings,
-                fpsOverlayEnabled
-        );
+                rawMode, alternateScreen, hideCursor, mouseCapture, pollTimeout, tickRate,
+                resizeGracePeriod, shutdownHook, bindings, fpsOverlayEnabled);
     }
 
     /**
@@ -351,7 +346,8 @@ public final class TuiConfig {
         /**
          * Sets whether to register a JVM shutdown hook for cleanup.
          *
-         * @param shutdownHook true to register a shutdown hook
+         * @param shutdownHook
+         *            true to register a shutdown hook
          * @return this builder
          */
         public Builder shutdownHook(boolean shutdownHook) {
@@ -362,7 +358,8 @@ public final class TuiConfig {
         /**
          * Sets whether to enable raw mode.
          *
-         * @param rawMode true to enable raw mode
+         * @param rawMode
+         *            true to enable raw mode
          * @return this builder
          */
         public Builder rawMode(boolean rawMode) {
@@ -373,7 +370,8 @@ public final class TuiConfig {
         /**
          * Sets whether to use alternate screen buffer.
          *
-         * @param alternateScreen true to use alternate screen
+         * @param alternateScreen
+         *            true to use alternate screen
          * @return this builder
          */
         public Builder alternateScreen(boolean alternateScreen) {
@@ -384,7 +382,8 @@ public final class TuiConfig {
         /**
          * Sets whether to hide the cursor.
          *
-         * @param hideCursor true to hide the cursor
+         * @param hideCursor
+         *            true to hide the cursor
          * @return this builder
          */
         public Builder hideCursor(boolean hideCursor) {
@@ -395,7 +394,8 @@ public final class TuiConfig {
         /**
          * Sets whether to capture mouse events.
          *
-         * @param mouseCapture true to enable mouse capture
+         * @param mouseCapture
+         *            true to enable mouse capture
          * @return this builder
          */
         public Builder mouseCapture(boolean mouseCapture) {
@@ -406,19 +406,22 @@ public final class TuiConfig {
         /**
          * Sets the timeout for polling events.
          *
-         * @param pollTimeout poll timeout duration (non-null)
+         * @param pollTimeout
+         *            poll timeout duration (non-null)
          * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
-            this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
+            this.pollTimeout = pollTimeout != null
+                    ? pollTimeout
+                    : Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
             return this;
         }
 
         /**
-         * Sets the interval between tick events.
-         * Set to null to disable tick events.
+         * Sets the interval between tick events. Set to null to disable tick events.
          *
-         * @param tickRate the tick interval (e.g., Duration.ofMillis(16) for ~60fps)
+         * @param tickRate
+         *            the tick interval (e.g., Duration.ofMillis(16) for ~60fps)
          * @return this builder
          */
         public Builder tickRate(Duration tickRate) {
@@ -441,13 +444,14 @@ public final class TuiConfig {
         /**
          * Sets the resize grace period.
          * <p>
-         * This defines the maximum time before resize events are processed,
-         * ensuring the UI redraws promptly on terminal resize even when
-         * ticks are disabled or have a long interval.
+         * This defines the maximum time before resize events are processed, ensuring
+         * the UI redraws promptly on terminal resize even when ticks are disabled or
+         * have a long interval.
          * <p>
          * Default is {@value #DEFAULT_RESIZE_GRACE_PERIOD}ms.
          *
-         * @param resizeGracePeriod the grace period, or null to disable automatic resize handling
+         * @param resizeGracePeriod
+         *            the grace period, or null to disable automatic resize handling
          * @return this builder
          */
         public Builder resizeGracePeriod(Duration resizeGracePeriod) {
@@ -460,14 +464,15 @@ public final class TuiConfig {
          * <p>
          * Use predefined binding sets from {@link BindingSets}:
          * <ul>
-         *   <li>{@link BindingSets#standard()} - Arrow keys only (default)</li>
-         *   <li>{@link BindingSets#vim()} - Vim-style navigation (hjkl)</li>
-         *   <li>{@link BindingSets#emacs()} - Emacs-style navigation (Ctrl+n/p/f/b)</li>
-         *   <li>{@link BindingSets#intellij()} - IntelliJ IDEA-style</li>
-         *   <li>{@link BindingSets#vscode()} - VS Code-style</li>
+         * <li>{@link BindingSets#standard()} - Arrow keys only (default)</li>
+         * <li>{@link BindingSets#vim()} - Vim-style navigation (hjkl)</li>
+         * <li>{@link BindingSets#emacs()} - Emacs-style navigation (Ctrl+n/p/f/b)</li>
+         * <li>{@link BindingSets#intellij()} - IntelliJ IDEA-style</li>
+         * <li>{@link BindingSets#vscode()} - VS Code-style</li>
          * </ul>
          *
-         * @param bindings the bindings to use
+         * @param bindings
+         *            the bindings to use
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
@@ -478,25 +483,29 @@ public final class TuiConfig {
         /**
          * Sets the error handler for render errors.
          * <p>
-         * The handler is invoked when an exception occurs during rendering.
-         * Use factory methods from {@link RenderErrorHandlers} for common behaviors.
+         * The handler is invoked when an exception occurs during rendering. Use factory
+         * methods from {@link RenderErrorHandlers} for common behaviors.
          *
-         * @param errorHandler the error handler to use
+         * @param errorHandler
+         *            the error handler to use
          * @return this builder
          * @see RenderErrorHandlers
          */
         public Builder errorHandler(RenderErrorHandler errorHandler) {
-            this.errorHandler = errorHandler != null ? errorHandler : RenderErrorHandlers.displayAndQuit();
+            this.errorHandler = errorHandler != null
+                    ? errorHandler
+                    : RenderErrorHandlers.displayAndQuit();
             return this;
         }
 
         /**
          * Sets the output stream for error logging.
          * <p>
-         * This stream is used to log fatal errors when the TUI has captured
-         * standard streams. Defaults to {@code System.err}.
+         * This stream is used to log fatal errors when the TUI has captured standard
+         * streams. Defaults to {@code System.err}.
          *
-         * @param errorOutput the error output stream
+         * @param errorOutput
+         *            the error output stream
          * @return this builder
          */
         public Builder errorOutput(PrintStream errorOutput) {
@@ -507,7 +516,8 @@ public final class TuiConfig {
         /**
          * Enables or disables the FPS overlay.
          *
-         * @param enabled true to enable the FPS overlay
+         * @param enabled
+         *            true to enable the FPS overlay
          * @return this builder
          */
         public Builder fpsOverlay(boolean enabled) {
@@ -518,11 +528,12 @@ public final class TuiConfig {
         /**
          * Adds a post-render processor.
          * <p>
-         * Post-render processors are called after each frame is rendered,
-         * allowing for effects, overlays, or other post-processing.
-         * Processors are called in the order they are added.
+         * Post-render processors are called after each frame is rendered, allowing for
+         * effects, overlays, or other post-processing. Processors are called in the
+         * order they are added.
          *
-         * @param processor the processor to add
+         * @param processor
+         *            the processor to add
          * @return this builder
          */
         public Builder postRenderProcessor(PostRenderProcessor processor) {
@@ -538,21 +549,9 @@ public final class TuiConfig {
          * @return the constructed TuiConfig
          */
         public TuiConfig build() {
-            return new TuiConfig(
-                    rawMode,
-                    alternateScreen,
-                    hideCursor,
-                    mouseCapture,
-                    pollTimeout,
-                    tickRate,
-                    resizeGracePeriod,
-                    shutdownHook,
-                    bindings,
-                    errorHandler,
-                    errorOutput,
-                    fpsOverlayEnabled,
-                    postRenderProcessors
-            );
+            return new TuiConfig(rawMode, alternateScreen, hideCursor, mouseCapture, pollTimeout,
+                    tickRate, resizeGracePeriod, shutdownHook, bindings, errorHandler, errorOutput,
+                    fpsOverlayEnabled, postRenderProcessors);
         }
     }
 }

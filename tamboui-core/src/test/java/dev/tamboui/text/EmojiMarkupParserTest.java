@@ -4,12 +4,12 @@
  */
 package dev.tamboui.text;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import static dev.tamboui.text.MarkupParser.containsEmojiCodes;
 import static dev.tamboui.text.MarkupParser.replaceEmoji;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 class EmojiMarkupParserTest {
 
@@ -37,8 +37,7 @@ class EmojiMarkupParserTest {
     @Test
     @DisplayName("replace multiple emoji codes")
     void replaceMultipleEmojiCodes() {
-        assertThat(replaceEmoji(":cross_mark: :warning:"))
-            .isEqualTo("❌ ⚠");
+        assertThat(replaceEmoji(":cross_mark: :warning:")).isEqualTo("❌ ⚠");
     }
 
     @Test

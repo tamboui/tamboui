@@ -4,20 +4,21 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.style.Overflow;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -31,13 +32,8 @@ class TextElementTest {
     @Test
     @DisplayName("TextElement fluent API chains correctly")
     void fluentApiChaining() {
-        TextElement element = text("Hello, World!")
-            .bold()
-            .italic()
-            .underlined()
-            .fg(Color.CYAN)
-            .bg(Color.BLACK)
-            .dim();
+        TextElement element = text("Hello, World!").bold().italic().underlined().fg(Color.CYAN)
+                .bg(Color.BLACK).dim();
 
         assertThat(element).isInstanceOf(TextElement.class);
     }
@@ -59,9 +55,7 @@ class TextElementTest {
     @Test
     @DisplayName("Color shortcuts work")
     void colorShortcuts() {
-        TextElement element = text("Colored")
-            .red()
-            .onBlue();
+        TextElement element = text("Colored").red().onBlue();
 
         assertThat(element).isNotNull();
     }
@@ -73,8 +67,7 @@ class TextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        text("Hello")
-            .render(frame, area, RenderContext.empty());
+        text("Hello").render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("e");
@@ -90,10 +83,7 @@ class TextElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        text("Hi")
-            .bold()
-            .fg(Color.RED)
-            .render(frame, area, RenderContext.empty());
+        text("Hi").bold().fg(Color.RED).render(frame, area, RenderContext.empty());
 
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
@@ -142,14 +132,8 @@ class TextElementTest {
     @Test
     @DisplayName("All color methods work")
     void allColorMethods() {
-        TextElement element = text("Colors")
-            .cyan()
-            .yellow()
-            .green()
-            .blue()
-            .magenta()
-            .white()
-            .gray();
+        TextElement element = text("Colors").cyan().yellow().green().blue().magenta().white()
+                .gray();
 
         // Should not throw
         assertThat(element).isNotNull();
@@ -158,15 +142,8 @@ class TextElementTest {
     @Test
     @DisplayName("Background color methods work")
     void backgroundColorMethods() {
-        TextElement element = text("BG")
-            .onRed()
-            .onGreen()
-            .onYellow()
-            .onBlue()
-            .onMagenta()
-            .onCyan()
-            .onWhite()
-            .onBlack();
+        TextElement element = text("BG").onRed().onGreen().onYellow().onBlue().onMagenta().onCyan()
+                .onWhite().onBlack();
 
         assertThat(element).isNotNull();
     }
@@ -245,11 +222,8 @@ class TextElementTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            column(
-                text("Line 1"),
-                text("Line 2"),
-                text("Line 3")
-            ).render(frame, area, RenderContext.empty());
+            column(text("Line 1"), text("Line 2"), text("Line 3")).render(frame, area,
+                    RenderContext.empty());
 
             // Build expected buffer - text should be on consecutive lines without gaps
             Buffer expected = Buffer.empty(area);
@@ -267,10 +241,9 @@ class TextElementTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            column(
-                text("Short"),
-                text("This is a long line that should wrap").overflow(Overflow.WRAP_WORD)
-            ).render(frame, area, RenderContext.empty());
+            column(text("Short"),
+                    text("This is a long line that should wrap").overflow(Overflow.WRAP_WORD))
+                    .render(frame, area, RenderContext.empty());
 
             // First line should be "Short" at line 0
             Buffer expected = Buffer.empty(area);
@@ -315,7 +288,8 @@ class TextElementTest {
             assertThat(element.preferredHeight(10, null)).isEqualTo(2);
 
             // 25 chars should wrap to 3 lines at width 10
-            TextElement longer = text("1234567890123456789012345").overflow(Overflow.WRAP_CHARACTER);
+            TextElement longer = text("1234567890123456789012345")
+                    .overflow(Overflow.WRAP_CHARACTER);
             assertThat(longer.preferredHeight(10, null)).isEqualTo(3);
         }
 
@@ -331,7 +305,8 @@ class TextElementTest {
         @DisplayName("preferredHeight(width) handles multi-line text with wrapping")
         void multiLineWithWrapping() {
             // Two lines, each 15 chars, should wrap to 4 lines at width 10
-            TextElement element = text("123456789012345\n123456789012345").overflow(Overflow.WRAP_CHARACTER);
+            TextElement element = text("123456789012345\n123456789012345")
+                    .overflow(Overflow.WRAP_CHARACTER);
             assertThat(element.preferredHeight(10, null)).isEqualTo(4);
         }
 
@@ -383,8 +358,7 @@ class TextElementTest {
 
             // Create CSS resolver with text-overflow: wrap-character
             CssStyleResolver cssResolver = CssStyleResolver.builder()
-                    .set(StandardProperties.TEXT_OVERFLOW, Overflow.WRAP_CHARACTER)
-                    .build();
+                    .set(StandardProperties.TEXT_OVERFLOW, Overflow.WRAP_CHARACTER).build();
 
             // Create mock RenderContext that returns the resolver for this element
             RenderContext context = new RenderContext() {
@@ -399,7 +373,8 @@ class TextElementTest {
                 }
 
                 @Override
-                public java.util.Optional<CssStyleResolver> resolveStyle(dev.tamboui.css.Styleable styleable) {
+                public java.util.Optional<CssStyleResolver> resolveStyle(
+                        dev.tamboui.css.Styleable styleable) {
                     return java.util.Optional.of(cssResolver);
                 }
             };
