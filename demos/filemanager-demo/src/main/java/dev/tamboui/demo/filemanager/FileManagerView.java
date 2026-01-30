@@ -13,6 +13,7 @@ import java.util.List;
 import dev.tamboui.image.Image;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
+import dev.tamboui.lumis4j.Lumis4jMarkup;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -337,7 +338,7 @@ public class FileManagerView implements Element {
         int dialogWidth = Math.min(area.width() - 4, 120);
         int dialogHeight = Math.min(area.height() - 4, 40);
 
-        // For image files, create the image widget first to get protocol name
+        // For image files, show protocol in title; for text files, show lang/formatter used
         String dialogTitle = fileName;
         if (isImage) {
             try {
@@ -351,6 +352,9 @@ public class FileManagerView implements Element {
             } catch (IOException e) {
                 // If we can't load the image, just use the filename
             }
+        } else {
+            String lang = Lumis4jMarkup.guessLangFromFileName(fileName);
+            dialogTitle = fileName + (lang != null ? " (" + lang + ")" : " (plain text)");
         }
 
         // Create a custom element for the viewer
@@ -411,20 +415,27 @@ public class FileManagerView implements Element {
             byte[] bytes = Files.readAllBytes(textPath);
             String content = new String(bytes, StandardCharsets.UTF_8);
             int scrollPos = manager.textScrollPosition();
-            
-            Paragraph paragraph = Paragraph.builder()
-                    .text(Text.from(content))
-                    .overflow(Overflow.WRAP_WORD)
-                    .scroll(scrollPos)
-                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.WHITE))
-                    .build();
+
+            String lang = Lumis4jMarkup.guessLangFromFileName(textPath.getFileName().toString());
+            Text textContent =
+                    lang != null
+                            ? Lumis4jMarkup.sourceToText(content, lang)
+                            : Text.from(content);
+
+            Paragraph paragraph =
+                    Paragraph.builder()
+                            .text(textContent)
+                            .overflow(Overflow.WRAP_WORD)
+                            .scroll(scrollPos)
+                            .style(dev.tamboui.style.Style.EMPTY.fg(Color.WHITE))
+                            .build();
             frame.renderWidget(paragraph, area);
         } catch (IOException e) {
-            // Render error message
-            Paragraph error = Paragraph.builder()
-                    .text(Text.from("Error reading file: " + e.getMessage()))
-                    .style(dev.tamboui.style.Style.EMPTY.fg(Color.RED))
-                    .build();
+            Paragraph error =
+                    Paragraph.builder()
+                            .text(Text.from("Error reading file: " + e.getMessage()))
+                            .style(dev.tamboui.style.Style.EMPTY.fg(Color.RED))
+                            .build();
             frame.renderWidget(error, area);
         }
     }
