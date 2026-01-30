@@ -12,8 +12,9 @@ import java.lang.annotation.Target;
 /**
  * Marks a method as an action handler for the specified action.
  * <p>
- * When used with the annotation processor, methods annotated with {@code @OnAction}
- * will be automatically registered with an {@code ActionHandler} via generated code.
+ * When used with the annotation processor, methods annotated with
+ * {@code @OnAction} will be automatically registered with an
+ * {@code ActionHandler} via generated code.
  *
  * <pre>{@code
  * public class MyApp {
@@ -31,9 +32,9 @@ import java.lang.annotation.Target;
  * <p>
  * The annotated method must:
  * <ul>
- *   <li>Have exactly one parameter of type {@code Event} (or a subtype)</li>
- *   <li>Return {@code void}</li>
- *   <li>Be accessible (not private)</li>
+ * <li>Have exactly one parameter of type {@code Event} (or a subtype)</li>
+ * <li>Return {@code void}</li>
+ * <li>Be accessible (not private)</li>
  * </ul>
  */
 @Retention(RetentionPolicy.RUNTIME)

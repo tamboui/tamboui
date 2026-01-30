@@ -23,7 +23,8 @@ public interface PostRenderProcessor {
     /**
      * Processes the frame after rendering.
      *
-     * @param frame the rendered frame
+     * @param frame
+     *            the rendered frame
      */
     void process(Frame frame);
 }

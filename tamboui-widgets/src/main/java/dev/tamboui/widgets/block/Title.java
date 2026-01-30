@@ -5,9 +5,9 @@
 package dev.tamboui.widgets.block;
 
 import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import dev.tamboui.style.Overflow;
 
 /**
  * A title for a block, with optional alignment and overflow handling.
@@ -21,9 +21,12 @@ public final class Title {
     /**
      * Creates a new title.
      *
-     * @param content   the title content
-     * @param alignment the title alignment
-     * @param overflow  the overflow handling strategy
+     * @param content
+     *            the title content
+     * @param alignment
+     *            the title alignment
+     * @param overflow
+     *            the overflow handling strategy
      */
     public Title(Line content, Alignment alignment, Overflow overflow) {
         this.content = content;
@@ -34,7 +37,8 @@ public final class Title {
     /**
      * Creates a left-aligned title from a string.
      *
-     * @param text the title text
+     * @param text
+     *            the title text
      * @return a new Title
      */
     public static Title from(String text) {
@@ -44,7 +48,8 @@ public final class Title {
     /**
      * Creates a left-aligned title from a span.
      *
-     * @param span the title span
+     * @param span
+     *            the title span
      * @return a new Title
      */
     public static Title from(Span span) {
@@ -54,7 +59,8 @@ public final class Title {
     /**
      * Creates a left-aligned title from a line.
      *
-     * @param line the title line
+     * @param line
+     *            the title line
      * @return a new Title
      */
     public static Title from(Line line) {
@@ -64,7 +70,8 @@ public final class Title {
     /**
      * Returns a new title with the given alignment.
      *
-     * @param alignment the alignment
+     * @param alignment
+     *            the alignment
      * @return a new Title with the specified alignment
      */
     public Title alignment(Alignment alignment) {
@@ -101,7 +108,8 @@ public final class Title {
     /**
      * Returns a new title with the given overflow mode.
      *
-     * @param overflow the overflow mode
+     * @param overflow
+     *            the overflow mode
      * @return a new Title with the specified overflow
      */
     public Title overflow(Overflow overflow) {
@@ -171,7 +179,8 @@ public final class Title {
             return false;
         }
         Title title = (Title) o;
-        return content.equals(title.content) && alignment == title.alignment && overflow == title.overflow;
+        return content.equals(title.content) && alignment == title.alignment
+                && overflow == title.overflow;
     }
 
     @Override
@@ -184,6 +193,7 @@ public final class Title {
 
     @Override
     public String toString() {
-        return String.format("Title[content=%s, alignment=%s, overflow=%s]", content, alignment, overflow);
+        return String.format("Title[content=%s, alignment=%s, overflow=%s]", content, alignment,
+                overflow);
     }
 }

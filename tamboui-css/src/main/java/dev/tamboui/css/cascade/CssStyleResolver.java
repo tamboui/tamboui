@@ -4,23 +4,6 @@
  */
 package dev.tamboui.css.cascade;
 
-import dev.tamboui.style.StandardProperties;
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Direction;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.layout.Margin;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Modifier;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.Style;
-import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.layout.Padding;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -28,6 +11,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Margin;
+import dev.tamboui.layout.Padding;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.StandardProperties;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderType;
 
 /**
  * Represents the computed style for an element after CSS cascade resolution.
@@ -38,6 +38,7 @@ import java.util.Set;
  * {@link #get(PropertyDefinition)} method.
  * <p>
  * Example usage with PropertyDefinition:
+ * 
  * <pre>{@code
  * CssStyleResolver style = cascadeResolver.resolve(element, rules);
  * Color borderColor = style.get(StandardProperties.BORDER_COLOR).orElse(Color.WHITE);
@@ -45,19 +46,15 @@ import java.util.Set;
  */
 public final class CssStyleResolver implements StylePropertyResolver {
 
-    private static final CssStyleResolver EMPTY = new CssStyleResolver(
-            TypedPropertyMap.empty(),
-            Collections.emptyMap(),
-            Collections.emptySet()
-    );
+    private static final CssStyleResolver EMPTY = new CssStyleResolver(TypedPropertyMap.empty(),
+            Collections.emptyMap(), Collections.emptySet());
 
     private final TypedPropertyMap properties;
     private final Map<String, String> rawValues;
-    private final Set<String> inheritedProperties;   // properties set to "inherit"
+    private final Set<String> inheritedProperties; // properties set to "inherit"
 
-    private CssStyleResolver(TypedPropertyMap properties,
-                             Map<String, String> rawValues,
-                             Set<String> inheritedProperties) {
+    private CssStyleResolver(TypedPropertyMap properties, Map<String, String> rawValues,
+            Set<String> inheritedProperties) {
         this.properties = properties;
         this.rawValues = rawValues;
         this.inheritedProperties = inheritedProperties;
@@ -81,14 +78,16 @@ public final class CssStyleResolver implements StylePropertyResolver {
      * <p>
      * The resolution order is:
      * <ol>
-     *   <li>Check for a pre-converted value in the typed property map</li>
-     *   <li>Check for a raw CSS value and convert using the property's converter</li>
+     * <li>Check for a pre-converted value in the typed property map</li>
+     * <li>Check for a raw CSS value and convert using the property's converter</li>
      * </ol>
      * This allows widget-defined properties to be resolved from CSS without
      * requiring the CSS engine to know about all properties upfront.
      *
-     * @param property the property definition
-     * @param <T>      the type of the property value
+     * @param property
+     *            the property definition
+     * @param <T>
+     *            the type of the property value
      * @return the property value, or empty if not found
      */
     @Override
@@ -248,8 +247,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * Returns the border-chars string, if set.
-     * Format: 8 quoted strings (top-h, bottom-h, left-v, right-v, tl, tr, bl, br).
+     * Returns the border-chars string, if set. Format: 8 quoted strings (top-h,
+     * bottom-h, left-v, right-v, tl, tr, bl, br).
      *
      * @return the border-chars value
      */
@@ -366,16 +365,18 @@ public final class CssStyleResolver implements StylePropertyResolver {
     }
 
     /**
-     * Creates a new resolver that uses this resolver's properties but falls back
-     * to the given resolver for CSS-inheritable properties not set in this resolver.
+     * Creates a new resolver that uses this resolver's properties but falls back to
+     * the given resolver for CSS-inheritable properties not set in this resolver.
      * <p>
-     * Per CSS semantics, only certain properties inherit from parent to child.
-     * The inheritance behavior is defined per-property in {@link PropertyDefinition#isInheritable()}.
+     * Per CSS semantics, only certain properties inherit from parent to child. The
+     * inheritance behavior is defined per-property in
+     * {@link PropertyDefinition#isInheritable()}.
      * <p>
      * Additionally, this method handles the {@code inherit} keyword: properties
      * explicitly requesting parent's value.
      *
-     * @param fallback the fallback resolver for missing inheritable properties
+     * @param fallback
+     *            the fallback resolver for missing inheritable properties
      * @return a new resolver with fallback behavior for inheritable properties only
      */
     public CssStyleResolver withFallback(CssStyleResolver fallback) {
@@ -386,7 +387,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         // Merge raw values: start with child's own values
         Map<String, String> mergedRaw = new HashMap<>();
 
-        // Handle explicit "inherit" keyword - copy from parent regardless of inheritability
+        // Handle explicit "inherit" keyword - copy from parent regardless of
+        // inheritability
         for (String prop : this.inheritedProperties) {
             if (fallback.rawValues.containsKey(prop)) {
                 mergedRaw.put(prop, fallback.rawValues.get(prop));
@@ -414,7 +416,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         }
         TypedPropertyMap inheritedTyped = inheritBuilder.build();
 
-        // Merge: start with merged (has fallback inheritable), overlay with explicit inherited
+        // Merge: start with merged (has fallback inheritable), overlay with explicit
+        // inherited
         if (!inheritedTyped.isEmpty()) {
             Map<PropertyDefinition<?>, Object> finalMerged = new HashMap<>();
             for (PropertyDefinition<?> p : merged.properties()) {
@@ -434,9 +437,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void copyTypedProperty(TypedPropertyMap.Builder builder,
-                                       TypedPropertyMap source,
-                                       PropertyDefinition<T> property) {
+    private <T> void copyTypedProperty(TypedPropertyMap.Builder builder, TypedPropertyMap source,
+            PropertyDefinition<T> property) {
         source.get(property).ifPresent(v -> builder.put(property, v));
     }
 
@@ -464,9 +466,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets a typed property value.
          *
-         * @param property the property definition
-         * @param value    the property value
-         * @param <T>      the type of the property value
+         * @param property
+         *            the property definition
+         * @param value
+         *            the property value
+         * @param <T>
+         *            the type of the property value
          * @return this builder
          */
         public <T> Builder set(PropertyDefinition<T> property, T value) {
@@ -479,13 +484,15 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets a raw property value for lazy conversion.
          * <p>
-         * Raw values are stored by property name and converted lazily when
-         * accessed via {@link CssStyleResolver#get(PropertyDefinition)}.
-         * This enables widget-defined properties to be resolved from CSS
-         * without requiring the CSS engine to know all property definitions.
+         * Raw values are stored by property name and converted lazily when accessed via
+         * {@link CssStyleResolver#get(PropertyDefinition)}. This enables widget-defined
+         * properties to be resolved from CSS without requiring the CSS engine to know
+         * all property definitions.
          *
-         * @param propertyName the CSS property name
-         * @param value        the raw CSS value (already variable-resolved)
+         * @param propertyName
+         *            the CSS property name
+         * @param value
+         *            the raw CSS value (already variable-resolved)
          * @return this builder
          */
         public Builder setRaw(String propertyName, String value) {
@@ -498,7 +505,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the foreground color.
          *
-         * @param color the foreground color
+         * @param color
+         *            the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {
@@ -508,7 +516,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the background color.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -518,7 +527,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Adds a text modifier.
          *
-         * @param modifier the modifier to add
+         * @param modifier
+         *            the modifier to add
          * @return this builder
          */
         public Builder addModifier(Modifier modifier) {
@@ -529,7 +539,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Adds multiple text modifiers.
          *
-         * @param modifiers the modifiers to add
+         * @param modifiers
+         *            the modifiers to add
          * @return this builder
          */
         public Builder addModifiers(Set<Modifier> modifiers) {
@@ -542,7 +553,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the padding.
          *
-         * @param padding the padding
+         * @param padding
+         *            the padding
          * @return this builder
          */
         public Builder padding(Padding padding) {
@@ -552,7 +564,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the text alignment.
          *
-         * @param alignment the alignment
+         * @param alignment
+         *            the alignment
          * @return this builder
          */
         public Builder alignment(Alignment alignment) {
@@ -562,7 +575,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the border type.
          *
-         * @param borderType the border type
+         * @param borderType
+         *            the border type
          * @return this builder
          */
         public Builder borderType(BorderType borderType) {
@@ -572,7 +586,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the width constraint.
          *
-         * @param constraint the width constraint
+         * @param constraint
+         *            the width constraint
          * @return this builder
          */
         public Builder width(Constraint constraint) {
@@ -582,7 +597,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the flex layout mode.
          *
-         * @param flex the flex mode
+         * @param flex
+         *            the flex mode
          * @return this builder
          */
         public Builder flex(Flex flex) {
@@ -592,7 +608,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the layout direction.
          *
-         * @param direction the direction
+         * @param direction
+         *            the direction
          * @return this builder
          */
         public Builder direction(Direction direction) {
@@ -602,7 +619,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the margin.
          *
-         * @param margin the margin
+         * @param margin
+         *            the margin
          * @return this builder
          */
         public Builder margin(Margin margin) {
@@ -612,7 +630,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the spacing (gap between elements).
          *
-         * @param spacing the spacing
+         * @param spacing
+         *            the spacing
          * @return this builder
          */
         public Builder spacing(Integer spacing) {
@@ -622,7 +641,8 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Sets the height constraint (for vertical layouts).
          *
-         * @param constraint the height constraint
+         * @param constraint
+         *            the height constraint
          * @return this builder
          */
         public Builder heightConstraint(Constraint constraint) {
@@ -632,11 +652,12 @@ public final class CssStyleResolver implements StylePropertyResolver {
         /**
          * Marks a property as using the "inherit" keyword.
          * <p>
-         * This indicates that the child element wants to explicitly inherit
-         * this property's value from its parent, regardless of whether the
-         * property is normally inheritable.
+         * This indicates that the child element wants to explicitly inherit this
+         * property's value from its parent, regardless of whether the property is
+         * normally inheritable.
          *
-         * @param propertyName the CSS property name
+         * @param propertyName
+         *            the CSS property name
          * @return this builder
          */
         public Builder markAsInherited(String propertyName) {

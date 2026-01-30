@@ -4,17 +4,18 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
+import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -54,10 +55,8 @@ class ConstraintCssTest {
         void cssHeightFixed() {
             setupBuffer(20, 10);
 
-            column(
-                text("A").addClass("height-fixed"),  // height: 3
-                text("B")
-            ).render(frame, new Rect(0, 0, 20, 10), context);
+            column(text("A").addClass("height-fixed"), // height: 3
+                    text("B")).render(frame, new Rect(0, 0, 20, 10), context);
 
             // A should be at row 0
             assertThat(buffer).hasSymbolAt(0, 0, "A");
@@ -70,10 +69,8 @@ class ConstraintCssTest {
         void cssHeightFit() {
             setupBuffer(20, 10);
 
-            column(
-                text("Line1\nLine2").addClass("height-fit"),  // Should be 2 rows
-                text("After")
-            ).render(frame, new Rect(0, 0, 20, 10), context);
+            column(text("Line1\nLine2").addClass("height-fit"), // Should be 2 rows
+                    text("After")).render(frame, new Rect(0, 0, 20, 10), context);
 
             // First text at row 0
             assertThat(buffer).hasSymbolAt(0, 0, "L");
@@ -91,10 +88,8 @@ class ConstraintCssTest {
         void cssWidthFixed() {
             setupBuffer(30, 1);
 
-            row(
-                text("A").addClass("width-fixed"),  // width: 10
-                text("B")
-            ).render(frame, new Rect(0, 0, 30, 1), context);
+            row(text("A").addClass("width-fixed"), // width: 10
+                    text("B")).render(frame, new Rect(0, 0, 30, 1), context);
 
             // A at column 0
             assertThat(buffer).hasSymbolAt(0, 0, "A");
@@ -107,10 +102,8 @@ class ConstraintCssTest {
         void cssWidthFit() {
             setupBuffer(30, 1);
 
-            row(
-                text("Hello").addClass("width-fit"),  // Should be 5 columns
-                text("World")
-            ).render(frame, new Rect(0, 0, 30, 1), context);
+            row(text("Hello").addClass("width-fit"), // Should be 5 columns
+                    text("World")).render(frame, new Rect(0, 0, 30, 1), context);
 
             // "Hello" at column 0
             assertThat(buffer).hasSymbolAt(0, 0, "H");
@@ -123,10 +116,8 @@ class ConstraintCssTest {
         void cssWidthPercent() {
             setupBuffer(40, 1);
 
-            row(
-                text("A").addClass("width-percent"),  // width: 25% = 10 columns
-                text("B")
-            ).render(frame, new Rect(0, 0, 40, 1), context);
+            row(text("A").addClass("width-percent"), // width: 25% = 10 columns
+                    text("B")).render(frame, new Rect(0, 0, 40, 1), context);
 
             // A at column 0
             assertThat(buffer).hasSymbolAt(0, 0, "A");
@@ -146,11 +137,8 @@ class ConstraintCssTest {
 
             // .parent-row .child-text { width: fit; }
             // .parent-row { flex: center; }
-            row(
-                text("Short").addClass("child-text"),
-                text("Rest")
-            ).addClass("parent-row")
-             .render(frame, new Rect(0, 0, 40, 1), context);
+            row(text("Short").addClass("child-text"), text("Rest")).addClass("parent-row")
+                    .render(frame, new Rect(0, 0, 40, 1), context);
 
             // With width: fit, "Short" takes only 5 columns
             // "Rest" also fits to its preferred width of 4 columns
@@ -171,10 +159,8 @@ class ConstraintCssTest {
         void programmaticOverridesCssHeight() {
             setupBuffer(20, 10);
 
-            column(
-                text("A").addClass("height-fixed").length(5),  // CSS: 3, programmatic: 5
-                text("B")
-            ).render(frame, new Rect(0, 0, 20, 10), context);
+            column(text("A").addClass("height-fixed").length(5), // CSS: 3, programmatic: 5
+                    text("B")).render(frame, new Rect(0, 0, 20, 10), context);
 
             // A should be at row 0
             assertThat(buffer).hasSymbolAt(0, 0, "A");
@@ -187,10 +173,8 @@ class ConstraintCssTest {
         void programmaticOverridesCssWidth() {
             setupBuffer(30, 1);
 
-            row(
-                text("A").addClass("width-fixed").length(15),  // CSS: 10, programmatic: 15
-                text("B")
-            ).render(frame, new Rect(0, 0, 30, 1), context);
+            row(text("A").addClass("width-fixed").length(15), // CSS: 10, programmatic: 15
+                    text("B")).render(frame, new Rect(0, 0, 30, 1), context);
 
             // A at column 0
             assertThat(buffer).hasSymbolAt(0, 0, "A");

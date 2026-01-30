@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * Tooling API model containing all demo projects.
  * <p>
- * This model is used by the demo selector to discover demos
- * without parsing build files directly.
+ * This model is used by the demo selector to discover demos without parsing
+ * build files directly.
  */
 public interface DemosModel {
 

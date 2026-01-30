@@ -6,6 +6,10 @@
  */
 package dev.tamboui.demo;
 
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.toolkit.app.InlineApp;
@@ -14,10 +18,6 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.InlineTuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
-
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 
 import static dev.tamboui.toolkit.InlineToolkit.*;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -28,20 +28,17 @@ import static dev.tamboui.toolkit.Toolkit.*;
  * This demo recreates the same multi-phase UI as InlineProgressDemo but using
  * the toolkit's element-based DSL instead of manual widget composition.
  * <p>
- * Compare the ~400 lines of InlineProgressDemo with this ~200 line version
- * to see how the toolkit simplifies inline progress displays.
+ * Compare the ~400 lines of InlineProgressDemo with this ~200 line version to
+ * see how the toolkit simplifies inline progress displays.
  */
 public class InlineToolkitDemo extends InlineApp {
 
     private static final String[] SPINNER = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
 
     private static final List<Package> PACKAGES = Arrays.asList(
-            new Package("lodash", "4.17.21", 150),
-            new Package("express", "4.18.2", 280),
-            new Package("typescript", "5.3.3", 420),
-            new Package("react", "18.2.0", 310),
-            new Package("webpack", "5.89.0", 890)
-    );
+            new Package("lodash", "4.17.21", 150), new Package("express", "4.18.2", 280),
+            new Package("typescript", "5.3.3", 420), new Package("react", "18.2.0", 310),
+            new Package("webpack", "5.89.0", 890));
 
     private static final String[] NATIVE_MODULES = {"node-sass", "bcrypt", "sharp"};
 
@@ -73,8 +70,11 @@ public class InlineToolkitDemo extends InlineApp {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         System.out.println("=== Inline Toolkit Demo ===\n");
@@ -91,9 +91,7 @@ public class InlineToolkitDemo extends InlineApp {
 
     @Override
     protected InlineTuiConfig configure(int height) {
-        return InlineTuiConfig.builder(height)
-                .tickRate(Duration.ofMillis(30))
-                .clearOnClose(false)
+        return InlineTuiConfig.builder(height).tickRate(Duration.ofMillis(30)).clearOnClose(false)
                 .build();
     }
 
@@ -112,92 +110,60 @@ public class InlineToolkitDemo extends InlineApp {
 
     private Element renderFormInput() {
         return column(
-                row(
-                        text("Project: ").bold().fit(),
-                        textInput(projectNameState)
-                                .id("project")
-                                .placeholder("my-project")
+                row(text("Project: ").bold().fit(),
+                        textInput(projectNameState).id("project").placeholder("my-project")
                                 .constraint(Constraint.length(25))
-                                .onSubmit(() -> runner().focusManager().focusNext())
-                ).flex(Flex.START),
-                row(
-                        text("Author:  ").bold().fit(),
-                        textInput(authorState)
-                                .id("author")
-                                .placeholder("Your Name")
-                                .constraint(Constraint.length(25))
-                                .onSubmit(this::submitForm)
-                ).flex(Flex.START),
+                                .onSubmit(() -> runner().focusManager().focusNext()))
+                        .flex(Flex.START),
+                row(text("Author:  ").bold().fit(),
+                        textInput(authorState).id("author").placeholder("Your Name")
+                                .constraint(Constraint.length(25)).onSubmit(this::submitForm))
+                        .flex(Flex.START),
                 spacer(),
-                text("[Tab/Enter] Next field  [Enter on last] Start install  [q] Quit").dim()
-        );
+                text("[Tab/Enter] Next field  [Enter on last] Start install  [q] Quit").dim());
     }
 
     private void submitForm() {
         String project = projectNameState.text().isEmpty() ? "my-project" : projectNameState.text();
         String author = authorState.text().isEmpty() ? "anonymous" : authorState.text();
         println(text(""));
-        println(row(
-                text("Creating ").fit(),
-                text(project).cyan().fit(),
-                text(" by ").fit(),
-                text(author).green().fit()
-        ).flex(Flex.START));
+        println(row(text("Creating ").fit(), text(project).cyan().fit(), text(" by ").fit(),
+                text(author).green().fit()).flex(Flex.START));
         println(text(""));
         phase = Phase.NPM_INSTALL;
     }
-
 
     private Element renderNpmInstall() {
         Package pkg = PACKAGES.get(currentIndex);
         int currentDownloaded = downloadedSize + (pkg.sizeKb * pkgProgress / 100);
 
         return column(
-                row(
-                        text(SPINNER[spinnerIndex] + " ").cyan(),
-                        text("Installing "),
-                        text(pkg.name).bold()
-                ).flex(Flex.START),
+                row(text(SPINNER[spinnerIndex] + " ").cyan(), text("Installing "),
+                        text(pkg.name).bold()).flex(Flex.START),
                 gauge((double) currentDownloaded / TOTAL_SIZE).green(),
                 scope(showDetails,
                         text("  resolving: " + pkg.name + "@^" + pkg.version).dim().fit(),
-                        text("  registry: https://registry.npmjs.org/" + pkg.name).dim().fit()
-                ),
-                row(
-                        text(currentIndex + "/" + PACKAGES.size()).yellow(),
-                        text(" packages  "),
+                        text("  registry: https://registry.npmjs.org/" + pkg.name).dim().fit()),
+                row(text(currentIndex + "/" + PACKAGES.size()).yellow(), text(" packages  "),
                         text(formatSize(currentDownloaded)).cyan(),
                         text(" / " + formatSize(TOTAL_SIZE) + "  "),
-                        text("[d] " + (showDetails ? "hide" : "show") + " details").dim()
-                ).flex(Flex.START)
-        ).focusable().onKeyEvent(this::handleDetailsKey);
+                        text("[d] " + (showDetails ? "hide" : "show") + " details").dim())
+                        .flex(Flex.START))
+                .focusable().onKeyEvent(this::handleDetailsKey);
     }
 
     private Element renderNpmComplete() {
-        return column(
-                row(
-                        text("added "),
-                        text(String.valueOf(PACKAGES.size())).green(),
-                        text(" packages in 2.3s")
-                ).flex(Flex.START),
-                spacer(),
-                spacer(),
-                spacer()
-        );
+        return column(row(text("added "), text(String.valueOf(PACKAGES.size())).green(),
+                text(" packages in 2.3s")).flex(Flex.START), spacer(), spacer(), spacer());
     }
 
     private Element renderPromptContinue() {
         // Use element-level key handler - element must be focusable
         return column(
-                row(
-                        text("? ").cyan().bold().constraint(Constraint.fit()),
+                row(text("? ").cyan().bold().constraint(Constraint.fit()),
                         text("Continue with native module build? ").constraint(Constraint.fit()),
-                        text("[Y/n] ").dim().constraint(Constraint.fit())
-                ).flex(Flex.START),
-                spacer(),
-                spacer(),
-                spacer()
-        ).focusable().onKeyEvent(this::handlePromptKey);
+                        text("[Y/n] ").dim().constraint(Constraint.fit())).flex(Flex.START),
+                spacer(), spacer(), spacer()).focusable().onKeyEvent(this::handlePromptKey);
     }
 
     private EventResult handlePromptKey(KeyEvent keyEvent) {
@@ -232,39 +198,28 @@ public class InlineToolkitDemo extends InlineApp {
         String module = NATIVE_MODULES[currentIndex];
 
         return column(
-                row(
-                        text(SPINNER[spinnerIndex] + " ").cyan(),
-                        text("Compiling "),
-                        text(module).bold(),
-                        text("...")
-                ).flex(Flex.START),
+                row(text(SPINNER[spinnerIndex] + " ").cyan(), text("Compiling "),
+                        text(module).bold(), text("...")).flex(Flex.START),
                 gauge(pkgProgress / 100.0).green(),
                 scope(showDetails,
-                        text("  cc: " + module + "/src/binding.cc -o build/" + module + ".o").dim().fit(),
-                        text("  link: build/" + module + ".node").dim().fit()
-                ),
-                row(
-                        text((currentIndex + 1) + "/" + NATIVE_MODULES.length).yellow(),
+                        text("  cc: " + module + "/src/binding.cc -o build/" + module + ".o").dim()
+                                .fit(),
+                        text("  link: build/" + module + ".node").dim().fit()),
+                row(text((currentIndex + 1) + "/" + NATIVE_MODULES.length).yellow(),
                         text(" modules  "),
-                        text("[d] " + (showDetails ? "hide" : "show") + " details").dim()
-                ).flex(Flex.START)
-        ).focusable().onKeyEvent(this::handleDetailsKey);
+                        text("[d] " + (showDetails ? "hide" : "show") + " details").dim())
+                        .flex(Flex.START))
+                .focusable().onKeyEvent(this::handleDetailsKey);
     }
 
     private Element renderBuildComplete() {
-        return column(
-                row(
-                        text("✓ ").green().fit(),
-                        text("Built " + NATIVE_MODULES.length + " native modules").fit()
-                ).flex(Flex.START)
-        );
+        return column(row(text("✓ ").green().fit(),
+                text("Built " + NATIVE_MODULES.length + " native modules").fit()).flex(Flex.START));
     }
 
     private Element renderDone() {
-        return column(
-                text("Installation complete!").green().bold(),
-                text("Run 'npm start' to begin.")
-        );
+        return column(text("Installation complete!").green().bold(),
+                text("Run 'npm start' to begin."));
     }
 
     @Override
@@ -315,11 +270,9 @@ public class InlineToolkitDemo extends InlineApp {
 
         if (pkgProgress > 100) {
             Package pkg = PACKAGES.get(currentIndex);
-            println(row(
-                    text("+ ").green().constraint(Constraint.fit()),
+            println(row(text("+ ").green().constraint(Constraint.fit()),
                     text(pkg.name).constraint(Constraint.fit()),
-                    text("@" + pkg.version).dim().constraint(Constraint.fit())
-            ).flex(Flex.START));
+                    text("@" + pkg.version).dim().constraint(Constraint.fit())).flex(Flex.START));
 
             downloadedSize += pkg.sizeKb;
             currentIndex++;
@@ -337,11 +290,9 @@ public class InlineToolkitDemo extends InlineApp {
 
         if (pkgProgress > 100) {
             String module = NATIVE_MODULES[currentIndex];
-            println(row(
-                    text("✓ ").green().constraint(Constraint.fit()),
+            println(row(text("✓ ").green().constraint(Constraint.fit()),
                     text("Built ").constraint(Constraint.fit()),
-                    text(module).constraint(Constraint.fit())
-            ).flex(Flex.START));
+                    text(module).constraint(Constraint.fit())).flex(Flex.START));
 
             currentIndex++;
             pkgProgress = 0;
@@ -361,13 +312,7 @@ public class InlineToolkitDemo extends InlineApp {
     }
 
     private enum Phase {
-        FORM_INPUT,
-        NPM_INSTALL,
-        NPM_COMPLETE,
-        PROMPT_CONTINUE,
-        NATIVE_BUILD,
-        BUILD_COMPLETE,
-        DONE
+        FORM_INPUT, NPM_INSTALL, NPM_COMPLETE, PROMPT_CONTINUE, NATIVE_BUILD, BUILD_COMPLETE, DONE
     }
 
     private static class Package {

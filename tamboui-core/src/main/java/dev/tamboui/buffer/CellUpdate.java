@@ -15,9 +15,12 @@ public final class CellUpdate {
     /**
      * Creates a cell update at the given position.
      *
-     * @param x    the column position
-     * @param y    the row position
-     * @param cell the cell value
+     * @param x
+     *            the column position
+     * @param y
+     *            the row position
+     * @param cell
+     *            the cell value
      */
     public CellUpdate(int x, int y, Cell cell) {
         this.x = x;

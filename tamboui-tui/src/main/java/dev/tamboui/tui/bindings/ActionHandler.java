@@ -4,9 +4,6 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.annotations.bindings.OnAction;
-import dev.tamboui.tui.event.Event;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +14,9 @@ import java.util.ServiceLoader;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import dev.tamboui.annotations.bindings.OnAction;
+import dev.tamboui.tui.event.Event;
+
 /**
  * Dispatches events to registered action handlers.
  * <p>
@@ -25,10 +25,8 @@ import java.util.function.Consumer;
  * against the bindings and the corresponding handlers are invoked.
  *
  * <pre>{@code
- * ActionHandler handler = new ActionHandler(BindingSets.vim())
- *     .on(Actions.QUIT, e -> runner.quit())
- *     .on("save", this::save)
- *     .on("delete", this::delete);
+ * ActionHandler handler = new ActionHandler(BindingSets.vim()).on(Actions.QUIT, e -> runner.quit())
+ *         .on("save", this::save).on("delete", this::delete);
  *
  * // In event handler:
  * if (handler.dispatch(event)) {
@@ -46,7 +44,8 @@ public final class ActionHandler {
     /**
      * Creates a new action handler with the given bindings.
      *
-     * @param bindings the bindings to use for matching events to actions
+     * @param bindings
+     *            the bindings to use for matching events to actions
      */
     public ActionHandler(Bindings bindings) {
         this.bindings = bindings;
@@ -55,11 +54,13 @@ public final class ActionHandler {
     /**
      * Registers a handler for the specified action.
      * <p>
-     * Multiple handlers can be registered for the same action; they will
-     * be invoked in registration order when the action is triggered.
+     * Multiple handlers can be registered for the same action; they will be invoked
+     * in registration order when the action is triggered.
      *
-     * @param action  the action name to handle
-     * @param handler the handler to invoke when the action is triggered
+     * @param action
+     *            the action name to handle
+     * @param handler
+     *            the handler to invoke when the action is triggered
      * @return this handler for method chaining
      */
     public ActionHandler on(String action, Consumer<Event> handler) {
@@ -68,16 +69,19 @@ public final class ActionHandler {
     }
 
     /**
-     * Registers a handler for the specified action that also receives the action name.
+     * Registers a handler for the specified action that also receives the action
+     * name.
      * <p>
-     * This is useful when the same handler is registered for multiple actions
-     * and needs to know which action triggered it.
+     * This is useful when the same handler is registered for multiple actions and
+     * needs to know which action triggered it.
      * <p>
-     * Multiple handlers can be registered for the same action; they will
-     * be invoked in registration order when the action is triggered.
+     * Multiple handlers can be registered for the same action; they will be invoked
+     * in registration order when the action is triggered.
      *
-     * @param action  the action name to handle
-     * @param handler the handler to invoke, receiving the event and action name
+     * @param action
+     *            the action name to handle
+     * @param handler
+     *            the handler to invoke, receiving the event and action name
      * @return this handler for method chaining
      */
     public ActionHandler on(String action, BiConsumer<Event, String> handler) {
@@ -88,7 +92,8 @@ public final class ActionHandler {
     /**
      * Removes all handlers for the specified action.
      *
-     * @param action the action name
+     * @param action
+     *            the action name
      * @return this handler for method chaining
      */
     public ActionHandler off(String action) {
@@ -99,10 +104,11 @@ public final class ActionHandler {
     /**
      * Sets the bindings used for matching events to actions.
      * <p>
-     * This allows changing the key bindings at runtime without
-     * re-registering handlers.
+     * This allows changing the key bindings at runtime without re-registering
+     * handlers.
      *
-     * @param bindings the new bindings to use
+     * @param bindings
+     *            the new bindings to use
      */
     public void setBindings(Bindings bindings) {
         this.bindings = bindings;
@@ -120,13 +126,14 @@ public final class ActionHandler {
     /**
      * Dispatches an event to registered handlers.
      * <p>
-     * The event is matched against the bindings. If a matching action is found
-     * and handlers are registered for that action, all handlers are invoked
-     * in registration order.
+     * The event is matched against the bindings. If a matching action is found and
+     * handlers are registered for that action, all handlers are invoked in
+     * registration order.
      *
-     * @param event the event to dispatch
-     * @return true if the event was handled (action found with registered handlers),
-     *         false otherwise
+     * @param event
+     *            the event to dispatch
+     * @return true if the event was handled (action found with registered
+     *         handlers), false otherwise
      */
     public boolean dispatch(Event event) {
         Optional<String> action = bindings.actionFor(event);
@@ -146,7 +153,8 @@ public final class ActionHandler {
     /**
      * Checks if any handlers are registered for the specified action.
      *
-     * @param action the action name
+     * @param action
+     *            the action name
      * @return true if handlers are registered, false otherwise
      */
     public boolean hasHandlers(String action) {
@@ -157,12 +165,15 @@ public final class ActionHandler {
     /**
      * Discovers and registers action handlers from the target object.
      * <p>
-     * First attempts to find generated {@link ActionHandlerRegistrar} implementations
-     * via ServiceLoader. If no registrar is found for the target's exact class,
-     * falls back to reflection-based discovery of {@code @OnAction} annotated methods.
+     * First attempts to find generated {@link ActionHandlerRegistrar}
+     * implementations via ServiceLoader. If no registrar is found for the target's
+     * exact class, falls back to reflection-based discovery of {@code @OnAction}
+     * annotated methods.
      *
-     * @param target the object containing {@code @OnAction} annotated methods
-     * @param <T>    the target type
+     * @param target
+     *            the object containing {@code @OnAction} annotated methods
+     * @param <T>
+     *            the target type
      * @return this handler for method chaining
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -170,8 +181,8 @@ public final class ActionHandler {
         Class<?> targetClass = target.getClass();
         boolean foundRegistrar = false;
 
-        ServiceLoader<ActionHandlerRegistrar> loader =
-                ServiceLoader.load(ActionHandlerRegistrar.class);
+        ServiceLoader<ActionHandlerRegistrar> loader = ServiceLoader
+                .load(ActionHandlerRegistrar.class);
         for (ActionHandlerRegistrar<?> registrar : loader) {
             if (registrar.targetType() == targetClass) {
                 ((ActionHandlerRegistrar<T>) registrar).register(target, this);
@@ -187,7 +198,8 @@ public final class ActionHandler {
     }
 
     /**
-     * Registers action handlers via reflection by scanning for {@code @OnAction} methods.
+     * Registers action handlers via reflection by scanning for {@code @OnAction}
+     * methods.
      */
     private <T> void registerViaReflection(T target) {
         for (Method method : target.getClass().getDeclaredMethods()) {

@@ -4,40 +4,40 @@
  */
 package dev.tamboui.toolkit.event;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Set;
+
 import dev.tamboui.css.Styleable;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.layout.Rect;
-
-import java.util.Collections;
-import java.util.Set;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-
 /**
  * Routes events to elements based on focus and position.
  * <p>
  * Events are routed as follows:
  * <ul>
- *   <li>Key events go to the focused element</li>
- *   <li>Mouse events go to the element at the mouse position</li>
- *   <li>Tab/Shift+Tab navigate focus</li>
- *   <li>Drag events are tracked and routed to the dragged element</li>
+ * <li>Key events go to the focused element</li>
+ * <li>Mouse events go to the element at the mouse position</li>
+ * <li>Tab/Shift+Tab navigate focus</li>
+ * <li>Drag events are tracked and routed to the dragged element</li>
  * </ul>
  * <p>
  * Events can be consumed by handlers to stop propagation.
  * <p>
  * The router uses an {@link ElementRegistry} to track element areas by ID,
- * which can be used by external systems (like effects) to look up element positions.
+ * which can be used by external systems (like effects) to look up element
+ * positions.
  */
 public final class EventRouter {
 
@@ -56,8 +56,10 @@ public final class EventRouter {
     /**
      * Creates a new event router.
      *
-     * @param focusManager    the focus manager for focus navigation
-     * @param elementRegistry the registry for tracking element areas by ID
+     * @param focusManager
+     *            the focus manager for focus navigation
+     * @param elementRegistry
+     *            the registry for tracking element areas by ID
      */
     public EventRouter(FocusManager focusManager, ElementRegistry elementRegistry) {
         this.focusManager = focusManager;
@@ -68,7 +70,8 @@ public final class EventRouter {
      * Adds a global event handler that is called before element-specific handlers.
      * Global handlers can intercept events before they reach elements.
      *
-     * @param handler the handler to add
+     * @param handler
+     *            the handler to add
      */
     public void addGlobalHandler(GlobalEventHandler handler) {
         globalHandlers.add(handler);
@@ -77,39 +80,42 @@ public final class EventRouter {
     /**
      * Adds an action handler as a global event handler.
      * <p>
-     * This is a convenience method that wraps the action handler.
-     * Events are dispatched to the action handler before reaching elements.
+     * This is a convenience method that wraps the action handler. Events are
+     * dispatched to the action handler before reaching elements.
      *
-     * @param handler the action handler to add
+     * @param handler
+     *            the action handler to add
      */
     public void addGlobalHandler(ActionHandler handler) {
-        addGlobalHandler(event -> handler.dispatch(event)
-                ? EventResult.HANDLED
-                : EventResult.UNHANDLED);
+        addGlobalHandler(
+                event -> handler.dispatch(event) ? EventResult.HANDLED : EventResult.UNHANDLED);
     }
 
     /**
      * Removes a global event handler.
      *
-     * @param handler the handler to remove
+     * @param handler
+     *            the handler to remove
      */
     public void removeGlobalHandler(GlobalEventHandler handler) {
         globalHandlers.remove(handler);
     }
 
     /**
-     * Registers an element for event routing.
-     * Called during rendering to build the element list.
-     * The area is stored internally - elements don't need to track it.
+     * Registers an element for event routing. Called during rendering to build the
+     * element list. The area is stored internally - elements don't need to track
+     * it.
      * <p>
-     * If an element is already registered, this updates its area but
-     * does not add a duplicate entry.
+     * If an element is already registered, this updates its area but does not add a
+     * duplicate entry.
      * <p>
-     * Elements are also registered in the {@link ElementRegistry}
-     * for CSS-like queries by external systems (like effects).
+     * Elements are also registered in the {@link ElementRegistry} for CSS-like
+     * queries by external systems (like effects).
      *
-     * @param element the element to register
-     * @param area the element's rendered area
+     * @param element
+     *            the element to register
+     * @param area
+     *            the element's rendered area
      */
     public void registerElement(Element element, Rect area) {
         // Prevent duplicate registration (element identity check)
@@ -140,8 +146,8 @@ public final class EventRouter {
     }
 
     /**
-     * Clears all registered elements.
-     * Should be called at the start of each render cycle.
+     * Clears all registered elements. Should be called at the start of each render
+     * cycle.
      */
     public void clear() {
         elements.clear();
@@ -152,11 +158,13 @@ public final class EventRouter {
     /**
      * Routes an event to the appropriate element(s).
      * <p>
-     * For key events, the focused element is given first chance to handle the event.
-     * This allows text inputs to consume character keys before global handlers see them.
-     * Global handlers are called after element routing if the event wasn't handled.
+     * For key events, the focused element is given first chance to handle the
+     * event. This allows text inputs to consume character keys before global
+     * handlers see them. Global handlers are called after element routing if the
+     * event wasn't handled.
      *
-     * @param event the event to route
+     * @param event
+     *            the event to route
      * @return HANDLED if any handler handled the event, UNHANDLED otherwise
      */
     public EventResult route(Event event) {
@@ -223,7 +231,8 @@ public final class EventRouter {
         }
 
         // Call global handlers after focused element but before unfocused elements
-        // This allows global actions (like quit) to work when text input doesn't consume the key
+        // This allows global actions (like quit) to work when text input doesn't
+        // consume the key
         for (GlobalEventHandler handler : globalHandlers) {
             EventResult result = handler.handle(event);
             if (result.isHandled()) {
@@ -316,9 +325,8 @@ public final class EventRouter {
         }
 
         // Route other mouse events to element at position
-        if (event.kind() == MouseEventKind.MOVE ||
-            event.kind() == MouseEventKind.SCROLL_UP ||
-            event.kind() == MouseEventKind.SCROLL_DOWN) {
+        if (event.kind() == MouseEventKind.MOVE || event.kind() == MouseEventKind.SCROLL_UP
+                || event.kind() == MouseEventKind.SCROLL_DOWN) {
 
             for (int i = elements.size() - 1; i >= 0; i--) {
                 Element element = elements.get(i);
@@ -388,8 +396,8 @@ public final class EventRouter {
     /**
      * Returns the element registry used by this router.
      * <p>
-     * The registry contains ID-to-area mappings for all elements with IDs.
-     * External systems (like effects) can use this to look up element positions.
+     * The registry contains ID-to-area mappings for all elements with IDs. External
+     * systems (like effects) can use this to look up element positions.
      *
      * @return the element registry
      */

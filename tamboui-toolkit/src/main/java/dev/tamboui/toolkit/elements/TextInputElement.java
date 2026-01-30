@@ -4,14 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.toolkit.event.EventResult;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.id.IdGenerator;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -20,10 +23,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.input.TextInput;
 import dev.tamboui.widgets.input.TextInputState;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
 /**
@@ -31,29 +30,30 @@ import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
  * <p>
  * A single-line text input field. This element is always focusable to receive
  * keyboard input for text editing.
+ * 
  * <pre>{@code
- * textInput(inputState)
- *     .placeholder("Enter name...")
- *     .title("Name")
- *     .rounded()
+ * textInput(inputState).placeholder("Enter name...").title("Name").rounded()
  * }</pre>
  *
  * <h2>CSS Child Selectors</h2>
  * <p>
  * The following child selectors can be used to style sub-components:
  * <ul>
- *   <li>{@code TextInputElement-cursor} - The cursor style (default: reversed)</li>
- *   <li>{@code TextInputElement-placeholder} - The placeholder text style (default: dim)</li>
+ * <li>{@code TextInputElement-cursor} - The cursor style (default:
+ * reversed)</li>
+ * <li>{@code TextInputElement-placeholder} - The placeholder text style
+ * (default: dim)</li>
  * </ul>
  * <p>
  * Example CSS:
+ * 
  * <pre>{@code
  * TextInputElement-cursor { text-style: reversed; background: yellow; }
  * TextInputElement-placeholder { color: gray; text-style: italic; }
  * }</pre>
  * <p>
- * Note: Programmatic styles set via {@link #cursorStyle(Style)} or {@link #placeholderStyle(Style)}
- * take precedence over CSS styles.
+ * Note: Programmatic styles set via {@link #cursorStyle(Style)} or
+ * {@link #placeholderStyle(Style)} take precedence over CSS styles.
  */
 public final class TextInputElement extends StyledElement<TextInputElement> {
 
@@ -81,7 +81,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Creates a new text input element with the given state.
      *
-     * @param state the text input state, or null for a default state
+     * @param state
+     *            the text input state, or null for a default state
      */
     public TextInputElement(TextInputState state) {
         this.state = state != null ? state : new TextInputState();
@@ -90,10 +91,11 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Returns whether this text input is focusable.
      * <p>
-     * By default, text inputs are focusable to receive keyboard input.
-     * Use {@link #focusable(boolean)} to disable focusability for display-only inputs.
+     * By default, text inputs are focusable to receive keyboard input. Use
+     * {@link #focusable(boolean)} to disable focusability for display-only inputs.
      *
-     * @return true if focusable (default), false if disabled via {@link #focusable(boolean)}
+     * @return true if focusable (default), false if disabled via
+     *         {@link #focusable(boolean)}
      */
     @Override
     public boolean isFocusable() {
@@ -104,11 +106,12 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
      * Sets whether this text input is focusable.
      * <p>
      * By default, text inputs are focusable. Set to {@code false} for display-only
-     * inputs that should not participate in TAB navigation or receive keyboard events.
-     * This is useful when the text input is used to display read-only data within
-     * a container that handles its own key events.
+     * inputs that should not participate in TAB navigation or receive keyboard
+     * events. This is useful when the text input is used to display read-only data
+     * within a container that handles its own key events.
      *
-     * @param focusable true to make focusable (default), false to disable
+     * @param focusable
+     *            true to make focusable (default), false to disable
      * @return this element for chaining
      */
     public TextInputElement focusable(boolean focusable) {
@@ -119,7 +122,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the text input state.
      *
-     * @param state the text input state
+     * @param state
+     *            the text input state
      * @return this builder
      */
     public TextInputElement state(TextInputState state) {
@@ -130,7 +134,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the initial text.
      *
-     * @param text the initial text content
+     * @param text
+     *            the initial text content
      * @return this builder
      */
     public TextInputElement text(String text) {
@@ -143,7 +148,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the placeholder text.
      *
-     * @param placeholder the placeholder text
+     * @param placeholder
+     *            the placeholder text
      * @return this builder
      */
     public TextInputElement placeholder(String placeholder) {
@@ -154,7 +160,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the placeholder style.
      *
-     * @param style the placeholder style
+     * @param style
+     *            the placeholder style
      * @return this builder
      */
     public TextInputElement placeholderStyle(Style style) {
@@ -165,7 +172,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the placeholder color.
      *
-     * @param color the placeholder color
+     * @param color
+     *            the placeholder color
      * @return this builder
      */
     public TextInputElement placeholderColor(Color color) {
@@ -176,7 +184,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the cursor style.
      *
-     * @param style the cursor style
+     * @param style
+     *            the cursor style
      * @return this builder
      */
     public TextInputElement cursorStyle(Style style) {
@@ -187,7 +196,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets whether to show the cursor.
      *
-     * @param show true to show the cursor
+     * @param show
+     *            true to show the cursor
      * @return this builder
      */
     public TextInputElement showCursor(boolean show) {
@@ -198,12 +208,14 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets whether the cursor requires focus to be displayed.
      * <p>
-     * When {@code true} (default), the cursor is only shown when this element is focused.
-     * When {@code false}, the cursor is shown whenever {@link #showCursor(boolean)} is true,
-     * regardless of focus state. This is useful when the text input is inside a focusable
-     * container that handles key events manually.
+     * When {@code true} (default), the cursor is only shown when this element is
+     * focused. When {@code false}, the cursor is shown whenever
+     * {@link #showCursor(boolean)} is true, regardless of focus state. This is
+     * useful when the text input is inside a focusable container that handles key
+     * events manually.
      *
-     * @param requiresFocus true to require focus for cursor display
+     * @param requiresFocus
+     *            true to require focus for cursor display
      * @return this element for chaining
      */
     public TextInputElement cursorRequiresFocus(boolean requiresFocus) {
@@ -214,7 +226,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the title for the border.
      *
-     * @param title the border title
+     * @param title
+     *            the border title
      * @return this builder
      */
     public TextInputElement title(String title) {
@@ -235,7 +248,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this builder
      */
     public TextInputElement borderColor(Color color) {
@@ -246,10 +260,12 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
     /**
      * Sets the border color when focused.
      * <p>
-     * When set, this color overrides the normal border color when the element has focus.
-     * If not set, CSS {@code :focus} pseudo-class can be used to style the focused border.
+     * When set, this color overrides the normal border color when the element has
+     * focus. If not set, CSS {@code :focus} pseudo-class can be used to style the
+     * focused border.
      *
-     * @param color the focused border color
+     * @param color
+     *            the focused border color
      * @return this builder
      */
     public TextInputElement focusedBorderColor(Color color) {
@@ -291,7 +307,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
      * <p>
      * Use this for form submission or to move to the next field.
      *
-     * @param onSubmit the callback to invoke on Enter
+     * @param onSubmit
+     *            the callback to invoke on Enter
      * @return this element for chaining
      */
     public TextInputElement onSubmit(Runnable onSubmit) {
@@ -303,11 +320,13 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
      * Handles a key event for text input.
      * <p>
      * Handles: character input, backspace, delete, left/right arrows, home/end.
-     * Enter triggers the onSubmit callback if set.
-     * Only processes events when focused.
+     * Enter triggers the onSubmit callback if set. Only processes events when
+     * focused.
      *
-     * @param event the key event
-     * @param focused whether this element is currently focused
+     * @param event
+     *            the key event
+     * @param focused
+     *            whether this element is currently focused
      * @return HANDLED if the event was processed, UNHANDLED otherwise
      */
     @Override
@@ -333,14 +352,14 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         boolean isFocused = elementId != null && context.isFocused(elementId);
 
         // Resolve styles with priority: explicit > CSS > default
-        Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle, DEFAULT_CURSOR_STYLE);
-        Style effectivePlaceholderStyle = resolveEffectiveStyle(context, "placeholder", placeholderStyle, DEFAULT_PLACEHOLDER_STYLE);
+        Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle,
+                DEFAULT_CURSOR_STYLE);
+        Style effectivePlaceholderStyle = resolveEffectiveStyle(context, "placeholder",
+                placeholderStyle, DEFAULT_PLACEHOLDER_STYLE);
 
-        TextInput.Builder builder = TextInput.builder()
-            .style(context.currentStyle())
-            .cursorStyle(effectiveCursorStyle)
-            .placeholder(placeholder)
-            .placeholderStyle(effectivePlaceholderStyle);
+        TextInput.Builder builder = TextInput.builder().style(context.currentStyle())
+                .cursorStyle(effectiveCursorStyle).placeholder(placeholder)
+                .placeholderStyle(effectivePlaceholderStyle);
 
         // Determine border color: focus color > programmatic color
         Color effectiveBorderColor = isFocused && focusedBorderColor != null
@@ -348,8 +367,7 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
                 : borderColor;
 
         if (title != null || borderType != null || effectiveBorderColor != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

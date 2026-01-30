@@ -8,6 +8,8 @@ import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.style.RichTextState;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
@@ -28,26 +30,25 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.RichTextState;
 
 /**
  * A toolkit element for displaying styled text with scrolling support.
  * <p>
- * This element provides internal scroll state management and keyboard/mouse event handling.
- * It accepts pre-styled {@link Text} objects, enabling syntax highlighting, markup rendering,
- * and other rich text features.
+ * This element provides internal scroll state management and keyboard/mouse
+ * event handling. It accepts pre-styled {@link Text} objects, enabling syntax
+ * highlighting, markup rendering, and other rich text features.
  * <p>
  * Unlike {@link TextElement}, this element:
  * <ul>
- *   <li>Accepts {@link Text} objects with multiple styled {@link Span}s</li>
- *   <li>Supports vertical scrolling with automatic scroll state</li>
- *   <li>Handles keyboard navigation (UP/DOWN/PAGE_UP/PAGE_DOWN/HOME/END)</li>
- *   <li>Handles mouse scroll events</li>
- *   <li>Optionally displays line numbers</li>
+ * <li>Accepts {@link Text} objects with multiple styled {@link Span}s</li>
+ * <li>Supports vertical scrolling with automatic scroll state</li>
+ * <li>Handles keyboard navigation (UP/DOWN/PAGE_UP/PAGE_DOWN/HOME/END)</li>
+ * <li>Handles mouse scroll events</li>
+ * <li>Optionally displays line numbers</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * import static dev.tamboui.toolkit.Toolkit.*;
  *
@@ -65,9 +66,12 @@ import dev.tamboui.style.RichTextState;
  *
  * <h2>CSS Child Selectors</h2>
  * <ul>
- *   <li>{@code RichTextAreaElement-line-number} - The line number style (default: dim)</li>
- *   <li>{@code RichTextAreaElement-scrollbar-thumb} - The scrollbar thumb style</li>
- *   <li>{@code RichTextAreaElement-scrollbar-track} - The scrollbar track style</li>
+ * <li>{@code RichTextAreaElement-line-number} - The line number style (default:
+ * dim)</li>
+ * <li>{@code RichTextAreaElement-scrollbar-thumb} - The scrollbar thumb
+ * style</li>
+ * <li>{@code RichTextAreaElement-scrollbar-track} - The scrollbar track
+ * style</li>
  * </ul>
  *
  * @see Text for creating styled text
@@ -116,7 +120,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Creates a RichTextAreaElement from a string.
      *
-     * @param content the text content
+     * @param content
+     *            the text content
      */
     public RichTextAreaElement(String content) {
         this(content != null ? Text.from(content) : Text.empty());
@@ -125,7 +130,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Creates a RichTextAreaElement from styled text.
      *
-     * @param text the styled text to display
+     * @param text
+     *            the styled text to display
      */
     public RichTextAreaElement(Text text) {
         this.text = text != null ? text : Text.empty();
@@ -135,7 +141,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the text to display.
      *
-     * @param text the styled text
+     * @param text
+     *            the styled text
      * @return this element for chaining
      */
     public RichTextAreaElement text(Text text) {
@@ -146,7 +153,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the text from a string.
      *
-     * @param content the text content
+     * @param content
+     *            the text content
      * @return this element for chaining
      */
     public RichTextAreaElement text(String content) {
@@ -157,7 +165,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the overflow mode.
      *
-     * @param overflow the overflow mode
+     * @param overflow
+     *            the overflow mode
      * @return this element for chaining
      */
     public RichTextAreaElement overflow(Overflow overflow) {
@@ -208,7 +217,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the text alignment.
      *
-     * @param alignment the alignment
+     * @param alignment
+     *            the alignment
      * @return this element for chaining
      */
     public RichTextAreaElement alignment(Alignment alignment) {
@@ -249,7 +259,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets whether to show line numbers.
      *
-     * @param show true to show line numbers
+     * @param show
+     *            true to show line numbers
      * @return this element for chaining
      */
     public RichTextAreaElement showLineNumbers(boolean show) {
@@ -260,7 +271,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the line number style.
      *
-     * @param style the style for line numbers
+     * @param style
+     *            the style for line numbers
      * @return this element for chaining
      */
     public RichTextAreaElement lineNumberStyle(Style style) {
@@ -271,7 +283,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the separator between line numbers and content.
      *
-     * @param separator the separator string
+     * @param separator
+     *            the separator string
      * @return this element for chaining
      */
     public RichTextAreaElement lineNumberSeparator(String separator) {
@@ -282,7 +295,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the title.
      *
-     * @param title the title text
+     * @param title
+     *            the title text
      * @return this element for chaining
      */
     public RichTextAreaElement title(String title) {
@@ -303,7 +317,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the border type.
      *
-     * @param borderType the border type
+     * @param borderType
+     *            the border type
      * @return this element for chaining
      */
     public RichTextAreaElement borderType(BorderType borderType) {
@@ -314,7 +329,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element for chaining
      */
     public RichTextAreaElement borderColor(Color color) {
@@ -335,7 +351,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the scrollbar policy.
      *
-     * @param policy the scrollbar display policy
+     * @param policy
+     *            the scrollbar display policy
      * @return this element for chaining
      */
     public RichTextAreaElement scrollbar(ScrollBarPolicy policy) {
@@ -346,7 +363,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the scrollbar thumb color.
      *
-     * @param color the thumb color
+     * @param color
+     *            the thumb color
      * @return this element for chaining
      */
     public RichTextAreaElement scrollbarThumbColor(Color color) {
@@ -357,7 +375,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the scrollbar track color.
      *
-     * @param color the track color
+     * @param color
+     *            the track color
      * @return this element for chaining
      */
     public RichTextAreaElement scrollbarTrackColor(Color color) {
@@ -368,7 +387,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Sets the border color when the element is focused.
      *
-     * @param color the focused border color
+     * @param color
+     *            the focused border color
      * @return this element for chaining
      */
     public RichTextAreaElement focusedBorderColor(Color color) {
@@ -379,7 +399,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Scrolls to show the specified line.
      *
-     * @param line the line number (0-based)
+     * @param line
+     *            the line number (0-based)
      * @return this element for chaining
      */
     public RichTextAreaElement scrollToLine(int line) {
@@ -390,7 +411,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     /**
      * Ensures the specified line is visible, scrolling if necessary.
      *
-     * @param line the line number (0-based)
+     * @param line
+     *            the line number (0-based)
      * @return this element for chaining
      */
     public RichTextAreaElement ensureLineVisible(int line) {
@@ -415,7 +437,9 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
             maxWidth = Math.max(maxWidth, line.width());
         }
         // Add line number width and border
-        int lineNumWidth = showLineNumbers ? String.valueOf(text.lines().size()).length() + lineNumberSeparator.length() : 0;
+        int lineNumWidth = showLineNumbers
+                ? String.valueOf(text.lines().size()).length() + lineNumberSeparator.length()
+                : 0;
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
         return maxWidth + lineNumWidth + borderWidth;
     }
@@ -441,7 +465,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     @Override
     public int preferredHeight(int availableWidth, RenderContext context) {
         Overflow effectiveOverflow = overflow != null ? overflow : Overflow.CLIP;
-        if (effectiveOverflow != Overflow.WRAP_CHARACTER && effectiveOverflow != Overflow.WRAP_WORD) {
+        if (effectiveOverflow != Overflow.WRAP_CHARACTER
+                && effectiveOverflow != Overflow.WRAP_WORD) {
             return text.height();
         }
 
@@ -472,8 +497,7 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
                     ? focusedBorderColor
                     : borderColor;
 
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));
@@ -502,35 +526,26 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
 
         // Determine if we should show scrollbar
         boolean reserveScrollbarSpace = scrollBarPolicy == ScrollBarPolicy.ALWAYS
-                || (scrollBarPolicy == ScrollBarPolicy.AS_NEEDED && text.height() > contentArea.height());
+                || (scrollBarPolicy == ScrollBarPolicy.AS_NEEDED
+                        && text.height() > contentArea.height());
 
-        // Calculate the actual rendering area for text (excluding scrollbar and line numbers)
+        // Calculate the actual rendering area for text (excluding scrollbar and line
+        // numbers)
         Rect textRenderArea = contentArea;
         if (reserveScrollbarSpace && contentArea.width() > 1) {
-            textRenderArea = new Rect(
-                contentArea.left(),
-                contentArea.top(),
-                contentArea.width() - 1,
-                contentArea.height()
-            );
+            textRenderArea = new Rect(contentArea.left(), contentArea.top(),
+                    contentArea.width() - 1, contentArea.height());
         }
 
         // Calculate line number area and text content area
         Rect lineNumberArea = null;
         Rect textContentArea = textRenderArea;
         if (showLineNumbers && lineNumberWidth > 0 && textRenderArea.width() > lineNumberWidth) {
-            lineNumberArea = new Rect(
-                textRenderArea.left(),
-                textRenderArea.top(),
-                lineNumberWidth,
-                textRenderArea.height()
-            );
-            textContentArea = new Rect(
-                textRenderArea.left() + lineNumberWidth,
-                textRenderArea.top(),
-                textRenderArea.width() - lineNumberWidth,
-                textRenderArea.height()
-            );
+            lineNumberArea = new Rect(textRenderArea.left(), textRenderArea.top(), lineNumberWidth,
+                    textRenderArea.height());
+            textContentArea = new Rect(textRenderArea.left() + lineNumberWidth,
+                    textRenderArea.top(), textRenderArea.width() - lineNumberWidth,
+                    textRenderArea.height());
         }
 
         // Update state with content dimensions
@@ -545,8 +560,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
         int endLine = Math.min(startLine + textContentArea.height(), text.lines().size());
 
         // Resolve line number style
-        Style effectiveLineNumberStyle = resolveEffectiveStyle(
-            context, "line-number", lineNumberStyle, DEFAULT_LINE_NUMBER_STYLE);
+        Style effectiveLineNumberStyle = resolveEffectiveStyle(context, "line-number",
+                lineNumberStyle, DEFAULT_LINE_NUMBER_STYLE);
 
         // Render line numbers if enabled
         if (showLineNumbers && lineNumberArea != null) {
@@ -554,9 +569,10 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
             for (int i = 0; i < endLine - startLine; i++) {
                 int lineIndex = startLine + i;
                 int y = lineNumberArea.top() + i;
-                String lineNum = String.format("%" + lineNumDigits + "d%s",
-                    lineIndex + 1, lineNumberSeparator);
-                frame.buffer().setString(lineNumberArea.left(), y, lineNum, effectiveLineNumberStyle);
+                String lineNum = String.format("%" + lineNumDigits + "d%s", lineIndex + 1,
+                        lineNumberSeparator);
+                frame.buffer().setString(lineNumberArea.left(), y, lineNum,
+                        effectiveLineNumberStyle);
             }
         }
 
@@ -569,10 +585,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
         }
 
         // Build and render the Paragraph widget
-        Paragraph.Builder paragraphBuilder = Paragraph.builder()
-                .text(visibleText)
-                .style(context.currentStyle())
-                .styleResolver(styleResolver(context));
+        Paragraph.Builder paragraphBuilder = Paragraph.builder().text(visibleText)
+                .style(context.currentStyle()).styleResolver(styleResolver(context));
 
         if (overflow != null) {
             paragraphBuilder.overflow(overflow);
@@ -589,26 +603,27 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
                 || (scrollBarPolicy == ScrollBarPolicy.AS_NEEDED && state.isScrollable());
 
         if (showScrollbar && contentArea.width() > 1) {
-            Rect scrollbarArea = new Rect(
-                contentArea.right() - 1,
-                contentArea.top(),
-                1,
-                contentArea.height()
-            );
+            Rect scrollbarArea = new Rect(contentArea.right() - 1, contentArea.top(), 1,
+                    contentArea.height());
 
             ScrollbarState scrollbarState = new ScrollbarState()
-                .contentLength(state.contentHeight())
-                .viewportContentLength(state.viewportHeight())
-                .position(state.scrollRow());
+                    .contentLength(state.contentHeight())
+                    .viewportContentLength(state.viewportHeight()).position(state.scrollRow());
 
             // Resolve scrollbar styles
-            Style explicitThumbStyle = scrollbarThumbColor != null ? Style.EMPTY.fg(scrollbarThumbColor) : null;
-            Style explicitTrackStyle = scrollbarTrackColor != null ? Style.EMPTY.fg(scrollbarTrackColor) : null;
-            Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle, Style.EMPTY);
-            Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle, Style.EMPTY);
+            Style explicitThumbStyle = scrollbarThumbColor != null
+                    ? Style.EMPTY.fg(scrollbarThumbColor)
+                    : null;
+            Style explicitTrackStyle = scrollbarTrackColor != null
+                    ? Style.EMPTY.fg(scrollbarTrackColor)
+                    : null;
+            Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle,
+                    Style.EMPTY);
+            Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle,
+                    Style.EMPTY);
 
             Scrollbar.Builder scrollbarBuilder = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
+                    .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
             if (!thumbStyle.equals(Style.EMPTY)) {
                 scrollbarBuilder.thumbStyle(thumbStyle);
             }

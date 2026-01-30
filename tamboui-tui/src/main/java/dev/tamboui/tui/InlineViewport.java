@@ -4,14 +4,14 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
-
-import java.io.IOException;
-import java.util.function.Consumer;
 
 /**
  * Frame-compatible wrapper around {@link InlineDisplay}.
@@ -26,19 +26,20 @@ final class InlineViewport {
     private Buffer buffer;
     private Rect area;
     private Frame frame;
-    private int contentHeight;  // Current content height to allocate
+    private int contentHeight; // Current content height to allocate
 
     /**
      * Creates a new viewport wrapping the given display.
      *
-     * @param display the inline display to wrap
+     * @param display
+     *            the inline display to wrap
      */
     InlineViewport(InlineDisplay display) {
         this.display = display;
         this.area = Rect.of(display.width(), display.height());
         this.buffer = Buffer.empty(area);
         this.frame = Frame.forTesting(buffer);
-        this.contentHeight = display.height();  // Default to initial height
+        this.contentHeight = display.height(); // Default to initial height
     }
 
     /**
@@ -71,12 +72,13 @@ final class InlineViewport {
     /**
      * Sets the content height for the next draw.
      * <p>
-     * This determines how many terminal lines will be allocated
-     * for the inline display. The display will grow or shrink
-     * accordingly on the next draw() call. If the requested height
-     * exceeds the current buffer size, the buffer is resized.
+     * This determines how many terminal lines will be allocated for the inline
+     * display. The display will grow or shrink accordingly on the next draw() call.
+     * If the requested height exceeds the current buffer size, the buffer is
+     * resized.
      *
-     * @param height the desired content height in lines
+     * @param height
+     *            the desired content height in lines
      */
     void setContentHeight(int height) {
         height = Math.max(0, height);
@@ -92,14 +94,15 @@ final class InlineViewport {
     /**
      * Draws the UI using the given renderer.
      * <p>
-     * The buffer is cleared, the renderer is called, and then
-     * the buffer content is pushed to the inline display.
+     * The buffer is cleared, the renderer is called, and then the buffer content is
+     * pushed to the inline display.
      *
-     * @param renderer the render function that populates the frame
+     * @param renderer
+     *            the render function that populates the frame
      */
     void draw(Consumer<Frame> renderer) {
         buffer.clear();
-        frame.clearCursor();  // Reset cursor before render
+        frame.clearCursor(); // Reset cursor before render
         renderer.accept(frame);
 
         // Get cursor position from frame (if set by a text input)
@@ -120,7 +123,8 @@ final class InlineViewport {
     /**
      * Prints a plain text message above the viewport.
      *
-     * @param message the message to print
+     * @param message
+     *            the message to print
      */
     void println(String message) {
         display.println(message);
@@ -129,7 +133,8 @@ final class InlineViewport {
     /**
      * Prints styled text above the viewport.
      *
-     * @param text the styled text to print
+     * @param text
+     *            the styled text to print
      */
     void println(Text text) {
         display.println(text);
@@ -145,7 +150,8 @@ final class InlineViewport {
     /**
      * Closes the underlying display.
      *
-     * @throws IOException if an I/O error occurs
+     * @throws IOException
+     *             if an I/O error occurs
      */
     void close() throws IOException {
         display.close();

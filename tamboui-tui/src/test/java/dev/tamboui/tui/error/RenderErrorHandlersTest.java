@@ -4,16 +4,16 @@
  */
 package dev.tamboui.tui.error;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -44,9 +44,7 @@ class RenderErrorHandlersTest {
 
         assertThat(action).isEqualTo(ErrorAction.QUIT_IMMEDIATELY);
         String logged = output.toString();
-        assertThat(logged)
-                .contains("TamboUI Render Error")
-                .contains("RuntimeException")
+        assertThat(logged).contains("TamboUI Render Error").contains("RuntimeException")
                 .contains("Test error message");
     }
 
@@ -63,9 +61,7 @@ class RenderErrorHandlersTest {
         assertThat(action).isEqualTo(ErrorAction.DISPLAY_AND_QUIT);
         assertThat(logFile).exists();
         String content = new String(Files.readAllBytes(logFile), StandardCharsets.UTF_8);
-        assertThat(content)
-                .contains("TamboUI Render Error")
-                .contains("RuntimeException")
+        assertThat(content).contains("TamboUI Render Error").contains("RuntimeException")
                 .contains("File test error");
     }
 

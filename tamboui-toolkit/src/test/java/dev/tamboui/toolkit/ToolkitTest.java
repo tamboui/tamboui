@@ -4,6 +4,14 @@
  */
 package dev.tamboui.toolkit;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Constraint;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.elements.BarChartElement;
 import dev.tamboui.toolkit.elements.CalendarElement;
@@ -22,15 +30,8 @@ import dev.tamboui.toolkit.elements.TableElement;
 import dev.tamboui.toolkit.elements.TabsElement;
 import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
-import dev.tamboui.layout.Constraint;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.Arrays;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;

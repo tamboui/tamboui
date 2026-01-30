@@ -4,11 +4,12 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
@@ -16,24 +17,25 @@ import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
 
 /**
  * A horizontal layout container that arranges children in a row.
  * <p>
  * Layout properties can be set via CSS or programmatically:
  * <ul>
- *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
- *   <li>{@code spacing} - Gap between children in cells</li>
- *   <li>{@code margin} - Margin around the row</li>
+ * <li>{@code flex} - Flex positioning mode: "start", "center", "end",
+ * "space-between", "space-around", "space-evenly"</li>
+ * <li>{@code spacing} - Gap between children in cells</li>
+ * <li>{@code margin} - Margin around the row</li>
  * </ul>
  * <p>
  * Programmatic values override CSS values when both are set.
  * <p>
  * Example usage:
+ * 
  * <pre>
  * row(child1, child2, child3).flex(Flex.CENTER).spacing(1)
  * </pre>
@@ -51,7 +53,8 @@ public final class Row extends ContainerElement<Row> {
     /**
      * Creates a row with the given children.
      *
-     * @param children the child elements
+     * @param children
+     *            the child elements
      */
     public Row(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -62,7 +65,8 @@ public final class Row extends ContainerElement<Row> {
      * <p>
      * Can also be set via CSS {@code spacing} property.
      *
-     * @param spacing spacing in cells between adjacent children
+     * @param spacing
+     *            spacing in cells between adjacent children
      * @return this row for method chaining
      */
     public Row spacing(int spacing) {
@@ -75,7 +79,8 @@ public final class Row extends ContainerElement<Row> {
      * <p>
      * Can also be set via CSS {@code flex} property.
      *
-     * @param flex the flex mode for space distribution
+     * @param flex
+     *            the flex mode for space distribution
      * @return this row for method chaining
      * @see Flex
      */
@@ -89,7 +94,8 @@ public final class Row extends ContainerElement<Row> {
      * <p>
      * Can also be set via CSS {@code margin} property.
      *
-     * @param margin the margin
+     * @param margin
+     *            the margin
      * @return this row for method chaining
      */
     public Row margin(Margin margin) {
@@ -100,7 +106,8 @@ public final class Row extends ContainerElement<Row> {
     /**
      * Sets uniform margin around the row.
      *
-     * @param value the margin value for all sides
+     * @param value
+     *            the margin value for all sides
      * @return this row for method chaining
      */
     public Row margin(int value) {
@@ -228,10 +235,8 @@ public final class Row extends ContainerElement<Row> {
             }
         }
 
-        List<Rect> areas = Layout.horizontal()
-            .constraints(constraints.toArray(new Constraint[0]))
-            .flex(effectiveFlex)
-            .split(effectiveArea);
+        List<Rect> areas = Layout.horizontal().constraints(constraints.toArray(new Constraint[0]))
+                .flex(effectiveFlex).split(effectiveArea);
 
         // Render children (skipping spacing areas)
         int childIndex = 0;

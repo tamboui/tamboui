@@ -28,7 +28,8 @@ public final class RecordingConfig {
     private final int height;
     private final Path configFile;
 
-    RecordingConfig(Path outputPath, int fps, int maxDurationMs, int width, int height, Path configFile) {
+    RecordingConfig(Path outputPath, int fps, int maxDurationMs, int width, int height,
+            Path configFile) {
         this.outputPath = outputPath;
         this.fps = fps;
         this.maxDurationMs = maxDurationMs;
@@ -40,7 +41,8 @@ public final class RecordingConfig {
     /**
      * Loads recording configuration from system properties and installs capture.
      * This method installs AnsiTerminalCapture immediately so that all System.out
-     * output is captured from the start, not just after the first Backend is created.
+     * output is captured from the start, not just after the first Backend is
+     * created.
      *
      * @return configuration if recording is enabled, null otherwise
      */
@@ -57,14 +59,12 @@ public final class RecordingConfig {
 
         String configPath = System.getProperty(PREFIX + ".config");
 
-        RecordingConfig config = new RecordingConfig(
-                Paths.get(output),
+        RecordingConfig config = new RecordingConfig(Paths.get(output),
                 Integer.getInteger(PREFIX + ".fps", 10),
                 Integer.getInteger(PREFIX + ".duration", 10000),
                 Integer.getInteger(PREFIX + ".width", 80),
                 Integer.getInteger(PREFIX + ".height", 24),
-                configPath != null ? Paths.get(configPath) : null
-        );
+                configPath != null ? Paths.get(configPath) : null);
 
         // Install System.out capture immediately so all output is captured
         AnsiTerminalCapture.install(config);
@@ -89,8 +89,8 @@ public final class RecordingConfig {
     }
 
     /**
-     * Checks if recording is enabled via system properties.
-     * This does NOT install the capture - use {@link #load()} for that.
+     * Checks if recording is enabled via system properties. This does NOT install
+     * the capture - use {@link #load()} for that.
      *
      * @return true if recording is configured
      */
@@ -99,7 +99,8 @@ public final class RecordingConfig {
     }
 
     /**
-     * Clears the active config (called when RecordingBackend writes from draw frames).
+     * Clears the active config (called when RecordingBackend writes from draw
+     * frames).
      */
     static synchronized void clearActive() {
         activeConfig = null;
@@ -128,7 +129,8 @@ public final class RecordingConfig {
                 return;
             }
 
-            String cast = AsciinemaAnimation.fromRawFrames(capturedFrames, captureWidth, captureHeight);
+            String cast = AsciinemaAnimation.fromRawFrames(capturedFrames, captureWidth,
+                    captureHeight);
 
             Path outputPath = config.outputPath();
             Path parent = outputPath.getParent();
@@ -150,16 +152,23 @@ public final class RecordingConfig {
     }
 
     /**
-     * Creates a config with explicit values (used by TuiRunner for config file support).
+     * Creates a config with explicit values (used by TuiRunner for config file
+     * support).
      *
-     * @param outputPath    the output file path
-     * @param fps           the frames per second
-     * @param maxDurationMs the maximum recording duration in milliseconds
-     * @param width         the recording width in columns
-     * @param height        the recording height in rows
+     * @param outputPath
+     *            the output file path
+     * @param fps
+     *            the frames per second
+     * @param maxDurationMs
+     *            the maximum recording duration in milliseconds
+     * @param width
+     *            the recording width in columns
+     * @param height
+     *            the recording height in rows
      * @return a new recording config
      */
-    public static RecordingConfig of(Path outputPath, int fps, int maxDurationMs, int width, int height) {
+    public static RecordingConfig of(Path outputPath, int fps, int maxDurationMs, int width,
+            int height) {
         return new RecordingConfig(outputPath, fps, maxDurationMs, width, height, null);
     }
 

@@ -4,6 +4,11 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
@@ -14,13 +19,9 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.component.Component;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.input.TextAreaState;
+import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -30,13 +31,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests CSS child styling for various elements.
  * <p>
  * These tests verify the "explicit > CSS > default" priority pattern
- * implemented via {@link dev.tamboui.toolkit.element.StyledElement#resolveEffectiveStyle}.
+ * implemented via
+ * {@link dev.tamboui.toolkit.element.StyledElement#resolveEffectiveStyle}.
  */
 class ElementChildStyleCssTest {
 
     /**
-     * Minimal Component that mimics ProgressCard's structure:
-     * Component → Panel (with cssParent) → Column → [Text, Text, Gauge]
+     * Minimal Component that mimics ProgressCard's structure: Component → Panel
+     * (with cssParent) → Column → [Text, Text, Gauge]
      */
     static class TestProgressComponent extends Component<TestProgressComponent> {
         private final double progress;
@@ -49,16 +51,11 @@ class ElementChildStyleCssTest {
 
         @Override
         protected Element render() {
-            return panel(() -> column(
-                    text("Title").addClass("card-title").length(1),
-                    text("Desc").addClass("card-description").length(1),
-                    gauge(progress)
-                            .label("")
-                            .addClass("progress-" + statusCssClass)
-                            .fill()
-            ))
-                    .addClass(statusCssClass)
-                    .cssParent(this);
+            return panel(
+                    () -> column(text("Title").addClass("card-title").length(1),
+                            text("Desc").addClass("card-description").length(1), gauge(progress)
+                                    .label("").addClass("progress-" + statusCssClass).fill()))
+                    .addClass(statusCssClass).cssParent(this);
         }
     }
 
@@ -94,10 +91,8 @@ class ElementChildStyleCssTest {
             context.focusManager().setFocus("test-input");
 
             // Use explicit style
-            textInput(state)
-                .id("test-input")
-                .cursorStyle(Style.EMPTY.bg(Color.RED))
-                .render(frame, area, context);
+            textInput(state).id("test-input").cursorStyle(Style.EMPTY.bg(Color.RED)).render(frame,
+                    area, context);
 
             // Explicit style should override CSS - cursor at position 5
             assertThat(buffer.get(5, 0).style().bg()).contains(Color.RED);
@@ -117,10 +112,8 @@ class ElementChildStyleCssTest {
             TextInputState state = new TextInputState();
             // Empty text shows placeholder
 
-            textInput(state)
-                .placeholder("Enter text...")
-                .placeholderStyle(Style.EMPTY.fg(Color.MAGENTA))
-                .render(frame, area, context);
+            textInput(state).placeholder("Enter text...")
+                    .placeholderStyle(Style.EMPTY.fg(Color.MAGENTA)).render(frame, area, context);
 
             // Explicit placeholder style should override CSS
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.MAGENTA);
@@ -139,13 +132,10 @@ class ElementChildStyleCssTest {
             // Focus the element so cursor is rendered
             context.focusManager().setFocus("test-input");
 
-            textInput(state)
-                .id("test-input")
-                .render(frame, area, context);
+            textInput(state).id("test-input").render(frame, area, context);
 
             // Default cursor style is reversed - cursor at position 2
-            assertThat(buffer.get(2, 0).style().effectiveModifiers())
-                .contains(Modifier.REVERSED);
+            assertThat(buffer.get(2, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
         }
 
         @Test
@@ -158,13 +148,10 @@ class ElementChildStyleCssTest {
             TextInputState state = new TextInputState();
             // Empty text shows placeholder
 
-            textInput(state)
-                .placeholder("Enter text...")
-                .render(frame, area, context);
+            textInput(state).placeholder("Enter text...").render(frame, area, context);
 
             // Default placeholder style is dim
-            assertThat(buffer.get(0, 0).style().effectiveModifiers())
-                .contains(Modifier.DIM);
+            assertThat(buffer.get(0, 0).style().effectiveModifiers()).contains(Modifier.DIM);
         }
     }
 
@@ -183,10 +170,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            gauge(1.0)
-                .label("")
-                .gaugeColor(Color.YELLOW)
-                .render(frame, area, context);
+            gauge(1.0).label("").gaugeColor(Color.YELLOW).render(frame, area, context);
 
             // Explicit style should override CSS
             assertThat(buffer).at(0, 0).hasForeground(Color.YELLOW);
@@ -199,9 +183,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            gauge(1.0)
-                .label("")
-                .render(frame, area, context);
+            gauge(1.0).label("").render(frame, area, context);
 
             // Gauge should render (filled character)
             assertThat(buffer).at(0, 0).hasSymbol("█");
@@ -218,9 +200,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            gauge(1.0)
-                .label("")
-                .render(frame, area, context);
+            gauge(1.0).label("").render(frame, area, context);
 
             // CSS should apply green foreground to filled cells
             assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
@@ -237,10 +217,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            gauge(1.0)
-                .label("")
-                .addClass("progress-complete")
-                .render(frame, area, context);
+            gauge(1.0).label("").addClass("progress-complete").render(frame, area, context);
 
             // CSS descendant selector should apply green to filled cells
             assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
@@ -258,12 +235,8 @@ class ElementChildStyleCssTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Nest gauge in a column (like the demo does)
-            column(
-                gauge(1.0)
-                    .label("")
-                    .addClass("progress-complete")
-                    .fill()
-            ).render(frame, area, context);
+            column(gauge(1.0).label("").addClass("progress-complete").fill()).render(frame, area,
+                    context);
 
             // CSS descendant selector should still apply green when nested
             assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
@@ -272,8 +245,8 @@ class ElementChildStyleCssTest {
         @Test
         @DisplayName("CSS descendant child selector applies color in panel > column > gauge hierarchy")
         void cssDescendantChildSelectorWorksDeeplyNested() {
-            String css = ".progress-complete GaugeElement-filled { color: green; }\n" +
-                         ".progress-in-progress GaugeElement-filled { color: yellow; }";
+            String css = ".progress-complete GaugeElement-filled { color: green; }\n"
+                    + ".progress-in-progress GaugeElement-filled { color: yellow; }";
             styleEngine.addStylesheet("test", css);
             styleEngine.setActiveStylesheet("test");
 
@@ -282,15 +255,12 @@ class ElementChildStyleCssTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Mimic demo structure: panel > column > gauge
-            panel(() -> column(
-                gauge(1.0)
-                    .label("")
-                    .addClass("progress-complete")
-                    .fill()
-            )).render(frame, area, context);
+            panel(() -> column(gauge(1.0).label("").addClass("progress-complete").fill()))
+                    .render(frame, area, context);
 
             // Find a filled gauge cell (inside the panel border)
-            // Panel with borders takes 1 char on each side, so gauge content starts at x=1, y=1
+            // Panel with borders takes 1 char on each side, so gauge content starts at x=1,
+            // y=1
             assertThat(buffer).at(1, 1).hasForeground(Color.GREEN);
         }
     }
@@ -299,14 +269,12 @@ class ElementChildStyleCssTest {
     @DisplayName("GaugeElement CSS child styling with full demo CSS")
     class GaugeElementFullDemoCssTests {
 
-        private static final String DEMO_CSS =
-                "GaugeElement { background: #1a1a1a; }\n" +
-                ".card-title { color: cyan; text-style: bold; }\n" +
-                ".card-description { color: #888888; }\n" +
-                ".progress-complete GaugeElement-filled { color: green; }\n" +
-                ".progress-in-progress GaugeElement-filled { color: yellow; }\n" +
-                ".dim { text-style: dim; }\n" +
-                ".title { color: cyan; text-style: bold; }";
+        private static final String DEMO_CSS = "GaugeElement { background: #1a1a1a; }\n"
+                + ".card-title { color: cyan; text-style: bold; }\n"
+                + ".card-description { color: #888888; }\n"
+                + ".progress-complete GaugeElement-filled { color: green; }\n"
+                + ".progress-in-progress GaugeElement-filled { color: yellow; }\n"
+                + ".dim { text-style: dim; }\n" + ".title { color: cyan; text-style: bold; }";
 
         @Test
         @DisplayName("CSS descendant child selector works with full demo CSS loaded")
@@ -318,10 +286,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            gauge(1.0)
-                .label("")
-                .addClass("progress-complete")
-                .render(frame, area, context);
+            gauge(1.0).label("").addClass("progress-complete").render(frame, area, context);
 
             assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
         }
@@ -337,18 +302,15 @@ class ElementChildStyleCssTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Mimic ProgressCard structure: panel > column > [title, description, gauge]
-            panel(() -> column(
-                text("Task Title").addClass("card-title").length(1),
-                text("Description").addClass("card-description").length(1),
-                gauge(1.0)
-                    .label("")
-                    .addClass("progress-complete")
-                    .fill()
-            )).render(frame, area, context);
+            panel(() -> column(text("Task Title").addClass("card-title").length(1),
+                    text("Description").addClass("card-description").length(1),
+                    gauge(1.0).label("").addClass("progress-complete").fill()))
+                    .render(frame, area, context);
 
             // The gauge should be rendered inside the panel border
             // Panel border is 1 char, title text is row 1, description row 2
-            // Gauge should be in row 3 (y=3 inside the panel, which is y=3 in buffer due to border)
+            // Gauge should be in row 3 (y=3 inside the panel, which is y=3 in buffer due to
+            // border)
             // Actually, in a 5-row panel with border, inner area is rows 1-3
             // Row 1: title, Row 2: description, Row 3: gauge
             // Gauge cells should have green foreground
@@ -362,7 +324,8 @@ class ElementChildStyleCssTest {
                         break;
                     }
                 }
-                if (foundGreenGauge) break;
+                if (foundGreenGauge)
+                    break;
             }
             assertThat(foundGreenGauge).isTrue();
         }
@@ -377,10 +340,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            gauge(0.5)
-                .label("")
-                .addClass("progress-in-progress")
-                .render(frame, area, context);
+            gauge(0.5).label("").addClass("progress-in-progress").render(frame, area, context);
 
             // First cell should be filled with yellow
             assertThat(buffer).at(0, 0).hasForeground(Color.YELLOW);
@@ -394,8 +354,8 @@ class ElementChildStyleCssTest {
         @Test
         @DisplayName("explicit styles override CSS for both filled and unfilled")
         void explicitStylesOverrideCss() {
-            String css = "LineGaugeElement-filled { color: magenta; }\n" +
-                         "LineGaugeElement-unfilled { color: gray; }";
+            String css = "LineGaugeElement-filled { color: magenta; }\n"
+                    + "LineGaugeElement-unfilled { color: gray; }";
             styleEngine.addStylesheet("test", css);
             styleEngine.setActiveStylesheet("test");
 
@@ -403,10 +363,8 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            lineGauge(0.5)
-                .filledColor(Color.RED)
-                .unfilledColor(Color.BLUE)
-                .render(frame, area, context);
+            lineGauge(0.5).filledColor(Color.RED).unfilledColor(Color.BLUE).render(frame, area,
+                    context);
 
             // Explicit styles should override CSS
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
@@ -420,8 +378,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            lineGauge(0.5)
-                .render(frame, area, context);
+            lineGauge(0.5).render(frame, area, context);
 
             // Line gauge should render its characters
             assertThat(buffer.get(0, 0).symbol()).isNotEqualTo(" ");
@@ -443,16 +400,10 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            ScrollbarState state = new ScrollbarState()
-                .contentLength(100)
-                .viewportContentLength(10)
-                .position(0);
+            ScrollbarState state = new ScrollbarState().contentLength(100).viewportContentLength(10)
+                    .position(0);
 
-            scrollbar()
-                .vertical()
-                .state(state)
-                .thumbColor(Color.CYAN)
-                .render(frame, area, context);
+            scrollbar().vertical().state(state).thumbColor(Color.CYAN).render(frame, area, context);
 
             // Check that the scrollbar renders without errors
             assertThat(buffer).isNotNull();
@@ -465,15 +416,10 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            ScrollbarState state = new ScrollbarState()
-                .contentLength(100)
-                .viewportContentLength(10)
-                .position(0);
+            ScrollbarState state = new ScrollbarState().contentLength(100).viewportContentLength(10)
+                    .position(0);
 
-            scrollbar()
-                .vertical()
-                .state(state)
-                .render(frame, area, context);
+            scrollbar().vertical().state(state).render(frame, area, context);
 
             // Scrollbar should render some non-empty content
             boolean hasContent = false;
@@ -505,10 +451,8 @@ class ElementChildStyleCssTest {
             TextAreaState state = new TextAreaState();
             state.setText("Line 1\nLine 2");
 
-            textArea(state)
-                .showLineNumbers()
-                .lineNumberStyle(Style.EMPTY.fg(Color.RED))
-                .render(frame, area, context);
+            textArea(state).showLineNumbers().lineNumberStyle(Style.EMPTY.fg(Color.RED))
+                    .render(frame, area, context);
 
             // Explicit style should override CSS
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
@@ -528,10 +472,8 @@ class ElementChildStyleCssTest {
             TextAreaState state = new TextAreaState();
             // Empty text shows placeholder
 
-            textArea(state)
-                .placeholder("Enter description...")
-                .placeholderStyle(Style.EMPTY.fg(Color.GREEN))
-                .render(frame, area, context);
+            textArea(state).placeholder("Enter description...")
+                    .placeholderStyle(Style.EMPTY.fg(Color.GREEN)).render(frame, area, context);
 
             // Explicit placeholder style should override CSS
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
@@ -547,13 +489,10 @@ class ElementChildStyleCssTest {
             TextAreaState state = new TextAreaState();
             state.setText("Line 1\nLine 2");
 
-            textArea(state)
-                .showLineNumbers()
-                .render(frame, area, context);
+            textArea(state).showLineNumbers().render(frame, area, context);
 
             // Default line number style is dim
-            assertThat(buffer.get(0, 0).style().effectiveModifiers())
-                .contains(Modifier.DIM);
+            assertThat(buffer.get(0, 0).style().effectiveModifiers()).contains(Modifier.DIM);
         }
     }
 
@@ -561,14 +500,12 @@ class ElementChildStyleCssTest {
     @DisplayName("Component rendering path CSS child styling")
     class ComponentRenderingPathCssTests {
 
-        private static final String DEMO_CSS =
-                "GaugeElement { background: #1a1a1a; }\n" +
-                ".card-title { color: cyan; text-style: bold; }\n" +
-                ".card-description { color: #888888; }\n" +
-                ".progress-complete GaugeElement-filled { color: green; }\n" +
-                ".progress-in-progress GaugeElement-filled { color: yellow; }\n" +
-                ".dim { text-style: dim; }\n" +
-                ".title { color: cyan; text-style: bold; }";
+        private static final String DEMO_CSS = "GaugeElement { background: #1a1a1a; }\n"
+                + ".card-title { color: cyan; text-style: bold; }\n"
+                + ".card-description { color: #888888; }\n"
+                + ".progress-complete GaugeElement-filled { color: green; }\n"
+                + ".progress-in-progress GaugeElement-filled { color: yellow; }\n"
+                + ".dim { text-style: dim; }\n" + ".title { color: cyan; text-style: bold; }";
 
         @Test
         @DisplayName("CSS child selector works through Component rendering path with complete status")
@@ -580,8 +517,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            new TestProgressComponent(1.0, "complete")
-                    .render(frame, area, context);
+            new TestProgressComponent(1.0, "complete").render(frame, area, context);
 
             // Find gauge cells (filled block character) and verify green foreground
             // Panel border takes 1 char each side; title row 1, desc row 2, gauge row 3
@@ -595,10 +531,11 @@ class ElementChildStyleCssTest {
                         break;
                     }
                 }
-                if (foundGreenGauge) break;
+                if (foundGreenGauge)
+                    break;
             }
-            assertThat(foundGreenGauge)
-                    .as("Expected to find gauge cells with green foreground in Component rendering path")
+            assertThat(foundGreenGauge).as(
+                    "Expected to find gauge cells with green foreground in Component rendering path")
                     .isTrue();
         }
 
@@ -612,8 +549,7 @@ class ElementChildStyleCssTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            new TestProgressComponent(0.5, "in-progress")
-                    .render(frame, area, context);
+            new TestProgressComponent(0.5, "in-progress").render(frame, area, context);
 
             // Find gauge filled cells and verify yellow foreground
             boolean foundYellowGauge = false;
@@ -625,10 +561,11 @@ class ElementChildStyleCssTest {
                         break;
                     }
                 }
-                if (foundYellowGauge) break;
+                if (foundYellowGauge)
+                    break;
             }
-            assertThat(foundYellowGauge)
-                    .as("Expected to find gauge cells with yellow foreground in Component rendering path")
+            assertThat(foundYellowGauge).as(
+                    "Expected to find gauge cells with yellow foreground in Component rendering path")
                     .isTrue();
         }
     }

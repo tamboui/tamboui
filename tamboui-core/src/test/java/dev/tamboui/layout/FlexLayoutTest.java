@@ -4,10 +4,10 @@
  */
 package dev.tamboui.layout;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,11 +18,7 @@ class FlexLayoutTest {
     void flexStart() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
-                .flex(Flex.START);
+                .constraints(Constraint.length(20), Constraint.length(20)).flex(Flex.START);
 
         List<Rect> rects = layout.split(area);
 
@@ -36,11 +32,7 @@ class FlexLayoutTest {
     void flexEnd() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
-                .flex(Flex.END);
+                .constraints(Constraint.length(20), Constraint.length(20)).flex(Flex.END);
 
         List<Rect> rects = layout.split(area);
 
@@ -54,11 +46,7 @@ class FlexLayoutTest {
     void flexCenter() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
-                .flex(Flex.CENTER);
+                .constraints(Constraint.length(20), Constraint.length(20)).flex(Flex.CENTER);
 
         List<Rect> rects = layout.split(area);
 
@@ -72,11 +60,7 @@ class FlexLayoutTest {
     void flexSpaceBetween() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
+                .constraints(Constraint.length(20), Constraint.length(20), Constraint.length(20))
                 .flex(Flex.SPACE_BETWEEN);
 
         List<Rect> rects = layout.split(area);
@@ -92,11 +76,7 @@ class FlexLayoutTest {
     void flexSpaceAround() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
-                .flex(Flex.SPACE_AROUND);
+                .constraints(Constraint.length(20), Constraint.length(20)).flex(Flex.SPACE_AROUND);
 
         List<Rect> rects = layout.split(area);
 
@@ -113,11 +93,7 @@ class FlexLayoutTest {
     @DisplayName("Flex mode works with vertical layout")
     void flexVertical() {
         Rect area = new Rect(0, 0, 50, 100);
-        Layout layout = Layout.vertical()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
+        Layout layout = Layout.vertical().constraints(Constraint.length(20), Constraint.length(20))
                 .flex(Flex.END);
 
         List<Rect> rects = layout.split(area);
@@ -132,11 +108,7 @@ class FlexLayoutTest {
     void flexWithSpacing() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
-                .spacing(10)
+                .constraints(Constraint.length(20), Constraint.length(20)).spacing(10)
                 .flex(Flex.CENTER);
 
         List<Rect> rects = layout.split(area);
@@ -151,11 +123,7 @@ class FlexLayoutTest {
     void flexWithMargin() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(20),
-                        Constraint.length(20)
-                )
-                .margin(10)
+                .constraints(Constraint.length(20), Constraint.length(20)).margin(10)
                 .flex(Flex.CENTER);
 
         List<Rect> rects = layout.split(area);
@@ -171,22 +139,17 @@ class FlexLayoutTest {
         Rect area = new Rect(0, 0, 100, 50);
 
         // CENTER with single element
-        Layout center = Layout.horizontal()
-                .constraints(Constraint.length(20))
-                .flex(Flex.CENTER);
+        Layout center = Layout.horizontal().constraints(Constraint.length(20)).flex(Flex.CENTER);
         List<Rect> centerRects = center.split(area);
         assertThat(centerRects.get(0).x()).isEqualTo(40); // (100-20)/2
 
         // END with single element
-        Layout end = Layout.horizontal()
-                .constraints(Constraint.length(20))
-                .flex(Flex.END);
+        Layout end = Layout.horizontal().constraints(Constraint.length(20)).flex(Flex.END);
         List<Rect> endRects = end.split(area);
         assertThat(endRects.get(0).x()).isEqualTo(80); // 100-20
 
         // SPACE_BETWEEN with single element behaves like CENTER
-        Layout between = Layout.horizontal()
-                .constraints(Constraint.length(20))
+        Layout between = Layout.horizontal().constraints(Constraint.length(20))
                 .flex(Flex.SPACE_BETWEEN);
         List<Rect> betweenRects = between.split(area);
         assertThat(betweenRects.get(0).x()).isEqualTo(40);
@@ -197,11 +160,7 @@ class FlexLayoutTest {
     void flexNoExtraSpace() {
         Rect area = new Rect(0, 0, 100, 50);
         Layout layout = Layout.horizontal()
-                .constraints(
-                        Constraint.length(50),
-                        Constraint.length(50)
-                )
-                .flex(Flex.CENTER);
+                .constraints(Constraint.length(50), Constraint.length(50)).flex(Flex.CENTER);
 
         List<Rect> rects = layout.split(area);
 

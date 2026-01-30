@@ -4,14 +4,14 @@
  */
 package dev.tamboui.demo.actionhandler;
 
+import java.util.function.Consumer;
+
+import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.component.Component;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.tui.event.Event;
-
-import java.util.function.Consumer;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -30,9 +30,13 @@ public class CounterComponent extends Component<CounterComponent> {
 
     /**
      * Creates a counter component.
-     * @param title the title
-     * @param color the color
-     * @param logger the logger consumer
+     * 
+     * @param title
+     *            the title
+     * @param color
+     *            the color
+     * @param logger
+     *            the logger consumer
      */
     public CounterComponent(String title, Color color, Consumer<String> logger) {
         this.title = title;
@@ -66,6 +70,7 @@ public class CounterComponent extends Component<CounterComponent> {
 
     /**
      * Gets the current count.
+     * 
      * @return the count
      */
     public int count() {
@@ -85,17 +90,10 @@ public class CounterComponent extends Component<CounterComponent> {
         var borderColor = isFocused() ? color : Color.DARK_GRAY;
 
         return panel(() -> column(
-                row(
-                        text("Value: "),
-                        text(String.valueOf(count))
-                                .bold()
-                                .fg(count >= 0 ? Color.GREEN : Color.RED)
-                ),
-                text("(arrows/hjkl when focused)").dim()
-        ))
-                .title(title)
-                .rounded()
-                .borderColor(borderColor)
-                .fill();
+                row(text("Value: "),
+                        text(String.valueOf(count)).bold()
+                                .fg(count >= 0 ? Color.GREEN : Color.RED)),
+                text("(arrows/hjkl when focused)").dim())).title(title).rounded()
+                .borderColor(borderColor).fill();
     }
 }

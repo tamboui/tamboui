@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit;
 
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.css.engine.StyleEngine;
@@ -12,15 +14,15 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.elements.TextElement;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test that verifies CSS can override programmatic named colors.
  * <p>
- * When code uses {@code .red()} or {@code .fg(Color.RED)}, a CSS class "red" is added.
- * Theme stylesheets should be able to override the color via {@code .red { color: #FF5555; }}.
+ * When code uses {@code .red()} or {@code .fg(Color.RED)}, a CSS class "red" is
+ * added. Theme stylesheets should be able to override the color via {@code .red
+ * { color: #FF5555; }}.
  */
 class NamedColorCssOverrideTest {
 

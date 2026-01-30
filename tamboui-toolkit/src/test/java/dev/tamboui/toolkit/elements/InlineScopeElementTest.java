@@ -4,9 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,11 +17,8 @@ class InlineScopeElementTest {
     @Test
     @DisplayName("preferredHeight returns 0 when hidden")
     void preferredHeightReturnsZeroWhenHidden() {
-        InlineScopeElement scope = new InlineScopeElement(
-            text("Line 1"),
-            text("Line 2"),
-            text("Line 3")
-        ).visible(false);
+        InlineScopeElement scope = new InlineScopeElement(text("Line 1"), text("Line 2"),
+                text("Line 3")).visible(false);
 
         int height = scope.preferredHeight(80, RenderContext.empty());
         assertThat(height).isEqualTo(0);
@@ -38,11 +36,8 @@ class InlineScopeElementTest {
     @Test
     @DisplayName("preferredHeight sums children heights when visible")
     void preferredHeightSumsChildrenWhenVisible() {
-        InlineScopeElement scope = new InlineScopeElement(
-            text("Line 1"),
-            text("Line 2"),
-            text("Line 3")
-        ).visible(true);
+        InlineScopeElement scope = new InlineScopeElement(text("Line 1"), text("Line 2"),
+                text("Line 3")).visible(true);
 
         int height = scope.preferredHeight(80, RenderContext.empty());
         // Each text element should have height 1
@@ -68,10 +63,8 @@ class InlineScopeElementTest {
     @Test
     @DisplayName("constraint returns zero height when hidden")
     void constraintReturnsZeroHeightWhenHidden() {
-        InlineScopeElement scope = new InlineScopeElement(
-            text("Line 1"),
-            text("Line 2")
-        ).visible(false);
+        InlineScopeElement scope = new InlineScopeElement(text("Line 1"), text("Line 2"))
+                .visible(false);
 
         assertThat(scope.constraint().toString()).contains("Length[value=0]");
     }
@@ -79,11 +72,8 @@ class InlineScopeElementTest {
     @Test
     @DisplayName("toggling visibility changes preferred height")
     void togglingVisibilityChangesPreferredHeight() {
-        InlineScopeElement scope = new InlineScopeElement(
-            text("Line 1"),
-            text("Line 2"),
-            text("Line 3")
-        );
+        InlineScopeElement scope = new InlineScopeElement(text("Line 1"), text("Line 2"),
+                text("Line 3"));
 
         // Initially visible (default)
         int heightWhenVisible = scope.preferredHeight(80, RenderContext.empty());
@@ -103,16 +93,11 @@ class InlineScopeElementTest {
     @Test
     @DisplayName("nested scopes calculate height correctly")
     void nestedScopesCalculateHeightCorrectly() {
-        InlineScopeElement innerScope = new InlineScopeElement(
-            text("Inner line 1"),
-            text("Inner line 2")
-        );
+        InlineScopeElement innerScope = new InlineScopeElement(text("Inner line 1"),
+                text("Inner line 2"));
 
-        InlineScopeElement outerScope = new InlineScopeElement(
-            text("Outer line 1"),
-            innerScope,
-            text("Outer line 3")
-        );
+        InlineScopeElement outerScope = new InlineScopeElement(text("Outer line 1"), innerScope,
+                text("Outer line 3"));
 
         // Both visible: 1 + 2 + 1 = 4
         int heightBothVisible = outerScope.preferredHeight(80, RenderContext.empty());

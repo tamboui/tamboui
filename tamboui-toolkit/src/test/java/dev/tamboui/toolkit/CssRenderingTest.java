@@ -4,6 +4,13 @@
  */
 package dev.tamboui.toolkit;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.css.engine.StyleEngine;
@@ -15,12 +22,6 @@ import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.Panel;
 import dev.tamboui.toolkit.elements.Row;
 import dev.tamboui.toolkit.elements.TextElement;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CssRenderingTest {
 
     // Path to the demo's theme resources (single source of truth)
-    private static final Path THEMES_DIR = Paths.get("../tamboui-css/demos/css-demo/src/main/resources/themes");
+    private static final Path THEMES_DIR = Paths
+            .get("../tamboui-css/demos/css-demo/src/main/resources/themes");
 
     private StyleEngine styleEngine;
     private DefaultRenderContext context;
@@ -110,7 +112,8 @@ class CssRenderingTest {
 
         // Check that cell 10 (no text) - Row fills its background from CSS rule
         Cell cell10 = buffer.get(10, 0);
-        System.out.println("Cell at (10,0): symbol='" + cell10.symbol() + "' style=" + cell10.style());
+        System.out.println(
+                "Cell at (10,0): symbol='" + cell10.symbol() + "' style=" + cell10.style());
 
         // TextElement has foreground from CSS
         assertThat(cell0.style().fg()).isPresent();
@@ -134,9 +137,11 @@ class CssRenderingTest {
         Cell cell0 = buffer.get(0, 0);
         System.out.println("Cell at (0,0): symbol='" + cell0.symbol() + "' style=" + cell0.style());
 
-        // Check that cell on row 1 (no text) - Column fills its background from CSS rule
+        // Check that cell on row 1 (no text) - Column fills its background from CSS
+        // rule
         Cell cell01 = buffer.get(0, 1);
-        System.out.println("Cell at (0,1): symbol='" + cell01.symbol() + "' style=" + cell01.style());
+        System.out
+                .println("Cell at (0,1): symbol='" + cell01.symbol() + "' style=" + cell01.style());
 
         // TextElement has foreground from CSS
         assertThat(cell0.style().fg()).isPresent();
@@ -158,11 +163,13 @@ class CssRenderingTest {
 
         // Check that the border has the style
         Cell borderCell = buffer.get(0, 0);
-        System.out.println("Border cell at (0,0): symbol='" + borderCell.symbol() + "' style=" + borderCell.style());
+        System.out.println("Border cell at (0,0): symbol='" + borderCell.symbol() + "' style="
+                + borderCell.style());
 
         // Check that inner area has background
         Cell innerCell = buffer.get(2, 2);
-        System.out.println("Inner cell at (2,2): symbol='" + innerCell.symbol() + "' style=" + innerCell.style());
+        System.out.println("Inner cell at (2,2): symbol='" + innerCell.symbol() + "' style="
+                + innerCell.style());
 
         // Panel has its own background rule in CSS (#eeeeee)
         assertThat(borderCell.style().bg()).isPresent();
@@ -185,7 +192,8 @@ class CssRenderingTest {
         Cell borderCell = buffer.get(0, 0);
 
         // The Panel's background is applied to its area, then children render on top
-        // Check that the Panel area (background) has correct color by checking border cell's bg
+        // Check that the Panel area (background) has correct color by checking border
+        // cell's bg
         // .status class sets background: $bg-primary (#eeeeee in light theme)
         assertThat(borderCell.style().bg()).isPresent();
         assertThat(borderCell.style().bg().get()).isInstanceOf(Color.Rgb.class);

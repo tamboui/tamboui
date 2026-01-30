@@ -4,11 +4,11 @@
  */
 package dev.tamboui.css.selector;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-
 import java.util.List;
 import java.util.Objects;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 
 /**
  * A pseudo-class selector that matches elements in a particular state.
@@ -17,12 +17,12 @@ import java.util.Objects;
  * <p>
  * Supported pseudo-classes:
  * <ul>
- *   <li>{@code :focus} - element has keyboard focus</li>
- *   <li>{@code :hover} - mouse is over element</li>
- *   <li>{@code :disabled} - element is disabled</li>
- *   <li>{@code :active} - element is being activated (clicked)</li>
- *   <li>{@code :first-child} - element is first child of parent</li>
- *   <li>{@code :last-child} - element is last child of parent</li>
+ * <li>{@code :focus} - element has keyboard focus</li>
+ * <li>{@code :hover} - mouse is over element</li>
+ * <li>{@code :disabled} - element is disabled</li>
+ * <li>{@code :active} - element is being activated (clicked)</li>
+ * <li>{@code :first-child} - element is first child of parent</li>
+ * <li>{@code :last-child} - element is last child of parent</li>
  * </ul>
  */
 public final class PseudoClassSelector implements Selector {
@@ -32,7 +32,8 @@ public final class PseudoClassSelector implements Selector {
     /**
      * Creates a pseudo-class selector for the given pseudo-class name.
      *
-     * @param pseudoClass the pseudo-class name (without the leading colon)
+     * @param pseudoClass
+     *            the pseudo-class name (without the leading colon)
      */
     public PseudoClassSelector(String pseudoClass) {
         this.pseudoClass = Objects.requireNonNull(pseudoClass);

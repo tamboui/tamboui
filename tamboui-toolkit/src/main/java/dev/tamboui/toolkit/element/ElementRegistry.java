@@ -4,14 +4,6 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.selector.Selector;
-import dev.tamboui.css.selector.SelectorParser;
-import dev.tamboui.layout.Rect;
-
-import dev.tamboui.tui.RenderThread;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,32 +12,41 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.css.selector.Selector;
+import dev.tamboui.css.selector.SelectorParser;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.tui.RenderThread;
+
 /**
- * Registry that maps elements to their rendered areas with full CSS selector support.
+ * Registry that maps elements to their rendered areas with full CSS selector
+ * support.
  * <p>
  * ElementRegistry is populated during the render pass as elements are rendered.
- * It provides a way to look up element areas using CSS selectors, which is useful for
- * effect systems that need to target specific elements without holding
- * direct references to Element objects.
+ * It provides a way to look up element areas using CSS selectors, which is
+ * useful for effect systems that need to target specific elements without
+ * holding direct references to Element objects.
  * <p>
  * The registry should be cleared at the start of each render cycle and
  * repopulated as elements render themselves.
  *
  * <h2>Supported Selectors</h2>
  * <ul>
- *   <li>{@code *} - Universal selector (matches all elements)</li>
- *   <li>{@code Type} - Type selector (e.g., Panel, Button)</li>
- *   <li>{@code #id} - ID selector</li>
- *   <li>{@code .class} - Class selector</li>
- *   <li>{@code :pseudo} - Pseudo-class selector (focus, hover, disabled, etc.)</li>
- *   <li>{@code [attr]} - Attribute existence selector</li>
- *   <li>{@code [attr=value]} - Attribute equals selector</li>
- *   <li>{@code [attr^=value]} - Attribute starts-with selector</li>
- *   <li>{@code [attr$=value]} - Attribute ends-with selector</li>
- *   <li>{@code [attr*=value]} - Attribute contains selector</li>
- *   <li>{@code A B} - Descendant combinator</li>
- *   <li>{@code A > B} - Child combinator</li>
- *   <li>{@code A.class#id} - Compound selectors</li>
+ * <li>{@code *} - Universal selector (matches all elements)</li>
+ * <li>{@code Type} - Type selector (e.g., Panel, Button)</li>
+ * <li>{@code #id} - ID selector</li>
+ * <li>{@code .class} - Class selector</li>
+ * <li>{@code :pseudo} - Pseudo-class selector (focus, hover, disabled,
+ * etc.)</li>
+ * <li>{@code [attr]} - Attribute existence selector</li>
+ * <li>{@code [attr=value]} - Attribute equals selector</li>
+ * <li>{@code [attr^=value]} - Attribute starts-with selector</li>
+ * <li>{@code [attr$=value]} - Attribute ends-with selector</li>
+ * <li>{@code [attr*=value]} - Attribute contains selector</li>
+ * <li>{@code A B} - Descendant combinator</li>
+ * <li>{@code A > B} - Child combinator</li>
+ * <li>{@code A.class#id} - Compound selectors</li>
  * </ul>
  *
  * <pre>{@code
@@ -90,8 +91,8 @@ public final class ElementRegistry {
         private final Rect area;
         private final ElementInfo parent;
 
-        ElementInfo(String id, String type, Set<String> cssClasses,
-                    Map<String, String> attributes, Rect area, ElementInfo parent) {
+        ElementInfo(String id, String type, Set<String> cssClasses, Map<String, String> attributes,
+                Rect area, ElementInfo parent) {
             this.id = id;
             this.type = type;
             this.cssClasses = cssClasses != null ? cssClasses : Collections.emptySet();
@@ -184,10 +185,14 @@ public final class ElementRegistry {
     /**
      * Registers an element with full information.
      *
-     * @param elementId  the element ID (may be null)
-     * @param type       the element type name
-     * @param cssClasses the element's CSS classes
-     * @param area       the rendered area
+     * @param elementId
+     *            the element ID (may be null)
+     * @param type
+     *            the element type name
+     * @param cssClasses
+     *            the element's CSS classes
+     * @param area
+     *            the rendered area
      */
     public void register(String elementId, String type, Set<String> cssClasses, Rect area) {
         register(elementId, type, cssClasses, null, area, null);
@@ -198,15 +203,21 @@ public final class ElementRegistry {
      * <p>
      * Must be called from the render thread.
      *
-     * @param elementId  the element ID (may be null)
-     * @param type       the element type name
-     * @param cssClasses the element's CSS classes
-     * @param attributes the element's style attributes (may be null)
-     * @param area       the rendered area
-     * @param parent     the parent element info (may be null for root elements)
+     * @param elementId
+     *            the element ID (may be null)
+     * @param type
+     *            the element type name
+     * @param cssClasses
+     *            the element's CSS classes
+     * @param attributes
+     *            the element's style attributes (may be null)
+     * @param area
+     *            the rendered area
+     * @param parent
+     *            the parent element info (may be null for root elements)
      */
     public void register(String elementId, String type, Set<String> cssClasses,
-                         Map<String, String> attributes, Rect area, ElementInfo parent) {
+            Map<String, String> attributes, Rect area, ElementInfo parent) {
         RenderThread.checkRenderThread();
         if (area == null) {
             return;
@@ -223,8 +234,10 @@ public final class ElementRegistry {
      * <p>
      * This is a convenience method for simple ID-based registration.
      *
-     * @param elementId the element ID
-     * @param area      the rendered area
+     * @param elementId
+     *            the element ID
+     * @param area
+     *            the rendered area
      */
     public void register(String elementId, Rect area) {
         register(elementId, null, null, null, area, null);
@@ -235,7 +248,8 @@ public final class ElementRegistry {
      * <p>
      * Uses {@link PseudoClassState#NONE} for pseudo-class matching.
      *
-     * @param selector the CSS selector string
+     * @param selector
+     *            the CSS selector string
      * @return the matching element info, or empty if not found
      */
     public Optional<ElementInfo> query(String selector) {
@@ -245,8 +259,10 @@ public final class ElementRegistry {
     /**
      * Queries for a single element matching the selector with pseudo-class state.
      *
-     * @param selector the CSS selector string
-     * @param state    the pseudo-class state for matching
+     * @param selector
+     *            the CSS selector string
+     * @param state
+     *            the pseudo-class state for matching
      * @return the matching element info, or empty if not found
      */
     public Optional<ElementInfo> query(String selector, PseudoClassState state) {
@@ -259,7 +275,8 @@ public final class ElementRegistry {
 
             // Fast path for ID-only selector
             if (selector.startsWith("#") && !selector.contains(" ") && !selector.contains(">")
-                    && !selector.contains(".") && !selector.contains(":") && !selector.contains("[")) {
+                    && !selector.contains(".") && !selector.contains(":")
+                    && !selector.contains("[")) {
                 String id = selector.substring(1);
                 ElementInfo info = elementsById.get(id);
                 if (info != null && parsed.matches(info, state, info.ancestors())) {
@@ -285,7 +302,8 @@ public final class ElementRegistry {
      * <p>
      * Uses {@link PseudoClassState#NONE} for pseudo-class matching.
      *
-     * @param selector the CSS selector string
+     * @param selector
+     *            the CSS selector string
      * @return list of matching element info (may be empty)
      */
     public List<ElementInfo> queryAll(String selector) {
@@ -295,8 +313,10 @@ public final class ElementRegistry {
     /**
      * Queries for all elements matching the selector with pseudo-class state.
      *
-     * @param selector the CSS selector string
-     * @param state    the pseudo-class state for matching
+     * @param selector
+     *            the CSS selector string
+     * @param state
+     *            the pseudo-class state for matching
      * @return list of matching element info (may be empty)
      */
     public List<ElementInfo> queryAll(String selector, PseudoClassState state) {
@@ -325,7 +345,8 @@ public final class ElementRegistry {
      * <p>
      * This is a convenience method equivalent to {@code query("#" + elementId)}.
      *
-     * @param elementId the element ID
+     * @param elementId
+     *            the element ID
      * @return the element's area, or null if not registered
      */
     public Rect getArea(String elementId) {
@@ -339,7 +360,8 @@ public final class ElementRegistry {
     /**
      * Returns whether an element with the given ID is registered.
      *
-     * @param elementId the element ID
+     * @param elementId
+     *            the element ID
      * @return true if registered
      */
     public boolean contains(String elementId) {
@@ -352,8 +374,8 @@ public final class ElementRegistry {
     /**
      * Clears all registered elements.
      * <p>
-     * Should be called at the start of each render cycle.
-     * Must be called from the render thread.
+     * Should be called at the start of each render cycle. Must be called from the
+     * render thread.
      */
     public void clear() {
         RenderThread.checkRenderThread();

@@ -7,6 +7,9 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -27,9 +30,6 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.tabs.Tabs;
 import dev.tamboui.widgets.tabs.TabsState;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Demo TUI application showcasing the Tabs widget.
  */
@@ -37,52 +37,27 @@ public class TabsDemo {
 
     private static final String[] TAB_NAMES = {"Home", "Settings", "Profile", "Help"};
 
-    private static final String[][] TAB_CONTENT = {
-        { // Home
-            "Welcome to TamboUI!",
-            "",
+    private static final String[][] TAB_CONTENT = {{ // Home
+            "Welcome to TamboUI!", "",
             "TamboUI is a pure Java port of ratatui, the Rust library for",
-            "building terminal user interfaces.",
-            "",
-            "Features:",
+            "building terminal user interfaces.", "", "Features:",
             "  - Pure Java implementation (no native dependencies)",
             "  - Modern Java 21+ features (records, sealed classes, pattern matching)",
             "  - JLine backend for cross-platform terminal support",
-            "  - GraalVM native image compatible"
-        },
-        { // Settings
-            "Application Settings",
-            "",
-            "Theme:        Dark",
-            "Font Size:    Medium",
-            "Auto-save:    Enabled",
-            "Notifications: On",
-            "",
-            "Press 's' to toggle settings (demo only)"
-        },
-        { // Profile
-            "User Profile",
-            "",
-            "Username:     developer",
-            "Email:        dev@example.com",
-            "Role:         Administrator",
-            "Last Login:   Today",
-            "",
-            "Account created: January 2025"
-        },
-        { // Help
-            "Keyboard Shortcuts",
-            "",
-            "Navigation:",
-            "  Tab / Right Arrow  - Next tab",
-            "  Shift+Tab / Left   - Previous tab",
-            "  1-4                - Jump to tab",
-            "",
-            "General:",
-            "  q / Ctrl+C         - Quit application",
-            "  ?                  - Show this help"
-        }
-    };
+            "  - GraalVM native image compatible"},
+            { // Settings
+                    "Application Settings", "", "Theme:        Dark", "Font Size:    Medium",
+                    "Auto-save:    Enabled", "Notifications: On", "",
+                    "Press 's' to toggle settings (demo only)"},
+            { // Profile
+                    "User Profile", "", "Username:     developer", "Email:        dev@example.com",
+                    "Role:         Administrator", "Last Login:   Today", "",
+                    "Account created: January 2025"},
+            { // Help
+                    "Keyboard Shortcuts", "", "Navigation:", "  Tab / Right Arrow  - Next tab",
+                    "  Shift+Tab / Left   - Previous tab", "  1-4                - Jump to tab", "",
+                    "General:", "  q / Ctrl+C         - Quit application",
+                    "  ?                  - Show this help"}};
 
     private boolean running = true;
     private final TabsState tabsState = new TabsState(0);
@@ -93,8 +68,11 @@ public class TabsDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new TabsDemo().run();
@@ -103,9 +81,10 @@ public class TabsDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -198,14 +177,11 @@ public class TabsDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        List<Rect> layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Header
-                Constraint.length(3),  // Tabs
-                Constraint.fill(),     // Content
-                Constraint.length(3)   // Footer
-            )
-            .split(area);
+        List<Rect> layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.length(3), // Tabs
+                Constraint.fill(), // Content
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderTabs(frame, layout.get(1));
@@ -214,17 +190,11 @@ public class TabsDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Tabs Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("Tabs Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -234,25 +204,16 @@ public class TabsDemo {
         Line[] tabLines = new Line[TAB_NAMES.length];
         for (int i = 0; i < TAB_NAMES.length; i++) {
             String number = String.valueOf(i + 1);
-            tabLines[i] = Line.from(
-                Span.raw(number).dim(),
-                Span.raw(":"),
-                Span.raw(TAB_NAMES[i])
-            );
+            tabLines[i] = Line.from(Span.raw(number).dim(), Span.raw(":"), Span.raw(TAB_NAMES[i]));
         }
 
-        Tabs tabs = Tabs.builder()
-            .titles(tabLines)
-            .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
-            .style(Style.EMPTY.fg(Color.WHITE))
-            .divider(Span.raw(" │ ").fg(Color.DARK_GRAY))
-            .padding(" ", " ")
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.GREEN))
-                .build())
-            .build();
+        Tabs tabs = Tabs.builder().titles(tabLines)
+                .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
+                .style(Style.EMPTY.fg(Color.WHITE)).divider(Span.raw(" │ ").fg(Color.DARK_GRAY))
+                .padding(" ", " ")
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.GREEN)).build())
+                .build();
 
         frame.renderStatefulWidget(tabs, area, tabsState);
     }
@@ -273,45 +234,26 @@ public class TabsDemo {
             default -> Color.WHITE;
         };
 
-        Paragraph paragraph = Paragraph.builder()
-            .text(contentText)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
+        Paragraph paragraph = Paragraph.builder().text(contentText).block(Block.builder()
+                .borders(Borders.ALL).borderType(BorderType.ROUNDED)
                 .borderStyle(Style.EMPTY.fg(borderColor))
-                .title(Title.from(
-                    Line.from(
-                        Span.raw(" "),
-                        Span.raw(TAB_NAMES[tabIndex]).fg(borderColor).bold(),
-                        Span.raw(" ")
-                    )
-                ))
-                .build())
-            .build();
+                .title(Title.from(Line.from(Span.raw(" "),
+                        Span.raw(TAB_NAMES[tabIndex]).fg(borderColor).bold(), Span.raw(" "))))
+                .build()).build();
 
         frame.renderWidget(paragraph, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-            Span.raw(" Tab/→").bold().yellow(),
-            Span.raw(" Next  ").dim(),
-            Span.raw("←/Shift+Tab").bold().yellow(),
-            Span.raw(" Prev  ").dim(),
-            Span.raw("1-4").bold().yellow(),
-            Span.raw(" Jump  ").dim(),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" Tab/→").bold().yellow(), Span.raw(" Next  ").dim(),
+                Span.raw("←/Shift+Tab").bold().yellow(), Span.raw(" Prev  ").dim(),
+                Span.raw("1-4").bold().yellow(), Span.raw(" Jump  ").dim(),
+                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

@@ -4,13 +4,6 @@
  */
 package dev.tamboui.css.selector;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,7 +47,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("Button");
             TestElement element = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isTrue();
         }
 
         @Test
@@ -56,7 +57,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("Button");
             TestElement element = new TestElement("Panel", null, Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
     }
 
@@ -79,7 +81,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("#sidebar");
             TestElement element = new TestElement("Panel", "sidebar", Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isTrue();
         }
 
         @Test
@@ -88,7 +91,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("#sidebar");
             TestElement element = new TestElement("Panel", "header", Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
     }
 
@@ -111,7 +115,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse(".highlight");
             TestElement element = new TestElement("Text", null, setOf("highlight", "bold"));
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isTrue();
         }
 
         @Test
@@ -120,7 +125,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse(".highlight");
             TestElement element = new TestElement("Text", null, setOf("bold"));
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
     }
 
@@ -142,11 +148,9 @@ class SelectorParserTest {
         void matchesAnyElement() {
             Selector selector = SelectorParser.parse("*");
 
-            assertThat(selector.matches(
-                    new TestElement("Panel", null, Collections.emptySet()),
+            assertThat(selector.matches(new TestElement("Panel", null, Collections.emptySet()),
                     PseudoClassState.NONE, Collections.emptyList())).isTrue();
-            assertThat(selector.matches(
-                    new TestElement("Button", "btn1", setOf("primary")),
+            assertThat(selector.matches(new TestElement("Button", "btn1", setOf("primary")),
                     PseudoClassState.NONE, Collections.emptyList())).isTrue();
         }
     }
@@ -179,8 +183,10 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse(":focus");
             TestElement element = new TestElement("Input", null, Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.ofFocused(), Collections.emptyList())).isTrue();
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.ofFocused(),
+                    Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
 
         @Test
@@ -189,8 +195,10 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse(":hover");
             TestElement element = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.ofHovered(), Collections.emptyList())).isTrue();
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.ofHovered(),
+                    Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
 
         @Test
@@ -199,8 +207,10 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse(":disabled");
             TestElement element = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.ofDisabled(), Collections.emptyList())).isTrue();
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.ofDisabled(),
+                    Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
     }
 
@@ -257,7 +267,8 @@ class SelectorParserTest {
             TestElement element = new TestElement("Panel", null, Collections.emptySet());
             element.setAttribute("title", "My Panel");
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isTrue();
         }
 
         @Test
@@ -266,7 +277,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("[title]");
             TestElement element = new TestElement("Panel", null, Collections.emptySet());
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
 
         @Test
@@ -276,7 +288,8 @@ class SelectorParserTest {
             TestElement element = new TestElement("Panel", null, Collections.emptySet());
             element.setAttribute("title", "Hello");
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isTrue();
         }
     }
 
@@ -314,7 +327,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("Button.primary#submit");
             TestElement element = new TestElement("Button", "submit", setOf("primary", "large"));
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isTrue();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isTrue();
         }
 
         @Test
@@ -323,7 +337,8 @@ class SelectorParserTest {
             Selector selector = SelectorParser.parse("Button.primary#submit");
             TestElement element = new TestElement("Button", "cancel", setOf("primary"));
 
-            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList())).isFalse();
+            assertThat(selector.matches(element, PseudoClassState.NONE, Collections.emptyList()))
+                    .isFalse();
         }
     }
 
@@ -346,7 +361,8 @@ class SelectorParserTest {
             TestElement parent = new TestElement("Panel", null, Collections.emptySet());
             TestElement child = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(child, PseudoClassState.NONE, Collections.singletonList(parent))).isTrue();
+            assertThat(selector.matches(child, PseudoClassState.NONE,
+                    Collections.singletonList(parent))).isTrue();
         }
 
         @Test
@@ -368,7 +384,8 @@ class SelectorParserTest {
             TestElement parent = new TestElement("Row", null, Collections.emptySet());
             TestElement child = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(child, PseudoClassState.NONE, Collections.singletonList(parent))).isFalse();
+            assertThat(selector.matches(child, PseudoClassState.NONE,
+                    Collections.singletonList(parent))).isFalse();
         }
     }
 
@@ -391,7 +408,8 @@ class SelectorParserTest {
             TestElement parent = new TestElement("Panel", null, Collections.emptySet());
             TestElement child = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(child, PseudoClassState.NONE, Collections.singletonList(parent))).isTrue();
+            assertThat(selector.matches(child, PseudoClassState.NONE,
+                    Collections.singletonList(parent))).isTrue();
         }
 
         @Test
@@ -464,7 +482,8 @@ class SelectorParserTest {
             TestElement parent = new TestElement("Panel", null, Collections.emptySet());
             TestElement child = new TestElement("Button", null, Collections.emptySet());
 
-            assertThat(selector.matches(child, PseudoClassState.NONE, Collections.singletonList(parent))).isTrue();
+            assertThat(selector.matches(child, PseudoClassState.NONE,
+                    Collections.singletonList(parent))).isTrue();
         }
 
         @Test

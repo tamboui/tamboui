@@ -9,8 +9,8 @@ package dev.tamboui.widgets.chart;
  */
 public enum GraphType {
     /**
-     * Renders individual points without connecting lines.
-     * This is the default graph type.
+     * Renders individual points without connecting lines. This is the default graph
+     * type.
      */
     SCATTER,
 

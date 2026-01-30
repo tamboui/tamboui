@@ -4,31 +4,27 @@
  */
 package dev.tamboui.layout.flow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
- * A wrap layout widget where items flow left-to-right and wrap to the
- * next line when exceeding the available width.
+ * A wrap layout widget where items flow left-to-right and wrap to the next line
+ * when exceeding the available width.
  * <p>
- * Useful for tag clouds, button groups, chip lists, and similar layouts
- * where items should wrap naturally.
+ * Useful for tag clouds, button groups, chip lists, and similar layouts where
+ * items should wrap naturally.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
- * Flow flow = Flow.builder()
- *     .item(tagWidget1, 8)
- *     .item(tagWidget2, 12)
- *     .item(tagWidget3, 6)
- *     .horizontalSpacing(1)
- *     .verticalSpacing(1)
- *     .build();
+ * Flow flow = Flow.builder().item(tagWidget1, 8).item(tagWidget2, 12).item(tagWidget3, 6)
+ *         .horizontalSpacing(1).verticalSpacing(1).build();
  *
  * flow.render(area, buffer);
  * }</pre>
@@ -104,8 +100,10 @@ public final class Flow implements Widget {
         /**
          * Adds an item with the given widget and width (height defaults to 1).
          *
-         * @param widget the widget to render
-         * @param width  the width in cells
+         * @param widget
+         *            the widget to render
+         * @param width
+         *            the width in cells
          * @return this builder
          */
         public Builder item(Widget widget, int width) {
@@ -116,9 +114,12 @@ public final class Flow implements Widget {
         /**
          * Adds an item with the given widget, width, and height.
          *
-         * @param widget the widget to render
-         * @param width  the width in cells
-         * @param height the height in cells
+         * @param widget
+         *            the widget to render
+         * @param width
+         *            the width in cells
+         * @param height
+         *            the height in cells
          * @return this builder
          */
         public Builder item(Widget widget, int width, int height) {
@@ -129,7 +130,8 @@ public final class Flow implements Widget {
         /**
          * Sets the items from a list.
          *
-         * @param items the flow items
+         * @param items
+         *            the flow items
          * @return this builder
          */
         public Builder items(List<FlowItem> items) {
@@ -141,7 +143,8 @@ public final class Flow implements Widget {
         /**
          * Sets the horizontal gap between items on the same row.
          *
-         * @param spacing the horizontal spacing in cells (default: 0)
+         * @param spacing
+         *            the horizontal spacing in cells (default: 0)
          * @return this builder
          */
         public Builder horizontalSpacing(int spacing) {
@@ -152,7 +155,8 @@ public final class Flow implements Widget {
         /**
          * Sets the vertical gap between rows.
          *
-         * @param spacing the vertical spacing in cells (default: 0)
+         * @param spacing
+         *            the vertical spacing in cells (default: 0)
          * @return this builder
          */
         public Builder verticalSpacing(int spacing) {

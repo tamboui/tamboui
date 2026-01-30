@@ -4,6 +4,10 @@
  */
 package dev.tamboui.widgets.chart;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -12,40 +16,24 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A chart widget for plotting datasets in a cartesian coordinate system.
  * <p>
- * Supports scatter plots, line charts, and bar charts with configurable
- * axes, legends, and styling.
+ * Supports scatter plots, line charts, and bar charts with configurable axes,
+ * legends, and styling.
  *
  * <pre>{@code
  * Chart chart = Chart.builder()
- *     .datasets(
- *         Dataset.builder()
- *             .name("Series 1")
- *             .data(new double[][] {{0, 1}, {1, 3}, {2, 2}, {3, 4}})
- *             .graphType(GraphType.LINE)
- *             .style(Style.EMPTY.fg(Color.CYAN))
- *             .build()
- *     )
- *     .xAxis(Axis.builder()
- *         .title("X")
- *         .bounds(0, 4)
- *         .labels("0", "1", "2", "3", "4")
- *         .build())
- *     .yAxis(Axis.builder()
- *         .title("Y")
- *         .bounds(0, 5)
- *         .labels("0", "1", "2", "3", "4", "5")
- *         .build())
- *     .block(Block.bordered().title(Title.from("My Chart")))
- *     .build();
+ *         .datasets(Dataset.builder().name("Series 1")
+ *                 .data(new double[][]{{0, 1}, {1, 3}, {2, 2}, {3, 4}}).graphType(GraphType.LINE)
+ *                 .style(Style.EMPTY.fg(Color.CYAN)).build())
+ *         .xAxis(Axis.builder().title("X").bounds(0, 4).labels("0", "1", "2", "3", "4").build())
+ *         .yAxis(Axis.builder().title("Y").bounds(0, 5).labels("0", "1", "2", "3", "4", "5")
+ *                 .build())
+ *         .block(Block.bordered().title(Title.from("My Chart"))).build();
  * }</pre>
  *
  * @see Dataset
@@ -82,7 +70,8 @@ public final class Chart implements Widget {
     /**
      * Creates a chart with the given datasets.
      *
-     * @param datasets the datasets to plot
+     * @param datasets
+     *            the datasets to plot
      * @return a new chart
      */
     public static Chart of(Dataset... datasets) {
@@ -203,7 +192,8 @@ public final class Chart implements Widget {
                 int labelTextWidth = CharWidth.of(labelText);
                 // Center label under position
                 int labelX = x - labelTextWidth / 2;
-                labelX = Math.max(graphArea.x(), Math.min(labelX, graphArea.right() - labelTextWidth));
+                labelX = Math.max(graphArea.x(),
+                        Math.min(labelX, graphArea.right() - labelTextWidth));
                 buffer.setString(labelX, y, labelText, labelStyle);
             }
         }
@@ -273,27 +263,28 @@ public final class Chart implements Widget {
             double yFraction = (y - yMin) / yRange;
 
             screenX[i] = graphArea.x() + (int) Math.round(xFraction * (graphArea.width() - 1));
-            screenY[i] = graphArea.bottom() - 1 - (int) Math.round(yFraction * (graphArea.height() - 1));
+            screenY[i] = graphArea.bottom() - 1
+                    - (int) Math.round(yFraction * (graphArea.height() - 1));
         }
 
         // Render based on graph type
         switch (dataset.graphType()) {
-            case SCATTER:
+            case SCATTER :
                 renderScatter(buffer, graphArea, screenX, screenY, marker, dataStyle);
                 break;
-            case LINE:
+            case LINE :
                 renderLine(buffer, graphArea, screenX, screenY, marker, dataStyle);
                 break;
-            case BAR:
+            case BAR :
                 renderBars(buffer, graphArea, screenX, screenY, dataStyle);
                 break;
-            default:
+            default :
                 break;
         }
     }
 
     private void renderScatter(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY,
-                                String marker, Style style) {
+            String marker, Style style) {
         for (int i = 0; i < screenX.length; i++) {
             int x = screenX[i];
             int y = screenY[i];
@@ -304,17 +295,19 @@ public final class Chart implements Widget {
     }
 
     private void renderLine(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY,
-                             String marker, Style style) {
+            String marker, Style style) {
         // First render the points
         renderScatter(buffer, graphArea, screenX, screenY, marker, style);
 
         // Then connect with lines
         for (int i = 0; i < screenX.length - 1; i++) {
-            drawLine(buffer, graphArea, screenX[i], screenY[i], screenX[i + 1], screenY[i + 1], style);
+            drawLine(buffer, graphArea, screenX[i], screenY[i], screenX[i + 1], screenY[i + 1],
+                    style);
         }
     }
 
-    private void renderBars(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY, Style style) {
+    private void renderBars(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY,
+            Style style) {
         int baseY = graphArea.bottom() - 1;
 
         for (int i = 0; i < screenX.length; i++) {
@@ -330,7 +323,8 @@ public final class Chart implements Widget {
         }
     }
 
-    private void drawLine(Buffer buffer, Rect graphArea, int x0, int y0, int x1, int y1, Style style) {
+    private void drawLine(Buffer buffer, Rect graphArea, int x0, int y0, int x1, int y1,
+            Style style) {
         // Bresenham's line algorithm
         int dx = Math.abs(x1 - x0);
         int dy = Math.abs(y1 - y0);
@@ -386,9 +380,8 @@ public final class Chart implements Widget {
 
     private void renderLegend(Buffer buffer, Rect graphArea) {
         // Count datasets with names
-        List<Dataset> namedDatasets = datasets.stream()
-            .filter(Dataset::hasName)
-            .collect(Collectors.toList());
+        List<Dataset> namedDatasets = datasets.stream().filter(Dataset::hasName)
+                .collect(Collectors.toList());
 
         if (namedDatasets.isEmpty()) {
             return;
@@ -396,9 +389,8 @@ public final class Chart implements Widget {
 
         // Calculate legend size
         int maxNameLength = namedDatasets.stream()
-            .mapToInt(d -> d.name().map(n -> n.rawContent().length()).orElse(0))
-            .max()
-            .orElse(0);
+                .mapToInt(d -> d.name().map(n -> n.rawContent().length()).orElse(0)).max()
+                .orElse(0);
 
         int legendWidth = maxNameLength + 4; // marker + space + name + padding
         int legendHeight = namedDatasets.size();
@@ -406,23 +398,23 @@ public final class Chart implements Widget {
         // Position legend
         int legendX, legendY;
         switch (legendPosition) {
-            case TOP_LEFT:
+            case TOP_LEFT :
                 legendX = graphArea.x() + 1;
                 legendY = graphArea.y();
                 break;
-            case TOP_RIGHT:
+            case TOP_RIGHT :
                 legendX = graphArea.right() - legendWidth - 1;
                 legendY = graphArea.y();
                 break;
-            case BOTTOM_LEFT:
+            case BOTTOM_LEFT :
                 legendX = graphArea.x() + 1;
                 legendY = graphArea.bottom() - legendHeight;
                 break;
-            case BOTTOM_RIGHT:
+            case BOTTOM_RIGHT :
                 legendX = graphArea.right() - legendWidth - 1;
                 legendY = graphArea.bottom() - legendHeight;
                 break;
-            default:
+            default :
                 legendX = graphArea.right() - legendWidth - 1;
                 legendY = graphArea.y();
                 break;
@@ -433,7 +425,8 @@ public final class Chart implements Widget {
             Dataset ds = namedDatasets.get(i);
             int y = legendY + i;
             if (y >= graphArea.y() && y < graphArea.bottom()) {
-                String entry = ds.marker().symbol() + " " + ds.name().map(Line::rawContent).orElse("");
+                String entry = ds.marker().symbol() + " "
+                        + ds.name().map(Line::rawContent).orElse("");
                 buffer.setString(legendX, y, entry, ds.style());
             }
         }
@@ -447,10 +440,7 @@ public final class Chart implements Widget {
         if (!yAxis.hasLabels()) {
             return 0;
         }
-        return yAxis.labels().stream()
-            .mapToInt(s -> CharWidth.of(s.content()))
-            .max()
-            .orElse(0) + 1;
+        return yAxis.labels().stream().mapToInt(s -> CharWidth.of(s.content())).max().orElse(0) + 1;
     }
 
     /**
@@ -464,12 +454,14 @@ public final class Chart implements Widget {
         private Style style;
         private LegendPosition legendPosition = LegendPosition.TOP_RIGHT;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the datasets to plot.
          *
-         * @param datasets the datasets to plot
+         * @param datasets
+         *            the datasets to plot
          * @return this builder
          */
         public Builder datasets(Dataset... datasets) {
@@ -483,7 +475,8 @@ public final class Chart implements Widget {
         /**
          * Sets the datasets to plot.
          *
-         * @param datasets the datasets to plot
+         * @param datasets
+         *            the datasets to plot
          * @return this builder
          */
         public Builder datasets(List<Dataset> datasets) {
@@ -497,7 +490,8 @@ public final class Chart implements Widget {
         /**
          * Adds a dataset.
          *
-         * @param dataset the dataset to add
+         * @param dataset
+         *            the dataset to add
          * @return this builder
          */
         public Builder addDataset(Dataset dataset) {
@@ -510,7 +504,8 @@ public final class Chart implements Widget {
         /**
          * Sets the X-axis configuration.
          *
-         * @param xAxis the x-axis configuration
+         * @param xAxis
+         *            the x-axis configuration
          * @return this builder
          */
         public Builder xAxis(Axis xAxis) {
@@ -521,7 +516,8 @@ public final class Chart implements Widget {
         /**
          * Sets the Y-axis configuration.
          *
-         * @param yAxis the y-axis configuration
+         * @param yAxis
+         *            the y-axis configuration
          * @return this builder
          */
         public Builder yAxis(Axis yAxis) {
@@ -532,7 +528,8 @@ public final class Chart implements Widget {
         /**
          * Wraps the chart in a block.
          *
-         * @param block the block to wrap the chart in
+         * @param block
+         *            the block to wrap the chart in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -543,7 +540,8 @@ public final class Chart implements Widget {
         /**
          * Sets the chart style.
          *
-         * @param style the style to apply to the chart
+         * @param style
+         *            the style to apply to the chart
          * @return this builder
          */
         public Builder style(Style style) {
@@ -554,7 +552,8 @@ public final class Chart implements Widget {
         /**
          * Sets the legend position.
          *
-         * @param position the legend position
+         * @param position
+         *            the legend position
          * @return this builder
          */
         public Builder legendPosition(LegendPosition position) {

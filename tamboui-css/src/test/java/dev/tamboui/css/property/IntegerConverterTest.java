@@ -4,11 +4,11 @@
  */
 package dev.tamboui.css.property;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,26 +18,22 @@ class IntegerConverterTest {
 
     @Test
     void convertsPositiveInteger() {
-        assertThat(converter.convert("5", Collections.emptyMap()))
-            .hasValue(5);
+        assertThat(converter.convert("5", Collections.emptyMap())).hasValue(5);
     }
 
     @Test
     void convertsZero() {
-        assertThat(converter.convert("0", Collections.emptyMap()))
-            .hasValue(0);
+        assertThat(converter.convert("0", Collections.emptyMap())).hasValue(0);
     }
 
     @Test
     void convertsNegativeInteger() {
-        assertThat(converter.convert("-3", Collections.emptyMap()))
-            .hasValue(-3);
+        assertThat(converter.convert("-3", Collections.emptyMap())).hasValue(-3);
     }
 
     @Test
     void handlesWhitespace() {
-        assertThat(converter.convert("  10  ", Collections.emptyMap()))
-            .hasValue(10);
+        assertThat(converter.convert("  10  ", Collections.emptyMap())).hasValue(10);
     }
 
     @Test
@@ -45,8 +41,7 @@ class IntegerConverterTest {
         Map<String, String> variables = new HashMap<>();
         variables.put("gap", "2");
 
-        assertThat(converter.convert("$gap", variables))
-            .hasValue(2);
+        assertThat(converter.convert("$gap", variables)).hasValue(2);
     }
 
     @Test

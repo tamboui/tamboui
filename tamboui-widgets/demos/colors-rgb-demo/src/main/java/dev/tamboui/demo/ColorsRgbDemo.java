@@ -7,6 +7,9 @@
  */
 package dev.tamboui.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Alignment;
@@ -21,15 +24,11 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Demo TUI application showcasing RGB color support.
  * <p>
- * Displays the full range of RGB colors in an animated gradient.
- * Uses half-block characters (▀) to display two rows of pixels per screen row.
+ * Displays the full range of RGB colors in an animated gradient. Uses
+ * half-block characters (▀) to display two rows of pixels per screen row.
  * <p>
  * Requires a terminal that supports 24-bit color (true color).
  */
@@ -45,8 +44,11 @@ public class ColorsRgbDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new ColorsRgbDemo().run();
@@ -55,9 +57,10 @@ public class ColorsRgbDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -94,19 +97,13 @@ public class ColorsRgbDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(1),  // Title bar
-                Constraint.fill()      // Colors
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(1), // Title bar
+                Constraint.fill() // Colors
+        ).split(area);
 
-        var titleLayout = Layout.horizontal()
-            .constraints(
-                Constraint.fill(),     // Title
-                Constraint.length(8)   // FPS
-            )
-            .split(layout.get(0));
+        var titleLayout = Layout.horizontal().constraints(Constraint.fill(), // Title
+                Constraint.length(8) // FPS
+        ).split(layout.get(0));
 
         renderTitleBar(frame, titleLayout.get(0));
         fpsWidget.render(frame, titleLayout.get(1));
@@ -114,7 +111,8 @@ public class ColorsRgbDemo {
     }
 
     private void renderTitleBar(Frame frame, Rect area) {
-        Line titleLine = Line.from("colors_rgb example. Press q to quit").alignment(Alignment.CENTER);
+        Line titleLine = Line.from("colors_rgb example. Press q to quit")
+                .alignment(Alignment.CENTER);
         int titleX = area.left() + (area.width() - titleLine.width()) / 2;
         frame.buffer().setLine(titleX, area.top(), titleLine);
     }
@@ -165,30 +163,32 @@ public class ColorsRgbDemo {
             int height = area.height();
             int areaX = area.x();
             int areaY = area.y();
-            
+
             // Pre-calculate the symbol string to avoid repeated string creation
             String halfBlock = "▀";
-            
+
             // Pre-calculate modulo for animation
             int frameMod = frameCount % width;
-            
+
             // Optimize: cache color lists to avoid repeated get() calls
             // Reorder loops to cache row lookups
             for (int y = 0; y < height; y++) {
                 int colorY = y * 2;
                 List<Color.Rgb> fgRow = colors.get(colorY);
                 List<Color.Rgb> bgRow = colors.get(colorY + 1);
-                
+
                 for (int x = 0; x < width; x++) {
                     // Animate the colors by shifting the x index by the frame number
                     int xi = (x + frameMod) % width;
-                    
-                    // Render a half block character for each row of pixels with the foreground color
-                    // set to the color of the pixel and the background color set to the color of the
+
+                    // Render a half block character for each row of pixels with the foreground
+                    // color
+                    // set to the color of the pixel and the background color set to the color of
+                    // the
                     // pixel below it
                     Color.Rgb fg = fgRow.get(xi);
                     Color.Rgb bg = bgRow.get(xi);
-                    
+
                     // Create style and cell directly
                     Style style = Style.EMPTY.fg(fg).bg(bg);
                     Cell cell = new Cell(halfBlock, style);
@@ -200,7 +200,8 @@ public class ColorsRgbDemo {
 
         private void setupColors(Rect area) {
             int width = area.width();
-            int height = area.height() * 2; // Double height because each screen row has two rows of half block pixels
+            int height = area.height() * 2; // Double height because each screen row has two rows of
+                                            // half block pixels
 
             // Only update the colors if the size has changed
             if (colors.size() == height && !colors.isEmpty() && colors.get(0).size() == width) {
@@ -230,9 +231,12 @@ public class ColorsRgbDemo {
         /**
          * Converts HSV color to RGB.
          *
-         * @param h hue in degrees (0-360)
-         * @param s saturation (0-1)
-         * @param v value/brightness (0-1)
+         * @param h
+         *            hue in degrees (0-360)
+         * @param s
+         *            saturation (0-1)
+         * @param v
+         *            value/brightness (0-1)
          * @return RGB color
          */
         private Color.Rgb hsvToRgb(float h, float s, float v) {
@@ -281,4 +285,3 @@ public class ColorsRgbDemo {
         }
     }
 }
-

@@ -4,18 +4,18 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,8 +35,8 @@ class DefaultRenderContextChildStyleTest {
     @DisplayName("childStyle with ChildPosition resolves nth-child(odd)")
     void childStyleResolvesNthChildOdd() {
         // Given CSS with nth-child selectors
-        String css = "ListElement-item:nth-child(odd) { background: red; }\n" +
-                     "ListElement-item:nth-child(even) { background: blue; }";
+        String css = "ListElement-item:nth-child(odd) { background: red; }\n"
+                + "ListElement-item:nth-child(even) { background: blue; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 
@@ -57,8 +57,8 @@ class DefaultRenderContextChildStyleTest {
     @DisplayName("childStyle with ChildPosition resolves nth-child(even)")
     void childStyleResolvesNthChildEven() {
         // Given CSS with nth-child selectors
-        String css = "ListElement-item:nth-child(odd) { background: red; }\n" +
-                     "ListElement-item:nth-child(even) { background: blue; }";
+        String css = "ListElement-item:nth-child(odd) { background: red; }\n"
+                + "ListElement-item:nth-child(even) { background: blue; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 
@@ -95,8 +95,8 @@ class DefaultRenderContextChildStyleTest {
     @DisplayName("childStyle with hex colors parses correctly")
     void childStyleParsesHexColors() {
         // Given CSS with hex color values (like the real theme)
-        String css = "ListElement-item:nth-child(odd) { background: #ff0000; }\n" +
-                     "ListElement-item:nth-child(even) { background: #0000ff; }";
+        String css = "ListElement-item:nth-child(odd) { background: #ff0000; }\n"
+                + "ListElement-item:nth-child(even) { background: #0000ff; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 
@@ -127,11 +127,12 @@ class DefaultRenderContextChildStyleTest {
     @Test
     @DisplayName("childStyle with universal selector override")
     void childStyleWithUniversalSelectorOverride() {
-        // Given CSS with universal selector AND specific nth-child rules (like real theme)
-        String css = "* { background: black; color: white; }\n" +
-                     "ListElement-item { color: white; }\n" +
-                     "ListElement-item:nth-child(odd) { background: #992299; }\n" +
-                     "ListElement-item:nth-child(even) { background: #229922; }";
+        // Given CSS with universal selector AND specific nth-child rules (like real
+        // theme)
+        String css = "* { background: black; color: white; }\n"
+                + "ListElement-item { color: white; }\n"
+                + "ListElement-item:nth-child(odd) { background: #992299; }\n"
+                + "ListElement-item:nth-child(even) { background: #229922; }";
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
 

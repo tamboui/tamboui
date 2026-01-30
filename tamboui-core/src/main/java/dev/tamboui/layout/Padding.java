@@ -20,10 +20,14 @@ public final class Padding {
     /**
      * Creates a padding with the given values.
      *
-     * @param top    top padding
-     * @param right  right padding
-     * @param bottom bottom padding
-     * @param left   left padding
+     * @param top
+     *            top padding
+     * @param right
+     *            right padding
+     * @param bottom
+     *            bottom padding
+     * @param left
+     *            left padding
      */
     public Padding(int top, int right, int bottom, int left) {
         this.top = top;
@@ -35,7 +39,8 @@ public final class Padding {
     /**
      * Returns a uniform padding on all sides.
      *
-     * @param value padding in cells
+     * @param value
+     *            padding in cells
      * @return a padding with equal values on all sides
      */
     public static Padding uniform(int value) {
@@ -45,8 +50,10 @@ public final class Padding {
     /**
      * Returns a padding with symmetric vertical and horizontal values.
      *
-     * @param vertical   top/bottom padding
-     * @param horizontal left/right padding
+     * @param vertical
+     *            top/bottom padding
+     * @param horizontal
+     *            left/right padding
      * @return a padding with the given symmetric values
      */
     public static Padding symmetric(int vertical, int horizontal) {
@@ -56,7 +63,8 @@ public final class Padding {
     /**
      * Returns a padding applied horizontally only.
      *
-     * @param value left/right padding
+     * @param value
+     *            left/right padding
      * @return a padding with horizontal values set
      */
     public static Padding horizontal(int value) {
@@ -66,7 +74,8 @@ public final class Padding {
     /**
      * Returns a padding applied vertically only.
      *
-     * @param value top/bottom padding
+     * @param value
+     *            top/bottom padding
      * @return a padding with vertical values set
      */
     public static Padding vertical(int value) {
@@ -136,10 +145,8 @@ public final class Padding {
             return false;
         }
         Padding padding = (Padding) o;
-        return top == padding.top
-            && right == padding.right
-            && bottom == padding.bottom
-            && left == padding.left;
+        return top == padding.top && right == padding.right && bottom == padding.bottom
+                && left == padding.left;
     }
 
     @Override
@@ -153,6 +160,7 @@ public final class Padding {
 
     @Override
     public String toString() {
-        return String.format("Padding[top=%d, right=%d, bottom=%d, left=%d]", top, right, bottom, left);
+        return String.format("Padding[top=%d, right=%d, bottom=%d, left=%d]", top, right, bottom,
+                left);
     }
 }

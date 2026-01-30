@@ -4,6 +4,11 @@
  */
 package dev.tamboui.buffer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiConsumer;
+
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -12,15 +17,10 @@ import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiConsumer;
-
 /**
- * A buffer that stores cells for a rectangular area.
- * Widgets render to a Buffer, and the Terminal calculates diffs between buffers
- * to minimize updates sent to the backend.
+ * A buffer that stores cells for a rectangular area. Widgets render to a
+ * Buffer, and the Terminal calculates diffs between buffers to minimize updates
+ * sent to the backend.
  */
 public final class Buffer {
 
@@ -36,7 +36,8 @@ public final class Buffer {
     /**
      * Creates an empty buffer filled with empty cells.
      *
-     * @param area the area for the buffer
+     * @param area
+     *            the area for the buffer
      * @return a new empty buffer
      */
     public static Buffer empty(Rect area) {
@@ -48,8 +49,10 @@ public final class Buffer {
     /**
      * Creates a buffer filled with the given cell.
      *
-     * @param area the area for the buffer
-     * @param cell the cell to fill the buffer with
+     * @param area
+     *            the area for the buffer
+     * @param cell
+     *            the cell to fill the buffer with
      * @return a new buffer filled with the given cell
      */
     public static Buffer filled(Rect area, Cell cell) {
@@ -59,12 +62,12 @@ public final class Buffer {
     }
 
     /**
-     * Creates a buffer from an array of strings.
-     * Each string represents a line in the buffer.
-     * The buffer area is determined by the maximum line width and the number of lines.
-     * Lines shorter than the maximum width are padded with spaces.
+     * Creates a buffer from an array of strings. Each string represents a line in
+     * the buffer. The buffer area is determined by the maximum line width and the
+     * number of lines. Lines shorter than the maximum width are padded with spaces.
      *
-     * @param lines the lines to create the buffer from
+     * @param lines
+     *            the lines to create the buffer from
      * @return a new buffer containing the lines
      */
     public static Buffer withLines(String... lines) {
@@ -99,10 +102,11 @@ public final class Buffer {
      * Sets a listener to be notified when styled content is written to this buffer.
      * <p>
      * The listener receives the style and area for each span written to the buffer.
-     * This allows external systems (like Frame) to track styled areas for
-     * effect targeting without Buffer needing to know about registries.
+     * This allows external systems (like Frame) to track styled areas for effect
+     * targeting without Buffer needing to know about registries.
      *
-     * @param listener the listener, or null to disable notifications
+     * @param listener
+     *            the listener, or null to disable notifications
      */
     public void setStyledContentListener(BiConsumer<Style, Rect> listener) {
         this.styledContentListener = listener;
@@ -138,8 +142,10 @@ public final class Buffer {
     /**
      * Gets the cell at the given position.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
      * @return the cell at the position, or an empty cell if out of bounds
      */
     public Cell get(int x, int y) {
@@ -152,7 +158,8 @@ public final class Buffer {
     /**
      * Gets the cell at the given position.
      *
-     * @param pos the position
+     * @param pos
+     *            the position
      * @return the cell at the position, or an empty cell if out of bounds
      */
     public Cell get(Position pos) {
@@ -162,9 +169,12 @@ public final class Buffer {
     /**
      * Sets the cell at the given position.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param cell the cell to set
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param cell
+     *            the cell to set
      */
     public void set(int x, int y, Cell cell) {
         if (area.contains(x, y)) {
@@ -175,32 +185,39 @@ public final class Buffer {
     /**
      * Sets the cell at the given position.
      *
-     * @param pos the position
-     * @param cell the cell to set
+     * @param pos
+     *            the position
+     * @param cell
+     *            the cell to set
      */
     public void set(Position pos, Cell cell) {
         set(pos.x(), pos.y(), cell);
     }
 
     /**
-     * Sets a string at the given position with the given style.
-     * Returns the x position after the last character written.
+     * Sets a string at the given position with the given style. Returns the x
+     * position after the last character written.
      * <p>
      * This method patches the style of existing cells rather than replacing them,
-     * preserving background colors and other style attributes that were previously set.
-     * This matches the behavior of ratatui.rs.
+     * preserving background colors and other style attributes that were previously
+     * set. This matches the behavior of ratatui.rs.
      * <p>
      * Handles grapheme clusters correctly:
      * <ul>
-     *   <li>ZWJ sequences: characters after ZWJ are appended to the preceding cell</li>
-     *   <li>Regional Indicator pairs: combined into a single 2-wide cell</li>
-     *   <li>Skin tone modifiers: appended to preceding cell (zero-width)</li>
+     * <li>ZWJ sequences: characters after ZWJ are appended to the preceding
+     * cell</li>
+     * <li>Regional Indicator pairs: combined into a single 2-wide cell</li>
+     * <li>Skin tone modifiers: appended to preceding cell (zero-width)</li>
      * </ul>
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param string the string to set
-     * @param style the style to apply (will be patched onto existing cell style)
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param string
+     *            the string to set
+     * @param style
+     *            the style to apply (will be patched onto existing cell style)
      * @return the x position after the last character written
      */
     public int setString(int x, int y, String string, Style style) {
@@ -210,7 +227,7 @@ public final class Buffer {
 
         int col = x;
         boolean appendToLast = false; // true after ZWJ - next char should join
-        for (int i = 0; i < string.length(); ) {
+        for (int i = 0; i < string.length();) {
             if (col >= area.right()) {
                 break;
             }
@@ -241,8 +258,8 @@ public final class Buffer {
                     int next = string.codePointAt(nextIdx);
                     if (isRegionalIndicator(next)) {
                         // Combine both RIs into a single 2-wide cell
-                        String flag = new String(Character.toChars(codePoint)) +
-                                      new String(Character.toChars(next));
+                        String flag = new String(Character.toChars(codePoint))
+                                + new String(Character.toChars(next));
 
                         if (col + 1 >= area.right()) {
                             // No room for 2-wide flag, replace with space
@@ -302,11 +319,13 @@ public final class Buffer {
                     set(col - 1, y, get(col - 1, y).symbol(" "));
                 }
 
-                // If this is a wide char, check if the next cell is also a continuation of something
+                // If this is a wide char, check if the next cell is also a continuation of
+                // something
                 if (charWidth == 2 && col + 1 < area.right()) {
                     Cell next = get(col + 1, y);
                     if (next.isContinuation()) {
-                        // The cell after our continuation was itself a continuation - clear its owner
+                        // The cell after our continuation was itself a continuation - clear its
+                        // owner
                         // (This handles overwriting in the middle of an existing wide char)
                     }
                 }
@@ -329,9 +348,9 @@ public final class Buffer {
     }
 
     /**
-     * Finds the base cell (non-continuation) for a given column.
-     * Looks backward from col-1 to find the first non-continuation cell.
-     * Returns -1 if no base cell found within the area.
+     * Finds the base cell (non-continuation) for a given column. Looks backward
+     * from col-1 to find the first non-continuation cell. Returns -1 if no base
+     * cell found within the area.
      */
     private int findBaseCell(int col, int y) {
         int searchCol = col - 1;
@@ -346,22 +365,26 @@ public final class Buffer {
     }
 
     /**
-     * Returns true if the code point is a Regional Indicator symbol (U+1F1E6-U+1F1FF).
+     * Returns true if the code point is a Regional Indicator symbol
+     * (U+1F1E6-U+1F1FF).
      */
     private static boolean isRegionalIndicator(int codePoint) {
         return codePoint >= 0x1F1E6 && codePoint <= 0x1F1FF;
     }
 
     /**
-     * Sets a span at the given position.
-     * Returns the x position after the last character written.
+     * Sets a span at the given position. Returns the x position after the last
+     * character written.
      * <p>
-     * If a styled content listener is set, it will be notified with the
-     * span's style and area.
+     * If a styled content listener is set, it will be notified with the span's
+     * style and area.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param span the span to set
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param span
+     *            the span to set
      * @return the x position after the last character written
      */
     public int setSpan(int x, int y, Span span) {
@@ -381,12 +404,15 @@ public final class Buffer {
     }
 
     /**
-     * Sets a line at the given position.
-     * Returns the x position after the last character written.
+     * Sets a line at the given position. Returns the x position after the last
+     * character written.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param line the line to set
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param line
+     *            the line to set
      * @return the x position after the last character written
      */
     public int setLine(int x, int y, Line line) {
@@ -401,8 +427,10 @@ public final class Buffer {
     /**
      * Sets the style for all cells in the given area.
      *
-     * @param area the area to set the style for
-     * @param style the style to apply
+     * @param area
+     *            the area to set the style for
+     * @param style
+     *            the style to apply
      */
     public void setStyle(Rect area, Style style) {
         Rect intersection = this.area.intersection(area);
@@ -421,8 +449,10 @@ public final class Buffer {
     /**
      * Fills the given area with the specified cell.
      *
-     * @param area the area to fill
-     * @param cell the cell to fill with
+     * @param area
+     *            the area to fill
+     * @param cell
+     *            the cell to fill with
      */
     public void fill(Rect area, Cell cell) {
         Rect intersection = this.area.intersection(area);
@@ -447,7 +477,8 @@ public final class Buffer {
     /**
      * Resets the buffer to empty cells within the given area.
      *
-     * @param area the area to clear
+     * @param area
+     *            the area to clear
      */
     public void clear(Rect area) {
         fill(area, Cell.EMPTY);
@@ -456,9 +487,12 @@ public final class Buffer {
     /**
      * Merges another buffer into this one at the specified position.
      *
-     * @param other the buffer to merge
-     * @param offsetX the x offset for merging
-     * @param offsetY the y offset for merging
+     * @param other
+     *            the buffer to merge
+     * @param offsetX
+     *            the x offset for merging
+     * @param offsetY
+     *            the y offset for merging
      */
     public void merge(Buffer other, int offsetX, int offsetY) {
         for (int y = 0; y < other.height(); y++) {
@@ -483,10 +517,11 @@ public final class Buffer {
     }
 
     /**
-     * Calculates the differences between this buffer and another.
-     * Returns a list of cell updates needed to transform this buffer into the other.
+     * Calculates the differences between this buffer and another. Returns a list of
+     * cell updates needed to transform this buffer into the other.
      *
-     * @param other the buffer to compare with
+     * @param other
+     *            the buffer to compare with
      * @return a list of cell updates representing the differences
      */
     public List<CellUpdate> diff(Buffer other) {
@@ -517,11 +552,13 @@ public final class Buffer {
     }
 
     /**
-     * Renders the buffer content as an ANSI-escaped string.
-     * Each row becomes a line of output with embedded ANSI escape codes for styling.
-     * The result can be printed directly to stdout without needing the full TUI system.
+     * Renders the buffer content as an ANSI-escaped string. Each row becomes a line
+     * of output with embedded ANSI escape codes for styling. The result can be
+     * printed directly to stdout without needing the full TUI system.
      *
-     * <p>Example usage:
+     * <p>
+     * Example usage:
+     * 
      * <pre>{@code
      * Buffer buffer = Buffer.empty(Rect.of(80, 3));
      * myWidget.render(buffer.area(), buffer);
@@ -564,9 +601,10 @@ public final class Buffer {
     }
 
     /**
-     * Renders the buffer content as an ANSI-escaped string using explicit cursor positioning.
-     * Each row is preceded by a cursor position escape sequence (CSI row;1H) to ensure
-     * correct rendering in terminal recording players like asciinema.
+     * Renders the buffer content as an ANSI-escaped string using explicit cursor
+     * positioning. Each row is preceded by a cursor position escape sequence (CSI
+     * row;1H) to ensure correct rendering in terminal recording players like
+     * asciinema.
      *
      * @return an ANSI string representation of the buffer with cursor positioning
      */
@@ -600,11 +638,12 @@ public final class Buffer {
     }
 
     /**
-     * Renders the buffer content as an ANSI-escaped string, trimming trailing whitespace
-     * from each line. This produces cleaner output when the buffer contains significant
-     * empty space on the right side.
+     * Renders the buffer content as an ANSI-escaped string, trimming trailing
+     * whitespace from each line. This produces cleaner output when the buffer
+     * contains significant empty space on the right side.
      *
-     * @return an ANSI string representation of the buffer with trailing spaces removed
+     * @return an ANSI string representation of the buffer with trailing spaces
+     *         removed
      */
     public String toAnsiStringTrimmed() {
         StringBuilder result = new StringBuilder();
@@ -656,7 +695,7 @@ public final class Buffer {
     private int index(int x, int y) {
         return (y - area.y()) * area.width() + (x - area.x());
     }
- 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

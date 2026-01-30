@@ -26,10 +26,14 @@ public final class Rect {
     /**
      * Creates a rectangle at the given position and size.
      *
-     * @param x      left coordinate
-     * @param y      top coordinate
-     * @param width  width in cells
-     * @param height height in cells
+     * @param x
+     *            left coordinate
+     * @param y
+     *            top coordinate
+     * @param width
+     *            width in cells
+     * @param height
+     *            height in cells
      */
     public Rect(int x, int y, int width, int height) {
         this.x = x;
@@ -50,8 +54,10 @@ public final class Rect {
     /**
      * Creates a rectangle at origin with the given size.
      *
-     * @param width  width in cells
-     * @param height height in cells
+     * @param width
+     *            width in cells
+     * @param height
+     *            height in cells
      * @return a rectangle starting at (0,0)
      */
     public static Rect of(int width, int height) {
@@ -61,58 +67,84 @@ public final class Rect {
     /**
      * Creates a rectangle from a position and size.
      *
-     * @param position top-left position
-     * @param size     size of the rectangle
+     * @param position
+     *            top-left position
+     * @param size
+     *            size of the rectangle
      * @return a rectangle at the given position and size
      */
     public static Rect of(Position position, Size size) {
         return new Rect(position.x(), position.y(), size.width(), size.height());
     }
 
-    /** Returns the x coordinate.
-     * @return x coordinate */
+    /**
+     * Returns the x coordinate.
+     * 
+     * @return x coordinate
+     */
     public int x() {
         return x;
     }
 
-    /** Returns the y coordinate.
-     * @return y coordinate */
+    /**
+     * Returns the y coordinate.
+     * 
+     * @return y coordinate
+     */
     public int y() {
         return y;
     }
 
-    /** Returns the width.
-     * @return width */
+    /**
+     * Returns the width.
+     * 
+     * @return width
+     */
     public int width() {
         return width;
     }
 
-    /** Returns the height.
-     * @return height */
+    /**
+     * Returns the height.
+     * 
+     * @return height
+     */
     public int height() {
         return height;
     }
 
-    /** Returns the left edge (same as {@link #x()}).
-     * @return left edge */
+    /**
+     * Returns the left edge (same as {@link #x()}).
+     * 
+     * @return left edge
+     */
     public int left() {
         return x;
     }
 
-    /** Returns the right edge (exclusive).
-     * @return right edge */
+    /**
+     * Returns the right edge (exclusive).
+     * 
+     * @return right edge
+     */
     public int right() {
         return x + width;
     }
 
-    /** Returns the top edge (same as {@link #y()}).
-     * @return top edge */
+    /**
+     * Returns the top edge (same as {@link #y()}).
+     * 
+     * @return top edge
+     */
     public int top() {
         return y;
     }
 
-    /** Returns the bottom edge (exclusive).
-     * @return bottom edge */
+    /**
+     * Returns the bottom edge (exclusive).
+     * 
+     * @return bottom edge
+     */
     public int bottom() {
         return y + height;
     }
@@ -156,19 +188,21 @@ public final class Rect {
     /**
      * Returns true if the given position lies inside this rectangle.
      *
-     * @param pos position to test
+     * @param pos
+     *            position to test
      * @return true if contained
      */
     public boolean contains(Position pos) {
-        return pos.x() >= x && pos.x() < right()
-            && pos.y() >= y && pos.y() < bottom();
+        return pos.x() >= x && pos.x() < right() && pos.y() >= y && pos.y() < bottom();
     }
 
     /**
      * Returns true if the given coordinates lie inside this rectangle.
      *
-     * @param px x coordinate
-     * @param py y coordinate
+     * @param px
+     *            x coordinate
+     * @param py
+     *            y coordinate
      * @return true if contained
      */
     public boolean contains(int px, int py) {
@@ -178,7 +212,8 @@ public final class Rect {
     /**
      * Returns the inner area after applying the given margin.
      *
-     * @param margin margin to subtract
+     * @param margin
+     *            margin to subtract
      * @return inner rectangle (clamped to non-negative size)
      */
     public Rect inner(Margin margin) {
@@ -192,7 +227,8 @@ public final class Rect {
     /**
      * Returns the intersection of this rectangle with another.
      *
-     * @param other rectangle to intersect with
+     * @param other
+     *            rectangle to intersect with
      * @return overlapping rectangle, or {@link #ZERO} if none
      */
     public Rect intersection(Rect other) {
@@ -210,7 +246,8 @@ public final class Rect {
     /**
      * Returns the union of this rectangle with another.
      *
-     * @param other rectangle to union with
+     * @param other
+     *            rectangle to union with
      * @return bounding rectangle covering both
      */
     public Rect union(Rect other) {
@@ -233,10 +270,8 @@ public final class Rect {
      * @return stream of positions
      */
     public Stream<Position> positions() {
-        return IntStream.range(y, bottom())
-            .boxed()
-            .flatMap(row -> IntStream.range(x, right())
-                .mapToObj(col -> new Position(col, row)));
+        return IntStream.range(y, bottom()).boxed().flatMap(
+                row -> IntStream.range(x, right()).mapToObj(col -> new Position(col, row)));
     }
 
     /**
@@ -294,7 +329,8 @@ public final class Rect {
     /**
      * Clamps another rectangle to fit within this one.
      *
-     * @param inner rectangle to clamp
+     * @param inner
+     *            rectangle to clamp
      * @return clamped rectangle
      */
     public Rect clamp(Rect inner) {
@@ -317,10 +353,7 @@ public final class Rect {
         if (cachedHashCode != rect.cachedHashCode) {
             return false;
         }
-        return x == rect.x
-            && y == rect.y
-            && width == rect.width
-            && height == rect.height;
+        return x == rect.x && y == rect.y && width == rect.width && height == rect.height;
     }
 
     @Override

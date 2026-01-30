@@ -4,19 +4,6 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.build.model.DemosModel;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.style.Color;
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.toolkit.elements.ListElement;
-import dev.tamboui.style.Overflow;
-import org.gradle.tooling.GradleConnector;
-
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -29,6 +16,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.gradle.tooling.GradleConnector;
+
+import dev.tamboui.build.model.DemosModel;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.toolkit.app.ToolkitApp;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.elements.ListElement;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -49,18 +50,17 @@ public class DemoSelector extends ToolkitApp {
     private final List<DisplayItem> displayItems = new ArrayList<>();
 
     private DemoSelector() {
-        demoList = list()
-            .highlightSymbol("> ")
-            .highlightColor(Color.YELLOW)
-            .autoScroll()
-            .scrollbar()
-            .scrollbarThumbColor(Color.CYAN);
+        demoList = list().highlightSymbol("> ").highlightColor(Color.YELLOW).autoScroll()
+                .scrollbar().scrollbarThumbColor(Color.CYAN);
     }
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         var selector = new DemoSelector();
@@ -97,12 +97,14 @@ public class DemoSelector extends ToolkitApp {
             var demos = entry.getValue();
 
             // Filter demos
-            var filteredDemos = filter.isEmpty() ? demos : demos.stream()
-                    .filter(d -> d.displayName().toLowerCase(Locale.ROOT).contains(lowerFilter)
-                            || d.name().toLowerCase(Locale.ROOT).contains(lowerFilter)
+            var filteredDemos = filter.isEmpty()
+                    ? demos
+                    : demos.stream().filter(d -> d.displayName().toLowerCase(Locale.ROOT).contains(
+                            lowerFilter) || d.name().toLowerCase(Locale.ROOT).contains(lowerFilter)
                             || d.description().toLowerCase(Locale.ROOT).contains(lowerFilter)
-                            || d.tags().stream().anyMatch(t -> t.toLowerCase(Locale.ROOT).contains(lowerFilter)))
-                    .toList();
+                            || d.tags().stream().anyMatch(
+                                    t -> t.toLowerCase(Locale.ROOT).contains(lowerFilter)))
+                            .toList();
 
             if (filteredDemos.isEmpty() && !filter.isEmpty()) {
                 continue; // Skip empty groups when filtering
@@ -147,9 +149,7 @@ public class DemoSelector extends ToolkitApp {
             lines.add(item.toDisplayString());
         }
 
-        var title = filter.isEmpty()
-                ? "Demos (" + totalDemoCount() + ")"
-                : "Filter: " + filter;
+        var title = filter.isEmpty() ? "Demos (" + totalDemoCount() + ")" : "Filter: " + filter;
 
         var selected = selectedItem();
 
@@ -158,53 +158,39 @@ public class DemoSelector extends ToolkitApp {
         if (selected != null && selected.demo() != null) {
             var tags = selected.demo().tags();
             var tagsLine = tags.isEmpty() ? "" : "Tags: " + String.join(", ", tags);
-            descriptionContent = column(
-                    text(tagsLine).magenta().overflow(Overflow.WRAP_WORD),
-                    text(""),
-                    text(selected.demo().description()).overflow(Overflow.WRAP_WORD)
-            );
+            descriptionContent = column(text(tagsLine).magenta().overflow(Overflow.WRAP_WORD),
+                    text(""), text(selected.demo().description()).overflow(Overflow.WRAP_WORD));
         } else if (selected != null) {
             // Module header selected
             var count = demosByModule.get(selected.module()).size();
-            descriptionContent = column(
-                    text(selected.module()).bold().cyan().length(1),
-                    text(""),
+            descriptionContent = column(text(selected.module()).bold().cyan().length(1), text(""),
                     text(count + " demo" + (count != 1 ? "s" : "") + " in this module.").length(1),
                     text(""),
-                    text(selected.expanded() ? "Press ← or Enter to collapse." : "Press → or Enter to expand.")
-                            .dim().length(1)
-            );
+                    text(selected.expanded()
+                            ? "Press ← or Enter to collapse."
+                            : "Press → or Enter to expand.").dim().length(1));
         } else {
             descriptionContent = text("");
         }
 
         return dock()
                 // Header
-                .top(panel(
-                        text(" TamboUI Demo Selector ").bold().cyan()
-                ).rounded().borderColor(Color.CYAN))
+                .top(panel(text(" TamboUI Demo Selector ").bold().cyan()).rounded()
+                        .borderColor(Color.CYAN))
 
                 // Demo list (left side)
-                .left(panel(
-                        demoList.items(lines)
-                )
-                        .title(title)
-                        .rounded()
-                        .borderColor(filter.isEmpty() ? Color.WHITE : Color.YELLOW)
-                        .id("demo-list")
-                        .focusable()
-                        .onKeyEvent(this::handleKey), Constraint.percentage(50))
+                .left(panel(demoList.items(lines)).title(title).rounded()
+                        .borderColor(filter.isEmpty() ? Color.WHITE : Color.YELLOW).id("demo-list")
+                        .focusable().onKeyEvent(this::handleKey), Constraint.percentage(50))
 
                 // Description panel (center/right)
-                .center(panel(descriptionContent)
-                        .title("Description")
-                        .rounded()
+                .center(panel(descriptionContent).title("Description").rounded()
                         .borderColor(Color.DARK_GRAY))
 
                 // Footer
-                .bottom(panel(
-                        text(" Type: Filter | ←/→: Collapse/Expand | ↑↓: Navigate | PgUp/PgDn: Sections | Enter: Select | Ctrl+C: Quit ").dim()
-                ).rounded().borderColor(Color.DARK_GRAY));
+                .bottom(panel(text(
+                        " Type: Filter | ←/→: Collapse/Expand | ↑↓: Navigate | PgUp/PgDn: Sections | Enter: Select | Ctrl+C: Quit ")
+                        .dim()).rounded().borderColor(Color.DARK_GRAY));
     }
 
     private EventResult handleKey(KeyEvent event) {
@@ -364,16 +350,13 @@ public class DemoSelector extends ToolkitApp {
         System.setErr(new PrintStream(OutputStream.nullOutputStream()));
 
         // Use Gradle Tooling API to fetch the demos model
-        try (var connection = GradleConnector.newConnector()
-                .forProjectDirectory(projectRoot)
+        try (var connection = GradleConnector.newConnector().forProjectDirectory(projectRoot)
                 .connect()) {
 
             // Suppress Gradle output by redirecting to null streams
-            var model = connection.model(DemosModel.class)
-                    .setColorOutput(false)
+            var model = connection.model(DemosModel.class).setColorOutput(false)
                     .setStandardOutput(OutputStream.nullOutputStream())
-                    .setStandardError(OutputStream.nullOutputStream())
-                    .get();
+                    .setStandardError(OutputStream.nullOutputStream()).get();
 
             for (var demo : model.getDemos()) {
                 if (SELF_NAME.equals(demo.getName())) {
@@ -381,19 +364,15 @@ public class DemoSelector extends ToolkitApp {
                 }
 
                 var module = demo.getModule();
-                var demoInfo = new DemoInfo(
-                        demo.getName(),
-                        demo.getDisplayName(),
-                        demo.getDescription(),
-                        module,
-                        demo.getTags()
-                );
+                var demoInfo = new DemoInfo(demo.getName(), demo.getDisplayName(),
+                        demo.getDescription(), module, demo.getTags());
 
                 demosByModule.computeIfAbsent(module, k -> new ArrayList<>()).add(demoInfo);
             }
         } catch (Exception e) {
             // Fall back to empty list if Tooling API fails
-            throw new RuntimeException("Warning: Could not fetch demos via Tooling API: " + e.getMessage());
+            throw new RuntimeException(
+                    "Warning: Could not fetch demos via Tooling API: " + e.getMessage());
         } finally {
             System.setOut(stdout);
             System.setErr(stderr);
@@ -415,7 +394,8 @@ public class DemoSelector extends ToolkitApp {
         return null;
     }
 
-    private record DemoInfo(String name, String displayName, String description, String module, Set<String> tags) {
+    private record DemoInfo(String name, String displayName, String description, String module,
+            Set<String> tags) {
     }
 
     /**

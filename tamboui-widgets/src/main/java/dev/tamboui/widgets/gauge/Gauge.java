@@ -11,44 +11,41 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
 /**
- * A progress bar widget that renders a bar filled according to the progress value.
+ * A progress bar widget that renders a bar filled according to the progress
+ * value.
  * <p>
- * Progress can be set as a percentage (0-100) or as a ratio (0.0-1.0).
- * The gauge can optionally display a label centered in the bar.
+ * Progress can be set as a percentage (0-100) or as a ratio (0.0-1.0). The
+ * gauge can optionally display a label centered in the bar.
  * <p>
  * When unicode mode is enabled, the widget uses block characters for smoother
  * visual progression with 8 extra fractional parts per cell.
  *
  * <pre>{@code
- * Gauge gauge = Gauge.builder()
- *     .percent(75)
- *     .label("75%")
- *     .gaugeStyle(Style.EMPTY.fg(Color.GREEN))
- *     .build();
+ * Gauge gauge = Gauge.builder().percent(75).label("75%").gaugeStyle(Style.EMPTY.fg(Color.GREEN))
+ *         .build();
  * }</pre>
  */
 public final class Gauge implements Widget {
 
     // Unicode block characters for sub-cell precision (1/8 increments)
-    private static final String[] UNICODE_BLOCKS = {
-        " ",  // 0/8 - empty
-        "▏",  // 1/8
-        "▎",  // 2/8
-        "▍",  // 3/8
-        "▌",  // 4/8
-        "▋",  // 5/8
-        "▊",  // 6/8
-        "▉",  // 7/8
-        "█"   // 8/8 - full
+    private static final String[] UNICODE_BLOCKS = {" ", // 0/8 - empty
+            "▏", // 1/8
+            "▎", // 2/8
+            "▍", // 3/8
+            "▌", // 4/8
+            "▋", // 5/8
+            "▊", // 6/8
+            "▉", // 7/8
+            "█" // 8/8 - full
     };
 
     /**
@@ -56,8 +53,8 @@ public final class Gauge implements Widget {
      * <p>
      * CSS property name: {@code gauge-color}
      */
-    public static final PropertyDefinition<Color> GAUGE_COLOR =
-            PropertyDefinition.of("gauge-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> GAUGE_COLOR = PropertyDefinition.of("gauge-color",
+            ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.register(GAUGE_COLOR);
@@ -105,7 +102,8 @@ public final class Gauge implements Widget {
     /**
      * Creates a gauge with the given percentage (0-100).
      *
-     * @param percent the progress percentage (0-100)
+     * @param percent
+     *            the progress percentage (0-100)
      * @return a new gauge
      */
     public static Gauge percent(int percent) {
@@ -115,7 +113,8 @@ public final class Gauge implements Widget {
     /**
      * Creates a gauge with the given ratio (0.0-1.0).
      *
-     * @param ratio the progress ratio (0.0-1.0)
+     * @param ratio
+     *            the progress ratio (0.0-1.0)
      * @return a new gauge
      */
     public static Gauge ratio(double ratio) {
@@ -148,7 +147,8 @@ public final class Gauge implements Widget {
         int fullCells = (int) filledWidth;
 
         // Render filled portion
-        for (int x = gaugeArea.left(); x < gaugeArea.left() + fullCells && x < gaugeArea.right(); x++) {
+        for (int x = gaugeArea.left(); x < gaugeArea.left() + fullCells
+                && x < gaugeArea.right(); x++) {
             for (int y = gaugeArea.top(); y < gaugeArea.bottom(); y++) {
                 buffer.set(x, y, new Cell(UNICODE_BLOCKS[8], gaugeStyle)); // Full block
             }
@@ -217,18 +217,22 @@ public final class Gauge implements Widget {
         private Color background;
         private Color gaugeColor;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the progress as a percentage (0-100).
          *
-         * @param percent the progress percentage (0-100)
+         * @param percent
+         *            the progress percentage (0-100)
          * @return this builder
-         * @throws IllegalArgumentException if percent is not in range 0-100
+         * @throws IllegalArgumentException
+         *             if percent is not in range 0-100
          */
         public Builder percent(int percent) {
             if (percent < 0 || percent > 100) {
-                throw new IllegalArgumentException("Percent must be between 0 and 100, got: " + percent);
+                throw new IllegalArgumentException(
+                        "Percent must be between 0 and 100, got: " + percent);
             }
             this.ratio = percent / 100.0;
             return this;
@@ -237,23 +241,27 @@ public final class Gauge implements Widget {
         /**
          * Sets the progress as a ratio (0.0-1.0).
          *
-         * @param ratio the progress ratio (0.0-1.0)
+         * @param ratio
+         *            the progress ratio (0.0-1.0)
          * @return this builder
-         * @throws IllegalArgumentException if ratio is not in range 0.0-1.0
+         * @throws IllegalArgumentException
+         *             if ratio is not in range 0.0-1.0
          */
         public Builder ratio(double ratio) {
             if (ratio < 0.0 || ratio > 1.0) {
-                throw new IllegalArgumentException("Ratio must be between 0.0 and 1.0, got: " + ratio);
+                throw new IllegalArgumentException(
+                        "Ratio must be between 0.0 and 1.0, got: " + ratio);
             }
             this.ratio = ratio;
             return this;
         }
 
         /**
-         * Sets the label displayed centered in the gauge.
-         * If not set, defaults to showing the percentage.
+         * Sets the label displayed centered in the gauge. If not set, defaults to
+         * showing the percentage.
          *
-         * @param label the label text
+         * @param label
+         *            the label text
          * @return this builder
          */
         public Builder label(String label) {
@@ -264,7 +272,8 @@ public final class Gauge implements Widget {
         /**
          * Sets the label displayed centered in the gauge.
          *
-         * @param label the label as a styled line
+         * @param label
+         *            the label as a styled line
          * @return this builder
          */
         public Builder label(Line label) {
@@ -275,7 +284,8 @@ public final class Gauge implements Widget {
         /**
          * Sets the label displayed centered in the gauge.
          *
-         * @param span the label as a styled span
+         * @param span
+         *            the label as a styled span
          * @return this builder
          */
         public Builder label(Span span) {
@@ -286,7 +296,8 @@ public final class Gauge implements Widget {
         /**
          * Wraps the gauge in a block container.
          *
-         * @param block the block container
+         * @param block
+         *            the block container
          * @return this builder
          */
         public Builder block(Block block) {
@@ -297,7 +308,8 @@ public final class Gauge implements Widget {
         /**
          * Sets the style for the widget background (not the filled bar).
          *
-         * @param style the background style
+         * @param style
+         *            the background style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -308,7 +320,8 @@ public final class Gauge implements Widget {
         /**
          * Sets the style for the filled portion of the gauge.
          *
-         * @param gaugeStyle the gauge style
+         * @param gaugeStyle
+         *            the gauge style
          * @return this builder
          */
         public Builder gaugeStyle(Style gaugeStyle) {
@@ -317,10 +330,11 @@ public final class Gauge implements Widget {
         }
 
         /**
-         * Enables or disables unicode block characters for smoother rendering.
-         * When enabled (default), uses 8 fractional parts per cell.
+         * Enables or disables unicode block characters for smoother rendering. When
+         * enabled (default), uses 8 fractional parts per cell.
          *
-         * @param useUnicode {@code true} to enable unicode rendering
+         * @param useUnicode
+         *            {@code true} to enable unicode rendering
          * @return this builder
          */
         public Builder useUnicode(boolean useUnicode) {
@@ -331,10 +345,11 @@ public final class Gauge implements Widget {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code gauge-color} and {@code background}
-         * will be resolved if not set programmatically.
+         * When set, properties like {@code gauge-color} and {@code background} will be
+         * resolved if not set programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -347,7 +362,8 @@ public final class Gauge implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -360,7 +376,8 @@ public final class Gauge implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the gauge color
+         * @param color
+         *            the gauge color
          * @return this builder
          */
         public Builder gaugeColor(Color color) {

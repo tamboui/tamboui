@@ -4,20 +4,20 @@
  */
 package dev.tamboui.widgets.canvas;
 
-import dev.tamboui.style.Color;
-
 import java.util.Optional;
+
+import dev.tamboui.style.Color;
 
 /**
  * Provides an interface for drawing on a {@link Canvas} grid.
  * <p>
  * The Painter handles coordinate transformation from canvas space
- * (floating-point coordinates with configurable bounds) to grid space
- * (integer coordinates within the terminal area).
+ * (floating-point coordinates with configurable bounds) to grid space (integer
+ * coordinates within the terminal area).
  * <p>
- * Canvas coordinates use a mathematical coordinate system with the
- * origin at the lower-left corner, while grid coordinates use the
- * upper-left corner as origin (matching terminal conventions).
+ * Canvas coordinates use a mathematical coordinate system with the origin at
+ * the lower-left corner, while grid coordinates use the upper-left corner as
+ * origin (matching terminal conventions).
  *
  * @see Shape
  * @see Context
@@ -29,7 +29,8 @@ public class Painter {
     /**
      * Creates a painter that draws on the given context.
      *
-     * @param context the canvas context to draw on
+     * @param context
+     *            the canvas context to draw on
      */
     public Painter(Context context) {
         this.context = context;
@@ -38,12 +39,14 @@ public class Painter {
     /**
      * Converts canvas coordinates to grid coordinates.
      * <p>
-     * The canvas uses a mathematical coordinate system with the origin
-     * at the lower-left corner. This method transforms those coordinates
-     * to grid positions suitable for terminal rendering.
+     * The canvas uses a mathematical coordinate system with the origin at the
+     * lower-left corner. This method transforms those coordinates to grid positions
+     * suitable for terminal rendering.
      *
-     * @param x the x coordinate in canvas space
-     * @param y the y coordinate in canvas space
+     * @param x
+     *            the x coordinate in canvas space
+     * @param y
+     *            the y coordinate in canvas space
      * @return the grid position, or empty if outside canvas bounds
      */
     public Optional<GridPoint> getPoint(double x, double y) {
@@ -81,9 +84,12 @@ public class Painter {
     /**
      * Paints a colored point at the specified grid coordinates.
      *
-     * @param x     the x grid coordinate
-     * @param y     the y grid coordinate
-     * @param color the color to paint
+     * @param x
+     *            the x grid coordinate
+     * @param y
+     *            the y grid coordinate
+     * @param color
+     *            the color to paint
      */
     public void paint(int x, int y, Color color) {
         context.paint(x, y, color);
@@ -99,8 +105,10 @@ public class Painter {
         /**
          * Creates a new grid point.
          *
-         * @param x the x coordinate
-         * @param y the y coordinate
+         * @param x
+         *            the x coordinate
+         * @param y
+         *            the y coordinate
          */
         public GridPoint(int x, int y) {
             this.x = x;

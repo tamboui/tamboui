@@ -4,18 +4,18 @@
  */
 package dev.tamboui.css.selector;
 
+import java.util.List;
+import java.util.Objects;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.css.cascade.PseudoClassStateProvider;
 
-import java.util.List;
-import java.util.Objects;
-
 /**
  * A child combinator selector that matches direct children.
  * <p>
- * Example: {@code Panel > Button { ... }} matches a Button that is
- * a direct child of a Panel (not a grandchild or deeper).
+ * Example: {@code Panel > Button { ... }} matches a Button that is a direct
+ * child of a Panel (not a grandchild or deeper).
  */
 public final class ChildSelector implements Selector {
 
@@ -25,8 +25,10 @@ public final class ChildSelector implements Selector {
     /**
      * Creates a child combinator selector.
      *
-     * @param parent the parent selector
-     * @param child  the child selector
+     * @param parent
+     *            the parent selector
+     * @param child
+     *            the child selector
      */
     public ChildSelector(Selector parent, Selector child) {
         this.parent = Objects.requireNonNull(parent);
@@ -65,7 +67,8 @@ public final class ChildSelector implements Selector {
 
         // Then, check if the immediate parent matches the parent selector
         // Note: This uses NONE for the parent, so pseudo-classes on parent won't match.
-        // Use matches(element, stateProvider, ancestors) for proper pseudo-class support.
+        // Use matches(element, stateProvider, ancestors) for proper pseudo-class
+        // support.
         if (ancestors.isEmpty()) {
             return false;
         }
@@ -76,7 +79,8 @@ public final class ChildSelector implements Selector {
     }
 
     @Override
-    public boolean matches(Styleable element, PseudoClassStateProvider stateProvider, List<Styleable> ancestors) {
+    public boolean matches(Styleable element, PseudoClassStateProvider stateProvider,
+            List<Styleable> ancestors) {
         // First, the child selector must match the element
         if (!child.matches(element, stateProvider, ancestors)) {
             return false;

@@ -7,13 +7,17 @@ package dev.tamboui.layout.cassowary;
 import dev.tamboui.layout.Fraction;
 
 /**
- * A term in a linear expression, representing a coefficient multiplied by a variable.
+ * A term in a linear expression, representing a coefficient multiplied by a
+ * variable.
  *
- * <p>Terms are the building blocks of linear expressions. A term consists of
- * a variable and a coefficient, representing the product {@code coefficient * variable}.
+ * <p>
+ * Terms are the building blocks of linear expressions. A term consists of a
+ * variable and a coefficient, representing the product
+ * {@code coefficient * variable}.
  *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
+ * <p>
+ * This implementation uses {@link Fraction} for exact arithmetic, avoiding the
+ * cumulative rounding errors that occur with floating-point.
  */
 public final class Term {
 
@@ -23,8 +27,10 @@ public final class Term {
     /**
      * Creates a new term with the given variable and coefficient.
      *
-     * @param variable    the variable
-     * @param coefficient the coefficient
+     * @param variable
+     *            the variable
+     * @param coefficient
+     *            the coefficient
      */
     public Term(Variable variable, Fraction coefficient) {
         if (variable == null) {
@@ -40,7 +46,8 @@ public final class Term {
     /**
      * Creates a new term with coefficient 1.
      *
-     * @param variable the variable
+     * @param variable
+     *            the variable
      */
     public Term(Variable variable) {
         this(variable, Fraction.ONE);
@@ -76,7 +83,8 @@ public final class Term {
     /**
      * Returns a new term with the coefficient multiplied by the given factor.
      *
-     * @param factor the factor to multiply by
+     * @param factor
+     *            the factor to multiply by
      * @return a new term with the scaled coefficient
      */
     public Term times(Fraction factor) {
@@ -101,8 +109,7 @@ public final class Term {
             return false;
         }
         Term term = (Term) o;
-        return coefficient.equals(term.coefficient)
-                && variable.equals(term.variable);
+        return coefficient.equals(term.coefficient) && variable.equals(term.variable);
     }
 
     @Override

@@ -12,17 +12,18 @@ import java.util.concurrent.ConcurrentMap;
  * Thread-safe registry for style property definitions.
  * <p>
  * This registry allows widgets and components to register their custom
- * {@link PropertyDefinition}s so that style resolvers can recognize them
- * as valid properties.
+ * {@link PropertyDefinition}s so that style resolvers can recognize them as
+ * valid properties.
  * <p>
- * Properties are registered by name. If a property with the same name
- * is registered multiple times, the last registration wins.
+ * Properties are registered by name. If a property with the same name is
+ * registered multiple times, the last registration wins.
  * <p>
  * Example usage in a widget:
+ * 
  * <pre>{@code
  * public class MyWidget {
- *     public static final PropertyDefinition<Color> BAR_COLOR =
- *         PropertyDefinition.of("bar-color", ColorConverter.INSTANCE);
+ *     public static final PropertyDefinition<Color> BAR_COLOR = PropertyDefinition.of("bar-color",
+ *             ColorConverter.INSTANCE);
  *
  *     static {
  *         PropertyRegistry.register(BAR_COLOR);
@@ -44,11 +45,13 @@ public final class PropertyRegistry {
     /**
      * Registers a property definition.
      * <p>
-     * Once registered, the property will be recognized by style resolvers
-     * and will not trigger unknown property warnings or errors.
+     * Once registered, the property will be recognized by style resolvers and will
+     * not trigger unknown property warnings or errors.
      *
-     * @param property the property definition to register
-     * @throws NullPointerException if property is null
+     * @param property
+     *            the property definition to register
+     * @throws NullPointerException
+     *             if property is null
      */
     public static void register(PropertyDefinition<?> property) {
         if (property == null) {
@@ -60,8 +63,10 @@ public final class PropertyRegistry {
     /**
      * Registers multiple property definitions.
      *
-     * @param properties the property definitions to register
-     * @throws NullPointerException if any property is null
+     * @param properties
+     *            the property definitions to register
+     * @throws NullPointerException
+     *             if any property is null
      */
     public static void registerAll(PropertyDefinition<?>... properties) {
         for (PropertyDefinition<?> property : properties) {
@@ -72,7 +77,8 @@ public final class PropertyRegistry {
     /**
      * Looks up a property definition by name.
      *
-     * @param name the property name (e.g., "color", "border-type")
+     * @param name
+     *            the property name (e.g., "color", "border-type")
      * @return the property definition, or empty if not registered
      */
     public static Optional<PropertyDefinition<?>> byName(String name) {
@@ -85,7 +91,8 @@ public final class PropertyRegistry {
     /**
      * Checks if a property with the given name is registered.
      *
-     * @param name the property name
+     * @param name
+     *            the property name
      * @return true if the property is registered
      */
     public static boolean isRegistered(String name) {

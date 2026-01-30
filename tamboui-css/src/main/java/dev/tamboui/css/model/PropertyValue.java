@@ -9,13 +9,14 @@ import java.util.Objects;
 /**
  * Represents a CSS property value as parsed from the stylesheet.
  * <p>
- * The raw value is stored as a string and converted to the appropriate
- * type when applied to elements.
+ * The raw value is stored as a string and converted to the appropriate type
+ * when applied to elements.
  */
 public final class PropertyValue {
 
     /**
-     * The keyword used when a child wants to explicitly inherit a value from its parent.
+     * The keyword used when a child wants to explicitly inherit a value from its
+     * parent.
      */
     public static final String INHERIT_KEYWORD = "inherit";
 
@@ -25,8 +26,10 @@ public final class PropertyValue {
     /**
      * Creates a property value.
      *
-     * @param raw       the raw value string
-     * @param important whether the value has !important
+     * @param raw
+     *            the raw value string
+     * @param important
+     *            whether the value has !important
      */
     public PropertyValue(String raw, boolean important) {
         this.raw = Objects.requireNonNull(raw);
@@ -36,7 +39,8 @@ public final class PropertyValue {
     /**
      * Creates a regular (non-important) property value.
      *
-     * @param raw the raw value string
+     * @param raw
+     *            the raw value string
      * @return the property value
      */
     public static PropertyValue of(String raw) {
@@ -46,7 +50,8 @@ public final class PropertyValue {
     /**
      * Creates an important (!important) property value.
      *
-     * @param raw the raw value string
+     * @param raw
+     *            the raw value string
      * @return the property value
      */
     public static PropertyValue important(String raw) {
@@ -72,8 +77,8 @@ public final class PropertyValue {
     }
 
     /**
-     * Returns true if this value is the special "inherit" keyword,
-     * indicating the child wants to explicitly inherit from parent.
+     * Returns true if this value is the special "inherit" keyword, indicating the
+     * child wants to explicitly inherit from parent.
      *
      * @return true if the raw value is "inherit"
      */
@@ -90,8 +95,7 @@ public final class PropertyValue {
             return false;
         }
         PropertyValue that = (PropertyValue) o;
-        return important == that.important
-                && raw.equals(that.raw);
+        return important == that.important && raw.equals(that.raw);
     }
 
     @Override

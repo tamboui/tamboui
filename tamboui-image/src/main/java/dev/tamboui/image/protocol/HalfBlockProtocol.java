@@ -4,6 +4,8 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.io.OutputStream;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
@@ -11,16 +13,14 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
-import java.io.OutputStream;
-
 /**
  * Renders images using Unicode half-block characters.
  * <p>
- * Each terminal cell can display two vertical half-blocks (▀▄█),
- * providing 1x2 virtual pixel resolution per cell.
+ * Each terminal cell can display two vertical half-blocks (▀▄█), providing 1x2
+ * virtual pixel resolution per cell.
  * <p>
- * The top half uses the foreground color and the bottom half uses the background color,
- * allowing two independent colors per cell.
+ * The top half uses the foreground color and the bottom half uses the
+ * background color, allowing two independent colors per cell.
  */
 public final class HalfBlockProtocol implements ImageProtocol {
 

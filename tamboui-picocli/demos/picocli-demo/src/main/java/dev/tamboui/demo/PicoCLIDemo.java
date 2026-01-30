@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -30,24 +32,25 @@ import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import java.util.List;
 
 /**
  * Demo showcasing PicoCLI integration with TamboUI.
  * <p>
  * This demo shows how to:
  * <ul>
- *   <li>Use TuiCommand as a base class</li>
- *   <li>Parse CLI arguments with PicoCLI</li>
- *   <li>Pass CLI options into the TUI</li>
- *   <li>Use the built-in TUI options mixin</li>
+ * <li>Use TuiCommand as a base class</li>
+ * <li>Parse CLI arguments with PicoCLI</li>
+ * <li>Pass CLI options into the TUI</li>
+ * <li>Use the built-in TUI options mixin</li>
  * </ul>
  *
- * <p>Try running with different options:
+ * <p>
+ * Try running with different options:
+ * 
  * <pre>
  * ./gradlew :demos:picocli-demo:run
  * ./gradlew :demos:picocli-demo:run --args="--title 'Custom Title'"
@@ -56,34 +59,19 @@ import java.util.List;
  * ./gradlew :demos:picocli-demo:run --args="--mouse --tick-rate 100"
  * </pre>
  */
-@Command(
-    name = "picocli-demo",
-    description = "Demo TUI application with PicoCLI integration",
-    mixinStandardHelpOptions = true,
-    version = "1.0.0"
-)
+@Command(name = "picocli-demo", description = "Demo TUI application with PicoCLI integration", mixinStandardHelpOptions = true, version = "1.0.0")
 public class PicoCLIDemo extends TuiCommand {
 
-    @Option(
-        names = {"-t", "--title"},
-        description = "Title for the list widget",
-        defaultValue = "Items"
-    )
+    @Option(names = {"-t",
+            "--title"}, description = "Title for the list widget", defaultValue = "Items")
     private String title;
 
-    @Option(
-        names = {"-i", "--items"},
-        description = "Comma-separated list of items",
-        split = ",",
-        defaultValue = "First Item,Second Item,Third Item,Fourth Item,Fifth Item"
-    )
+    @Option(names = {"-i",
+            "--items"}, description = "Comma-separated list of items", split = ",", defaultValue = "First Item,Second Item,Third Item,Fourth Item,Fifth Item")
     private List<String> items;
 
-    @Option(
-        names = {"-c", "--color"},
-        description = "Highlight color (RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA)",
-        defaultValue = "BLUE"
-    )
+    @Option(names = {"-c",
+            "--color"}, description = "Highlight color (RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA)", defaultValue = "BLUE")
     private String highlightColorName;
 
     private final ListState listState = new ListState();
@@ -105,7 +93,9 @@ public class PicoCLIDemo extends TuiCommand {
 
     /**
      * Main entry point
-     * @param args command line arguments
+     * 
+     * @param args
+     *            command line arguments
      */
     public static void main(String[] args) {
         int exitCode = new CommandLine(new PicoCLIDemo()).execute(args);
@@ -177,14 +167,8 @@ public class PicoCLIDemo extends TuiCommand {
     private void render(Frame frame) {
         Rect area = frame.area();
 
-        List<Rect> layout = Layout.vertical()
-                .constraints(
-                        Constraint.length(3),
-                        Constraint.fill(),
-                        Constraint.length(5),
-                        Constraint.length(3)
-                )
-                .split(area);
+        List<Rect> layout = Layout.vertical().constraints(Constraint.length(3), Constraint.fill(),
+                Constraint.length(5), Constraint.length(3)).split(area);
 
         renderHeader(frame, layout.get(0));
         renderList(frame, layout.get(1));
@@ -193,40 +177,27 @@ public class PicoCLIDemo extends TuiCommand {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block header = Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
+        Block header = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
                 .borderStyle(Style.EMPTY.fg(Color.CYAN))
-                .title(Title.from(
-                        Line.from(
-                                Span.raw(" PicoCLI ").bold().cyan(),
-                                Span.raw("+ ").white(),
-                                Span.raw("TamboUI ").bold().yellow(),
-                                Span.raw("Demo ").white()
-                        )
-                ).centered())
+                .title(Title
+                        .from(Line.from(Span.raw(" PicoCLI ").bold().cyan(), Span.raw("+ ").white(),
+                                Span.raw("TamboUI ").bold().yellow(), Span.raw("Demo ").white()))
+                        .centered())
                 .build();
 
         frame.renderWidget(header, area);
     }
 
     private void renderList(Frame frame, Rect area) {
-        List<ListItem> listItems = items.stream()
-                .map(ListItem::from)
-                .toList();
+        List<ListItem> listItems = items.stream().map(ListItem::from).toList();
 
-        ListWidget list = ListWidget.builder()
-                .items(listItems)
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(Color.GREEN))
-                        .title(title)
+        ListWidget list = ListWidget.builder().items(listItems)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.GREEN)).title(title)
                         .titleBottom(Title.from("j/k/↑/↓ navigate, a add, d delete").right())
                         .build())
                 .highlightStyle(Style.EMPTY.bg(getHighlightColor()).fg(Color.WHITE).bold())
-                .highlightSymbol("▶ ")
-                .build();
+                .highlightSymbol("▶ ").build();
 
         frame.renderStatefulWidget(list, area, listState);
     }
@@ -237,55 +208,30 @@ public class PicoCLIDemo extends TuiCommand {
                 ? items.get(selected)
                 : "None";
 
-        Text content = Text.from(
-                Line.from(
-                        Span.raw("Title: ").bold(),
-                        Span.raw(title).cyan()
-                ),
-                Line.from(
-                        Span.raw("Items: ").bold(),
-                        Span.raw(String.valueOf(items.size())).yellow()
-                ),
-                Line.from(
-                        Span.raw("Selected: ").bold(),
-                        Span.raw(selectedText).green()
-                )
-        );
+        Text content = Text.from(Line.from(Span.raw("Title: ").bold(), Span.raw(title).cyan()),
+                Line.from(Span.raw("Items: ").bold(),
+                        Span.raw(String.valueOf(items.size())).yellow()),
+                Line.from(Span.raw("Selected: ").bold(), Span.raw(selectedText).green()));
 
-        Paragraph info = Paragraph.builder()
-                .text(content)
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(Color.MAGENTA))
-                        .title("CLI Options")
-                        .build())
+        Paragraph info = Paragraph.builder().text(content)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.MAGENTA)).title("CLI Options").build())
                 .build();
 
         frame.renderWidget(info, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-                Span.raw(" j/k/↑↓").bold().yellow(),
-                Span.raw(" Navigate  ").dim(),
-                Span.raw("a").bold().yellow(),
-                Span.raw(" Add  ").dim(),
-                Span.raw("d").bold().yellow(),
-                Span.raw(" Delete  ").dim(),
-                Span.raw("q/Ctrl+C").bold().yellow(),
-                Span.raw(" Quit  ").dim(),
-                Span.raw("--help").bold().yellow(),
-                Span.raw(" CLI help").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" j/k/↑↓").bold().yellow(),
+                Span.raw(" Navigate  ").dim(), Span.raw("a").bold().yellow(),
+                Span.raw(" Add  ").dim(), Span.raw("d").bold().yellow(),
+                Span.raw(" Delete  ").dim(), Span.raw("q/Ctrl+C").bold().yellow(),
+                Span.raw(" Quit  ").dim(), Span.raw("--help").bold().yellow(),
+                Span.raw(" CLI help").dim());
 
-        Paragraph footer = Paragraph.builder()
-                .text(Text.from(helpLine))
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                        .build())
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
                 .build();
 
         frame.renderWidget(footer, area);

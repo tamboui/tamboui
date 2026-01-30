@@ -6,33 +6,33 @@
  */
 package dev.tamboui.demo;
 
+import java.util.Arrays;
+
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.inline.InlineDisplay;
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.widgets.gauge.Gauge;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.util.Arrays;
 
 /**
  * Demonstrates the InlineDisplay class for NPM/Gradle-style progress UX.
  * <p>
  * This demo shows:
  * <ul>
- *   <li>Basic inline display with widgets</li>
- *   <li>Release and continue pattern (multiple phases)</li>
- *   <li>println() scrolling above status area</li>
- *   <li>clearOnClose() for transient displays</li>
+ * <li>Basic inline display with widgets</li>
+ * <li>Release and continue pattern (multiple phases)</li>
+ * <li>println() scrolling above status area</li>
+ * <li>clearOnClose() for transient displays</li>
  * </ul>
  */
 public class InlineProgressDemo {
@@ -41,8 +41,11 @@ public class InlineProgressDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         // Initialize recording early to capture all System.out output
@@ -94,12 +97,15 @@ public class InlineProgressDemo {
 
         // Simple styled text
         var buf = Buffer.empty(Rect.of(50, 1));
-        Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled("Success: ", Style.EMPTY.fg(Color.GREEN).addModifier(Modifier.BOLD)),
-                Span.raw("Operation completed successfully"))))
-            .build()
-            .render(buf.area(), buf);
+        Paragraph
+                .builder().text(
+                        Text.from(
+                                Line.from(
+                                        Span.styled("Success: ",
+                                                Style.EMPTY.fg(Color.GREEN)
+                                                        .addModifier(Modifier.BOLD)),
+                                        Span.raw("Operation completed successfully"))))
+                .build().render(buf.area(), buf);
         System.out.println(buf.toAnsiStringTrimmed());
 
         // Progress bar with carriage return for updates
@@ -108,12 +114,8 @@ public class InlineProgressDemo {
         buf = Buffer.empty(Rect.of(40, 1));
         for (var i = 0; i <= 100; i += 5) {
             buf.clear();
-            Gauge.builder()
-                .ratio(i / 100.0)
-                .label(i + "%")
-                .gaugeStyle(Style.EMPTY.fg(Color.CYAN))
-                .build()
-                .render(buf.area(), buf);
+            Gauge.builder().ratio(i / 100.0).label(i + "%").gaugeStyle(Style.EMPTY.fg(Color.CYAN))
+                    .build().render(buf.area(), buf);
             System.out.print("\r" + prefix + buf.toAnsiString());
             System.out.flush();
             Thread.sleep(50);
@@ -122,10 +124,9 @@ public class InlineProgressDemo {
         // Replace progress bar with completion message
         buf.clear();
         Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled("Done!", Style.EMPTY.fg(Color.GREEN).addModifier(Modifier.BOLD)))))
-            .build()
-            .render(buf.area(), buf);
+                .text(Text.from(Line.from(Span.styled("Done!",
+                        Style.EMPTY.fg(Color.GREEN).addModifier(Modifier.BOLD)))))
+                .build().render(buf.area(), buf);
         System.out.print("\r" + prefix + buf.toAnsiString());
         System.out.println();
     }
@@ -137,13 +138,9 @@ public class InlineProgressDemo {
         System.out.println("--- Part 2: NPM-style Install ---\n");
         System.out.println("npm install\n");
 
-        var packages = Arrays.asList(
-            new Package("lodash", "4.17.21", 150),
-            new Package("express", "4.18.2", 280),
-            new Package("typescript", "5.3.3", 420),
-            new Package("react", "18.2.0", 310),
-            new Package("webpack", "5.89.0", 890)
-        );
+        var packages = Arrays.asList(new Package("lodash", "4.17.21", 150),
+                new Package("express", "4.18.2", 280), new Package("typescript", "5.3.3", 420),
+                new Package("react", "18.2.0", 310), new Package("webpack", "5.89.0", 890));
 
         var totalSize = 0;
         for (var pkg : packages) {
@@ -165,8 +162,8 @@ public class InlineProgressDemo {
                     final var finalProgress = progress;
 
                     display.render((area, buf) -> {
-                        renderNpmStatus(area, buf, pkg, spinnerIdx, finalInstalled,
-                                        packages.size(), currentDownloaded, finalTotalSize, finalProgress);
+                        renderNpmStatus(area, buf, pkg, spinnerIdx, finalInstalled, packages.size(),
+                                currentDownloaded, finalTotalSize, finalProgress);
                     });
 
                     Thread.sleep(30);
@@ -176,78 +173,55 @@ public class InlineProgressDemo {
                 installed++;
 
                 // Log package installation above status area
-                display.println(Text.from(Line.from(
-                    Span.styled("+ ", Style.EMPTY.fg(Color.GREEN)),
-                    Span.raw(pkg.name),
-                    Span.styled("@" + pkg.version, Style.EMPTY.fg(Color.GRAY))
-                )));
+                display.println(Text.from(Line.from(Span.styled("+ ", Style.EMPTY.fg(Color.GREEN)),
+                        Span.raw(pkg.name),
+                        Span.styled("@" + pkg.version, Style.EMPTY.fg(Color.GRAY)))));
             }
 
             // Final summary
             display.render((area, buf) -> {
                 Paragraph.builder()
-                    .text(Text.from(Line.from(
-                        Span.styled("added ", Style.EMPTY),
-                        Span.styled(String.valueOf(packages.size()), Style.EMPTY.fg(Color.GREEN)),
-                        Span.raw(" packages in 2.3s"))))
-                    .build()
-                    .render(area, buf);
+                        .text(Text.from(Line.from(Span.styled("added ", Style.EMPTY),
+                                Span.styled(String.valueOf(packages.size()),
+                                        Style.EMPTY.fg(Color.GREEN)),
+                                Span.raw(" packages in 2.3s"))))
+                        .build().render(area, buf);
             });
 
             Thread.sleep(500);
         }
     }
 
-    private static void renderNpmStatus(Rect area,
-                                        Buffer buf,
-                                        Package pkg,
-                                        int spinnerIdx,
-                                        int installed,
-                                        int total,
-                                        int downloadedKb,
-                                        int totalKb,
-                                        int pkgProgress) {
-        var rows = Layout.vertical()
-            .constraints(
-                Constraint.length(1),
-                Constraint.length(1),
-                Constraint.length(1),
-                Constraint.length(1))
-            .split(area);
+    private static void renderNpmStatus(Rect area, Buffer buf, Package pkg, int spinnerIdx,
+            int installed, int total, int downloadedKb, int totalKb, int pkgProgress) {
+        var rows = Layout.vertical().constraints(Constraint.length(1), Constraint.length(1),
+                Constraint.length(1), Constraint.length(1)).split(area);
 
         // Row 0: Spinner and current package
         Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled(SPINNER[spinnerIdx] + " ", Style.EMPTY.fg(Color.CYAN)),
-                Span.raw("Installing "),
-                Span.styled(pkg.name, Style.EMPTY.addModifier(Modifier.BOLD)))))
-            .build()
-            .render(rows.get(0), buf);
+                .text(Text.from(Line.from(
+                        Span.styled(SPINNER[spinnerIdx] + " ", Style.EMPTY.fg(Color.CYAN)),
+                        Span.raw("Installing "),
+                        Span.styled(pkg.name, Style.EMPTY.addModifier(Modifier.BOLD)))))
+                .build().render(rows.get(0), buf);
 
         // Row 1: Progress bar
-        Gauge.builder()
-            .ratio((double) downloadedKb / totalKb)
-            .gaugeStyle(Style.EMPTY.fg(Color.GREEN))
-            .build()
-            .render(rows.get(1), buf);
+        Gauge.builder().ratio((double) downloadedKb / totalKb)
+                .gaugeStyle(Style.EMPTY.fg(Color.GREEN)).build().render(rows.get(1), buf);
 
         // Row 2: Package stats
         Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled(String.format("%d/%d", installed, total), Style.EMPTY.fg(Color.YELLOW)),
-                Span.raw(" packages  "),
-                Span.styled(formatSize(downloadedKb), Style.EMPTY.fg(Color.CYAN)),
-                Span.raw(" / "),
-                Span.raw(formatSize(totalKb)))))
-            .build()
-            .render(rows.get(2), buf);
+                .text(Text.from(Line.from(
+                        Span.styled(String.format("%d/%d", installed, total),
+                                Style.EMPTY.fg(Color.YELLOW)),
+                        Span.raw(" packages  "),
+                        Span.styled(formatSize(downloadedKb), Style.EMPTY.fg(Color.CYAN)),
+                        Span.raw(" / "), Span.raw(formatSize(totalKb)))))
+                .build().render(rows.get(2), buf);
 
         // Row 3: Timing
-        Paragraph.builder()
-            .text(Text.styled("timing: reify:install " + pkgProgress + "%",
-                              Style.EMPTY.fg(Color.GRAY)))
-            .build()
-            .render(rows.get(3), buf);
+        Paragraph.builder().text(Text.styled("timing: reify:install " + pkgProgress + "%",
+                Style.EMPTY.fg(Color.GRAY))).build().render(rows.get(3), buf);
     }
 
     /**
@@ -263,19 +237,13 @@ public class InlineProgressDemo {
                 final var progress = i;
                 display.render((area, buf) -> {
                     var rows = Layout.vertical()
-                        .constraints(Constraint.length(1), Constraint.length(1))
-                        .split(area);
+                            .constraints(Constraint.length(1), Constraint.length(1)).split(area);
 
-                    Paragraph.builder()
-                        .text(Text.raw("Downloading packages..."))
-                        .build()
-                        .render(rows.get(0), buf);
+                    Paragraph.builder().text(Text.raw("Downloading packages...")).build()
+                            .render(rows.get(0), buf);
 
-                    Gauge.builder()
-                        .ratio(progress / 100.0)
-                        .label(progress + "%")
-                        .build()
-                        .render(rows.get(1), buf);
+                    Gauge.builder().ratio(progress / 100.0).label(progress + "%").build()
+                            .render(rows.get(1), buf);
                 });
                 Thread.sleep(20);
             }
@@ -296,28 +264,20 @@ public class InlineProgressDemo {
                     final var progress = i;
 
                     display.render((area, buf) -> {
-                        var rows = Layout.vertical()
-                            .constraints(
-                                Constraint.length(1),
-                                Constraint.length(1),
-                                Constraint.length(1))
-                            .split(area);
+                        var rows = Layout.vertical().constraints(Constraint.length(1),
+                                Constraint.length(1), Constraint.length(1)).split(area);
 
                         Paragraph.builder()
-                            .text(Text.raw("Compiling " + modules[moduleIdx] + "..."))
-                            .build()
-                            .render(rows.get(0), buf);
+                                .text(Text.raw("Compiling " + modules[moduleIdx] + "...")).build()
+                                .render(rows.get(0), buf);
 
-                        Gauge.builder()
-                            .ratio(progress / 100.0)
-                            .build()
-                            .render(rows.get(1), buf);
+                        Gauge.builder().ratio(progress / 100.0).build().render(rows.get(1), buf);
 
                         Paragraph.builder()
-                            .text(Text.styled((moduleIdx + 1) + "/" + modules.length + " modules",
-                                              Style.EMPTY.fg(Color.GRAY)))
-                            .build()
-                            .render(rows.get(2), buf);
+                                .text(Text.styled(
+                                        (moduleIdx + 1) + "/" + modules.length + " modules",
+                                        Style.EMPTY.fg(Color.GRAY)))
+                                .build().render(rows.get(2), buf);
                     });
                     Thread.sleep(15);
                 }
@@ -339,13 +299,16 @@ public class InlineProgressDemo {
 
     private static boolean promptContinue() throws Exception {
         var buf = Buffer.empty(Rect.of(60, 1));
-        Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled("? ", Style.EMPTY.fg(Color.CYAN).addModifier(Modifier.BOLD)),
-                Span.raw("Continue with native module build? "),
-                Span.styled("[Y/n] ", Style.EMPTY.fg(Color.GRAY)))))
-            .build()
-            .render(buf.area(), buf);
+        Paragraph
+                .builder().text(
+                        Text.from(
+                                Line.from(
+                                        Span.styled("? ",
+                                                Style.EMPTY.fg(Color.CYAN)
+                                                        .addModifier(Modifier.BOLD)),
+                                        Span.raw("Continue with native module build? "),
+                                        Span.styled("[Y/n] ", Style.EMPTY.fg(Color.GRAY)))))
+                .build().render(buf.area(), buf);
         System.out.print(buf.toAnsiStringTrimmed());
         System.out.flush();
 
@@ -363,13 +326,12 @@ public class InlineProgressDemo {
         System.out.println();
         var buf = Buffer.empty(Rect.of(60, 1));
         Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled("? ", Style.EMPTY.fg(Color.CYAN).addModifier(Modifier.BOLD)),
-                Span.raw("Press "),
-                Span.styled("r", Style.EMPTY.fg(Color.YELLOW).addModifier(Modifier.BOLD)),
-                Span.raw(" to restart or any other key to exit "))))
-            .build()
-            .render(buf.area(), buf);
+                .text(Text.from(Line.from(
+                        Span.styled("? ", Style.EMPTY.fg(Color.CYAN).addModifier(Modifier.BOLD)),
+                        Span.raw("Press "),
+                        Span.styled("r", Style.EMPTY.fg(Color.YELLOW).addModifier(Modifier.BOLD)),
+                        Span.raw(" to restart or any other key to exit "))))
+                .build().render(buf.area(), buf);
         System.out.print(buf.toAnsiStringTrimmed());
         System.out.flush();
 
@@ -389,12 +351,9 @@ public class InlineProgressDemo {
 
     private static void printSuccess(String message) {
         var buf = Buffer.empty(Rect.of(message.length() + 2, 1));
-        Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.styled("✓ ", Style.EMPTY.fg(Color.GREEN)),
-                Span.raw(message))))
-            .build()
-            .render(buf.area(), buf);
+        Paragraph.builder().text(Text
+                .from(Line.from(Span.styled("✓ ", Style.EMPTY.fg(Color.GREEN)), Span.raw(message))))
+                .build().render(buf.area(), buf);
         System.out.println(buf.toAnsiStringTrimmed());
         System.out.println();
     }

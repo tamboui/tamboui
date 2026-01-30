@@ -4,37 +4,39 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.layout.Rect;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 /**
  * Renders images using the iTerm2 inline images protocol.
  * <p>
- * The iTerm2 protocol uses OSC (Operating System Command) escape sequences
- * with base64-encoded image data. It's simpler than Kitty but widely supported.
+ * The iTerm2 protocol uses OSC (Operating System Command) escape sequences with
+ * base64-encoded image data. It's simpler than Kitty but widely supported.
  * <p>
  * Supported by: iTerm2, WezTerm, Ghostty, Konsole, mintty.
  *
  * <h2>Protocol Format</h2>
+ * 
  * <pre>
  * ESC ] 1337 ; File = [arguments] : base64-data BEL
  * </pre>
  *
- * @see <a href="https://iterm2.com/documentation-images.html">iTerm2 Inline Images</a>
+ * @see <a href="https://iterm2.com/documentation-images.html">iTerm2 Inline
+ *      Images</a>
  */
 public final class ITermProtocol implements ImageProtocol {
 
     private static final String OSC = "\033]1337;File=";
     private static final String BEL = "\007";
-    private static final String ST = "\033\\";  // Alternative terminator
+    private static final String ST = "\033\\"; // Alternative terminator
 
     private final boolean useStTerminator;
 
@@ -48,14 +50,16 @@ public final class ITermProtocol implements ImageProtocol {
     /**
      * Creates an iTerm2 protocol instance.
      *
-     * @param useStTerminator if true, use ESC \ instead of BEL as terminator
+     * @param useStTerminator
+     *            if true, use ESC \ instead of BEL as terminator
      */
     public ITermProtocol(boolean useStTerminator) {
         this.useStTerminator = useStTerminator;
     }
 
     @Override
-    public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput) throws IOException {
+    public void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput)
+            throws IOException {
         if (rawOutput == null) {
             throw new RuntimeIOException("iTerm2 protocol requires raw output stream");
         }
@@ -80,9 +84,10 @@ public final class ITermProtocol implements ImageProtocol {
         // inline=1: display inline (not as download)
         // width=N: display width in cells
         // height=N: display height in cells
-        // preserveAspectRatio=0: do not apply additional scaling (Image.scaleImage() handles it)
-        cmd.append(String.format("inline=1;width=%d;height=%d;preserveAspectRatio=0:",
-            area.width(), area.height()));
+        // preserveAspectRatio=0: do not apply additional scaling (Image.scaleImage()
+        // handles it)
+        cmd.append(String.format("inline=1;width=%d;height=%d;preserveAspectRatio=0:", area.width(),
+                area.height()));
 
         // Append base64 data
         cmd.append(base64Data);

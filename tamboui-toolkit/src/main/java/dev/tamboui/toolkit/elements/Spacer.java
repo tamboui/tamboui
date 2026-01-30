@@ -4,15 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
 
 /**
- * An empty element that takes up space in layouts.
- * Useful for pushing elements apart or creating gaps.
+ * An empty element that takes up space in layouts. Useful for pushing elements
+ * apart or creating gaps.
  */
 public final class Spacer implements Element {
 
@@ -25,7 +25,8 @@ public final class Spacer implements Element {
     /**
      * Creates a spacer with a fixed length.
      *
-     * @param length the fixed length in cells
+     * @param length
+     *            the fixed length in cells
      */
     public Spacer(int length) {
         this.layoutConstraint = Constraint.length(length);
@@ -43,7 +44,8 @@ public final class Spacer implements Element {
     /**
      * Creates a spacer with a fixed length.
      *
-     * @param length the fixed length in cells
+     * @param length
+     *            the fixed length in cells
      * @return a new fixed-length spacer
      */
     public static Spacer length(int length) {
@@ -53,7 +55,8 @@ public final class Spacer implements Element {
     /**
      * Sets the constraint to fill available space with given weight.
      *
-     * @param weight the fill weight
+     * @param weight
+     *            the fill weight
      * @return this spacer
      */
     public Spacer withWeight(int weight) {
@@ -64,7 +67,8 @@ public final class Spacer implements Element {
     /**
      * Sets the constraint to a percentage.
      *
-     * @param percent the percentage of available space (0 to 100)
+     * @param percent
+     *            the percentage of available space (0 to 100)
      * @return this spacer
      */
     public Spacer percent(int percent) {

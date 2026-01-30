@@ -4,6 +4,10 @@
  */
 package dev.tamboui.layout.columns;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
@@ -11,30 +15,23 @@ import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A grid layout widget that arranges children into columns.
  * <p>
- * The column count must be set explicitly (no auto-detection at the widget level).
- * Children are rendered in grid cells whose positions are determined by the
- * {@linkplain ColumnOrder ordering mode}.
+ * The column count must be set explicitly (no auto-detection at the widget
+ * level). Children are rendered in grid cells whose positions are determined by
+ * the {@linkplain ColumnOrder ordering mode}.
  * <p>
- * Column widths default to {@link Constraint#fill()} for each column but can
- * be overridden via {@link Builder#columnWidths(Constraint...)}.
- * Row heights default to equal distribution of available height but can be
- * overridden via {@link Builder#rowHeights(int...)}.
+ * Column widths default to {@link Constraint#fill()} for each column but can be
+ * overridden via {@link Builder#columnWidths(Constraint...)}. Row heights
+ * default to equal distribution of available height but can be overridden via
+ * {@link Builder#rowHeights(int...)}.
  *
  * <pre>{@code
- * Columns columns = Columns.builder()
- *     .children(widget1, widget2, widget3, widget4)
- *     .columnCount(2)
- *     .spacing(1)
- *     .build();
+ * Columns columns = Columns.builder().children(widget1, widget2, widget3, widget4).columnCount(2)
+ *         .spacing(1).build();
  *
  * columns.render(area, buffer);
  * }</pre>
@@ -80,10 +77,7 @@ public final class Columns implements Widget {
         // Build horizontal constraints with spacing gaps
         List<Constraint> hConstraints = buildHorizontalConstraints(cols);
 
-        List<Rect> colAreas = Layout.horizontal()
-            .constraints(hConstraints)
-            .flex(flex)
-            .split(area);
+        List<Rect> colAreas = Layout.horizontal().constraints(hConstraints).flex(flex).split(area);
 
         // Extract only the column areas (skip spacing areas)
         List<Rect> columnRects = extractColumnRects(colAreas);
@@ -179,7 +173,8 @@ public final class Columns implements Widget {
         /**
          * Sets the children widgets.
          *
-         * @param children the child widgets
+         * @param children
+         *            the child widgets
          * @return this builder
          */
         public Builder children(Widget... children) {
@@ -191,7 +186,8 @@ public final class Columns implements Widget {
         /**
          * Sets the children widgets from a list.
          *
-         * @param children the child widgets
+         * @param children
+         *            the child widgets
          * @return this builder
          */
         public Builder children(List<Widget> children) {
@@ -203,7 +199,8 @@ public final class Columns implements Widget {
         /**
          * Sets the number of columns.
          *
-         * @param count the column count (must be at least 1)
+         * @param count
+         *            the column count (must be at least 1)
          * @return this builder
          */
         public Builder columnCount(int count) {
@@ -214,7 +211,8 @@ public final class Columns implements Widget {
         /**
          * Sets the spacing between columns in cells.
          *
-         * @param spacing the spacing (0 or more)
+         * @param spacing
+         *            the spacing (0 or more)
          * @return this builder
          */
         public Builder spacing(int spacing) {
@@ -225,7 +223,8 @@ public final class Columns implements Widget {
         /**
          * Sets how remaining space is distributed among columns.
          *
-         * @param flex the flex mode
+         * @param flex
+         *            the flex mode
          * @return this builder
          */
         public Builder flex(Flex flex) {
@@ -236,7 +235,8 @@ public final class Columns implements Widget {
         /**
          * Sets the ordering mode for children in the grid.
          *
-         * @param order the column ordering mode
+         * @param order
+         *            the column ordering mode
          * @return this builder
          */
         public Builder order(ColumnOrder order) {
@@ -247,11 +247,11 @@ public final class Columns implements Widget {
         /**
          * Sets the width constraints for columns.
          * <p>
-         * If not set, all columns use {@link Constraint#fill()}.
-         * If fewer constraints than columns are provided, remaining columns use
-         * {@link Constraint#fill()}.
+         * If not set, all columns use {@link Constraint#fill()}. If fewer constraints
+         * than columns are provided, remaining columns use {@link Constraint#fill()}.
          *
-         * @param widths the column width constraints
+         * @param widths
+         *            the column width constraints
          * @return this builder
          */
         public Builder columnWidths(Constraint... widths) {
@@ -262,7 +262,8 @@ public final class Columns implements Widget {
         /**
          * Sets the width constraints for columns from a list.
          *
-         * @param widths the column width constraints
+         * @param widths
+         *            the column width constraints
          * @return this builder
          */
         public Builder columnWidths(List<Constraint> widths) {
@@ -273,10 +274,11 @@ public final class Columns implements Widget {
         /**
          * Sets explicit row heights.
          * <p>
-         * If not set, rows share the available height equally.
-         * If fewer heights than rows are provided, remaining rows default to 1.
+         * If not set, rows share the available height equally. If fewer heights than
+         * rows are provided, remaining rows default to 1.
          *
-         * @param heights the row heights
+         * @param heights
+         *            the row heights
          * @return this builder
          */
         public Builder rowHeights(int... heights) {

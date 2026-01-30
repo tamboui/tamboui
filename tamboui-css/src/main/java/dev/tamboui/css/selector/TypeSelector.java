@@ -4,19 +4,20 @@
  */
 package dev.tamboui.css.selector;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-
 import java.util.List;
 import java.util.Objects;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 
 /**
  * A type selector that matches elements by their type name.
  * <p>
  * Example: {@code Panel { ... }} matches all Panel elements.
  * <p>
- * Type selectors also match subclasses. For example, if {@code MyPanel extends Panel},
- * the selector {@code Panel { ... }} will match both Panel and MyPanel elements.
+ * Type selectors also match subclasses. For example, if
+ * {@code MyPanel extends Panel}, the selector {@code Panel { ... }} will match
+ * both Panel and MyPanel elements.
  */
 public final class TypeSelector implements Selector {
 
@@ -25,7 +26,8 @@ public final class TypeSelector implements Selector {
     /**
      * Creates a type selector for the given type name.
      *
-     * @param typeName the element type name
+     * @param typeName
+     *            the element type name
      */
     public TypeSelector(String typeName) {
         this.typeName = Objects.requireNonNull(typeName);

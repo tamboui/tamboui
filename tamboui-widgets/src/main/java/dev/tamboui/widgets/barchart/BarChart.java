@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.barchart;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Rect;
@@ -11,41 +14,31 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.List;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A bar chart widget for displaying grouped data.
  * <p>
- * Supports both vertical (default) and horizontal bar orientations,
- * with customizable bar widths, gaps, and styling.
+ * Supports both vertical (default) and horizontal bar orientations, with
+ * customizable bar widths, gaps, and styling.
  *
  * <pre>{@code
  * // Simple bar chart with values
- * BarChart chart = BarChart.builder()
- *     .data(BarGroup.of(10, 20, 30, 40))
- *     .build();
+ * BarChart chart = BarChart.builder().data(BarGroup.of(10, 20, 30, 40)).build();
  *
  * // Grouped bar chart with labels
  * BarChart chart2 = BarChart.builder()
- *     .data(
- *         BarGroup.of("Q1", Bar.of(100, "Jan"), Bar.of(150, "Feb")),
- *         BarGroup.of("Q2", Bar.of(120, "Mar"), Bar.of(180, "Apr"))
- *     )
- *     .barWidth(3)
- *     .barGap(1)
- *     .groupGap(2)
- *     .barStyle(Style.EMPTY.fg(Color.CYAN))
- *     .block(Block.bordered().title(Title.from("Sales")))
- *     .build();
+ *         .data(BarGroup.of("Q1", Bar.of(100, "Jan"), Bar.of(150, "Feb")),
+ *                 BarGroup.of("Q2", Bar.of(120, "Mar"), Bar.of(180, "Apr")))
+ *         .barWidth(3).barGap(1).groupGap(2).barStyle(Style.EMPTY.fg(Color.CYAN))
+ *         .block(Block.bordered().title(Title.from("Sales"))).build();
  * }</pre>
  *
  * @see Bar
@@ -58,24 +51,24 @@ public final class BarChart implements Widget {
      * <p>
      * CSS property name: {@code bar-color}
      */
-    public static final PropertyDefinition<Color> BAR_COLOR =
-            PropertyDefinition.of("bar-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> BAR_COLOR = PropertyDefinition.of("bar-color",
+            ColorConverter.INSTANCE);
 
     /**
      * Property key for the value label color.
      * <p>
      * CSS property name: {@code value-color}
      */
-    public static final PropertyDefinition<Color> VALUE_COLOR =
-            PropertyDefinition.of("value-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> VALUE_COLOR = PropertyDefinition.of("value-color",
+            ColorConverter.INSTANCE);
 
     /**
      * Property key for the bar label color.
      * <p>
      * CSS property name: {@code label-color}
      */
-    public static final PropertyDefinition<Color> LABEL_COLOR =
-            PropertyDefinition.of("label-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> LABEL_COLOR = PropertyDefinition.of("label-color",
+            ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(BAR_COLOR, VALUE_COLOR, LABEL_COLOR);
@@ -98,27 +91,28 @@ public final class BarChart implements Widget {
         /**
          * Creates a new bar set with the given symbols for each fill level.
          *
-         * @param empty the empty symbol
-         * @param oneEighth the one-eighth fill symbol
-         * @param oneQuarter the one-quarter fill symbol
-         * @param threeEighths the three-eighths fill symbol
-         * @param half the half fill symbol
-         * @param fiveEighths the five-eighths fill symbol
-         * @param threeQuarters the three-quarters fill symbol
-         * @param sevenEighths the seven-eighths fill symbol
-         * @param full the full fill symbol
+         * @param empty
+         *            the empty symbol
+         * @param oneEighth
+         *            the one-eighth fill symbol
+         * @param oneQuarter
+         *            the one-quarter fill symbol
+         * @param threeEighths
+         *            the three-eighths fill symbol
+         * @param half
+         *            the half fill symbol
+         * @param fiveEighths
+         *            the five-eighths fill symbol
+         * @param threeQuarters
+         *            the three-quarters fill symbol
+         * @param sevenEighths
+         *            the seven-eighths fill symbol
+         * @param full
+         *            the full fill symbol
          */
-        public BarSet(
-            String empty,
-            String oneEighth,
-            String oneQuarter,
-            String threeEighths,
-            String half,
-            String fiveEighths,
-            String threeQuarters,
-            String sevenEighths,
-            String full
-        ) {
+        public BarSet(String empty, String oneEighth, String oneQuarter, String threeEighths,
+                String half, String fiveEighths, String threeQuarters, String sevenEighths,
+                String full) {
             this.empty = empty;
             this.oneEighth = oneEighth;
             this.oneQuarter = oneQuarter;
@@ -133,23 +127,20 @@ public final class BarChart implements Widget {
         /**
          * Nine-level vertical bar set.
          */
-        public static final BarSet NINE_LEVELS = new BarSet(
-            " ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"
-        );
+        public static final BarSet NINE_LEVELS = new BarSet(" ", "▁", "▂", "▃", "▄", "▅", "▆", "▇",
+                "█");
 
         /**
          * Three-level vertical bar set.
          */
-        public static final BarSet THREE_LEVELS = new BarSet(
-            " ", "▄", "▄", "▄", "▄", "█", "█", "█", "█"
-        );
+        public static final BarSet THREE_LEVELS = new BarSet(" ", "▄", "▄", "▄", "▄", "█", "█", "█",
+                "█");
 
         /**
          * Horizontal bar set (left to right).
          */
-        public static final BarSet HORIZONTAL = new BarSet(
-            " ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"
-        );
+        public static final BarSet HORIZONTAL = new BarSet(" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉",
+                "█");
 
         /**
          * Returns the symbols as an array for indexed access.
@@ -157,10 +148,8 @@ public final class BarChart implements Widget {
          * @return the symbols array
          */
         public String[] symbols() {
-            return new String[] {
-                empty, oneEighth, oneQuarter, threeEighths,
-                half, fiveEighths, threeQuarters, sevenEighths, full
-            };
+            return new String[]{empty, oneEighth, oneQuarter, threeEighths, half, fiveEighths,
+                    threeQuarters, sevenEighths, full};
         }
 
         /**
@@ -253,15 +242,12 @@ public final class BarChart implements Widget {
                 return false;
             }
             BarSet barSet = (BarSet) o;
-            return empty.equals(barSet.empty)
-                && oneEighth.equals(barSet.oneEighth)
-                && oneQuarter.equals(barSet.oneQuarter)
-                && threeEighths.equals(barSet.threeEighths)
-                && half.equals(barSet.half)
-                && fiveEighths.equals(barSet.fiveEighths)
-                && threeQuarters.equals(barSet.threeQuarters)
-                && sevenEighths.equals(barSet.sevenEighths)
-                && full.equals(barSet.full);
+            return empty.equals(barSet.empty) && oneEighth.equals(barSet.oneEighth)
+                    && oneQuarter.equals(barSet.oneQuarter)
+                    && threeEighths.equals(barSet.threeEighths) && half.equals(barSet.half)
+                    && fiveEighths.equals(barSet.fiveEighths)
+                    && threeQuarters.equals(barSet.threeQuarters)
+                    && sevenEighths.equals(barSet.sevenEighths) && full.equals(barSet.full);
         }
 
         @Override
@@ -281,8 +267,9 @@ public final class BarChart implements Widget {
         @Override
         public String toString() {
             return String.format(
-                "BarSet[empty=%s, oneEighth=%s, oneQuarter=%s, threeEighths=%s, half=%s, fiveEighths=%s, threeQuarters=%s, sevenEighths=%s, full=%s]",
-                empty, oneEighth, oneQuarter, threeEighths, half, fiveEighths, threeQuarters, sevenEighths, full);
+                    "BarSet[empty=%s, oneEighth=%s, oneQuarter=%s, threeEighths=%s, half=%s, fiveEighths=%s, threeQuarters=%s, sevenEighths=%s, full=%s]",
+                    empty, oneEighth, oneQuarter, threeEighths, half, fiveEighths, threeQuarters,
+                    sevenEighths, full);
         }
     }
 
@@ -317,9 +304,7 @@ public final class BarChart implements Widget {
 
         Style baseStyle = builder.style;
         if (resolvedBg != null) {
-            baseStyle = baseStyle != null
-                    ? baseStyle.bg(resolvedBg)
-                    : Style.EMPTY.bg(resolvedBg);
+            baseStyle = baseStyle != null ? baseStyle.bg(resolvedBg) : Style.EMPTY.bg(resolvedBg);
         }
         this.style = baseStyle;
 
@@ -427,7 +412,8 @@ public final class BarChart implements Widget {
                 barHeight = Math.min(barHeight, chartHeight);
 
                 // Get effective style
-                Style effectiveBarStyle = bar.style().orElse(barStyle != null ? barStyle : Style.EMPTY);
+                Style effectiveBarStyle = bar.style()
+                        .orElse(barStyle != null ? barStyle : Style.EMPTY);
 
                 // Render bar from bottom
                 for (int h = 0; h < barHeight; h++) {
@@ -469,7 +455,7 @@ public final class BarChart implements Widget {
                     int valueStrWidth = CharWidth.of(valueStr);
                     if (valueStrWidth <= barWidth) {
                         Style effectiveValueStyle = bar.valueStyle()
-                            .orElse(valueStyle != null ? valueStyle : Style.EMPTY);
+                                .orElse(valueStyle != null ? valueStyle : Style.EMPTY);
                         int valueX = x + (barWidth - valueStrWidth) / 2;
                         valueX = Math.max(x, valueX);
                         int valueY = area.y() + chartHeight - barHeight - 1;
@@ -519,7 +505,8 @@ public final class BarChart implements Widget {
                 barLength = Math.min(barLength, chartWidth);
 
                 // Get effective style
-                Style effectiveBarStyle = bar.style().orElse(barStyle != null ? barStyle : Style.EMPTY);
+                Style effectiveBarStyle = bar.style()
+                        .orElse(barStyle != null ? barStyle : Style.EMPTY);
 
                 // Render label
                 if (bar.label().isPresent()) {
@@ -537,7 +524,8 @@ public final class BarChart implements Widget {
                 int barStartX = area.x() + labelWidth + 1;
                 for (int l = 0; l < barLength; l++) {
                     for (int h = 0; h < barWidth && y + h < area.bottom(); h++) {
-                        buffer.setString(barStartX + l, y + h, BarSet.HORIZONTAL.full, effectiveBarStyle);
+                        buffer.setString(barStartX + l, y + h, BarSet.HORIZONTAL.full,
+                                effectiveBarStyle);
                     }
                 }
 
@@ -546,7 +534,7 @@ public final class BarChart implements Widget {
                 int valueStrWidth = CharWidth.of(valueStr);
                 if (barLength + valueStrWidth + 1 <= chartWidth) {
                     Style effectiveValueStyle = bar.valueStyle()
-                        .orElse(valueStyle != null ? valueStyle : Style.EMPTY);
+                            .orElse(valueStyle != null ? valueStyle : Style.EMPTY);
                     buffer.setString(barStartX + barLength + 1, y, valueStr, effectiveValueStyle);
                 }
 
@@ -559,25 +547,16 @@ public final class BarChart implements Widget {
         if (max != null) {
             return max;
         }
-        return data.stream()
-            .mapToLong(BarGroup::maxValue)
-            .max()
-            .orElse(0);
+        return data.stream().mapToLong(BarGroup::maxValue).max().orElse(0);
     }
 
     private boolean hasLabels() {
-        return data.stream()
-            .flatMap(g -> g.bars().stream())
-            .anyMatch(b -> b.label().isPresent());
+        return data.stream().flatMap(g -> g.bars().stream()).anyMatch(b -> b.label().isPresent());
     }
 
     private int calculateLabelWidth() {
-        return data.stream()
-            .flatMap(g -> g.bars().stream())
-            .filter(b -> b.label().isPresent())
-            .mapToInt(b -> b.label().get().width())
-            .max()
-            .orElse(0);
+        return data.stream().flatMap(g -> g.bars().stream()).filter(b -> b.label().isPresent())
+                .mapToInt(b -> b.label().get().width()).max().orElse(0);
     }
 
     private String truncate(String str, int maxWidth) {
@@ -611,12 +590,14 @@ public final class BarChart implements Widget {
         private Color valueColor;
         private Color labelColor;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Adds bar groups to the chart.
          *
-         * @param groups the bar groups to add
+         * @param groups
+         *            the bar groups to add
          * @return this builder
          */
         public Builder data(BarGroup... groups) {
@@ -629,7 +610,8 @@ public final class BarChart implements Widget {
         /**
          * Adds bar groups to the chart.
          *
-         * @param groups the bar groups to add
+         * @param groups
+         *            the bar groups to add
          * @return this builder
          */
         public Builder data(List<BarGroup> groups) {
@@ -642,7 +624,8 @@ public final class BarChart implements Widget {
         /**
          * Adds a single bar group.
          *
-         * @param group the bar group to add
+         * @param group
+         *            the bar group to add
          * @return this builder
          */
         public Builder addGroup(BarGroup group) {
@@ -655,7 +638,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the maximum value for scaling.
          *
-         * @param max the maximum value
+         * @param max
+         *            the maximum value
          * @return this builder
          */
         public Builder max(long max) {
@@ -676,7 +660,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the bar width (default: 1).
          *
-         * @param barWidth the bar width
+         * @param barWidth
+         *            the bar width
          * @return this builder
          */
         public Builder barWidth(int barWidth) {
@@ -687,7 +672,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the gap between bars in a group (default: 1).
          *
-         * @param barGap the gap between bars
+         * @param barGap
+         *            the gap between bars
          * @return this builder
          */
         public Builder barGap(int barGap) {
@@ -698,7 +684,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the gap between groups (default: 1).
          *
-         * @param groupGap the gap between groups
+         * @param groupGap
+         *            the gap between groups
          * @return this builder
          */
         public Builder groupGap(int groupGap) {
@@ -709,7 +696,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the chart direction (default: VERTICAL).
          *
-         * @param direction the chart direction
+         * @param direction
+         *            the chart direction
          * @return this builder
          */
         public Builder direction(Direction direction) {
@@ -720,7 +708,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the overall chart style.
          *
-         * @param style the chart style
+         * @param style
+         *            the chart style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -731,7 +720,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the default bar style.
          *
-         * @param barStyle the bar style
+         * @param barStyle
+         *            the bar style
          * @return this builder
          */
         public Builder barStyle(Style barStyle) {
@@ -742,7 +732,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the value display style.
          *
-         * @param valueStyle the value style
+         * @param valueStyle
+         *            the value style
          * @return this builder
          */
         public Builder valueStyle(Style valueStyle) {
@@ -753,7 +744,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the label style.
          *
-         * @param labelStyle the label style
+         * @param labelStyle
+         *            the label style
          * @return this builder
          */
         public Builder labelStyle(Style labelStyle) {
@@ -764,7 +756,8 @@ public final class BarChart implements Widget {
         /**
          * Wraps the chart in a block.
          *
-         * @param block the surrounding block
+         * @param block
+         *            the surrounding block
          * @return this builder
          */
         public Builder block(Block block) {
@@ -775,7 +768,8 @@ public final class BarChart implements Widget {
         /**
          * Sets the bar symbol set.
          *
-         * @param barSet the bar symbol set
+         * @param barSet
+         *            the bar symbol set
          * @return this builder
          */
         public Builder barSet(BarSet barSet) {
@@ -787,10 +781,11 @@ public final class BarChart implements Widget {
          * Sets the property resolver for style-aware properties.
          * <p>
          * When set, properties like {@code background}, {@code bar-color},
-         * {@code value-color}, and {@code label-color} will be resolved
-         * if not set programmatically.
+         * {@code value-color}, and {@code label-color} will be resolved if not set
+         * programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -803,7 +798,8 @@ public final class BarChart implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the background color
+         * @param color
+         *            the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -816,7 +812,8 @@ public final class BarChart implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the bar color
+         * @param color
+         *            the bar color
          * @return this builder
          */
         public Builder barColor(Color color) {
@@ -829,7 +826,8 @@ public final class BarChart implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the value color
+         * @param color
+         *            the value color
          * @return this builder
          */
         public Builder valueColor(Color color) {
@@ -842,7 +840,8 @@ public final class BarChart implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the label color
+         * @param color
+         *            the label color
          * @return this builder
          */
         public Builder labelColor(Color color) {

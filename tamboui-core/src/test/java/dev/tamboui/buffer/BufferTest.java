@@ -4,16 +4,17 @@
  */
 package dev.tamboui.buffer;
 
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 import static dev.tamboui.assertj.BufferAssertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 class BufferTest {
 
@@ -84,7 +85,8 @@ class BufferTest {
         Style textStyle = Style.EMPTY.fg(Color.RED);
         buffer.setString(0, 0, "Hi", textStyle);
 
-        // Text cells should have both foreground (from textStyle) and background (from bgStyle)
+        // Text cells should have both foreground (from textStyle) and background (from
+        // bgStyle)
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
         assertThat(buffer.get(0, 0).style().bg()).contains(Color.BLUE);
         assertThat(buffer.get(1, 0).style().fg()).contains(Color.RED);
@@ -179,11 +181,8 @@ class BufferTest {
     @DisplayName("BufferAssertions can assert buffer properties")
     void bufferAssertionsProperties() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 5));
-        
-        assertThat(buffer)
-            .hasArea(new Rect(0, 0, 10, 5))
-            .hasWidth(10)
-            .hasHeight(5);
+
+        assertThat(buffer).hasArea(new Rect(0, 0, 10, 5)).hasWidth(10).hasHeight(5);
     }
 
     @Test
@@ -221,9 +220,9 @@ class BufferTest {
         String result = buffer.toAnsiString();
 
         // Should contain red code for A and green code for B
-        assertThat(result).contains(";31m");  // red
+        assertThat(result).contains(";31m"); // red
         assertThat(result).contains("A");
-        assertThat(result).contains(";32m");  // green
+        assertThat(result).contains(";32m"); // green
         assertThat(result).contains("B");
     }
 
@@ -246,7 +245,8 @@ class BufferTest {
     void ansiStringUsesCarriageReturnLineFeed() {
         // When OPOST is disabled (e.g. the Panama backend's raw mode), a bare \n
         // only moves the cursor down without returning to column 0. Using \r\n
-        // ensures lines start at the left edge regardless of the output processing mode.
+        // ensures lines start at the left edge regardless of the output processing
+        // mode.
         Buffer buffer = Buffer.empty(new Rect(0, 0, 3, 3));
         buffer.setString(0, 0, "AAA", Style.EMPTY);
         buffer.setString(0, 1, "BBB", Style.EMPTY);
@@ -304,7 +304,7 @@ class BufferTest {
     void toAnsiStringTrimmedPreservesStyledSpaces() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 1));
         buffer.set(0, 0, new Cell("A", Style.EMPTY));
-        buffer.set(1, 0, new Cell(" ", Style.EMPTY.bg(Color.RED)));  // Styled space
+        buffer.set(1, 0, new Cell(" ", Style.EMPTY.bg(Color.RED))); // Styled space
         buffer.set(2, 0, new Cell("B", Style.EMPTY));
         // 3 and 4 are empty default spaces
 

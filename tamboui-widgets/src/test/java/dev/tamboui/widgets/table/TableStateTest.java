@@ -4,11 +4,11 @@
  */
 package dev.tamboui.widgets.table;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -143,13 +143,8 @@ class TableStateTest {
     @DisplayName("scrollToSelected adjusts offset to show selected row")
     void scrollToSelected() {
         TableState state = new TableState();
-        List<Row> rows = Arrays.asList(
-            Row.from("Row 1"),
-            Row.from("Row 2"),
-            Row.from("Row 3"),
-            Row.from("Row 4"),
-            Row.from("Row 5")
-        );
+        List<Row> rows = Arrays.asList(Row.from("Row 1"), Row.from("Row 2"), Row.from("Row 3"),
+                Row.from("Row 4"), Row.from("Row 5"));
 
         // Select row 4 (index 3)
         state.select(3);

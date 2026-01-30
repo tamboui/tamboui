@@ -4,12 +4,18 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -18,23 +24,14 @@ import dev.tamboui.widgets.calendar.CalendarEventStore;
 import dev.tamboui.widgets.calendar.DateStyler;
 import dev.tamboui.widgets.calendar.Monthly;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * A DSL wrapper for the Monthly calendar widget.
  * <p>
  * Displays a calendar grid for a month.
+ * 
  * <pre>{@code
- * calendar(LocalDate.now())
- *     .showMonthHeader()
- *     .showWeekdaysHeader()
- *     .highlightToday(Color.RED)
- *     .title("Calendar")
- *     .rounded()
+ * calendar(LocalDate.now()).showMonthHeader().showWeekdaysHeader().highlightToday(Color.RED)
+ *         .title("Calendar").rounded()
  * }</pre>
  */
 public final class CalendarElement extends StyledElement<CalendarElement> {
@@ -59,7 +56,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Creates a new calendar element for the month of the given date.
      *
-     * @param date the date determining which month to display
+     * @param date
+     *            the date determining which month to display
      */
     public CalendarElement(LocalDate date) {
         this.displayDate = date != null ? date : LocalDate.now();
@@ -68,7 +66,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Sets the display date (determines which month to show).
      *
-     * @param date the date determining which month to display
+     * @param date
+     *            the date determining which month to display
      * @return this element
      */
     public CalendarElement date(LocalDate date) {
@@ -79,7 +78,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Sets the date styler for customizing individual dates.
      *
-     * @param styler the date styler callback
+     * @param styler
+     *            the date styler callback
      * @return this element
      */
     public CalendarElement dateStyler(DateStyler styler) {
@@ -90,7 +90,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Highlights today with the given color.
      *
-     * @param color the highlight color for today
+     * @param color
+     *            the highlight color for today
      * @return this element
      */
     public CalendarElement highlightToday(Color color) {
@@ -101,7 +102,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Highlights today with the given style.
      *
-     * @param style the highlight style for today
+     * @param style
+     *            the highlight style for today
      * @return this element
      */
     public CalendarElement highlightToday(Style style) {
@@ -112,7 +114,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Shows the month header with the given style.
      *
-     * @param style the month header style
+     * @param style
+     *            the month header style
      * @return this element
      */
     public CalendarElement showMonthHeader(Style style) {
@@ -133,7 +136,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Shows the weekdays header with the given style.
      *
-     * @param style the weekdays header style
+     * @param style
+     *            the weekdays header style
      * @return this element
      */
     public CalendarElement showWeekdaysHeader(Style style) {
@@ -154,7 +158,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Shows surrounding days (from previous/next month) with the given style.
      *
-     * @param style the surrounding days style
+     * @param style
+     *            the surrounding days style
      * @return this element
      */
     public CalendarElement showSurrounding(Style style) {
@@ -175,7 +180,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Sets the default date style.
      *
-     * @param style the default style for dates
+     * @param style
+     *            the default style for dates
      * @return this element
      */
     public CalendarElement defaultStyle(Style style) {
@@ -186,7 +192,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Sets the first day of the week.
      *
-     * @param day the first day of the week
+     * @param day
+     *            the first day of the week
      * @return this element
      */
     public CalendarElement firstDayOfWeek(DayOfWeek day) {
@@ -207,7 +214,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Sets the title.
      *
-     * @param title the calendar title
+     * @param title
+     *            the calendar title
      * @return this element
      */
     public CalendarElement title(String title) {
@@ -228,7 +236,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this element
      */
     public CalendarElement borderColor(Color color) {
@@ -246,7 +255,8 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
 
     @Override
     public int preferredHeight() {
-        // Calendar shows: month header (optional) + weekday header (optional) + 6 weeks max
+        // Calendar shows: month header (optional) + weekday header (optional) + 6 weeks
+        // max
         int height = 6; // 6 week rows
         if (monthHeaderStyle != null) {
             height++;
@@ -274,7 +284,7 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
         }
 
         Monthly.Builder builder = Monthly.builder(displayDate, dateStyler)
-            .firstDayOfWeek(firstDayOfWeek);
+                .firstDayOfWeek(firstDayOfWeek);
 
         if (monthHeaderStyle != null) {
             builder.monthHeaderStyle(monthHeaderStyle);
@@ -293,8 +303,7 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
         }
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

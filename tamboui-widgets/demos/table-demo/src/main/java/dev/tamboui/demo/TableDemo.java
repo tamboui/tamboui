@@ -8,6 +8,10 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -30,29 +34,27 @@ import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.Table;
 import dev.tamboui.widgets.table.TableState;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Demo TUI application showcasing the Table widget.
  */
 public class TableDemo {
 
     private static final List<String[]> DATA = List.of(
-        new String[]{"Alice Johnson", "Software Engineer", "Engineering", "$120,000", "San Francisco"},
-        new String[]{"Bob Smith", "Product Manager", "Product", "$135,000", "New York"},
-        new String[]{"Charlie Brown", "Data Scientist", "Analytics", "$125,000", "Seattle"},
-        new String[]{"Diana Ross", "UX Designer", "Design", "$95,000", "Austin"},
-        new String[]{"Edward Chen", "DevOps Engineer", "Engineering", "$115,000", "Portland"},
-        new String[]{"Fiona Garcia", "Frontend Developer", "Engineering", "$105,000", "Denver"},
-        new String[]{"George Wilson", "Backend Developer", "Engineering", "$110,000", "Chicago"},
-        new String[]{"Hannah Lee", "QA Engineer", "Engineering", "$90,000", "Boston"},
-        new String[]{"Ivan Petrov", "Security Analyst", "Security", "$130,000", "Washington DC"},
-        new String[]{"Julia Martinez", "Technical Writer", "Documentation", "$85,000", "Miami"},
-        new String[]{"Kevin O'Brien", "Sales Engineer", "Sales", "$140,000", "Los Angeles"},
-        new String[]{"Laura Kim", "HR Manager", "Human Resources", "$100,000", "Atlanta"}
-    );
+            new String[]{"Alice Johnson", "Software Engineer", "Engineering", "$120,000",
+                    "San Francisco"},
+            new String[]{"Bob Smith", "Product Manager", "Product", "$135,000", "New York"},
+            new String[]{"Charlie Brown", "Data Scientist", "Analytics", "$125,000", "Seattle"},
+            new String[]{"Diana Ross", "UX Designer", "Design", "$95,000", "Austin"},
+            new String[]{"Edward Chen", "DevOps Engineer", "Engineering", "$115,000", "Portland"},
+            new String[]{"Fiona Garcia", "Frontend Developer", "Engineering", "$105,000", "Denver"},
+            new String[]{"George Wilson", "Backend Developer", "Engineering", "$110,000",
+                    "Chicago"},
+            new String[]{"Hannah Lee", "QA Engineer", "Engineering", "$90,000", "Boston"},
+            new String[]{"Ivan Petrov", "Security Analyst", "Security", "$130,000",
+                    "Washington DC"},
+            new String[]{"Julia Martinez", "Technical Writer", "Documentation", "$85,000", "Miami"},
+            new String[]{"Kevin O'Brien", "Sales Engineer", "Sales", "$140,000", "Los Angeles"},
+            new String[]{"Laura Kim", "HR Manager", "Human Resources", "$100,000", "Atlanta"});
 
     private boolean running = true;
     private final TableState tableState = new TableState();
@@ -63,8 +65,11 @@ public class TableDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new TableDemo().run();
@@ -73,9 +78,10 @@ public class TableDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -163,14 +169,11 @@ public class TableDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        List<Rect> layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Header
-                Constraint.fill(),     // Table
-                Constraint.length(5),  // Details
-                Constraint.length(3)   // Footer
-            )
-            .split(area);
+        List<Rect> layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Table
+                Constraint.length(5), // Details
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderTable(frame, layout.get(1));
@@ -179,30 +182,24 @@ public class TableDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Table Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("Table Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
 
     private void renderTable(Frame frame, Rect area) {
         // Create header row
-        Row header = Row.from(
-            Cell.from("Name").style(Style.EMPTY.bold()),
-            Cell.from("Title").style(Style.EMPTY.bold()),
-            Cell.from("Department").style(Style.EMPTY.bold()),
-            Cell.from("Salary").style(Style.EMPTY.bold()),
-            Cell.from("Location").style(Style.EMPTY.bold())
-        ).style(Style.EMPTY.fg(Color.YELLOW));
+        Row header = Row
+                .from(Cell.from("Name").style(Style.EMPTY.bold()),
+                        Cell.from("Title").style(Style.EMPTY.bold()),
+                        Cell.from("Department").style(Style.EMPTY.bold()),
+                        Cell.from("Salary").style(Style.EMPTY.bold()),
+                        Cell.from("Location").style(Style.EMPTY.bold()))
+                .style(Style.EMPTY.fg(Color.YELLOW));
 
         // Create data rows with alternating colors
         List<Row> rows = new ArrayList<>();
@@ -212,31 +209,19 @@ public class TableDemo {
             rows.add(Row.from(data).style(rowStyle));
         }
 
-        Table table = Table.builder()
-            .header(header)
-            .rows(rows)
-            .widths(
-                Constraint.percentage(20),  // Name
-                Constraint.percentage(20),  // Title
-                Constraint.percentage(20),  // Department
-                Constraint.length(12),      // Salary
-                Constraint.fill()           // Location
-            )
-            .highlightStyle(Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE).bold())
-            .highlightSymbol("▶ ")
-            .columnSpacing(1)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.GREEN))
-                .title(Title.from(
-                    Line.from(
-                        Span.raw("Employees "),
-                        Span.raw("(" + DATA.size() + " total)").dim()
-                    )
-                ))
-                .build())
-            .build();
+        Table table = Table.builder().header(header).rows(rows).widths(Constraint.percentage(20), // Name
+                Constraint.percentage(20), // Title
+                Constraint.percentage(20), // Department
+                Constraint.length(12), // Salary
+                Constraint.fill() // Location
+        ).highlightStyle(Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE).bold()).highlightSymbol("▶ ")
+                .columnSpacing(1).block(
+                        Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                                .borderStyle(Style.EMPTY.fg(Color.GREEN))
+                                .title(Title.from(Line.from(Span.raw("Employees "),
+                                        Span.raw("(" + DATA.size() + " total)").dim())))
+                                .build())
+                .build();
 
         frame.renderStatefulWidget(table, area, tableState);
     }
@@ -249,73 +234,40 @@ public class TableDemo {
             String[] data = DATA.get(selected);
             // Create a search URL for the location
             String locationUrl = "https://maps.example.com/search?q=" + data[4].replace(" ", "+");
-            detailsText = Text.from(
-                Line.from(
-                    Span.raw("Name: ").bold(),
-                    Span.raw(data[0]).cyan()
-                ),
-                Line.from(
-                    Span.raw("Title: ").bold(),
-                    Span.raw(data[1]).green()
-                ),
-                Line.from(
-                    Span.raw("Department: ").bold(),
-                    Span.raw(data[2]).yellow(),
-                    Span.raw("  |  Salary: ").bold(),
-                    Span.raw(data[3]).magenta(),
-                    Span.raw("  |  Location: ").bold(),
-                    Span.raw(data[4])
-                        .hyperlink(locationUrl)
-                        .underlined()
-                        .blue()
-                ),
-                Line.from(
-                    Span.raw("Email: ").bold(),
-                    Span.raw(data[0].toLowerCase().replace(" ", ".") + "@company.com")
-                        .hyperlink("mailto:" + data[0].toLowerCase().replace(" ", ".") + "@company.com")
-                        .underlined()
-                        .cyan()
-                )
-            );
+            detailsText = Text.from(Line.from(Span.raw("Name: ").bold(), Span.raw(data[0]).cyan()),
+                    Line.from(Span.raw("Title: ").bold(), Span.raw(data[1]).green()),
+                    Line.from(Span.raw("Department: ").bold(), Span.raw(data[2]).yellow(),
+                            Span.raw("  |  Salary: ").bold(), Span.raw(data[3]).magenta(),
+                            Span.raw("  |  Location: ").bold(),
+                            Span.raw(data[4]).hyperlink(locationUrl).underlined().blue()),
+                    Line.from(Span.raw("Email: ").bold(),
+                            Span.raw(data[0].toLowerCase().replace(" ", ".") + "@company.com")
+                                    .hyperlink("mailto:" + data[0].toLowerCase().replace(" ", ".")
+                                            + "@company.com")
+                                    .underlined().cyan()));
         } else {
             detailsText = Text.from(Line.from(Span.raw("No employee selected").dim()));
         }
 
-        Paragraph details = Paragraph.builder()
-            .text(detailsText)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.MAGENTA))
-                .title("Details")
-                .build())
-            .build();
+        Paragraph details = Paragraph.builder().text(detailsText)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.MAGENTA)).title("Details").build())
+                .build();
 
         frame.renderWidget(details, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-            Span.raw(" j/↓").bold().yellow(),
-            Span.raw(" Down  ").dim(),
-            Span.raw("k/↑").bold().yellow(),
-            Span.raw(" Up  ").dim(),
-            Span.raw("g").bold().yellow(),
-            Span.raw(" First  ").dim(),
-            Span.raw("G").bold().yellow(),
-            Span.raw(" Last  ").dim(),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" j/↓").bold().yellow(), Span.raw(" Down  ").dim(),
+                Span.raw("k/↑").bold().yellow(), Span.raw(" Up  ").dim(),
+                Span.raw("g").bold().yellow(), Span.raw(" First  ").dim(),
+                Span.raw("G").bold().yellow(), Span.raw(" Last  ").dim(),
+                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

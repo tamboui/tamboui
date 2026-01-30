@@ -4,31 +4,30 @@
  */
 package dev.tamboui.css.parser;
 
+import java.util.*;
+
 import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.model.Stylesheet;
 import dev.tamboui.css.selector.*;
 
-import java.util.*;
-
 /**
  * Recursive descent parser for Textual-style CSS.
  * <p>
- * Parses CSS input into a Stylesheet containing variables and rules.
- * Supports:
+ * Parses CSS input into a Stylesheet containing variables and rules. Supports:
  * <ul>
- *   <li>Variables: {@code $name: value;}</li>
- *   <li>Type selectors: {@code Panel { ... }}</li>
- *   <li>ID selectors: {@code #sidebar { ... }}</li>
- *   <li>Class selectors: {@code .error { ... }}</li>
- *   <li>Universal selector: {@code * { ... }}</li>
- *   <li>Pseudo-classes: {@code :focus, :hover, :disabled}</li>
- *   <li>Compound selectors: {@code Panel.primary#sidebar}</li>
- *   <li>Descendant combinator: {@code Panel Button { ... }}</li>
- *   <li>Child combinator: {@code Panel > Button { ... }}</li>
- *   <li>Nested rules: {@code Panel { &:focus { ... } }}</li>
- *   <li>Selector lists: {@code .foo, .bar { ... }}</li>
- *   <li>Attribute selectors: {@code Panel[title="Test"] { ... }}</li>
+ * <li>Variables: {@code $name: value;}</li>
+ * <li>Type selectors: {@code Panel { ... }}</li>
+ * <li>ID selectors: {@code #sidebar { ... }}</li>
+ * <li>Class selectors: {@code .error { ... }}</li>
+ * <li>Universal selector: {@code * { ... }}</li>
+ * <li>Pseudo-classes: {@code :focus, :hover, :disabled}</li>
+ * <li>Compound selectors: {@code Panel.primary#sidebar}</li>
+ * <li>Descendant combinator: {@code Panel Button { ... }}</li>
+ * <li>Child combinator: {@code Panel > Button { ... }}</li>
+ * <li>Nested rules: {@code Panel { &:focus { ... } }}</li>
+ * <li>Selector lists: {@code .foo, .bar { ... }}</li>
+ * <li>Attribute selectors: {@code Panel[title="Test"] { ... }}</li>
  * </ul>
  */
 public final class CssParser {
@@ -46,9 +45,11 @@ public final class CssParser {
     /**
      * Parses CSS input into a stylesheet.
      *
-     * @param css the CSS source code
+     * @param css
+     *            the CSS source code
      * @return the parsed stylesheet
-     * @throws CssParseException if parsing fails
+     * @throws CssParseException
+     *             if parsing fails
      */
     public static Stylesheet parse(String css) {
         CssLexer lexer = new CssLexer(css);
@@ -166,7 +167,8 @@ public final class CssParser {
             if (token instanceof Token.Delim && ((Token.Delim) token).value() == '!') {
                 advance();
                 Token next = advance();
-                if (next instanceof Token.Ident && ((Token.Ident) next).value().equals("important")) {
+                if (next instanceof Token.Ident
+                        && ((Token.Ident) next).value().equals("important")) {
                     important = true;
                 } else {
                     throw error("Expected 'important' after '!'");
@@ -187,8 +189,7 @@ public final class CssParser {
         }
 
         String trimmedValue = value.toString().trim();
-        declarations.put(property.value(),
-                new PropertyValue(trimmedValue, important));
+        declarations.put(property.value(), new PropertyValue(trimmedValue, important));
     }
 
     private Selector parseSelector() {
@@ -267,7 +268,8 @@ public final class CssParser {
 
         if (token instanceof Token.Colon) {
             advance();
-            Token.Ident pseudoClass = consume(Token.Ident.class, "Expected pseudo-class name after ':'");
+            Token.Ident pseudoClass = consume(Token.Ident.class,
+                    "Expected pseudo-class name after ':'");
             String name = pseudoClass.value();
 
             // Handle functional pseudo-classes like :nth-child(even)
@@ -391,8 +393,7 @@ public final class CssParser {
 
         try {
             // Skip potential selector
-            while (isStartOfSimpleSelector() ||
-                   (check(Token.Delim.class) && peekDelim() == '>')) {
+            while (isStartOfSimpleSelector() || (check(Token.Delim.class) && peekDelim() == '>')) {
                 // Skip attribute selectors entirely
                 if (check(Token.OpenBracket.class)) {
                     advance(); // consume '['
@@ -420,11 +421,11 @@ public final class CssParser {
         // For now, simple descendant combination with first parent
         Selector parent = parentSelectors.get(0);
 
-        // If child is class selectors or pseudo-classes (like &:focus or &.foo), combine as compound
-        if (childSelector instanceof PseudoClassSelector ||
-            childSelector instanceof ClassSelector ||
-            (childSelector instanceof CompoundSelector &&
-             allPseudoOrClass((CompoundSelector) childSelector))) {
+        // If child is class selectors or pseudo-classes (like &:focus or &.foo),
+        // combine as compound
+        if (childSelector instanceof PseudoClassSelector || childSelector instanceof ClassSelector
+                || (childSelector instanceof CompoundSelector
+                        && allPseudoOrClass((CompoundSelector) childSelector))) {
             if (parent instanceof CompoundSelector) {
                 List<Selector> combined = new ArrayList<>(((CompoundSelector) parent).parts());
                 if (childSelector instanceof CompoundSelector) {

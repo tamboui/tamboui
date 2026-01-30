@@ -4,22 +4,22 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.style.Modifier;
-
 import java.util.*;
+
+import dev.tamboui.style.Modifier;
 
 /**
  * Converts CSS text-style values to TamboUI Modifier sets.
  * <p>
  * Supported values:
  * <ul>
- *   <li>bold</li>
- *   <li>dim</li>
- *   <li>italic</li>
- *   <li>underlined / underline</li>
- *   <li>reversed / reverse</li>
- *   <li>crossed-out / strikethrough</li>
- *   <li>hidden</li>
+ * <li>bold</li>
+ * <li>dim</li>
+ * <li>italic</li>
+ * <li>underlined / underline</li>
+ * <li>reversed / reverse</li>
+ * <li>crossed-out / strikethrough</li>
+ * <li>hidden</li>
  * </ul>
  * Multiple values can be space-separated: "bold italic underlined"
  */

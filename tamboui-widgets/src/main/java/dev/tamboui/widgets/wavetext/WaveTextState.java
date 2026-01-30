@@ -14,7 +14,7 @@ package dev.tamboui.widgets.wavetext;
  * WaveTextState state = new WaveTextState();
  *
  * // In your render loop:
- * state.tick();  // Advance animation
+ * state.tick(); // Advance animation
  * frame.renderStatefulWidget(waveText, area, state);
  * }</pre>
  */
@@ -32,7 +32,8 @@ public final class WaveTextState {
     /**
      * Creates a new state with the given initial tick.
      *
-     * @param initialTick the initial tick value
+     * @param initialTick
+     *            the initial tick value
      */
     public WaveTextState(long initialTick) {
         this.tick = initialTick;
@@ -61,7 +62,8 @@ public final class WaveTextState {
     /**
      * Advances the tick by the given amount.
      *
-     * @param amount the amount to advance
+     * @param amount
+     *            the amount to advance
      */
     public void advance(long amount) {
         tick += amount;
@@ -70,7 +72,8 @@ public final class WaveTextState {
     /**
      * Sets the tick to a specific value.
      *
-     * @param tick the new tick value
+     * @param tick
+     *            the new tick value
      */
     public void setTick(long tick) {
         this.tick = tick;

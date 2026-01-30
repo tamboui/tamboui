@@ -4,13 +4,6 @@
  */
 package dev.tamboui.internal.record;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.buffer.CellUpdate;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.layout.Size;
-import dev.tamboui.terminal.Backend;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,10 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.layout.Position;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.Size;
+import dev.tamboui.terminal.Backend;
+
 /**
- * A backend wrapper that records frames to an Asciinema cast file.
- * This backend is headless - it does not output to the real terminal.
- * This is an internal API and not part of the public contract.
+ * A backend wrapper that records frames to an Asciinema cast file. This backend
+ * is headless - it does not output to the real terminal. This is an internal
+ * API and not part of the public contract.
  */
 public final class RecordingBackend implements Backend {
 
@@ -36,13 +36,15 @@ public final class RecordingBackend implements Backend {
     private long lastCaptureTimeNanos;
     private volatile boolean recording;
     private volatile boolean closed;
-    private volatile boolean hasDrawn;  // Track if draw() was ever called
+    private volatile boolean hasDrawn; // Track if draw() was ever called
 
     /**
      * Creates a new recording backend wrapping the given delegate.
      *
-     * @param delegate the delegate backend
-     * @param config   the recording configuration
+     * @param delegate
+     *            the delegate backend
+     * @param config
+     *            the recording configuration
      */
     public RecordingBackend(Backend delegate, RecordingConfig config) {
         this.delegate = delegate;
@@ -109,7 +111,8 @@ public final class RecordingBackend implements Backend {
             return false;
         }
         // Check duration limit
-        if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos) > config.maxDurationMs()) {
+        if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos) > config
+                .maxDurationMs()) {
             recording = false;
             return false;
         }
@@ -284,12 +287,12 @@ public final class RecordingBackend implements Backend {
         // For inline demos (no draw() calls), frames will be empty and we let
         // the shutdown hook write the System.out captured frames instead
         if (frames.isEmpty()) {
-            return;  // Let shutdown hook handle AnsiTerminalCapture frames
+            return; // Let shutdown hook handle AnsiTerminalCapture frames
         }
 
         // We have draw() frames - uninstall System.out capture and write draw frames
         AnsiTerminalCapture.uninstall();
-        RecordingConfig.clearActive();  // Prevent shutdown hook from also writing
+        RecordingConfig.clearActive(); // Prevent shutdown hook from also writing
 
         AsciinemaAnimation animation = new AsciinemaAnimation(frames, config.fps());
         String cast = animation.toCast();

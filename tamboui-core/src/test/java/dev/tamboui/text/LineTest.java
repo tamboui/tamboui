@@ -4,11 +4,12 @@
  */
 package dev.tamboui.text;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -25,21 +26,14 @@ class LineTest {
     @Test
     @DisplayName("Line.from(Span...) creates line with multiple spans")
     void fromSpans() {
-        Line line = Line.from(
-            Span.raw("Hello "),
-            Span.styled("World", Style.EMPTY.fg(Color.RED))
-        );
+        Line line = Line.from(Span.raw("Hello "), Span.styled("World", Style.EMPTY.fg(Color.RED)));
         assertThat(line.spans()).hasSize(2);
     }
 
     @Test
     @DisplayName("Line width is sum of span widths")
     void width() {
-        Line line = Line.from(
-            Span.raw("Hello"),
-            Span.raw(" "),
-            Span.raw("World")
-        );
+        Line line = Line.from(Span.raw("Hello"), Span.raw(" "), Span.raw("World"));
         assertThat(line.width()).isEqualTo(11);
     }
 

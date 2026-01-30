@@ -9,10 +9,11 @@ import java.util.Optional;
 /**
  * Converts string values to Double objects.
  * <p>
- * Handles standard decimal number formats including negative values
- * and scientific notation.
+ * Handles standard decimal number formats including negative values and
+ * scientific notation.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * // Standalone usage
  * Optional<Double> value = DoubleConverter.INSTANCE.convert("1.5");

@@ -13,12 +13,12 @@ import java.util.Optional;
  * <p>
  * Supported values:
  * <ul>
- *   <li>{@code clip} - silent truncation at boundary</li>
- *   <li>{@code wrap}, {@code wrap-character} - wrap at character boundaries</li>
- *   <li>{@code wrap-word} - wrap at word boundaries</li>
- *   <li>{@code ellipsis} - truncate with "..." at end</li>
- *   <li>{@code ellipsis-start} - truncate with "..." at start</li>
- *   <li>{@code ellipsis-middle} - truncate with "..." in middle</li>
+ * <li>{@code clip} - silent truncation at boundary</li>
+ * <li>{@code wrap}, {@code wrap-character} - wrap at character boundaries</li>
+ * <li>{@code wrap-word} - wrap at word boundaries</li>
+ * <li>{@code ellipsis} - truncate with "..." at end</li>
+ * <li>{@code ellipsis-start} - truncate with "..." at start</li>
+ * <li>{@code ellipsis-middle} - truncate with "..." in middle</li>
  * </ul>
  */
 public final class OverflowConverter implements PropertyConverter<Overflow> {

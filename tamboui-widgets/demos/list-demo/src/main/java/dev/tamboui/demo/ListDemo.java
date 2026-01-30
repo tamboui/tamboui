@@ -8,6 +8,9 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -30,25 +33,17 @@ import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Demo TUI application showcasing the List widget.
  * <p>
- * Demonstrates various List features:
- * - Basic list with selection
- * - Highlight styles and symbols
- * - Multiline list items
- * - Styled list items
- * - Block integration
- * - Navigation
+ * Demonstrates various List features: - Basic list with selection - Highlight
+ * styles and symbols - Multiline list items - Styled list items - Block
+ * integration - Navigation
  */
 public class ListDemo {
 
     private enum FocusedList {
-        BASIC,
-        MULTILINE
+        BASIC, MULTILINE
     }
 
     private boolean running = true;
@@ -62,8 +57,11 @@ public class ListDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new ListDemo().run();
@@ -72,9 +70,10 @@ public class ListDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -84,7 +83,7 @@ public class ListDemo {
 
             // Handle resize
             backend.onResize(() -> {
-                    terminal.draw(this::ui);
+                terminal.draw(this::ui);
             });
 
             // Select first item in both lists
@@ -127,9 +126,9 @@ public class ListDemo {
             }
             case '\t' -> {
                 // Switch focus between lists
-                focusedList = focusedList == FocusedList.BASIC 
-                    ? FocusedList.MULTILINE 
-                    : FocusedList.BASIC;
+                focusedList = focusedList == FocusedList.BASIC
+                        ? FocusedList.MULTILINE
+                        : FocusedList.BASIC;
                 yield true;
             }
             case 'j', 'J' -> {
@@ -196,38 +195,28 @@ public class ListDemo {
 
     private List<ListItem> getMultilineItems() {
         return List.of(
-            ListItem.from(Text.from(
-                Line.from("[Remy]: I'm building one now."),
-                Line.from("It even supports multiline text!")
-            )),
-            ListItem.from(Line.from("[Gusteau]: With enough passion, yes.")),
-            ListItem.from(Line.from("[Remy]: But can anyone build a TUI in Java?")),
-            ListItem.from(Line.from("[Gusteau]: With enough passion, yes!")),
-            ListItem.from(Line.from(
-                Span.raw("[System]: ").bold().fg(Color.CYAN),
-                Span.raw("List widget supports ").fg(Color.WHITE),
-                Span.raw("styled text").bold().fg(Color.YELLOW),
-                Span.raw(" in items!").fg(Color.WHITE)
-            )),
-            ListItem.from(Line.from(
-                Span.raw("[Info]: ").bold().fg(Color.GREEN),
-                Span.raw("You can use ").fg(Color.WHITE),
-                Span.raw("multiple spans").italic().fg(Color.MAGENTA),
-                Span.raw(" per line.").fg(Color.WHITE)
-            ))
-        );
+                ListItem.from(Text.from(Line.from("[Remy]: I'm building one now."),
+                        Line.from("It even supports multiline text!"))),
+                ListItem.from(Line.from("[Gusteau]: With enough passion, yes.")),
+                ListItem.from(Line.from("[Remy]: But can anyone build a TUI in Java?")),
+                ListItem.from(Line.from("[Gusteau]: With enough passion, yes!")),
+                ListItem.from(Line.from(Span.raw("[System]: ").bold().fg(Color.CYAN),
+                        Span.raw("List widget supports ").fg(Color.WHITE),
+                        Span.raw("styled text").bold().fg(Color.YELLOW),
+                        Span.raw(" in items!").fg(Color.WHITE))),
+                ListItem.from(Line.from(Span.raw("[Info]: ").bold().fg(Color.GREEN),
+                        Span.raw("You can use ").fg(Color.WHITE),
+                        Span.raw("multiple spans").italic().fg(Color.MAGENTA),
+                        Span.raw(" per line.").fg(Color.WHITE))));
     }
 
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Header
-                Constraint.fill(),     // Main content
-                Constraint.length(3)   // Footer
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Main content
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderMainContent(frame, layout.get(1));
@@ -235,17 +224,11 @@ public class ListDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("List Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("List Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -253,12 +236,8 @@ public class ListDemo {
     private void renderMainContent(Frame frame, Rect area) {
         // Split into 2 rows
         var rows = Layout.vertical()
-            .constraints(
-                Constraint.percentage(50),
-                Constraint.percentage(50)
-            )
-            .spacing(1)
-            .split(area);
+                .constraints(Constraint.percentage(50), Constraint.percentage(50)).spacing(1)
+                .split(area);
 
         // Top: Basic list
         renderBasicList(frame, rows.get(0));
@@ -271,16 +250,10 @@ public class ListDemo {
      * Render a basic list with selection.
      */
     private void renderBasicList(Frame frame, Rect area) {
-        List<ListItem> items = getItems().stream()
-            .map(ListItem::from)
-            .toList();
+        List<ListItem> items = getItems().stream().map(ListItem::from).toList();
 
-        ListWidget list = ListWidget.builder()
-            .items(items)
-            .style(Style.EMPTY.fg(Color.WHITE))
-            .highlightStyle(Style.EMPTY.reversed())
-            .highlightSymbol("> ")
-            .build();
+        ListWidget list = ListWidget.builder().items(items).style(Style.EMPTY.fg(Color.WHITE))
+                .highlightStyle(Style.EMPTY.reversed()).highlightSymbol("> ").build();
 
         frame.renderStatefulWidget(list, area, basicListState);
     }
@@ -291,14 +264,10 @@ public class ListDemo {
     private void renderMultilineList(Frame frame, Rect area) {
         List<ListItem> items = getMultilineItems();
 
-        ListWidget list = ListWidget.builder()
-            .items(items)
-            .style(Style.EMPTY.fg(Color.WHITE))
-            .highlightStyle(Style.EMPTY.fg(Color.YELLOW).italic())
-            .highlightSymbol(Line.from("> ").fg(Color.RED))
-            .direction(ListDirection.BOTTOM_TO_TOP)
-            .repeatHighlightSymbol(false)
-            .build();
+        ListWidget list = ListWidget.builder().items(items).style(Style.EMPTY.fg(Color.WHITE))
+                .highlightStyle(Style.EMPTY.fg(Color.YELLOW).italic())
+                .highlightSymbol(Line.from("> ").fg(Color.RED))
+                .direction(ListDirection.BOTTOM_TO_TOP).repeatHighlightSymbol(false).build();
 
         frame.renderStatefulWidget(list, area, multilineListState);
     }
@@ -309,42 +278,29 @@ public class ListDemo {
         if (focusedList == FocusedList.BASIC) {
             selected = basicListState.selected();
             selectedText = selected != null && selected < getItems().size()
-                ? getItems().get(selected)
-                : "None";
+                    ? getItems().get(selected)
+                    : "None";
         } else {
             selected = multilineListState.selected();
             List<ListItem> items = getMultilineItems();
             selectedText = selected != null && selected < items.size()
-                ? items.get(selected).content().lines().get(0).rawContent()
-                : "None";
+                    ? items.get(selected).content().lines().get(0).rawContent()
+                    : "None";
         }
 
-        Line helpLine = Line.from(
-            Span.raw(" Focus: ").dim(),
-            Span.raw(focusedList == FocusedList.BASIC ? "Basic" : "Multiline").bold().cyan(),
-            Span.raw("  Selected: ").dim(),
-            Span.raw(selectedText).bold().cyan(),
-            Span.raw("   "),
-            Span.raw("Tab").bold().yellow(),
-            Span.raw(" Switch  ").dim(),
-            Span.raw("j/k/↑/↓").bold().yellow(),
-            Span.raw(" Navigate  ").dim(),
-            Span.raw("g/G").bold().yellow(),
-            Span.raw(" First/Last  ").dim(),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" Focus: ").dim(),
+                Span.raw(focusedList == FocusedList.BASIC ? "Basic" : "Multiline").bold().cyan(),
+                Span.raw("  Selected: ").dim(), Span.raw(selectedText).bold().cyan(),
+                Span.raw("   "), Span.raw("Tab").bold().yellow(), Span.raw(" Switch  ").dim(),
+                Span.raw("j/k/↑/↓").bold().yellow(), Span.raw(" Navigate  ").dim(),
+                Span.raw("g/G").bold().yellow(), Span.raw(" First/Last  ").dim(),
+                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }
 }
-

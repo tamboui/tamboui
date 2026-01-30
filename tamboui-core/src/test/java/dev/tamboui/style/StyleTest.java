@@ -4,8 +4,8 @@
  */
 package dev.tamboui.style;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -59,11 +59,7 @@ class StyleTest {
     @Test
     @DisplayName("Style chaining")
     void chaining() {
-        Style style = Style.EMPTY
-            .fg(Color.RED)
-            .bg(Color.BLACK)
-            .bold()
-            .italic();
+        Style style = Style.EMPTY.fg(Color.RED).bg(Color.BLACK).bold().italic();
 
         assertThat(style.fg()).contains(Color.RED);
         assertThat(style.bg()).contains(Color.BLACK);
@@ -119,9 +115,7 @@ class StyleTest {
     @Test
     @DisplayName("Style preserves hyperlink across style modifiers")
     void hyperlinkPreservedAcrossModifiers() {
-        Style style = Style.EMPTY.hyperlink("https://example.com")
-            .fg(Color.RED)
-            .underlined();
+        Style style = Style.EMPTY.hyperlink("https://example.com").fg(Color.RED).underlined();
 
         assertThat(style.hyperlink()).contains(Hyperlink.of("https://example.com"));
     }

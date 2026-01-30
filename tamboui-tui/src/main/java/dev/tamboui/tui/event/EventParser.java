@@ -4,32 +4,36 @@
  */
 package dev.tamboui.tui.event;
 
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-
 import java.io.IOException;
+
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 
 /**
  * Parses raw terminal input into typed {@link Event} objects.
  * <p>
- * Handles escape sequences for arrow keys, function keys, navigation keys,
- * and mouse events (SGR extended mode).
+ * Handles escape sequences for arrow keys, function keys, navigation keys, and
+ * mouse events (SGR extended mode).
  */
 public final class EventParser {
 
     private static final int ESC = 27;
     private static final int PEEK_TIMEOUT = 50;
 
-    private EventParser() {}
+    private EventParser() {
+    }
 
     /**
      * Reads and parses the next event from the backend using the default bindings.
      *
-     * @param backend the terminal backend
-     * @param timeout timeout in milliseconds for the initial read
+     * @param backend
+     *            the terminal backend
+     * @param timeout
+     *            timeout in milliseconds for the initial read
      * @return the parsed event, or null if no event was available
-     * @throws IOException if an I/O error occurs
+     * @throws IOException
+     *             if an I/O error occurs
      */
     public static Event readEvent(Backend backend, int timeout) throws IOException {
         return readEvent(backend, timeout, BindingSets.defaults());
@@ -38,13 +42,18 @@ public final class EventParser {
     /**
      * Reads and parses the next event from the backend.
      *
-     * @param backend  the terminal backend
-     * @param timeout  timeout in milliseconds for the initial read
-     * @param bindings the bindings for event semantic action matching
+     * @param backend
+     *            the terminal backend
+     * @param timeout
+     *            timeout in milliseconds for the initial read
+     * @param bindings
+     *            the bindings for event semantic action matching
      * @return the parsed event, or null if no event was available
-     * @throws IOException if an I/O error occurs
+     * @throws IOException
+     *             if an I/O error occurs
      */
-    public static Event readEvent(Backend backend, int timeout, Bindings bindings) throws IOException {
+    public static Event readEvent(Backend backend, int timeout, Bindings bindings)
+            throws IOException {
         int c = backend.read(timeout);
 
         if (c == -2) {
@@ -86,16 +95,16 @@ public final class EventParser {
 
     private static Event parseControlChar(int c, Bindings bindings) {
         switch (c) {
-            case 3:
-                return KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings);  // Ctrl+C
-            case 9:
-                return KeyEvent.ofKey(KeyCode.TAB, bindings);               // Tab
-            case 10:
-            case 13:
-                return KeyEvent.ofKey(KeyCode.ENTER, bindings);        // Enter (LF or CR)
-            case 27:
-                return KeyEvent.ofKey(KeyCode.ESCAPE, bindings);           // Escape (standalone)
-            default:
+            case 3 :
+                return KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings); // Ctrl+C
+            case 9 :
+                return KeyEvent.ofKey(KeyCode.TAB, bindings); // Tab
+            case 10 :
+            case 13 :
+                return KeyEvent.ofKey(KeyCode.ENTER, bindings); // Enter (LF or CR)
+            case 27 :
+                return KeyEvent.ofKey(KeyCode.ESCAPE, bindings); // Escape (standalone)
+            default :
                 if (c >= 1 && c <= 26) {
                     char letter = (char) ('a' + c - 1);
                     return KeyEvent.ofChar(letter, KeyModifiers.CTRL, bindings);
@@ -104,7 +113,8 @@ public final class EventParser {
         }
     }
 
-    private static Event parseEscapeSequence(Backend backend, Bindings bindings) throws IOException {
+    private static Event parseEscapeSequence(Backend backend, Bindings bindings)
+            throws IOException {
         int next = backend.peek(PEEK_TIMEOUT);
 
         if (next == -2 || next == -1) {
@@ -147,24 +157,25 @@ public final class EventParser {
 
         // Arrow keys and simple sequences
         switch (c) {
-            case 'A':
+            case 'A' :
                 return KeyEvent.ofKey(KeyCode.UP, bindings);
-            case 'B':
+            case 'B' :
                 return KeyEvent.ofKey(KeyCode.DOWN, bindings);
-            case 'C':
+            case 'C' :
                 return KeyEvent.ofKey(KeyCode.RIGHT, bindings);
-            case 'D':
+            case 'D' :
                 return KeyEvent.ofKey(KeyCode.LEFT, bindings);
-            case 'H':
+            case 'H' :
                 return KeyEvent.ofKey(KeyCode.HOME, bindings);
-            case 'F':
+            case 'F' :
                 return KeyEvent.ofKey(KeyCode.END, bindings);
-            default:
+            default :
                 return parseExtendedCSI(c, backend, bindings);
         }
     }
 
-    private static Event parseExtendedCSI(int first, Backend backend, Bindings bindings) throws IOException {
+    private static Event parseExtendedCSI(int first, Backend backend, Bindings bindings)
+            throws IOException {
         // Parse numeric parameter(s)
         StringBuilder sb = new StringBuilder();
         sb.append((char) first);
@@ -208,43 +219,43 @@ public final class EventParser {
         KeyModifiers mods = parts.length > 1 ? parseModifierCode(parts[1]) : KeyModifiers.NONE;
 
         switch (code) {
-            case 1:
+            case 1 :
                 return KeyEvent.ofKey(KeyCode.HOME, mods, bindings);
-            case 2:
+            case 2 :
                 return KeyEvent.ofKey(KeyCode.INSERT, mods, bindings);
-            case 3:
+            case 3 :
                 return KeyEvent.ofKey(KeyCode.DELETE, mods, bindings);
-            case 4:
+            case 4 :
                 return KeyEvent.ofKey(KeyCode.END, mods, bindings);
-            case 5:
+            case 5 :
                 return KeyEvent.ofKey(KeyCode.PAGE_UP, mods, bindings);
-            case 6:
+            case 6 :
                 return KeyEvent.ofKey(KeyCode.PAGE_DOWN, mods, bindings);
-            case 11:
+            case 11 :
                 return KeyEvent.ofKey(KeyCode.F1, mods, bindings);
-            case 12:
+            case 12 :
                 return KeyEvent.ofKey(KeyCode.F2, mods, bindings);
-            case 13:
+            case 13 :
                 return KeyEvent.ofKey(KeyCode.F3, mods, bindings);
-            case 14:
+            case 14 :
                 return KeyEvent.ofKey(KeyCode.F4, mods, bindings);
-            case 15:
+            case 15 :
                 return KeyEvent.ofKey(KeyCode.F5, mods, bindings);
-            case 17:
+            case 17 :
                 return KeyEvent.ofKey(KeyCode.F6, mods, bindings);
-            case 18:
+            case 18 :
                 return KeyEvent.ofKey(KeyCode.F7, mods, bindings);
-            case 19:
+            case 19 :
                 return KeyEvent.ofKey(KeyCode.F8, mods, bindings);
-            case 20:
+            case 20 :
                 return KeyEvent.ofKey(KeyCode.F9, mods, bindings);
-            case 21:
+            case 21 :
                 return KeyEvent.ofKey(KeyCode.F10, mods, bindings);
-            case 23:
+            case 23 :
                 return KeyEvent.ofKey(KeyCode.F11, mods, bindings);
-            case 24:
+            case 24 :
                 return KeyEvent.ofKey(KeyCode.F12, mods, bindings);
-            default:
+            default :
                 return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
         }
     }
@@ -255,25 +266,25 @@ public final class EventParser {
 
         KeyCode code;
         switch (terminator) {
-            case 'A':
+            case 'A' :
                 code = KeyCode.UP;
                 break;
-            case 'B':
+            case 'B' :
                 code = KeyCode.DOWN;
                 break;
-            case 'C':
+            case 'C' :
                 code = KeyCode.RIGHT;
                 break;
-            case 'D':
+            case 'D' :
                 code = KeyCode.LEFT;
                 break;
-            case 'H':
+            case 'H' :
                 code = KeyCode.HOME;
                 break;
-            case 'F':
+            case 'F' :
                 code = KeyCode.END;
                 break;
-            default:
+            default :
                 code = KeyCode.UNKNOWN;
                 break;
         }
@@ -306,27 +317,27 @@ public final class EventParser {
 
         // SS3 sequences (typically function keys on some terminals)
         switch (c) {
-            case 'P':
+            case 'P' :
                 return KeyEvent.ofKey(KeyCode.F1, bindings);
-            case 'Q':
+            case 'Q' :
                 return KeyEvent.ofKey(KeyCode.F2, bindings);
-            case 'R':
+            case 'R' :
                 return KeyEvent.ofKey(KeyCode.F3, bindings);
-            case 'S':
+            case 'S' :
                 return KeyEvent.ofKey(KeyCode.F4, bindings);
-            case 'A':
+            case 'A' :
                 return KeyEvent.ofKey(KeyCode.UP, bindings);
-            case 'B':
+            case 'B' :
                 return KeyEvent.ofKey(KeyCode.DOWN, bindings);
-            case 'C':
+            case 'C' :
                 return KeyEvent.ofKey(KeyCode.RIGHT, bindings);
-            case 'D':
+            case 'D' :
                 return KeyEvent.ofKey(KeyCode.LEFT, bindings);
-            case 'H':
+            case 'H' :
                 return KeyEvent.ofKey(KeyCode.HOME, bindings);
-            case 'F':
+            case 'F' :
                 return KeyEvent.ofKey(KeyCode.END, bindings);
-            default:
+            default :
                 return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
         }
     }
@@ -378,7 +389,9 @@ public final class EventParser {
         // Determine event kind and button
         if (button >= 64 && button <= 65) {
             // Scroll wheel
-            MouseEventKind kind = (button == 64) ? MouseEventKind.SCROLL_UP : MouseEventKind.SCROLL_DOWN;
+            MouseEventKind kind = (button == 64)
+                    ? MouseEventKind.SCROLL_UP
+                    : MouseEventKind.SCROLL_DOWN;
             return new MouseEvent(kind, MouseButton.NONE, x, y, mods, bindings);
         }
 
@@ -387,16 +400,16 @@ public final class EventParser {
 
         MouseButton mouseButton;
         switch (button) {
-            case 0:
+            case 0 :
                 mouseButton = MouseButton.LEFT;
                 break;
-            case 1:
+            case 1 :
                 mouseButton = MouseButton.MIDDLE;
                 break;
-            case 2:
+            case 2 :
                 mouseButton = MouseButton.RIGHT;
                 break;
-            default:
+            default :
                 mouseButton = MouseButton.NONE;
                 break;
         }

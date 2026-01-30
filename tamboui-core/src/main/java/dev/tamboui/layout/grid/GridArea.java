@@ -4,18 +4,19 @@
  */
 package dev.tamboui.layout.grid;
 
-import dev.tamboui.layout.LayoutException;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import dev.tamboui.layout.LayoutException;
+
 /**
  * Parses and validates CSS grid-template-areas style layout definitions.
  * <p>
- * Area names must be alphanumeric identifiers starting with a letter.
- * Use "." for empty cells. Named areas must form contiguous rectangles.
+ * Area names must be alphanumeric identifiers starting with a letter. Use "."
+ * for empty cells. Named areas must form contiguous rectangles.
+ * 
  * <pre>{@code
  * GridArea areas = GridArea.parse("A A B", "A A C", "D D D");
  * // A spans columns 0-1, rows 0-1
@@ -46,14 +47,15 @@ public final class GridArea {
     /**
      * Parses area template strings into a GridArea.
      * <p>
-     * Each string represents a row; tokens are space-separated area names.
-     * All rows must have the same number of tokens (columns).
-     * Named areas must form contiguous rectangles.
-     * Use "." for empty cells.
+     * Each string represents a row; tokens are space-separated area names. All rows
+     * must have the same number of tokens (columns). Named areas must form
+     * contiguous rectangles. Use "." for empty cells.
      *
-     * @param rowTemplates the row templates (e.g., "A A B", "A A C")
+     * @param rowTemplates
+     *            the row templates (e.g., "A A B", "A A C")
      * @return the parsed GridArea
-     * @throws LayoutException if the template is invalid
+     * @throws LayoutException
+     *             if the template is invalid
      */
     public static GridArea parse(String... rowTemplates) {
         if (rowTemplates == null || rowTemplates.length == 0) {
@@ -75,21 +77,22 @@ public final class GridArea {
                 columnCount = tokens.length;
             } else if (tokens.length != columnCount) {
                 throw new LayoutException(String.format(
-                    "Row %d has %d columns but expected %d (all rows must have equal columns)",
-                    row, tokens.length, columnCount));
+                        "Row %d has %d columns but expected %d (all rows must have equal columns)",
+                        row, tokens.length, columnCount));
             }
 
             grid[row] = tokens;
         }
 
         // Validate area names and collect bounds
-        Map<String, AreaBounds> areas = collectAndValidateAreas(grid, rowTemplates.length, columnCount);
+        Map<String, AreaBounds> areas = collectAndValidateAreas(grid, rowTemplates.length,
+                columnCount);
 
         return new GridArea(rowTemplates.length, columnCount, areas, grid);
     }
 
-    private static Map<String, AreaBounds> collectAndValidateAreas(
-            String[][] grid, int rows, int cols) {
+    private static Map<String, AreaBounds> collectAndValidateAreas(String[][] grid, int rows,
+            int cols) {
 
         Map<String, AreaBounds> areas = new LinkedHashMap<>();
 
@@ -104,9 +107,9 @@ public final class GridArea {
                 // Validate name format (alphanumeric, starting with letter)
                 if (!isValidAreaName(name)) {
                     throw new LayoutException(String.format(
-                        "Invalid area name '%s' at row %d, column %d. " +
-                        "Names must be alphanumeric and start with a letter.",
-                        name, row, col));
+                            "Invalid area name '%s' at row %d, column %d. "
+                                    + "Names must be alphanumeric and start with a letter.",
+                            name, row, col));
                 }
 
                 if (!areas.containsKey(name)) {
@@ -120,8 +123,8 @@ public final class GridArea {
         return areas;
     }
 
-    private static AreaBounds findAreaBounds(String[][] grid, String name,
-            int startRow, int startCol, int totalRows, int totalCols) {
+    private static AreaBounds findAreaBounds(String[][] grid, String name, int startRow,
+            int startCol, int totalRows, int totalCols) {
 
         // Find the extent of this area
         int endRow = startRow;
@@ -153,9 +156,9 @@ public final class GridArea {
             for (int c = startCol; c <= endCol; c++) {
                 if (!name.equals(grid[r][c])) {
                     throw new LayoutException(String.format(
-                        "Area '%s' is not a contiguous rectangle. " +
-                        "Cell at row %d, column %d has '%s' instead.",
-                        name, r, c, grid[r][c]));
+                            "Area '%s' is not a contiguous rectangle. "
+                                    + "Cell at row %d, column %d has '%s' instead.",
+                            name, r, c, grid[r][c]));
                 }
             }
         }
@@ -168,17 +171,17 @@ public final class GridArea {
                     if (!inBounds) {
                         // Check if this cell is adjacent to the bounds (non-rectangular)
                         // or completely separated (disconnected)
-                        boolean isAdjacent = isAdjacentToBounds(r, c, startRow, endRow, startCol, endCol);
+                        boolean isAdjacent = isAdjacentToBounds(r, c, startRow, endRow, startCol,
+                                endCol);
                         if (isAdjacent) {
                             throw new LayoutException(String.format(
-                                "Area '%s' does not form a rectangle. " +
-                                "Cell at row %d, column %d extends beyond the rectangular bounds.",
-                                name, r, c));
+                                    "Area '%s' does not form a rectangle. "
+                                            + "Cell at row %d, column %d extends beyond the rectangular bounds.",
+                                    name, r, c));
                         } else {
-                            throw new LayoutException(String.format(
-                                "Area '%s' is not contiguous. " +
-                                "Found at row %d, column %d which is disconnected from the main area.",
-                                name, r, c));
+                            throw new LayoutException(String.format("Area '%s' is not contiguous. "
+                                    + "Found at row %d, column %d which is disconnected from the main area.",
+                                    name, r, c));
                         }
                     }
                 }
@@ -189,11 +192,11 @@ public final class GridArea {
     }
 
     /**
-     * Checks if a cell at (r, c) is adjacent to the rectangular bounds.
-     * Adjacent means the cell is directly next to the bounds (touching an edge).
+     * Checks if a cell at (r, c) is adjacent to the rectangular bounds. Adjacent
+     * means the cell is directly next to the bounds (touching an edge).
      */
-    private static boolean isAdjacentToBounds(int r, int c,
-            int startRow, int endRow, int startCol, int endCol) {
+    private static boolean isAdjacentToBounds(int r, int c, int startRow, int endRow, int startCol,
+            int endCol) {
         // Cell is adjacent if it's within 1 row/column of the bounds
         boolean rowAdjacent = r >= startRow - 1 && r <= endRow + 1;
         boolean colAdjacent = c >= startCol - 1 && c <= endCol + 1;
@@ -244,7 +247,8 @@ public final class GridArea {
     /**
      * Returns the bounds for a named area.
      *
-     * @param areaName the area name
+     * @param areaName
+     *            the area name
      * @return the bounds, or null if not found
      */
     public AreaBounds boundsFor(String areaName) {
@@ -296,10 +300,14 @@ public final class GridArea {
         /**
          * Creates area bounds.
          *
-         * @param row the start row (0-based)
-         * @param column the start column (0-based)
-         * @param rowSpan the number of rows spanned
-         * @param columnSpan the number of columns spanned
+         * @param row
+         *            the start row (0-based)
+         * @param column
+         *            the start column (0-based)
+         * @param rowSpan
+         *            the number of rows spanned
+         * @param columnSpan
+         *            the number of columns spanned
          */
         public AreaBounds(int row, int column, int rowSpan, int columnSpan) {
             this.row = row;
@@ -364,8 +372,8 @@ public final class GridArea {
 
         @Override
         public String toString() {
-            return String.format("AreaBounds[row=%d, col=%d, rowSpan=%d, colSpan=%d]",
-                row, column, rowSpan, columnSpan);
+            return String.format("AreaBounds[row=%d, col=%d, rowSpan=%d, colSpan=%d]", row, column,
+                    rowSpan, columnSpan);
         }
     }
 }

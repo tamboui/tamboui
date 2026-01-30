@@ -19,8 +19,10 @@ public final class Position {
     /**
      * Creates a position.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
      */
     public Position(int x, int y) {
         this.x = x;
@@ -49,8 +51,10 @@ public final class Position {
     /**
      * Returns a new position offset from this one.
      *
-     * @param dx delta x
-     * @param dy delta y
+     * @param dx
+     *            delta x
+     * @param dy
+     *            delta y
      * @return the offset position
      */
     public Position offset(int dx, int dy) {

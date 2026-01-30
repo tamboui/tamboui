@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.BorderType;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.widgets.block.BorderType;
 
 /**
  * Converts CSS border-type values to BorderType enum.
@@ -15,9 +15,9 @@ import java.util.Optional;
  * CSS values are derived from enum names by converting to lowercase and
  * replacing underscores with hyphens. For example:
  * <ul>
- *   <li>{@code NONE} becomes {@code "none"}</li>
- *   <li>{@code PLAIN} becomes {@code "plain"}</li>
- *   <li>{@code LIGHT_DOUBLE_DASHED} becomes {@code "light-double-dashed"}</li>
+ * <li>{@code NONE} becomes {@code "none"}</li>
+ * <li>{@code PLAIN} becomes {@code "plain"}</li>
+ * <li>{@code LIGHT_DOUBLE_DASHED} becomes {@code "light-double-dashed"}</li>
  * </ul>
  */
 public final class BorderTypeConverter implements PropertyConverter<BorderType> {

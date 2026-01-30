@@ -4,11 +4,11 @@
  */
 package dev.tamboui.tui.event;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -17,7 +17,8 @@ class UiRunnableTest {
     @Test
     @DisplayName("UiRunnable implements Event interface")
     void implementsEventInterface() {
-        UiRunnable runnable = new UiRunnable(() -> {});
+        UiRunnable runnable = new UiRunnable(() -> {
+        });
         assertThat(runnable).isInstanceOf(Event.class);
     }
 
@@ -52,8 +53,7 @@ class UiRunnableTest {
             throw new RuntimeException("test error");
         });
 
-        assertThatThrownBy(runnable::run)
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("test error");
+        assertThatThrownBy(runnable::run).isInstanceOf(RuntimeException.class)
+                .hasMessage("test error");
     }
 }

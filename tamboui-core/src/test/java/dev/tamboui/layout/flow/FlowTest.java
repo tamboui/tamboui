@@ -4,17 +4,16 @@
  */
 package dev.tamboui.layout.flow;
 
+import java.util.Arrays;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.widget.Widget;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for the {@link Flow} widget.
@@ -51,17 +50,11 @@ class FlowTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Flow.builder()
-            .item(charWidget("A"), 5)
-            .item(charWidget("B"), 5)
-            .item(charWidget("C"), 5)
-            .build()
-            .render(area, buffer);
+        Flow.builder().item(charWidget("A"), 5).item(charWidget("B"), 5).item(charWidget("C"), 5)
+                .build().render(area, buffer);
 
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A")
-            .hasSymbolAt(5, 0, "B")
-            .hasSymbolAt(10, 0, "C");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(5, 0, "B")
+                .hasSymbolAt(10, 0, "C");
     }
 
     @Test
@@ -71,17 +64,11 @@ class FlowTest {
         Buffer buffer = Buffer.empty(area);
 
         // 3 items of width 4 in a 10-wide area: first 2 fit (4+4=8), 3rd wraps
-        Flow.builder()
-            .item(charWidget("A"), 4)
-            .item(charWidget("B"), 4)
-            .item(charWidget("C"), 4)
-            .build()
-            .render(area, buffer);
+        Flow.builder().item(charWidget("A"), 4).item(charWidget("B"), 4).item(charWidget("C"), 4)
+                .build().render(area, buffer);
 
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A")
-            .hasSymbolAt(4, 0, "B")
-            .hasSymbolAt(0, 1, "C");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(4, 0, "B")
+                .hasSymbolAt(0, 1, "C");
     }
 
     @Test
@@ -90,17 +77,11 @@ class FlowTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Flow.builder()
-            .item(charWidget("A"), 3)
-            .item(charWidget("B"), 3)
-            .horizontalSpacing(2)
-            .build()
-            .render(area, buffer);
+        Flow.builder().item(charWidget("A"), 3).item(charWidget("B"), 3).horizontalSpacing(2)
+                .build().render(area, buffer);
 
         // A at x=0, B at x=3+2=5
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A")
-            .hasSymbolAt(5, 0, "B");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(5, 0, "B");
     }
 
     @Test
@@ -110,17 +91,11 @@ class FlowTest {
         Buffer buffer = Buffer.empty(area);
 
         // 3 items of width 4 in a 6-wide area: 1 per row
-        Flow.builder()
-            .item(charWidget("A"), 4)
-            .item(charWidget("B"), 4)
-            .verticalSpacing(1)
-            .build()
-            .render(area, buffer);
+        Flow.builder().item(charWidget("A"), 4).item(charWidget("B"), 4).verticalSpacing(1).build()
+                .render(area, buffer);
 
         // A at y=0, B at y=0+1+1=2
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A")
-            .hasSymbolAt(0, 2, "B");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(0, 2, "B");
     }
 
     @Test
@@ -131,17 +106,11 @@ class FlowTest {
 
         // First row: item of height 1 and item of height 3
         // Second row starts at y=3
-        Flow.builder()
-            .item(charWidget("A"), 5, 1)
-            .item(charWidget("B"), 5, 3)
-            .item(charWidget("C"), 5, 1)
-            .build()
-            .render(area, buffer);
+        Flow.builder().item(charWidget("A"), 5, 1).item(charWidget("B"), 5, 3)
+                .item(charWidget("C"), 5, 1).build().render(area, buffer);
 
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A")
-            .hasSymbolAt(5, 0, "B")
-            .hasSymbolAt(10, 0, "C");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(5, 0, "B")
+                .hasSymbolAt(10, 0, "C");
     }
 
     @Test
@@ -151,14 +120,10 @@ class FlowTest {
         Buffer buffer = Buffer.empty(area);
 
         // Only room for first item (1 row high)
-        Flow.builder()
-            .item(charWidget("A"), 5)
-            .item(charWidget("B"), 5)
-            .build()
-            .render(area, buffer);
+        Flow.builder().item(charWidget("A"), 5).item(charWidget("B"), 5).build().render(area,
+                buffer);
 
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A");
 
         // B should not appear (no room on second row)
     }
@@ -169,9 +134,7 @@ class FlowTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        Flow.builder()
-            .build()
-            .render(area, buffer);
+        Flow.builder().build().render(area, buffer);
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -182,10 +145,7 @@ class FlowTest {
         Rect emptyArea = new Rect(0, 0, 0, 0);
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 5));
 
-        Flow.builder()
-            .item(charWidget("A"), 5)
-            .build()
-            .render(emptyArea, buffer);
+        Flow.builder().item(charWidget("A"), 5).build().render(emptyArea, buffer);
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(new Rect(0, 0, 10, 5)));
     }
@@ -196,16 +156,10 @@ class FlowTest {
         Rect area = new Rect(0, 0, 20, 1);
         Buffer buffer = Buffer.empty(area);
 
-        Flow.builder()
-            .items(Arrays.asList(
-                FlowItem.of(charWidget("A"), 5),
-                FlowItem.of(charWidget("B"), 5)
-            ))
-            .build()
-            .render(area, buffer);
+        Flow.builder().items(
+                Arrays.asList(FlowItem.of(charWidget("A"), 5), FlowItem.of(charWidget("B"), 5)))
+                .build().render(area, buffer);
 
-        BufferAssertions.assertThat(buffer)
-            .hasSymbolAt(0, 0, "A")
-            .hasSymbolAt(5, 0, "B");
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(5, 0, "B");
     }
 }

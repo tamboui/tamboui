@@ -7,8 +7,8 @@ package dev.tamboui.tui.event;
 /**
  * Represents a terminal window resize event.
  * <p>
- * This event is triggered when the terminal window size changes,
- * typically due to the user resizing the terminal window.
+ * This event is triggered when the terminal window size changes, typically due
+ * to the user resizing the terminal window.
  */
 public final class ResizeEvent implements Event {
 
@@ -18,8 +18,10 @@ public final class ResizeEvent implements Event {
     /**
      * Creates a resize event with the given dimensions.
      *
-     * @param width  the new terminal width in columns
-     * @param height the new terminal height in rows
+     * @param width
+     *            the new terminal width in columns
+     * @param height
+     *            the new terminal height in rows
      */
     public ResizeEvent(int width, int height) {
         this.width = width;
@@ -29,8 +31,10 @@ public final class ResizeEvent implements Event {
     /**
      * Creates a resize event with the given dimensions.
      *
-     * @param width  the new terminal width in columns
-     * @param height the new terminal height in rows
+     * @param width
+     *            the new terminal width in columns
+     * @param height
+     *            the new terminal height in rows
      * @return a new resize event
      */
     public static ResizeEvent of(int width, int height) {

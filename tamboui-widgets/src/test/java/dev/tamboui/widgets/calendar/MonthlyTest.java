@@ -4,16 +4,17 @@
  */
 package dev.tamboui.widgets.calendar;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.Block;
-import org.junit.jupiter.api.Test;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -71,8 +72,7 @@ class MonthlyTest {
     @Test
     void renderWithMonthHeader() {
         LocalDate date = LocalDate.of(2025, 6, 15);
-        Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-            .showMonthHeader(Style.EMPTY.bold());
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY).showMonthHeader(Style.EMPTY.bold());
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
         calendar.render(new Rect(0, 0, 25, 10), buffer);
@@ -87,7 +87,7 @@ class MonthlyTest {
     void renderWithWeekdaysHeader() {
         LocalDate date = LocalDate.of(2025, 6, 15);
         Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-            .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN));
+                .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN));
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
         calendar.render(new Rect(0, 0, 25, 10), buffer);
@@ -100,9 +100,8 @@ class MonthlyTest {
     @Test
     void renderWithBothHeaders() {
         LocalDate date = LocalDate.of(2025, 6, 15);
-        Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-            .showMonthHeader(Style.EMPTY.bold())
-            .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN));
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY).showMonthHeader(Style.EMPTY.bold())
+                .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN));
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 12));
         calendar.render(new Rect(0, 0, 25, 12), buffer);
@@ -119,8 +118,7 @@ class MonthlyTest {
     @Test
     void renderWithBlock() {
         LocalDate date = LocalDate.of(2025, 6, 15);
-        Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-            .block(Block.bordered());
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY).block(Block.bordered());
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 27, 12));
         calendar.render(new Rect(0, 0, 27, 12), buffer);
@@ -173,8 +171,7 @@ class MonthlyTest {
         LocalDate date = LocalDate.of(2025, 6, 15);
         Style dimStyle = Style.EMPTY.dim();
 
-        Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-            .showSurrounding(dimStyle);
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY).showSurrounding(dimStyle);
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 8));
         calendar.render(new Rect(0, 0, 25, 8), buffer);
@@ -189,9 +186,8 @@ class MonthlyTest {
         Style red = Style.EMPTY.fg(Color.RED);
         Style green = Style.EMPTY.fg(Color.GREEN);
 
-        CalendarEventStore events = CalendarEventStore.empty()
-            .add(LocalDate.of(2025, 6, 15), red)
-            .add(LocalDate.of(2025, 6, 25), green);
+        CalendarEventStore events = CalendarEventStore.empty().add(LocalDate.of(2025, 6, 15), red)
+                .add(LocalDate.of(2025, 6, 25), green);
 
         Monthly calendar = Monthly.of(date, events);
 
@@ -205,13 +201,11 @@ class MonthlyTest {
     void firstDayOfWeekChangesDayOrder() {
         LocalDate date = LocalDate.of(2025, 6, 15);
 
-        Monthly mondayFirst = Monthly.of(date, d -> Style.EMPTY)
-            .showWeekdaysHeader(Style.EMPTY)
-            .firstDayOfWeek(DayOfWeek.MONDAY);
+        Monthly mondayFirst = Monthly.of(date, d -> Style.EMPTY).showWeekdaysHeader(Style.EMPTY)
+                .firstDayOfWeek(DayOfWeek.MONDAY);
 
-        Monthly sundayFirst = Monthly.of(date, d -> Style.EMPTY)
-            .showWeekdaysHeader(Style.EMPTY)
-            .firstDayOfWeek(DayOfWeek.SUNDAY);
+        Monthly sundayFirst = Monthly.of(date, d -> Style.EMPTY).showWeekdaysHeader(Style.EMPTY)
+                .firstDayOfWeek(DayOfWeek.SUNDAY);
 
         Buffer buffer1 = Buffer.empty(new Rect(0, 0, 25, 10));
         Buffer buffer2 = Buffer.empty(new Rect(0, 0, 25, 10));
@@ -234,8 +228,7 @@ class MonthlyTest {
         LocalDate date = LocalDate.of(2025, 6, 15);
         Style defaultCyan = Style.EMPTY.fg(Color.CYAN);
 
-        Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-            .defaultStyle(defaultCyan);
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY).defaultStyle(defaultCyan);
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 8));
         calendar.render(new Rect(0, 0, 25, 8), buffer);
@@ -267,14 +260,9 @@ class MonthlyTest {
         Style dim = Style.EMPTY.dim();
         Style white = Style.EMPTY.fg(Color.WHITE);
 
-        Monthly calendar = Monthly.builder(date, d -> Style.EMPTY)
-            .monthHeaderStyle(red)
-            .weekdaysHeaderStyle(cyan)
-            .surroundingStyle(dim)
-            .defaultStyle(white)
-            .block(Block.bordered())
-            .firstDayOfWeek(DayOfWeek.SUNDAY)
-            .build();
+        Monthly calendar = Monthly.builder(date, d -> Style.EMPTY).monthHeaderStyle(red)
+                .weekdaysHeaderStyle(cyan).surroundingStyle(dim).defaultStyle(white)
+                .block(Block.bordered()).firstDayOfWeek(DayOfWeek.SUNDAY).build();
 
         assertThat(calendar).isNotNull();
     }
@@ -284,8 +272,7 @@ class MonthlyTest {
         // Test different months render correctly
         for (int month = 1; month <= 12; month++) {
             LocalDate date = LocalDate.of(2025, month, 15);
-            Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
-                .showMonthHeader(Style.EMPTY);
+            Monthly calendar = Monthly.of(date, d -> Style.EMPTY).showMonthHeader(Style.EMPTY);
 
             Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
             calendar.render(new Rect(0, 0, 25, 10), buffer);
@@ -323,7 +310,8 @@ class MonthlyTest {
         assertThat(content).contains("28");
     }
 
-    private String extractBufferContent(Buffer buffer, int startX, int startY, int width, int height) {
+    private String extractBufferContent(Buffer buffer, int startX, int startY, int width,
+            int height) {
         StringBuilder sb = new StringBuilder();
         for (int y = startY; y < startY + height; y++) {
             for (int x = startX; x < startX + width; x++) {

@@ -7,6 +7,10 @@
  */
 package dev.tamboui.demo;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -27,19 +31,11 @@ import dev.tamboui.widgets.calendar.CalendarEventStore;
 import dev.tamboui.widgets.calendar.Monthly;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.YearMonth;
-
 /**
  * Demo TUI application showcasing the Calendar widget.
  * <p>
- * Demonstrates monthly calendar views with:
- * - Different styling options
- * - Event highlighting
- * - First day of week configuration
- * - Multi-month displays
+ * Demonstrates monthly calendar views with: - Different styling options - Event
+ * highlighting - First day of week configuration - Multi-month displays
  */
 public class CalendarDemo {
 
@@ -54,8 +50,11 @@ public class CalendarDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new CalendarDemo().run();
@@ -64,9 +63,10 @@ public class CalendarDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -112,13 +112,10 @@ public class CalendarDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),  // Header
-                Constraint.fill(),     // Main content
-                Constraint.length(3)   // Footer
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Main content
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderCalendars(frame, layout.get(1));
@@ -126,18 +123,17 @@ public class CalendarDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Calendar Demo ").yellow(),
-                    Span.raw("[" + currentDate.getMonth().name() + " " + currentDate.getYear() + "]").dim()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(
+                        Style.EMPTY.fg(Color.CYAN))
+                .title(Title
+                        .from(Line
+                                .from(Span.raw(" TamboUI ").bold().cyan(),
+                                        Span.raw("Calendar Demo ").yellow(),
+                                        Span.raw("[" + currentDate.getMonth().name() + " "
+                                                + currentDate.getYear() + "]").dim()))
+                        .centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -145,25 +141,15 @@ public class CalendarDemo {
     private void renderCalendars(Frame frame, Rect area) {
         // Create layout: 2x2 grid of calendars
         var rows = Layout.vertical()
-            .constraints(
-                Constraint.percentage(50),
-                Constraint.percentage(50)
-            )
-            .split(area);
+                .constraints(Constraint.percentage(50), Constraint.percentage(50)).split(area);
 
         var topCols = Layout.horizontal()
-            .constraints(
-                Constraint.percentage(50),
-                Constraint.percentage(50)
-            )
-            .split(rows.get(0));
+                .constraints(Constraint.percentage(50), Constraint.percentage(50))
+                .split(rows.get(0));
 
         var bottomCols = Layout.horizontal()
-            .constraints(
-                Constraint.percentage(50),
-                Constraint.percentage(50)
-            )
-            .split(rows.get(1));
+                .constraints(Constraint.percentage(50), Constraint.percentage(50))
+                .split(rows.get(1));
 
         // Current month with events
         renderCurrentMonth(frame, topCols.get(0));
@@ -183,8 +169,8 @@ public class CalendarDemo {
         LocalDate today = LocalDate.now();
         YearMonth ym = YearMonth.from(currentDate);
 
-        var events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold())
-            .add(currentDate, Style.EMPTY.fg(Color.YELLOW).bold());
+        var events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold()).add(currentDate,
+                Style.EMPTY.fg(Color.YELLOW).bold());
 
         // Add some example holidays/events
         LocalDate christmas = LocalDate.of(currentDate.getYear(), 12, 25);
@@ -192,17 +178,16 @@ public class CalendarDemo {
         LocalDate valentines = LocalDate.of(currentDate.getYear(), 2, 14);
         LocalDate july4 = LocalDate.of(currentDate.getYear(), 7, 4);
 
-        events = events
-            .add(christmas, Style.EMPTY.fg(Color.GREEN).bold())
-            .add(newYear, Style.EMPTY.fg(Color.MAGENTA).bold())
-            .add(valentines, Style.EMPTY.fg(Color.LIGHT_RED).bold())
-            .add(july4, Style.EMPTY.fg(Color.BLUE).bold());
+        events = events.add(christmas, Style.EMPTY.fg(Color.GREEN).bold())
+                .add(newYear, Style.EMPTY.fg(Color.MAGENTA).bold())
+                .add(valentines, Style.EMPTY.fg(Color.LIGHT_RED).bold())
+                .add(july4, Style.EMPTY.fg(Color.BLUE).bold());
 
         // Mark weekends
         LocalDate weekendDate = ym.atDay(1);
         while (weekendDate.getMonth() == currentDate.getMonth()) {
-            if (weekendDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
-                weekendDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            if (weekendDate.getDayOfWeek() == DayOfWeek.SATURDAY
+                    || weekendDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 if (!events.contains(weekendDate)) {
                     events = events.add(weekendDate, Style.EMPTY.dim());
                 }
@@ -211,18 +196,12 @@ public class CalendarDemo {
         }
 
         var builder = Monthly.builder(currentDate, events)
-            .monthHeaderStyle(Style.EMPTY.bold().fg(Color.CYAN))
-            .weekdaysHeaderStyle(Style.EMPTY.fg(Color.YELLOW))
-            .defaultStyle(Style.EMPTY.fg(Color.WHITE))
-            .firstDayOfWeek(firstDayOfWeek)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.CYAN))
-                .title(Title.from(Line.from(
-                    Span.raw(" Current Month ").cyan()
-                )))
-                .build());
+                .monthHeaderStyle(Style.EMPTY.bold().fg(Color.CYAN))
+                .weekdaysHeaderStyle(Style.EMPTY.fg(Color.YELLOW))
+                .defaultStyle(Style.EMPTY.fg(Color.WHITE)).firstDayOfWeek(firstDayOfWeek)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                        .title(Title.from(Line.from(Span.raw(" Current Month ").cyan()))).build());
 
         if (showSurrounding) {
             builder.surroundingStyle(Style.EMPTY.dim());
@@ -235,18 +214,11 @@ public class CalendarDemo {
     private void renderPreviousMonth(Frame frame, Rect area) {
         LocalDate prevMonth = currentDate.minusMonths(1);
 
-        var calendar = Monthly.of(prevMonth, d -> Style.EMPTY)
-            .showMonthHeader(Style.EMPTY.bold())
-            .showWeekdaysHeader(Style.EMPTY.dim())
-            .firstDayOfWeek(firstDayOfWeek)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .title(Title.from(Line.from(
-                    Span.raw(" Previous Month ").dim()
-                )))
-                .build());
+        var calendar = Monthly.of(prevMonth, d -> Style.EMPTY).showMonthHeader(Style.EMPTY.bold())
+                .showWeekdaysHeader(Style.EMPTY.dim()).firstDayOfWeek(firstDayOfWeek)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+                        .title(Title.from(Line.from(Span.raw(" Previous Month ").dim()))).build());
 
         if (showSurrounding) {
             calendar = calendar.showSurrounding(Style.EMPTY.dim());
@@ -258,18 +230,11 @@ public class CalendarDemo {
     private void renderNextMonth(Frame frame, Rect area) {
         LocalDate nextMonth = currentDate.plusMonths(1);
 
-        var calendar = Monthly.of(nextMonth, d -> Style.EMPTY)
-            .showMonthHeader(Style.EMPTY.bold())
-            .showWeekdaysHeader(Style.EMPTY.dim())
-            .firstDayOfWeek(firstDayOfWeek)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .title(Title.from(Line.from(
-                    Span.raw(" Next Month ").dim()
-                )))
-                .build());
+        var calendar = Monthly.of(nextMonth, d -> Style.EMPTY).showMonthHeader(Style.EMPTY.bold())
+                .showWeekdaysHeader(Style.EMPTY.dim()).firstDayOfWeek(firstDayOfWeek)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+                        .title(Title.from(Line.from(Span.raw(" Next Month ").dim()))).build());
 
         if (showSurrounding) {
             calendar = calendar.showSurrounding(Style.EMPTY.dim());
@@ -281,27 +246,21 @@ public class CalendarDemo {
     private void renderStyleShowcase(Frame frame, Rect area) {
         // Rainbow style: each day of week has different color
         var calendar = Monthly.of(currentDate, date -> {
-                return switch (date.getDayOfWeek()) {
-                    case MONDAY -> Style.EMPTY.fg(Color.RED);
-                    case TUESDAY -> Style.EMPTY.fg(Color.YELLOW);
-                    case WEDNESDAY -> Style.EMPTY.fg(Color.GREEN);
-                    case THURSDAY -> Style.EMPTY.fg(Color.CYAN);
-                    case FRIDAY -> Style.EMPTY.fg(Color.BLUE);
-                    case SATURDAY -> Style.EMPTY.fg(Color.MAGENTA);
-                    case SUNDAY -> Style.EMPTY.fg(Color.WHITE);
-                };
-            })
-            .showMonthHeader(Style.EMPTY.bold().fg(Color.MAGENTA))
-            .showWeekdaysHeader(Style.EMPTY.fg(Color.GREEN))
-            .firstDayOfWeek(firstDayOfWeek)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.MAGENTA))
-                .title(Title.from(Line.from(
-                    Span.raw(" Rainbow Days ").magenta()
-                )))
-                .build());
+            return switch (date.getDayOfWeek()) {
+                case MONDAY -> Style.EMPTY.fg(Color.RED);
+                case TUESDAY -> Style.EMPTY.fg(Color.YELLOW);
+                case WEDNESDAY -> Style.EMPTY.fg(Color.GREEN);
+                case THURSDAY -> Style.EMPTY.fg(Color.CYAN);
+                case FRIDAY -> Style.EMPTY.fg(Color.BLUE);
+                case SATURDAY -> Style.EMPTY.fg(Color.MAGENTA);
+                case SUNDAY -> Style.EMPTY.fg(Color.WHITE);
+            };
+        }).showMonthHeader(Style.EMPTY.bold().fg(Color.MAGENTA))
+                .showWeekdaysHeader(Style.EMPTY.fg(Color.GREEN)).firstDayOfWeek(firstDayOfWeek)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.MAGENTA))
+                        .title(Title.from(Line.from(Span.raw(" Rainbow Days ").magenta())))
+                        .build());
 
         if (showSurrounding) {
             calendar = calendar.showSurrounding(Style.EMPTY.dim());
@@ -318,29 +277,18 @@ public class CalendarDemo {
             default -> firstDayOfWeek.name();
         };
 
-        Line helpLine = Line.from(
-            Span.raw(" h/l").bold().yellow(),
-            Span.raw(" Month ").dim(),
-            Span.raw("j/k").bold().yellow(),
-            Span.raw(" Year ").dim(),
-            Span.raw("t").bold().yellow(),
-            Span.raw(" Today ").dim(),
-            Span.raw("f").bold().yellow(),
-            Span.raw(" First:" + fdow + " ").dim(),
-            Span.raw("s").bold().yellow(),
-            Span.raw(" Surround:" + (showSurrounding ? "ON" : "OFF") + " ").dim(),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" h/l").bold().yellow(), Span.raw(" Month ").dim(),
+                Span.raw("j/k").bold().yellow(), Span.raw(" Year ").dim(),
+                Span.raw("t").bold().yellow(), Span.raw(" Today ").dim(),
+                Span.raw("f").bold().yellow(), Span.raw(" First:" + fdow + " ").dim(),
+                Span.raw("s").bold().yellow(),
+                Span.raw(" Surround:" + (showSurrounding ? "ON" : "OFF") + " ").dim(),
+                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

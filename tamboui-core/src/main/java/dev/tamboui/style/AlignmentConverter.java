@@ -4,20 +4,20 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Alignment;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Alignment;
 
 /**
  * Converts string values to {@link Alignment} enum values.
  * <p>
  * Supported values (case-insensitive):
  * <ul>
- *   <li>{@code left} - left alignment</li>
- *   <li>{@code center} - center alignment</li>
- *   <li>{@code right} - right alignment</li>
+ * <li>{@code left} - left alignment</li>
+ * <li>{@code center} - center alignment</li>
+ * <li>{@code right} - right alignment</li>
  * </ul>
  */
 public final class AlignmentConverter implements PropertyConverter<Alignment> {

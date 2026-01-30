@@ -14,8 +14,10 @@ public interface KeyEventHandler {
     /**
      * Handles a key event.
      *
-     * @param event the key event
-     * @return HANDLED if the event was handled and should not propagate, UNHANDLED otherwise
+     * @param event
+     *            the key event
+     * @return HANDLED if the event was handled and should not propagate, UNHANDLED
+     *         otherwise
      */
     EventResult handle(KeyEvent event);
 }

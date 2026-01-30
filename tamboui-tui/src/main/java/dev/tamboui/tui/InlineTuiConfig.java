@@ -4,22 +4,22 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-
 import java.time.Duration;
+
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 
 /**
  * Configuration options for {@link InlineTuiRunner}.
  * <p>
  * Unlike {@link TuiConfig}, this configuration is tailored for inline displays
- * that stay within the normal terminal flow (no alternate screen, cursor stays visible).
+ * that stay within the normal terminal flow (no alternate screen, cursor stays
+ * visible).
  *
  * <pre>{@code
- * InlineTuiConfig config = InlineTuiConfig.builder(4)
- *     .tickRate(Duration.ofMillis(50))  // For animations
- *     .clearOnClose(true)
- *     .build();
+ * InlineTuiConfig config = InlineTuiConfig.builder(4).tickRate(Duration.ofMillis(50)) // For
+ *                                                                                     // animations
+ *         .clearOnClose(true).build();
  * }</pre>
  *
  * @see InlineTuiRunner
@@ -43,7 +43,7 @@ public final class InlineTuiConfig {
     private final Bindings bindings;
 
     private InlineTuiConfig(int height, Duration tickRate, Duration pollTimeout,
-                            boolean clearOnClose, Bindings bindings) {
+            boolean clearOnClose, Bindings bindings) {
         this.height = height;
         this.tickRate = tickRate;
         this.pollTimeout = pollTimeout;
@@ -56,29 +56,26 @@ public final class InlineTuiConfig {
      * <p>
      * Defaults:
      * <ul>
-     *   <li>Tick rate: 40ms (~25fps, suitable for animations)</li>
-     *   <li>Poll timeout: 40ms</li>
-     *   <li>Clear on close: false</li>
-     *   <li>Bindings: defaults</li>
+     * <li>Tick rate: 40ms (~25fps, suitable for animations)</li>
+     * <li>Poll timeout: 40ms</li>
+     * <li>Clear on close: false</li>
+     * <li>Bindings: defaults</li>
      * </ul>
      *
-     * @param height the number of lines for the inline display
+     * @param height
+     *            the number of lines for the inline display
      * @return a new configuration with defaults
      */
     public static InlineTuiConfig defaults(int height) {
-        return new InlineTuiConfig(
-                height,
-                Duration.ofMillis(DEFAULT_TICK_RATE),
-                Duration.ofMillis(DEFAULT_POLL_TIMEOUT),
-                false,
-                BindingSets.defaults()
-        );
+        return new InlineTuiConfig(height, Duration.ofMillis(DEFAULT_TICK_RATE),
+                Duration.ofMillis(DEFAULT_POLL_TIMEOUT), false, BindingSets.defaults());
     }
 
     /**
      * Returns a builder for creating custom configurations.
      *
-     * @param height the number of lines for the inline display
+     * @param height
+     *            the number of lines for the inline display
      * @return a new builder
      */
     public static Builder builder(int height) {
@@ -142,8 +139,8 @@ public final class InlineTuiConfig {
     @Override
     public String toString() {
         return String.format(
-                "InlineTuiConfig[height=%d, tickRate=%s, pollTimeout=%s, clearOnClose=%s]",
-                height, tickRate, pollTimeout, clearOnClose);
+                "InlineTuiConfig[height=%d, tickRate=%s, pollTimeout=%s, clearOnClose=%s]", height,
+                tickRate, pollTimeout, clearOnClose);
     }
 
     /**
@@ -166,15 +163,16 @@ public final class InlineTuiConfig {
         /**
          * Sets the tick interval for animations.
          * <p>
-         * A shorter interval provides smoother animations but uses more CPU.
-         * Common values:
+         * A shorter interval provides smoother animations but uses more CPU. Common
+         * values:
          * <ul>
-         *   <li>16ms (~60fps) - very smooth</li>
-         *   <li>40ms (~25fps) - good default</li>
-         *   <li>100ms (~10fps) - simple progress updates</li>
+         * <li>16ms (~60fps) - very smooth</li>
+         * <li>40ms (~25fps) - good default</li>
+         * <li>100ms (~10fps) - simple progress updates</li>
          * </ul>
          *
-         * @param tickRate the tick interval, or null to disable ticks
+         * @param tickRate
+         *            the tick interval, or null to disable ticks
          * @return this builder
          */
         public Builder tickRate(Duration tickRate) {
@@ -197,11 +195,14 @@ public final class InlineTuiConfig {
         /**
          * Sets the timeout for polling events.
          *
-         * @param pollTimeout the poll timeout
+         * @param pollTimeout
+         *            the poll timeout
          * @return this builder
          */
         public Builder pollTimeout(Duration pollTimeout) {
-            this.pollTimeout = pollTimeout != null ? pollTimeout : Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
+            this.pollTimeout = pollTimeout != null
+                    ? pollTimeout
+                    : Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
             return this;
         }
 
@@ -211,7 +212,8 @@ public final class InlineTuiConfig {
          * When true, the inline display area is cleared on close, leaving no trace.
          * When false (default), the final content remains visible.
          *
-         * @param clearOnClose true to clear on close
+         * @param clearOnClose
+         *            true to clear on close
          * @return this builder
          */
         public Builder clearOnClose(boolean clearOnClose) {
@@ -222,7 +224,8 @@ public final class InlineTuiConfig {
         /**
          * Sets the key bindings for semantic action matching.
          *
-         * @param bindings the bindings to use
+         * @param bindings
+         *            the bindings to use
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {

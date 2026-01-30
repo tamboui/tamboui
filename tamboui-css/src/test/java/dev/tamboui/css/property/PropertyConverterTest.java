@@ -4,11 +4,11 @@
  */
 package dev.tamboui.css.property;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,16 +49,16 @@ class PropertyConverterTest {
     }
 
     /**
-     * This test demonstrates deterministic behavior when variable values
-     * contain references to other variables.
+     * This test demonstrates deterministic behavior when variable values contain
+     * references to other variables.
      * <p>
-     * Given:
-     * - variables: {accent: "bold $primary", primary: "blue"}
-     * - input: "style: $accent; color: $primary;"
+     * Given: - variables: {accent: "bold $primary", primary: "blue"} - input:
+     * "style: $accent; color: $primary;"
      * <p>
-     * The EXPECTED deterministic result should be: "style: bold $primary; color: blue;"
-     * (each $var in the INPUT is replaced with its value, but $primary inside accent's value
-     * should NOT be expanded - we're only resolving variables in the original input)
+     * The EXPECTED deterministic result should be: "style: bold $primary; color:
+     * blue;" (each $var in the INPUT is replaced with its value, but $primary
+     * inside accent's value should NOT be expanded - we're only resolving variables
+     * in the original input)
      * <p>
      * The old implementation iterated over the map and did sequential replacements,
      * which would produce different results depending on HashMap iteration order.
@@ -82,12 +82,12 @@ class PropertyConverterTest {
         String resultPA = PropertyConverter.resolveVariables(input, variablesOrderPA);
 
         // The expected deterministic result: replace $accent and $primary in the input
-        // with their literal values, without recursively expanding variables inside values
+        // with their literal values, without recursively expanding variables inside
+        // values
         String expected = "style: bold $primary; color: blue;";
 
         // Both results should be the same regardless of iteration order
-        assertThat(resultAP)
-                .as("Result should be the same regardless of variable iteration order")
+        assertThat(resultAP).as("Result should be the same regardless of variable iteration order")
                 .isEqualTo(resultPA);
 
         // Both should equal the expected deterministic result
@@ -115,8 +115,6 @@ class PropertyConverterTest {
         String result2 = PropertyConverter.resolveVariables(input, variablesOrder2);
 
         // Both should produce the same result
-        assertThat(result1)
-                .as("Variable resolution should be deterministic")
-                .isEqualTo(result2);
+        assertThat(result1).as("Variable resolution should be deterministic").isEqualTo(result2);
     }
 }

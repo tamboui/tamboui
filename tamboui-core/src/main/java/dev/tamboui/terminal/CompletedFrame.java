@@ -17,8 +17,10 @@ public final class CompletedFrame {
     /**
      * Creates a completed frame with the given buffer and area.
      *
-     * @param buffer the rendered buffer
-     * @param area   the area that was rendered
+     * @param buffer
+     *            the rendered buffer
+     * @param area
+     *            the area that was rendered
      */
     public CompletedFrame(Buffer buffer, Rect area) {
         this.buffer = buffer;

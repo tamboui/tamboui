@@ -4,19 +4,19 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Alignment;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Alignment;
 
 /**
  * Converts CSS text-align values to Alignment enum.
  * <p>
  * Supports the following values:
  * <ul>
- *   <li>{@code "left"} - left alignment</li>
- *   <li>{@code "center"} - center alignment</li>
- *   <li>{@code "right"} - right alignment</li>
+ * <li>{@code "left"} - left alignment</li>
+ * <li>{@code "center"} - center alignment</li>
+ * <li>{@code "right"} - right alignment</li>
  * </ul>
  */
 public final class AlignmentConverter implements PropertyConverter<Alignment> {
@@ -39,13 +39,13 @@ public final class AlignmentConverter implements PropertyConverter<Alignment> {
         String resolved = PropertyConverter.resolveVariables(value.trim(), variables).toLowerCase();
 
         switch (resolved) {
-            case "left":
+            case "left" :
                 return Optional.of(Alignment.LEFT);
-            case "center":
+            case "center" :
                 return Optional.of(Alignment.CENTER);
-            case "right":
+            case "right" :
                 return Optional.of(Alignment.RIGHT);
-            default:
+            default :
                 return Optional.empty();
         }
     }

@@ -4,15 +4,16 @@
  */
 package dev.tamboui.widgets.chart;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * An axis configuration for a {@link Chart}.
@@ -20,12 +21,8 @@ import java.util.Optional;
  * Defines the title, bounds, labels, and styling for an axis.
  *
  * <pre>{@code
- * Axis xAxis = Axis.builder()
- *     .title("Time (s)")
- *     .bounds(0, 100)
- *     .labels("0", "25", "50", "75", "100")
- *     .style(Style.EMPTY.fg(Color.CYAN))
- *     .build();
+ * Axis xAxis = Axis.builder().title("Time (s)").bounds(0, 100).labels("0", "25", "50", "75", "100")
+ *         .style(Style.EMPTY.fg(Color.CYAN)).build();
  * }</pre>
  */
 public final class Axis {
@@ -153,12 +150,14 @@ public final class Axis {
         private Style style;
         private Alignment labelsAlignment = Alignment.LEFT;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the axis title.
          *
-         * @param title the title
+         * @param title
+         *            the title
          * @return this builder
          */
         public Builder title(String title) {
@@ -169,7 +168,8 @@ public final class Axis {
         /**
          * Sets the axis title.
          *
-         * @param title the title
+         * @param title
+         *            the title
          * @return this builder
          */
         public Builder title(Line title) {
@@ -180,7 +180,8 @@ public final class Axis {
         /**
          * Sets the axis title with styling.
          *
-         * @param spans the spans composing the title
+         * @param spans
+         *            the spans composing the title
          * @return this builder
          */
         public Builder title(Span... spans) {
@@ -191,24 +192,27 @@ public final class Axis {
         /**
          * Sets the axis bounds [min, max].
          *
-         * @param min the minimum bound
-         * @param max the maximum bound
+         * @param min
+         *            the minimum bound
+         * @param max
+         *            the maximum bound
          * @return this builder
          */
         public Builder bounds(double min, double max) {
-            this.bounds = new double[] {min, max};
+            this.bounds = new double[]{min, max};
             return this;
         }
 
         /**
          * Sets the axis bounds.
          *
-         * @param bounds the bounds array
+         * @param bounds
+         *            the bounds array
          * @return this builder
          */
         public Builder bounds(double[] bounds) {
             if (bounds != null && bounds.length >= 2) {
-                this.bounds = new double[] {bounds[0], bounds[1]};
+                this.bounds = new double[]{bounds[0], bounds[1]};
             }
             return this;
         }
@@ -216,7 +220,8 @@ public final class Axis {
         /**
          * Sets the axis labels.
          *
-         * @param labels the labels
+         * @param labels
+         *            the labels
          * @return this builder
          */
         public Builder labels(String... labels) {
@@ -232,7 +237,8 @@ public final class Axis {
         /**
          * Sets the axis labels.
          *
-         * @param labels the labels
+         * @param labels
+         *            the labels
          * @return this builder
          */
         public Builder labels(Span... labels) {
@@ -246,7 +252,8 @@ public final class Axis {
         /**
          * Sets the axis labels.
          *
-         * @param labels the labels
+         * @param labels
+         *            the labels
          * @return this builder
          */
         public Builder labels(List<Span> labels) {
@@ -260,7 +267,8 @@ public final class Axis {
         /**
          * Adds a label.
          *
-         * @param label the label
+         * @param label
+         *            the label
          * @return this builder
          */
         public Builder addLabel(String label) {
@@ -271,7 +279,8 @@ public final class Axis {
         /**
          * Adds a label.
          *
-         * @param label the label
+         * @param label
+         *            the label
          * @return this builder
          */
         public Builder addLabel(Span label) {
@@ -282,7 +291,8 @@ public final class Axis {
         /**
          * Sets the axis style.
          *
-         * @param style the style
+         * @param style
+         *            the style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -293,7 +303,8 @@ public final class Axis {
         /**
          * Sets the labels alignment.
          *
-         * @param alignment the alignment
+         * @param alignment
+         *            the alignment
          * @return this builder
          */
         public Builder labelsAlignment(Alignment alignment) {

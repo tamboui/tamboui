@@ -4,9 +4,10 @@
  */
 package dev.tamboui.layout.grid;
 
-import dev.tamboui.layout.LayoutException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.LayoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -109,9 +110,8 @@ class GridAreaTest {
     @Test
     @DisplayName("parses multi-character area names")
     void parsesMultiCharacterNames() {
-        GridArea area = GridArea.parse("header header header",
-                                       "nav main main",
-                                       "footer footer footer");
+        GridArea area = GridArea.parse("header header header", "nav main main",
+                "footer footer footer");
 
         assertThat(area.areaNames()).containsExactly("header", "nav", "main", "footer");
 
@@ -143,50 +143,44 @@ class GridAreaTest {
     @Test
     @DisplayName("throws on empty template")
     void throwsOnEmptyTemplate() {
-        assertThatThrownBy(() -> GridArea.parse())
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("cannot be empty");
+        assertThatThrownBy(() -> GridArea.parse()).isInstanceOf(LayoutException.class)
+                .hasMessageContaining("cannot be empty");
     }
 
     @Test
     @DisplayName("throws on null template array")
     void throwsOnNullTemplateArray() {
         assertThatThrownBy(() -> GridArea.parse((String[]) null))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("cannot be empty");
+                .isInstanceOf(LayoutException.class).hasMessageContaining("cannot be empty");
     }
 
     @Test
     @DisplayName("throws on empty row template")
     void throwsOnEmptyRowTemplate() {
-        assertThatThrownBy(() -> GridArea.parse("A B", ""))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Row 1 template cannot be empty");
+        assertThatThrownBy(() -> GridArea.parse("A B", "")).isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Row 1 template cannot be empty");
     }
 
     @Test
     @DisplayName("throws on unequal column counts")
     void throwsOnUnequalColumnCounts() {
-        assertThatThrownBy(() -> GridArea.parse("A B", "A B C"))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Row 1 has 3 columns but expected 2");
+        assertThatThrownBy(() -> GridArea.parse("A B", "A B C")).isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Row 1 has 3 columns but expected 2");
     }
 
     @Test
     @DisplayName("throws on invalid area name starting with digit")
     void throwsOnInvalidNameStartingWithDigit() {
-        assertThatThrownBy(() -> GridArea.parse("1A B"))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Invalid area name '1A'")
-            .hasMessageContaining("row 0, column 0");
+        assertThatThrownBy(() -> GridArea.parse("1A B")).isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Invalid area name '1A'")
+                .hasMessageContaining("row 0, column 0");
     }
 
     @Test
     @DisplayName("throws on invalid area name with special characters")
     void throwsOnInvalidNameWithSpecialChars() {
-        assertThatThrownBy(() -> GridArea.parse("A-B C"))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Invalid area name 'A-B'");
+        assertThatThrownBy(() -> GridArea.parse("A-B C")).isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Invalid area name 'A-B'");
     }
 
     @Test
@@ -194,8 +188,8 @@ class GridAreaTest {
     void throwsOnNonRectangularArea() {
         // L-shape: 'A' at (0,0), (0,1), (1,0) - adjacent but not a rectangle
         assertThatThrownBy(() -> GridArea.parse("A A B", "A B B"))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Area 'A' does not form a rectangle");
+                .isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Area 'A' does not form a rectangle");
     }
 
     @Test
@@ -203,19 +197,18 @@ class GridAreaTest {
     void throwsOnDisconnectedArea() {
         // 'A' at rows 0 and 2, separated by row 1 - disconnected
         assertThatThrownBy(() -> GridArea.parse("A A B", "C C C", "A A D"))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Area 'A' is not contiguous")
-            .hasMessageContaining("disconnected");
+                .isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Area 'A' is not contiguous")
+                .hasMessageContaining("disconnected");
     }
 
     @Test
     @DisplayName("throws on disconnected area in same row")
     void throwsOnDisconnectedAreaSameRow() {
         // 'A' at cols 0 and 2, separated by col 1 - disconnected
-        assertThatThrownBy(() -> GridArea.parse("A B A"))
-            .isInstanceOf(LayoutException.class)
-            .hasMessageContaining("Area 'A' is not contiguous")
-            .hasMessageContaining("disconnected");
+        assertThatThrownBy(() -> GridArea.parse("A B A")).isInstanceOf(LayoutException.class)
+                .hasMessageContaining("Area 'A' is not contiguous")
+                .hasMessageContaining("disconnected");
     }
 
     @Test

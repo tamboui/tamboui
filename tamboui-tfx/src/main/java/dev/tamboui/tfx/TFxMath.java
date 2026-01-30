@@ -10,18 +10,19 @@ package dev.tamboui.tfx;
  * Provides fast math operations optimized for effect calculations.
  */
 public final class TFxMath {
-    
+
     private static final float PI = (float) java.lang.Math.PI;
     private static final float TAU = 2.0f * PI;
-    
+
     private TFxMath() {
         // Utility class
     }
-    
+
     /**
      * Computes the square root of a float value.
      *
-     * @param x the value
+     * @param x
+     *            the value
      * @return the square root of {@code x}
      */
     public static float sqrt(float x) {
@@ -31,7 +32,8 @@ public final class TFxMath {
     /**
      * Computes the sine of a float value in radians.
      *
-     * @param x the angle in radians
+     * @param x
+     *            the angle in radians
      * @return the sine of {@code x}
      */
     public static float sin(float x) {
@@ -41,7 +43,8 @@ public final class TFxMath {
     /**
      * Computes the cosine of a float value in radians.
      *
-     * @param x the angle in radians
+     * @param x
+     *            the angle in radians
      * @return the cosine of {@code x}
      */
     public static float cos(float x) {
@@ -51,8 +54,10 @@ public final class TFxMath {
     /**
      * Raises a float base to a float exponent.
      *
-     * @param base the base value
-     * @param exp the exponent
+     * @param base
+     *            the base value
+     * @param exp
+     *            the exponent
      * @return {@code base} raised to the power of {@code exp}
      */
     public static float powf(float base, float exp) {
@@ -62,8 +67,10 @@ public final class TFxMath {
     /**
      * Raises a float base to an integer exponent.
      *
-     * @param base the base value
-     * @param exp the integer exponent
+     * @param base
+     *            the base value
+     * @param exp
+     *            the integer exponent
      * @return {@code base} raised to the power of {@code exp}
      */
     public static float powi(float base, int exp) {
@@ -73,7 +80,8 @@ public final class TFxMath {
     /**
      * Rounds a float value to the nearest integer.
      *
-     * @param x the value to round
+     * @param x
+     *            the value to round
      * @return the nearest integer to {@code x}
      */
     public static float round(float x) {
@@ -83,7 +91,8 @@ public final class TFxMath {
     /**
      * Returns the largest integer value less than or equal to the argument.
      *
-     * @param x the value
+     * @param x
+     *            the value
      * @return the floor of {@code x}
      */
     public static float floor(float x) {
@@ -93,7 +102,8 @@ public final class TFxMath {
     /**
      * Returns the smallest integer value greater than or equal to the argument.
      *
-     * @param x the value
+     * @param x
+     *            the value
      * @return the ceiling of {@code x}
      */
     public static float ceil(float x) {
@@ -118,4 +128,3 @@ public final class TFxMath {
         return TAU;
     }
 }
-

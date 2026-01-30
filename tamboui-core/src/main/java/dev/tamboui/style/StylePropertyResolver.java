@@ -9,12 +9,13 @@ import java.util.Optional;
 /**
  * A resolver for retrieving typed property values by definition.
  * <p>
- * This is the minimal abstraction that allows widgets to resolve style properties
- * without depending on any specific styling system.
+ * This is the minimal abstraction that allows widgets to resolve style
+ * properties without depending on any specific styling system.
  * <p>
  * Use {@link #empty()} when no styling is needed.
  *
  * <h2>Usage in widgets:</h2>
+ * 
  * <pre>{@code
  * public void render(Rect area, Buffer buffer, StylePropertyResolver resolver) {
  *     Color borderColor = resolver.resolve(StandardProperties.BORDER_COLOR, this.borderColor);
@@ -28,8 +29,10 @@ public interface StylePropertyResolver {
     /**
      * Retrieves the value for the given property definition.
      *
-     * @param property the property definition
-     * @param <T>      the type of the property value
+     * @param property
+     *            the property definition
+     * @param <T>
+     *            the type of the property value
      * @return the property value, or empty if not found
      */
     <T> Optional<T> get(PropertyDefinition<T> property);
@@ -39,14 +42,17 @@ public interface StylePropertyResolver {
      * <p>
      * Resolution order: <strong>programmatic → resolver → property default</strong>
      * <ol>
-     *   <li>If {@code programmaticValue} is non-null, return it</li>
-     *   <li>Otherwise, try to resolve from this resolver</li>
-     *   <li>Otherwise, return {@link PropertyDefinition#defaultValue()}</li>
+     * <li>If {@code programmaticValue} is non-null, return it</li>
+     * <li>Otherwise, try to resolve from this resolver</li>
+     * <li>Otherwise, return {@link PropertyDefinition#defaultValue()}</li>
      * </ol>
      *
-     * @param property          the property definition
-     * @param programmaticValue the value set programmatically, or null
-     * @param <T>               the type of the property value
+     * @param property
+     *            the property definition
+     * @param programmaticValue
+     *            the value set programmatically, or null
+     * @param <T>
+     *            the type of the property value
      * @return the resolved value (may be null if property has no default)
      */
     default <T> T resolve(PropertyDefinition<T> property, T programmaticValue) {

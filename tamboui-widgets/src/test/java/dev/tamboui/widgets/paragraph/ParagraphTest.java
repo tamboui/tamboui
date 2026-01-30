@@ -4,25 +4,26 @@
  */
 package dev.tamboui.widgets.paragraph;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Hyperlink;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.style.Overflow;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -31,9 +32,7 @@ class ParagraphTest {
     @Test
     @DisplayName("Paragraph renders text")
     void rendersText() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello"))
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello")).build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -50,10 +49,7 @@ class ParagraphTest {
     @DisplayName("Paragraph with style applies to background")
     void withStyle() {
         Style style = Style.EMPTY.fg(Color.RED);
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hi"))
-            .style(style)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hi")).style(style).build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -68,10 +64,8 @@ class ParagraphTest {
     @Test
     @DisplayName("Paragraph with block")
     void withBlock() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hi"))
-            .block(Block.bordered())
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hi")).block(Block.bordered())
+                .build();
         Rect area = new Rect(0, 0, 10, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -86,10 +80,8 @@ class ParagraphTest {
     @Test
     @DisplayName("Paragraph with center alignment")
     void centerAlignment() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hi"))
-            .alignment(Alignment.CENTER)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hi")).alignment(Alignment.CENTER)
+                .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -103,10 +95,8 @@ class ParagraphTest {
     @Test
     @DisplayName("Paragraph with right alignment")
     void rightAlignment() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hi"))
-            .alignment(Alignment.RIGHT)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hi")).alignment(Alignment.RIGHT)
+                .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -120,9 +110,7 @@ class ParagraphTest {
     @Test
     @DisplayName("Paragraph with multi-line text")
     void multiLine() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Line1\nLine2"))
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Line1\nLine2")).build();
         Rect area = new Rect(0, 0, 10, 2);
         Buffer buffer = Buffer.empty(area);
 
@@ -137,10 +125,8 @@ class ParagraphTest {
     @Test
     @DisplayName("CLIP overflow truncates text at boundary without indicator")
     void clipOverflow() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello World"))
-            .overflow(Overflow.CLIP)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello World"))
+                .overflow(Overflow.CLIP).build();
         Rect area = new Rect(0, 0, 5, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -157,14 +143,9 @@ class ParagraphTest {
     void clipOverflowPreservesSpanStyles() {
         Style redStyle = Style.EMPTY.fg(Color.RED);
         Style blueStyle = Style.EMPTY.fg(Color.BLUE);
-        Line line = Line.from(
-            new Span("Red", redStyle),
-            new Span("Blue", blueStyle)
-        );
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from(line))
-            .overflow(Overflow.CLIP)
-            .build();
+        Line line = Line.from(new Span("Red", redStyle), new Span("Blue", blueStyle));
+        Paragraph paragraph = Paragraph.builder().text(Text.from(line)).overflow(Overflow.CLIP)
+                .build();
         Rect area = new Rect(0, 0, 5, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -180,10 +161,8 @@ class ParagraphTest {
     @Test
     @DisplayName("CLIP overflow does not modify text that fits")
     void clipOverflowTextFits() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hi"))
-            .overflow(Overflow.CLIP)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hi")).overflow(Overflow.CLIP)
+                .build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -197,10 +176,8 @@ class ParagraphTest {
     @Test
     @DisplayName("WRAP_CHARACTER wraps long text at character boundaries")
     void wrapCharacterOverflow() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("HelloWorld"))
-            .overflow(Overflow.WRAP_CHARACTER)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("HelloWorld"))
+                .overflow(Overflow.WRAP_CHARACTER).build();
         Rect area = new Rect(0, 0, 5, 2);
         Buffer buffer = Buffer.empty(area);
 
@@ -215,10 +192,8 @@ class ParagraphTest {
     @Test
     @DisplayName("WRAP_WORD wraps at word boundaries")
     void wrapWordOverflow() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello World"))
-            .overflow(Overflow.WRAP_WORD)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello World"))
+                .overflow(Overflow.WRAP_WORD).build();
         Rect area = new Rect(0, 0, 7, 2);
         Buffer buffer = Buffer.empty(area);
 
@@ -233,10 +208,8 @@ class ParagraphTest {
     @Test
     @DisplayName("WRAP_WORD breaks long words by character when necessary")
     void wrapWordBreaksLongWords() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Supercalifragilistic"))
-            .overflow(Overflow.WRAP_WORD)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Supercalifragilistic"))
+                .overflow(Overflow.WRAP_WORD).build();
         Rect area = new Rect(0, 0, 5, 4);
         Buffer buffer = Buffer.empty(area);
 
@@ -253,10 +226,8 @@ class ParagraphTest {
     @Test
     @DisplayName("ELLIPSIS truncates with ellipsis at end")
     void ellipsisOverflow() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello World"))
-            .overflow(Overflow.ELLIPSIS)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello World"))
+                .overflow(Overflow.ELLIPSIS).build();
         Rect area = new Rect(0, 0, 8, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -271,10 +242,8 @@ class ParagraphTest {
     @Test
     @DisplayName("ELLIPSIS does not modify text that fits")
     void ellipsisOverflowTextFits() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello"))
-            .overflow(Overflow.ELLIPSIS)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello"))
+                .overflow(Overflow.ELLIPSIS).build();
         Rect area = new Rect(0, 0, 10, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -288,10 +257,8 @@ class ParagraphTest {
     @Test
     @DisplayName("ELLIPSIS_START truncates with ellipsis at start")
     void ellipsisStartOverflow() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello World"))
-            .overflow(Overflow.ELLIPSIS_START)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello World"))
+                .overflow(Overflow.ELLIPSIS_START).build();
         Rect area = new Rect(0, 0, 8, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -306,10 +273,8 @@ class ParagraphTest {
     @Test
     @DisplayName("ELLIPSIS_MIDDLE truncates with ellipsis in middle")
     void ellipsisMiddleOverflow() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello World"))
-            .overflow(Overflow.ELLIPSIS_MIDDLE)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello World"))
+                .overflow(Overflow.ELLIPSIS_MIDDLE).build();
         Rect area = new Rect(0, 0, 8, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -324,10 +289,8 @@ class ParagraphTest {
     @Test
     @DisplayName("ELLIPSIS clips when width is too small for ellipsis")
     void ellipsisWithTinyWidth() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("Hello"))
-            .overflow(Overflow.ELLIPSIS)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from("Hello"))
+                .overflow(Overflow.ELLIPSIS).build();
         Rect area = new Rect(0, 0, 2, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -346,12 +309,10 @@ class ParagraphTest {
     void hyperlinkWrapsAcrossLinesCharacter() {
         String longUrl = "https://example.com/very/long/url/that/will/wrap";
         Paragraph paragraph = Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.raw("Visit "),
-                Span.raw(longUrl).hyperlink("https://example.com/very/long/url/that/will/wrap")
-            )))
-            .overflow(Overflow.WRAP_CHARACTER)
-            .build();
+                .text(Text.from(Line.from(Span.raw("Visit "),
+                        Span.raw(longUrl)
+                                .hyperlink("https://example.com/very/long/url/that/will/wrap"))))
+                .overflow(Overflow.WRAP_CHARACTER).build();
         Rect area = new Rect(0, 0, 15, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -367,22 +328,23 @@ class ParagraphTest {
                 }
             }
         }
-        
+
         // Should have found hyperlink cells
         assertThat(foundHyperlinks).isNotEmpty();
-        
+
         // All hyperlinks should have the same URL and ID
         Hyperlink firstLink = foundHyperlinks.get(0);
         assertThat(firstLink.url()).isEqualTo("https://example.com/very/long/url/that/will/wrap");
         assertThat(firstLink.id()).isPresent();
-        
+
         for (Hyperlink link : foundHyperlinks) {
             assertThat(link.url()).isEqualTo("https://example.com/very/long/url/that/will/wrap");
             assertThat(link.id()).isPresent();
             assertThat(link.id()).isEqualTo(firstLink.id());
         }
-        
-        // Verify hyperlink spans multiple lines by checking we have links on different rows
+
+        // Verify hyperlink spans multiple lines by checking we have links on different
+        // rows
         Set<Integer> rowsWithLinks = new HashSet<>();
         for (int y = 0; y < area.height(); y++) {
             for (int x = 0; x < area.width(); x++) {
@@ -399,12 +361,10 @@ class ParagraphTest {
     void hyperlinkWrapsAcrossLinesWord() {
         String longUrl = "https://example.com/very/long/url/that/will/wrap";
         Paragraph paragraph = Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.raw("Visit "),
-                Span.raw(longUrl).hyperlink("https://example.com/very/long/url/that/will/wrap")
-            )))
-            .overflow(Overflow.WRAP_WORD)
-            .build();
+                .text(Text.from(Line.from(Span.raw("Visit "),
+                        Span.raw(longUrl)
+                                .hyperlink("https://example.com/very/long/url/that/will/wrap"))))
+                .overflow(Overflow.WRAP_WORD).build();
         Rect area = new Rect(0, 0, 20, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -420,21 +380,21 @@ class ParagraphTest {
                 }
             }
         }
-        
+
         // Should have found hyperlink cells
         assertThat(foundHyperlinks).isNotEmpty();
-        
+
         // All hyperlinks should have the same URL and ID
         Hyperlink firstLink = foundHyperlinks.get(0);
         assertThat(firstLink.url()).isEqualTo("https://example.com/very/long/url/that/will/wrap");
         assertThat(firstLink.id()).isPresent();
-        
+
         for (Hyperlink link : foundHyperlinks) {
             assertThat(link.url()).isEqualTo("https://example.com/very/long/url/that/will/wrap");
             assertThat(link.id()).isPresent();
             assertThat(link.id()).isEqualTo(firstLink.id());
         }
-        
+
         // Verify hyperlink spans multiple lines
         Set<Integer> rowsWithLinks = new HashSet<>();
         for (int y = 0; y < area.height(); y++) {
@@ -451,13 +411,11 @@ class ParagraphTest {
     @DisplayName("Hyperlink with explicit ID wraps correctly")
     void hyperlinkWithIdWrapsCorrectly() {
         Paragraph paragraph = Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.raw("See "),
-                Span.raw("https://example.com/documentation").hyperlink("https://example.com/documentation", "doc-link"),
-                Span.raw(" for more info")
-            )))
-            .overflow(Overflow.WRAP_CHARACTER)
-            .build();
+                .text(Text.from(Line.from(Span.raw("See "),
+                        Span.raw("https://example.com/documentation")
+                                .hyperlink("https://example.com/documentation", "doc-link"),
+                        Span.raw(" for more info"))))
+                .overflow(Overflow.WRAP_CHARACTER).build();
         Rect area = new Rect(0, 0, 15, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -478,7 +436,7 @@ class ParagraphTest {
                 }
             }
         }
-        
+
         assertThat(link1).isNotNull();
         assertThat(link1.url()).isEqualTo("https://example.com/documentation");
         assertThat(link1.id()).contains("doc-link");
@@ -489,15 +447,10 @@ class ParagraphTest {
     @Test
     @DisplayName("Multiple hyperlinks in same line wrap independently")
     void multipleHyperlinksWrapIndependently() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.raw("Visit "),
-                Span.raw("https://site1.com").hyperlink("https://site1.com"),
-                Span.raw(" and "),
-                Span.raw("https://site2.com").hyperlink("https://site2.com")
-            )))
-            .overflow(Overflow.WRAP_CHARACTER)
-            .build();
+        Paragraph paragraph = Paragraph.builder().text(Text.from(Line.from(Span.raw("Visit "),
+                Span.raw("https://site1.com").hyperlink("https://site1.com"), Span.raw(" and "),
+                Span.raw("https://site2.com").hyperlink("https://site2.com"))))
+                .overflow(Overflow.WRAP_CHARACTER).build();
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
@@ -519,7 +472,7 @@ class ParagraphTest {
                 }
             }
         }
-        
+
         assertThat(foundLink1).isTrue();
         assertThat(foundLink2).isTrue();
     }

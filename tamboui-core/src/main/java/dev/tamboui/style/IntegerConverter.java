@@ -12,6 +12,7 @@ import java.util.Optional;
  * Handles standard integer formats including negative values.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * // Standalone usage
  * Optional<Integer> value = IntegerConverter.INSTANCE.convert("42");

@@ -4,13 +4,14 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.Painter;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,14 +54,13 @@ class PointsTest {
         double[] y = {10, 20};
 
         assertThatThrownBy(() -> Points.of(x, y, Color.RED))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("same length");
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("same length");
     }
 
     @Test
     void draw_points() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
-        Points points = new Points(new double[][] {{0, 0}, {5, 5}, {10, 10}}, Color.YELLOW);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Points points = new Points(new double[][]{{0, 0}, {5, 5}, {10, 10}}, Color.YELLOW);
 
         points.draw(new Painter(ctx));
 
@@ -70,8 +70,8 @@ class PointsTest {
 
     @Test
     void draw_single_point() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
-        Points points = new Points(new double[][] {{5, 5}}, Color.CYAN);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Points points = new Points(new double[][]{{5, 5}}, Color.CYAN);
 
         points.draw(new Painter(ctx));
 
@@ -81,7 +81,7 @@ class PointsTest {
 
     @Test
     void draw_empty_points() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Points points = new Points(new double[0][], Color.MAGENTA);
 
         points.draw(new Painter(ctx));
@@ -90,7 +90,7 @@ class PointsTest {
 
     @Test
     void draw_null_coords() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Points points = new Points(null, Color.WHITE);
 
         points.draw(new Painter(ctx));
@@ -99,8 +99,8 @@ class PointsTest {
 
     @Test
     void draw_points_outside_bounds() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
-        Points points = new Points(new double[][] {{-5, -5}, {15, 15}}, Color.RED);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Points points = new Points(new double[][]{{-5, -5}, {15, 15}}, Color.RED);
 
         points.draw(new Painter(ctx));
         // Should clip and not throw
@@ -108,11 +108,11 @@ class PointsTest {
 
     @Test
     void draw_points_partial_null() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         double[][] coords = new double[3][];
-        coords[0] = new double[] {5, 5};
+        coords[0] = new double[]{5, 5};
         coords[1] = null;
-        coords[2] = new double[] {3, 3};
+        coords[2] = new double[]{3, 3};
         Points points = new Points(coords, Color.GREEN);
 
         points.draw(new Painter(ctx));

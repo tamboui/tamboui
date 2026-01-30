@@ -24,12 +24,15 @@ public final class CapabilityReportBuilder {
     private final Map<String, Map<String, Object>> featuresBySource = new LinkedHashMap<>();
 
     /**
-     * Adds an environment key that should be printed (value resolved at print-time).
+     * Adds an environment key that should be printed (value resolved at
+     * print-time).
      * <p>
      * Prefer using environment variable names as keys.
      *
-     * @param source the provider source name
-     * @param key    the environment variable name
+     * @param source
+     *            the provider source name
+     * @param key
+     *            the environment variable name
      * @return this builder
      */
     public CapabilityReportBuilder env(String source, String key) {
@@ -37,9 +40,7 @@ public final class CapabilityReportBuilder {
         if (key == null || key.isEmpty()) {
             return this;
         }
-        environmentBySource
-                .computeIfAbsent(source, s -> new ArrayList<String>())
-                .add(key);
+        environmentBySource.computeIfAbsent(source, s -> new ArrayList<String>()).add(key);
         return this;
     }
 
@@ -48,8 +49,10 @@ public final class CapabilityReportBuilder {
      * <p>
      * Prefer using property names as keys (e.g. {@code java.version}).
      *
-     * @param source the provider source name
-     * @param key    the system property name
+     * @param source
+     *            the provider source name
+     * @param key
+     *            the system property name
      * @return this builder
      */
     public CapabilityReportBuilder property(String source, String key) {
@@ -57,18 +60,20 @@ public final class CapabilityReportBuilder {
         if (key == null || key.isEmpty()) {
             return this;
         }
-        propertiesBySource
-                .computeIfAbsent(source, s -> new ArrayList<String>())
-                .add(key);
+        propertiesBySource.computeIfAbsent(source, s -> new ArrayList<String>()).add(key);
         return this;
     }
 
     /**
-     * Adds a general capability/feature. Keys SHOULD use dotted notation to create stable namespaces.
+     * Adds a general capability/feature. Keys SHOULD use dotted notation to create
+     * stable namespaces.
      *
-     * @param source the provider source name
-     * @param key    the feature key (prefer dotted notation)
-     * @param value  the feature value
+     * @param source
+     *            the provider source name
+     * @param key
+     *            the feature key (prefer dotted notation)
+     * @param value
+     *            the feature value
      * @return this builder
      */
     public CapabilityReportBuilder feature(String source, String key, Object value) {
@@ -76,9 +81,8 @@ public final class CapabilityReportBuilder {
         if (key == null || key.isEmpty()) {
             return this;
         }
-        featuresBySource
-                .computeIfAbsent(source, s -> new LinkedHashMap<String, Object>())
-                .put(key, value);
+        featuresBySource.computeIfAbsent(source, s -> new LinkedHashMap<String, Object>()).put(key,
+                value);
         return this;
     }
 
@@ -91,5 +95,3 @@ public final class CapabilityReportBuilder {
         return new CapabilityReport(environmentBySource, propertiesBySource, featuresBySource);
     }
 }
-
-

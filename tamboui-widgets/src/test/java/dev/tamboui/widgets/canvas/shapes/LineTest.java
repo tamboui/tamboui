@@ -4,13 +4,14 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.Painter;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,7 @@ class LineTest {
 
     @Test
     void draw_horizontal_line() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Line line = new Line(0, 5, 10, 5, Color.GREEN);
 
         line.draw(new Painter(ctx));
@@ -52,7 +53,7 @@ class LineTest {
 
     @Test
     void draw_vertical_line() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Line line = new Line(5, 0, 5, 10, Color.YELLOW);
 
         line.draw(new Painter(ctx));
@@ -63,7 +64,7 @@ class LineTest {
 
     @Test
     void draw_diagonal_line() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Line line = new Line(0, 0, 10, 10, Color.CYAN);
 
         line.draw(new Painter(ctx));
@@ -75,7 +76,7 @@ class LineTest {
     @Test
     void draw_point_line() {
         // Line with same start and end points
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Line line = new Line(5, 5, 5, 5, Color.MAGENTA);
 
         line.draw(new Painter(ctx));
@@ -84,7 +85,7 @@ class LineTest {
 
     @Test
     void draw_line_outside_bounds() {
-        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
         Line line = new Line(-10, -10, 20, 20, Color.WHITE);
 
         line.draw(new Painter(ctx));

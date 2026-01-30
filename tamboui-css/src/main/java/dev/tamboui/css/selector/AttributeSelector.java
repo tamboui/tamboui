@@ -4,26 +4,27 @@
  */
 package dev.tamboui.css.selector;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 
 /**
  * An attribute selector that matches elements by their style attributes.
  * <p>
  * Supports the following operators:
  * <ul>
- *   <li>{@code [attr]} - attribute exists</li>
- *   <li>{@code [attr=value]} - exact match</li>
- *   <li>{@code [attr^=value]} - starts with</li>
- *   <li>{@code [attr$=value]} - ends with</li>
- *   <li>{@code [attr*=value]} - contains</li>
+ * <li>{@code [attr]} - attribute exists</li>
+ * <li>{@code [attr=value]} - exact match</li>
+ * <li>{@code [attr^=value]} - starts with</li>
+ * <li>{@code [attr$=value]} - ends with</li>
+ * <li>{@code [attr*=value]} - contains</li>
  * </ul>
  * <p>
- * Example: {@code Panel[title="Test Tree"]} matches Panels with title="Test Tree".
+ * Example: {@code Panel[title="Test Tree"]} matches Panels with title="Test
+ * Tree".
  */
 public final class AttributeSelector implements Selector {
 
@@ -50,7 +51,8 @@ public final class AttributeSelector implements Selector {
     /**
      * Creates an attribute existence selector.
      *
-     * @param attribute the attribute name
+     * @param attribute
+     *            the attribute name
      */
     public AttributeSelector(String attribute) {
         this.attribute = Objects.requireNonNull(attribute);
@@ -61,9 +63,12 @@ public final class AttributeSelector implements Selector {
     /**
      * Creates an attribute selector with an operator and value.
      *
-     * @param attribute the attribute name
-     * @param operator the matching operator
-     * @param value the value to match against
+     * @param attribute
+     *            the attribute name
+     * @param operator
+     *            the matching operator
+     * @param value
+     *            the value to match against
      */
     public AttributeSelector(String attribute, Operator operator, String value) {
         this.attribute = Objects.requireNonNull(attribute);
@@ -109,17 +114,17 @@ public final class AttributeSelector implements Selector {
         String attrValue = attrs.get(attribute);
 
         switch (operator) {
-            case EXISTS:
+            case EXISTS :
                 return attrValue != null;
-            case EQUALS:
+            case EQUALS :
                 return value.equals(attrValue);
-            case STARTS_WITH:
+            case STARTS_WITH :
                 return attrValue != null && attrValue.startsWith(value);
-            case ENDS_WITH:
+            case ENDS_WITH :
                 return attrValue != null && attrValue.endsWith(value);
-            case CONTAINS:
+            case CONTAINS :
                 return attrValue != null && attrValue.contains(value);
-            default:
+            default :
                 return false;
         }
     }
@@ -129,18 +134,18 @@ public final class AttributeSelector implements Selector {
         StringBuilder sb = new StringBuilder();
         sb.append('[').append(attribute);
         switch (operator) {
-            case EXISTS:
+            case EXISTS :
                 break;
-            case EQUALS:
+            case EQUALS :
                 sb.append('=').append('"').append(value).append('"');
                 break;
-            case STARTS_WITH:
+            case STARTS_WITH :
                 sb.append("^=").append('"').append(value).append('"');
                 break;
-            case ENDS_WITH:
+            case ENDS_WITH :
                 sb.append("$=").append('"').append(value).append('"');
                 break;
-            case CONTAINS:
+            case CONTAINS :
                 sb.append("*=").append('"').append(value).append('"');
                 break;
         }
@@ -157,9 +162,8 @@ public final class AttributeSelector implements Selector {
             return false;
         }
         AttributeSelector that = (AttributeSelector) o;
-        return attribute.equals(that.attribute) &&
-               operator == that.operator &&
-               Objects.equals(value, that.value);
+        return attribute.equals(that.attribute) && operator == that.operator
+                && Objects.equals(value, that.value);
     }
 
     @Override

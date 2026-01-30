@@ -7,8 +7,8 @@ package dev.tamboui.internal.record;
 import dev.tamboui.buffer.Buffer;
 
 /**
- * A captured frame with its timestamp relative to recording start.
- * This is an internal API and not part of the public contract.
+ * A captured frame with its timestamp relative to recording start. This is an
+ * internal API and not part of the public contract.
  */
 final class TimedFrame {
 

@@ -7,8 +7,8 @@ package dev.tamboui.internal.record;
 import java.nio.file.Path;
 
 /**
- * Represents a scripted interaction for demo recording.
- * This is an internal API and not part of the public contract.
+ * Represents a scripted interaction for demo recording. This is an internal API
+ * and not part of the public contract.
  */
 abstract class Interaction {
 

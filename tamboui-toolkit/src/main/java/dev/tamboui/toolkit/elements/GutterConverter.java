@@ -4,17 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.Optional;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts CSS string values to {@link Gutter} objects.
  * <p>
  * Supported formats:
  * <ul>
- *   <li>{@code "2"} — uniform gutter of 2</li>
- *   <li>{@code "1 2"} — horizontal 1, vertical 2</li>
+ * <li>{@code "2"} — uniform gutter of 2</li>
+ * <li>{@code "1 2"} — horizontal 1, vertical 2</li>
  * </ul>
  */
 public final class GutterConverter implements PropertyConverter<Gutter> {

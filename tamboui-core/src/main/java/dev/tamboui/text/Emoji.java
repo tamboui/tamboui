@@ -6,10 +6,7 @@ package dev.tamboui.text;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Replaces emoji codes (e.g. {@code :smiley:}, {@code :warning:}) with Unicode
@@ -35,7 +32,8 @@ public final class Emoji {
     /**
      * Returns the map of emoji shortcodes to Unicode emoji characters.
      *
-     * @return an unmodifiable map of emoji shortcodes to their Unicode representations
+     * @return an unmodifiable map of emoji shortcodes to their Unicode
+     *         representations
      */
     public static Map<String, String> emojis() {
         // using Holder to delay loading until accesses.

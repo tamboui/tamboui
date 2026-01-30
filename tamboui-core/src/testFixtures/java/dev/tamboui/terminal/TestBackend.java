@@ -4,26 +4,24 @@
  */
 package dev.tamboui.terminal;
 
-import dev.tamboui.buffer.CellUpdate;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Size;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.layout.Position;
+import dev.tamboui.layout.Size;
+
 /**
  * A test backend that captures all terminal operations for assertion.
  * <p>
  * Provides a higher-level DSL for verifying terminal behavior in tests:
+ * 
  * <pre>{@code
  * TestBackend backend = new TestBackend(80, 24);
  * // ... perform operations ...
- * backend.assertOps()
- *     .hasInsertLines(1)
- *     .hasCursorUp(3)
- *     .hasDeleteLines(2);
+ * backend.assertOps().hasInsertLines(1).hasCursorUp(3).hasDeleteLines(2);
  * }</pre>
  */
 public class TestBackend implements Backend {
@@ -64,7 +62,8 @@ public class TestBackend implements Backend {
 
     /**
      * Returns the ordered transcript of all interactions (ops and raw writes).
-     * Elements are either {@link Op} instances or {@link String} instances (raw output).
+     * Elements are either {@link Op} instances or {@link String} instances (raw
+     * output).
      */
     public List<Object> transcript() {
         return Collections.unmodifiableList(transcript);
@@ -222,16 +221,7 @@ public class TestBackend implements Backend {
     // -- Structured operation types --
 
     public enum OpType {
-        INSERT_LINES,
-        DELETE_LINES,
-        CURSOR_UP,
-        CURSOR_DOWN,
-        CURSOR_LEFT,
-        CURSOR_RIGHT,
-        ERASE_EOL,
-        CARRIAGE_RETURN,
-        SHOW_CURSOR,
-        HIDE_CURSOR
+        INSERT_LINES, DELETE_LINES, CURSOR_UP, CURSOR_DOWN, CURSOR_LEFT, CURSOR_RIGHT, ERASE_EOL, CARRIAGE_RETURN, SHOW_CURSOR, HIDE_CURSOR
     }
 
     public static final class Op {
@@ -253,8 +243,12 @@ public class TestBackend implements Backend {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if (!(o instanceof Op)) { return false; }
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Op)) {
+                return false;
+            }
             Op op = (Op) o;
             return count == op.count && type == op.type;
         }
@@ -362,7 +356,7 @@ public class TestBackend implements Backend {
             Op unexpected = new Op(type, count);
             if (ops.contains(unexpected)) {
                 throw new AssertionError(
-                    "Unexpected operation " + unexpected + " found in: " + ops);
+                        "Unexpected operation " + unexpected + " found in: " + ops);
             }
             return this;
         }
@@ -381,7 +375,7 @@ public class TestBackend implements Backend {
         public OpAssert hasSize(int expected) {
             if (ops.size() != expected) {
                 throw new AssertionError(
-                    "Expected " + expected + " operations, but got " + ops.size() + ": " + ops);
+                        "Expected " + expected + " operations, but got " + ops.size() + ": " + ops);
             }
             return this;
         }
@@ -390,15 +384,15 @@ public class TestBackend implements Backend {
             Op expected = new Op(type, count);
             if (!ops.contains(expected)) {
                 throw new AssertionError(
-                    "Expected operation " + expected + " not found in: " + ops);
+                        "Expected operation " + expected + " not found in: " + ops);
             }
         }
 
         private void assertNotContainsType(OpType type) {
             for (Op op : ops) {
                 if (op.type() == type) {
-                    throw new AssertionError(
-                        "Expected no " + type + " operations, but found: " + op + " in: " + ops);
+                    throw new AssertionError("Expected no " + type + " operations, but found: " + op
+                            + " in: " + ops);
                 }
             }
         }
@@ -407,9 +401,10 @@ public class TestBackend implements Backend {
     /**
      * Assertion DSL for verifying the transcript ordering.
      * <p>
-     * The transcript contains both {@link Op} instances and raw output {@link String}s
-     * in the order they were emitted. Assertions work with cumulative raw text to handle
-     * character-by-character writes (e.g., cell-by-cell rendering produces individual chars).
+     * The transcript contains both {@link Op} instances and raw output
+     * {@link String}s in the order they were emitted. Assertions work with
+     * cumulative raw text to handle character-by-character writes (e.g.,
+     * cell-by-cell rendering produces individual chars).
      */
     public static class TranscriptAssert {
         private final List<Object> transcript;
@@ -432,9 +427,8 @@ public class TestBackend implements Backend {
                     return this;
                 }
             }
-            throw new AssertionError(
-                "Expected " + expected + " not found after position " + position
-                    + " in transcript: " + formatTranscript());
+            throw new AssertionError("Expected " + expected + " not found after position "
+                    + position + " in transcript: " + formatTranscript());
         }
 
         /**
@@ -453,15 +447,14 @@ public class TestBackend implements Backend {
                     }
                 }
             }
-            throw new AssertionError(
-                "Expected raw output containing \"" + escape(text) + "\" not found after position "
-                    + position + ". Accumulated raw: \"" + escape(accumulated.toString())
-                    + "\"\n  Transcript: " + formatTranscript());
+            throw new AssertionError("Expected raw output containing \"" + escape(text)
+                    + "\" not found after position " + position + ". Accumulated raw: \""
+                    + escape(accumulated.toString()) + "\"\n  Transcript: " + formatTranscript());
         }
 
         /**
-         * Asserts that a specific Op appears BEFORE the cumulative raw output
-         * contains the given text. This validates output ordering.
+         * Asserts that a specific Op appears BEFORE the cumulative raw output contains
+         * the given text. This validates output ordering.
          */
         public TranscriptAssert hasOpBefore(OpType type, int count, String rawText) {
             Op expected = new Op(type, count);
@@ -486,19 +479,17 @@ public class TestBackend implements Backend {
             }
 
             if (opIndex < 0) {
-                throw new AssertionError(
-                    "Operation " + expected + " not found in transcript: " + formatTranscript());
+                throw new AssertionError("Operation " + expected + " not found in transcript: "
+                        + formatTranscript());
             }
             if (rawCompleteIndex < 0) {
-                throw new AssertionError(
-                    "Raw output containing \"" + escape(rawText)
+                throw new AssertionError("Raw output containing \"" + escape(rawText)
                         + "\" not found in transcript: " + formatTranscript());
             }
             if (opIndex >= rawCompleteIndex) {
-                throw new AssertionError(
-                    "Expected " + expected + " (at " + opIndex + ") to appear before raw \""
-                        + escape(rawText) + "\" (completed at " + rawCompleteIndex
-                        + ") in transcript: " + formatTranscript());
+                throw new AssertionError("Expected " + expected + " (at " + opIndex
+                        + ") to appear before raw \"" + escape(rawText) + "\" (completed at "
+                        + rawCompleteIndex + ") in transcript: " + formatTranscript());
             }
             return this;
         }

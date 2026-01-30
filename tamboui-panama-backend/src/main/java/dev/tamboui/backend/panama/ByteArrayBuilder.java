@@ -10,12 +10,12 @@ import java.util.Arrays;
 /**
  * Efficient byte array builder optimized for terminal output.
  * <p>
- * This class is designed for the common case of ASCII escape sequences
- * mixed with UTF-8 cell symbols. It avoids the overhead of StringBuilder
- * followed by String.getBytes() by building the byte array directly.
+ * This class is designed for the common case of ASCII escape sequences mixed
+ * with UTF-8 cell symbols. It avoids the overhead of StringBuilder followed by
+ * String.getBytes() by building the byte array directly.
  * <p>
- * ASCII operations (escape sequences, integers) write bytes directly.
- * UTF-8 operations (cell symbols) encode only when necessary.
+ * ASCII operations (escape sequences, integers) write bytes directly. UTF-8
+ * operations (cell symbols) encode only when necessary.
  */
 public final class ByteArrayBuilder {
 
@@ -28,7 +28,8 @@ public final class ByteArrayBuilder {
     /**
      * Creates a new ByteArrayBuilder with the specified initial capacity.
      *
-     * @param initialCapacity the initial buffer size in bytes
+     * @param initialCapacity
+     *            the initial buffer size in bytes
      */
     public ByteArrayBuilder(int initialCapacity) {
         this.buffer = new byte[initialCapacity];
@@ -36,9 +37,11 @@ public final class ByteArrayBuilder {
     }
 
     /**
-     * Ensures the buffer has capacity for at least the specified number of additional bytes.
+     * Ensures the buffer has capacity for at least the specified number of
+     * additional bytes.
      *
-     * @param additionalBytes the number of additional bytes needed
+     * @param additionalBytes
+     *            the number of additional bytes needed
      */
     private void ensureCapacity(int additionalBytes) {
         int required = position + additionalBytes;
@@ -65,7 +68,8 @@ public final class ByteArrayBuilder {
     /**
      * Appends a single byte.
      *
-     * @param b the byte to append
+     * @param b
+     *            the byte to append
      * @return this builder for chaining
      */
     public ByteArrayBuilder append(byte b) {
@@ -77,7 +81,8 @@ public final class ByteArrayBuilder {
     /**
      * Appends a byte array.
      *
-     * @param bytes the bytes to append
+     * @param bytes
+     *            the bytes to append
      * @return this builder for chaining
      */
     public ByteArrayBuilder append(byte[] bytes) {
@@ -90,11 +95,12 @@ public final class ByteArrayBuilder {
     /**
      * Appends an ASCII string without charset encoding.
      * <p>
-     * This method assumes the string contains only ASCII characters (0-127).
-     * It is faster than {@link #appendUtf8(String)} for escape sequences
-     * and other ASCII-only content.
+     * This method assumes the string contains only ASCII characters (0-127). It is
+     * faster than {@link #appendUtf8(String)} for escape sequences and other
+     * ASCII-only content.
      *
-     * @param s the ASCII string to append
+     * @param s
+     *            the ASCII string to append
      * @return this builder for chaining
      */
     public ByteArrayBuilder appendAscii(String s) {
@@ -109,10 +115,11 @@ public final class ByteArrayBuilder {
     /**
      * Appends a non-negative integer as ASCII digits.
      * <p>
-     * This method converts the integer directly to ASCII digit bytes
-     * without creating intermediate String objects.
+     * This method converts the integer directly to ASCII digit bytes without
+     * creating intermediate String objects.
      *
-     * @param value the non-negative integer to append
+     * @param value
+     *            the non-negative integer to append
      * @return this builder for chaining
      */
     public ByteArrayBuilder appendInt(int value) {
@@ -150,13 +157,14 @@ public final class ByteArrayBuilder {
     /**
      * Appends a UTF-8 encoded string.
      * <p>
-     * Use this method for cell symbols which may contain multi-byte
-     * UTF-8 characters (box-drawing, CJK, emoji, etc.).
+     * Use this method for cell symbols which may contain multi-byte UTF-8
+     * characters (box-drawing, CJK, emoji, etc.).
      * <p>
-     * Optimized for the common case of ASCII-only strings to avoid
-     * the overhead of {@link String#getBytes(java.nio.charset.Charset)}.
+     * Optimized for the common case of ASCII-only strings to avoid the overhead of
+     * {@link String#getBytes(java.nio.charset.Charset)}.
      *
-     * @param s the string to append as UTF-8
+     * @param s
+     *            the string to append as UTF-8
      * @return this builder for chaining
      */
     public ByteArrayBuilder appendUtf8(String s) {
@@ -201,8 +209,8 @@ public final class ByteArrayBuilder {
     /**
      * Returns the internal buffer.
      * <p>
-     * The returned array may be larger than the actual content.
-     * Use {@link #length()} to determine the valid data length.
+     * The returned array may be larger than the actual content. Use
+     * {@link #length()} to determine the valid data length.
      *
      * @return the internal byte array
      */
@@ -222,8 +230,8 @@ public final class ByteArrayBuilder {
     /**
      * Resets the builder for reuse.
      * <p>
-     * This method clears the position but retains the allocated buffer
-     * for efficient reuse across frames.
+     * This method clears the position but retains the allocated buffer for
+     * efficient reuse across frames.
      */
     public void reset() {
         position = 0;
@@ -232,8 +240,8 @@ public final class ByteArrayBuilder {
     /**
      * Creates a new byte array containing only the valid data.
      * <p>
-     * This method allocates a new array. For zero-copy writes,
-     * use {@link #buffer()} with {@link #length()} instead.
+     * This method allocates a new array. For zero-copy writes, use
+     * {@link #buffer()} with {@link #length()} instead.
      *
      * @return a new byte array with the buffer contents
      */

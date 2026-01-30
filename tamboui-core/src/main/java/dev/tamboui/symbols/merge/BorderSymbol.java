@@ -7,7 +7,8 @@ package dev.tamboui.symbols.merge;
 /**
  * Represents a composite border symbol using individual line components.
  * <p>
- * This is an internal type specifically used to make the merge logic easier to implement.
+ * This is an internal type specifically used to make the merge logic easier to
+ * implement.
  */
 final class BorderSymbol {
     private final LineStyle right;
@@ -43,20 +44,20 @@ final class BorderSymbol {
     }
 
     /**
-     * Finds the closest representation of this BorderSymbol that has a corresponding unicode character.
+     * Finds the closest representation of this BorderSymbol that has a
+     * corresponding unicode character.
      */
     BorderSymbol fuzzy(BorderSymbol other) {
         BorderSymbol result = this;
 
         // Dashes only include vertical and horizontal lines.
         if (!result.isStraight()) {
-            result = result
-                .replace(LineStyle.DOUBLE_DASH, LineStyle.PLAIN)
-                .replace(LineStyle.TRIPLE_DASH, LineStyle.PLAIN)
-                .replace(LineStyle.QUADRUPLE_DASH, LineStyle.PLAIN)
-                .replace(LineStyle.DOUBLE_DASH_THICK, LineStyle.THICK)
-                .replace(LineStyle.TRIPLE_DASH_THICK, LineStyle.THICK)
-                .replace(LineStyle.QUADRUPLE_DASH_THICK, LineStyle.THICK);
+            result = result.replace(LineStyle.DOUBLE_DASH, LineStyle.PLAIN)
+                    .replace(LineStyle.TRIPLE_DASH, LineStyle.PLAIN)
+                    .replace(LineStyle.QUADRUPLE_DASH, LineStyle.PLAIN)
+                    .replace(LineStyle.DOUBLE_DASH_THICK, LineStyle.THICK)
+                    .replace(LineStyle.TRIPLE_DASH_THICK, LineStyle.THICK)
+                    .replace(LineStyle.QUADRUPLE_DASH_THICK, LineStyle.THICK);
         }
 
         // Rounded has only corner variants.
@@ -88,27 +89,33 @@ final class BorderSymbol {
     }
 
     /**
-     * Returns true only if the symbol is a line and both parts have the same LineStyle.
+     * Returns true only if the symbol is a line and both parts have the same
+     * LineStyle.
      */
     boolean isStraight() {
         return (up == down && left == right)
-            && (up == LineStyle.NOTHING || left == LineStyle.NOTHING);
+                && (up == LineStyle.NOTHING || left == LineStyle.NOTHING);
     }
 
     /**
-     * Returns true only if the symbol is a corner and both parts have the same LineStyle.
+     * Returns true only if the symbol is a corner and both parts have the same
+     * LineStyle.
      */
     boolean isCorner() {
-        if (up != LineStyle.NOTHING && right != LineStyle.NOTHING && down == LineStyle.NOTHING && left == LineStyle.NOTHING) {
+        if (up != LineStyle.NOTHING && right != LineStyle.NOTHING && down == LineStyle.NOTHING
+                && left == LineStyle.NOTHING) {
             return up == right;
         }
-        if (up == LineStyle.NOTHING && right != LineStyle.NOTHING && down != LineStyle.NOTHING && left == LineStyle.NOTHING) {
+        if (up == LineStyle.NOTHING && right != LineStyle.NOTHING && down != LineStyle.NOTHING
+                && left == LineStyle.NOTHING) {
             return right == down;
         }
-        if (up == LineStyle.NOTHING && right == LineStyle.NOTHING && down != LineStyle.NOTHING && left != LineStyle.NOTHING) {
+        if (up == LineStyle.NOTHING && right == LineStyle.NOTHING && down != LineStyle.NOTHING
+                && left != LineStyle.NOTHING) {
             return down == left;
         }
-        if (up != LineStyle.NOTHING && right == LineStyle.NOTHING && down == LineStyle.NOTHING && left != LineStyle.NOTHING) {
+        if (up != LineStyle.NOTHING && right == LineStyle.NOTHING && down == LineStyle.NOTHING
+                && left != LineStyle.NOTHING) {
             return up == left;
         }
         return false;
@@ -125,32 +132,24 @@ final class BorderSymbol {
      * Replaces all line styles matching `from` by `to`.
      */
     BorderSymbol replace(LineStyle from, LineStyle to) {
-        return new BorderSymbol(
-            right == from ? to : right,
-            up == from ? to : up,
-            left == from ? to : left,
-            down == from ? to : down
-        );
+        return new BorderSymbol(right == from ? to : right, up == from ? to : up,
+                left == from ? to : left, down == from ? to : down);
     }
 
     /**
      * Merges two border symbols into one.
      */
     BorderSymbol merge(BorderSymbol other, MergeStrategy strategy) {
-        BorderSymbol exactResult = BorderSymbol.of(
-            right.merge(other.right),
-            up.merge(other.up),
-            left.merge(other.left),
-            down.merge(other.down)
-        );
+        BorderSymbol exactResult = BorderSymbol.of(right.merge(other.right), up.merge(other.up),
+                left.merge(other.left), down.merge(other.down));
 
         switch (strategy) {
-            case REPLACE:
+            case REPLACE :
                 return other;
-            case FUZZY:
+            case FUZZY :
                 return exactResult.fuzzy(other);
-            case EXACT:
-            default:
+            case EXACT :
+            default :
                 return exactResult;
         }
     }
@@ -181,4 +180,3 @@ final class BorderSymbol {
         return SymbolRegistry.toString(this);
     }
 }
-

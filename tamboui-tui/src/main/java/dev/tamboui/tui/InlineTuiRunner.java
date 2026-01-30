@@ -4,18 +4,6 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.inline.InlineDisplay;
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.terminal.BackendFactory;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.Text;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.event.Event;
-import dev.tamboui.tui.event.EventParser;
-import dev.tamboui.tui.event.TickEvent;
-import dev.tamboui.tui.event.UiRunnable;
-
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,35 +18,43 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import dev.tamboui.inline.InlineDisplay;
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.BackendFactory;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Text;
+import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.TickEvent;
+import dev.tamboui.tui.event.UiRunnable;
+
 /**
  * Event loop for inline displays.
  * <p>
- * InlineTuiRunner combines the inline display semantics of {@link InlineDisplay}
- * with the event handling capabilities of {@link TuiRunner}. It provides:
+ * InlineTuiRunner combines the inline display semantics of
+ * {@link InlineDisplay} with the event handling capabilities of
+ * {@link TuiRunner}. It provides:
  * <ul>
- *   <li>Raw mode for key event reading (like TuiRunner)</li>
- *   <li>NO alternate screen (stays inline, like InlineDisplay)</li>
- *   <li>Tick events for animations (WaveText, etc.)</li>
- *   <li>Input reader thread for responsive keyboard handling</li>
- *   <li>Thread-safe operations for background task integration</li>
+ * <li>Raw mode for key event reading (like TuiRunner)</li>
+ * <li>NO alternate screen (stays inline, like InlineDisplay)</li>
+ * <li>Tick events for animations (WaveText, etc.)</li>
+ * <li>Input reader thread for responsive keyboard handling</li>
+ * <li>Thread-safe operations for background task integration</li>
  * </ul>
  *
  * <pre>{@code
  * try (var runner = InlineTuiRunner.create(4)) {
  *     int[] progress = {0};
  *
- *     runner.run(
- *         (event, r) -> {
- *             if (event instanceof TickEvent) {
- *                 progress[0] = Math.min(100, progress[0] + 1);
- *                 if (progress[0] >= 100) r.quit();
- *             }
- *             return true;
- *         },
- *         frame -> {
- *             gauge(progress[0] / 100.0).render(frame.area(), frame.buffer());
+ *     runner.run((event, r) -> {
+ *         if (event instanceof TickEvent) {
+ *             progress[0] = Math.min(100, progress[0] + 1);
+ *             if (progress[0] >= 100)
+ *                 r.quit();
  *         }
- *     );
+ *         return true;
+ *     }, frame -> {
+ *         gauge(progress[0] / 100.0).render(frame.area(), frame.buffer());
+ *     });
  * }
  * }</pre>
  *
@@ -100,13 +96,15 @@ public final class InlineTuiRunner implements AutoCloseable {
                 return t;
             });
             long periodMs = config.tickRate().toMillis();
-            scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
+            scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs,
+                    TimeUnit.MILLISECONDS);
         } else {
             this.scheduler = null;
         }
 
         // Create and start the input reader thread
-        this.inputReader = new TerminalInputReader(backend, eventQueue, config.bindings(), running, config.pollTimeout());
+        this.inputReader = new TerminalInputReader(backend, eventQueue, config.bindings(), running,
+                config.pollTimeout());
         this.inputReader.start();
 
         // Register shutdown hook
@@ -115,11 +113,14 @@ public final class InlineTuiRunner implements AutoCloseable {
     }
 
     /**
-     * Creates an InlineTuiRunner with the specified height and default configuration.
+     * Creates an InlineTuiRunner with the specified height and default
+     * configuration.
      *
-     * @param height the number of lines for the inline display
+     * @param height
+     *            the number of lines for the inline display
      * @return a new InlineTuiRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static InlineTuiRunner create(int height) throws Exception {
         return create(InlineTuiConfig.defaults(height));
@@ -128,9 +129,11 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Creates an InlineTuiRunner with the specified configuration.
      *
-     * @param config the configuration to use
+     * @param config
+     *            the configuration to use
      * @return a new InlineTuiRunner
-     * @throws Exception if terminal initialization fails
+     * @throws Exception
+     *             if terminal initialization fails
      */
     public static InlineTuiRunner create(InlineTuiConfig config) throws Exception {
         Backend backend = BackendFactory.create();
@@ -162,12 +165,15 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Runs the main event loop with the given handler and renderer.
      * <p>
-     * The event handler is called for each event (key, mouse, tick).
-     * The renderer is called to update the display when the handler returns true.
+     * The event handler is called for each event (key, mouse, tick). The renderer
+     * is called to update the display when the handler returns true.
      *
-     * @param handler  the event handler
-     * @param renderer the UI renderer
-     * @throws Exception if an error occurs during execution
+     * @param handler
+     *            the event handler
+     * @param renderer
+     *            the UI renderer
+     * @throws Exception
+     *             if an error occurs during execution
      */
     public void run(InlineEventHandler handler, Renderer renderer) throws Exception {
         // Mark this thread as the render thread
@@ -200,7 +206,8 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Polls for the next event with the specified timeout.
      *
-     * @param timeout the maximum time to wait
+     * @param timeout
+     *            the maximum time to wait
      * @return the next event, or null if timeout expires
      */
     public Event pollEvent(Duration timeout) {
@@ -245,7 +252,8 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Prints a plain text message above the viewport.
      *
-     * @param message the message to print
+     * @param message
+     *            the message to print
      */
     public void println(String message) {
         viewport.println(message);
@@ -254,7 +262,8 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Prints styled text above the viewport.
      *
-     * @param text the styled text to print
+     * @param text
+     *            the styled text to print
      */
     public void println(Text text) {
         viewport.println(text);
@@ -264,9 +273,11 @@ public final class InlineTuiRunner implements AutoCloseable {
      * Sets the content height for the next draw.
      * <p>
      * This controls how many terminal lines are allocated for the inline display.
-     * Calling this before rendering allows the display to grow or shrink dynamically.
+     * Calling this before rendering allows the display to grow or shrink
+     * dynamically.
      *
-     * @param height the desired content height in lines
+     * @param height
+     *            the desired content height in lines
      */
     public void setContentHeight(int height) {
         viewport.setContentHeight(height);
@@ -275,10 +286,11 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Executes an action on the render thread.
      * <p>
-     * If called from the render thread, the action is executed immediately.
-     * If called from another thread, the action is queued for execution.
+     * If called from the render thread, the action is executed immediately. If
+     * called from another thread, the action is queued for execution.
      *
-     * @param action the action to execute
+     * @param action
+     *            the action to execute
      */
     public void runOnRenderThread(Runnable action) {
         if (RenderThread.isRenderThread()) {
@@ -291,10 +303,11 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Queues an action to be executed on the render thread.
      * <p>
-     * Unlike {@link #runOnRenderThread(Runnable)}, this method always queues
-     * the action even if called from the render thread.
+     * Unlike {@link #runOnRenderThread(Runnable)}, this method always queues the
+     * action even if called from the render thread.
      *
-     * @param action the action to execute
+     * @param action
+     *            the action to execute
      */
     public void runLater(Runnable action) {
         eventQueue.offer(new UiRunnable(action));
@@ -337,7 +350,8 @@ public final class InlineTuiRunner implements AutoCloseable {
     /**
      * Draws the UI using the given renderer.
      *
-     * @param renderer the render function
+     * @param renderer
+     *            the render function
      */
     public void draw(Consumer<Frame> renderer) {
         viewport.draw(renderer);

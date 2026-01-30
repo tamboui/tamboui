@@ -4,23 +4,24 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.mapCopyOf;
-
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.mapCopyOf;
+
 /**
  * A simple {@link DateStyler} implementation backed by a {@link HashMap}.
  * <p>
- * Allows storing styles for specific dates and retrieving them during
- * calendar rendering.
+ * Allows storing styles for specific dates and retrieving them during calendar
+ * rendering.
  *
  * <pre>{@code
  * CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.fg(Color.RED).bold())
- *     .add(LocalDate.of(2025, 12, 25), Style.EMPTY.fg(Color.GREEN))
- *     .add(LocalDate.of(2025, 1, 1), Style.EMPTY.fg(Color.YELLOW));
+ *         .add(LocalDate.of(2025, 12, 25), Style.EMPTY.fg(Color.GREEN))
+ *         .add(LocalDate.of(2025, 1, 1), Style.EMPTY.fg(Color.YELLOW));
  *
  * Monthly calendar = Monthly.of(LocalDate.now(), events);
  * }</pre>
@@ -48,7 +49,8 @@ public final class CalendarEventStore implements DateStyler {
     /**
      * Creates an event store with today's date styled.
      *
-     * @param style the style to apply to today's date
+     * @param style
+     *            the style to apply to today's date
      * @return a new event store with today styled
      */
     public static CalendarEventStore today(Style style) {
@@ -58,8 +60,10 @@ public final class CalendarEventStore implements DateStyler {
     /**
      * Adds a date with the specified style.
      *
-     * @param date  the date to style
-     * @param style the style to apply
+     * @param date
+     *            the date to style
+     * @param style
+     *            the style to apply
      * @return this store for chaining
      */
     public CalendarEventStore add(LocalDate date, Style style) {
@@ -71,8 +75,10 @@ public final class CalendarEventStore implements DateStyler {
     /**
      * Adds multiple dates with the same style.
      *
-     * @param style the style to apply
-     * @param dates the dates to style
+     * @param style
+     *            the style to apply
+     * @param dates
+     *            the dates to style
      * @return this store for chaining
      */
     public CalendarEventStore addAll(Style style, LocalDate... dates) {
@@ -86,9 +92,12 @@ public final class CalendarEventStore implements DateStyler {
     /**
      * Adds a range of dates with the specified style.
      *
-     * @param start the start date (inclusive)
-     * @param end   the end date (inclusive)
-     * @param style the style to apply
+     * @param start
+     *            the start date (inclusive)
+     * @param end
+     *            the end date (inclusive)
+     * @param style
+     *            the style to apply
      * @return this store for chaining
      */
     public CalendarEventStore addRange(LocalDate start, LocalDate end, Style style) {
@@ -127,7 +136,8 @@ public final class CalendarEventStore implements DateStyler {
     /**
      * Returns true if the given date has a style.
      *
-     * @param date the date to check
+     * @param date
+     *            the date to check
      * @return {@code true} if the date has a style
      */
     public boolean contains(LocalDate date) {

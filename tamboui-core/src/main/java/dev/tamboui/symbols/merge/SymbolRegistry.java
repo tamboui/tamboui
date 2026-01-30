@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Registry for mapping between Unicode box drawing characters and their BorderSymbol representations.
+ * Registry for mapping between Unicode box drawing characters and their
+ * BorderSymbol representations.
  */
 final class SymbolRegistry {
     private static final Map<String, BorderSymbol> STRING_TO_SYMBOL = new HashMap<>();
@@ -21,14 +22,22 @@ final class SymbolRegistry {
         register("━", LineStyle.THICK, LineStyle.NOTHING, LineStyle.THICK, LineStyle.NOTHING);
         register("│", LineStyle.NOTHING, LineStyle.PLAIN, LineStyle.NOTHING, LineStyle.PLAIN);
         register("┃", LineStyle.NOTHING, LineStyle.THICK, LineStyle.NOTHING, LineStyle.THICK);
-        register("┄", LineStyle.TRIPLE_DASH, LineStyle.NOTHING, LineStyle.TRIPLE_DASH, LineStyle.NOTHING);
-        register("┅", LineStyle.TRIPLE_DASH_THICK, LineStyle.NOTHING, LineStyle.TRIPLE_DASH_THICK, LineStyle.NOTHING);
-        register("┆", LineStyle.NOTHING, LineStyle.TRIPLE_DASH, LineStyle.NOTHING, LineStyle.TRIPLE_DASH);
-        register("┇", LineStyle.NOTHING, LineStyle.TRIPLE_DASH_THICK, LineStyle.NOTHING, LineStyle.TRIPLE_DASH_THICK);
-        register("┈", LineStyle.QUADRUPLE_DASH, LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH, LineStyle.NOTHING);
-        register("┉", LineStyle.QUADRUPLE_DASH_THICK, LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH_THICK, LineStyle.NOTHING);
-        register("┊", LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH, LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH);
-        register("┋", LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH_THICK, LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH_THICK);
+        register("┄", LineStyle.TRIPLE_DASH, LineStyle.NOTHING, LineStyle.TRIPLE_DASH,
+                LineStyle.NOTHING);
+        register("┅", LineStyle.TRIPLE_DASH_THICK, LineStyle.NOTHING, LineStyle.TRIPLE_DASH_THICK,
+                LineStyle.NOTHING);
+        register("┆", LineStyle.NOTHING, LineStyle.TRIPLE_DASH, LineStyle.NOTHING,
+                LineStyle.TRIPLE_DASH);
+        register("┇", LineStyle.NOTHING, LineStyle.TRIPLE_DASH_THICK, LineStyle.NOTHING,
+                LineStyle.TRIPLE_DASH_THICK);
+        register("┈", LineStyle.QUADRUPLE_DASH, LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH,
+                LineStyle.NOTHING);
+        register("┉", LineStyle.QUADRUPLE_DASH_THICK, LineStyle.NOTHING,
+                LineStyle.QUADRUPLE_DASH_THICK, LineStyle.NOTHING);
+        register("┊", LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH, LineStyle.NOTHING,
+                LineStyle.QUADRUPLE_DASH);
+        register("┋", LineStyle.NOTHING, LineStyle.QUADRUPLE_DASH_THICK, LineStyle.NOTHING,
+                LineStyle.QUADRUPLE_DASH_THICK);
         register("┌", LineStyle.PLAIN, LineStyle.NOTHING, LineStyle.NOTHING, LineStyle.PLAIN);
         register("┍", LineStyle.THICK, LineStyle.NOTHING, LineStyle.NOTHING, LineStyle.PLAIN);
         register("┎", LineStyle.PLAIN, LineStyle.NOTHING, LineStyle.NOTHING, LineStyle.THICK);
@@ -93,10 +102,14 @@ final class SymbolRegistry {
         register("╉", LineStyle.PLAIN, LineStyle.THICK, LineStyle.THICK, LineStyle.THICK);
         register("╊", LineStyle.THICK, LineStyle.THICK, LineStyle.PLAIN, LineStyle.THICK);
         register("╋", LineStyle.THICK, LineStyle.THICK, LineStyle.THICK, LineStyle.THICK);
-        register("╌", LineStyle.DOUBLE_DASH, LineStyle.NOTHING, LineStyle.DOUBLE_DASH, LineStyle.NOTHING);
-        register("╍", LineStyle.DOUBLE_DASH_THICK, LineStyle.NOTHING, LineStyle.DOUBLE_DASH_THICK, LineStyle.NOTHING);
-        register("╎", LineStyle.NOTHING, LineStyle.DOUBLE_DASH, LineStyle.NOTHING, LineStyle.DOUBLE_DASH);
-        register("╏", LineStyle.NOTHING, LineStyle.DOUBLE_DASH_THICK, LineStyle.NOTHING, LineStyle.DOUBLE_DASH_THICK);
+        register("╌", LineStyle.DOUBLE_DASH, LineStyle.NOTHING, LineStyle.DOUBLE_DASH,
+                LineStyle.NOTHING);
+        register("╍", LineStyle.DOUBLE_DASH_THICK, LineStyle.NOTHING, LineStyle.DOUBLE_DASH_THICK,
+                LineStyle.NOTHING);
+        register("╎", LineStyle.NOTHING, LineStyle.DOUBLE_DASH, LineStyle.NOTHING,
+                LineStyle.DOUBLE_DASH);
+        register("╏", LineStyle.NOTHING, LineStyle.DOUBLE_DASH_THICK, LineStyle.NOTHING,
+                LineStyle.DOUBLE_DASH_THICK);
         register("═", LineStyle.DOUBLE, LineStyle.NOTHING, LineStyle.DOUBLE, LineStyle.NOTHING);
         register("║", LineStyle.NOTHING, LineStyle.DOUBLE, LineStyle.NOTHING, LineStyle.DOUBLE);
         register("╒", LineStyle.DOUBLE, LineStyle.NOTHING, LineStyle.NOTHING, LineStyle.PLAIN);
@@ -144,7 +157,8 @@ final class SymbolRegistry {
         register("╿", LineStyle.NOTHING, LineStyle.THICK, LineStyle.NOTHING, LineStyle.PLAIN);
     }
 
-    private static void register(String symbol, LineStyle right, LineStyle up, LineStyle left, LineStyle down) {
+    private static void register(String symbol, LineStyle right, LineStyle up, LineStyle left,
+            LineStyle down) {
         BorderSymbol borderSymbol = BorderSymbol.of(right, up, left, down);
         STRING_TO_SYMBOL.put(symbol, borderSymbol);
         SYMBOL_TO_STRING.put(borderSymbol, symbol);
@@ -163,4 +177,3 @@ final class SymbolRegistry {
         return SYMBOL_TO_STRING.containsKey(symbol);
     }
 }
-

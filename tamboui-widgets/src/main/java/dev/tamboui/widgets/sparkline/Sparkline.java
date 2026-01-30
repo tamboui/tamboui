@@ -4,39 +4,34 @@
  */
 package dev.tamboui.widgets.sparkline;
 
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A sparkline widget for displaying data trends in a compact form.
  * <p>
- * Sparklines are small, word-sized graphics that show data trends.
- * Each data point is rendered as a bar using Unicode block characters
- * with varying heights based on the value.
+ * Sparklines are small, word-sized graphics that show data trends. Each data
+ * point is rendered as a bar using Unicode block characters with varying
+ * heights based on the value.
  *
  * <pre>{@code
  * // Simple sparkline with data
- * Sparkline sparkline = Sparkline.builder()
- *     .data(1, 2, 3, 4, 5, 4, 3, 2, 1)
- *     .style(Style.EMPTY.fg(Color.CYAN))
- *     .build();
+ * Sparkline sparkline = Sparkline.builder().data(1, 2, 3, 4, 5, 4, 3, 2, 1)
+ *         .style(Style.EMPTY.fg(Color.CYAN)).build();
  *
  * // With block wrapper and custom max
- * Sparkline sparkline2 = Sparkline.builder()
- *     .data(dataArray)
- *     .max(100)
- *     .block(Block.bordered().title(Title.from("CPU Usage")))
- *     .barSet(Sparkline.BarSet.THREE_LEVELS)
- *     .build();
+ * Sparkline sparkline2 = Sparkline.builder().data(dataArray).max(100)
+ *         .block(Block.bordered().title(Title.from("CPU Usage")))
+ *         .barSet(Sparkline.BarSet.THREE_LEVELS).build();
  * }</pre>
  *
  * @see RenderDirection
@@ -59,15 +54,15 @@ public final class Sparkline implements Widget {
      * <p>
      * Contains Unicode block characters for different fill levels:
      * <ul>
-     *   <li><b>empty</b> - symbol for zero/empty value</li>
-     *   <li><b>oneEighth</b> - symbol for 1/8 fill</li>
-     *   <li><b>oneQuarter</b> - symbol for 1/4 fill</li>
-     *   <li><b>threeEighths</b> - symbol for 3/8 fill</li>
-     *   <li><b>half</b> - symbol for 1/2 fill</li>
-     *   <li><b>fiveEighths</b> - symbol for 5/8 fill</li>
-     *   <li><b>threeQuarters</b> - symbol for 3/4 fill</li>
-     *   <li><b>sevenEighths</b> - symbol for 7/8 fill</li>
-     *   <li><b>full</b> - symbol for full fill</li>
+     * <li><b>empty</b> - symbol for zero/empty value</li>
+     * <li><b>oneEighth</b> - symbol for 1/8 fill</li>
+     * <li><b>oneQuarter</b> - symbol for 1/4 fill</li>
+     * <li><b>threeEighths</b> - symbol for 3/8 fill</li>
+     * <li><b>half</b> - symbol for 1/2 fill</li>
+     * <li><b>fiveEighths</b> - symbol for 5/8 fill</li>
+     * <li><b>threeQuarters</b> - symbol for 3/4 fill</li>
+     * <li><b>sevenEighths</b> - symbol for 7/8 fill</li>
+     * <li><b>full</b> - symbol for full fill</li>
      * </ul>
      */
     public static final class BarSet {
@@ -84,27 +79,28 @@ public final class Sparkline implements Widget {
         /**
          * Creates a new bar set with the given symbols.
          *
-         * @param empty         symbol for zero/empty value
-         * @param oneEighth     symbol for 1/8 fill
-         * @param oneQuarter    symbol for 1/4 fill
-         * @param threeEighths  symbol for 3/8 fill
-         * @param half          symbol for 1/2 fill
-         * @param fiveEighths   symbol for 5/8 fill
-         * @param threeQuarters symbol for 3/4 fill
-         * @param sevenEighths  symbol for 7/8 fill
-         * @param full          symbol for full fill
+         * @param empty
+         *            symbol for zero/empty value
+         * @param oneEighth
+         *            symbol for 1/8 fill
+         * @param oneQuarter
+         *            symbol for 1/4 fill
+         * @param threeEighths
+         *            symbol for 3/8 fill
+         * @param half
+         *            symbol for 1/2 fill
+         * @param fiveEighths
+         *            symbol for 5/8 fill
+         * @param threeQuarters
+         *            symbol for 3/4 fill
+         * @param sevenEighths
+         *            symbol for 7/8 fill
+         * @param full
+         *            symbol for full fill
          */
-        public BarSet(
-            String empty,
-            String oneEighth,
-            String oneQuarter,
-            String threeEighths,
-            String half,
-            String fiveEighths,
-            String threeQuarters,
-            String sevenEighths,
-            String full
-        ) {
+        public BarSet(String empty, String oneEighth, String oneQuarter, String threeEighths,
+                String half, String fiveEighths, String threeQuarters, String sevenEighths,
+                String full) {
             this.empty = empty;
             this.oneEighth = oneEighth;
             this.oneQuarter = oneQuarter;
@@ -116,25 +112,22 @@ public final class Sparkline implements Widget {
             this.full = full;
         }
         /**
-         * Nine-level bar set with fine-grained fill levels.
-         * Uses: ▁▂▃▄▅▆▇█
+         * Nine-level bar set with fine-grained fill levels. Uses: ▁▂▃▄▅▆▇█
          */
-        public static final BarSet NINE_LEVELS = new BarSet(
-            " ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"
-        );
+        public static final BarSet NINE_LEVELS = new BarSet(" ", "▁", "▂", "▃", "▄", "▅", "▆", "▇",
+                "█");
 
         /**
-         * Three-level bar set with coarse fill levels.
-         * Uses: ▄█ (empty, half, full)
+         * Three-level bar set with coarse fill levels. Uses: ▄█ (empty, half, full)
          */
-        public static final BarSet THREE_LEVELS = new BarSet(
-            " ", "▄", "▄", "▄", "▄", "█", "█", "█", "█"
-        );
+        public static final BarSet THREE_LEVELS = new BarSet(" ", "▄", "▄", "▄", "▄", "█", "█", "█",
+                "█");
 
         /**
          * Returns the symbol for the given fill level (0.0 to 1.0).
          *
-         * @param level the fill level between 0.0 and 1.0
+         * @param level
+         *            the fill level between 0.0 and 1.0
          * @return the symbol for the given level
          */
         public String symbolForLevel(double level) {
@@ -255,15 +248,12 @@ public final class Sparkline implements Widget {
                 return false;
             }
             BarSet barSet = (BarSet) o;
-            return empty.equals(barSet.empty)
-                && oneEighth.equals(barSet.oneEighth)
-                && oneQuarter.equals(barSet.oneQuarter)
-                && threeEighths.equals(barSet.threeEighths)
-                && half.equals(barSet.half)
-                && fiveEighths.equals(barSet.fiveEighths)
-                && threeQuarters.equals(barSet.threeQuarters)
-                && sevenEighths.equals(barSet.sevenEighths)
-                && full.equals(barSet.full);
+            return empty.equals(barSet.empty) && oneEighth.equals(barSet.oneEighth)
+                    && oneQuarter.equals(barSet.oneQuarter)
+                    && threeEighths.equals(barSet.threeEighths) && half.equals(barSet.half)
+                    && fiveEighths.equals(barSet.fiveEighths)
+                    && threeQuarters.equals(barSet.threeQuarters)
+                    && sevenEighths.equals(barSet.sevenEighths) && full.equals(barSet.full);
         }
 
         @Override
@@ -283,8 +273,9 @@ public final class Sparkline implements Widget {
         @Override
         public String toString() {
             return String.format(
-                "BarSet[empty=%s, oneEighth=%s, oneQuarter=%s, threeEighths=%s, half=%s, fiveEighths=%s, threeQuarters=%s, sevenEighths=%s, full=%s]",
-                empty, oneEighth, oneQuarter, threeEighths, half, fiveEighths, threeQuarters, sevenEighths, full);
+                    "BarSet[empty=%s, oneEighth=%s, oneQuarter=%s, threeEighths=%s, half=%s, fiveEighths=%s, threeQuarters=%s, sevenEighths=%s, full=%s]",
+                    empty, oneEighth, oneQuarter, threeEighths, half, fiveEighths, threeQuarters,
+                    sevenEighths, full);
         }
     }
 
@@ -324,7 +315,8 @@ public final class Sparkline implements Widget {
     /**
      * Creates a sparkline with the given data values.
      *
-     * @param data the data values
+     * @param data
+     *            the data values
      * @return a new Sparkline
      */
     public static Sparkline from(long... data) {
@@ -334,7 +326,8 @@ public final class Sparkline implements Widget {
     /**
      * Creates a sparkline with the given data values.
      *
-     * @param data the data values
+     * @param data
+     *            the data values
      * @return a new Sparkline
      */
     public static Sparkline from(List<Long> data) {
@@ -367,8 +360,8 @@ public final class Sparkline implements Widget {
         // Determine how many data points to display
         int displayCount = Math.min(data.length, sparklineArea.width());
         int dataOffset = data.length > sparklineArea.width()
-            ? data.length - sparklineArea.width()
-            : 0;
+                ? data.length - sparklineArea.width()
+                : 0;
 
         // Render each bar
         for (int i = 0; i < displayCount; i++) {
@@ -385,8 +378,8 @@ public final class Sparkline implements Widget {
             // In LEFT_TO_RIGHT: data[0] at left (x=0), data[n] at right
             // In RIGHT_TO_LEFT: data[0] at right, data[n] at left
             int x = direction == RenderDirection.LEFT_TO_RIGHT
-                ? sparklineArea.x() + i
-                : sparklineArea.right() - 1 - i;
+                    ? sparklineArea.x() + i
+                    : sparklineArea.right() - 1 - i;
 
             // Render from bottom of area
             int y = sparklineArea.bottom() - 1;
@@ -419,12 +412,14 @@ public final class Sparkline implements Widget {
         // Style-aware properties (resolved via styleResolver in build())
         private Color foreground;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the data values to display.
          *
-         * @param data the data values
+         * @param data
+         *            the data values
          * @return this builder
          */
         public Builder data(long... data) {
@@ -435,7 +430,8 @@ public final class Sparkline implements Widget {
         /**
          * Sets the data values from a list.
          *
-         * @param data the data values
+         * @param data
+         *            the data values
          * @return this builder
          */
         public Builder data(List<Long> data) {
@@ -450,7 +446,8 @@ public final class Sparkline implements Widget {
         /**
          * Sets the data values from an int array.
          *
-         * @param data the data values
+         * @param data
+         *            the data values
          * @return this builder
          */
         public Builder data(int... data) {
@@ -470,7 +467,8 @@ public final class Sparkline implements Widget {
          * <p>
          * If not set, the maximum value in the data is used.
          *
-         * @param max the maximum value
+         * @param max
+         *            the maximum value
          * @return this builder
          */
         public Builder max(long max) {
@@ -491,7 +489,8 @@ public final class Sparkline implements Widget {
         /**
          * Wraps the sparkline in a block.
          *
-         * @param block the block to wrap in
+         * @param block
+         *            the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -502,7 +501,8 @@ public final class Sparkline implements Widget {
         /**
          * Sets the bar symbol set.
          *
-         * @param barSet the bar symbol set
+         * @param barSet
+         *            the bar symbol set
          * @return this builder
          */
         public Builder barSet(BarSet barSet) {
@@ -513,7 +513,8 @@ public final class Sparkline implements Widget {
         /**
          * Sets the render direction.
          *
-         * @param direction the render direction
+         * @param direction
+         *            the render direction
          * @return this builder
          */
         public Builder direction(RenderDirection direction) {
@@ -524,7 +525,8 @@ public final class Sparkline implements Widget {
         /**
          * Sets the style for the sparkline bars.
          *
-         * @param style the bar style
+         * @param style
+         *            the bar style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -535,10 +537,11 @@ public final class Sparkline implements Widget {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code color} will be resolved
-         * if not set programmatically.
+         * When set, properties like {@code color} will be resolved if not set
+         * programmatically.
          *
-         * @param resolver the property resolver
+         * @param resolver
+         *            the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -551,7 +554,8 @@ public final class Sparkline implements Widget {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color the foreground color
+         * @param color
+         *            the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {

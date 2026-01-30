@@ -10,24 +10,26 @@ import java.util.List;
 /**
  * Parses CSS selector strings into {@link Selector} objects.
  * <p>
- * This parser supports the full CSS selector syntax used by the tamboui CSS module:
+ * This parser supports the full CSS selector syntax used by the tamboui CSS
+ * module:
  * <ul>
- *   <li>{@code *} - Universal selector</li>
- *   <li>{@code Type} - Type selector</li>
- *   <li>{@code #id} - ID selector</li>
- *   <li>{@code .class} - Class selector</li>
- *   <li>{@code :pseudo} - Pseudo-class selector</li>
- *   <li>{@code [attr]} - Attribute existence selector</li>
- *   <li>{@code [attr=value]} - Attribute equals selector</li>
- *   <li>{@code [attr^=value]} - Attribute starts-with selector</li>
- *   <li>{@code [attr$=value]} - Attribute ends-with selector</li>
- *   <li>{@code [attr*=value]} - Attribute contains selector</li>
- *   <li>{@code A B} - Descendant combinator</li>
- *   <li>{@code A > B} - Child combinator</li>
- *   <li>{@code A.class#id} - Compound selectors</li>
+ * <li>{@code *} - Universal selector</li>
+ * <li>{@code Type} - Type selector</li>
+ * <li>{@code #id} - ID selector</li>
+ * <li>{@code .class} - Class selector</li>
+ * <li>{@code :pseudo} - Pseudo-class selector</li>
+ * <li>{@code [attr]} - Attribute existence selector</li>
+ * <li>{@code [attr=value]} - Attribute equals selector</li>
+ * <li>{@code [attr^=value]} - Attribute starts-with selector</li>
+ * <li>{@code [attr$=value]} - Attribute ends-with selector</li>
+ * <li>{@code [attr*=value]} - Attribute contains selector</li>
+ * <li>{@code A B} - Descendant combinator</li>
+ * <li>{@code A > B} - Child combinator</li>
+ * <li>{@code A.class#id} - Compound selectors</li>
  * </ul>
  * <p>
  * <b>Usage:</b>
+ * 
  * <pre>{@code
  * Selector selector = SelectorParser.parse(".primary.large");
  * boolean matches = selector.matches(element, state, ancestors);
@@ -46,9 +48,11 @@ public final class SelectorParser {
     /**
      * Parses a CSS selector string into a Selector object.
      *
-     * @param selector the CSS selector string
+     * @param selector
+     *            the CSS selector string
      * @return the parsed Selector
-     * @throws IllegalArgumentException if the selector is invalid
+     * @throws IllegalArgumentException
+     *             if the selector is invalid
      */
     public static Selector parse(String selector) {
         if (selector == null || selector.isEmpty()) {
@@ -144,7 +148,8 @@ public final class SelectorParser {
             pos++;
         }
         if (start == pos) {
-            throw new IllegalArgumentException("Expected class name after '.' at position " + start);
+            throw new IllegalArgumentException(
+                    "Expected class name after '.' at position " + start);
         }
         return new ClassSelector(input.substring(start, pos));
     }
@@ -152,11 +157,13 @@ public final class SelectorParser {
     private Selector parsePseudoClassSelector() {
         pos++; // consume ':'
         int start = pos;
-        while (pos < input.length() && (isIdentChar(input.charAt(pos)) || input.charAt(pos) == '-')) {
+        while (pos < input.length()
+                && (isIdentChar(input.charAt(pos)) || input.charAt(pos) == '-')) {
             pos++;
         }
         if (start == pos) {
-            throw new IllegalArgumentException("Expected pseudo-class name after ':' at position " + start);
+            throw new IllegalArgumentException(
+                    "Expected pseudo-class name after ':' at position " + start);
         }
         String name = input.substring(start, pos);
 
@@ -196,7 +203,8 @@ public final class SelectorParser {
             pos++;
         }
         if (nameStart == pos) {
-            throw new IllegalArgumentException("Expected attribute name after '[' at position " + nameStart);
+            throw new IllegalArgumentException(
+                    "Expected attribute name after '[' at position " + nameStart);
         }
         String attrName = input.substring(nameStart, pos);
 
@@ -236,7 +244,8 @@ public final class SelectorParser {
             value = parseString(c);
         } else {
             int valueStart = pos;
-            while (pos < input.length() && input.charAt(pos) != ']' && !Character.isWhitespace(input.charAt(pos))) {
+            while (pos < input.length() && input.charAt(pos) != ']'
+                    && !Character.isWhitespace(input.charAt(pos))) {
                 pos++;
             }
             value = input.substring(valueStart, pos);

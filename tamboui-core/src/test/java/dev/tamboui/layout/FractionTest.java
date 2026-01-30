@@ -57,8 +57,7 @@ class FractionTest {
     @Test
     @DisplayName("Division by zero throws")
     void divisionByZeroThrows() {
-        assertThatThrownBy(() -> Fraction.of(1, 0))
-                .isInstanceOf(ArithmeticException.class);
+        assertThatThrownBy(() -> Fraction.of(1, 0)).isInstanceOf(ArithmeticException.class);
     }
 
     @Test
@@ -101,8 +100,7 @@ class FractionTest {
     @DisplayName("Division by zero fraction throws")
     void divisionByZeroFractionThrows() {
         Fraction a = Fraction.of(1, 2);
-        assertThatThrownBy(() -> a.divide(Fraction.ZERO))
-                .isInstanceOf(ArithmeticException.class);
+        assertThatThrownBy(() -> a.divide(Fraction.ZERO)).isInstanceOf(ArithmeticException.class);
     }
 
     @Test
@@ -140,7 +138,8 @@ class FractionTest {
     @DisplayName("To double")
     void toDoubleConversion() {
         assertThat(Fraction.of(1, 2).toDouble()).isEqualTo(0.5);
-        assertThat(Fraction.of(1, 3).toDouble()).isCloseTo(0.333333, org.assertj.core.data.Offset.offset(0.00001));
+        assertThat(Fraction.of(1, 3).toDouble()).isCloseTo(0.333333,
+                org.assertj.core.data.Offset.offset(0.00001));
     }
 
     @Test

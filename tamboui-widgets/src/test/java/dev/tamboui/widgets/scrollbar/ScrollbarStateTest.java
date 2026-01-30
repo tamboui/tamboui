@@ -4,8 +4,8 @@
  */
 package dev.tamboui.widgets.scrollbar;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -43,10 +43,8 @@ class ScrollbarStateTest {
     @Test
     @DisplayName("Fluent setters return state for chaining")
     void fluentSetters() {
-        ScrollbarState state = new ScrollbarState()
-            .contentLength(50)
-            .position(10)
-            .viewportContentLength(20);
+        ScrollbarState state = new ScrollbarState().contentLength(50).position(10)
+                .viewportContentLength(20);
 
         assertThat(state.contentLength()).isEqualTo(50);
         assertThat(state.position()).isEqualTo(10);
@@ -170,9 +168,7 @@ class ScrollbarStateTest {
     @Test
     @DisplayName("pageDown uses viewport length")
     void pageDown() {
-        ScrollbarState state = new ScrollbarState(100)
-            .viewportContentLength(10)
-            .position(0);
+        ScrollbarState state = new ScrollbarState(100).viewportContentLength(10).position(0);
 
         state.pageDown();
         assertThat(state.position()).isEqualTo(10);
@@ -181,9 +177,7 @@ class ScrollbarStateTest {
     @Test
     @DisplayName("pageUp uses viewport length")
     void pageUp() {
-        ScrollbarState state = new ScrollbarState(100)
-            .viewportContentLength(10)
-            .position(50);
+        ScrollbarState state = new ScrollbarState(100).viewportContentLength(10).position(50);
 
         state.pageUp();
         assertThat(state.position()).isEqualTo(40);

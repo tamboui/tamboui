@@ -9,16 +9,19 @@ import java.io.Writer;
 import java.util.Locale;
 
 /**
- * Writes Asciinema v2 cast format (newline-delimited JSON).
- * This is an internal API and not part of the public contract.
+ * Writes Asciinema v2 cast format (newline-delimited JSON). This is an internal
+ * API and not part of the public contract.
  *
- * <p>The asciicast v2 format consists of:
+ * <p>
+ * The asciicast v2 format consists of:
  * <ul>
- *   <li>Line 1: JSON header with version, width, height, and optional metadata</li>
- *   <li>Following lines: Event arrays [time, event_type, data]</li>
+ * <li>Line 1: JSON header with version, width, height, and optional
+ * metadata</li>
+ * <li>Following lines: Event arrays [time, event_type, data]</li>
  * </ul>
  *
- * @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2 specification</a>
+ * @see <a href="https://docs.asciinema.org/manual/asciicast/v2/">asciicast v2
+ *      specification</a>
  */
 final class AsciinemaWriter {
 
@@ -29,10 +32,14 @@ final class AsciinemaWriter {
     /**
      * Writes the cast file header.
      *
-     * @param out the writer to write to
-     * @param width terminal width in columns
-     * @param height terminal height in rows
-     * @throws IOException if an I/O error occurs
+     * @param out
+     *            the writer to write to
+     * @param width
+     *            terminal width in columns
+     * @param height
+     *            terminal height in rows
+     * @throws IOException
+     *             if an I/O error occurs
      */
     static void writeHeader(Writer out, int width, int height) throws IOException {
         long timestamp = System.currentTimeMillis() / 1000;
@@ -44,20 +51,26 @@ final class AsciinemaWriter {
     /**
      * Writes an output event to the cast file.
      *
-     * @param out the writer to write to
-     * @param timeSeconds time offset in seconds from the start of the recording
-     * @param data the terminal output data (may contain ANSI escape sequences)
-     * @throws IOException if an I/O error occurs
+     * @param out
+     *            the writer to write to
+     * @param timeSeconds
+     *            time offset in seconds from the start of the recording
+     * @param data
+     *            the terminal output data (may contain ANSI escape sequences)
+     * @throws IOException
+     *             if an I/O error occurs
      */
     static void writeOutputEvent(Writer out, double timeSeconds, String data) throws IOException {
-        out.write(String.format(Locale.US, "[%.6f, \"o\", \"%s\"]%n", timeSeconds, escapeJsonString(data)));
+        out.write(String.format(Locale.US, "[%.6f, \"o\", \"%s\"]%n", timeSeconds,
+                escapeJsonString(data)));
     }
 
     /**
-     * Escapes a string for use in JSON.
-     * Handles special characters, control codes, and Unicode.
+     * Escapes a string for use in JSON. Handles special characters, control codes,
+     * and Unicode.
      *
-     * @param s the string to escape
+     * @param s
+     *            the string to escape
      * @return the escaped string (without surrounding quotes)
      */
     static String escapeJsonString(String s) {
@@ -65,28 +78,28 @@ final class AsciinemaWriter {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             switch (c) {
-                case '"':
+                case '"' :
                     sb.append("\\\"");
                     break;
-                case '\\':
+                case '\\' :
                     sb.append("\\\\");
                     break;
-                case '\b':
+                case '\b' :
                     sb.append("\\b");
                     break;
-                case '\f':
+                case '\f' :
                     sb.append("\\f");
                     break;
-                case '\n':
+                case '\n' :
                     sb.append("\\n");
                     break;
-                case '\r':
+                case '\r' :
                     sb.append("\\r");
                     break;
-                case '\t':
+                case '\t' :
                     sb.append("\\t");
                     break;
-                default:
+                default :
                     if (c < 0x20) {
                         // Control character - use Unicode escape
                         sb.append(String.format("\\u%04x", (int) c));

@@ -4,11 +4,11 @@
  */
 package dev.tamboui.tui.event;
 
-import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-
 import java.util.Optional;
+
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 
 /**
  * Represents a mouse input event.
@@ -50,40 +50,40 @@ public final class MouseEvent implements Event {
     /**
      * Creates a mouse event with the default bindings.
      *
-     * @param kind      kind of mouse event
-     * @param button    button involved (or {@link MouseButton#NONE})
-     * @param x         x coordinate (0-based)
-     * @param y         y coordinate (0-based)
-     * @param modifiers keyboard modifiers active during the event
+     * @param kind
+     *            kind of mouse event
+     * @param button
+     *            button involved (or {@link MouseButton#NONE})
+     * @param x
+     *            x coordinate (0-based)
+     * @param y
+     *            y coordinate (0-based)
+     * @param modifiers
+     *            keyboard modifiers active during the event
      */
-    public MouseEvent(
-        MouseEventKind kind,
-        MouseButton button,
-        int x,
-        int y,
-        KeyModifiers modifiers
-    ) {
+    public MouseEvent(MouseEventKind kind, MouseButton button, int x, int y,
+            KeyModifiers modifiers) {
         this(kind, button, x, y, modifiers, BindingSets.defaults());
     }
 
     /**
      * Creates a mouse event with specific bindings.
      *
-     * @param kind      kind of mouse event
-     * @param button    button involved (or {@link MouseButton#NONE})
-     * @param x         x coordinate (0-based)
-     * @param y         y coordinate (0-based)
-     * @param modifiers keyboard modifiers active during the event
-     * @param bindings  the bindings for semantic action matching
+     * @param kind
+     *            kind of mouse event
+     * @param button
+     *            button involved (or {@link MouseButton#NONE})
+     * @param x
+     *            x coordinate (0-based)
+     * @param y
+     *            y coordinate (0-based)
+     * @param modifiers
+     *            keyboard modifiers active during the event
+     * @param bindings
+     *            the bindings for semantic action matching
      */
-    public MouseEvent(
-        MouseEventKind kind,
-        MouseButton button,
-        int x,
-        int y,
-        KeyModifiers modifiers,
-        Bindings bindings
-    ) {
+    public MouseEvent(MouseEventKind kind, MouseButton button, int x, int y, KeyModifiers modifiers,
+            Bindings bindings) {
         this.kind = kind;
         this.button = button;
         this.x = x;
@@ -95,9 +95,12 @@ public final class MouseEvent implements Event {
     /**
      * Creates a mouse press event.
      *
-     * @param button button pressed
-     * @param x      x coordinate
-     * @param y      y coordinate
+     * @param button
+     *            button pressed
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
      * @return mouse event
      */
     public static MouseEvent press(MouseButton button, int x, int y) {
@@ -107,10 +110,14 @@ public final class MouseEvent implements Event {
     /**
      * Creates a mouse press event with specific bindings.
      *
-     * @param button   button pressed
-     * @param x        x coordinate
-     * @param y        y coordinate
-     * @param bindings the bindings for semantic action matching
+     * @param button
+     *            button pressed
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
+     * @param bindings
+     *            the bindings for semantic action matching
      * @return mouse event
      */
     public static MouseEvent press(MouseButton button, int x, int y, Bindings bindings) {
@@ -120,9 +127,12 @@ public final class MouseEvent implements Event {
     /**
      * Creates a mouse release event.
      *
-     * @param button button released
-     * @param x      x coordinate
-     * @param y      y coordinate
+     * @param button
+     *            button released
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
      * @return mouse event
      */
     public static MouseEvent release(MouseButton button, int x, int y) {
@@ -132,8 +142,10 @@ public final class MouseEvent implements Event {
     /**
      * Creates a mouse move event.
      *
-     * @param x x coordinate
-     * @param y y coordinate
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
      * @return mouse event
      */
     public static MouseEvent move(int x, int y) {
@@ -143,9 +155,12 @@ public final class MouseEvent implements Event {
     /**
      * Creates a mouse drag event.
      *
-     * @param button button held during drag
-     * @param x      x coordinate
-     * @param y      y coordinate
+     * @param button
+     *            button held during drag
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
      * @return mouse event
      */
     public static MouseEvent drag(MouseButton button, int x, int y) {
@@ -155,8 +170,10 @@ public final class MouseEvent implements Event {
     /**
      * Creates a scroll up event.
      *
-     * @param x x coordinate
-     * @param y y coordinate
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
      * @return mouse event
      */
     public static MouseEvent scrollUp(int x, int y) {
@@ -166,12 +183,15 @@ public final class MouseEvent implements Event {
     /**
      * Creates a scroll down event.
      *
-     * @param x x coordinate
-     * @param y y coordinate
+     * @param x
+     *            x coordinate
+     * @param y
+     *            y coordinate
      * @return mouse event
      */
     public static MouseEvent scrollDown(int x, int y) {
-        return new MouseEvent(MouseEventKind.SCROLL_DOWN, MouseButton.NONE, x, y, KeyModifiers.NONE);
+        return new MouseEvent(MouseEventKind.SCROLL_DOWN, MouseButton.NONE, x, y,
+                KeyModifiers.NONE);
     }
 
     /**
@@ -276,9 +296,12 @@ public final class MouseEvent implements Event {
     // ========== Semantic Action Methods (delegating to bindings) ==========
 
     /**
-     * Returns true if this event matches the given action in the configured bindings.
+     * Returns true if this event matches the given action in the configured
+     * bindings.
      *
-     * @param action the action to check (use {@link Actions} constants or custom strings)
+     * @param action
+     *            the action to check (use {@link Actions} constants or custom
+     *            strings)
      * @return true if this event triggers the action
      */
     public boolean matches(String action) {
@@ -295,7 +318,8 @@ public final class MouseEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "click" event (left mouse press) according to the bindings.
+     * Returns true if this is a "click" event (left mouse press) according to the
+     * bindings.
      *
      * @return true if this event triggers the click action
      */
@@ -321,11 +345,8 @@ public final class MouseEvent implements Event {
             return false;
         }
         MouseEvent that = (MouseEvent) o;
-        return x == that.x
-            && y == that.y
-            && kind == that.kind
-            && button == that.button
-            && modifiers.equals(that.modifiers);
+        return x == that.x && y == that.y && kind == that.kind && button == that.button
+                && modifiers.equals(that.modifiers);
     }
 
     @Override
@@ -340,13 +361,7 @@ public final class MouseEvent implements Event {
 
     @Override
     public String toString() {
-        return String.format(
-            "MouseEvent[kind=%s, button=%s, x=%d, y=%d, modifiers=%s]",
-            kind,
-            button,
-            x,
-            y,
-            modifiers
-        );
+        return String.format("MouseEvent[kind=%s, button=%s, x=%d, y=%d, modifiers=%s]", kind,
+                button, x, y, modifiers);
     }
 }

@@ -11,15 +11,20 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.EnumSet;
+
 import dev.tamboui.image.Image;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
-import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
+import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
-import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
+import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.internal.record.RecordingBackend;
@@ -40,20 +45,15 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.EnumSet;
-
 /**
  * Demo TUI application showcasing image rendering capabilities.
  * <p>
  * Demonstrates:
  * <ul>
- *   <li>Terminal capability detection</li>
- *   <li>Image rendering with half-block and Braille protocols</li>
- *   <li>Scaling modes (FIT, FILL, STRETCH, NONE)</li>
- *   <li>Protocol switching via keyboard</li>
+ * <li>Terminal capability detection</li>
+ * <li>Image rendering with half-block and Braille protocols</li>
+ * <li>Scaling modes (FIT, FILL, STRETCH, NONE)</li>
+ * <li>Protocol switching via keyboard</li>
  * </ul>
  */
 public class ImageDemo {
@@ -78,8 +78,11 @@ public class ImageDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         var customImagePath = args.length > 0 ? args[0] : null;
@@ -89,10 +92,8 @@ public class ImageDemo {
     private ImageDemo(String customImagePath) throws IOException {
         try (var backend = BackendFactory.create()) {
             if (backend instanceof RecordingBackend) {
-                this.capabilities = TerminalImageCapabilities.withSupport(EnumSet.of(
-                        TerminalImageProtocol.HALF_BLOCK,
-                        TerminalImageProtocol.BRAILLE
-                ));
+                this.capabilities = TerminalImageCapabilities.withSupport(EnumSet
+                        .of(TerminalImageProtocol.HALF_BLOCK, TerminalImageProtocol.BRAILLE));
             } else {
                 this.capabilities = TerminalImageCapabilities.detect();
             }
@@ -112,9 +113,10 @@ public class ImageDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (var backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -143,47 +145,47 @@ public class ImageDemo {
         var previousProtocol = currentProtocol;
 
         switch (c) {
-            case 'q':
-            case 'Q':
-            case 3: // Ctrl+C
+            case 'q' :
+            case 'Q' :
+            case 3 : // Ctrl+C
                 running = false;
                 break;
-            case '1':
+            case '1' :
                 currentProtocol = HALF_BLOCK;
                 break;
-            case '2':
+            case '2' :
                 currentProtocol = BRAILLE;
                 break;
-            case '3':
+            case '3' :
                 currentProtocol = SIXEL;
                 break;
-            case '4':
+            case '4' :
                 currentProtocol = KITTY;
                 break;
-            case '5':
+            case '5' :
                 currentProtocol = ITERM2;
                 break;
-            case 'f':
+            case 'f' :
                 currentScaling = ImageScaling.FIT;
                 break;
-            case 'i':
+            case 'i' :
                 currentScaling = ImageScaling.FILL;
                 break;
-            case 's':
+            case 's' :
                 currentScaling = ImageScaling.STRETCH;
                 break;
-            case 'n':
+            case 'n' :
                 currentScaling = ImageScaling.NONE;
                 break;
-            case 'a':
-            case 'A':
+            case 'a' :
+            case 'A' :
                 // Auto-detect best protocol
                 currentProtocol = capabilities.bestProtocol();
                 break;
-            case 6: // Ctrl+F - force protocol
+            case 6 : // Ctrl+F - force protocol
                 forceProtocol = true;
                 break;
-            default:
+            default :
                 break;
         }
 
@@ -196,14 +198,11 @@ public class ImageDemo {
     private void ui(Frame frame) {
         var area = frame.area();
 
-        var layout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),   // Header
-                Constraint.length(7),   // Capabilities info
-                Constraint.fill(),      // Image area
-                Constraint.length(4)    // Footer/help
-            )
-            .split(area);
+        var layout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.length(7), // Capabilities info
+                Constraint.fill(), // Image area
+                Constraint.length(4) // Footer/help
+        ).split(area);
 
         renderHeader(frame, layout.get(0));
         renderCapabilities(frame, layout.get(1));
@@ -212,17 +211,11 @@ public class ImageDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        var headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Image Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        var headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("Image Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -232,59 +225,56 @@ public class ImageDemo {
 
         var titleLine = Line.from(Span.raw(" Terminal Capabilities ").bold().green());
 
-        var detectedLine = Line.from(
-            Span.raw("  Best detected: ").dim(),
-            supportSpan(best)
-        );
+        var detectedLine = Line.from(Span.raw("  Best detected: ").dim(), supportSpan(best));
 
-        var supportLine = Line.from(
-            Span.raw("  Supported: ").dim(),
-            capabilities.supports(TerminalImageProtocol.KITTY) ? Span.raw("Kitty ").green() : Span.raw("Kitty ").dim(),
-            capabilities.supports(TerminalImageProtocol.ITERM2) ? Span.raw("iTerm2 ").green() : Span.raw("iTerm2 ").dim(),
-            capabilities.supports(TerminalImageProtocol.SIXEL) ? Span.raw("Sixel ").green() : Span.raw("Sixel ").dim(),
-            capabilities.supports(TerminalImageProtocol.HALF_BLOCK) ? Span.raw("Half-Block ").green() : Span.raw("Half-Block ").dim(),
-            capabilities.supports(TerminalImageProtocol.BRAILLE) ? Span.raw("Braille ").green() : Span.raw("Braille ").dim()
-        );
+        var supportLine = Line.from(Span.raw("  Supported: ").dim(),
+                capabilities.supports(TerminalImageProtocol.KITTY)
+                        ? Span.raw("Kitty ").green()
+                        : Span.raw("Kitty ").dim(),
+                capabilities.supports(TerminalImageProtocol.ITERM2)
+                        ? Span.raw("iTerm2 ").green()
+                        : Span.raw("iTerm2 ").dim(),
+                capabilities.supports(TerminalImageProtocol.SIXEL)
+                        ? Span.raw("Sixel ").green()
+                        : Span.raw("Sixel ").dim(),
+                capabilities.supports(TerminalImageProtocol.HALF_BLOCK)
+                        ? Span.raw("Half-Block ").green()
+                        : Span.raw("Half-Block ").dim(),
+                capabilities.supports(TerminalImageProtocol.BRAILLE)
+                        ? Span.raw("Braille ").green()
+                        : Span.raw("Braille ").dim());
 
-        var currentLine = Line.from(
-            Span.raw("  Current protocol: ").dim(),
-            Span.raw(currentProtocol.name()).bold().yellow(),
-            Span.raw(" (").dim(),
-            Span.raw(currentProtocol.resolution().widthMultiplier() + "x" +
-                currentProtocol.resolution().heightMultiplier()).cyan(),
-            Span.raw(" per cell)").dim()
-        );
+        var currentLine = Line.from(Span.raw("  Current protocol: ").dim(),
+                Span.raw(currentProtocol.name()).bold().yellow(), Span.raw(" (").dim(),
+                Span.raw(currentProtocol.resolution().widthMultiplier() + "x"
+                        + currentProtocol.resolution().heightMultiplier()).cyan(),
+                Span.raw(" per cell)").dim());
 
-        var scalingLine = Line.from(
-            Span.raw("  Scaling mode: ").dim(),
-            Span.raw(currentScaling.name()).bold().magenta()
-        );
+        var scalingLine = Line.from(Span.raw("  Scaling mode: ").dim(),
+                Span.raw(currentScaling.name()).bold().magenta());
 
         var info = Paragraph.builder()
-            .text(Text.from(titleLine, detectedLine, supportLine, currentLine, scalingLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.GREEN))
-                .build())
-            .build();
+                .text(Text.from(titleLine, detectedLine, supportLine, currentLine, scalingLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.GREEN)).build())
+                .build();
 
         frame.renderWidget(info, area);
     }
 
     private Span supportSpan(TerminalImageProtocol support) {
         switch (support) {
-            case KITTY:
+            case KITTY :
                 return Span.raw("Kitty Graphics").bold().green();
-            case ITERM2:
+            case ITERM2 :
                 return Span.raw("iTerm2 Inline Images").bold().green();
-            case SIXEL:
+            case SIXEL :
                 return Span.raw("Sixel Graphics").bold().green();
-            case HALF_BLOCK:
+            case HALF_BLOCK :
                 return Span.raw("Half-Block (Unicode)").yellow();
-            case BRAILLE:
+            case BRAILLE :
                 return Span.raw("Braille (Unicode)").yellow();
-            default:
+            default :
                 return Span.raw("None").red();
         }
     }
@@ -296,86 +286,53 @@ public class ImageDemo {
             return;
         }
 
-        var image = Image.builder()
-            .data(imageData)
-            .scaling(currentScaling)
-            .protocol(currentProtocol)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.BLUE))
-                .title(Title.from(Line.from(Span.raw(" " + imageTitle + " ").blue())))
-                .build())
-            .build();
+        var image = Image.builder().data(imageData).scaling(currentScaling)
+                .protocol(currentProtocol)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.BLUE))
+                        .title(Title.from(Line.from(Span.raw(" " + imageTitle + " ").blue())))
+                        .build())
+                .build();
 
         frame.renderWidget(image, area);
     }
 
     private void renderUnsupportedProtocolWarning(Frame frame, Rect area) {
-        var warningLine1 = Line.from(
-            Span.raw("The ").dim(),
-            Span.raw(currentProtocol.name()).bold().yellow(),
-            Span.raw(" protocol is not detected as supported by your terminal.").dim()
-        );
-        var warningLine2 = Line.from(
-            Span.raw("Press ").dim(),
-            Span.raw("Ctrl+F").bold().cyan(),
-            Span.raw(" to force using it anyway.").dim()
-        );
+        var warningLine1 = Line.from(Span.raw("The ").dim(),
+                Span.raw(currentProtocol.name()).bold().yellow(),
+                Span.raw(" protocol is not detected as supported by your terminal.").dim());
+        var warningLine2 = Line.from(Span.raw("Press ").dim(), Span.raw("Ctrl+F").bold().cyan(),
+                Span.raw(" to force using it anyway.").dim());
 
         var warning = Paragraph.builder()
-            .text(Text.from(Line.empty(), warningLine1, Line.empty(), warningLine2))
-            .centered()
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.YELLOW))
-                .title(Title.from(Line.from(Span.raw(" " + imageTitle + " ").blue())))
-                .build())
-            .build();
+                .text(Text.from(Line.empty(), warningLine1, Line.empty(), warningLine2)).centered()
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.YELLOW))
+                        .title(Title.from(Line.from(Span.raw(" " + imageTitle + " ").blue())))
+                        .build())
+                .build();
 
         frame.renderWidget(warning, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        var helpLine1 = Line.from(
-            Span.raw(" Protocol: ").dim(),
-            Span.raw("1").bold().yellow(),
-            Span.raw(" Half-Block ").dim(),
-            Span.raw("2").bold().yellow(),
-            Span.raw(" Braille ").dim(),
-            Span.raw("3").bold().yellow(),
-            Span.raw(" Sixel ").dim(),
-            Span.raw("4").bold().yellow(),
-            Span.raw(" Kitty ").dim(),
-            Span.raw("5").bold().yellow(),
-            Span.raw(" iTerm2 ").dim(),
-            Span.raw("a").bold().yellow(),
-            Span.raw(" Auto").dim()
-        );
+        var helpLine1 = Line.from(Span.raw(" Protocol: ").dim(), Span.raw("1").bold().yellow(),
+                Span.raw(" Half-Block ").dim(), Span.raw("2").bold().yellow(),
+                Span.raw(" Braille ").dim(), Span.raw("3").bold().yellow(),
+                Span.raw(" Sixel ").dim(), Span.raw("4").bold().yellow(), Span.raw(" Kitty ").dim(),
+                Span.raw("5").bold().yellow(), Span.raw(" iTerm2 ").dim(),
+                Span.raw("a").bold().yellow(), Span.raw(" Auto").dim());
 
-        var helpLine2 = Line.from(
-            Span.raw(" Scaling: ").dim(),
-            Span.raw("f").bold().yellow(),
-            Span.raw(" Fit  ").dim(),
-            Span.raw("i").bold().yellow(),
-            Span.raw(" Fill  ").dim(),
-            Span.raw("s").bold().yellow(),
-            Span.raw(" Stretch  ").dim(),
-            Span.raw("n").bold().yellow(),
-            Span.raw(" None  ").dim(),
-            Span.raw("q").bold().red(),
-            Span.raw(" Quit").dim()
-        );
+        var helpLine2 = Line.from(Span.raw(" Scaling: ").dim(), Span.raw("f").bold().yellow(),
+                Span.raw(" Fit  ").dim(), Span.raw("i").bold().yellow(), Span.raw(" Fill  ").dim(),
+                Span.raw("s").bold().yellow(), Span.raw(" Stretch  ").dim(),
+                Span.raw("n").bold().yellow(), Span.raw(" None  ").dim(),
+                Span.raw("q").bold().red(), Span.raw(" Quit").dim());
 
-        var footer = Paragraph.builder()
-            .text(Text.from(helpLine1, helpLine2))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        var footer = Paragraph.builder().text(Text.from(helpLine1, helpLine2))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

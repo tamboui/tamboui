@@ -18,4 +18,3 @@ public enum ListDirection {
      */
     BOTTOM_TO_TOP
 }
-

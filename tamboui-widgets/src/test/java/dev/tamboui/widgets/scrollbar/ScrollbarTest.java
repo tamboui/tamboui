@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.scrollbar;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
@@ -11,8 +14,6 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.TestStylePropertyResolver;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -21,9 +22,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Vertical scrollbar renders on right edge")
     void verticalRightRendersOnRightEdge() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .build();
         ScrollbarState state = new ScrollbarState(100).position(0);
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -39,9 +39,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Vertical scrollbar renders on left edge")
     void verticalLeftRendersOnLeftEdge() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_LEFT)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_LEFT)
+                .build();
         ScrollbarState state = new ScrollbarState(100).position(0);
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -56,8 +55,7 @@ class ScrollbarTest {
     @DisplayName("Horizontal scrollbar renders on bottom edge")
     void horizontalBottomRendersOnBottomEdge() {
         Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.HORIZONTAL_BOTTOM)
-            .build();
+                .orientation(ScrollbarOrientation.HORIZONTAL_BOTTOM).build();
         ScrollbarState state = new ScrollbarState(100).position(0);
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -71,9 +69,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Horizontal scrollbar renders on top edge")
     void horizontalTopRendersOnTopEdge() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.HORIZONTAL_TOP)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.HORIZONTAL_TOP)
+                .build();
         ScrollbarState state = new ScrollbarState(100).position(0);
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
@@ -87,9 +84,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Thumb moves with scroll position")
     void thumbMovesWithPosition() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .build();
         Rect area = new Rect(0, 0, 5, 10);
         ScrollbarState state = new ScrollbarState(100).viewportContentLength(10);
 
@@ -109,11 +105,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Scrollbar renders with begin and end symbols")
     void rendersWithBeginEndSymbols() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-            .beginSymbol("↑")
-            .endSymbol("↓")
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .beginSymbol("↑").endSymbol("↓").build();
         ScrollbarState state = new ScrollbarState(100).position(50);
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -127,11 +120,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Scrollbar renders with custom symbols")
     void rendersWithCustomSymbols() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-            .trackSymbol("░")
-            .thumbSymbol("▓")
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .trackSymbol("░").thumbSymbol("▓").build();
         ScrollbarState state = new ScrollbarState(10).position(0);
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -157,9 +147,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Scrollbar with symbol set")
     void withSymbolSet() {
-        Scrollbar scrollbar = Scrollbar.builder()
-            .symbols(Scrollbar.SymbolSet.DOUBLE_VERTICAL)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().symbols(Scrollbar.SymbolSet.DOUBLE_VERTICAL)
+                .build();
         ScrollbarState state = new ScrollbarState(100).position(0);
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -174,10 +163,8 @@ class ScrollbarTest {
     @DisplayName("Scrollbar applies thumb style")
     void appliesThumbStyle() {
         Style thumbStyle = Style.EMPTY.fg(Color.YELLOW);
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-            .thumbStyle(thumbStyle)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .thumbStyle(thumbStyle).build();
         ScrollbarState state = new ScrollbarState(10).position(0);
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -201,10 +188,8 @@ class ScrollbarTest {
     @DisplayName("Scrollbar applies track style")
     void appliesTrackStyle() {
         Style trackStyle = Style.EMPTY.fg(Color.DARK_GRAY);
-        Scrollbar scrollbar = Scrollbar.builder()
-            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-            .trackStyle(trackStyle)
-            .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .trackStyle(trackStyle).build();
         ScrollbarState state = new ScrollbarState(100).position(50);
         Rect area = new Rect(0, 0, 5, 10);
         Buffer buffer = Buffer.empty(area);
@@ -323,10 +308,8 @@ class ScrollbarTest {
     @Test
     @DisplayName("Scrollbar uses THUMB_COLOR property from StylePropertyResolver")
     void usesThumbColorProperty() {
-        Scrollbar scrollbar = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-                .styleResolver(TestStylePropertyResolver.of("thumb-color", Color.YELLOW))
-                .build();
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                .styleResolver(TestStylePropertyResolver.of("thumb-color", Color.YELLOW)).build();
         ScrollbarState state = new ScrollbarState(10).position(0);
         Rect area = new Rect(0, 0, 5, 5);
         Buffer buffer = Buffer.empty(area);
@@ -347,8 +330,7 @@ class ScrollbarTest {
     @Test
     @DisplayName("Scrollbar uses TRACK_COLOR property from StylePropertyResolver")
     void usesTrackColorProperty() {
-        Scrollbar scrollbar = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+        Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
                 .styleResolver(TestStylePropertyResolver.of("track-color", Color.DARK_GRAY))
                 .build();
         ScrollbarState state = new ScrollbarState(100).position(50);

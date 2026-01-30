@@ -15,7 +15,8 @@ public final class DuplicateConstraintException extends SolverException {
     /**
      * Creates a new exception for the duplicate constraint.
      *
-     * @param constraint the duplicate constraint
+     * @param constraint
+     *            the duplicate constraint
      */
     public DuplicateConstraintException(CassowaryConstraint constraint) {
         super("Constraint already exists in solver: " + constraint);

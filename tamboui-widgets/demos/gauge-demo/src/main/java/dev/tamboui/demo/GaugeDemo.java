@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -28,9 +30,6 @@ import dev.tamboui.widgets.gauge.Gauge;
 import dev.tamboui.widgets.gauge.LineGauge;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Demo TUI application showcasing Gauge and LineGauge widgets.
  */
@@ -46,8 +45,11 @@ public class GaugeDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new GaugeDemo().run();
@@ -56,9 +58,10 @@ public class GaugeDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -131,13 +134,10 @@ public class GaugeDemo {
         Rect area = frame.area();
 
         // Split into header, main content, and footer
-        List<Rect> mainLayout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),    // Header
-                Constraint.fill(),       // Main content
-                Constraint.length(3)     // Footer
-            )
-            .split(area);
+        List<Rect> mainLayout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Main content
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, mainLayout.get(0));
         renderMain(frame, mainLayout.get(1));
@@ -145,33 +145,23 @@ public class GaugeDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Gauge Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
+                        Span.raw("Gauge Demo ").yellow())).centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
 
     private void renderMain(Frame frame, Rect area) {
         // Split main area into sections for different gauge styles
-        List<Rect> sections = Layout.vertical()
-            .constraints(
-                Constraint.length(5),  // Basic gauge
-                Constraint.length(5),  // Styled gauge
-                Constraint.length(5),  // Gauge with block
-                Constraint.length(3),  // Line gauges
-                Constraint.fill()      // Info section
-            )
-            .margin(1)
-            .split(area);
+        List<Rect> sections = Layout.vertical().constraints(Constraint.length(5), // Basic gauge
+                Constraint.length(5), // Styled gauge
+                Constraint.length(5), // Gauge with block
+                Constraint.length(3), // Line gauges
+                Constraint.fill() // Info section
+        ).margin(1).split(area);
 
         renderBasicGauge(frame, sections.get(0));
         renderStyledGauge(frame, sections.get(1));
@@ -181,14 +171,8 @@ public class GaugeDemo {
     }
 
     private void renderBasicGauge(Frame frame, Rect area) {
-        Gauge gauge = Gauge.builder()
-            .percent(progress)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .title("Basic Gauge")
-                .build())
-            .build();
+        Gauge gauge = Gauge.builder().percent(progress).block(Block.builder().borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED).title("Basic Gauge").build()).build();
 
         frame.renderWidget(gauge, area);
     }
@@ -204,111 +188,67 @@ public class GaugeDemo {
             gaugeColor = Color.GREEN;
         }
 
-        Gauge gauge = Gauge.builder()
-            .percent(progress)
-            .label(String.format("Progress: %d%%", progress))
-            .gaugeStyle(Style.EMPTY.fg(gaugeColor).bg(Color.DARK_GRAY))
-            .style(Style.EMPTY.bg(Color.BLACK))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(gaugeColor))
-                .title(Title.from(
-                    Line.from(Span.raw("Styled Gauge ").fg(gaugeColor))
-                ))
-                .build())
-            .build();
+        Gauge gauge = Gauge.builder().percent(progress)
+                .label(String.format("Progress: %d%%", progress))
+                .gaugeStyle(Style.EMPTY.fg(gaugeColor).bg(Color.DARK_GRAY))
+                .style(Style.EMPTY.bg(Color.BLACK))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(gaugeColor))
+                        .title(Title.from(Line.from(Span.raw("Styled Gauge ").fg(gaugeColor))))
+                        .build())
+                .build();
 
         frame.renderWidget(gauge, area);
     }
 
     private void renderGaugeWithBlock(Frame frame, Rect area) {
         // Multiple gauges in horizontal layout
-        List<Rect> gaugeAreas = Layout.horizontal()
-            .constraints(
-                Constraint.percentage(33),
-                Constraint.percentage(33),
-                Constraint.percentage(34)
-            )
-            .split(area);
+        List<Rect> gaugeAreas = Layout.horizontal().constraints(Constraint.percentage(33),
+                Constraint.percentage(33), Constraint.percentage(34)).split(area);
 
         // Download progress
         int downloadProgress = (progress * 2) % 101;
-        Gauge download = Gauge.builder()
-            .percent(downloadProgress)
-            .label("Download")
-            .gaugeStyle(Style.EMPTY.fg(Color.BLUE))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .title("Downloads")
-                .build())
-            .build();
+        Gauge download = Gauge.builder().percent(downloadProgress).label("Download")
+                .gaugeStyle(Style.EMPTY.fg(Color.BLUE))
+                .block(Block.builder().borders(Borders.ALL).title("Downloads").build()).build();
         frame.renderWidget(download, gaugeAreas.get(0));
 
         // Upload progress
         int uploadProgress = (progress * 3) % 101;
-        Gauge upload = Gauge.builder()
-            .percent(uploadProgress)
-            .label("Upload")
-            .gaugeStyle(Style.EMPTY.fg(Color.MAGENTA))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .title("Uploads")
-                .build())
-            .build();
+        Gauge upload = Gauge.builder().percent(uploadProgress).label("Upload")
+                .gaugeStyle(Style.EMPTY.fg(Color.MAGENTA))
+                .block(Block.builder().borders(Borders.ALL).title("Uploads").build()).build();
         frame.renderWidget(upload, gaugeAreas.get(1));
 
         // CPU usage (inverse)
         int cpuProgress = 100 - progress;
-        Gauge cpu = Gauge.builder()
-            .percent(cpuProgress)
-            .label("CPU: " + cpuProgress + "%")
-            .gaugeStyle(Style.EMPTY.fg(cpuProgress > 80 ? Color.RED : Color.GREEN))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .title("System")
-                .build())
-            .build();
+        Gauge cpu = Gauge.builder().percent(cpuProgress).label("CPU: " + cpuProgress + "%")
+                .gaugeStyle(Style.EMPTY.fg(cpuProgress > 80 ? Color.RED : Color.GREEN))
+                .block(Block.builder().borders(Borders.ALL).title("System").build()).build();
         frame.renderWidget(cpu, gaugeAreas.get(2));
     }
 
     private void renderLineGauges(Frame frame, Rect area) {
         List<Rect> lineAreas = Layout.vertical()
-            .constraints(
-                Constraint.length(1),
-                Constraint.length(1),
-                Constraint.length(1)
-            )
-            .split(area);
+                .constraints(Constraint.length(1), Constraint.length(1), Constraint.length(1))
+                .split(area);
 
         // Normal line gauge
-        LineGauge normal = LineGauge.builder()
-            .percent(progress)
-            .label("Normal:  ")
-            .filledStyle(Style.EMPTY.fg(Color.GREEN))
-            .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-            .lineSet(LineGauge.NORMAL)
-            .build();
+        LineGauge normal = LineGauge.builder().percent(progress).label("Normal:  ")
+                .filledStyle(Style.EMPTY.fg(Color.GREEN))
+                .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY)).lineSet(LineGauge.NORMAL).build();
         frame.renderWidget(normal, lineAreas.get(0));
 
         // Thick line gauge
-        LineGauge thick = LineGauge.builder()
-            .percent(progress)
-            .label("Thick:   ")
-            .filledStyle(Style.EMPTY.fg(Color.CYAN))
-            .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-            .lineSet(LineGauge.THICK)
-            .build();
+        LineGauge thick = LineGauge.builder().percent(progress).label("Thick:   ")
+                .filledStyle(Style.EMPTY.fg(Color.CYAN))
+                .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY)).lineSet(LineGauge.THICK).build();
         frame.renderWidget(thick, lineAreas.get(1));
 
         // Double line gauge
-        LineGauge doubleGauge = LineGauge.builder()
-            .percent(progress)
-            .label("Double:  ")
-            .filledStyle(Style.EMPTY.fg(Color.YELLOW))
-            .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-            .lineSet(LineGauge.DOUBLE)
-            .build();
+        LineGauge doubleGauge = LineGauge.builder().percent(progress).label("Double:  ")
+                .filledStyle(Style.EMPTY.fg(Color.YELLOW))
+                .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY)).lineSet(LineGauge.DOUBLE).build();
         frame.renderWidget(doubleGauge, lineAreas.get(2));
     }
 
@@ -317,43 +257,26 @@ public class GaugeDemo {
         Color modeColor = autoProgress ? Color.GREEN : Color.YELLOW;
 
         Paragraph info = Paragraph.builder()
-            .text(Text.from(Line.from(
-                Span.raw("Progress: ").bold(),
-                Span.raw(progress + "%").cyan(),
-                Span.raw("  |  Mode: "),
-                Span.raw(modeText).fg(modeColor)
-            )))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .title("Status")
-                .build())
-            .build();
+                .text(Text.from(
+                        Line.from(Span.raw("Progress: ").bold(), Span.raw(progress + "%").cyan(),
+                                Span.raw("  |  Mode: "), Span.raw(modeText).fg(modeColor))))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).title("Status").build())
+                .build();
 
         frame.renderWidget(info, area);
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-            Span.raw(" Space").bold().yellow(),
-            Span.raw(" Toggle auto  ").dim(),
-            Span.raw("+/-").bold().yellow(),
-            Span.raw(" Adjust  ").dim(),
-            Span.raw("r").bold().yellow(),
-            Span.raw(" Reset  ").dim(),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" Space").bold().yellow(),
+                Span.raw(" Toggle auto  ").dim(), Span.raw("+/-").bold().yellow(),
+                Span.raw(" Adjust  ").dim(), Span.raw("r").bold().yellow(),
+                Span.raw(" Reset  ").dim(), Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

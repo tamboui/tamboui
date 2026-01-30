@@ -4,6 +4,13 @@
  */
 package dev.tamboui.tfx.toolkit;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.css.cascade.PseudoClassStateProvider;
@@ -15,53 +22,50 @@ import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
 import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.buffer.Buffer;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.StyledSpan;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.RenderThread;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Registry for effects that target specific elements by ID.
  * <p>
  * ElementEffectRegistry manages effects that are associated with element IDs.
- * Effects are stored with their element ID associations, and areas are looked up
- * dynamically each frame from the ElementRegistry. This ensures effects automatically
- * follow their target elements when the terminal resizes.
+ * Effects are stored with their element ID associations, and areas are looked
+ * up dynamically each frame from the ElementRegistry. This ensures effects
+ * automatically follow their target elements when the terminal resizes.
  * <p>
  * <b>Design Philosophy:</b>
  * <ul>
- *   <li><b>Dynamic Area Lookup:</b> Effect areas are looked up each frame, so effects
- *       automatically follow elements when they move or resize</li>
- *   <li><b>render thread:</b> All mutating operations must be called from the render thread</li>
- *   <li><b>No Coupling:</b> Does not require Element interface changes</li>
+ * <li><b>Dynamic Area Lookup:</b> Effect areas are looked up each frame, so
+ * effects automatically follow elements when they move or resize</li>
+ * <li><b>render thread:</b> All mutating operations must be called from the
+ * render thread</li>
+ * <li><b>No Coupling:</b> Does not require Element interface changes</li>
  * </ul>
  * <p>
  * <b>Supported Pseudo-Classes:</b>
  * <ul>
- *   <li>{@code :focus} - Matches elements that have focus (via FocusManager)</li>
+ * <li>{@code :focus} - Matches elements that have focus (via FocusManager)</li>
  * </ul>
  * <p>
  * <b>Limitations - Pseudo-classes NOT supported for effects:</b>
  * <ul>
- *   <li>{@code :hover} - No mouse hover tracking in TUI</li>
- *   <li>{@code :disabled}, {@code :selected}, {@code :active} - Element state not tracked post-render</li>
- *   <li>{@code :first-child}, {@code :last-child}, {@code :nth-child()} - Sibling position not tracked</li>
+ * <li>{@code :hover} - No mouse hover tracking in TUI</li>
+ * <li>{@code :disabled}, {@code :selected}, {@code :active} - Element state not
+ * tracked post-render</li>
+ * <li>{@code :first-child}, {@code :last-child}, {@code :nth-child()} - Sibling
+ * position not tracked</li>
  * </ul>
  * <p>
- * Note: These pseudo-classes work for CSS styling during render (via {@code childStyle()})
- * but are not available for effect targeting because element state and position are not
- * preserved in the ElementRegistry after rendering.
+ * Note: These pseudo-classes work for CSS styling during render (via
+ * {@code childStyle()}) but are not available for effect targeting because
+ * element state and position are not preserved in the ElementRegistry after
+ * rendering.
  * <p>
  * <b>Usage:</b>
+ * 
  * <pre>{@code
  * ElementEffectRegistry registry = new ElementEffectRegistry();
  *
@@ -85,7 +89,8 @@ public final class ElementEffectRegistry {
     private final List<SelectorEffect> pendingSelectors = new ArrayList<>();
     private final Map<SelectorEffect, List<Effect>> selectorEffects = new LinkedHashMap<>();
 
-    // Styled area effects: keep selector→effects mapping (areas re-queried each frame)
+    // Styled area effects: keep selector→effects mapping (areas re-queried each
+    // frame)
     private final Map<SelectorEffect, List<Effect>> styledAreaEffects = new LinkedHashMap<>();
 
     // Global effects don't need element lookup
@@ -121,8 +126,10 @@ public final class ElementEffectRegistry {
      * <p>
      * Must be called from the render thread.
      *
-     * @param elementId the ID of the target element
-     * @param effect    the effect to add
+     * @param elementId
+     *            the ID of the target element
+     * @param effect
+     *            the effect to add
      */
     public void addEffect(String elementId, Effect effect) {
         RenderThread.checkRenderThread();
@@ -134,9 +141,12 @@ public final class ElementEffectRegistry {
      * <p>
      * Convenience method that extracts the element's ID.
      *
-     * @param element the target element
-     * @param effect  the effect to add
-     * @throws IllegalArgumentException if the element has no ID
+     * @param element
+     *            the target element
+     * @param effect
+     *            the effect to add
+     * @throws IllegalArgumentException
+     *             if the element has no ID
      */
     public void addEffect(Element element, Effect effect) {
         String id = element.id();
@@ -150,22 +160,24 @@ public final class ElementEffectRegistry {
      * Adds an effect that targets elements matching a CSS-like selector.
      * <p>
      * The effect will be applied to all elements matching the selector when
-     * {@link #expandSelectors(ElementRegistry)} is called. Each matching
-     * element receives a copy of the effect.
+     * {@link #expandSelectors(ElementRegistry)} is called. Each matching element
+     * receives a copy of the effect.
      * <p>
      * Must be called from the render thread.
      * <p>
      * Supported selectors:
      * <ul>
-     *   <li>{@code #id} - matches element by ID</li>
-     *   <li>{@code .class} - matches elements by CSS class</li>
-     *   <li>{@code Type} - matches elements by type name</li>
-     *   <li>{@code Type.class} - combined type and class</li>
-     *   <li>{@code .class1.class2} - multiple classes</li>
+     * <li>{@code #id} - matches element by ID</li>
+     * <li>{@code .class} - matches elements by CSS class</li>
+     * <li>{@code Type} - matches elements by type name</li>
+     * <li>{@code Type.class} - combined type and class</li>
+     * <li>{@code .class1.class2} - multiple classes</li>
      * </ul>
      *
-     * @param selector the CSS-like selector
-     * @param effect   the effect to add (copied for each matching element)
+     * @param selector
+     *            the CSS-like selector
+     * @param effect
+     *            the effect to add (copied for each matching element)
      * @return the number of elements that matched (0 if selector is deferred)
      */
     public int addEffectBySelector(String selector, Effect effect) {
@@ -181,7 +193,8 @@ public final class ElementEffectRegistry {
      * <p>
      * Must be called from the render thread.
      *
-     * @param effect the effect to add
+     * @param effect
+     *            the effect to add
      */
     public void addGlobalEffect(Effect effect) {
         RenderThread.checkRenderThread();
@@ -192,13 +205,14 @@ public final class ElementEffectRegistry {
      * Expands pending selector-based effects to individual effect instances.
      * <p>
      * This method queries the ElementRegistry to find elements matching each
-     * pending selector and creates effect copies for each match. The selector
-     * and its effect instances are then tracked for dynamic area lookup.
+     * pending selector and creates effect copies for each match. The selector and
+     * its effect instances are then tracked for dynamic area lookup.
      * <p>
      * This should be called after rendering completes but before
      * {@link #processEffects(TFxDuration, Buffer, Rect, ElementRegistry, StyledAreaRegistry, FocusManager)}.
      *
-     * @param registry the element registry containing element areas
+     * @param registry
+     *            the element registry containing element areas
      */
     public void expandSelectors(ElementRegistry registry) {
         expandSelectors(registry, null);
@@ -209,24 +223,29 @@ public final class ElementEffectRegistry {
      * <p>
      * This method queries both the ElementRegistry (for elements) and
      * StyledAreaRegistry (for styled spans) to find all targets matching each
-     * pending selector. Effect copies are created for each match and tracked
-     * for dynamic area lookup.
+     * pending selector. Effect copies are created for each match and tracked for
+     * dynamic area lookup.
      * <p>
      * This enables selectors like:
      * <ul>
-     *   <li>{@code .highlight} - matches both elements and spans with class "highlight"</li>
-     *   <li>{@code #myPanel .highlight} - matches spans inside element #myPanel</li>
-     *   <li>{@code Span.error} - matches only styled spans (type "Span")</li>
+     * <li>{@code .highlight} - matches both elements and spans with class
+     * "highlight"</li>
+     * <li>{@code #myPanel .highlight} - matches spans inside element #myPanel</li>
+     * <li>{@code Span.error} - matches only styled spans (type "Span")</li>
      * </ul>
      *
-     * @param elementRegistry    the element registry containing element areas
-     * @param styledAreaRegistry the styled area registry (may be null)
+     * @param elementRegistry
+     *            the element registry containing element areas
+     * @param styledAreaRegistry
+     *            the styled area registry (may be null)
      */
-    public void expandSelectors(ElementRegistry elementRegistry, StyledAreaRegistry styledAreaRegistry) {
+    public void expandSelectors(ElementRegistry elementRegistry,
+            StyledAreaRegistry styledAreaRegistry) {
         RenderThread.checkRenderThread();
         for (SelectorEffect se : pendingSelectors) {
             // Query elements (uses string selector for ElementRegistry API)
-            List<ElementRegistry.ElementInfo> elementMatches = elementRegistry.queryAll(se.selectorStr);
+            List<ElementRegistry.ElementInfo> elementMatches = elementRegistry
+                    .queryAll(se.selectorStr);
             List<Effect> effects = new ArrayList<>();
             for (int i = 0; i < elementMatches.size(); i++) {
                 effects.add(se.effect.copy());
@@ -238,7 +257,8 @@ public final class ElementEffectRegistry {
             // Query styled areas ignoring pseudo-class state to capture potential targets.
             // Actual pseudo-class state is evaluated during processEffects.
             if (styledAreaRegistry != null) {
-                List<StyledSpan> styledMatches = queryStyledAreas(se.selector, styledAreaRegistry, elementRegistry, e -> PseudoClassState.allMatch());
+                List<StyledSpan> styledMatches = queryStyledAreas(se.selector, styledAreaRegistry,
+                        elementRegistry, e -> PseudoClassState.allMatch());
                 if (!styledMatches.isEmpty()) {
                     List<Effect> styledEffects = new ArrayList<>();
                     for (int i = 0; i < styledMatches.size(); i++) {
@@ -254,8 +274,9 @@ public final class ElementEffectRegistry {
     /**
      * Queries styled areas matching a selector with the given state provider.
      */
-    private List<StyledSpan> queryStyledAreas(Selector selector, StyledAreaRegistry styledAreaRegistry,
-                                               ElementRegistry elementRegistry, PseudoClassStateProvider stateProvider) {
+    private List<StyledSpan> queryStyledAreas(Selector selector,
+            StyledAreaRegistry styledAreaRegistry, ElementRegistry elementRegistry,
+            PseudoClassStateProvider stateProvider) {
         List<StyledSpan> matches = new ArrayList<>();
         for (StyledAreaInfo info : styledAreaRegistry.all()) {
             StyledSpan styleable = new StyledSpan(info, elementRegistry);
@@ -299,24 +320,32 @@ public final class ElementEffectRegistry {
     /**
      * Processes all active effects with dynamic area lookup from both registries.
      * <p>
-     * This processes global effects, ID-based effects, selector-based element effects,
-     * and selector-based styled area effects. Areas are looked up dynamically each
-     * frame, so effects automatically follow their targets when they move or resize.
+     * This processes global effects, ID-based effects, selector-based element
+     * effects, and selector-based styled area effects. Areas are looked up
+     * dynamically each frame, so effects automatically follow their targets when
+     * they move or resize.
      * <p>
-     * Pseudo-class selectors like {@code :focus} are supported via the FocusManager.
+     * Pseudo-class selectors like {@code :focus} are supported via the
+     * FocusManager.
      * <p>
      * Effects are automatically removed when complete.
      *
-     * @param delta              the time elapsed since the last frame
-     * @param buffer             the buffer to apply effects to
-     * @param area               the default area for global effects
-     * @param elementRegistry    the element registry for element area lookup
-     * @param styledAreaRegistry the styled area registry
-     * @param focusManager       the focus manager for pseudo-class state
+     * @param delta
+     *            the time elapsed since the last frame
+     * @param buffer
+     *            the buffer to apply effects to
+     * @param area
+     *            the default area for global effects
+     * @param elementRegistry
+     *            the element registry for element area lookup
+     * @param styledAreaRegistry
+     *            the styled area registry
+     * @param focusManager
+     *            the focus manager for pseudo-class state
      */
     public void processEffects(TFxDuration delta, Buffer buffer, Rect area,
-                               ElementRegistry elementRegistry, StyledAreaRegistry styledAreaRegistry,
-                               FocusManager focusManager) {
+            ElementRegistry elementRegistry, StyledAreaRegistry styledAreaRegistry,
+            FocusManager focusManager) {
         // Global effects (no element lookup needed)
         globalEffects.processEffects(delta, buffer, area);
 
@@ -326,7 +355,7 @@ public final class ElementEffectRegistry {
             Map.Entry<String, List<Effect>> entry = idIter.next();
             Rect elementArea = elementRegistry.getArea(entry.getKey());
             if (elementArea == null) {
-                continue;  // Element not rendered yet
+                continue; // Element not rendered yet
             }
 
             processEffectList(entry.getValue(), delta, buffer, elementArea);
@@ -336,10 +365,12 @@ public final class ElementEffectRegistry {
         }
 
         // Selector-based element effects: look up current areas for each instance
-        Iterator<Map.Entry<SelectorEffect, List<Effect>>> selectorIter = selectorEffects.entrySet().iterator();
+        Iterator<Map.Entry<SelectorEffect, List<Effect>>> selectorIter = selectorEffects.entrySet()
+                .iterator();
         while (selectorIter.hasNext()) {
             Map.Entry<SelectorEffect, List<Effect>> entry = selectorIter.next();
-            List<ElementRegistry.ElementInfo> matches = elementRegistry.queryAll(entry.getKey().selectorStr);
+            List<ElementRegistry.ElementInfo> matches = elementRegistry
+                    .queryAll(entry.getKey().selectorStr);
             List<Effect> effects = entry.getValue();
 
             int count = Math.min(matches.size(), effects.size());
@@ -362,11 +393,12 @@ public final class ElementEffectRegistry {
             String focusedId = focusManager != null ? focusManager.focusedId() : null;
             PseudoClassStateProvider stateProvider = createStateProvider(focusedId);
 
-            Iterator<Map.Entry<SelectorEffect, List<Effect>>> styledAreaIter =
-                    styledAreaEffects.entrySet().iterator();
+            Iterator<Map.Entry<SelectorEffect, List<Effect>>> styledAreaIter = styledAreaEffects
+                    .entrySet().iterator();
             while (styledAreaIter.hasNext()) {
                 Map.Entry<SelectorEffect, List<Effect>> entry = styledAreaIter.next();
-                List<StyledSpan> matches = queryStyledAreas(entry.getKey().selector, styledAreaRegistry, elementRegistry, stateProvider);
+                List<StyledSpan> matches = queryStyledAreas(entry.getKey().selector,
+                        styledAreaRegistry, elementRegistry, stateProvider);
                 List<Effect> effects = entry.getValue();
 
                 int count = Math.min(matches.size(), effects.size());
@@ -389,7 +421,8 @@ public final class ElementEffectRegistry {
     /**
      * Processes a list of effects, removing completed ones.
      */
-    private void processEffectList(List<Effect> effects, TFxDuration delta, Buffer buffer, Rect area) {
+    private void processEffectList(List<Effect> effects, TFxDuration delta, Buffer buffer,
+            Rect area) {
         Iterator<Effect> iter = effects.iterator();
         while (iter.hasNext()) {
             Effect effect = iter.next();
@@ -406,11 +439,8 @@ public final class ElementEffectRegistry {
      * @return true if effects are active
      */
     public boolean isRunning() {
-        return globalEffects.isRunning() ||
-               !idEffects.isEmpty() ||
-               !pendingSelectors.isEmpty() ||
-               !selectorEffects.isEmpty() ||
-               !styledAreaEffects.isEmpty();
+        return globalEffects.isRunning() || !idEffects.isEmpty() || !pendingSelectors.isEmpty()
+                || !selectorEffects.isEmpty() || !styledAreaEffects.isEmpty();
     }
 
     /**
@@ -437,7 +467,8 @@ public final class ElementEffectRegistry {
     }
 
     /**
-     * Returns the number of running effects (global + element-targeted + styled-area-targeted).
+     * Returns the number of running effects (global + element-targeted +
+     * styled-area-targeted).
      *
      * @return running effect count
      */

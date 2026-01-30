@@ -6,6 +6,9 @@
  */
 package dev.tamboui.demo.layout;
 
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import dev.tamboui.layout.Flex;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -19,9 +22,6 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.table.TableState;
 
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
@@ -29,7 +29,7 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public final class FormTableDemo {
 
-    private static final String[] TAB_NAMES = { "F1:Form", "F2:Table" };
+    private static final String[] TAB_NAMES = {"F1:Form", "F2:Table"};
     private static final int LABEL_WIDTH = 14;
     private static final AtomicInteger TAB_INDEX = new AtomicInteger(0);
     private static final TableState TABLE_STATE = new TableState();
@@ -46,14 +46,12 @@ public final class FormTableDemo {
     private static final TextInputState SESSIONS = new TextInputState("3 active");
     private static final TextInputState KEYS = new TextInputState("2 registered");
 
-    private static final String[][] TABLE_ROWS = {
-            { "TX-1001", "Open", "Onboarding", "2d", "Low" },
-            { "TX-1002", "In Review", "Billing", "6h", "High" },
-            { "TX-1003", "Blocked", "Security", "1d", "Urgent" },
-            { "TX-1004", "QA", "Integrations", "3d", "Medium" },
-            { "TX-1005", "Scheduled", "Growth", "5d", "Low" },
-            { "TX-1006", "In Progress", "Mobile", "12h", "High" }
-    };
+    private static final String[][] TABLE_ROWS = {{"TX-1001", "Open", "Onboarding", "2d", "Low"},
+            {"TX-1002", "In Review", "Billing", "6h", "High"},
+            {"TX-1003", "Blocked", "Security", "1d", "Urgent"},
+            {"TX-1004", "QA", "Integrations", "3d", "Medium"},
+            {"TX-1005", "Scheduled", "Growth", "5d", "Low"},
+            {"TX-1006", "In Progress", "Mobile", "12h", "High"}};
 
     static {
         TABLE_STATE.select(0);
@@ -64,13 +62,14 @@ public final class FormTableDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        var config = TuiConfig.builder()
-                .tickRate(Duration.ofMillis(100))
-                .build();
+        var config = TuiConfig.builder().tickRate(Duration.ofMillis(100)).build();
 
         try (var runner = ToolkitRunner.create(config)) {
             runner.run(FormTableDemo::renderUI);
@@ -83,15 +82,9 @@ public final class FormTableDemo {
                 ? "Form uses label length + input fill, with nested rows for alignment."
                 : "Table uses length/percent/fill columns. Use Up/Down to move selection.";
 
-        return column(
-                header(tab).length(4),
-                text(" " + hint).dim().length(1),
-                tab == 0 ? renderFormLayout() : renderTableLayout()
-        ).spacing(1)
-         .fill()
-         .focusable()
-         .id("root")
-         .onKeyEvent(FormTableDemo::handleKey);
+        return column(header(tab).length(4), text(" " + hint).dim().length(1),
+                tab == 0 ? renderFormLayout() : renderTableLayout()).spacing(1).fill().focusable()
+                .id("root").onKeyEvent(FormTableDemo::handleKey);
     }
 
     private static EventResult handleKey(KeyEvent event) {
@@ -117,18 +110,10 @@ public final class FormTableDemo {
     }
 
     private static Panel header(int tab) {
-        return panel(() -> column(
-                row(
-                        tab(0, tab),
-                        tab(1, tab)
-                ).spacing(1).length(1),
-                row(
-                        text(" Tabs: [F1/F2] ").dim(),
-                        text(" Focus: [Tab] ").dim(),
-                        text(" Table: [Up/Down] ").dim(),
-                        text(" [Ctrl+C] Quit ").dim()
-                ).length(1)
-        )).rounded().borderColor(Color.DARK_GRAY);
+        return panel(() -> column(row(tab(0, tab), tab(1, tab)).spacing(1).length(1),
+                row(text(" Tabs: [F1/F2] ").dim(), text(" Focus: [Tab] ").dim(),
+                        text(" Table: [Up/Down] ").dim(), text(" [Ctrl+C] Quit ").dim()).length(1)))
+                .rounded().borderColor(Color.DARK_GRAY);
     }
 
     private static Element tab(int index, int current) {
@@ -141,62 +126,42 @@ public final class FormTableDemo {
 
     private static Element renderFormLayout() {
         return column(
-                panel("Profile", column(
-                        formRow("full-name", "Full name", FULL_NAME),
-                        formRow("email", "Email", EMAIL),
-                        formRow("role", "Role", ROLE),
-                        formRow("timezone", "Time zone", TIMEZONE)
-                ).spacing(1))
-                .rounded()
-                .borderColor(Color.CYAN)
-                .fit(),
+                panel("Profile",
+                        column(formRow("full-name", "Full name", FULL_NAME),
+                                formRow("email", "Email", EMAIL), formRow("role", "Role", ROLE),
+                                formRow("timezone", "Time zone", TIMEZONE)).spacing(1))
+                        .rounded().borderColor(Color.CYAN).fit(),
 
-                row(
-                        panel("Preferences", column(
-                                formRow("theme", "Theme", THEME),
+                row(panel("Preferences",
+                        column(formRow("theme", "Theme", THEME),
                                 formRow("density", "Density", DENSITY),
-                                formRow("notifications", "Notifications", NOTIFICATIONS)
-                        ).spacing(1))
-                        .rounded()
-                        .borderColor(Color.GREEN)
-                        .fill(),
+                                formRow("notifications", "Notifications", NOTIFICATIONS))
+                                .spacing(1))
+                        .rounded().borderColor(Color.GREEN).fill(),
 
-                        panel("Security", column(
-                                formRow("2fa", "2FA", TWO_FA),
-                                formRow("sessions", "Sessions", SESSIONS),
-                                formRow("keys", "Keys", KEYS)
-                        ).spacing(1))
-                        .rounded()
-                        .borderColor(Color.YELLOW)
-                        .fill()
-                ).spacing(2).fill(),
+                        panel("Security",
+                                column(formRow("2fa", "2FA", TWO_FA),
+                                        formRow("sessions", "Sessions", SESSIONS),
+                                        formRow("keys", "Keys", KEYS)).spacing(1))
+                                .rounded().borderColor(Color.YELLOW).fill())
+                        .spacing(2).fill(),
 
-                row(
-                        text(" Save ").bold().black().onGreen(),
-                        text(" Cancel ").bold().white().bg(Color.DARK_GRAY)
-                ).spacing(2).flex(Flex.END).length(1)
-        ).spacing(1).fill();
+                row(text(" Save ").bold().black().onGreen(),
+                        text(" Cancel ").bold().white().bg(Color.DARK_GRAY)).spacing(2)
+                        .flex(Flex.END).length(1))
+                .spacing(1).fill();
     }
 
     private static Element formRow(String id, String label, TextInputState state) {
-        return row(
-                text(label).dim().length(LABEL_WIDTH),
-                textInput(state)
-                        .id(id)
-                        .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN)
-                        .fill()
-        ).spacing(1).length(3);
+        return row(text(label).dim().length(LABEL_WIDTH), textInput(state).id(id).rounded()
+                .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN).fill()).spacing(1)
+                .length(3);
     }
 
     private static Element renderTableLayout() {
-        var table = table()
-                .header("Ticket", "Status", "Owner", "Age", "Priority")
-                .widths(length(8), percent(20), fill(2), length(5), length(8))
-                .columnSpacing(1)
-                .state(TABLE_STATE)
-                .highlightSymbol(">> ")
+        var table = table().header("Ticket", "Status", "Owner", "Age", "Priority")
+                .widths(length(8), percent(20), fill(2), length(5), length(8)).columnSpacing(1)
+                .state(TABLE_STATE).highlightSymbol(">> ")
                 .highlightStyle(Style.EMPTY.bg(Color.CYAN).fg(Color.BLACK));
 
         for (String[] row : TABLE_ROWS) {
@@ -204,14 +169,9 @@ public final class FormTableDemo {
         }
 
         return column(
-                panel(() -> table)
-                        .title("Work Queue")
-                        .rounded()
-                        .borderColor(Color.CYAN)
-                        .fill(),
-                text(" Widths: length(8), percent(20), fill(2), length(5), length(8).")
-                        .dim()
-                        .length(1)
-        ).spacing(1).fill();
+                panel(() -> table).title("Work Queue").rounded().borderColor(Color.CYAN).fill(),
+                text(" Widths: length(8), percent(20), fill(2), length(5), length(8).").dim()
+                        .length(1))
+                .spacing(1).fill();
     }
 }

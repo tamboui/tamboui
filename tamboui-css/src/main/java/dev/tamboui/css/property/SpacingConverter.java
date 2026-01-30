@@ -4,19 +4,19 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Padding;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Padding;
 
 /**
  * Converts CSS padding/margin values to Padding objects.
  * <p>
  * Supports the following formats:
  * <ul>
- *   <li>{@code "1"} - uniform padding on all sides</li>
- *   <li>{@code "1 2"} - vertical (top/bottom) and horizontal (left/right)</li>
- *   <li>{@code "1 2 3 4"} - top, right, bottom, left (CSS order)</li>
+ * <li>{@code "1"} - uniform padding on all sides</li>
+ * <li>{@code "1 2"} - vertical (top/bottom) and horizontal (left/right)</li>
+ * <li>{@code "1 2 3 4"} - top, right, bottom, left (CSS order)</li>
  * </ul>
  */
 public final class SpacingConverter implements PropertyConverter<Padding> {
@@ -38,23 +38,23 @@ public final class SpacingConverter implements PropertyConverter<Padding> {
 
         try {
             switch (parts.length) {
-                case 1: {
+                case 1 : {
                     int all = Integer.parseInt(parts[0]);
                     return Optional.of(Padding.uniform(all));
                 }
-                case 2: {
+                case 2 : {
                     int vertical = Integer.parseInt(parts[0]);
                     int horizontal = Integer.parseInt(parts[1]);
                     return Optional.of(Padding.symmetric(vertical, horizontal));
                 }
-                case 4: {
+                case 4 : {
                     int top = Integer.parseInt(parts[0]);
                     int right = Integer.parseInt(parts[1]);
                     int bottom = Integer.parseInt(parts[2]);
                     int left = Integer.parseInt(parts[3]);
                     return Optional.of(new Padding(top, right, bottom, left));
                 }
-                default:
+                default :
                     return Optional.empty();
             }
         } catch (NumberFormatException e) {

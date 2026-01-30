@@ -9,8 +9,8 @@ import java.util.Objects;
 /**
  * Represents a token in the CSS lexer output.
  * <p>
- * Tokens are the building blocks produced by the lexer that the parser
- * uses to construct the CSS AST.
+ * Tokens are the building blocks produced by the lexer that the parser uses to
+ * construct the CSS AST.
  */
 public abstract class Token {
 
@@ -20,7 +20,8 @@ public abstract class Token {
     /**
      * Creates a token at the given source position.
      *
-     * @param position the position in the source
+     * @param position
+     *            the position in the source
      */
     protected Token(Position position) {
         this.position = position;
@@ -37,9 +38,9 @@ public abstract class Token {
     }
 
     /**
-     * Returns whether this token was preceded by whitespace in the source.
-     * This is used to distinguish between compound selectors (Panel.class)
-     * and descendant selectors (Panel Button).
+     * Returns whether this token was preceded by whitespace in the source. This is
+     * used to distinguish between compound selectors (Panel.class) and descendant
+     * selectors (Panel Button).
      *
      * @return {@code true} if preceded by whitespace
      */
@@ -67,8 +68,10 @@ public abstract class Token {
         /**
          * Creates a position with the given line and column.
          *
-         * @param line   the 1-based line number
-         * @param column the 1-based column number
+         * @param line
+         *            the 1-based line number
+         * @param column
+         *            the 1-based column number
          */
         public Position(int line, int column) {
             this.line = line;
@@ -125,8 +128,10 @@ public abstract class Token {
         /**
          * Creates an identifier token.
          *
-         * @param value    the identifier value
-         * @param position the source position
+         * @param value
+         *            the identifier value
+         * @param position
+         *            the source position
          */
         public Ident(String value, Position position) {
             super(position);
@@ -157,8 +162,10 @@ public abstract class Token {
         /**
          * Creates a string token.
          *
-         * @param value    the string value (without quotes)
-         * @param position the source position
+         * @param value
+         *            the string value (without quotes)
+         * @param position
+         *            the source position
          */
         public StringToken(String value, Position position) {
             super(position);
@@ -190,9 +197,12 @@ public abstract class Token {
         /**
          * Creates a number token.
          *
-         * @param value        the numeric value as a string
-         * @param isPercentage whether the number is followed by a percent sign
-         * @param position     the source position
+         * @param value
+         *            the numeric value as a string
+         * @param isPercentage
+         *            whether the number is followed by a percent sign
+         * @param position
+         *            the source position
          */
         public Number(String value, boolean isPercentage, Position position) {
             super(position);
@@ -233,8 +243,10 @@ public abstract class Token {
         /**
          * Creates a hash token.
          *
-         * @param value    the hash value (without the leading #)
-         * @param position the source position
+         * @param value
+         *            the hash value (without the leading #)
+         * @param position
+         *            the source position
          */
         public Hash(String value, Position position) {
             super(position);
@@ -265,8 +277,10 @@ public abstract class Token {
         /**
          * Creates a variable reference token.
          *
-         * @param name     the variable name (without the leading $)
-         * @param position the source position
+         * @param name
+         *            the variable name (without the leading $)
+         * @param position
+         *            the source position
          */
         public Variable(String name, Position position) {
             super(position);
@@ -297,8 +311,10 @@ public abstract class Token {
         /**
          * Creates a delimiter token.
          *
-         * @param value    the delimiter character
-         * @param position the source position
+         * @param value
+         *            the delimiter character
+         * @param position
+         *            the source position
          */
         public Delim(char value, Position position) {
             super(position);
@@ -327,7 +343,8 @@ public abstract class Token {
         /**
          * Creates a colon token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public Colon(Position position) {
             super(position);
@@ -346,7 +363,8 @@ public abstract class Token {
         /**
          * Creates a semicolon token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public Semicolon(Position position) {
             super(position);
@@ -365,7 +383,8 @@ public abstract class Token {
         /**
          * Creates an opening brace token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public OpenBrace(Position position) {
             super(position);
@@ -384,7 +403,8 @@ public abstract class Token {
         /**
          * Creates a closing brace token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public CloseBrace(Position position) {
             super(position);
@@ -403,7 +423,8 @@ public abstract class Token {
         /**
          * Creates an opening parenthesis token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public OpenParen(Position position) {
             super(position);
@@ -422,7 +443,8 @@ public abstract class Token {
         /**
          * Creates a closing parenthesis token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public CloseParen(Position position) {
             super(position);
@@ -441,7 +463,8 @@ public abstract class Token {
         /**
          * Creates a comma token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public Comma(Position position) {
             super(position);
@@ -460,7 +483,8 @@ public abstract class Token {
         /**
          * Creates an opening bracket token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public OpenBracket(Position position) {
             super(position);
@@ -479,7 +503,8 @@ public abstract class Token {
         /**
          * Creates a closing bracket token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public CloseBracket(Position position) {
             super(position);
@@ -492,8 +517,8 @@ public abstract class Token {
     }
 
     /**
-     * Whitespace (spaces, tabs, newlines).
-     * Usually filtered out before parsing but useful for preserving formatting.
+     * Whitespace (spaces, tabs, newlines). Usually filtered out before parsing but
+     * useful for preserving formatting.
      */
     public static final class Whitespace extends Token {
         private final String value;
@@ -501,8 +526,10 @@ public abstract class Token {
         /**
          * Creates a whitespace token.
          *
-         * @param value    the whitespace characters
-         * @param position the source position
+         * @param value
+         *            the whitespace characters
+         * @param position
+         *            the source position
          */
         public Whitespace(String value, Position position) {
             super(position);
@@ -531,7 +558,8 @@ public abstract class Token {
         /**
          * Creates an end-of-file token.
          *
-         * @param position the source position
+         * @param position
+         *            the source position
          */
         public EOF(Position position) {
             super(position);

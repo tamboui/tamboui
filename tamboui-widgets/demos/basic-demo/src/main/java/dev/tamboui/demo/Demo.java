@@ -8,6 +8,10 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -31,26 +35,17 @@ import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Demo TUI application showcasing TamboUI features.
  */
 public class Demo {
 
-    private static final String[] DEFAULT_ITEMS = {
-        "Item 1 - First item in the list",
-        "Item 2 - Second item",
-        "Item 3 - Third item",
-        "Item 4 - Fourth item",
-        "Item 5 - Fifth item"
-    };
+    private static final String[] DEFAULT_ITEMS = {"Item 1 - First item in the list",
+            "Item 2 - Second item", "Item 3 - Third item", "Item 4 - Fourth item",
+            "Item 5 - Fifth item"};
 
     private enum FocusedWidget {
-        LIST,
-        INPUT
+        LIST, INPUT
     }
 
     private boolean running = true;
@@ -66,8 +61,11 @@ public class Demo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new Demo().run();
@@ -76,9 +74,10 @@ public class Demo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
+    public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
             backend.enableRawMode();
             backend.enterAlternateScreen();
@@ -88,7 +87,7 @@ public class Demo {
 
             // Handle resize
             backend.onResize(() -> {
-                    terminal.draw(this::ui);
+                terminal.draw(this::ui);
             });
 
             // Select first item
@@ -276,14 +275,11 @@ public class Demo {
         Rect area = frame.area();
 
         // Split into 4 areas: header, main content, input, footer
-        List<Rect> mainLayout = Layout.vertical()
-            .constraints(
-                Constraint.length(3),    // Header
-                Constraint.fill(),       // Main content
-                Constraint.length(3),    // Input field
-                Constraint.length(3)     // Footer
-            )
-            .split(area);
+        List<Rect> mainLayout = Layout.vertical().constraints(Constraint.length(3), // Header
+                Constraint.fill(), // Main content
+                Constraint.length(3), // Input field
+                Constraint.length(3) // Footer
+        ).split(area);
 
         renderHeader(frame, mainLayout.get(0));
         renderMain(frame, mainLayout.get(1));
@@ -292,17 +288,12 @@ public class Demo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.ROUNDED)
-            .borderStyle(Style.EMPTY.fg(Color.CYAN))
-            .title(Title.from(
-                Line.from(
-                    Span.raw(" TamboUI ").bold().cyan(),
-                    Span.raw("Demo ").yellow()
-                )
-            ).centered())
-            .build();
+        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                .title(Title.from(
+                        Line.from(Span.raw(" TamboUI ").bold().cyan(), Span.raw("Demo ").yellow()))
+                        .centered())
+                .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -310,42 +301,27 @@ public class Demo {
     private void renderMain(Frame frame, Rect area) {
         // Split main area into left and right panels
         List<Rect> mainPanels = Layout.horizontal()
-            .constraints(
-                Constraint.percentage(50),
-                Constraint.percentage(50)
-            )
-            .spacing(1)
-            .split(area);
+                .constraints(Constraint.percentage(50), Constraint.percentage(50)).spacing(1)
+                .split(area);
 
         renderList(frame, mainPanels.get(0));
         renderInfo(frame, mainPanels.get(1));
     }
 
     private void renderList(Frame frame, Rect area) {
-        List<ListItem> listItems = items.stream()
-            .map(ListItem::from)
-            .toList();
+        List<ListItem> listItems = items.stream().map(ListItem::from).toList();
 
         boolean isFocused = focused == FocusedWidget.LIST;
         Color borderColor = isFocused ? Color.GREEN : Color.DARK_GRAY;
 
-        ListWidget list = ListWidget.builder()
-            .items(listItems)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(borderColor))
-                .title(Title.from(
-                    Line.from(
-                        Span.raw("Items "),
-                        Span.raw(isFocused ? "(focused)" : "").dim()
-                    )
-                ))
-                .titleBottom(Title.from("j/k/↑/↓ navigate, d delete").right())
-                .build())
-            .highlightStyle(Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE).bold())
-            .highlightSymbol("▶ ")
-            .build();
+        ListWidget list = ListWidget.builder().items(listItems)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(borderColor))
+                        .title(Title.from(Line.from(Span.raw("Items "),
+                                Span.raw(isFocused ? "(focused)" : "").dim())))
+                        .titleBottom(Title.from("j/k/↑/↓ navigate, d delete").right()).build())
+                .highlightStyle(Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE).bold())
+                .highlightSymbol("▶ ").build();
 
         frame.renderStatefulWidget(list, area, listState);
     }
@@ -353,31 +329,24 @@ public class Demo {
     private void renderInfo(Frame frame, Rect area) {
         Integer selected = listState.selected();
         String selectedText = selected != null && selected < items.size()
-            ? items.get(selected)
-            : "None";
+                ? items.get(selected)
+                : "None";
 
         Text infoText = Text.from(
-            Line.from(Span.raw("Selected: ").bold(), Span.raw(selectedText).cyan()),
-            Line.empty(),
-            Line.from(Span.raw("Items count: ").bold(), Span.raw(String.valueOf(items.size())).yellow()),
-            Line.empty(),
-            Line.from(Span.raw("Counter: ").bold(), Span.raw(String.valueOf(counter)).yellow()),
-            Line.empty(),
-            Line.from(Span.raw("Input text: ").bold()),
-            Line.from(Span.raw("  \"" + inputState.text() + "\"").green()),
-            Line.empty(),
-            Line.from(Span.raw("Focus: ").bold(), Span.raw(focused.name()).magenta())
-        );
+                Line.from(Span.raw("Selected: ").bold(), Span.raw(selectedText).cyan()),
+                Line.empty(),
+                Line.from(Span.raw("Items count: ").bold(),
+                        Span.raw(String.valueOf(items.size())).yellow()),
+                Line.empty(),
+                Line.from(Span.raw("Counter: ").bold(), Span.raw(String.valueOf(counter)).yellow()),
+                Line.empty(), Line.from(Span.raw("Input text: ").bold()),
+                Line.from(Span.raw("  \"" + inputState.text() + "\"").green()), Line.empty(),
+                Line.from(Span.raw("Focus: ").bold(), Span.raw(focused.name()).magenta()));
 
-        Paragraph info = Paragraph.builder()
-            .text(infoText)
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.MAGENTA))
-                .title("Information")
-                .build())
-            .build();
+        Paragraph info = Paragraph.builder().text(infoText)
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.MAGENTA)).title("Information").build())
+                .build();
 
         frame.renderWidget(info, area);
     }
@@ -387,23 +356,15 @@ public class Demo {
         Color borderColor = isFocused ? Color.YELLOW : Color.DARK_GRAY;
 
         TextInput input = TextInput.builder()
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(borderColor))
-                .title(Title.from(
-                    Line.from(
-                        Span.raw("Add Item "),
-                        Span.raw(isFocused ? "(focused)" : "").dim()
-                    )
-                ))
-                .titleBottom(Title.from("Enter to add, Tab to switch focus").right())
-                .build())
-            .style(Style.EMPTY.fg(Color.WHITE))
-            .cursorStyle(Style.EMPTY.reversed())
-            .placeholder("Type here and press Enter...")
-            .placeholderStyle(Style.EMPTY.dim().italic())
-            .build();
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(borderColor))
+                        .title(Title.from(Line.from(Span.raw("Add Item "),
+                                Span.raw(isFocused ? "(focused)" : "").dim())))
+                        .titleBottom(Title.from("Enter to add, Tab to switch focus").right())
+                        .build())
+                .style(Style.EMPTY.fg(Color.WHITE)).cursorStyle(Style.EMPTY.reversed())
+                .placeholder("Type here and press Enter...")
+                .placeholderStyle(Style.EMPTY.dim().italic()).build();
 
         if (isFocused) {
             input.renderWithCursor(area, frame.buffer(), inputState, frame);
@@ -413,27 +374,17 @@ public class Demo {
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(
-            Span.raw(" Tab").bold().yellow(),
-            Span.raw(" Switch focus  ").dim(),
-            Span.raw("q").bold().yellow(),
-            Span.raw(" Quit  ").dim(),
-            Span.raw("↑↓").bold().yellow(),
-            Span.raw(" Navigate  ").dim(),
-            Span.raw("Enter").bold().yellow(),
-            Span.raw(" Add item  ").dim(),
-            Span.raw("Ctrl+C").bold().yellow(),
-            Span.raw(" Force quit").dim()
-        );
+        Line helpLine = Line.from(Span.raw(" Tab").bold().yellow(),
+                Span.raw(" Switch focus  ").dim(), Span.raw("q").bold().yellow(),
+                Span.raw(" Quit  ").dim(), Span.raw("↑↓").bold().yellow(),
+                Span.raw(" Navigate  ").dim(), Span.raw("Enter").bold().yellow(),
+                Span.raw(" Add item  ").dim(), Span.raw("Ctrl+C").bold().yellow(),
+                Span.raw(" Force quit").dim());
 
-        Paragraph footer = Paragraph.builder()
-            .text(Text.from(helpLine))
-            .block(Block.builder()
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build())
-            .build();
+        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
+                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
+                .build();
 
         frame.renderWidget(footer, area);
     }

@@ -9,11 +9,12 @@ import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
 /**
- * Handles keyboard events and dispatches to the FileManager.
- * Translates key presses into controller commands.
+ * Handles keyboard events and dispatches to the FileManager. Translates key
+ * presses into controller commands.
  * <p>
- * Note: Input dialogs (mkdir, goto) are handled by DialogElement's modal behavior.
- * This handler only deals with confirmation dialogs and browser navigation.
+ * Note: Input dialogs (mkdir, goto) are handled by DialogElement's modal
+ * behavior. This handler only deals with confirmation dialogs and browser
+ * navigation.
  */
 public class FileManagerKeyHandler {
 
@@ -21,7 +22,9 @@ public class FileManagerKeyHandler {
 
     /**
      * Creates a new FileManagerKeyHandler.
-     * @param manager the file manager controller
+     * 
+     * @param manager
+     *            the file manager controller
      */
     public FileManagerKeyHandler(FileManagerController manager) {
         this.manager = manager;
@@ -29,7 +32,9 @@ public class FileManagerKeyHandler {
 
     /**
      * Handles a key event.
-     * @param event the key event
+     * 
+     * @param event
+     *            the key event
      * @return the event result
      */
     public EventResult handle(KeyEvent event) {
@@ -106,7 +111,8 @@ public class FileManagerKeyHandler {
             return EventResult.HANDLED;
         }
 
-        // Switch between panels (Tab is handled by focus system, left/right for quick switch)
+        // Switch between panels (Tab is handled by focus system, left/right for quick
+        // switch)
         if (event.isLeft()) {
             manager.setActiveSide(FileManagerController.Side.LEFT);
             return EventResult.HANDLED;

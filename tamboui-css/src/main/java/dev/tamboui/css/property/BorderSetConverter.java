@@ -4,23 +4,24 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.BorderSet;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import dev.tamboui.widgets.block.BorderSet;
+
 /**
  * Converts CSS border-chars values to BorderSet.
  * <p>
- * Format: 8 quoted strings representing (in order):
- * top-horizontal, bottom-horizontal, left-vertical, right-vertical,
- * top-left, top-right, bottom-left, bottom-right.
+ * Format: 8 quoted strings representing (in order): top-horizontal,
+ * bottom-horizontal, left-vertical, right-vertical, top-left, top-right,
+ * bottom-left, bottom-right.
  * <p>
  * Empty strings ({@code ""}) indicate that character should not be rendered.
  * <p>
  * Examples:
+ * 
  * <pre>
  * border-chars: "─" "─" "│" "│" "┌" "┐" "└" "┘";   // full border
  * border-chars: "" "" "" "" "┌" "┐" "└" "┘";       // corners only
@@ -48,21 +49,20 @@ public final class BorderSetConverter implements PropertyConverter<BorderSet> {
             return Optional.empty();
         }
 
-        return Optional.of(new BorderSet(
-                chars.get(0), // topHorizontal
+        return Optional.of(new BorderSet(chars.get(0), // topHorizontal
                 chars.get(1), // bottomHorizontal
                 chars.get(2), // leftVertical
                 chars.get(3), // rightVertical
                 chars.get(4), // topLeft
                 chars.get(5), // topRight
                 chars.get(6), // bottomLeft
-                chars.get(7)  // bottomRight
+                chars.get(7) // bottomRight
         ));
     }
 
     /**
-     * Parses a string containing quoted values.
-     * Supports both single and double quotes.
+     * Parses a string containing quoted values. Supports both single and double
+     * quotes.
      */
     private List<String> parseQuotedStrings(String input) {
         List<String> result = new ArrayList<>();

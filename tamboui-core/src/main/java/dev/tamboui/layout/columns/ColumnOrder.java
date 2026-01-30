@@ -8,8 +8,10 @@ package dev.tamboui.layout.columns;
  * Controls the ordering of children within a {@link Columns} layout.
  *
  * <ul>
- *   <li>{@link #ROW_FIRST} — items fill left-to-right, then top-to-bottom (like reading text)</li>
- *   <li>{@link #COLUMN_FIRST} — items fill top-to-bottom, then left-to-right (like newspaper columns)</li>
+ * <li>{@link #ROW_FIRST} — items fill left-to-right, then top-to-bottom (like
+ * reading text)</li>
+ * <li>{@link #COLUMN_FIRST} — items fill top-to-bottom, then left-to-right
+ * (like newspaper columns)</li>
  * </ul>
  */
 public enum ColumnOrder {
@@ -25,12 +27,17 @@ public enum ColumnOrder {
     COLUMN_FIRST;
 
     /**
-     * Resolves the child index for a given grid position based on this ordering mode.
+     * Resolves the child index for a given grid position based on this ordering
+     * mode.
      *
-     * @param row  the row index (0-based)
-     * @param col  the column index (0-based)
-     * @param rows the total number of rows
-     * @param cols the total number of columns
+     * @param row
+     *            the row index (0-based)
+     * @param col
+     *            the column index (0-based)
+     * @param rows
+     *            the total number of rows
+     * @param cols
+     *            the total number of columns
      * @return the child index
      */
     public int resolveIndex(int row, int col, int rows, int cols) {

@@ -4,21 +4,25 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import dev.tamboui.layout.Fraction;
 
 /**
  * A row in the simplex tableau.
  *
- * <p>Represents a linear equation of the form:
+ * <p>
+ * Represents a linear equation of the form:
  * {@code constant + sum(coefficient * symbol) = 0}
  *
- * <p>Each row represents a basic variable expressed in terms of non-basic variables.
+ * <p>
+ * Each row represents a basic variable expressed in terms of non-basic
+ * variables.
  *
- * <p>This implementation uses {@link Fraction} for exact arithmetic,
- * avoiding the cumulative rounding errors that occur with floating-point.
+ * <p>
+ * This implementation uses {@link Fraction} for exact arithmetic, avoiding the
+ * cumulative rounding errors that occur with floating-point.
  */
 final class Row {
 
@@ -36,7 +40,8 @@ final class Row {
     /**
      * Creates a row with the given constant.
      *
-     * @param constant the constant value
+     * @param constant
+     *            the constant value
      */
     Row(Fraction constant) {
         this.constant = constant;
@@ -46,7 +51,8 @@ final class Row {
     /**
      * Creates a copy of another row.
      *
-     * @param other the row to copy
+     * @param other
+     *            the row to copy
      */
     Row(Row other) {
         this.constant = other.constant;
@@ -65,7 +71,8 @@ final class Row {
     /**
      * Sets the constant part of this row.
      *
-     * @param constant the new constant
+     * @param constant
+     *            the new constant
      */
     void setConstant(Fraction constant) {
         this.constant = constant;
@@ -83,7 +90,8 @@ final class Row {
     /**
      * Returns the coefficient for the given symbol, or 0 if not present.
      *
-     * @param symbol the symbol to look up
+     * @param symbol
+     *            the symbol to look up
      * @return the coefficient
      */
     Fraction coefficientFor(Symbol symbol) {
@@ -94,11 +102,14 @@ final class Row {
     /**
      * Adds a symbol to this row with the given coefficient.
      *
-     * <p>If the symbol already exists, the coefficients are added.
-     * If the resulting coefficient is zero, the symbol is removed.
+     * <p>
+     * If the symbol already exists, the coefficients are added. If the resulting
+     * coefficient is zero, the symbol is removed.
      *
-     * @param symbol      the symbol to add
-     * @param coefficient the coefficient to add
+     * @param symbol
+     *            the symbol to add
+     * @param coefficient
+     *            the coefficient to add
      */
     void insertSymbol(Symbol symbol, Fraction coefficient) {
         // Fast path: adding zero has no effect
@@ -108,14 +119,15 @@ final class Row {
         // Use compute() to perform lookup + update in a single hash operation
         cells.compute(symbol, (k, existing) -> {
             Fraction newCoeff = (existing != null ? existing : Fraction.ZERO).add(coefficient);
-            return newCoeff.isZero() ? null : newCoeff;  // null removes the entry
+            return newCoeff.isZero() ? null : newCoeff; // null removes the entry
         });
     }
 
     /**
      * Removes a symbol from this row.
      *
-     * @param symbol the symbol to remove
+     * @param symbol
+     *            the symbol to remove
      */
     void removeSymbol(Symbol symbol) {
         cells.remove(symbol);
@@ -124,10 +136,13 @@ final class Row {
     /**
      * Inserts another row into this row, scaled by the given coefficient.
      *
-     * <p>This is equivalent to: this += other * coefficient
+     * <p>
+     * This is equivalent to: this += other * coefficient
      *
-     * @param other       the row to insert
-     * @param coefficient the scale factor
+     * @param other
+     *            the row to insert
+     * @param coefficient
+     *            the scale factor
      */
     void insertRow(Row other, Fraction coefficient) {
         constant = constant.add(other.constant.multiply(coefficient));
@@ -150,13 +165,16 @@ final class Row {
     /**
      * Solves the row for the given symbol.
      *
-     * <p>Rearranges the row so that the symbol becomes the basic variable
-     * (coefficient of -1), with all other terms on the right-hand side.
+     * <p>
+     * Rearranges the row so that the symbol becomes the basic variable (coefficient
+     * of -1), with all other terms on the right-hand side.
      *
-     * <p>For example, if the row is: {@code 3 + 2*x + y = 0}
-     * and we solve for x, the result is: {@code x = -1.5 - 0.5*y}
+     * <p>
+     * For example, if the row is: {@code 3 + 2*x + y = 0} and we solve for x, the
+     * result is: {@code x = -1.5 - 0.5*y}
      *
-     * @param symbol the symbol to solve for
+     * @param symbol
+     *            the symbol to solve for
      */
     void solveFor(Symbol symbol) {
         Fraction coeff = cells.remove(symbol);
@@ -171,11 +189,14 @@ final class Row {
     /**
      * Solves the row for the given symbol, substituting another symbol.
      *
-     * <p>This performs a pivot operation: the lhs symbol is moved out
-     * and the rhs symbol takes its place as a basic variable.
+     * <p>
+     * This performs a pivot operation: the lhs symbol is moved out and the rhs
+     * symbol takes its place as a basic variable.
      *
-     * @param lhs the leaving symbol
-     * @param rhs the entering symbol
+     * @param lhs
+     *            the leaving symbol
+     * @param rhs
+     *            the entering symbol
      */
     void solveFor(Symbol lhs, Symbol rhs) {
         insertSymbol(lhs, Fraction.NEG_ONE);
@@ -185,11 +206,14 @@ final class Row {
     /**
      * Substitutes a symbol with the given row.
      *
-     * <p>Replaces all occurrences of the symbol with the expression
-     * represented by the row.
+     * <p>
+     * Replaces all occurrences of the symbol with the expression represented by the
+     * row.
      *
-     * @param symbol the symbol to substitute
-     * @param row    the row to substitute in place of the symbol
+     * @param symbol
+     *            the symbol to substitute
+     * @param row
+     *            the row to substitute in place of the symbol
      */
     void substitute(Symbol symbol, Row row) {
         Fraction coeff = cells.remove(symbol);

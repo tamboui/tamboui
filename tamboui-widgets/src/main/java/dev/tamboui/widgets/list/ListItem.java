@@ -19,8 +19,10 @@ public final class ListItem {
     /**
      * Creates a new list item with the given content and style.
      *
-     * @param content the item content
-     * @param style the item style
+     * @param content
+     *            the item content
+     * @param style
+     *            the item style
      */
     public ListItem(Text content, Style style) {
         this.content = content;
@@ -30,7 +32,8 @@ public final class ListItem {
     /**
      * Creates a list item from a string.
      *
-     * @param text the item text
+     * @param text
+     *            the item text
      * @return a new list item
      */
     public static ListItem from(String text) {
@@ -40,7 +43,8 @@ public final class ListItem {
     /**
      * Creates a list item from a styled line.
      *
-     * @param line the item content as a line
+     * @param line
+     *            the item content as a line
      * @return a new list item
      */
     public static ListItem from(Line line) {
@@ -50,7 +54,8 @@ public final class ListItem {
     /**
      * Creates a list item from a text.
      *
-     * @param text the item content
+     * @param text
+     *            the item content
      * @return a new list item
      */
     public static ListItem from(Text text) {
@@ -60,7 +65,8 @@ public final class ListItem {
     /**
      * Returns a new list item with the given style applied.
      *
-     * @param style the style to apply
+     * @param style
+     *            the style to apply
      * @return a new list item with the given style
      */
     public ListItem style(Style style) {

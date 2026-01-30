@@ -4,17 +4,18 @@
  */
 package dev.tamboui.toolkit.focus;
 
-import dev.tamboui.layout.Rect;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dev.tamboui.layout.Rect;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
+
 /**
- * Manages focus state for focusable elements.
- * Handles tab navigation and click-to-focus.
+ * Manages focus state for focusable elements. Handles tab navigation and
+ * click-to-focus.
  */
 public final class FocusManager {
 
@@ -40,7 +41,8 @@ public final class FocusManager {
     /**
      * Returns whether the element with the given ID is currently focused.
      *
-     * @param elementId the element ID to check
+     * @param elementId
+     *            the element ID to check
      * @return true if focused
      */
     public boolean isFocused(String elementId) {
@@ -50,7 +52,8 @@ public final class FocusManager {
     /**
      * Sets focus to the element with the given ID.
      *
-     * @param elementId the element ID to focus, or null to clear focus
+     * @param elementId
+     *            the element ID to focus, or null to clear focus
      */
     public void setFocus(String elementId) {
         this.focusedId = elementId;
@@ -64,14 +67,16 @@ public final class FocusManager {
     }
 
     /**
-     * Registers a focusable element with its rendered area.
-     * Called during rendering to track focusable elements.
+     * Registers a focusable element with its rendered area. Called during rendering
+     * to track focusable elements.
      * <p>
-     * If nothing is currently focused, the first registered element
-     * will be auto-focused.
+     * If nothing is currently focused, the first registered element will be
+     * auto-focused.
      *
-     * @param elementId the element ID
-     * @param area the rendered area
+     * @param elementId
+     *            the element ID
+     * @param area
+     *            the rendered area
      */
     public void registerFocusable(String elementId, Rect area) {
         if (elementId != null) {
@@ -89,8 +94,8 @@ public final class FocusManager {
     }
 
     /**
-     * Clears all registered focusable elements.
-     * Should be called at the start of each render cycle.
+     * Clears all registered focusable elements. Should be called at the start of
+     * each render cycle.
      */
     public void clearFocusables() {
         focusOrder.clear();
@@ -160,8 +165,10 @@ public final class FocusManager {
     /**
      * Attempts to focus the element at the given screen position.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
      * @return true if an element was focused
      */
     public boolean focusAt(int x, int y) {

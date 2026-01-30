@@ -4,11 +4,12 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -91,12 +92,10 @@ class CalendarEventStoreTest {
         LocalDate newYear = LocalDate.of(2025, 1, 1);
         LocalDate july4 = LocalDate.of(2025, 7, 4);
 
-        CalendarEventStore store = CalendarEventStore.today(red)
-            .add(christmas, green)
-            .add(newYear, blue)
-            .add(july4, red);
+        CalendarEventStore store = CalendarEventStore.today(red).add(christmas, green)
+                .add(newYear, blue).add(july4, red);
 
-        if(LocalDate.now().equals(christmas)) {
+        if (LocalDate.now().equals(christmas)) {
             assertThat(store.size()).isEqualTo(3);
         } else {
             assertThat(store.size()).isEqualTo(4);
@@ -123,9 +122,7 @@ class CalendarEventStoreTest {
         Style red = Style.EMPTY.fg(Color.RED);
         Style blue = Style.EMPTY.fg(Color.BLUE);
 
-        CalendarEventStore store = CalendarEventStore.empty()
-            .add(date, red)
-            .add(date, blue);
+        CalendarEventStore store = CalendarEventStore.empty().add(date, red).add(date, blue);
 
         // Size should still be 1 (same date overwritten)
         assertThat(store.size()).isEqualTo(1);

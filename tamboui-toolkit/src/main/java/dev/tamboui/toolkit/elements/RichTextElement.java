@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
@@ -16,18 +17,18 @@ import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.style.Overflow;
 
 /**
  * A simple inline element for displaying styled {@link Text}.
  * <p>
- * This element is similar to {@link TextElement} but accepts pre-styled {@link Text}
- * objects with multiple {@link Span}s, enabling syntax highlighting, markup rendering,
- * and other rich text features.
+ * This element is similar to {@link TextElement} but accepts pre-styled
+ * {@link Text} objects with multiple {@link Span}s, enabling syntax
+ * highlighting, markup rendering, and other rich text features.
  * <p>
  * For scrollable rich text with borders, see {@link RichTextAreaElement}.
  * <p>
  * Example usage:
+ * 
  * <pre>{@code
  * import static dev.tamboui.toolkit.Toolkit.*;
  *
@@ -61,7 +62,8 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
     /**
      * Creates a rich text element with the specified text.
      *
-     * @param text the styled text to display
+     * @param text
+     *            the styled text to display
      */
     public RichTextElement(Text text) {
         this.text = text != null ? text : Text.empty();
@@ -70,18 +72,18 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
     /**
      * Creates a rich text element from a plain string.
      *
-     * @param content the text content
+     * @param content
+     *            the text content
      */
     public RichTextElement(String content) {
-        this.text = content != null && !content.isEmpty()
-                ? Text.raw(content)
-                : Text.empty();
+        this.text = content != null && !content.isEmpty() ? Text.raw(content) : Text.empty();
     }
 
     /**
      * Sets the text content.
      *
-     * @param text the styled text to display
+     * @param text
+     *            the styled text to display
      * @return this element for chaining
      */
     public RichTextElement text(Text text) {
@@ -101,7 +103,8 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
     /**
      * Sets the overflow mode for text that doesn't fit.
      *
-     * @param overflow the overflow mode
+     * @param overflow
+     *            the overflow mode
      * @return this element for chaining
      */
     public RichTextElement overflow(Overflow overflow) {
@@ -162,7 +165,8 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
     /**
      * Sets the text alignment.
      *
-     * @param alignment the alignment
+     * @param alignment
+     *            the alignment
      * @return this element for chaining
      */
     public RichTextElement alignment(Alignment alignment) {
@@ -231,12 +235,9 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
         Style effectiveStyle = context.currentStyle();
 
         StylePropertyResolver resolver = context.resolveStyle(this)
-                .map(r -> (StylePropertyResolver) r)
-                .orElse(StylePropertyResolver.empty());
+                .map(r -> (StylePropertyResolver) r).orElse(StylePropertyResolver.empty());
 
-        Paragraph.Builder paragraphBuilder = Paragraph.builder()
-                .text(text)
-                .style(effectiveStyle)
+        Paragraph.Builder paragraphBuilder = Paragraph.builder().text(text).style(effectiveStyle)
                 .styleResolver(resolver);
 
         if (alignment != null) {

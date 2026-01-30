@@ -6,6 +6,10 @@
  */
 package dev.tamboui.demo.flex;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Alignment;
@@ -36,23 +40,22 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.tabs.Tabs;
 import dev.tamboui.widgets.tabs.TabsState;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Ratatui-like flex demo (ported as closely as possible).
  *
- * <p>This is a TamboUI port of Ratatui's `examples/apps/flex` demo, aiming to match:
- * tabs, colors (Tailwind palette), borders, spacer rendering and interactions.
+ * <p>
+ * This is a TamboUI port of Ratatui's `examples/apps/flex` demo, aiming to
+ * match: tabs, colors (Tailwind palette), borders, spacer rendering and
+ * interactions.
  *
- * <p>Controls:
+ * <p>
+ * Controls:
  * <ul>
- *   <li>h/l or ←/→: Change tab</li>
- *   <li>j/k or ↓/↑: Scroll</li>
- *   <li>g/G or Home/End: Jump</li>
- *   <li>+/-: Change spacing</li>
- *   <li>q or Esc: Quit</li>
+ * <li>h/l or ←/→: Change tab</li>
+ * <li>j/k or ↓/↑: Scroll</li>
+ * <li>g/G or Home/End: Jump</li>
+ * <li>+/-: Change spacing</li>
+ * <li>q or Esc: Quit</li>
  * </ul>
  */
 public final class RFlexDemo {
@@ -83,123 +86,95 @@ public final class RFlexDemo {
     }
 
     private static final ExampleData[] EXAMPLE_DATA = {
-        new ExampleData(
-            "Min(u16) takes any excess space always",
-            new Constraint[] {
-                Constraint.length(10), Constraint.min(10), Constraint.max(10), Constraint.percentage(10), Constraint.ratio(1, 10)
-            },
-            null
-        ),
-        new ExampleData(
-            "Fill(u16) takes any excess space always",
-            new Constraint[] { Constraint.length(20), Constraint.percentage(20), Constraint.ratio(1, 5), Constraint.fill(1) },
-            null
-        ),
-        new ExampleData(
-            "Here's all constraints in one line",
-            new Constraint[] {
-                Constraint.length(10),
-                Constraint.min(10),
-                Constraint.max(10),
-                Constraint.percentage(10),
-                Constraint.ratio(1, 10),
-                Constraint.fill(1)
-            },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.max(50), Constraint.min(50) }, null),
-        new ExampleData("", new Constraint[] { Constraint.max(20), Constraint.length(10) }, null),
-        new ExampleData("", new Constraint[] { Constraint.max(20), Constraint.length(10) }, null),
-        new ExampleData(
-            "Min grows always but also allows Fill to grow",
-            new Constraint[] { Constraint.percentage(50), Constraint.fill(1), Constraint.fill(2), Constraint.min(50) },
-            null
-        ),
-        new ExampleData(
-            "In `Legacy`, the last constraint of lowest priority takes excess space",
-            new Constraint[] { Constraint.length(20), Constraint.length(20), Constraint.percentage(20) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.length(20), Constraint.percentage(20), Constraint.length(20) }, null),
-        new ExampleData(
-            "A lowest priority constraint will be broken before a high priority constraint",
-            new Constraint[] { Constraint.ratio(1, 4), Constraint.percentage(20) },
-            null
-        ),
-        new ExampleData(
-            "`Length` is higher priority than `Percentage`",
-            new Constraint[] { Constraint.percentage(20), Constraint.length(10) },
-            null
-        ),
-        new ExampleData(
-            "`Min/Max` is higher priority than `Length`",
-            new Constraint[] { Constraint.length(10), Constraint.max(20) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.length(100), Constraint.min(20) }, null),
-        new ExampleData(
-            "`Length` is higher priority than `Min/Max`",
-            new Constraint[] { Constraint.max(20), Constraint.length(10) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.min(20), Constraint.length(90) }, null),
-        new ExampleData(
-            "Fill is the lowest priority and will fill any excess space",
-            new Constraint[] { Constraint.fill(1), Constraint.ratio(1, 4) },
-            null
-        ),
-        new ExampleData(
-            "Fill can be used to scale proportionally with other Fill blocks",
-            new Constraint[] { Constraint.fill(1), Constraint.percentage(20), Constraint.fill(2) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.ratio(1, 3), Constraint.percentage(20), Constraint.ratio(2, 3) }, null),
-        new ExampleData(
-            "Legacy will stretch the last lowest priority constraint\nStretch will only stretch equal weighted constraints",
-            new Constraint[] { Constraint.length(20), Constraint.length(15) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.percentage(20), Constraint.length(15) }, null),
-        new ExampleData(
-            "`Fill(u16)` fills up excess space, but is lower priority to spacers.\n"
-                + "i.e. Fill will only have widths in Flex::Stretch and Flex::Legacy",
-            new Constraint[] { Constraint.fill(1), Constraint.fill(1) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.length(20), Constraint.length(20) }, null),
-        new ExampleData(
-            "When not using `Flex::Stretch` or `Flex::Legacy`,\n`Min(u16)` and `Max(u16)` collapse to their lowest values",
-            new Constraint[] { Constraint.min(20), Constraint.max(20) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.max(20) }, null),
-        new ExampleData("", new Constraint[] { Constraint.min(20), Constraint.max(20), Constraint.length(20), Constraint.length(20) }, null),
+            new ExampleData("Min(u16) takes any excess space always",
+                    new Constraint[]{Constraint.length(10), Constraint.min(10), Constraint.max(10),
+                            Constraint.percentage(10), Constraint.ratio(1, 10)},
+                    null),
+            new ExampleData("Fill(u16) takes any excess space always",
+                    new Constraint[]{Constraint.length(20), Constraint.percentage(20),
+                            Constraint.ratio(1, 5), Constraint.fill(1)},
+                    null),
+            new ExampleData("Here's all constraints in one line",
+                    new Constraint[]{Constraint.length(10), Constraint.min(10), Constraint.max(10),
+                            Constraint.percentage(10), Constraint.ratio(1, 10), Constraint.fill(1)},
+                    null),
+            new ExampleData("", new Constraint[]{Constraint.max(50), Constraint.min(50)}, null),
+            new ExampleData("", new Constraint[]{Constraint.max(20), Constraint.length(10)}, null),
+            new ExampleData("", new Constraint[]{Constraint.max(20), Constraint.length(10)}, null),
+            new ExampleData("Min grows always but also allows Fill to grow",
+                    new Constraint[]{Constraint.percentage(50), Constraint.fill(1),
+                            Constraint.fill(2), Constraint.min(50)},
+                    null),
+            new ExampleData(
+                    "In `Legacy`, the last constraint of lowest priority takes excess space",
+                    new Constraint[]{Constraint.length(20), Constraint.length(20),
+                            Constraint.percentage(20)},
+                    null),
+            new ExampleData("",
+                    new Constraint[]{Constraint.length(20), Constraint.percentage(20),
+                            Constraint.length(20)},
+                    null),
+            new ExampleData(
+                    "A lowest priority constraint will be broken before a high priority constraint",
+                    new Constraint[]{Constraint.ratio(1, 4), Constraint.percentage(20)}, null),
+            new ExampleData("`Length` is higher priority than `Percentage`",
+                    new Constraint[]{Constraint.percentage(20), Constraint.length(10)}, null),
+            new ExampleData("`Min/Max` is higher priority than `Length`",
+                    new Constraint[]{Constraint.length(10), Constraint.max(20)}, null),
+            new ExampleData("", new Constraint[]{Constraint.length(100), Constraint.min(20)}, null),
+            new ExampleData("`Length` is higher priority than `Min/Max`",
+                    new Constraint[]{Constraint.max(20), Constraint.length(10)}, null),
+            new ExampleData("", new Constraint[]{Constraint.min(20), Constraint.length(90)}, null),
+            new ExampleData("Fill is the lowest priority and will fill any excess space",
+                    new Constraint[]{Constraint.fill(1), Constraint.ratio(1, 4)}, null),
+            new ExampleData("Fill can be used to scale proportionally with other Fill blocks",
+                    new Constraint[]{Constraint.fill(1), Constraint.percentage(20),
+                            Constraint.fill(2)},
+                    null),
+            new ExampleData("",
+                    new Constraint[]{Constraint.ratio(1, 3), Constraint.percentage(20),
+                            Constraint.ratio(2, 3)},
+                    null),
+            new ExampleData(
+                    "Legacy will stretch the last lowest priority constraint\nStretch will only stretch equal weighted constraints",
+                    new Constraint[]{Constraint.length(20), Constraint.length(15)}, null),
+            new ExampleData("", new Constraint[]{Constraint.percentage(20), Constraint.length(15)},
+                    null),
+            new ExampleData(
+                    "`Fill(u16)` fills up excess space, but is lower priority to spacers.\n"
+                            + "i.e. Fill will only have widths in Flex::Stretch and Flex::Legacy",
+                    new Constraint[]{Constraint.fill(1), Constraint.fill(1)}, null),
+            new ExampleData("", new Constraint[]{Constraint.length(20), Constraint.length(20)},
+                    null),
+            new ExampleData(
+                    "When not using `Flex::Stretch` or `Flex::Legacy`,\n`Min(u16)` and `Max(u16)` collapse to their lowest values",
+                    new Constraint[]{Constraint.min(20), Constraint.max(20)}, null),
+            new ExampleData("", new Constraint[]{Constraint.max(20)}, null),
+            new ExampleData("",
+                    new Constraint[]{Constraint.min(20), Constraint.max(20), Constraint.length(20),
+                            Constraint.length(20)},
+                    null),
 
-        new ExampleData("", new Constraint[] { Constraint.fill(0), Constraint.fill(0) }, null),
-        new ExampleData(
-            "`Fill(1)` can be to scale with respect to other `Fill(2)`",
-            new Constraint[] { Constraint.fill(1), Constraint.fill(2) },
-            null
-        ),
-        new ExampleData("", new Constraint[] { Constraint.fill(1), Constraint.min(10), Constraint.max(10), Constraint.fill(2) }, null),
-        new ExampleData(
-            "`Fill(0)` collapses if there are other non-zero `Fill(_)`\nconstraints. e.g. `[Fill(0), Fill(0), Fill(1)]`:",
-            new Constraint[] { Constraint.fill(0), Constraint.fill(0), Constraint.fill(1) },
-            null
-        )
-    };
-    private static final BorderSet CORNERS_ONLY = BorderSet.builder()
-        .topLeft("┌").topRight("┐")
-        .bottomLeft("└").bottomRight("┘")
-        .build();
+            new ExampleData("", new Constraint[]{Constraint.fill(0), Constraint.fill(0)}, null),
+            new ExampleData("`Fill(1)` can be to scale with respect to other `Fill(2)`",
+                    new Constraint[]{Constraint.fill(1), Constraint.fill(2)}, null),
+            new ExampleData("",
+                    new Constraint[]{Constraint.fill(1), Constraint.min(10), Constraint.max(10),
+                            Constraint.fill(2)},
+                    null),
+            new ExampleData(
+                    "`Fill(0)` collapses if there are other non-zero `Fill(_)`\nconstraints. e.g. `[Fill(0), Fill(0), Fill(1)]`:",
+                    new Constraint[]{Constraint.fill(0), Constraint.fill(0), Constraint.fill(1)},
+                    null)};
+    private static final BorderSet CORNERS_ONLY = BorderSet.builder().topLeft("┌").topRight("┐")
+            .bottomLeft("└").bottomRight("┘").build();
 
     private enum SelectedTab {
-        START("Start", 0x38bdf8, Flex.START),
-        CENTER("Center", 0x7dd3fc, Flex.CENTER),
-        END("End", 0xbae6fd, Flex.END),
-        SPACE_AROUND("SpaceAround", 0x6366f1, Flex.SPACE_AROUND),
-        SPACE_EVENLY("SpaceEvenly", 0x818cf8, Flex.SPACE_EVENLY),
-        SPACE_BETWEEN("SpaceBetween", 0xa5b4fc, Flex.SPACE_BETWEEN);
+        START("Start", 0x38bdf8, Flex.START), CENTER("Center", 0x7dd3fc, Flex.CENTER), END("End",
+                0xbae6fd,
+                Flex.END), SPACE_AROUND("SpaceAround", 0x6366f1, Flex.SPACE_AROUND), SPACE_EVENLY(
+                        "SpaceEvenly", 0x818cf8, Flex.SPACE_EVENLY), SPACE_BETWEEN("SpaceBetween",
+                                0xa5b4fc, Flex.SPACE_BETWEEN);
 
         final String label;
         final int colorRgb;
@@ -227,8 +202,11 @@ public final class RFlexDemo {
 
     /**
      * Demo entry point.
-     * @param args the CLI arguments
-     * @throws Exception on unexpected error
+     * 
+     * @param args
+     *            the CLI arguments
+     * @throws Exception
+     *             on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new RFlexDemo().run();
@@ -237,12 +215,11 @@ public final class RFlexDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception if an error occurs
+     * @throws Exception
+     *             if an error occurs
      */
-     public void run() throws Exception {
-        TuiConfig config = TuiConfig.builder()
-            .tickRate(Duration.ofMillis(100))
-            .build();
+    public void run() throws Exception {
+        TuiConfig config = TuiConfig.builder().tickRate(Duration.ofMillis(100)).build();
 
         try (TuiRunner tui = TuiRunner.create(config)) {
             tui.run(this::handleEvent, this::render);
@@ -301,7 +278,9 @@ public final class RFlexDemo {
 
     private int maxScrollOffset() {
         int totalHeight = examplesTotalHeight();
-        int last = EXAMPLE_DATA.length == 0 ? 0 : exampleHeight(EXAMPLE_DATA[EXAMPLE_DATA.length - 1]);
+        int last = EXAMPLE_DATA.length == 0
+                ? 0
+                : exampleHeight(EXAMPLE_DATA[EXAMPLE_DATA.length - 1]);
         return Math.max(0, totalHeight - last);
     }
 
@@ -327,8 +306,8 @@ public final class RFlexDemo {
     private void render(Frame frame) {
         Rect area = frame.area();
         List<Rect> parts = Layout.vertical()
-            .constraints(Constraint.length(3), Constraint.length(1), Constraint.fill())
-            .split(area);
+                .constraints(Constraint.length(3), Constraint.length(1), Constraint.fill())
+                .split(area);
 
         renderTabs(frame, parts.get(0));
         renderAxis(frame, parts.get(1));
@@ -341,40 +320,27 @@ public final class RFlexDemo {
             titles.add(Line.from(Span.raw(" " + tab.label + " ").fg(tab.color()).bg(TW_BLACK)));
         }
 
-        Tabs tabs = Tabs.builder()
-            .titles(titles)
-            .divider(" ")
-            .padding("", "")
-            .highlightStyle(Style.EMPTY.reversed())
-            .block(
-                Block.builder()
-                    .title(
-                        Title.from(
-                                Line.from(
-                                    Span.raw("Flex Layouts ").bold(),
-                                    Span.raw(" Use ◄ ► to change tab, ▲ ▼  to scroll, - + to change spacing ").dim()
-                                )
-                            )
-                    )
-                    .build()
-            )
-            .build();
+        Tabs tabs = Tabs.builder().titles(titles).divider(" ").padding("", "")
+                .highlightStyle(Style.EMPTY.reversed())
+                .block(Block.builder()
+                        .title(Title.from(Line.from(Span.raw("Flex Layouts ").bold(), Span.raw(
+                                " Use ◄ ► to change tab, ▲ ▼  to scroll, - + to change spacing ")
+                                .dim())))
+                        .build())
+                .build();
 
         frame.renderStatefulWidget(tabs, area, new TabsState(selectedTab.ordinal()));
     }
 
     private void renderAxis(Frame frame, Rect area) {
         int width = area.width();
-        String label = spacing != 0
-            ? width + " px (gap: " + spacing + " px)"
-            : width + " px";
+        String label = spacing != 0 ? width + " px (gap: " + spacing + " px)" : width + " px";
         int barWidth = Math.max(0, width - 2);
         String widthBar = "<" + center(label, barWidth, '-') + ">";
 
         Paragraph axis = Paragraph.builder()
-            .text(Text.from(Line.from(Span.raw(widthBar).fg(Color.DARK_GRAY))))
-            .alignment(Alignment.CENTER)
-            .build();
+                .text(Text.from(Line.from(Span.raw(widthBar).fg(Color.DARK_GRAY))))
+                .alignment(Alignment.CENTER).build();
         frame.renderWidget(axis, area);
     }
 
@@ -426,13 +392,11 @@ public final class RFlexDemo {
 
         if (needsScrollbar) {
             Scrollbar scrollbar = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
-                .thumbStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .trackStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .build();
+                    .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+                    .thumbStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+                    .trackStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build();
             ScrollbarState state = new ScrollbarState(maxScrollOffset() + 1)
-                .viewportContentLength(visibleHeight)
-                .position(scrollOffset);
+                    .viewportContentLength(visibleHeight).position(scrollOffset);
             frame.renderStatefulWidget(scrollbar, area, state);
         }
     }
@@ -441,8 +405,7 @@ public final class RFlexDemo {
         int titleHeight = descriptionHeight(ex.description);
         // Use Fill(0) to match ratatui exactly
         List<Rect> layout = Layout.vertical()
-            .constraints(Constraint.length(titleHeight), Constraint.fill(0))
-            .split(area);
+                .constraints(Constraint.length(titleHeight), Constraint.fill(0)).split(area);
 
         Rect title = layout.get(0);
         Rect illustrations = layout.get(1);
@@ -451,25 +414,27 @@ public final class RFlexDemo {
             String[] lines = ex.description.split("\n");
             for (int i = 0; i < lines.length; i++) {
                 Paragraph p = Paragraph.builder()
-                    .text(Text.from(Line.from(Span.raw("// " + lines[i]).italic().fg(SLATE_400))))
-                    .build();
+                        .text(Text
+                                .from(Line.from(Span.raw("// " + lines[i]).italic().fg(SLATE_400))))
+                        .build();
                 p.render(new Rect(title.x(), title.y() + i, title.width(), 1), buf);
             }
         }
 
         // In ratatui: split_with_spacers() returns blocks and spacers separately.
-        // TamboUI doesn't have that helper, so we compute gaps by comparing adjacent rects.
-        List<Rect> blocks = Layout.horizontal()
-            .constraints(ex.constraints)
-            .flex(flex)
-            .spacing(spacing)
-            .split(illustrations);
+        // TamboUI doesn't have that helper, so we compute gaps by comparing adjacent
+        // rects.
+        List<Rect> blocks = Layout.horizontal().constraints(ex.constraints).flex(flex)
+                .spacing(spacing).split(illustrations);
 
         List<Rect> spacers = computeSpacersFromBlocks(illustrations, blocks);
 
         for (int i = 0; i < blocks.size(); i++) {
-            String labelOverride = ex.displayOverrides != null && i < ex.displayOverrides.length ? ex.displayOverrides[i] : null;
-            renderIllustration(blocks.get(i), buf, ex.constraints[i], blocks.get(i).width(), labelOverride);
+            String labelOverride = ex.displayOverrides != null && i < ex.displayOverrides.length
+                    ? ex.displayOverrides[i]
+                    : null;
+            renderIllustration(blocks.get(i), buf, ex.constraints[i], blocks.get(i).width(),
+                    labelOverride);
         }
         for (Rect spacer : spacers) {
             renderSpacer(spacer, buf);
@@ -484,7 +449,8 @@ public final class RFlexDemo {
 
         Rect first = blocks.get(0);
         if (first.x() > container.x()) {
-            spacers.add(new Rect(container.x(), container.y(), first.x() - container.x(), container.height()));
+            spacers.add(new Rect(container.x(), container.y(), first.x() - container.x(),
+                    container.height()));
         }
         for (int i = 0; i < blocks.size() - 1; i++) {
             Rect a = blocks.get(i);
@@ -497,12 +463,14 @@ public final class RFlexDemo {
         }
         Rect last = blocks.get(blocks.size() - 1);
         if (last.right() < container.right()) {
-            spacers.add(new Rect(last.right(), container.y(), container.right() - last.right(), container.height()));
+            spacers.add(new Rect(last.right(), container.y(), container.right() - last.right(),
+                    container.height()));
         }
         return spacers;
     }
 
-    private static void renderIllustration(Rect area, Buffer buf, Constraint constraint, int width, String displayOverride) {
+    private static void renderIllustration(Rect area, Buffer buf, Constraint constraint, int width,
+            String displayOverride) {
         Color main = colorForConstraint(constraint);
         String title = displayOverride != null ? displayOverride : constraintLabel(constraint);
         String content = width + " px";
@@ -510,23 +478,16 @@ public final class RFlexDemo {
         Style blockStyle = Style.EMPTY.fg(TW_WHITE).bg(main);
         Style borderStyle = Style.EMPTY.fg(main).reversed();
 
-        Block block = Block.builder()
-            .borders(Borders.ALL)
-            .borderType(BorderType.QUADRANT_OUTSIDE)
-            .borderStyle(borderStyle)
-            .style(blockStyle)
-            .build();
+        Block block = Block.builder().borders(Borders.ALL).borderType(BorderType.QUADRANT_OUTSIDE)
+                .borderStyle(borderStyle).style(blockStyle).build();
         block.render(area, buf);
 
         // Style the text with the same fg/bg as the block so it renders properly
         // (Buffer.setString replaces cells, so the text must carry its own style)
         Paragraph para = Paragraph.builder()
-            .text(Text.from(
-                Line.from(Span.styled(title, blockStyle)),
-                Line.from(Span.styled(content, blockStyle))
-            ))
-            .alignment(Alignment.CENTER)
-            .build();
+                .text(Text.from(Line.from(Span.styled(title, blockStyle)),
+                        Line.from(Span.styled(content, blockStyle))))
+                .alignment(Alignment.CENTER).build();
         para.render(block.inner(area), buf);
     }
 
@@ -581,11 +542,8 @@ public final class RFlexDemo {
 
         if (width > 1) {
             // Corners-only border using custom BorderSet
-            Block.builder()
-                .customBorderSet(CORNERS_ONLY)
-                .borderStyle(style)
-                .build()
-                .render(spacer, buf);
+            Block.builder().customBorderSet(CORNERS_ONLY).borderStyle(style).build().render(spacer,
+                    buf);
 
             String label;
             if (width > 4) {
@@ -597,16 +555,10 @@ public final class RFlexDemo {
             }
 
             if (!label.isEmpty()) {
-                Text text = Text.from(
-                    Line.from(""),
-                    Line.from(""),
-                    Line.from(Span.raw(label).fg(Color.DARK_GRAY))
-                );
-                Paragraph para = Paragraph.builder()
-                    .text(text)
-                    .alignment(Alignment.CENTER)
-                    .style(style)
-                    .build();
+                Text text = Text.from(Line.from(""), Line.from(""),
+                        Line.from(Span.raw(label).fg(Color.DARK_GRAY)));
+                Paragraph para = Paragraph.builder().text(text).alignment(Alignment.CENTER)
+                        .style(style).build();
                 para.render(spacer, buf);
             }
         } else {
@@ -628,7 +580,6 @@ public final class RFlexDemo {
         }
     }
 
-
     private static final class ExampleData {
         final String description;
         final Constraint[] constraints;
@@ -641,4 +592,3 @@ public final class RFlexDemo {
         }
     }
 }
-

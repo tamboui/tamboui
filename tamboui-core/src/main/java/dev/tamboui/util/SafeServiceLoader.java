@@ -17,16 +17,14 @@ import java.util.function.Consumer;
  * and continuing to try other providers.
  * 
  * It will skip providers that fail due to service configuration issues, newer
- * classfile versions,
- * or linkage problems (missing deps / binary incompatibilities), and continues
- * trying to
- * locate other providers. Has a stop-gap to prevent (theoretical possible)
- * infinite loop.
+ * classfile versions, or linkage problems (missing deps / binary
+ * incompatibilities), and continues trying to locate other providers. Has a
+ * stop-gap to prevent (theoretical possible) infinite loop.
  * 
- * This works on Java 8+ relying on the ServiceLoader API that states:
- * "If an error is thrown then subsequent invocations of the iterator will make
- * a best effort to locate and instantiate the next available provider, but in
- * general such recovery cannot be guaranteed."
+ * This works on Java 8+ relying on the ServiceLoader API that states: "If an
+ * error is thrown then subsequent invocations of the iterator will make a best
+ * effort to locate and instantiate the next available provider, but in general
+ * such recovery cannot be guaranteed."
  *
  * 
  */
@@ -40,11 +38,16 @@ public final class SafeServiceLoader {
     private static final int MAX_CONSECUTIVE_ERRORS = 4;
 
     /**
-     * Loads providers for the given service, skipping broken providers and continuing to try other providers.
+     * Loads providers for the given service, skipping broken providers and
+     * continuing to try other providers.
      *
-     * @param service the SPI interface/class
-     * @param onError optional sink for errors encountered while iterating/instantiating providers
-     * @param <S>     service type
+     * @param service
+     *            the SPI interface/class
+     * @param onError
+     *            optional sink for errors encountered while iterating/instantiating
+     *            providers
+     * @param <S>
+     *            service type
      * @return list of successfully instantiated providers (no duplicates)
      */
     public static <S> List<S> load(Class<S> service, Consumer<Throwable> onError) {
@@ -67,7 +70,7 @@ public final class SafeServiceLoader {
                 consecutiveErrors = 0;
 
                 loaded.add(provider);
-            } catch (ServiceConfigurationError | LinkageError  e) {
+            } catch (ServiceConfigurationError | LinkageError e) {
                 if (onError != null) {
                     onError.accept(e);
                 }
@@ -81,10 +84,13 @@ public final class SafeServiceLoader {
     }
 
     /**
-     * Loads providers for the given service, skipping broken providers and continuing to try other providers.
+     * Loads providers for the given service, skipping broken providers and
+     * continuing to try other providers.
      *
-     * @param service the SPI interface/class
-     * @param <S>     service type
+     * @param service
+     *            the SPI interface/class
+     * @param <S>
+     *            service type
      * @return list of successfully instantiated providers
      */
     public static <S> List<S> load(Class<S> service) {

@@ -4,22 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
-import dev.tamboui.widgets.block.Title;
-import dev.tamboui.text.CharWidth;
-import dev.tamboui.text.Span;
-import dev.tamboui.widgets.tabs.Tabs;
-import dev.tamboui.widgets.tabs.TabsState;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,15 +11,29 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.CharWidth;
+import dev.tamboui.text.Span;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.tabs.Tabs;
+import dev.tamboui.widgets.tabs.TabsState;
+
 /**
  * A DSL wrapper for the Tabs widget.
  * <p>
  * Displays a horizontal set of tabs with one selected.
+ * 
  * <pre>{@code
- * tabs("Home", "Settings", "About")
- *     .state(tabsState)
- *     .highlightColor(Color.YELLOW)
- *     .divider(" | ")
+ * tabs("Home", "Settings", "About").state(tabsState).highlightColor(Color.YELLOW).divider(" | ")
  * }</pre>
  */
 public final class TabsElement extends StyledElement<TabsElement> {
@@ -44,7 +42,7 @@ public final class TabsElement extends StyledElement<TabsElement> {
 
     private final List<String> titles = new ArrayList<>();
     private TabsState state;
-    private Style highlightStyle;  // null means "use CSS or default"
+    private Style highlightStyle; // null means "use CSS or default"
     private String divider = " | ";
     private String paddingLeft = "";
     private String paddingRight = "";
@@ -59,7 +57,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Creates a new tabs element with the given titles.
      *
-     * @param titles the tab titles
+     * @param titles
+     *            the tab titles
      */
     public TabsElement(String... titles) {
         this.titles.addAll(Arrays.asList(titles));
@@ -68,7 +67,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Creates a new tabs element with the given titles.
      *
-     * @param titles the tab titles
+     * @param titles
+     *            the tab titles
      */
     public TabsElement(List<String> titles) {
         this.titles.addAll(titles);
@@ -77,7 +77,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the tab titles.
      *
-     * @param titles the tab titles
+     * @param titles
+     *            the tab titles
      * @return this builder
      */
     public TabsElement titles(String... titles) {
@@ -89,7 +90,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the tab titles from a list.
      *
-     * @param titles the tab titles
+     * @param titles
+     *            the tab titles
      * @return this builder
      */
     public TabsElement titles(List<String> titles) {
@@ -101,7 +103,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Adds a tab.
      *
-     * @param title the tab title to add
+     * @param title
+     *            the tab title to add
      * @return this builder
      */
     public TabsElement add(String title) {
@@ -112,7 +115,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the tabs state for selection tracking.
      *
-     * @param state the tabs state
+     * @param state
+     *            the tabs state
      * @return this builder
      */
     public TabsElement state(TabsState state) {
@@ -123,7 +127,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the selected tab index.
      *
-     * @param index the index of the selected tab
+     * @param index
+     *            the index of the selected tab
      * @return this builder
      */
     public TabsElement selected(int index) {
@@ -134,7 +139,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the highlight style for the selected tab.
      *
-     * @param style the highlight style
+     * @param style
+     *            the highlight style
      * @return this builder
      */
     public TabsElement highlightStyle(Style style) {
@@ -145,7 +151,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the highlight color for the selected tab.
      *
-     * @param color the highlight color
+     * @param color
+     *            the highlight color
      * @return this builder
      */
     public TabsElement highlightColor(Color color) {
@@ -156,7 +163,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the divider between tabs.
      *
-     * @param divider the divider string
+     * @param divider
+     *            the divider string
      * @return this builder
      */
     public TabsElement divider(String divider) {
@@ -167,8 +175,10 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the padding around tab titles.
      *
-     * @param left the left padding string
-     * @param right the right padding string
+     * @param left
+     *            the left padding string
+     * @param right
+     *            the right padding string
      * @return this builder
      */
     public TabsElement padding(String left, String right) {
@@ -180,7 +190,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the title for the border.
      *
-     * @param title the border title
+     * @param title
+     *            the border title
      * @return this builder
      */
     public TabsElement title(String title) {
@@ -201,7 +212,8 @@ public final class TabsElement extends StyledElement<TabsElement> {
     /**
      * Sets the border color.
      *
-     * @param color the border color
+     * @param color
+     *            the border color
      * @return this builder
      */
     public TabsElement borderColor(Color color) {
@@ -258,30 +270,25 @@ public final class TabsElement extends StyledElement<TabsElement> {
         // Resolve base tab style from CSS
         Style baseTabStyle = context.childStyle("tab");
         Style effectiveTabStyle = baseTabStyle.equals(context.currentStyle())
-            ? context.currentStyle()
-            : context.currentStyle().patch(baseTabStyle);
+                ? context.currentStyle()
+                : context.currentStyle().patch(baseTabStyle);
 
         // Resolve highlight style: explicit > CSS > default
-        Style effectiveHighlightStyle = resolveEffectiveStyle(
-            context, "tab", PseudoClassState.ofSelected(),
-            highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
+        Style effectiveHighlightStyle = resolveEffectiveStyle(context, "tab",
+                PseudoClassState.ofSelected(), highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
 
         // Resolve divider style from CSS
         Style dividerCssStyle = context.childStyle("divider");
         Span dividerSpan = dividerCssStyle.equals(context.currentStyle())
-            ? Span.raw(divider)
-            : Span.styled(divider, dividerCssStyle);
+                ? Span.raw(divider)
+                : Span.styled(divider, dividerCssStyle);
 
-        Tabs.Builder builder = Tabs.builder()
-            .titles(titles.toArray(new String[0]))
-            .style(effectiveTabStyle)
-            .highlightStyle(effectiveHighlightStyle)
-            .divider(dividerSpan)
-            .padding(paddingLeft, paddingRight);
+        Tabs.Builder builder = Tabs.builder().titles(titles.toArray(new String[0]))
+                .style(effectiveTabStyle).highlightStyle(effectiveHighlightStyle)
+                .divider(dividerSpan).padding(paddingLeft, paddingRight);
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder()
-                    .borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

@@ -7,18 +7,22 @@ package dev.tamboui.layout;
 /**
  * An immutable exact rational number represented as a fraction.
  *
- * <p>Fractions avoid the cumulative rounding errors that occur with floating-point
- * arithmetic in constraint solving. All arithmetic operations return exact results
- * by maintaining numerator and denominator as long integers.
+ * <p>
+ * Fractions avoid the cumulative rounding errors that occur with floating-point
+ * arithmetic in constraint solving. All arithmetic operations return exact
+ * results by maintaining numerator and denominator as long integers.
  *
- * <p>Fractions are always stored in normalized form: the denominator is positive,
+ * <p>
+ * Fractions are always stored in normalized form: the denominator is positive,
  * and the numerator and denominator share no common factors other than 1.
  *
- * <p>Example usage:
+ * <p>
+ * Example usage:
+ * 
  * <pre>
  * Fraction a = Fraction.of(1, 3);
  * Fraction b = Fraction.of(1, 6);
- * Fraction sum = a.add(b);  // 1/2
+ * Fraction sum = a.add(b); // 1/2
  * </pre>
  */
 public final class Fraction implements Comparable<Fraction> {
@@ -43,13 +47,17 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Creates a fraction from a numerator and denominator.
      *
-     * <p>The fraction is automatically normalized (reduced to lowest terms,
-     * with a positive denominator).
+     * <p>
+     * The fraction is automatically normalized (reduced to lowest terms, with a
+     * positive denominator).
      *
-     * @param numerator   the numerator
-     * @param denominator the denominator (must not be zero)
+     * @param numerator
+     *            the numerator
+     * @param denominator
+     *            the denominator (must not be zero)
      * @return a normalized fraction
-     * @throws ArithmeticException if the denominator is zero
+     * @throws ArithmeticException
+     *             if the denominator is zero
      */
     public static Fraction of(long numerator, long denominator) {
         if (denominator == 0) {
@@ -64,7 +72,8 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Creates a fraction from an integer value.
      *
-     * @param value the integer value
+     * @param value
+     *            the integer value
      * @return a fraction representing the integer
      */
     public static Fraction of(long value) {
@@ -83,11 +92,13 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Creates a fraction from a double value.
      *
-     * <p>This attempts to find a reasonable fraction approximation of the double.
-     * For exact integer values, an exact fraction is returned. For other values,
-     * a continued fraction algorithm is used to find a close approximation.
+     * <p>
+     * This attempts to find a reasonable fraction approximation of the double. For
+     * exact integer values, an exact fraction is returned. For other values, a
+     * continued fraction algorithm is used to find a close approximation.
      *
-     * @param value the double value
+     * @param value
+     *            the double value
      * @return a fraction approximating the double
      */
     public static Fraction fromDouble(double value) {
@@ -247,7 +258,8 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Returns the sum of this fraction and another.
      *
-     * @param other the fraction to add
+     * @param other
+     *            the fraction to add
      * @return the sum
      */
     public Fraction add(Fraction other) {
@@ -266,7 +278,8 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Returns the difference of this fraction and another.
      *
-     * @param other the fraction to subtract
+     * @param other
+     *            the fraction to subtract
      * @return the difference
      */
     public Fraction subtract(Fraction other) {
@@ -279,7 +292,8 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Returns the product of this fraction and another.
      *
-     * @param other the fraction to multiply by
+     * @param other
+     *            the fraction to multiply by
      * @return the product
      */
     public Fraction multiply(Fraction other) {
@@ -304,9 +318,11 @@ public final class Fraction implements Comparable<Fraction> {
     /**
      * Returns the quotient of this fraction divided by another.
      *
-     * @param other the fraction to divide by
+     * @param other
+     *            the fraction to divide by
      * @return the quotient
-     * @throws ArithmeticException if dividing by zero
+     * @throws ArithmeticException
+     *             if dividing by zero
      */
     public Fraction divide(Fraction other) {
         if (other.isZero()) {
@@ -355,7 +371,8 @@ public final class Fraction implements Comparable<Fraction> {
      * Returns the reciprocal of this fraction.
      *
      * @return the reciprocal (1/this)
-     * @throws ArithmeticException if this fraction is zero
+     * @throws ArithmeticException
+     *             if this fraction is zero
      */
     public Fraction reciprocal() {
         if (isZero()) {

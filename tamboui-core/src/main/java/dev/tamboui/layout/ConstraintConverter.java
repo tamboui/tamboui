@@ -4,25 +4,25 @@
  */
 package dev.tamboui.layout;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link Constraint} objects.
  * <p>
  * Supports the following formats:
  * <ul>
- *   <li>{@code fill} - Fill with weight 1</li>
- *   <li>{@code fill(2)} - Fill with specified weight</li>
- *   <li>{@code fit} - Fit content</li>
- *   <li>{@code 10} - Fixed length of 10 cells</li>
- *   <li>{@code 50%} - 50% of available space</li>
- *   <li>{@code min(10)} - Minimum 10 cells</li>
- *   <li>{@code max(20)} - Maximum 20 cells</li>
- *   <li>{@code 1/3} - Ratio (1 part of 3)</li>
+ * <li>{@code fill} - Fill with weight 1</li>
+ * <li>{@code fill(2)} - Fill with specified weight</li>
+ * <li>{@code fit} - Fit content</li>
+ * <li>{@code 10} - Fixed length of 10 cells</li>
+ * <li>{@code 50%} - 50% of available space</li>
+ * <li>{@code min(10)} - Minimum 10 cells</li>
+ * <li>{@code max(20)} - Maximum 20 cells</li>
+ * <li>{@code 1/3} - Ratio (1 part of 3)</li>
  * </ul>
  */
 public final class ConstraintConverter implements PropertyConverter<Constraint> {

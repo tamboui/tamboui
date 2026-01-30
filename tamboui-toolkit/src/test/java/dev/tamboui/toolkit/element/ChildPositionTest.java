@@ -29,24 +29,24 @@ class ChildPositionTest {
         @DisplayName("of() throws for negative index")
         void throwsForNegativeIndex() {
             assertThatThrownBy(() -> ChildPosition.of(-1, 5))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("index must be >= 0");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("index must be >= 0");
         }
 
         @Test
         @DisplayName("of() throws for zero total")
         void throwsForZeroTotal() {
             assertThatThrownBy(() -> ChildPosition.of(0, 0))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("total must be > 0");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("total must be > 0");
         }
 
         @Test
         @DisplayName("of() throws for index >= total")
         void throwsForIndexOutOfBounds() {
             assertThatThrownBy(() -> ChildPosition.of(5, 5))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("index must be < total");
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("index must be < total");
         }
     }
 

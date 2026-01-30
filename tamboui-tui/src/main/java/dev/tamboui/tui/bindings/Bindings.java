@@ -4,23 +4,23 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.tui.event.Event;
-
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.tui.event.Event;
 
 /**
  * Maps input events to semantic actions.
  * <p>
- * Bindings support both keyboard and mouse events, allowing the same
- * action to be triggered by either input type.
+ * Bindings support both keyboard and mouse events, allowing the same action to
+ * be triggered by either input type.
  * <p>
- * Actions are identified by strings, with common actions defined as
- * constants in {@link Actions}. Custom actions can use any string.
+ * Actions are identified by strings, with common actions defined as constants
+ * in {@link Actions}. Custom actions can use any string.
  * <p>
- * Events (both {@code KeyEvent} and {@code MouseEvent}) carry their own bindings
- * and provide convenience methods for action matching. The preferred API is to
- * call {@code matches()} directly on the event:
+ * Events (both {@code KeyEvent} and {@code MouseEvent}) carry their own
+ * bindings and provide convenience methods for action matching. The preferred
+ * API is to call {@code matches()} directly on the event:
  *
  * <pre>{@code
  * // Preferred: call matches() on the event
@@ -34,11 +34,8 @@ import java.util.Optional;
  * }
  *
  * // Customizing bindings
- * Bindings custom = BindingSets.standard()
- *     .toBuilder()
- *     .bind(KeyTrigger.ch('x'), Actions.QUIT)
- *     .bind(MouseTrigger.rightClick(), "myAction")
- *     .build();
+ * Bindings custom = BindingSets.standard().toBuilder().bind(KeyTrigger.ch('x'), Actions.QUIT)
+ *         .bind(MouseTrigger.rightClick(), "myAction").build();
  * }</pre>
  *
  * @see Actions
@@ -50,8 +47,10 @@ public interface Bindings {
     /**
      * Returns true if the event matches the given action.
      *
-     * @param event  the input event
-     * @param action the action to check
+     * @param event
+     *            the input event
+     * @param action
+     *            the action to check
      * @return true if the event triggers the action
      */
     boolean matches(Event event, String action);
@@ -61,7 +60,8 @@ public interface Bindings {
      * <p>
      * If multiple actions could match, returns the first one found.
      *
-     * @param event the input event
+     * @param event
+     *            the input event
      * @return the matching action, or empty if no action matches
      */
     Optional<String> actionFor(Event event);
@@ -69,7 +69,8 @@ public interface Bindings {
     /**
      * Returns all triggers for the given action.
      *
-     * @param action the action
+     * @param action
+     *            the action
      * @return list of triggers (may be empty, never null)
      */
     List<InputTrigger> triggersFor(String action);
@@ -79,7 +80,8 @@ public interface Bindings {
      * <p>
      * Useful for generating help screens.
      *
-     * @param action the action
+     * @param action
+     *            the action
      * @return description like "Up, k" or "(unbound)" if no triggers
      */
     String describeBindings(String action);
@@ -101,8 +103,10 @@ public interface Bindings {
          * <p>
          * This adds to existing triggers for the action.
          *
-         * @param trigger the input trigger
-         * @param action  the action to bind to
+         * @param trigger
+         *            the input trigger
+         * @param action
+         *            the action to bind to
          * @return this builder
          */
         Builder bind(InputTrigger trigger, String action);
@@ -110,8 +114,10 @@ public interface Bindings {
         /**
          * Replaces all triggers for an action with the given trigger.
          *
-         * @param trigger the new trigger (replaces existing triggers)
-         * @param action  the action
+         * @param trigger
+         *            the new trigger (replaces existing triggers)
+         * @param action
+         *            the action
          * @return this builder
          */
         Builder rebind(InputTrigger trigger, String action);
@@ -119,7 +125,8 @@ public interface Bindings {
         /**
          * Removes all triggers for an action.
          *
-         * @param action the action to unbind
+         * @param action
+         *            the action to unbind
          * @return this builder
          */
         Builder unbind(String action);
@@ -127,7 +134,8 @@ public interface Bindings {
         /**
          * Copies all triggers from another bindings instance.
          *
-         * @param other the bindings to copy from
+         * @param other
+         *            the bindings to copy from
          * @return this builder
          */
         Builder copyFrom(Bindings other);

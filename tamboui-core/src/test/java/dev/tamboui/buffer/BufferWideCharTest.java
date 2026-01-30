@@ -4,10 +4,11 @@
  */
 package dev.tamboui.buffer;
 
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Style;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -281,7 +282,7 @@ class BufferWideCharTest {
         int[] codepoints = cellSymbol.codePoints().toArray();
         assertThat(codepoints).hasSize(3);
         assertThat(codepoints[0]).isEqualTo(0x1F468); // man
-        assertThat(codepoints[1]).isEqualTo(0x200D);  // ZWJ
+        assertThat(codepoints[1]).isEqualTo(0x200D); // ZWJ
         assertThat(codepoints[2]).isEqualTo(0x1F9B2); // bald
 
         // Cell 1 should be continuation
@@ -338,7 +339,8 @@ class BufferWideCharTest {
         assertThat(updates).hasSize(2);
 
         // Check both updates are present
-        boolean hasCell0 = updates.stream().anyMatch(u -> u.x() == 0 && u.cell().symbol().equals(baldMan));
+        boolean hasCell0 = updates.stream()
+                .anyMatch(u -> u.x() == 0 && u.cell().symbol().equals(baldMan));
         boolean hasCell1 = updates.stream().anyMatch(u -> u.x() == 1 && u.cell().isContinuation());
         assertThat(hasCell0).isTrue();
         assertThat(hasCell1).isTrue();

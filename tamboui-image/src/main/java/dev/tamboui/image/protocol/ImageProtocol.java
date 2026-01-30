@@ -4,41 +4,50 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.layout.Rect;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 /**
  * Protocol for rendering images to a terminal.
  * <p>
  * Implementations may render images using character-based approximations
- * (half-blocks, Braille patterns) or native terminal protocols (Sixel, Kitty, iTerm2).
+ * (half-blocks, Braille patterns) or native terminal protocols (Sixel, Kitty,
+ * iTerm2).
  */
 public interface ImageProtocol {
 
     /**
      * Renders the image to the given terminal area.
      * <p>
-     * Character-based protocols write directly to the buffer.
-     * Native protocols write to the raw output stream.
+     * Character-based protocols write directly to the buffer. Native protocols
+     * write to the raw output stream.
      *
-     * @param image     the image data to render
-     * @param area      the terminal area (in character cells) to render into
-     * @param buffer    the buffer for character-based rendering
-     * @param rawOutput the output stream for native protocol escape sequences (may be null)
-     * @throws IOException if writing to rawOutput fails
+     * @param image
+     *            the image data to render
+     * @param area
+     *            the terminal area (in character cells) to render into
+     * @param buffer
+     *            the buffer for character-based rendering
+     * @param rawOutput
+     *            the output stream for native protocol escape sequences (may be
+     *            null)
+     * @throws IOException
+     *             if writing to rawOutput fails
      */
-    void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput) throws IOException;
+    void render(ImageData image, Rect area, Buffer buffer, OutputStream rawOutput)
+            throws IOException;
 
     /**
      * Returns true if this protocol requires raw byte output.
      * <p>
-     * Character-based protocols (half-block, braille) return false and use the buffer.
-     * Native protocols (Sixel, Kitty, iTerm2) return true and use rawOutput.
+     * Character-based protocols (half-block, braille) return false and use the
+     * buffer. Native protocols (Sixel, Kitty, iTerm2) return true and use
+     * rawOutput.
      *
      * @return true if raw output is required
      */
@@ -49,9 +58,9 @@ public interface ImageProtocol {
      * <p>
      * This indicates how many "virtual pixels" each terminal cell can represent:
      * <ul>
-     *   <li>Half-block: 1x2 (1 column, 2 rows per cell)</li>
-     *   <li>Braille: 2x4 (2 columns, 4 rows per cell)</li>
-     *   <li>Native protocols: depends on cell pixel size</li>
+     * <li>Half-block: 1x2 (1 column, 2 rows per cell)</li>
+     * <li>Braille: 2x4 (2 columns, 4 rows per cell)</li>
+     * <li>Native protocols: depends on cell pixel size</li>
      * </ul>
      *
      * @return the resolution multiplier
@@ -82,8 +91,10 @@ public interface ImageProtocol {
         /**
          * Creates a resolution multiplier.
          *
-         * @param widthMultiplier  virtual pixels per cell horizontally
-         * @param heightMultiplier virtual pixels per cell vertically
+         * @param widthMultiplier
+         *            virtual pixels per cell horizontally
+         * @param heightMultiplier
+         *            virtual pixels per cell vertically
          */
         public Resolution(int widthMultiplier, int heightMultiplier) {
             this.widthMultiplier = widthMultiplier;

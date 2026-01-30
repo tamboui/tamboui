@@ -67,7 +67,7 @@ public final class PlatformConstants {
     public static final long TIOCGWINSZ = IS_MACOS ? 0x40087468L : 0x5413L;
 
     /** Local flag: enable echo of input characters. */
-    public static final int ECHO = 0x00000008;  // Same on both
+    public static final int ECHO = 0x00000008; // Same on both
     /** Local flag: enable canonical (line-by-line) input mode. */
     public static final int ICANON = IS_MACOS ? 0x00000100 : 0x00000002;
     /** Local flag: enable signal generation for INTR, QUIT, SUSP characters. */
@@ -78,23 +78,27 @@ public final class PlatformConstants {
     /** Input flag: enable XON/XOFF flow control on output. */
     public static final int IXON = IS_MACOS ? 0x00000200 : 0x00000400;
     /** Input flag: translate carriage return to newline on input. */
-    public static final int ICRNL = 0x00000100;  // Same on both
+    public static final int ICRNL = 0x00000100; // Same on both
     /** Input flag: signal interrupt on break. */
-    public static final int BRKINT = 0x00000002;  // Same on both
+    public static final int BRKINT = 0x00000002; // Same on both
     /** Input flag: enable input parity check. */
-    public static final int INPCK = 0x00000010;  // Same on both
+    public static final int INPCK = 0x00000010; // Same on both
     /** Input flag: strip eighth bit off input characters. */
-    public static final int ISTRIP = 0x00000020;  // Same on both
+    public static final int ISTRIP = 0x00000020; // Same on both
 
     /** Output flag: enable implementation-defined output processing. */
-    public static final int OPOST = 0x00000001;  // Same on both
+    public static final int OPOST = 0x00000001; // Same on both
 
     /** Control flag: set character size to 8 bits. */
     public static final int CS8 = IS_MACOS ? 0x00000300 : 0x00000030;
 
-    /** Control character index for minimum number of bytes for non-canonical read. */
+    /**
+     * Control character index for minimum number of bytes for non-canonical read.
+     */
     public static final int VMIN = IS_MACOS ? 16 : 6;
-    /** Control character index for timeout in deciseconds for non-canonical read. */
+    /**
+     * Control character index for timeout in deciseconds for non-canonical read.
+     */
     public static final int VTIME = IS_MACOS ? 17 : 5;
 
     /** Signal number for terminal window size change. */
@@ -103,49 +107,30 @@ public final class PlatformConstants {
     /**
      * Termios structure layout.
      * <p>
-     * Linux layout:
-     * - c_iflag (4 bytes)
-     * - c_oflag (4 bytes)
-     * - c_cflag (4 bytes)
-     * - c_lflag (4 bytes)
-     * - c_line (1 byte)
-     * - c_cc[32] (32 bytes)
-     * - padding (3 bytes)
-     * - c_ispeed (4 bytes)
-     * - c_ospeed (4 bytes)
+     * Linux layout: - c_iflag (4 bytes) - c_oflag (4 bytes) - c_cflag (4 bytes) -
+     * c_lflag (4 bytes) - c_line (1 byte) - c_cc[32] (32 bytes) - padding (3 bytes)
+     * - c_ispeed (4 bytes) - c_ospeed (4 bytes)
      * <p>
-     * macOS layout:
-     * - c_iflag (8 bytes - unsigned long)
-     * - c_oflag (8 bytes)
-     * - c_cflag (8 bytes)
-     * - c_lflag (8 bytes)
-     * - c_cc[20] (20 bytes)
-     * - padding (4 bytes)
-     * - c_ispeed (8 bytes)
-     * - c_ospeed (8 bytes)
+     * macOS layout: - c_iflag (8 bytes - unsigned long) - c_oflag (8 bytes) -
+     * c_cflag (8 bytes) - c_lflag (8 bytes) - c_cc[20] (20 bytes) - padding (4
+     * bytes) - c_ispeed (8 bytes) - c_ospeed (8 bytes)
      */
     public static final MemoryLayout TERMIOS_LAYOUT = IS_MACOS
-            ? MemoryLayout.structLayout(
-                    ValueLayout.JAVA_LONG.withName("c_iflag"),
+            ? MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("c_iflag"),
                     ValueLayout.JAVA_LONG.withName("c_oflag"),
                     ValueLayout.JAVA_LONG.withName("c_cflag"),
                     ValueLayout.JAVA_LONG.withName("c_lflag"),
                     MemoryLayout.sequenceLayout(20, ValueLayout.JAVA_BYTE).withName("c_cc"),
-                    MemoryLayout.paddingLayout(4),
-                    ValueLayout.JAVA_LONG.withName("c_ispeed"),
-                    ValueLayout.JAVA_LONG.withName("c_ospeed")
-            )
-            : MemoryLayout.structLayout(
-                    ValueLayout.JAVA_INT.withName("c_iflag"),
+                    MemoryLayout.paddingLayout(4), ValueLayout.JAVA_LONG.withName("c_ispeed"),
+                    ValueLayout.JAVA_LONG.withName("c_ospeed"))
+            : MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("c_iflag"),
                     ValueLayout.JAVA_INT.withName("c_oflag"),
                     ValueLayout.JAVA_INT.withName("c_cflag"),
                     ValueLayout.JAVA_INT.withName("c_lflag"),
                     ValueLayout.JAVA_BYTE.withName("c_line"),
                     MemoryLayout.sequenceLayout(32, ValueLayout.JAVA_BYTE).withName("c_cc"),
-                    MemoryLayout.paddingLayout(3),
-                    ValueLayout.JAVA_INT.withName("c_ispeed"),
-                    ValueLayout.JAVA_INT.withName("c_ospeed")
-            );
+                    MemoryLayout.paddingLayout(3), ValueLayout.JAVA_INT.withName("c_ispeed"),
+                    ValueLayout.JAVA_INT.withName("c_ospeed"));
 
     /**
      * Offset to the c_cc array in the termios structure.

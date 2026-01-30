@@ -4,13 +4,14 @@
  */
 package dev.tamboui.widgets.barchart;
 
-import dev.tamboui.text.Line;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.text.Line;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A group of {@link Bar}s in a {@link BarChart}.
@@ -22,14 +23,8 @@ import java.util.Optional;
  * BarGroup group = BarGroup.of(10, 20, 30);
  *
  * // Group with label
- * BarGroup group2 = BarGroup.builder()
- *     .label("Q1")
- *     .bars(
- *         Bar.of(100, "Jan"),
- *         Bar.of(150, "Feb"),
- *         Bar.of(120, "Mar")
- *     )
- *     .build();
+ * BarGroup group2 = BarGroup.builder().label("Q1")
+ *         .bars(Bar.of(100, "Jan"), Bar.of(150, "Feb"), Bar.of(120, "Mar")).build();
  * }</pre>
  */
 public final class BarGroup {
@@ -45,7 +40,8 @@ public final class BarGroup {
     /**
      * Creates a group from bar values.
      *
-     * @param values the bar values
+     * @param values
+     *            the bar values
      * @return the bar group
      */
     public static BarGroup of(long... values) {
@@ -59,7 +55,8 @@ public final class BarGroup {
     /**
      * Creates a group from bars.
      *
-     * @param bars the bars
+     * @param bars
+     *            the bars
      * @return the bar group
      */
     public static BarGroup of(Bar... bars) {
@@ -69,8 +66,10 @@ public final class BarGroup {
     /**
      * Creates a group from bars with a label.
      *
-     * @param label the group label
-     * @param bars the bars
+     * @param label
+     *            the group label
+     * @param bars
+     *            the bars
      * @return the bar group
      */
     public static BarGroup of(String label, Bar... bars) {
@@ -119,10 +118,7 @@ public final class BarGroup {
      * @return the maximum value
      */
     public long maxValue() {
-        return bars.stream()
-            .mapToLong(Bar::value)
-            .max()
-            .orElse(0);
+        return bars.stream().mapToLong(Bar::value).max().orElse(0);
     }
 
     /**
@@ -132,12 +128,14 @@ public final class BarGroup {
         private final List<Bar> bars = new ArrayList<>();
         private Line label;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         /**
          * Sets the bars in this group.
          *
-         * @param bars the bars
+         * @param bars
+         *            the bars
          * @return this builder
          */
         public Builder bars(Bar... bars) {
@@ -151,7 +149,8 @@ public final class BarGroup {
         /**
          * Sets the bars in this group.
          *
-         * @param bars the bars
+         * @param bars
+         *            the bars
          * @return this builder
          */
         public Builder bars(List<Bar> bars) {
@@ -165,7 +164,8 @@ public final class BarGroup {
         /**
          * Adds a bar to this group.
          *
-         * @param bar the bar to add
+         * @param bar
+         *            the bar to add
          * @return this builder
          */
         public Builder addBar(Bar bar) {
@@ -178,7 +178,8 @@ public final class BarGroup {
         /**
          * Adds a bar with the given value.
          *
-         * @param value the bar value
+         * @param value
+         *            the bar value
          * @return this builder
          */
         public Builder addBar(long value) {
@@ -188,8 +189,10 @@ public final class BarGroup {
         /**
          * Adds a bar with the given value and label.
          *
-         * @param value the bar value
-         * @param label the bar label
+         * @param value
+         *            the bar value
+         * @param label
+         *            the bar label
          * @return this builder
          */
         public Builder addBar(long value, String label) {
@@ -199,7 +202,8 @@ public final class BarGroup {
         /**
          * Sets the group's label.
          *
-         * @param label the group label
+         * @param label
+         *            the group label
          * @return this builder
          */
         public Builder label(String label) {
@@ -210,7 +214,8 @@ public final class BarGroup {
         /**
          * Sets the group's label.
          *
-         * @param label the group label
+         * @param label
+         *            the group label
          * @return this builder
          */
         public Builder label(Line label) {

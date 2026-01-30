@@ -4,11 +4,11 @@
  */
 package dev.tamboui.css.selector;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-
 import java.util.List;
 import java.util.Objects;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 
 /**
  * An ID selector that matches elements by their unique identifier.
@@ -22,7 +22,8 @@ public final class IdSelector implements Selector {
     /**
      * Creates an ID selector for the given identifier.
      *
-     * @param id the element identifier
+     * @param id
+     *            the element identifier
      */
     public IdSelector(String id) {
         this.id = Objects.requireNonNull(id);

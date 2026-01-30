@@ -4,10 +4,11 @@
  */
 package dev.tamboui.text;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Color;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -40,10 +41,7 @@ class TextTest {
     @Test
     @DisplayName("Text.from(Line...) creates text from lines")
     void fromLines() {
-        Text text = Text.from(
-            Line.from("First"),
-            Line.from("Second")
-        );
+        Text text = Text.from(Line.from("First"), Line.from("Second"));
         assertThat(text.lines()).hasSize(2);
     }
 

@@ -4,8 +4,8 @@
  */
 package dev.tamboui.tui.event;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -77,6 +77,7 @@ class MouseEventTest {
     void allButtonsSupported() {
         assertThat(MouseEvent.press(MouseButton.LEFT, 0, 0).button()).isEqualTo(MouseButton.LEFT);
         assertThat(MouseEvent.press(MouseButton.RIGHT, 0, 0).button()).isEqualTo(MouseButton.RIGHT);
-        assertThat(MouseEvent.press(MouseButton.MIDDLE, 0, 0).button()).isEqualTo(MouseButton.MIDDLE);
+        assertThat(MouseEvent.press(MouseButton.MIDDLE, 0, 0).button())
+                .isEqualTo(MouseButton.MIDDLE);
     }
 }

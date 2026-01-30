@@ -4,6 +4,9 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.ContentAlignment;
 import dev.tamboui.layout.ContentAlignmentConverter;
@@ -17,33 +20,29 @@ import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 /**
  * An overlapping layers layout element where children render on top of each
  * other using a painter's algorithm (last child on top).
  * <p>
- * Essential for dialogs, popups, floating overlays, and any scenario
- * where UI elements need to overlap.
+ * Essential for dialogs, popups, floating overlays, and any scenario where UI
+ * elements need to overlap.
  * <p>
- * All layout properties can be set via CSS or programmatically.
- * Programmatic values override CSS values when both are set.
+ * All layout properties can be set via CSS or programmatically. Programmatic
+ * values override CSS values when both are set.
  * <p>
  * Supported CSS properties:
  * <ul>
- *   <li>{@code content-align} — how children are aligned within the stack
- *       (default: {@code stretch})</li>
- *   <li>{@code margin} — margin around the stack layout</li>
- *   <li>{@code background} — background color fill</li>
+ * <li>{@code content-align} — how children are aligned within the stack
+ * (default: {@code stretch})</li>
+ * <li>{@code margin} — margin around the stack layout</li>
+ * <li>{@code background} — background color fill</li>
  * </ul>
  * <p>
  * Example usage:
+ * 
  * <pre>
- * stack(
- *     text("Background").fill(),
- *     panel("Dialog", text("Content")).rounded()
- * ).alignment(ContentAlignment.CENTER)
+ * stack(text("Background").fill(), panel("Dialog", text("Content")).rounded())
+ *         .alignment(ContentAlignment.CENTER)
  * </pre>
  */
 public final class StackElement extends ContainerElement<StackElement> {
@@ -51,8 +50,8 @@ public final class StackElement extends ContainerElement<StackElement> {
     /**
      * CSS property definition for the content alignment.
      */
-    public static final PropertyDefinition<ContentAlignment> CONTENT_ALIGN =
-        PropertyDefinition.of("content-align", ContentAlignmentConverter.INSTANCE);
+    public static final PropertyDefinition<ContentAlignment> CONTENT_ALIGN = PropertyDefinition
+            .of("content-align", ContentAlignmentConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(CONTENT_ALIGN);
@@ -70,7 +69,8 @@ public final class StackElement extends ContainerElement<StackElement> {
     /**
      * Creates a stack layout with the given children.
      *
-     * @param children the child elements
+     * @param children
+     *            the child elements
      */
     public StackElement(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -79,7 +79,8 @@ public final class StackElement extends ContainerElement<StackElement> {
     /**
      * Creates a stack layout with the given children.
      *
-     * @param children the child elements
+     * @param children
+     *            the child elements
      */
     public StackElement(Collection<? extends Element> children) {
         this.children.addAll(children);
@@ -88,10 +89,11 @@ public final class StackElement extends ContainerElement<StackElement> {
     /**
      * Sets how children are aligned within the stack.
      * <p>
-     * Default is {@link ContentAlignment#STRETCH} which fills
-     * children to the full area.
+     * Default is {@link ContentAlignment#STRETCH} which fills children to the full
+     * area.
      *
-     * @param alignment the alignment mode
+     * @param alignment
+     *            the alignment mode
      * @return this stack for method chaining
      */
     public StackElement alignment(ContentAlignment alignment) {
@@ -102,7 +104,8 @@ public final class StackElement extends ContainerElement<StackElement> {
     /**
      * Sets the margin around the stack layout.
      *
-     * @param margin the margin
+     * @param margin
+     *            the margin
      * @return this stack for method chaining
      */
     public StackElement margin(Margin margin) {
@@ -113,7 +116,8 @@ public final class StackElement extends ContainerElement<StackElement> {
     /**
      * Sets uniform margin around the stack layout.
      *
-     * @param value the margin value for all sides
+     * @param value
+     *            the margin value for all sides
      * @return this stack for method chaining
      */
     public StackElement margin(int value) {

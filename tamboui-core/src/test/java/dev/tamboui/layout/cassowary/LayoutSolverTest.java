@@ -4,14 +4,14 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Flex;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.List;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,11 +21,8 @@ class LayoutSolverTest {
     @DisplayName("Fixed length constraints")
     void fixedLengths() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.length(20),
-                Constraint.length(30),
-                Constraint.length(50)
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.length(20), Constraint.length(30),
+                Constraint.length(50));
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -36,10 +33,8 @@ class LayoutSolverTest {
     @DisplayName("Percentage constraints")
     void percentages() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.percentage(25),
-                Constraint.percentage(75)
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.percentage(25),
+                Constraint.percentage(75));
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -50,10 +45,8 @@ class LayoutSolverTest {
     @DisplayName("Ratio constraints")
     void ratios() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.ratio(1, 3),
-                Constraint.ratio(2, 3)
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.ratio(1, 3),
+                Constraint.ratio(2, 3));
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -66,11 +59,8 @@ class LayoutSolverTest {
     @DisplayName("Fill with equal weights")
     void fillEqualWeights() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.fill(),
-                Constraint.fill(),
-                Constraint.fill()
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.fill(), Constraint.fill(),
+                Constraint.fill());
 
         int[] sizes = solver.solve(constraints, 90, 0, Flex.START);
 
@@ -82,11 +72,8 @@ class LayoutSolverTest {
     @DisplayName("Fill with different weights")
     void fillDifferentWeights() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.fill(1),
-                Constraint.fill(2),
-                Constraint.fill(1)
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.fill(1), Constraint.fill(2),
+                Constraint.fill(1));
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -98,10 +85,7 @@ class LayoutSolverTest {
     @DisplayName("Min constraint is enforced")
     void minConstraint() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.min(30),
-                Constraint.fill()
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.min(30), Constraint.fill());
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -112,10 +96,7 @@ class LayoutSolverTest {
     @DisplayName("Max constraint is enforced")
     void maxConstraint() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.max(30),
-                Constraint.fill()
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.max(30), Constraint.fill());
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -126,11 +107,8 @@ class LayoutSolverTest {
     @DisplayName("Mixed constraints")
     void mixedConstraints() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.length(20),
-                Constraint.fill(),
-                Constraint.percentage(30)
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.length(20), Constraint.fill(),
+                Constraint.percentage(30));
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -153,9 +131,7 @@ class LayoutSolverTest {
     @DisplayName("Single constraint")
     void singleConstraint() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.fill()
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.fill());
 
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);
 
@@ -166,10 +142,7 @@ class LayoutSolverTest {
     @DisplayName("Sizes are never negative")
     void sizesNeverNegative() {
         LayoutSolver solver = new LayoutSolver();
-        List<Constraint> constraints = Arrays.asList(
-                Constraint.length(80),
-                Constraint.length(80)
-        );
+        List<Constraint> constraints = Arrays.asList(Constraint.length(80), Constraint.length(80));
 
         // More requested than available
         int[] sizes = solver.solve(constraints, 100, 0, Flex.START);

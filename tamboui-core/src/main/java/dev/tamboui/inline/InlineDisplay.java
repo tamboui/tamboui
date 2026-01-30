@@ -4,6 +4,11 @@
  */
 package dev.tamboui.inline;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.function.BiConsumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
@@ -15,27 +20,25 @@ import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Text;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.function.BiConsumer;
-
 /**
  * Manages a fixed-height inline display area for Gradle/NPM-style progress UX.
  * <p>
  * InlineDisplay reserves a number of lines at the current cursor position and
- * allows rendering widgets to that area. Content can be printed above the display
- * area using {@link #println(String)}, which scrolls output while the display area
- * stays in place.
+ * allows rendering widgets to that area. Content can be printed above the
+ * display area using {@link #println(String)}, which scrolls output while the
+ * display area stays in place.
  *
- * <p>Unlike full TUI runners, InlineDisplay does NOT:
+ * <p>
+ * Unlike full TUI runners, InlineDisplay does NOT:
  * <ul>
- *   <li>Enter alternate screen mode</li>
- *   <li>Hide the cursor</li>
- *   <li>Capture the entire terminal</li>
+ * <li>Enter alternate screen mode</li>
+ * <li>Hide the cursor</li>
+ * <li>Capture the entire terminal</li>
  * </ul>
  *
- * <p>Example usage:
+ * <p>
+ * Example usage:
+ * 
  * <pre>{@code
  * try (InlineDisplay display = InlineDisplay.create(3)) {
  *     for (int i = 0; i <= 100; i += 10) {
@@ -52,16 +55,16 @@ import java.util.function.BiConsumer;
  */
 public final class InlineDisplay implements AutoCloseable {
 
-    private final int height;  // Maximum height
+    private final int height; // Maximum height
     private final int width;
-    private Buffer buffer;  // Resizable buffer
+    private Buffer buffer; // Resizable buffer
     private final PrintWriter out;
     private final Backend backend;
     private boolean initialized;
     private boolean released;
     private boolean shouldClearOnClose;
-    private int lastCursorY;  // Track where cursor was left for next render
-    private int currentHeight;  // Current terminal lines allocated
+    private int lastCursorY; // Track where cursor was left for next render
+    private int currentHeight; // Current terminal lines allocated
 
     InlineDisplay(int height, int width, Backend backend, PrintWriter out) {
         this.height = height;
@@ -72,16 +75,18 @@ public final class InlineDisplay implements AutoCloseable {
         this.initialized = false;
         this.released = false;
         this.shouldClearOnClose = false;
-        this.currentHeight = 0;  // Not allocated yet
+        this.currentHeight = 0; // Not allocated yet
     }
 
     /**
-     * Creates an InlineDisplay with the specified height.
-     * The width is automatically set to the terminal width.
+     * Creates an InlineDisplay with the specified height. The width is
+     * automatically set to the terminal width.
      *
-     * @param height the number of lines to reserve for the display area
+     * @param height
+     *            the number of lines to reserve for the display area
      * @return a new InlineDisplay
-     * @throws IOException if terminal initialization fails
+     * @throws IOException
+     *             if terminal initialization fails
      */
     public static InlineDisplay create(int height) throws IOException {
         Backend backend = BackendFactory.create();
@@ -93,10 +98,13 @@ public final class InlineDisplay implements AutoCloseable {
     /**
      * Creates an InlineDisplay with the specified height and width.
      *
-     * @param height the number of lines to reserve for the display area
-     * @param width  the width of the display area in characters
+     * @param height
+     *            the number of lines to reserve for the display area
+     * @param width
+     *            the width of the display area in characters
      * @return a new InlineDisplay
-     * @throws IOException if terminal initialization fails
+     * @throws IOException
+     *             if terminal initialization fails
      */
     public static InlineDisplay create(int height, int width) throws IOException {
         Backend backend = BackendFactory.create();
@@ -104,16 +112,22 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Creates an InlineDisplay using an existing backend. The InlineDisplay will not take ownership
-     * of the backend; callers should avoid invoking {@link #close()} and instead call {@link #release()}.
+     * Creates an InlineDisplay using an existing backend. The InlineDisplay will
+     * not take ownership of the backend; callers should avoid invoking
+     * {@link #close()} and instead call {@link #release()}.
      *
-     * @param height the number of lines to reserve for the display area
-     * @param width  the width of the display area in characters
-     * @param backend the backend to use for output
+     * @param height
+     *            the number of lines to reserve for the display area
+     * @param width
+     *            the width of the display area in characters
+     * @param backend
+     *            the backend to use for output
      * @return a new InlineDisplay
-     * @throws IOException if initialization fails
+     * @throws IOException
+     *             if initialization fails
      */
-    public static InlineDisplay withBackend(int height, int width, Backend backend) throws IOException {
+    public static InlineDisplay withBackend(int height, int width, Backend backend)
+            throws IOException {
         PrintWriter out = createPrintWriter(backend);
         return new InlineDisplay(height, width, backend, out);
     }
@@ -145,8 +159,8 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Configures the display to clear the display area when closed.
-     * By default, the display area content remains visible after close.
+     * Configures the display to clear the display area when closed. By default, the
+     * display area content remains visible after close.
      *
      * @return this display for chaining
      */
@@ -156,25 +170,31 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Renders widgets to the display area.
-     * The provided consumer receives the area and buffer to render into.
+     * Renders widgets to the display area. The provided consumer receives the area
+     * and buffer to render into.
      *
-     * @param renderer the rendering function that populates the buffer
+     * @param renderer
+     *            the rendering function that populates the buffer
      */
     public void render(BiConsumer<Rect, Buffer> renderer) {
         render(renderer, height, -1, -1);
     }
 
     /**
-     * Renders widgets to the display area with explicit cursor positioning.
-     * The provided consumer receives the area and buffer to render into.
+     * Renders widgets to the display area with explicit cursor positioning. The
+     * provided consumer receives the area and buffer to render into.
      *
-     * @param renderer the rendering function that populates the buffer
-     * @param contentHeight the desired height of the content in lines
-     * @param cursorX the x position for the cursor, or -1 to use default positioning
-     * @param cursorY the y position for the cursor, or -1 to use default positioning
+     * @param renderer
+     *            the rendering function that populates the buffer
+     * @param contentHeight
+     *            the desired height of the content in lines
+     * @param cursorX
+     *            the x position for the cursor, or -1 to use default positioning
+     * @param cursorY
+     *            the y position for the cursor, or -1 to use default positioning
      */
-    public void render(BiConsumer<Rect, Buffer> renderer, int contentHeight, int cursorX, int cursorY) {
+    public void render(BiConsumer<Rect, Buffer> renderer, int contentHeight, int cursorX,
+            int cursorY) {
         ensureInitialized();
 
         // Resize display if content height changed
@@ -189,11 +209,13 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Sets a single line of text in the display area.
-     * This is a convenience method for simple text updates without widgets.
+     * Sets a single line of text in the display area. This is a convenience method
+     * for simple text updates without widgets.
      *
-     * @param line    the line index (0-based, must be less than height)
-     * @param content the text content to display
+     * @param line
+     *            the line index (0-based, must be less than height)
+     * @param content
+     *            the text content to display
      */
     public void setLine(int line, String content) {
         if (line < 0 || line >= height) {
@@ -218,8 +240,10 @@ public final class InlineDisplay implements AutoCloseable {
     /**
      * Sets a single line of styled text in the display area.
      *
-     * @param line the line index (0-based, must be less than height)
-     * @param text the styled text to display
+     * @param line
+     *            the line index (0-based, must be less than height)
+     * @param text
+     *            the styled text to display
      */
     public void setLine(int line, Text text) {
         if (line < 0 || line >= height) {
@@ -246,11 +270,11 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Prints a line of text above the display area.
-     * The text scrolls up as new lines are added, while the display area
-     * stays in place at the bottom.
+     * Prints a line of text above the display area. The text scrolls up as new
+     * lines are added, while the display area stays in place at the bottom.
      *
-     * @param message the message to print
+     * @param message
+     *            the message to print
      */
     public void println(String message) {
         ensureInitialized();
@@ -292,7 +316,8 @@ public final class InlineDisplay implements AutoCloseable {
     /**
      * Prints styled text above the display area.
      *
-     * @param text the styled text to print
+     * @param text
+     *            the styled text to print
      */
     public void println(Text text) {
         // Render text to a temporary buffer for ANSI conversion
@@ -307,8 +332,8 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Explicitly releases the display before close().
-     * Moves the cursor below the display area and optionally clears it.
+     * Explicitly releases the display before close(). Moves the cursor below the
+     * display area and optionally clears it.
      */
     public void release() {
         if (released) {
@@ -326,9 +351,9 @@ public final class InlineDisplay implements AutoCloseable {
             if (toBottom > 0) {
                 backend.moveCursorDown(toBottom);
             }
-            out.print(AnsiStringBuilder.RESET);  // Reset style
+            out.print(AnsiStringBuilder.RESET); // Reset style
             backend.showCursor();
-            out.print("\u001b[0 q");  // Reset cursor to default style
+            out.print("\u001b[0 q"); // Reset cursor to default style
             out.println();
             out.flush();
         } catch (IOException e) {
@@ -380,7 +405,8 @@ public final class InlineDisplay implements AutoCloseable {
         }
 
         initialized = true;
-        // Note: Initial height allocation happens in first render() call via resizeDisplay()
+        // Note: Initial height allocation happens in first render() call via
+        // resizeDisplay()
     }
 
     private void redrawDisplayArea(int cursorX, int cursorY) {
@@ -388,7 +414,7 @@ public final class InlineDisplay implements AutoCloseable {
         // TextInput renders cursor as a styled cell (reversed) in the buffer.
 
         if (currentHeight == 0) {
-            return;  // Nothing to draw
+            return; // Nothing to draw
         }
 
         try {
@@ -466,8 +492,8 @@ public final class InlineDisplay implements AutoCloseable {
     }
 
     /**
-     * Finds the position after the last non-empty cell on a line,
-     * accounting for wide character display widths.
+     * Finds the position after the last non-empty cell on a line, accounting for
+     * wide character display widths.
      */
     private int findLastContentPosition(int line) {
         for (int x = width - 1; x >= 0; x--) {
@@ -510,11 +536,12 @@ public final class InlineDisplay implements AutoCloseable {
     /**
      * Resizes the display area to the specified height.
      * <p>
-     * When growing, inserts new lines at the bottom and moves cursor up.
-     * When shrinking, deletes lines from the bottom and moves cursor up.
-     * This ensures content above the display is pushed down/up accordingly.
+     * When growing, inserts new lines at the bottom and moves cursor up. When
+     * shrinking, deletes lines from the bottom and moves cursor up. This ensures
+     * content above the display is pushed down/up accordingly.
      *
-     * @param newHeight the new height in lines
+     * @param newHeight
+     *            the new height in lines
      */
     private void resizeDisplay(int newHeight) {
         if (newHeight < 0) {
@@ -522,7 +549,7 @@ public final class InlineDisplay implements AutoCloseable {
         }
 
         if (newHeight == currentHeight) {
-            return;  // No change needed
+            return; // No change needed
         }
 
         try {

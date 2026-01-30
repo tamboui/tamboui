@@ -4,19 +4,19 @@
  */
 package dev.tamboui.widgets;
 
-import dev.tamboui.terminal.Terminal;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Terminal;
 import dev.tamboui.widget.Widget;
 
 /**
  * A widget that clears/resets the area it is rendered to.
  * <p>
- * This widget is useful for layering widgets on top of each other,
- * such as rendering popups or modal dialogs over existing content.
- * By first rendering {@code Clear} to an area, you can ensure the
- * area is reset before rendering other widgets on top.
+ * This widget is useful for layering widgets on top of each other, such as
+ * rendering popups or modal dialogs over existing content. By first rendering
+ * {@code Clear} to an area, you can ensure the area is reset before rendering
+ * other widgets on top.
  *
  * <pre>{@code
  * // Clear an area before rendering a popup
@@ -24,9 +24,10 @@ import dev.tamboui.widget.Widget;
  * frame.renderWidget(popupContent, popupArea);
  * }</pre>
  *
- * <p><b>Note:</b> This widget cannot be used to clear the terminal on the
- * first render, as the rendering system assumes the render area starts empty.
- * Use {@code Terminal.clear()} instead for initial screen clearing.
+ * <p>
+ * <b>Note:</b> This widget cannot be used to clear the terminal on the first
+ * render, as the rendering system assumes the render area starts empty. Use
+ * {@code Terminal.clear()} instead for initial screen clearing.
  *
  * @see Terminal#clear()
  */

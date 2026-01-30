@@ -4,19 +4,21 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.concurrent.atomic.AtomicLong;
+
+import dev.tamboui.layout.Fraction;
 
 /**
  * A variable in the Cassowary constraint system.
  *
- * <p>Variables represent unknown values to be solved for, such as widget
- * positions or sizes. Each variable has a unique identifier and an optional
- * name for debugging purposes.
+ * <p>
+ * Variables represent unknown values to be solved for, such as widget positions
+ * or sizes. Each variable has a unique identifier and an optional name for
+ * debugging purposes.
  *
- * <p>Variables use identity semantics - two variables are equal only if they
- * are the same instance.
+ * <p>
+ * Variables use identity semantics - two variables are equal only if they are
+ * the same instance.
  */
 public final class Variable {
 
@@ -28,7 +30,8 @@ public final class Variable {
     /**
      * Creates a new variable with the given name.
      *
-     * @param name the variable name (for debugging)
+     * @param name
+     *            the variable name (for debugging)
      */
     public Variable(String name) {
         this.id = ID_GENERATOR.incrementAndGet();
@@ -72,7 +75,8 @@ public final class Variable {
     /**
      * Creates a term with this variable and the given coefficient.
      *
-     * @param coefficient the coefficient to multiply by
+     * @param coefficient
+     *            the coefficient to multiply by
      * @return a term representing coefficient * this
      */
     public Term times(Fraction coefficient) {
@@ -82,7 +86,8 @@ public final class Variable {
     /**
      * Creates a term with this variable and the given coefficient.
      *
-     * @param coefficient the coefficient to multiply by
+     * @param coefficient
+     *            the coefficient to multiply by
      * @return a term representing coefficient * this
      */
     public Term times(long coefficient) {

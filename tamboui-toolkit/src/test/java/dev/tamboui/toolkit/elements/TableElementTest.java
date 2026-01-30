@@ -4,17 +4,18 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.table.TableState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
@@ -28,16 +29,10 @@ class TableElementTest {
     @DisplayName("TableElement fluent API chains correctly")
     void fluentApiChaining() {
         TableState state = new TableState();
-        TableElement element = table()
-            .header("Name", "Age", "City")
-            .row("Alice", "30", "NYC")
-            .row("Bob", "25", "LA")
-            .state(state)
-            .widths(Constraint.percentage(40), Constraint.length(10), Constraint.fill())
-            .highlightColor(Color.YELLOW)
-            .title("Users")
-            .rounded()
-            .borderColor(Color.CYAN);
+        TableElement element = table().header("Name", "Age", "City").row("Alice", "30", "NYC")
+                .row("Bob", "25", "LA").state(state)
+                .widths(Constraint.percentage(40), Constraint.length(10), Constraint.fill())
+                .highlightColor(Color.YELLOW).title("Users").rounded().borderColor(Color.CYAN);
 
         assertThat(element).isInstanceOf(TableElement.class);
     }
@@ -59,19 +54,15 @@ class TableElementTest {
     @Test
     @DisplayName("row() adds data rows")
     void rowMethod() {
-        TableElement element = table()
-            .header("Name", "Value")
-            .row("A", "1")
-            .row("B", "2")
-            .row("C", "3");
+        TableElement element = table().header("Name", "Value").row("A", "1").row("B", "2").row("C",
+                "3");
         assertThat(element).isNotNull();
     }
 
     @Test
     @DisplayName("widths() sets column widths")
     void widthsMethod() {
-        TableElement element = table()
-            .widths(Constraint.length(10), Constraint.fill());
+        TableElement element = table().widths(Constraint.length(10), Constraint.fill());
         assertThat(element).isNotNull();
     }
 
@@ -83,15 +74,9 @@ class TableElementTest {
         Frame frame = Frame.forTesting(buffer);
         TableState state = new TableState();
 
-        table()
-            .header("Name", "Age")
-            .row("Alice", "30")
-            .row("Bob", "25")
-            .state(state)
-            .widths(Constraint.fill(), Constraint.length(10))
-            .title("Table")
-            .rounded()
-            .render(frame, area, RenderContext.empty());
+        table().header("Name", "Age").row("Alice", "30").row("Bob", "25").state(state)
+                .widths(Constraint.fill(), Constraint.length(10)).title("Table").rounded()
+                .render(frame, area, RenderContext.empty());
 
         // Check border is rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -106,13 +91,8 @@ class TableElementTest {
         TableState state = new TableState();
         state.select(1);
 
-        table()
-            .header("X", "Y")
-            .row("A", "1")
-            .row("B", "2")
-            .state(state)
-            .highlightColor(Color.GREEN)
-            .render(frame, area, RenderContext.empty());
+        table().header("X", "Y").row("A", "1").row("B", "2").state(state)
+                .highlightColor(Color.GREEN).render(frame, area, RenderContext.empty());
 
         // Should render without error
         assertThat(buffer).isNotNull();
@@ -127,11 +107,7 @@ class TableElementTest {
         TableState state = new TableState();
 
         // Should not throw
-        table()
-            .header("A")
-            .row("1")
-            .state(state)
-            .render(frame, emptyArea, RenderContext.empty());
+        table().header("A").row("1").state(state).render(frame, emptyArea, RenderContext.empty());
     }
 
     @Test
@@ -142,34 +118,27 @@ class TableElementTest {
         Frame frame = Frame.forTesting(buffer);
 
         // Should not throw even without state
-        table()
-            .header("Col")
-            .row("Value")
-            .render(frame, area, RenderContext.empty());
+        table().header("Col").row("Value").render(frame, area, RenderContext.empty());
     }
 
     @Test
     @DisplayName("highlightSymbol sets selection indicator")
     void highlightSymbol() {
-        TableElement element = table()
-            .highlightSymbol("→ ");
+        TableElement element = table().highlightSymbol("→ ");
         assertThat(element).isNotNull();
     }
 
     @Test
     @DisplayName("columnSpacing sets gap between columns")
     void columnSpacing() {
-        TableElement element = table()
-            .columnSpacing(2);
+        TableElement element = table().columnSpacing(2);
         assertThat(element).isNotNull();
     }
 
     @Test
     @DisplayName("footer() sets table footer")
     void footerMethod() {
-        TableElement element = table()
-            .header("H1", "H2")
-            .footer("Total", "100");
+        TableElement element = table().header("H1", "H2").footer("Total", "100");
         assertThat(element).isNotNull();
     }
 
@@ -182,10 +151,7 @@ class TableElementTest {
     @Test
     @DisplayName("preferredHeight returns content height for table elements")
     void preferredHeightReturnsContentHeight() {
-        TableElement element = table()
-            .header("Name", "Age")
-            .row("Alice", "30")
-            .row("Bob", "25");
+        TableElement element = table().header("Name", "Age").row("Alice", "30").row("Bob", "25");
 
         // 1 header row + 2 data rows = 3
         assertThat(element.preferredHeight()).isEqualTo(3);
@@ -206,7 +172,8 @@ class TableElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        table().header("Name", "Age").row("Alice", "30").title("Users").rounded().render(frame, area, context);
+        table().header("Name", "Age").row("Alice", "30").title("Users").rounded().render(frame,
+                area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }

@@ -10,15 +10,15 @@ import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
  * Demo entry point
- * @throws Exception in case something goes wrong
+ * 
+ * @throws Exception
+ *             in case something goes wrong
  */
 void main() throws Exception {
     try (var runner = ToolkitRunner.create()) {
-        runner.run(() ->
-                panel("Toolkit Demo",
-                        markupText("Hello, [red italic]TamboUI![/]").length(1),
-                        row(markupText("Press [green]q[/] to exit!").fit()).length(1).flex(END)
-                ).flex(SPACE_BETWEEN)
-        );
+        runner.run(
+                () -> panel("Toolkit Demo", markupText("Hello, [red italic]TamboUI![/]").length(1),
+                        row(markupText("Press [green]q[/] to exit!").fit()).length(1).flex(END))
+                        .flex(SPACE_BETWEEN));
     }
 }

@@ -4,25 +4,6 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.toolkit.event.DragHandler;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.toolkit.event.KeyEventHandler;
-import dev.tamboui.toolkit.event.MouseEventHandler;
-import dev.tamboui.toolkit.id.IdGenerator;
-import dev.tamboui.tui.bindings.ActionHandler;
-import dev.tamboui.tui.error.TuiException;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.tui.event.MouseEvent;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -31,13 +12,33 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.event.DragHandler;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.event.KeyEventHandler;
+import dev.tamboui.toolkit.event.MouseEventHandler;
+import dev.tamboui.toolkit.id.IdGenerator;
+import dev.tamboui.tui.bindings.ActionHandler;
+import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.MouseEvent;
+
 /**
- * Abstract base for elements that support styling and event handling.
- * Provides a fluent API for setting colors, modifiers, and event handlers.
+ * Abstract base for elements that support styling and event handling. Provides
+ * a fluent API for setting colors, modifiers, and event handlers.
  * <p>
  * Implements {@link Styleable} to support CSS-based styling.
  *
- * @param <T> the concrete element type for method chaining
+ * @param <T>
+ *            the concrete element type for method chaining
  */
 public abstract class StyledElement<T extends StyledElement<T>> implements Element, Styleable {
 
@@ -85,7 +86,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the foreground color.
      *
-     * @param color the foreground color
+     * @param color
+     *            the foreground color
      * @return this element for chaining
      */
     public T fg(Color color) {
@@ -179,7 +181,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the background color.
      *
-     * @param color the background color
+     * @param color
+     *            the background color
      * @return this element for chaining
      */
     public T bg(Color color) {
@@ -326,7 +329,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the style for this element.
      *
-     * @param style the style to apply
+     * @param style
+     *            the style to apply
      * @return this element for chaining
      */
     public T style(Style style) {
@@ -350,20 +354,24 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Renders this element. This is a template method that:
      * <ol>
-     *   <li>Resolves the effective CSS + inline style</li>
-     *   <li>Pushes the style and CSS resolver onto the context's stacks</li>
-     *   <li>Calls {@link #renderContent} for subclass-specific rendering</li>
-     *   <li>Pops the style and resolver when done</li>
+     * <li>Resolves the effective CSS + inline style</li>
+     * <li>Pushes the style and CSS resolver onto the context's stacks</li>
+     * <li>Calls {@link #renderContent} for subclass-specific rendering</li>
+     * <li>Pops the style and resolver when done</li>
      * </ol>
      * <p>
-     * Subclasses must implement {@link #renderContent} instead of overriding this method.
-     * The current style is available via {@link RenderContext#currentStyle()}.
-     * CSS properties not in Style (e.g., border-type) can be accessed from parent
-     * elements via {@link DefaultRenderContext#currentResolver()}.
+     * Subclasses must implement {@link #renderContent} instead of overriding this
+     * method. The current style is available via
+     * {@link RenderContext#currentStyle()}. CSS properties not in Style (e.g.,
+     * border-type) can be accessed from parent elements via
+     * {@link DefaultRenderContext#currentResolver()}.
      *
-     * @param frame the frame to render to
-     * @param area the area to render in
-     * @param context the render context
+     * @param frame
+     *            the frame to render to
+     * @param area
+     *            the area to render in
+     * @param context
+     *            the render context
      */
     @Override
     public final void render(Frame frame, Rect area, RenderContext context) {
@@ -397,7 +405,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
             if (isFocusable() && elementId == null) {
                 elementId = IdGenerator.newId(this);
             }
-            ctx.withElement(this, effectiveStyle, cssResolver, () -> renderContent(frame, area, context));
+            ctx.withElement(this, effectiveStyle, cssResolver,
+                    () -> renderContent(frame, area, context));
             ctx.registerElement(this, area);
         } else {
             // Fallback for non-default contexts (e.g., testing)
@@ -408,81 +417,94 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Renders the content of this element.
      * <p>
-     * Subclasses implement this method to perform their specific rendering.
-     * The current style (CSS + inline, merged with parent styles) is available
-     * via {@link RenderContext#currentStyle()}.
+     * Subclasses implement this method to perform their specific rendering. The
+     * current style (CSS + inline, merged with parent styles) is available via
+     * {@link RenderContext#currentStyle()}.
      *
-     * @param frame the frame to render to
-     * @param area the area to render in
-     * @param context the render context
+     * @param frame
+     *            the frame to render to
+     * @param area
+     *            the area to render in
+     * @param context
+     *            the render context
      */
     protected abstract void renderContent(Frame frame, Rect area, RenderContext context);
 
     /**
-     * Resolves a style for a sub-component following the priority: explicit > CSS > default.
+     * Resolves a style for a sub-component following the priority: explicit > CSS >
+     * default.
      * <p>
-     * This helper method standardizes how element sub-components (like cursors, placeholders,
-     * scrollbar thumbs, etc.) resolve their styles. It enables CSS theming while preserving
-     * programmatic control when needed.
+     * This helper method standardizes how element sub-components (like cursors,
+     * placeholders, scrollbar thumbs, etc.) resolve their styles. It enables CSS
+     * theming while preserving programmatic control when needed.
      * <p>
      * The resolution order is:
      * <ol>
-     *   <li>If {@code explicitStyle} is non-null, use it (programmatic override)</li>
-     *   <li>Otherwise, check CSS via {@link RenderContext#childStyle(String)}</li>
-     *   <li>If CSS provides styles, use those</li>
-     *   <li>Otherwise, use {@code defaultStyle}</li>
+     * <li>If {@code explicitStyle} is non-null, use it (programmatic override)</li>
+     * <li>Otherwise, check CSS via {@link RenderContext#childStyle(String)}</li>
+     * <li>If CSS provides styles, use those</li>
+     * <li>Otherwise, use {@code defaultStyle}</li>
      * </ol>
      * <p>
      * Example usage in a TextInput element:
+     * 
      * <pre>{@code
      * // In renderContent():
-     * Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle, DEFAULT_CURSOR_STYLE);
-     * Style effectivePlaceholderStyle = resolveEffectiveStyle(context, "placeholder", placeholderStyle, DEFAULT_PLACEHOLDER_STYLE);
+     * Style effectiveCursorStyle = resolveEffectiveStyle(context, "cursor", cursorStyle,
+     *         DEFAULT_CURSOR_STYLE);
+     * Style effectivePlaceholderStyle = resolveEffectiveStyle(context, "placeholder",
+     *         placeholderStyle, DEFAULT_PLACEHOLDER_STYLE);
      * }</pre>
      * <p>
      * This enables CSS like:
+     * 
      * <pre>{@code
      * TextInputElement-cursor { text-style: reversed; }
      * TextInputElement-placeholder { color: gray; }
      * }</pre>
      *
-     * @param context the render context for CSS resolution
-     * @param childName the child name (e.g., "cursor", "placeholder", "thumb")
-     * @param explicitStyle the explicitly set style (may be null for CSS/default)
-     * @param defaultStyle the default style to use when no explicit or CSS style is set
+     * @param context
+     *            the render context for CSS resolution
+     * @param childName
+     *            the child name (e.g., "cursor", "placeholder", "thumb")
+     * @param explicitStyle
+     *            the explicitly set style (may be null for CSS/default)
+     * @param defaultStyle
+     *            the default style to use when no explicit or CSS style is set
      * @return the resolved style
      */
-    protected Style resolveEffectiveStyle(RenderContext context,
-                                          String childName,
-                                          Style explicitStyle,
-                                          Style defaultStyle) {
+    protected Style resolveEffectiveStyle(RenderContext context, String childName,
+            Style explicitStyle, Style defaultStyle) {
         return resolveEffectiveStyle(context, childName, null, explicitStyle, defaultStyle);
     }
 
     /**
-     * Resolves a style for a sub-component with pseudo-class state, following the priority: explicit > CSS > default.
+     * Resolves a style for a sub-component with pseudo-class state, following the
+     * priority: explicit > CSS > default.
      * <p>
      * Use this overload for stateful children like selected items or focused tabs.
      * <p>
      * Example usage:
+     * 
      * <pre>{@code
-     * Style effectiveHighlightStyle = resolveEffectiveStyle(
-     *     context, "item", PseudoClassState.ofSelected(),
-     *     highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
+     * Style effectiveHighlightStyle = resolveEffectiveStyle(context, "item",
+     *         PseudoClassState.ofSelected(), highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
      * }</pre>
      *
-     * @param context the render context for CSS resolution
-     * @param childName the child name (e.g., "item", "row", "tab")
-     * @param state the pseudo-class state (e.g., selected, hover), or null for none
-     * @param explicitStyle the explicitly set style (may be null for CSS/default)
-     * @param defaultStyle the default style to use when no explicit or CSS style is set
+     * @param context
+     *            the render context for CSS resolution
+     * @param childName
+     *            the child name (e.g., "item", "row", "tab")
+     * @param state
+     *            the pseudo-class state (e.g., selected, hover), or null for none
+     * @param explicitStyle
+     *            the explicitly set style (may be null for CSS/default)
+     * @param defaultStyle
+     *            the default style to use when no explicit or CSS style is set
      * @return the resolved style
      */
-    protected Style resolveEffectiveStyle(RenderContext context,
-                                          String childName,
-                                          PseudoClassState state,
-                                          Style explicitStyle,
-                                          Style defaultStyle) {
+    protected Style resolveEffectiveStyle(RenderContext context, String childName,
+            PseudoClassState state, Style explicitStyle, Style defaultStyle) {
         // Priority 1: Explicit programmatic style
         if (explicitStyle != null) {
             return explicitStyle;
@@ -490,8 +512,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
 
         // Priority 2: CSS child style
         Style cssStyle = state != null
-            ? context.childStyle(childName, state)
-            : context.childStyle(childName);
+                ? context.childStyle(childName, state)
+                : context.childStyle(childName);
         if (!cssStyle.equals(context.currentStyle())) {
             // CSS provided specific styling for this child
             return cssStyle;
@@ -504,15 +526,16 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Gets the StylePropertyResolver for CSS property resolution.
      * <p>
-     * This is useful for passing to widgets like Block that need to resolve
-     * CSS properties beyond basic styling (e.g., border-type, border-color).
+     * This is useful for passing to widgets like Block that need to resolve CSS
+     * properties beyond basic styling (e.g., border-type, border-color).
      *
-     * @param context the render context
-     * @return the StylePropertyResolver, or an empty resolver if no CSS is available
+     * @param context
+     *            the render context
+     * @return the StylePropertyResolver, or an empty resolver if no CSS is
+     *         available
      */
     protected StylePropertyResolver styleResolver(RenderContext context) {
-        return context.resolveStyle(this)
-                .map(r -> (StylePropertyResolver) r)
+        return context.resolveStyle(this).map(r -> (StylePropertyResolver) r)
                 .orElse(StylePropertyResolver.empty());
     }
 
@@ -521,7 +544,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the layout constraint for this element.
      *
-     * @param constraint the constraint
+     * @param constraint
+     *            the constraint
      * @return this element for chaining
      */
     public T constraint(Constraint constraint) {
@@ -532,7 +556,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the constraint to an exact length.
      *
-     * @param length the exact length
+     * @param length
+     *            the exact length
      * @return this element for chaining
      */
     public T length(int length) {
@@ -542,7 +567,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the constraint to a percentage of the parent's size.
      *
-     * @param percent the percentage value
+     * @param percent
+     *            the percentage value
      * @return this element for chaining
      */
     public T percent(int percent) {
@@ -561,7 +587,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the constraint to fill available space with the given weight.
      *
-     * @param weight the fill weight
+     * @param weight
+     *            the fill weight
      * @return this element for chaining
      */
     public T fill(int weight) {
@@ -571,7 +598,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets a minimum size constraint.
      *
-     * @param min the minimum size
+     * @param min
+     *            the minimum size
      * @return this element for chaining
      */
     public T min(int min) {
@@ -581,7 +609,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets a maximum size constraint.
      *
-     * @param max the maximum size
+     * @param max
+     *            the maximum size
      * @return this element for chaining
      */
     public T max(int max) {
@@ -592,8 +621,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      * Sets the constraint to fit the element's preferred size.
      * <p>
      * When used in a row, the element will take only as much width as needed
-     * (queried via {@link #preferredWidth()}). This is useful for inline text
-     * where you want each text element to use its natural width.
+     * (queried via {@link #preferredWidth()}). This is useful for inline text where
+     * you want each text element to use its natural width.
      *
      * @return this element for chaining
      */
@@ -613,17 +642,21 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      * <p>
      * When an element is focusable:
      * <ul>
-     *   <li>It is included in the focus chain for TAB/Shift+TAB navigation</li>
-     *   <li>It receives keyboard events via {@link #handleKeyEvent(KeyEvent, boolean)} when focused</li>
-     *   <li>An ID is required for focus management - if not set via {@link #id(String)},
-     *       one will be auto-generated at render time</li>
+     * <li>It is included in the focus chain for TAB/Shift+TAB navigation</li>
+     * <li>It receives keyboard events via
+     * {@link #handleKeyEvent(KeyEvent, boolean)} when focused</li>
+     * <li>An ID is required for focus management - if not set via
+     * {@link #id(String)}, one will be auto-generated at render time</li>
      * </ul>
      * <p>
-     * Note: {@code focusable()} and {@link #onKeyEvent(KeyEventHandler)} are orthogonal:
+     * Note: {@code focusable()} and {@link #onKeyEvent(KeyEventHandler)} are
+     * orthogonal:
      * <ul>
-     *   <li>Use {@code focusable()} when the element should participate in TAB navigation</li>
-     *   <li>Use {@code onKeyEvent()} to handle keyboard events (works regardless of focusability)</li>
-     *   <li>Use both when you want TAB navigation AND custom key handling</li>
+     * <li>Use {@code focusable()} when the element should participate in TAB
+     * navigation</li>
+     * <li>Use {@code onKeyEvent()} to handle keyboard events (works regardless of
+     * focusability)</li>
+     * <li>Use both when you want TAB navigation AND custom key handling</li>
      * </ul>
      *
      * @return this element for chaining
@@ -636,7 +669,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets whether this element is focusable for TAB navigation.
      *
-     * @param focusable true to make focusable, false otherwise
+     * @param focusable
+     *            true to make focusable, false otherwise
      * @return this element for chaining
      * @see #focusable() for more details on focusability
      */
@@ -655,16 +689,19 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the element's ID for focus management and CSS targeting.
      * <p>
-     * The ID is immutable once set and cannot be changed. If an ID is needed
-     * but not explicitly provided, calling {@link #focusable()} will auto-generate one.
+     * The ID is immutable once set and cannot be changed. If an ID is needed but
+     * not explicitly provided, calling {@link #focusable()} will auto-generate one.
      *
-     * @param id the unique identifier for this element
+     * @param id
+     *            the unique identifier for this element
      * @return this element for chaining
-     * @throws IllegalStateException if the ID has already been set
+     * @throws IllegalStateException
+     *             if the ID has already been set
      */
     public T id(String id) {
         if (this.elementId != null) {
-            throw new TuiException("Element ID cannot be changed once set. Current ID: " + this.elementId);
+            throw new TuiException(
+                    "Element ID cannot be changed once set. Current ID: " + this.elementId);
         }
         this.elementId = id;
         return self();
@@ -680,7 +717,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Adds one or more CSS classes to this element.
      *
-     * @param classes the class names to add
+     * @param classes
+     *            the class names to add
      * @return this element for chaining
      */
     public T addClass(String... classes) {
@@ -695,7 +733,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Removes a CSS class from this element.
      *
-     * @param className the class name to remove
+     * @param className
+     *            the class name to remove
      * @return this element for chaining
      */
     public T removeClass(String className) {
@@ -706,8 +745,10 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Toggles a CSS class based on a condition.
      *
-     * @param className the class name to toggle
-     * @param condition true to add the class, false to remove it
+     * @param className
+     *            the class name to toggle
+     * @param condition
+     *            true to add the class, false to remove it
      * @return this element for chaining
      */
     public T toggleClass(String className, boolean condition) {
@@ -722,7 +763,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets the CSS parent for ancestor matching.
      *
-     * @param parent the parent element
+     * @param parent
+     *            the parent element
      * @return this element for chaining
      */
     public T cssParent(Styleable parent) {
@@ -736,8 +778,10 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      * Style attributes can be used with CSS attribute selectors like
      * {@code Panel[data-type="info"]} to target specific elements.
      *
-     * @param name the attribute name
-     * @param value the attribute value
+     * @param name
+     *            the attribute name
+     * @param value
+     *            the attribute value
      * @return this element for chaining
      */
     public T attr(String name, String value) {
@@ -784,19 +828,24 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
      * <p>
      * The handler receives keyboard events when:
      * <ul>
-     *   <li>This element is focused (receives events directly)</li>
-     *   <li>A focused descendant doesn't handle the event (bubbles up)</li>
+     * <li>This element is focused (receives events directly)</li>
+     * <li>A focused descendant doesn't handle the event (bubbles up)</li>
      * </ul>
      * <p>
      * <strong>Relationship with {@link #focusable()}:</strong>
      * <ul>
-     *   <li>{@code onKeyEvent()} registers a handler but does NOT make the element focusable</li>
-     *   <li>{@code focusable()} adds the element to TAB navigation but does NOT add a handler</li>
-     *   <li>Use both together when you want TAB navigation AND custom key handling</li>
-     *   <li>Use only {@code onKeyEvent()} for handling keys from focused children or global shortcuts</li>
+     * <li>{@code onKeyEvent()} registers a handler but does NOT make the element
+     * focusable</li>
+     * <li>{@code focusable()} adds the element to TAB navigation but does NOT add a
+     * handler</li>
+     * <li>Use both together when you want TAB navigation AND custom key
+     * handling</li>
+     * <li>Use only {@code onKeyEvent()} for handling keys from focused children or
+     * global shortcuts</li>
      * </ul>
      *
-     * @param handler the key event handler
+     * @param handler
+     *            the key event handler
      * @return this element for chaining
      * @see #focusable()
      */
@@ -808,27 +857,26 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Sets an action handler for this element.
      * <p>
-     * This is a convenience method that dispatches both key and mouse events
-     * to the action handler. Key events are dispatched when this element is focused,
-     * mouse events when clicking on the element.
+     * This is a convenience method that dispatches both key and mouse events to the
+     * action handler. Key events are dispatched when this element is focused, mouse
+     * events when clicking on the element.
      *
-     * @param handler the action handler to use
+     * @param handler
+     *            the action handler to use
      * @return this element for chaining
      */
     public T onAction(ActionHandler handler) {
-        onKeyEvent(event -> handler.dispatch(event)
-                ? EventResult.HANDLED
-                : EventResult.UNHANDLED);
-        onMouseEvent(event -> handler.dispatch(event)
-                ? EventResult.HANDLED
-                : EventResult.UNHANDLED);
+        onKeyEvent(event -> handler.dispatch(event) ? EventResult.HANDLED : EventResult.UNHANDLED);
+        onMouseEvent(
+                event -> handler.dispatch(event) ? EventResult.HANDLED : EventResult.UNHANDLED);
         return self();
     }
 
     /**
      * Sets the mouse event handler for this element.
      *
-     * @param handler the mouse event handler
+     * @param handler
+     *            the mouse event handler
      * @return this element for chaining
      */
     public T onMouseEvent(MouseEventHandler handler) {
@@ -839,7 +887,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Makes this element draggable with the given handler.
      *
-     * @param handler the drag handler
+     * @param handler
+     *            the drag handler
      * @return this element for chaining
      */
     public T onDrag(DragHandler handler) {
@@ -851,7 +900,8 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
     /**
      * Makes this element draggable with position callback.
      *
-     * @param onMove callback receiving (deltaX, deltaY) during drag
+     * @param onMove
+     *            callback receiving (deltaX, deltaY) during drag
      * @return this element for chaining
      */
     public T draggable(BiConsumer<Integer, Integer> onMove) {

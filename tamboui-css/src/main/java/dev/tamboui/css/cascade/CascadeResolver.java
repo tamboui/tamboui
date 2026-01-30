@@ -4,6 +4,10 @@
  */
 package dev.tamboui.css.cascade;
 
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
@@ -11,24 +15,20 @@ import dev.tamboui.css.property.PropertyConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Resolves CSS cascade and specificity to produce final computed styles.
  * <p>
  * The cascade algorithm:
  * <ol>
- *   <li>Find all rules whose selectors match the element</li>
- *   <li>Sort by specificity (higher wins)</li>
- *   <li>For equal specificity, later rules win (source order)</li>
- *   <li>!important declarations override all non-important</li>
- *   <li>Merge all matching declarations into a final style</li>
+ * <li>Find all rules whose selectors match the element</li>
+ * <li>Sort by specificity (higher wins)</li>
+ * <li>For equal specificity, later rules win (source order)</li>
+ * <li>!important declarations override all non-important</li>
+ * <li>Merge all matching declarations into a final style</li>
  * </ol>
  * <p>
- * Unknown properties (those not registered in {@link PropertyRegistry}) are handled
- * according to the configured {@link UnknownPropertyBehavior}.
+ * Unknown properties (those not registered in {@link PropertyRegistry}) are
+ * handled according to the configured {@link UnknownPropertyBehavior}.
  */
 public final class CascadeResolver {
 
@@ -37,7 +37,8 @@ public final class CascadeResolver {
     private final UnknownPropertyBehavior unknownPropertyBehavior;
 
     /**
-     * Creates a new cascade resolver with default behavior (IGNORE unknown properties).
+     * Creates a new cascade resolver with default behavior (IGNORE unknown
+     * properties).
      */
     public CascadeResolver() {
         this(UnknownPropertyBehavior.IGNORE);
@@ -46,7 +47,8 @@ public final class CascadeResolver {
     /**
      * Creates a new cascade resolver with the specified unknown property behavior.
      *
-     * @param unknownPropertyBehavior how to handle unknown CSS properties
+     * @param unknownPropertyBehavior
+     *            how to handle unknown CSS properties
      */
     public CascadeResolver(UnknownPropertyBehavior unknownPropertyBehavior) {
         this.unknownPropertyBehavior = unknownPropertyBehavior != null
@@ -57,18 +59,20 @@ public final class CascadeResolver {
     /**
      * Resolves the final computed style for an element.
      *
-     * @param element   the element to style
-     * @param state     the pseudo-class state (focus, hover, etc.)
-     * @param ancestors the ancestor chain from root to parent
-     * @param rules     all rules from the stylesheet
-     * @param variables CSS variables for value resolution
+     * @param element
+     *            the element to style
+     * @param state
+     *            the pseudo-class state (focus, hover, etc.)
+     * @param ancestors
+     *            the ancestor chain from root to parent
+     * @param rules
+     *            all rules from the stylesheet
+     * @param variables
+     *            CSS variables for value resolution
      * @return the resolved style
      */
-    public CssStyleResolver resolve(Styleable element,
-                                     PseudoClassState state,
-                                     List<Styleable> ancestors,
-                                     List<Rule> rules,
-                                     Map<String, String> variables) {
+    public CssStyleResolver resolve(Styleable element, PseudoClassState state,
+            List<Styleable> ancestors, List<Rule> rules, Map<String, String> variables) {
         // 1. Find matching rules
         List<MatchedRule> matches = new ArrayList<>();
         for (Rule rule : rules) {
@@ -110,7 +114,7 @@ public final class CascadeResolver {
     }
 
     private CssStyleResolver buildCssStyleResolver(Map<String, PropertyValue> props,
-                                                    Map<String, String> variables) {
+            Map<String, String> variables) {
         CssStyleResolver.Builder builder = CssStyleResolver.builder();
 
         for (Map.Entry<String, PropertyValue> entry : props.entrySet()) {
@@ -145,9 +149,8 @@ public final class CascadeResolver {
      * Converts and sets a property value using the PropertyDefinition.
      */
     @SuppressWarnings("unchecked")
-    private <T> void convertAndSet(CssStyleResolver.Builder builder,
-                                   PropertyDefinition<T> property,
-                                   String resolvedValue) {
+    private <T> void convertAndSet(CssStyleResolver.Builder builder, PropertyDefinition<T> property,
+            String resolvedValue) {
         Optional<T> converted = property.convert(resolvedValue);
         converted.ifPresent(v -> builder.set(property, v));
     }
@@ -156,23 +159,24 @@ public final class CascadeResolver {
      * Handles unknown properties according to the configured behavior.
      * <p>
      * Unknown properties are stored as raw values for lazy conversion by
-     * widget-defined properties. The behavior setting controls whether to
-     * also log a warning or throw an exception.
+     * widget-defined properties. The behavior setting controls whether to also log
+     * a warning or throw an exception.
      */
-    private void handleUnknownProperty(CssStyleResolver.Builder builder, String prop, String value) {
+    private void handleUnknownProperty(CssStyleResolver.Builder builder, String prop,
+            String value) {
         switch (unknownPropertyBehavior) {
-            case IGNORE:
+            case IGNORE :
                 // Store as raw value for lazy conversion
                 builder.setRaw(prop, value);
                 break;
-            case WARN:
+            case WARN :
                 // Store as raw value AND log a warning
                 builder.setRaw(prop, value);
                 LOGGER.log(Level.WARNING, "Unknown CSS property: {0}", prop);
                 break;
-            case FAIL:
+            case FAIL :
                 throw new UnknownCssPropertyException(prop, value);
-                // no default needed - all enum values covered
+            // no default needed - all enum values covered
         }
     }
 
