@@ -286,6 +286,130 @@ state.select(0);
 tabs.render(area, buffer, state);
 ----
 
+=== Tree
+
+A hierarchical tree view with expand/collapse, keyboard navigation, and support for custom node rendering. Use `TreeElement` (toolkit layer) with `TreeNode` for the data model.
+
+[source,java]
+----
+// Create tree nodes with data model
+TreeNode<FileInfo> src = TreeNode.of("src", new FileInfo("src", FileType.DIRECTORY))
+    .add(TreeNode.of("main", new FileInfo("main", FileType.DIRECTORY))
+        .add(TreeNode.of("App.java", new FileInfo("App.java", FileType.JAVA, 2048)).leaf())
+        .expanded())
+    .expanded();
+
+// Create tree with custom node renderer
+tree(src, docs, build)
+    .title("Project Files")
+    .rounded()
+    .highlightColor(Color.CYAN)
+    .scrollbar()
+    .nodeRenderer(node -> row(
+        text(node.data().icon() + " "),
+        text(node.label()).bold(),
+        spacer(),
+        text(node.data().formattedSize()).dim()
+    ))
+----
+
+==== Model/View Separation
+
+TreeElement encourages clean separation between data and presentation:
+
+**Model (TreeNode + Data)**: Contains only data, no rendering logic.
+[source,java]
+----
+// Pure data model - no view concerns
+record FileInfo(String name, FileType type, long size, Status status) {
+    String icon() { /* data-derived */ }
+    String formattedSize() { /* data formatting */ }
+}
+
+// TreeNode holds the data
+TreeNode<FileInfo> node = TreeNode.of("App.java", fileInfo).leaf();
+----
+
+**View (nodeRenderer)**: Transforms data into styled elements.
+[source,java]
+----
+// Rendering logic separated from model
+tree.nodeRenderer(node -> {
+    var info = node.data();
+    return row(
+        text(info.icon() + " "),
+        text(info.name()).fg(info.statusColor()),
+        spacer(),
+        text(info.formattedSize()).dim()
+    );
+});
+----
+
+This separation allows:
+
+* **Reusable models**: Same `TreeNode<T>` data can be rendered differently in different contexts
+* **Testable logic**: Data transformations can be unit tested without UI
+* **Flexible presentation**: Change rendering without modifying data structures
+
+==== Keyboard Navigation
+
+[cols="1,2",options="header"]
+|===
+|Key |Action
+
+|↑/↓ |Move selection up/down
+|→ |Expand node or move to first child
+|← |Collapse node or move to parent
+|Enter/Space |Toggle expand/collapse
+|Home/End |Jump to first/last visible node
+|Page Up/Down |Scroll by viewport height
+|===
+
+==== Lazy Loading
+
+Load children on-demand for large trees:
+
+[source,java]
+----
+TreeNode.of("Large Directory", dirInfo)
+    .childrenLoader(() -> loadChildrenFromDisk(dirInfo.path()))
+----
+
+The loader is called once when the node is first expanded.
+
+==== CSS Styling
+
+Style trees with CSS, including the `:selected` pseudo-class:
+
+[source,css]
+----
+/* Guide characters */
+TreeElement-guide {
+    color: #45475a;
+}
+
+/* Selected node styling */
+TreeElement-node:selected {
+    color: #89dceb;
+    background: #313244;
+    bold: true;
+}
+
+/* Scrollbar */
+TreeElement-scrollbar-thumb {
+    color: #89b4fa;
+}
+----
+
+CSS selectors:
+
+* `TreeElement` - the container
+* `TreeElement-node` - each tree node
+* `TreeElement-node:selected` - the selected node
+* `TreeElement-guide` - guide/branch characters
+* `TreeElement-scrollbar-thumb` - scrollbar thumb
+* `TreeElement-scrollbar-track` - scrollbar track
+
 == Data Visualization
 
 === Gauge

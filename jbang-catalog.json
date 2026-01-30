@@ -103,6 +103,9 @@
     "toolkit-demo": {
       "script-ref": "tamboui-toolkit/demos/toolkit-demo/src/main/java/dev/tamboui/demo/ToolkitDemo.java"
     },
+    "tree-demo": {
+      "script-ref": "tamboui-toolkit/demos/tree-demo/src/main/java/dev/tamboui/demo/tree/TreeDemo.java"
+    },
     "helloworld-demo": {
       "script-ref": "tamboui-tui/demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorldDemo.java"
     },

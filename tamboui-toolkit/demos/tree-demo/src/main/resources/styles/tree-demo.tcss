@@ -1,0 +1,40 @@
+/* Tree Demo Stylesheet */
+
+/* Main tree styling */
+#tree {
+    background: #1e1e2e;
+    guide-style: unicode;
+    scrollbar-policy: as-needed;
+    highlight-symbol: "▶ ";
+}
+
+/* Guide characters in dim cyan */
+TreeElement-guide {
+    color: #45475a;
+}
+
+/* Node styling - inherits parent style by default */
+TreeElement-node {
+    /* Default node style */
+}
+
+/* Selected node with cyan highlight and bold */
+TreeElement-node:selected {
+    color: #89dceb;
+    background: #313244;
+    bold: true;
+}
+
+/* Scrollbar styling */
+TreeElement-scrollbar-thumb {
+    color: #89b4fa;
+}
+
+TreeElement-scrollbar-track {
+    color: #313244;
+}
+
+/* Details panel */
+Panel {
+    background: #1e1e2e;
+}

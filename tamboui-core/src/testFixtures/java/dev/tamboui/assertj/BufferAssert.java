@@ -81,6 +81,41 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
     }
 
     /**
+     * Asserts that the actual buffer has the same content as the given lines, ignoring styles.
+     * <p>
+     * This is useful for testing text content without worrying about style differences.
+     * The number of lines must match the buffer height, and each line length must match the buffer width.
+     *
+     * @param expectedLines the expected content lines
+     * @return this assertion object
+     * @throws AssertionError if the content differs
+     */
+    public BufferAssert hasContent(String... expectedLines) {
+        isNotNull();
+
+        if (expectedLines.length != actual.height()) {
+            failWithMessage("Expected buffer to have %d lines, but had %d lines", expectedLines.length, actual.height());
+            return this;
+        }
+
+        for (int y = 0; y < expectedLines.length; y++) {
+            String expectedLine = expectedLines[y];
+            StringBuilder actualLine = new StringBuilder();
+            for (int x = 0; x < actual.width(); x++) {
+                actualLine.append(actual.get(x, y).symbol());
+            }
+            String actualLineStr = actualLine.toString();
+            if (!actualLineStr.equals(expectedLine)) {
+                failWithMessage("Content differs at line %d:%n  expected: \"%s\"%n  actual:   \"%s\"%n%nFull buffer content:%n%s",
+                        y, expectedLine, actualLineStr, formatBuffer(actual));
+                return this;
+            }
+        }
+
+        return this;
+    }
+
+    /**
      * Asserts that the buffer has the given width.
      *
      * @param expectedWidth the expected width
