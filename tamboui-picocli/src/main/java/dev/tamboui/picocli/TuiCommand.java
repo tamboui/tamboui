@@ -17,13 +17,13 @@ import java.util.concurrent.Callable;
  * The class handles terminal setup and teardown automatically.
  *
  * <pre>{@code
- * @Command(name = "myapp", description = "My TUI Application")
+ * &#64;Command(name = "myapp", description = "My TUI Application")
  * public class MyApp extends TuiCommand {
  *
- *     @Option(names = {"-c", "--config"}, description = "Config file path")
+ *     &#64;Option(names = {"-c", "--config"}, description = "Config file path")
  *     Path configFile;
  *
- *     @Override
+ *     &#64;Override
  *     protected void runTui(TuiRunner runner) throws Exception {
  *         AppState state = loadState(configFile);
  *

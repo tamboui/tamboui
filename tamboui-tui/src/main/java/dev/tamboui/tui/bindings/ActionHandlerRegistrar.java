@@ -17,13 +17,13 @@ package dev.tamboui.tui.bindings;
  * public final class MyApp_ActionHandlerRegistrar
  *         implements ActionHandlerRegistrar<MyApp> {
  *
- *     @Override
+ *     &#64;Override
  *     public void register(MyApp target, ActionHandler handler) {
  *         handler.on("save", target::save);
  *         handler.on("quit", target::quit);
  *     }
  *
- *     @Override
+ *     &#64;Override
  *     public Class<MyApp> targetType() {
  *         return MyApp.class;
  *     }

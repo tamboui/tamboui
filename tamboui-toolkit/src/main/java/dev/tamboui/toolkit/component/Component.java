@@ -23,16 +23,17 @@ import dev.tamboui.tui.event.MouseEvent;
  * Components handle key and mouse events when focused using
  * {@code @OnAction} annotations:
  *
+ * 
  * <pre>{@code
  * public class CounterComponent extends Component<CounterComponent> {
  *     private int count = 0;
  *
- *     @OnAction(Actions.MOVE_UP)
+ *     &#64;OnAction(Actions.MOVE_UP)
  *     void increment(Event event) {
  *         count++;
  *     }
  *
- *     @Override
+ *     &#64;Override
  *     protected Element render() {
  *         return text("Count: " + count);
  *     }
