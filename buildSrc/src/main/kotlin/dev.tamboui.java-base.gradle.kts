@@ -55,7 +55,7 @@ spotless {
         removeUnusedImports()
 
         eclipse().configFile(rootProject.file("config/spotless/eclipse-format.xml"))
-        formatAnnotations()
+       // formatAnnotations()
     }
 }
 
