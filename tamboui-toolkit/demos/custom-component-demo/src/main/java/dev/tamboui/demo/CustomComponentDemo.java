@@ -9,7 +9,7 @@ package dev.tamboui.demo;
 
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.css.parser.CssParseException;
-import dev.tamboui.export.BufferSvgExporter;
+import dev.tamboui.export.Formats;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -437,14 +437,9 @@ public class CustomComponentDemo implements Element {
                 .format(Instant.now());
             Path outFile = outDir.resolve("snapshot-" + timestamp + ".svg");
 
-            String svg = BufferSvgExporter.exportSvg(
-                snapshot,
-                new BufferSvgExporter.Options()
-                    .title("TamboUI")
-                    .uniqueId("snapshot-" + timestamp)
-            );
-
-            Files.write(outFile, svg.getBytes(StandardCharsets.UTF_8));
+            snapshot.export().as(Formats.SVG)
+                .options(o -> o.title("TamboUI").uniqueId("snapshot-" + timestamp))
+                .toFile(outFile);
             lastSvgExportMessage = "Saved " + outFile.toString();
         } catch (Exception e) {
             lastSvgExportMessage = "SVG export failed: " + e.getMessage();

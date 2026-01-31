@@ -2,9 +2,10 @@
  * Copyright (c) 2026 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.export;
+package dev.tamboui.export.svg;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.export.Formats;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-final class BufferSvgExporterTest {
+final class SvgExporterTest {
 
     @Test
     void exportsSvgWithStylesAndBackgrounds() {
@@ -21,9 +22,9 @@ final class BufferSvgExporterTest {
         buffer.setString(0, 1, "AB", Style.EMPTY.onBlue().bold());
         buffer.setString(2, 1, "CD", Style.EMPTY.italic().underlined());
 
-        String svg = BufferSvgExporter.exportSvg(buffer, new BufferSvgExporter.Options()
-            .title("Test")
-            .uniqueId("test"));
+        String svg = buffer.export().as(Formats.SVG)
+            .options(o -> o.title("Test").uniqueId("test"))
+            .toString();
 
         // Basic structure
         assertTrue(svg.contains("<svg"));
@@ -45,4 +46,3 @@ final class BufferSvgExporterTest {
         assertTrue(svg.contains(">CD<") || svg.contains("CD"));
     }
 }
-
