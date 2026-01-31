@@ -4,7 +4,6 @@
  */
 package dev.tamboui.internal.record;
 
-import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import dev.tamboui.export.BufferSvgExporter;
 import dev.tamboui.buffer.Buffer;
 /**
  * Plays back scripted interactions for demo recording.
@@ -442,12 +440,11 @@ final class InteractionPlayer {
                 }
             } else if (interaction instanceof Interaction.Screenshot) {
                 Interaction.Screenshot screenshot = (Interaction.Screenshot) interaction;
-                String svg = BufferSvgExporter.exportSvg(buffer);
                 try {
                     Files.createDirectories(screenshot.path().getParent());
-                    Files.write(screenshot.path(), svg.getBytes(StandardCharsets.UTF_8));
+                    buffer.export().toFile(screenshot.path());
                 } catch (IOException e) {
-                    throw new UncheckedIOException("Warning: Failed to write screenshot: " + e.getMessage(),e);
+                    throw new UncheckedIOException("Warning: Failed to write screenshot: " + e.getMessage(), e);
                 }
                 return -2; // Timeout to trigger redraw
             }

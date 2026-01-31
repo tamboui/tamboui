@@ -2,10 +2,11 @@
  * Copyright (c) 2026 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.export;
+package dev.tamboui.export.svg;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
+import dev.tamboui.export.ThemeColors;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
@@ -33,151 +34,35 @@ import java.util.zip.Adler32;
  *     <li>Colors are resolved via {@link Color#toRgb()} plus a simple theme fallback.</li>
  * </ul>
  */
-public final class BufferSvgExporter {
+public final class SvgExporter {
 
-    private BufferSvgExporter() {
+    private SvgExporter() {
     }
 
     /**
-     * Export options (all values have reasonable defaults).
-     */
-    public static final class Options {
-        private String title = "TamboUI";
-        private Theme theme = Theme.svgExportTheme();
-        private String codeFormat = DEFAULT_SVG_FORMAT;
-        private double fontAspectRatio = 0.61;
-        private String uniqueId;
-
-        /** Creates default export options. */
-        public Options() {
-        }
-
-        /**
-         * Sets the window title.
-         *
-         * @param title the SVG window title
-         * @return this options instance
-         */
-        public Options title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        /**
-         * Sets the color theme.
-         *
-         * @param theme the SVG color theme
-         * @return this options instance
-         */
-        public Options theme(Theme theme) {
-            this.theme = theme;
-            return this;
-        }
-
-        /**
-         * Sets the SVG template format string.
-         *
-         * @param codeFormat the SVG format template with placeholders
-         * @return this options instance
-         */
-        public Options codeFormat(String codeFormat) {
-            this.codeFormat = codeFormat;
-            return this;
-        }
-
-        /**
-         * Sets the font aspect ratio used for width calculations.
-         *
-         * @param fontAspectRatio the character width-to-height ratio
-         * @return this options instance
-         */
-        public Options fontAspectRatio(double fontAspectRatio) {
-            this.fontAspectRatio = fontAspectRatio;
-            return this;
-        }
-
-        /**
-         * Sets a custom unique ID prefix for CSS classes and clip paths.
-         *
-         * @param uniqueId the unique ID prefix, or {@code null} for auto-generated
-         * @return this options instance
-         */
-        public Options uniqueId(String uniqueId) {
-            this.uniqueId = uniqueId;
-            return this;
-        }
-    }
-
-    /**
-     * A minimal theme for SVG export.
-     */
-    public static final class Theme {
-        private final Color.Rgb background;
-        private final Color.Rgb foreground;
-
-        /**
-         * Creates a theme with the given colors.
-         *
-         * @param background the background color
-         * @param foreground the foreground (text) color
-         */
-        public Theme(Color.Rgb background, Color.Rgb foreground) {
-            this.background = Objects.requireNonNull(background, "background");
-            this.foreground = Objects.requireNonNull(foreground, "foreground");
-        }
-
-        /**
-         * Returns the background color.
-         *
-         * @return the background color
-         */
-        public Color.Rgb background() {
-            return background;
-        }
-
-        /**
-         * Returns the foreground color.
-         *
-         * @return the foreground color
-         */
-        public Color.Rgb foreground() {
-            return foreground;
-        }
-
-        /**
-         * Default theme aligned with Rich's {@code SVG_EXPORT_THEME}.
-         *
-         * @return the default SVG export theme
-         */
-        public static Theme svgExportTheme() {
-            return new Theme(new Color.Rgb(41, 41, 41), new Color.Rgb(197, 200, 198));
-        }
-    }
-
-    /**
-     * Exports the given buffer to SVG with default options.
-     *
-     * @param buffer the buffer to export
-     * @return the SVG string
-     */
-    public static String exportSvg(Buffer buffer) {
-        return exportSvg(buffer, new Options());
-    }
-
-    /**
-     * Exports the given buffer to SVG with the specified options.
+     * Encodes the buffer to SVG and appends to the given output.
+     * Used by the fluent export API.
      *
      * @param buffer  the buffer to export
-     * @param options export options (title, theme, format, etc.)
-     * @return the SVG string
+     * @param options export options
+     * @param out     where to append the SVG
      */
-    public static String exportSvg(Buffer buffer, Options options) {
+    static void encode(Buffer buffer, SvgOptions options, Appendable out) {
+        String svg = buildSvg(buffer, options);
+        try {
+            out.append(svg);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String buildSvg(Buffer buffer, SvgOptions options) {
         Objects.requireNonNull(buffer, "buffer");
         Objects.requireNonNull(options, "options");
         Objects.requireNonNull(options.theme, "options.theme");
         Objects.requireNonNull(options.codeFormat, "options.codeFormat");
 
-        final Theme theme = options.theme;
+        final ThemeColors themeColors = options.theme;
         final int widthCells = buffer.width();
         final int heightCells = buffer.height();
 
@@ -203,7 +88,7 @@ public final class BufferSvgExporter {
         final int terminalWidth = (int) Math.ceil(widthCells * charWidth + paddingWidth);
         final int terminalHeight = (int) Math.ceil(heightCells * lineHeight + paddingHeight);
 
-        final String uniqueId = options.uniqueId != null ? options.uniqueId : "terminal-" + computeStableHash(buffer, theme);
+        final String uniqueId = options.uniqueId != null ? options.uniqueId : "terminal-" + computeStableHash(buffer, themeColors);
 
         // Stable insertion order so class numbers are deterministic
         final Map<String, Integer> cssToClassNo = new LinkedHashMap<>();
@@ -231,10 +116,10 @@ public final class BufferSvgExporter {
                 }
                 int runLen = x - runStart;
 
-                ResolvedColors colors = resolveColors(style, theme);
+                ResolvedColors colors = resolveColors(style, themeColors);
                 boolean hasBackground = colors.hasBackground;
 
-                String css = styleToCss(style, colors, theme);
+                String css = styleToCss(style, colors);
                 Integer classNo = cssToClassNo.get(css);
                 if (classNo == null) {
                     classNo = nextClassNo++;
@@ -291,7 +176,7 @@ public final class BufferSvgExporter {
                 .append(" { ").append(entry.getKey()).append(" }");
         }
 
-        String chrome = buildChrome(uniqueId, options.title, theme, terminalWidth, terminalHeight, marginLeft, marginTop, charHeight);
+        String chrome = buildChrome(uniqueId, options.title, themeColors, terminalWidth, terminalHeight, marginLeft, marginTop, charHeight);
 
         // Match Rich template variables
         return options.codeFormat
@@ -314,8 +199,8 @@ public final class BufferSvgExporter {
 
     private static String buildChrome(
         String uniqueId,
-        String title,
-        Theme theme,
+        String windowTitle,
+        ThemeColors themeColors,
         int terminalWidth,
         int terminalHeight,
         int marginLeft,
@@ -325,7 +210,7 @@ public final class BufferSvgExporter {
         String chrome = makeTag(
             "rect",
             null,
-            "fill", toHex(theme.background()),
+            "fill", toHex(themeColors.background()),
             "stroke", "rgba(255,255,255,0.35)",
             "stroke-width", "1",
             "x", String.valueOf(marginLeft),
@@ -335,14 +220,14 @@ public final class BufferSvgExporter {
             "rx", "8"
         );
 
-        if (title != null && !title.isEmpty()) {
+        if (windowTitle != null && !windowTitle.isEmpty()) {
             // Position title below the dots (dots center at y=22, radius 7, so extend to y=29)
             // Title font is 18px, so position baseline at y=22+7+4=33 to give clearance
             chrome += makeTag(
                 "text",
-                escapeText(title),
+                escapeText(windowTitle),
                 "class", uniqueId + "-title",
-                "fill", toHex(theme.foreground()),
+                "fill", toHex(themeColors.foreground()),
                 "text-anchor", "middle",
                 "x", String.valueOf(terminalWidth / 2),
                 "y", String.valueOf(marginTop + 33)
@@ -371,12 +256,12 @@ public final class BufferSvgExporter {
         }
     }
 
-    private static ResolvedColors resolveColors(Style style, Theme theme) {
+    private static ResolvedColors resolveColors(Style style, ThemeColors themeColors) {
         EnumSet<Modifier> mods = style.effectiveModifiers();
         boolean reversed = mods.contains(Modifier.REVERSED);
 
-        Color.Rgb fg = style.fg().orElse(Color.RESET).equals(Color.RESET) ? theme.foreground() : style.fg().get().toRgb();
-        Color.Rgb bg = style.bg().orElse(Color.RESET).equals(Color.RESET) ? theme.background() : style.bg().get().toRgb();
+        Color.Rgb fg = style.fg().orElse(Color.RESET).equals(Color.RESET) ? themeColors.foreground() : style.fg().get().toRgb();
+        Color.Rgb bg = style.bg().orElse(Color.RESET).equals(Color.RESET) ? themeColors.background() : style.bg().get().toRgb();
 
         if (reversed) {
             Color.Rgb tmp = fg;
@@ -388,7 +273,7 @@ public final class BufferSvgExporter {
         return new ResolvedColors(toHex(fg), toHex(bg), hasBackground);
     }
 
-    private static String styleToCss(Style style, ResolvedColors colors, Theme theme) {
+    private static String styleToCss(Style style, ResolvedColors colors) {
         EnumSet<Modifier> mods = style.effectiveModifiers();
         boolean dim = mods.contains(Modifier.DIM);
 
@@ -513,21 +398,21 @@ public final class BufferSvgExporter {
         return String.format("#%02x%02x%02x", rgb.r(), rgb.g(), rgb.b());
     }
 
-    private static String computeStableHash(Buffer buffer, Theme theme) {
+    private static String computeStableHash(Buffer buffer, ThemeColors themeColors) {
         Adler32 adler32 = new Adler32();
         adler32.update((byte) 1);
-        adler32.update((byte) theme.background().r());
-        adler32.update((byte) theme.background().g());
-        adler32.update((byte) theme.background().b());
-        adler32.update((byte) theme.foreground().r());
-        adler32.update((byte) theme.foreground().g());
-        adler32.update((byte) theme.foreground().b());
+        adler32.update((byte) themeColors.background().r());
+        adler32.update((byte) themeColors.background().g());
+        adler32.update((byte) themeColors.background().b());
+        adler32.update((byte) themeColors.foreground().r());
+        adler32.update((byte) themeColors.foreground().g());
+        adler32.update((byte) themeColors.foreground().b());
 
         for (int y = 0; y < buffer.height(); y++) {
             for (int x = 0; x < buffer.width(); x++) {
                 Cell cell = buffer.get(x + buffer.area().x(), y + buffer.area().y());
                 Style s = cell.style();
-                ResolvedColors colors = resolveColors(s, theme);
+                ResolvedColors colors = resolveColors(s, themeColors);
                 adler32.update(cell.symbol().getBytes(StandardCharsets.UTF_8));
                 adler32.update((byte) 0);
                 adler32.update(colors.foregroundHex.getBytes(StandardCharsets.US_ASCII));
