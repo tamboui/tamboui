@@ -84,6 +84,9 @@ Layout widgets for arranging children: Columns, Grid, Dock, Stack, Flow.
 === link:widgets.html[Widgets Reference]
 Comprehensive guide to all available widgets with examples.
 
+=== link:forms.html[Forms]
+Form abstractions with labels, validation, and centralized state management.
+
 === link:api-levels.html[API Levels]
 Detailed documentation for immediate mode, TuiRunner, Toolkit DSL, and inline display.
 

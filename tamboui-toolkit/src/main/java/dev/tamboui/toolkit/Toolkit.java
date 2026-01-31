@@ -12,6 +12,8 @@ import dev.tamboui.toolkit.elements.ChartElement;
 import dev.tamboui.toolkit.elements.GenericWidgetElement;
 import dev.tamboui.toolkit.elements.DockElement;
 import dev.tamboui.toolkit.elements.FlowElement;
+import dev.tamboui.toolkit.elements.FormElement;
+import dev.tamboui.toolkit.elements.FormFieldElement;
 import dev.tamboui.toolkit.elements.GridElement;
 import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.ColumnsElement;
@@ -37,6 +39,10 @@ import dev.tamboui.toolkit.elements.RichTextElement;
 import dev.tamboui.toolkit.elements.RichTextAreaElement;
 import dev.tamboui.toolkit.elements.MarkupTextElement;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.widgets.form.BooleanFieldState;
+import dev.tamboui.widgets.form.FieldType;
+import dev.tamboui.widgets.form.FormState;
+import dev.tamboui.widgets.form.SelectFieldState;
 import dev.tamboui.text.Text;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
@@ -941,6 +947,100 @@ public final class Toolkit {
      */
     public static TextAreaElement textArea() {
         return new TextAreaElement();
+    }
+
+    // ==================== Form Field ====================
+
+    /**
+     * Creates a form field with a label and text input state.
+     * <p>
+     * Form fields combine a label and input into a single element with
+     * consistent layout and styling.
+     * <pre>{@code
+     * formField("Full name", nameState)
+     *     .labelWidth(14)
+     *     .rounded()
+     *     .borderColor(Color.DARK_GRAY)
+     *     .focusedBorderColor(Color.CYAN)
+     * }</pre>
+     *
+     * @param label the field label
+     * @param state the text input state
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, TextInputState state) {
+        return new FormFieldElement(label, state);
+    }
+
+    /**
+     * Creates a form field with a label and new text input state.
+     *
+     * @param label the field label
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label) {
+        return new FormFieldElement(label);
+    }
+
+    /**
+     * Creates a form field with a label and boolean state (checkbox).
+     * <p>
+     * Use {@link FormFieldElement#type(FieldType)} to change to TOGGLE.
+     *
+     * @param label the field label
+     * @param state the boolean field state
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, BooleanFieldState state) {
+        return new FormFieldElement(label, state, FieldType.CHECKBOX);
+    }
+
+    /**
+     * Creates a form field with a label, boolean state, and field type.
+     *
+     * @param label the field label
+     * @param state the boolean field state
+     * @param type the field type (CHECKBOX or TOGGLE)
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, BooleanFieldState state, FieldType type) {
+        return new FormFieldElement(label, state, type);
+    }
+
+    /**
+     * Creates a form field with a label and select state.
+     *
+     * @param label the field label
+     * @param state the select field state
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, SelectFieldState state) {
+        return new FormFieldElement(label, state);
+    }
+
+    // ==================== Form Container ====================
+
+    /**
+     * Creates a form container with the given state.
+     * <p>
+     * Form containers manage multiple fields with consistent styling
+     * and optional grouping.
+     * <pre>{@code
+     * form(formState)
+     *     .field("fullName", "Full name")
+     *     .field("email", "Email", Validators.email())
+     *     .group("Preferences")
+     *         .field("newsletter", "Newsletter", FieldType.CHECKBOX)
+     *     .labelWidth(14)
+     *     .rounded()
+     *     .onSubmit(state -> saveUser(state))
+     * }</pre>
+     *
+     * @param formState the form state
+     * @return a new form element
+     */
+    public static FormElement form(FormState formState) {
+        return new FormElement(formState);
     }
 
     // ==================== Bar Chart ====================

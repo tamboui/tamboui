@@ -11,15 +11,19 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.elements.FormFieldElement;
 import dev.tamboui.toolkit.elements.Panel;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.form.FieldType;
+import dev.tamboui.widgets.form.FormState;
+import dev.tamboui.widgets.form.Validators;
 import dev.tamboui.widgets.table.TableState;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -29,22 +33,34 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public final class FormTableDemo {
 
-    private static final String[] TAB_NAMES = { "F1:Form", "F2:Table" };
+    private static final String[] TAB_NAMES = { "F1:Form", "F2:Validation", "F3:Table" };
     private static final int LABEL_WIDTH = 14;
     private static final AtomicInteger TAB_INDEX = new AtomicInteger(0);
     private static final TableState TABLE_STATE = new TableState();
 
-    // Persistent text input states for form fields
-    private static final TextInputState FULL_NAME = new TextInputState("Ada Lovelace");
-    private static final TextInputState EMAIL = new TextInputState("ada@analytical.io");
-    private static final TextInputState ROLE = new TextInputState("Research");
-    private static final TextInputState TIMEZONE = new TextInputState("UTC+1");
-    private static final TextInputState THEME = new TextInputState("Nord");
-    private static final TextInputState DENSITY = new TextInputState("Comfortable");
-    private static final TextInputState NOTIFICATIONS = new TextInputState("Mentions + Direct");
-    private static final TextInputState TWO_FA = new TextInputState("Enabled");
-    private static final TextInputState SESSIONS = new TextInputState("3 active");
-    private static final TextInputState KEYS = new TextInputState("2 registered");
+    // Centralized form state for all fields
+    private static final FormState FORM = FormState.builder()
+            // Profile fields (text)
+            .textField("fullName", "Ada Lovelace")
+            .textField("email", "ada@analytical.io")
+            // Preferences fields (boolean + select)
+            .selectField("theme", Arrays.asList("Nord", "Dracula", "Solarized", "Monokai"), 0)
+            .booleanField("notifications", true)
+            .booleanField("darkMode", false)
+            // Security fields (boolean + text)
+            .booleanField("twoFa", true)
+            .textField("sessions", "3 active")
+            .build();
+
+    // Validation demo form state - validation results are stored here, not in FormFieldElement
+    private static final FormState VALIDATION_FORM = FormState.builder()
+            .textField("username", "")
+            .textField("email", "")
+            .textField("password", "")
+            .textField("age", "")
+            .textField("phone", "")
+            .textField("website", "")
+            .build();
 
     private static final String[][] TABLE_ROWS = {
             { "TX-1001", "Open", "Onboarding", "2d", "Low" },
@@ -79,14 +95,22 @@ public final class FormTableDemo {
 
     private static Element renderUI() {
         int tab = TAB_INDEX.get();
-        String hint = tab == 0
-                ? "Form uses label length + input fill, with nested rows for alignment."
-                : "Table uses length/percent/fill columns. Use Up/Down to move selection.";
+        String hint = switch (tab) {
+            case 0 -> "Form fields: text inputs, checkboxes, toggles, and select dropdowns.";
+            case 1 -> "Validation: required, email, minLength, maxLength, pattern, range.";
+            default -> "Table uses length/percent/fill columns. Use Up/Down to move selection.";
+        };
+
+        Element content = switch (tab) {
+            case 0 -> renderFormLayout();
+            case 1 -> renderValidationLayout();
+            default -> renderTableLayout();
+        };
 
         return column(
                 header(tab).length(4),
                 text(" " + hint).dim().length(1),
-                tab == 0 ? renderFormLayout() : renderTableLayout()
+                content
         ).spacing(1)
          .fill()
          .focusable()
@@ -103,7 +127,11 @@ public final class FormTableDemo {
             TAB_INDEX.set(1);
             return EventResult.HANDLED;
         }
-        if (TAB_INDEX.get() == 1) {
+        if (event.code() == KeyCode.F3) {
+            TAB_INDEX.set(2);
+            return EventResult.HANDLED;
+        }
+        if (TAB_INDEX.get() == 2) {
             if (event.isDown()) {
                 TABLE_STATE.selectNext(TABLE_ROWS.length);
                 return EventResult.HANDLED;
@@ -120,10 +148,11 @@ public final class FormTableDemo {
         return panel(() -> column(
                 row(
                         tab(0, tab),
-                        tab(1, tab)
+                        tab(1, tab),
+                        tab(2, tab)
                 ).spacing(1).length(1),
                 row(
-                        text(" Tabs: [F1/F2] ").dim(),
+                        text(" Tabs: [F1/F2/F3] ").dim(),
                         text(" Focus: [Tab] ").dim(),
                         text(" Table: [Up/Down] ").dim(),
                         text(" [Ctrl+C] Quit ").dim()
@@ -141,31 +170,40 @@ public final class FormTableDemo {
 
     private static Element renderFormLayout() {
         return column(
-                panel("Profile", column(
-                        formRow("full-name", "Full name", FULL_NAME),
-                        formRow("email", "Email", EMAIL),
-                        formRow("role", "Role", ROLE),
-                        formRow("timezone", "Time zone", TIMEZONE)
-                ).spacing(1))
+                panel("Profile (Text Fields)", column(
+                        formField("Full name", FORM.textField("fullName"))
+                                .id("full-name").labelWidth(LABEL_WIDTH).rounded()
+                                .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN),
+                        formField("Email", FORM.textField("email"))
+                                .id("email").labelWidth(LABEL_WIDTH).rounded()
+                                .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                ))
                 .rounded()
                 .borderColor(Color.CYAN)
                 .fit(),
 
                 row(
-                        panel("Preferences", column(
-                                formRow("theme", "Theme", THEME),
-                                formRow("density", "Density", DENSITY),
-                                formRow("notifications", "Notifications", NOTIFICATIONS)
-                        ).spacing(1))
+                        panel("Preferences (Select + Toggle)", column(
+                                formField("Theme", FORM.selectField("theme"))
+                                        .id("theme").labelWidth(LABEL_WIDTH),
+                                formField("Notifications", FORM.booleanField("notifications"), FieldType.CHECKBOX)
+                                        .id("notifications").labelWidth(LABEL_WIDTH)
+                                        .checkedColor(Color.GREEN),
+                                formField("Dark Mode", FORM.booleanField("darkMode"), FieldType.TOGGLE)
+                                        .id("dark-mode").labelWidth(LABEL_WIDTH)
+                        ))
                         .rounded()
                         .borderColor(Color.GREEN)
                         .fill(),
 
-                        panel("Security", column(
-                                formRow("2fa", "2FA", TWO_FA),
-                                formRow("sessions", "Sessions", SESSIONS),
-                                formRow("keys", "Keys", KEYS)
-                        ).spacing(1))
+                        panel("Security (Checkbox + Text)", column(
+                                formField("2FA Enabled", FORM.booleanField("twoFa"), FieldType.CHECKBOX)
+                                        .id("2fa").labelWidth(LABEL_WIDTH)
+                                        .bulletStyle().checkedColor(Color.GREEN),
+                                formField("Sessions", FORM.textField("sessions"))
+                                        .id("sessions").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                        ))
                         .rounded()
                         .borderColor(Color.YELLOW)
                         .fill()
@@ -178,16 +216,88 @@ public final class FormTableDemo {
         ).spacing(1).fill();
     }
 
-    private static Element formRow(String id, String label, TextInputState state) {
-        return row(
-                text(label).dim().length(LABEL_WIDTH),
-                textInput(state)
-                        .id(id)
+    private static Element renderValidationLayout() {
+        // Form fields are created inline on each render - validation state persists in VALIDATION_FORM
+        return column(
+                row(
+                        panel("Required & Length", column(
+                                formField("Username", VALIDATION_FORM.textField("username"))
+                                        .formState(VALIDATION_FORM, "username")
+                                        .id("val-username").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("3-20 characters")
+                                        .validate(Validators.required(), Validators.minLength(3), Validators.maxLength(20))
+                                        .showInlineErrors(true),
+                                formField("Password", VALIDATION_FORM.textField("password"))
+                                        .formState(VALIDATION_FORM, "password")
+                                        .id("val-password").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("min 8 characters")
+                                        .validate(Validators.required("Password is required"), Validators.minLength(8))
+                                        .showInlineErrors(true)
+                        ))
                         .rounded()
-                        .borderColor(Color.DARK_GRAY)
-                        .focusedBorderColor(Color.CYAN)
+                        .borderColor(Color.CYAN)
+                        .fill(),
+
+                        panel("Format Validation", column(
+                                formField("Email", VALIDATION_FORM.textField("email"))
+                                        .formState(VALIDATION_FORM, "email")
+                                        .id("val-email").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("you@example.com")
+                                        .validate(Validators.required(), Validators.email())
+                                        .showInlineErrors(true),
+                                formField("Phone", VALIDATION_FORM.textField("phone"))
+                                        .formState(VALIDATION_FORM, "phone")
+                                        .id("val-phone").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("123-456-7890")
+                                        .validate(Validators.pattern("\\d{3}-\\d{3}-\\d{4}", "Format: 123-456-7890"))
+                                        .showInlineErrors(true)
+                        ))
+                        .rounded()
+                        .borderColor(Color.GREEN)
                         .fill()
-        ).spacing(1).length(3);
+                ).spacing(2).fill(),
+
+                row(
+                        panel("Range Validation", column(
+                                formField("Age", VALIDATION_FORM.textField("age"))
+                                        .formState(VALIDATION_FORM, "age")
+                                        .id("val-age").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("18-120")
+                                        .validate(Validators.required(), Validators.range(18, 120))
+                                        .showInlineErrors(true)
+                        ))
+                        .rounded()
+                        .borderColor(Color.YELLOW)
+                        .fill(),
+
+                        panel("Pattern (URL)", column(
+                                formField("Website", VALIDATION_FORM.textField("website"))
+                                        .formState(VALIDATION_FORM, "website")
+                                        .id("val-website").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("https://example.com")
+                                        .validate(Validators.pattern("https?://.*", "Must start with http(s)://"))
+                                        .showInlineErrors(true)
+                        ))
+                        .rounded()
+                        .borderColor(Color.MAGENTA)
+                        .fill()
+                ).spacing(2).fill(),
+
+                text(" Validation triggers automatically as you type. Errors shown below fields.")
+                        .dim().length(1)
+        ).spacing(1).fill();
     }
 
     private static Element renderTableLayout() {
