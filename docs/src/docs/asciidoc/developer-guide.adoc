@@ -266,8 +266,8 @@ SVG export produces a standalone SVG document suitable for embedding or conversi
 Options (`SvgOptions`), via `.options(o -> ...)`:
 
 * `title(String)` — window/title text (default: `"TamboUI"`)
+* `chrome(boolean)` — include window frame, title, and traffic-light buttons (default: `true`); `false` for content only
 * `theme(ThemeColors)` — default foreground/background (default: `ThemeColors.defaultTheme()`)
-* `codeFormat(String)` — SVG template with placeholders (advanced)
 * `fontAspectRatio(double)` — character width-to-height ratio for layout (default: 0.61)
 * `uniqueId(String)` — prefix for CSS classes and clip paths, or `null` for auto-generated
 
@@ -285,7 +285,6 @@ HTML export produces a full HTML document with styled `<pre>` content. Styles ca
 Options (`HtmlOptions`):
 
 * `theme(ThemeColors)` — default foreground/background
-* `codeFormat(String)` — HTML template with placeholders `{code}`, `{stylesheet}`, `{foreground}`, `{background}` (advanced)
 * `inlineStyles(boolean)` — `true` for inline styles on each span (single-file, larger); `false` for a stylesheet (default, smaller HTML)
 
 [source,java]

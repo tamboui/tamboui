@@ -58,7 +58,6 @@ public final class HtmlExporter {
         Objects.requireNonNull(region, "region");
         Objects.requireNonNull(options, "options");
         Objects.requireNonNull(options.theme, "options.theme");
-        Objects.requireNonNull(options.codeFormat, "options.codeFormat");
 
         if (region.isEmpty()) {
             return minimalHtml(options);
@@ -135,7 +134,7 @@ public final class HtmlExporter {
         String foreground = toHex(themeColors.foreground());
         String background = toHex(themeColors.background());
 
-        return options.codeFormat
+        return DEFAULT_HTML_FORMAT
             .replace("{code}", code.toString())
             .replace("{stylesheet}", stylesheet.toString())
             .replace("{foreground}", foreground)
@@ -146,7 +145,7 @@ public final class HtmlExporter {
         ThemeColors theme = options.theme != null ? options.theme : ThemeColors.defaultTheme();
         String fg = toHex(theme.foreground());
         String bg = toHex(theme.background());
-        return options.codeFormat
+        return DEFAULT_HTML_FORMAT
             .replace("{code}", "")
             .replace("{stylesheet}", "")
             .replace("{foreground}", fg)

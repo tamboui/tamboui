@@ -17,7 +17,6 @@ public final class SvgOptions implements ExportOptions {
     String title = "TamboUI";
     boolean chrome = true;
     ThemeColors theme = ThemeColors.defaultTheme();
-    String codeFormat = SvgExporter.DEFAULT_SVG_FORMAT;
     double fontAspectRatio = 0.61;
     String uniqueId;
 
@@ -56,17 +55,6 @@ public final class SvgOptions implements ExportOptions {
      */
     public SvgOptions theme(ThemeColors theme) {
         this.theme = theme;
-        return this;
-    }
-
-    /**
-     * Sets the SVG template format string.
-     *
-     * @param codeFormat the SVG format template with placeholders
-     * @return this options instance
-     */
-    public SvgOptions codeFormat(String codeFormat) {
-        this.codeFormat = codeFormat;
         return this;
     }
 

@@ -26,10 +26,10 @@ public final class Formats {
     private Formats() {
     }
 
-    /** SVG format. Options: title, theme, codeFormat, fontAspectRatio, uniqueId. */
+    /** SVG format. Options: title, chrome, theme, fontAspectRatio, uniqueId. */
     public static final Format<SvgOptions> SVG = SvgFormat.instance();
 
-    /** HTML format. Options: theme, codeFormat, inlineStyles. */
+    /** HTML format. Options: theme, inlineStyles. */
     public static final Format<HtmlOptions> HTML = HtmlFormat.instance();
 
     /** Text format (plain or ANSI). Options: styles (true = include ANSI codes). */

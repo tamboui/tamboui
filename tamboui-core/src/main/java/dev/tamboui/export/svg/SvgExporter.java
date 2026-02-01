@@ -63,7 +63,6 @@ public final class SvgExporter {
         Objects.requireNonNull(region, "region");
         Objects.requireNonNull(options, "options");
         Objects.requireNonNull(options.theme, "options.theme");
-        Objects.requireNonNull(options.codeFormat, "options.codeFormat");
 
         if (region.isEmpty()) {
             return minimalSvg(options);
@@ -190,7 +189,7 @@ public final class SvgExporter {
             : buildBackgroundOnly(themeColors, terminalWidth, terminalHeight, marginLeft, marginTop);
 
         // Match Rich template variables
-        return options.codeFormat
+        return DEFAULT_SVG_FORMAT
             .replace("{unique_id}", uniqueId)
             .replace("{char_width}", format(charWidth))
             .replace("{char_height}", String.valueOf(charHeight))

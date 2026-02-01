@@ -15,7 +15,6 @@ import dev.tamboui.export.ThemeColors;
 public final class HtmlOptions implements ExportOptions {
 
     ThemeColors theme = ThemeColors.defaultTheme();
-    String codeFormat = HtmlExporter.DEFAULT_HTML_FORMAT;
     boolean inlineStyles = false;
 
     /** Creates default HTML export options. */
@@ -30,17 +29,6 @@ public final class HtmlOptions implements ExportOptions {
      */
     public HtmlOptions theme(ThemeColors theme) {
         this.theme = theme;
-        return this;
-    }
-
-    /**
-     * Sets the HTML template format string.
-     *
-     * @param codeFormat the format with placeholders {code}, {stylesheet}, {foreground}, {background}
-     * @return this options instance
-     */
-    public HtmlOptions codeFormat(String codeFormat) {
-        this.codeFormat = codeFormat;
         return this;
     }
 
