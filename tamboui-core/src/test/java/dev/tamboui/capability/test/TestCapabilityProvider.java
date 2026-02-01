@@ -22,3 +22,5 @@ public final class TestCapabilityProvider implements CapabilityProvider {
         report.feature(source(), "feature.b", false);
     }
 }
+
+

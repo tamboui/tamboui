@@ -4,12 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
@@ -19,6 +13,11 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +34,8 @@ class StackTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        stack(text("AAAAAAAAAA"), text("B")).render(frame, area, RenderContext.empty());
+        stack(text("AAAAAAAAAA"), text("B"))
+            .render(frame, area, RenderContext.empty());
 
         // "B" renders on top of "A" at position 0
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "B");
@@ -66,7 +66,8 @@ class StackTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        stack().render(frame, area, RenderContext.empty());
+        stack()
+            .render(frame, area, RenderContext.empty());
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -78,7 +79,8 @@ class StackTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        stack(text("Hello")).render(frame, area, RenderContext.empty());
+        stack(text("Hello"))
+            .render(frame, area, RenderContext.empty());
 
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "H");
     }
@@ -93,8 +95,10 @@ class StackTest {
     @Test
     @DisplayName("fluent API chains correctly")
     void fluentApiChaining() {
-        StackElement s = stack(text("A")).alignment(ContentAlignment.CENTER).margin(1)
-                .margin(new Margin(1, 2, 3, 4));
+        StackElement s = stack(text("A"))
+            .alignment(ContentAlignment.CENTER)
+            .margin(1)
+            .margin(new Margin(1, 2, 3, 4));
 
         assertThat(s).isInstanceOf(StackElement.class);
     }
@@ -125,7 +129,9 @@ class StackTest {
 
             // "X" is 1 char wide, 1 char high
             // center in 20x5: x=(20-1)/2=9, y=(5-1)/2=2
-            stack(text("X")).addClass("s").render(frame, area, ctx);
+            stack(text("X"))
+                .addClass("s")
+                .render(frame, area, ctx);
 
             BufferAssertions.assertThat(buffer).hasSymbolAt(9, 2, "X");
         }
@@ -139,7 +145,9 @@ class StackTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            stack(text("X")).addClass("s").render(frame, area, ctx);
+            stack(text("X"))
+                .addClass("s")
+                .render(frame, area, ctx);
 
             // With margin 1 and STRETCH, text renders at (1,1)
             BufferAssertions.assertThat(buffer).hasSymbolAt(1, 1, "X");
@@ -155,8 +163,10 @@ class StackTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Programmatic STRETCH overrides CSS top-left
-            stack(text("X")).addClass("s").alignment(ContentAlignment.STRETCH).render(frame, area,
-                    ctx);
+            stack(text("X"))
+                .addClass("s")
+                .alignment(ContentAlignment.STRETCH)
+                .render(frame, area, ctx);
 
             // With STRETCH, text renders at (0,0)
             BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "X");

@@ -4,10 +4,9 @@
  */
 package dev.tamboui.widgets.text;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.style.RichTextState;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.assertj.core.api.Assertions.*;
 

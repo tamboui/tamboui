@@ -4,9 +4,9 @@
  */
 package dev.tamboui.widgets.spinner;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,59 +15,51 @@ class SpinnerFrameSetConverterTest {
     @Test
     void convertsDoubleQuotedFrames() {
         // Input: "-" "|" "/" "X" (4 frames)
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("\"-\" \"|\" \"/\" \"X\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("\"-\" \"|\" \"/\" \"X\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("-", "|", "/", "X");
     }
 
     @Test
     void convertsSingleQuotedFrames() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("'-' '|' '/' 'X'");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("'-' '|' '/' 'X'");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("-", "|", "/", "X");
     }
 
     @Test
     void convertsMixedQuotes() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("'-' \"|\" '/' \"X\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("'-' \"|\" '/' \"X\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("-", "|", "/", "X");
     }
 
     @Test
     void preservesContentBetweenQuotes() {
-        // The converter extracts content between quotes verbatim, without escape
-        // processing
+        // The converter extracts content between quotes verbatim, without escape processing
         // Input CSS: "ab" "cd" - two frames with content "ab" and "cd"
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("\"ab\" \"cd\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("\"ab\" \"cd\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("ab", "cd");
     }
 
     @Test
     void convertsUnicodeFrames() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("\"⠋\" \"⠙\" \"⠹\" \"⠸\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("\"⠋\" \"⠙\" \"⠹\" \"⠸\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("⠋", "⠙", "⠹", "⠸");
     }
 
     @Test
     void convertsSimpleFrames() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("\"*\" \"+\" \"x\" \"+\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("\"*\" \"+\" \"x\" \"+\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("*", "+", "x", "+");
     }
 
     @Test
     void trimsWhitespace() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("  \"-\" \"|\"  ");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("  \"-\" \"|\"  ");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("-", "|");
     }
@@ -92,16 +84,14 @@ class SpinnerFrameSetConverterTest {
 
     @Test
     void handlesEmptyStrings() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("\"\" \"x\" \"\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("\"\" \"x\" \"\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("", "x", "");
     }
 
     @Test
     void handlesMultiCharacterFrames() {
-        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE
-                .convert("\"[    ]\" \"[=   ]\" \"[==  ]\" \"[=== ]\"");
+        Optional<SpinnerFrameSet> result = SpinnerFrameSetConverter.INSTANCE.convert("\"[    ]\" \"[=   ]\" \"[==  ]\" \"[=== ]\"");
         assertThat(result).isPresent();
         assertThat(result.get().frames()).containsExactly("[    ]", "[=   ]", "[==  ]", "[=== ]");
     }

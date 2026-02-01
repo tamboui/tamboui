@@ -4,11 +4,11 @@
  */
 package dev.tamboui.widgets.spinner;
 
+import dev.tamboui.style.PropertyConverter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link SpinnerFrameSet}.
@@ -16,7 +16,6 @@ import dev.tamboui.style.PropertyConverter;
  * Format: variable number of quoted strings representing the animation frames.
  * <p>
  * Examples:
- * 
  * <pre>
  * spinner-frames: "-" "\\" "|" "/";                   // classic line spinner
  * spinner-frames: "*" "+" "x" "+";                    // custom frames
@@ -49,8 +48,8 @@ public final class SpinnerFrameSetConverter implements PropertyConverter<Spinner
     }
 
     /**
-     * Parses a string containing quoted values. Supports both single and double
-     * quotes.
+     * Parses a string containing quoted values.
+     * Supports both single and double quotes.
      */
     private List<String> parseQuotedStrings(String input) {
         List<String> result = new ArrayList<>();

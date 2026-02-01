@@ -4,31 +4,31 @@
  */
 package dev.tamboui.widgets.spinner;
 
+import dev.tamboui.style.PropertyConverter;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link SpinnerStyle} enum values.
  * <p>
  * Supported values (case-insensitive, hyphens or underscores):
  * <ul>
- * <li>{@code dots} - braille dot pattern</li>
- * <li>{@code line} - classic -\|/</li>
- * <li>{@code arc} - quarter-circle characters</li>
- * <li>{@code circle} - clock-position characters</li>
- * <li>{@code bouncing-bar} - bouncing bar [=== ]</li>
- * <li>{@code toggle} - two-state toggle</li>
- * <li>{@code gauge} - horizontal block fill</li>
- * <li>{@code vertical-gauge} - vertical bar growth</li>
- * <li>{@code arrows} - rotating arrow directions</li>
- * <li>{@code clock} - clock face emoji</li>
- * <li>{@code moon} - moon phase emoji</li>
- * <li>{@code square-corners} - rotating square corners</li>
- * <li>{@code growing-dots} - braille dots filling</li>
- * <li>{@code bouncing-ball} - bouncing ball in braille</li>
+ *   <li>{@code dots} - braille dot pattern</li>
+ *   <li>{@code line} - classic -\|/</li>
+ *   <li>{@code arc} - quarter-circle characters</li>
+ *   <li>{@code circle} - clock-position characters</li>
+ *   <li>{@code bouncing-bar} - bouncing bar [=== ]</li>
+ *   <li>{@code toggle} - two-state toggle</li>
+ *   <li>{@code gauge} - horizontal block fill</li>
+ *   <li>{@code vertical-gauge} - vertical bar growth</li>
+ *   <li>{@code arrows} - rotating arrow directions</li>
+ *   <li>{@code clock} - clock face emoji</li>
+ *   <li>{@code moon} - moon phase emoji</li>
+ *   <li>{@code square-corners} - rotating square corners</li>
+ *   <li>{@code growing-dots} - braille dots filling</li>
+ *   <li>{@code bouncing-ball} - bouncing ball in braille</li>
  * </ul>
  */
 public final class SpinnerStyleConverter implements PropertyConverter<SpinnerStyle> {

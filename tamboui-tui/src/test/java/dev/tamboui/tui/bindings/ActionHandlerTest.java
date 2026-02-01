@@ -4,16 +4,15 @@
  */
 package dev.tamboui.tui.bindings;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,17 +38,16 @@ class ActionHandlerTest {
 
     @Test
     void onIsChainable() {
-        ActionHandler result = handler.on("moveUp", e -> {
-        }).on("moveDown", e -> {
-        });
+        ActionHandler result = handler
+                .on("moveUp", e -> {})
+                .on("moveDown", e -> {});
 
         assertThat(result).isSameAs(handler);
     }
 
     @Test
     void offRemovesHandlers() {
-        handler.on("moveUp", e -> {
-        });
+        handler.on("moveUp", e -> {});
         assertThat(handler.hasHandlers("moveUp")).isTrue();
 
         handler.off("moveUp");
@@ -91,8 +89,7 @@ class ActionHandlerTest {
 
     @Test
     void dispatchReturnsFalseWhenNoMatchingAction() {
-        handler.on("customAction", e -> {
-        });
+        handler.on("customAction", e -> {});
 
         KeyEvent upEvent = KeyEvent.ofKey(KeyCode.UP, bindings);
         boolean handled = handler.dispatch(upEvent);
@@ -102,8 +99,7 @@ class ActionHandlerTest {
 
     @Test
     void setBindingsChangesBindingsAtRuntime() {
-        handler.on(Actions.QUIT, e -> {
-        });
+        handler.on(Actions.QUIT, e -> {});
 
         // With standard bindings, 'q' triggers quit
         Bindings standard = BindingSets.standard();
@@ -112,7 +108,8 @@ class ActionHandlerTest {
         assertThat(handler.dispatch(qEvent)).isTrue();
 
         // With custom bindings that only have Ctrl+C for quit, 'q' doesn't trigger quit
-        Bindings noQuitOnQ = DefaultBindings.builder().bind(KeyTrigger.ctrl('c'), Actions.QUIT)
+        Bindings noQuitOnQ = DefaultBindings.builder()
+                .bind(KeyTrigger.ctrl('c'), Actions.QUIT)
                 .build();
         handler.setBindings(noQuitOnQ);
         KeyEvent qEventNoQuit = KeyEvent.ofChar('q', noQuitOnQ);
@@ -135,8 +132,7 @@ class ActionHandlerTest {
 
     @Test
     void hasHandlersReturnsFalseAfterRemovingAllHandlers() {
-        handler.on("test", e -> {
-        });
+        handler.on("test", e -> {});
         handler.off("test");
 
         assertThat(handler.hasHandlers("test")).isFalse();
@@ -145,7 +141,9 @@ class ActionHandlerTest {
     @Test
     void dispatchWorksWithCustomActions() {
         // Create bindings with custom action
-        Bindings custom = BindingSets.standard().toBuilder().bind(KeyTrigger.ctrl('s'), "save")
+        Bindings custom = BindingSets.standard()
+                .toBuilder()
+                .bind(KeyTrigger.ctrl('s'), "save")
                 .build();
         handler.setBindings(custom);
 

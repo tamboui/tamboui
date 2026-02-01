@@ -21,8 +21,7 @@ public final class TextInputState {
     /**
      * Creates a new text input state with the given initial text.
      *
-     * @param initialText
-     *            the initial text content
+     * @param initialText the initial text content
      */
     public TextInputState(String initialText) {
         this.text = new StringBuilder(initialText);
@@ -59,8 +58,7 @@ public final class TextInputState {
     /**
      * Inserts a character at the cursor position.
      *
-     * @param c
-     *            the character to insert
+     * @param c the character to insert
      */
     public void insert(char c) {
         text.insert(cursorPosition, c);
@@ -70,8 +68,7 @@ public final class TextInputState {
     /**
      * Inserts a string at the cursor position.
      *
-     * @param s
-     *            the string to insert
+     * @param s the string to insert
      */
     public void insert(String s) {
         text.insert(cursorPosition, s);
@@ -126,8 +123,7 @@ public final class TextInputState {
     /**
      * Replaces the text content.
      *
-     * @param newText
-     *            the new text content
+     * @param newText the new text content
      */
     public void setText(String newText) {
         text = new StringBuilder(newText);

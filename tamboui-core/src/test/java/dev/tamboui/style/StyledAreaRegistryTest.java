@@ -4,14 +4,13 @@
  */
 package dev.tamboui.style;
 
-import java.util.List;
-
+import dev.tamboui.layout.Rect;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import dev.tamboui.layout.Rect;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

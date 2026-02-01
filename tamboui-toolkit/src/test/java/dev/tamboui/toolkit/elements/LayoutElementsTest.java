@@ -4,20 +4,19 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-import dev.tamboui.style.Overflow;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.style.Overflow;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
@@ -34,8 +33,11 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Panel fluent API chains correctly")
         void fluentApiChaining() {
-            Panel element = panel("Title", text("Content")).rounded().borderColor(Color.GREEN)
-                    .fg(Color.WHITE).bg(Color.BLACK);
+            Panel element = panel("Title", text("Content"))
+                .rounded()
+                .borderColor(Color.GREEN)
+                .fg(Color.WHITE)
+                .bg(Color.BLACK);
 
             assertThat(element).isInstanceOf(Panel.class);
         }
@@ -61,7 +63,9 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            panel("Test", text("Content")).rounded().render(frame, area, RenderContext.empty());
+            panel("Test", text("Content"))
+                .rounded()
+                .render(frame, area, RenderContext.empty());
 
             // Rounded corners
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -77,7 +81,8 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            panel("Title", text("X")).render(frame, area, RenderContext.empty());
+            panel("Title", text("X"))
+                .render(frame, area, RenderContext.empty());
 
             // Title should appear in top border
             assertThat(buffer.get(1, 0).symbol()).isEqualTo("T");
@@ -101,7 +106,9 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            panel("X").borderColor(Color.RED).render(frame, area, RenderContext.empty());
+            panel("X")
+                .borderColor(Color.RED)
+                .render(frame, area, RenderContext.empty());
 
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
         }
@@ -117,7 +124,11 @@ class LayoutElementsTest {
         @Test
         @DisplayName("fit() computes height with children")
         void fitWithChildren() {
-            Panel p = panel(text("Line 1"), text("Line 2"), text("Line 3")).fit();
+            Panel p = panel(
+                text("Line 1"),
+                text("Line 2"),
+                text("Line 3")
+            ).fit();
             // 2 rows for borders + 3 children (1 row each)
             assertThat(p.constraint()).isEqualTo(Constraint.length(5));
         }
@@ -125,7 +136,9 @@ class LayoutElementsTest {
         @Test
         @DisplayName("fit() computes height with padding")
         void fitWithPadding() {
-            Panel p = panel(text("Line 1")).padding(1).fit();
+            Panel p = panel(text("Line 1"))
+                .padding(1)
+                .fit();
             // 2 rows for borders + 2 rows for padding (top + bottom) + 1 child
             assertThat(p.constraint()).isEqualTo(Constraint.length(5));
         }
@@ -133,7 +146,10 @@ class LayoutElementsTest {
         @Test
         @DisplayName("fit() respects child length constraints")
         void fitRespectsChildConstraints() {
-            Panel p = panel(text("Line 1").length(3), text("Line 2")).fit();
+            Panel p = panel(
+                text("Line 1").length(3),
+                text("Line 2")
+            ).fit();
             // 2 rows for borders + 3 (from length constraint) + 1 (default)
             assertThat(p.constraint()).isEqualTo(Constraint.length(6));
         }
@@ -158,7 +174,9 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Row fluent API chains correctly")
         void fluentApiChaining() {
-            Row element = row(text("Left"), spacer(), text("Right")).spacing(1).fg(Color.WHITE);
+            Row element = row(text("Left"), spacer(), text("Right"))
+                .spacing(1)
+                .fg(Color.WHITE);
 
             assertThat(element).isInstanceOf(Row.class);
         }
@@ -177,8 +195,10 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            row(text("A").length(5), text("B").length(5)).render(frame, area,
-                    RenderContext.empty());
+            row(
+                text("A").length(5),
+                text("B").length(5)
+            ).render(frame, area, RenderContext.empty());
 
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
             assertThat(buffer.get(5, 0).symbol()).isEqualTo("B");
@@ -201,7 +221,10 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            row(text("L").fill(), text("R").fill()).render(frame, area, RenderContext.empty());
+            row(
+                text("L").fill(),
+                text("R").fill()
+            ).render(frame, area, RenderContext.empty());
 
             // Both should be rendered with space distributed
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("L");
@@ -216,15 +239,19 @@ class LayoutElementsTest {
 
             // Three text elements with fit() - each should get exactly its content width
             // "Hello " = 6 chars, "World" = 5 chars, "!" = 1 char
-            row(text("Hello ").fit(), text("World").fit(), text("!").fit()).render(frame, area,
-                    RenderContext.empty());
+            row(
+                text("Hello ").fit(),
+                text("World").fit(),
+                text("!").fit()
+            ).render(frame, area, RenderContext.empty());
 
             // Text should render with no truncation, adjacent positions
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "H") // start of "Hello "
-                    .hasSymbolAt(5, 0, " ") // trailing space of "Hello "
-                    .hasSymbolAt(6, 0, "W") // start of "World"
-                    .hasSymbolAt(10, 0, "d") // end of "World"
-                    .hasSymbolAt(11, 0, "!"); // the "!"
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "H")      // start of "Hello "
+                .hasSymbolAt(5, 0, " ")      // trailing space of "Hello "
+                .hasSymbolAt(6, 0, "W")      // start of "World"
+                .hasSymbolAt(10, 0, "d")     // end of "World"
+                .hasSymbolAt(11, 0, "!");    // the "!"
         }
 
         @Test
@@ -242,8 +269,9 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Column fluent API chains correctly")
         void fluentApiChaining() {
-            Column element = column(text("Top"), spacer(), text("Bottom")).spacing(1)
-                    .fg(Color.WHITE);
+            Column element = column(text("Top"), spacer(), text("Bottom"))
+                .spacing(1)
+                .fg(Color.WHITE);
 
             assertThat(element).isInstanceOf(Column.class);
         }
@@ -262,8 +290,10 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            column(text("A").length(1), text("B").length(1)).render(frame, area,
-                    RenderContext.empty());
+            column(
+                text("A").length(1),
+                text("B").length(1)
+            ).render(frame, area, RenderContext.empty());
 
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
             assertThat(buffer.get(0, 1).symbol()).isEqualTo("B");
@@ -320,8 +350,10 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Row.preferredHeight(width) returns max child height")
         void rowMaxChildHeight() {
-            Row r = row(text("Short"),
-                    text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER));
+            Row r = row(
+                text("Short"),
+                text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
+            );
             // At width 20, each child gets 10 chars (20/2)
             // "12345678901234567890" = 20 chars at width 10 = 2 lines
             assertThat(r.preferredHeight(20, null)).isEqualTo(2);
@@ -334,8 +366,10 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Row.preferredHeight(width) accounts for spacing")
         void rowWithSpacing() {
-            Row r = row(text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER),
-                    text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)).spacing(2);
+            Row r = row(
+                text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER),
+                text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
+            ).spacing(2);
             // Width 22: 2 spacing + 20 content = 10 per child, each wraps to 2 lines
             assertThat(r.preferredHeight(22, null)).isEqualTo(2);
         }
@@ -343,8 +377,10 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Column.preferredHeight(width) returns sum of child heights")
         void columnSumChildHeights() {
-            Column c = column(text("Short"),
-                    text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER));
+            Column c = column(
+                text("Short"),
+                text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
+            );
             // At width 20, first child = 1, second child = 1 (no wrapping)
             assertThat(c.preferredHeight(20, null)).isEqualTo(2);
 
@@ -355,7 +391,11 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Column.preferredHeight(width) accounts for spacing")
         void columnWithSpacing() {
-            Column c = column(text("A"), text("B"), text("C")).spacing(1);
+            Column c = column(
+                text("A"),
+                text("B"),
+                text("C")
+            ).spacing(1);
             // 3 children + 2 spacing = 5
             assertThat(c.preferredHeight(20, null)).isEqualTo(5);
         }
@@ -379,7 +419,9 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Panel.preferredHeight(width) calculates wrapped content height")
         void panelWithWrappedContent() {
-            Panel p = panel(text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER));
+            Panel p = panel(
+                text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
+            );
             // At width 22: 2 borders, content width = 20, text fits in 1 line
             assertThat(p.preferredHeight(22, null)).isEqualTo(3);
 
@@ -390,10 +432,14 @@ class LayoutElementsTest {
         @Test
         @DisplayName("Nested row in column calculates height correctly")
         void nestedRowInColumn() {
-            Column c = column(text("Header"), row(
-                    text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER), text("Short")));
-            // At width 20: header = 1, row max = 1 (20 chars / 2 = 10 per child, wraps to
-            // 2)
+            Column c = column(
+                text("Header"),
+                row(
+                    text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER),
+                    text("Short")
+                )
+            );
+            // At width 20: header = 1, row max = 1 (20 chars / 2 = 10 per child, wraps to 2)
             // Actually: 20 chars at width 10 = 2 lines
             assertThat(c.preferredHeight(20, null)).isEqualTo(3); // 1 + 2
         }
@@ -418,7 +464,10 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            column(row(text("A"), text("B")), text("C")).render(frame, area, RenderContext.empty());
+            column(
+                row(text("A"), text("B")),
+                text("C")
+            ).render(frame, area, RenderContext.empty());
 
             // Should render without error
             assertThat(buffer).isNotNull();
@@ -431,8 +480,12 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            panel("Header", row(text("Left").fill(), text("Right").fill())).rounded().render(frame,
-                    area, RenderContext.empty());
+            panel("Header",
+                row(
+                    text("Left").fill(),
+                    text("Right").fill()
+                )
+            ).rounded().render(frame, area, RenderContext.empty());
 
             assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
         }
@@ -444,9 +497,13 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            column(panel("Title", text("Content")).rounded(),
-                    row(panel("Left", text("L")), panel("Right", text("R"))))
-                    .render(frame, area, RenderContext.empty());
+            column(
+                panel("Title", text("Content")).rounded(),
+                row(
+                    panel("Left", text("L")),
+                    panel("Right", text("R"))
+                )
+            ).render(frame, area, RenderContext.empty());
 
             // Should render without error
             assertThat(buffer).isNotNull();
@@ -461,9 +518,13 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            row(text("A 4"), text("passed"), text("B 3"), text("failed"), text("C 0"),
-                    text("skipped"), text("D 0"), text("running"), text("E 0"), text("pending"))
-                    .render(frame, area, RenderContext.empty());
+            row(
+                text("A 4"), text("passed"),
+                text("B 3"), text("failed"),
+                text("C 0"), text("skipped"),
+                text("D 0"), text("running"),
+                text("E 0"), text("pending")
+            ).render(frame, area, RenderContext.empty());
 
             // Check that text doesn't extend beyond the row's area
             // The last cell (x=39) should be within bounds
@@ -492,8 +553,9 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            row(text("AAAAAAAAAA"), // 10 chars, should be clipped to 5
-                    text("BBBBBBBBBB") // 10 chars, should be clipped to 5
+            row(
+                text("AAAAAAAAAA"), // 10 chars, should be clipped to 5
+                text("BBBBBBBBBB")  // 10 chars, should be clipped to 5
             ).render(frame, area, RenderContext.empty());
 
             // Print buffer for debugging
@@ -519,9 +581,11 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            row(text("AAAAAAAAAA"), // 10 chars
-                    text("BBBBBBBBBB") // 10 chars
-            ).flex(dev.tamboui.layout.Flex.START).render(frame, area, RenderContext.empty());
+            row(
+                text("AAAAAAAAAA"), // 10 chars
+                text("BBBBBBBBBB")  // 10 chars
+            ).flex(dev.tamboui.layout.Flex.START)
+             .render(frame, area, RenderContext.empty());
 
             // Print buffer for debugging
             StringBuilder row0 = new StringBuilder();
@@ -544,8 +608,14 @@ class LayoutElementsTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            panel("Test", column(row(text("AAAAAAAAAA"), text("BBBBBBBBBB")))).render(frame, area,
-                    RenderContext.empty());
+            panel("Test",
+                column(
+                    row(
+                        text("AAAAAAAAAA"),
+                        text("BBBBBBBBBB")
+                    )
+                )
+            ).render(frame, area, RenderContext.empty());
 
             // Print row 1 (inside the panel, after border)
             StringBuilder row1 = new StringBuilder();
@@ -570,10 +640,13 @@ class LayoutElementsTest {
 
             StyleEngine styleEngine = StyleEngine.create();
             styleEngine.addStylesheet(
-                    ".stats-row { text-overflow: wrap-character; height: 1; flex: start; }\n"
-                            + ".success { color: green; }\n" + ".error { color: red; }\n"
-                            + ".warning { color: yellow; }\n" + ".info { color: cyan; }\n"
-                            + ".dim { color: gray; }");
+                ".stats-row { text-overflow: wrap-character; height: 1; flex: start; }\n" +
+                ".success { color: green; }\n" +
+                ".error { color: red; }\n" +
+                ".warning { color: yellow; }\n" +
+                ".info { color: cyan; }\n" +
+                ".dim { color: gray; }"
+            );
 
             DefaultRenderContext context = DefaultRenderContext.createEmpty();
             context.setStyleEngine(styleEngine);
@@ -584,13 +657,20 @@ class LayoutElementsTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Create structure matching user's code
-            panel("Tests", column(row(text("Header")),
-                    row(text("+ 4").addClass("success"), text("passed"),
-                            text("x 3").addClass("error"), text("failed"),
-                            text("> 0").addClass("warning"), text("skipped"),
-                            text("~ 0").addClass("info"), text("running"),
-                            text("? 0").addClass("dim"), text("pending")).addClass("stats-row")))
-                    .render(frame, area, context);
+            panel("Tests",
+                column(
+                    row(
+                        text("Header")
+                    ),
+                    row(
+                        text("+ 4").addClass("success"), text("passed"),
+                        text("x 3").addClass("error"), text("failed"),
+                        text("> 0").addClass("warning"), text("skipped"),
+                        text("~ 0").addClass("info"), text("running"),
+                        text("? 0").addClass("dim"), text("pending")
+                    ).addClass("stats-row")
+                )
+            ).render(frame, area, context);
 
             // The panel borders must be intact - text must NOT overflow
             // Row 0: top border (┌Tests...┐)
@@ -598,12 +678,13 @@ class LayoutElementsTest {
             // Row 2: Empty row due to column expansion
             // Row 3: Stats row - THIS IS WHERE THE BUG IS (right border missing)
             // Row 4: bottom border (└...┘)
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 1, "│") // left border row 1
-                    .hasSymbolAt(49, 1, "│") // right border row 1
-                    .hasSymbolAt(0, 2, "│") // left border row 2
-                    .hasSymbolAt(49, 2, "│") // right border row 2
-                    .hasSymbolAt(0, 3, "│") // left border row 3 (stats row)
-                    .hasSymbolAt(49, 3, "│"); // right border row 3 (stats row) - BUG: this fails!
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 1, "│")   // left border row 1
+                .hasSymbolAt(49, 1, "│")  // right border row 1
+                .hasSymbolAt(0, 2, "│")   // left border row 2
+                .hasSymbolAt(49, 2, "│")  // right border row 2
+                .hasSymbolAt(0, 3, "│")   // left border row 3 (stats row)
+                .hasSymbolAt(49, 3, "│"); // right border row 3 (stats row) - BUG: this fails!
         }
 
         @Test
@@ -617,12 +698,19 @@ class LayoutElementsTest {
 
             // Inner area should be 18 wide (20 - 2 borders)
             // Row with 4 text elements, each ~4.5 chars
-            panel("T", row(text("AAAA"), text("BBBB"), text("CCCC"), text("DDDD"))).render(frame,
-                    area, RenderContext.empty());
+            panel("T",
+                row(
+                    text("AAAA"),
+                    text("BBBB"),
+                    text("CCCC"),
+                    text("DDDD")
+                )
+            ).render(frame, area, RenderContext.empty());
 
             // Right border must be intact at position 19
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 1, "│") // left border
-                    .hasSymbolAt(19, 1, "│"); // right border - must NOT be overwritten
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 1, "│")   // left border
+                .hasSymbolAt(19, 1, "│"); // right border - must NOT be overwritten
         }
     }
 }

@@ -4,13 +4,12 @@
  */
 package dev.tamboui.widgets.canvas;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
+import dev.tamboui.widgets.canvas.shapes.Line;
 import dev.tamboui.style.Color;
 import dev.tamboui.text.Span;
-import dev.tamboui.widgets.canvas.shapes.Line;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +17,7 @@ class ContextTest {
 
     @Test
     void constructor_creates_context() {
-        Context ctx = new Context(20, 10, new double[]{0, 100}, new double[]{0, 50}, Marker.DOT);
+        Context ctx = new Context(20, 10, new double[] {0, 100}, new double[] {0, 50}, Marker.DOT);
 
         assertThat(ctx.width()).isEqualTo(20);
         assertThat(ctx.height()).isEqualTo(10);
@@ -29,7 +28,7 @@ class ContextTest {
 
     @Test
     void grid_dimensions_for_dot_marker() {
-        Context ctx = new Context(20, 10, new double[]{0, 100}, new double[]{0, 50}, Marker.DOT);
+        Context ctx = new Context(20, 10, new double[] {0, 100}, new double[] {0, 50}, Marker.DOT);
 
         assertThat(ctx.gridWidth()).isEqualTo(20);
         assertThat(ctx.gridHeight()).isEqualTo(10);
@@ -37,17 +36,15 @@ class ContextTest {
 
     @Test
     void grid_dimensions_for_braille_marker() {
-        Context ctx = new Context(20, 10, new double[]{0, 100}, new double[]{0, 50},
-                Marker.BRAILLE);
+        Context ctx = new Context(20, 10, new double[] {0, 100}, new double[] {0, 50}, Marker.BRAILLE);
 
-        assertThat(ctx.gridWidth()).isEqualTo(40); // 2x horizontal
+        assertThat(ctx.gridWidth()).isEqualTo(40);  // 2x horizontal
         assertThat(ctx.gridHeight()).isEqualTo(40); // 4x vertical
     }
 
     @Test
     void grid_dimensions_for_half_block_marker() {
-        Context ctx = new Context(20, 10, new double[]{0, 100}, new double[]{0, 50},
-                Marker.HALF_BLOCK);
+        Context ctx = new Context(20, 10, new double[] {0, 100}, new double[] {0, 50}, Marker.HALF_BLOCK);
 
         assertThat(ctx.gridWidth()).isEqualTo(20);
         assertThat(ctx.gridHeight()).isEqualTo(20); // 2x vertical
@@ -55,7 +52,7 @@ class ContextTest {
 
     @Test
     void draw_adds_to_grid() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
 
         ctx.draw(new Line(0, 0, 10, 10, Color.RED));
 
@@ -65,7 +62,7 @@ class ContextTest {
 
     @Test
     void print_string_adds_label() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
 
         ctx.print(5, 5, "Hello");
 
@@ -77,7 +74,7 @@ class ContextTest {
 
     @Test
     void print_line_adds_label() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
 
         ctx.print(3, 7, dev.tamboui.text.Line.from("World"));
 
@@ -88,7 +85,7 @@ class ContextTest {
 
     @Test
     void print_span_adds_label() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
 
         ctx.print(1, 2, Span.raw("Test"));
 
@@ -97,7 +94,7 @@ class ContextTest {
 
     @Test
     void layer_saves_current_grid() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
 
         ctx.draw(new Line(0, 0, 5, 5, Color.RED));
         ctx.layer();
@@ -109,7 +106,7 @@ class ContextTest {
 
     @Test
     void multiple_layers() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
 
         ctx.draw(new Line(0, 0, 5, 5, Color.RED));
         ctx.layer();

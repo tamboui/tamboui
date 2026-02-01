@@ -28,10 +28,8 @@ public interface RenderErrorHandler {
     /**
      * Handles a render error.
      *
-     * @param error
-     *            the error information
-     * @param context
-     *            the error context providing output streams and runner control
+     * @param error   the error information
+     * @param context the error context providing output streams and runner control
      * @return the action to take
      */
     ErrorAction handle(RenderError error, ErrorContext context);

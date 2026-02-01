@@ -4,21 +4,21 @@
  */
 package dev.tamboui.toolkit.element;
 
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.layout.Rect;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.layout.Rect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -187,8 +187,7 @@ class ElementRegistryTest {
         void queryFocusReturnsElementWhenFocused() {
             registry.register("input1", "Input", setOf(), area1);
 
-            Optional<ElementRegistry.ElementInfo> result = registry.query(":focus",
-                    PseudoClassState.ofFocused());
+            Optional<ElementRegistry.ElementInfo> result = registry.query(":focus", PseudoClassState.ofFocused());
 
             assertThat(result).isPresent();
         }
@@ -198,8 +197,7 @@ class ElementRegistryTest {
         void queryFocusReturnsEmptyWhenNotFocused() {
             registry.register("input1", "Input", setOf(), area1);
 
-            Optional<ElementRegistry.ElementInfo> result = registry.query(":focus",
-                    PseudoClassState.NONE);
+            Optional<ElementRegistry.ElementInfo> result = registry.query(":focus", PseudoClassState.NONE);
 
             assertThat(result).isEmpty();
         }
@@ -210,8 +208,7 @@ class ElementRegistryTest {
             registry.register("input1", "Input", setOf(), area1);
             registry.register("btn1", "Button", setOf(), area2);
 
-            Optional<ElementRegistry.ElementInfo> result = registry.query("Button:focus",
-                    PseudoClassState.ofFocused());
+            Optional<ElementRegistry.ElementInfo> result = registry.query("Button:focus", PseudoClassState.ofFocused());
 
             assertThat(result).isPresent();
             assertThat(result.get().id()).isEqualTo("btn1");
@@ -222,8 +219,7 @@ class ElementRegistryTest {
         void queryHoverReturnsElementWhenHovered() {
             registry.register("btn1", "Button", setOf(), area1);
 
-            Optional<ElementRegistry.ElementInfo> result = registry.query(":hover",
-                    PseudoClassState.ofHovered());
+            Optional<ElementRegistry.ElementInfo> result = registry.query(":hover", PseudoClassState.ofHovered());
 
             assertThat(result).isPresent();
         }
@@ -233,8 +229,7 @@ class ElementRegistryTest {
         void queryDisabledReturnsElementWhenDisabled() {
             registry.register("btn1", "Button", setOf(), area1);
 
-            Optional<ElementRegistry.ElementInfo> result = registry.query(":disabled",
-                    PseudoClassState.ofDisabled());
+            Optional<ElementRegistry.ElementInfo> result = registry.query(":disabled", PseudoClassState.ofDisabled());
 
             assertThat(result).isPresent();
         }
@@ -296,7 +291,7 @@ class ElementRegistryTest {
         @DisplayName("Type#id matches element with both type and ID")
         void typeAndIdSelector() {
             registry.register("header", "Panel", setOf("main"), area1);
-            registry.register("header", "Row", setOf(), area2); // Same ID, different type
+            registry.register("header", "Row", setOf(), area2);  // Same ID, different type
 
             Optional<ElementRegistry.ElementInfo> result = registry.query("Panel#header");
 
@@ -324,8 +319,7 @@ class ElementRegistryTest {
         @Test
         @DisplayName("A B matches child of A")
         void matchesDirectChild() {
-            ElementRegistry.ElementInfo parent = registerAndGet("panel1", "Panel", setOf("main"),
-                    area1, null);
+            ElementRegistry.ElementInfo parent = registerAndGet("panel1", "Panel", setOf("main"), area1, null);
             registry.register("btn1", "Button", setOf("primary"), null, area2, parent);
 
             List<ElementRegistry.ElementInfo> results = registry.queryAll("Panel Button");
@@ -337,10 +331,8 @@ class ElementRegistryTest {
         @Test
         @DisplayName("A B matches nested descendant of A")
         void matchesNestedDescendant() {
-            ElementRegistry.ElementInfo grandparent = registerAndGet("panel1", "Panel",
-                    setOf("main"), area1, null);
-            ElementRegistry.ElementInfo parent = registerAndGet("row1", "Row", setOf(), area2,
-                    grandparent);
+            ElementRegistry.ElementInfo grandparent = registerAndGet("panel1", "Panel", setOf("main"), area1, null);
+            ElementRegistry.ElementInfo parent = registerAndGet("row1", "Row", setOf(), area2, grandparent);
             registry.register("btn1", "Button", setOf("primary"), null, area3, parent);
 
             List<ElementRegistry.ElementInfo> results = registry.queryAll("Panel Button");
@@ -352,8 +344,7 @@ class ElementRegistryTest {
         @Test
         @DisplayName("A B does not match without ancestor")
         void doesNotMatchWithoutAncestor() {
-            ElementRegistry.ElementInfo parent = registerAndGet("row1", "Row", setOf(), area1,
-                    null);
+            ElementRegistry.ElementInfo parent = registerAndGet("row1", "Row", setOf(), area1, null);
             registry.register("btn1", "Button", setOf("primary"), null, area2, parent);
 
             List<ElementRegistry.ElementInfo> results = registry.queryAll("Panel Button");
@@ -369,8 +360,7 @@ class ElementRegistryTest {
         @Test
         @DisplayName("A > B matches direct child of A")
         void matchesDirectChild() {
-            ElementRegistry.ElementInfo parent = registerAndGet("panel1", "Panel", setOf("main"),
-                    area1, null);
+            ElementRegistry.ElementInfo parent = registerAndGet("panel1", "Panel", setOf("main"), area1, null);
             registry.register("btn1", "Button", setOf("primary"), null, area2, parent);
 
             List<ElementRegistry.ElementInfo> results = registry.queryAll("Panel > Button");
@@ -382,10 +372,8 @@ class ElementRegistryTest {
         @Test
         @DisplayName("A > B does not match nested descendant")
         void doesNotMatchNestedDescendant() {
-            ElementRegistry.ElementInfo grandparent = registerAndGet("panel1", "Panel",
-                    setOf("main"), area1, null);
-            ElementRegistry.ElementInfo parent = registerAndGet("row1", "Row", setOf(), area2,
-                    grandparent);
+            ElementRegistry.ElementInfo grandparent = registerAndGet("panel1", "Panel", setOf("main"), area1, null);
+            ElementRegistry.ElementInfo parent = registerAndGet("row1", "Row", setOf(), area2, grandparent);
             registry.register("btn1", "Button", setOf("primary"), null, area3, parent);
 
             List<ElementRegistry.ElementInfo> results = registry.queryAll("Panel > Button");
@@ -456,9 +444,8 @@ class ElementRegistryTest {
     }
 
     private ElementRegistry.ElementInfo registerAndGet(String id, String type, Set<String> classes,
-            Rect area, ElementRegistry.ElementInfo parent) {
+                                                        Rect area, ElementRegistry.ElementInfo parent) {
         registry.register(id, type, classes, null, area, parent);
-        return registry.query("#" + id)
-                .orElseThrow(() -> new AssertionError("Element not found: " + id));
+        return registry.query("#" + id).orElseThrow(() -> new AssertionError("Element not found: " + id));
     }
 }

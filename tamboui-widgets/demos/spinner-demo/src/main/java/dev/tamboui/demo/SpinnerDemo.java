@@ -35,13 +35,13 @@ import dev.tamboui.widgets.spinner.SpinnerStyle;
  * <p>
  * Demonstrates all built-in spinner styles:
  * <ul>
- * <li>DOTS - Braille dot pattern</li>
- * <li>LINE - Classic -\|/ spinner</li>
- * <li>ARC - Quarter-circle characters</li>
- * <li>CIRCLE - Clock-position circle</li>
- * <li>BOUNCING_BAR - Bouncing bar effect</li>
- * <li>TOGGLE - Two-state toggle</li>
- * <li>Custom frames</li>
+ *   <li>DOTS - Braille dot pattern</li>
+ *   <li>LINE - Classic -\|/ spinner</li>
+ *   <li>ARC - Quarter-circle characters</li>
+ *   <li>CIRCLE - Clock-position circle</li>
+ *   <li>BOUNCING_BAR - Bouncing bar effect</li>
+ *   <li>TOGGLE - Two-state toggle</li>
+ *   <li>Custom frames</li>
  * </ul>
  */
 public class SpinnerDemo {
@@ -75,8 +75,8 @@ public class SpinnerDemo {
     private final SpinnerState customState = new SpinnerState();
 
     // Custom frame set example
-    private static final SpinnerFrameSet CUSTOM_FRAMES = SpinnerFrameSet.of("◐", "◓", "◑", "◒" // rotating
-                                                                                               // half-circle
+    private static final SpinnerFrameSet CUSTOM_FRAMES = SpinnerFrameSet.of(
+            "◐", "◓", "◑", "◒"  // rotating half-circle
     );
 
     private SpinnerDemo() {
@@ -84,11 +84,8 @@ public class SpinnerDemo {
 
     /**
      * Demo entry point.
-     * 
-     * @param args
-     *            the CLI arguments
-     * @throws Exception
-     *             on unexpected error
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
         new SpinnerDemo().run();
@@ -97,8 +94,7 @@ public class SpinnerDemo {
     /**
      * Runs the demo application.
      *
-     * @throws Exception
-     *             if an error occurs
+     * @throws Exception if an error occurs
      */
     public void run() throws Exception {
         try (Backend backend = BackendFactory.create()) {
@@ -148,10 +144,13 @@ public class SpinnerDemo {
     private void ui(Frame frame) {
         Rect area = frame.area();
 
-        var layout = Layout.vertical().constraints(Constraint.length(3), // Header
-                Constraint.fill(), // Main content
-                Constraint.length(3) // Footer
-        ).split(area);
+        var layout = Layout.vertical()
+            .constraints(
+                Constraint.length(3),  // Header
+                Constraint.fill(),     // Main content
+                Constraint.length(3)   // Footer
+            )
+            .split(area);
 
         renderHeader(frame, layout.get(0));
         renderMainContent(frame, layout.get(1));
@@ -159,11 +158,17 @@ public class SpinnerDemo {
     }
 
     private void renderHeader(Frame frame, Rect area) {
-        Block headerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.CYAN))
-                .title(Title.from(Line.from(Span.raw(" TamboUI ").bold().cyan(),
-                        Span.raw("Spinner Demo ").yellow())).centered())
-                .build();
+        Block headerBlock = Block.builder()
+            .borders(Borders.ALL)
+            .borderType(BorderType.ROUNDED)
+            .borderStyle(Style.EMPTY.fg(Color.CYAN))
+            .title(Title.from(
+                Line.from(
+                    Span.raw(" TamboUI ").bold().cyan(),
+                    Span.raw("Spinner Demo ").yellow()
+                )
+            ).centered())
+            .build();
 
         frame.renderWidget(headerBlock, area);
     }
@@ -171,114 +176,127 @@ public class SpinnerDemo {
     private void renderMainContent(Frame frame, Rect area) {
         // Split into two columns for more spinners
         var cols = Layout.horizontal()
-                .constraints(Constraint.percentage(50), Constraint.percentage(50)).split(area);
+            .constraints(
+                Constraint.percentage(50),
+                Constraint.percentage(50)
+            )
+            .split(area);
 
         // Left column - basic styles
-        var leftRows = Layout.vertical().constraints(Constraint.length(3), // DOTS
-                Constraint.length(3), // LINE
-                Constraint.length(3), // ARC
-                Constraint.length(3), // CIRCLE
-                Constraint.length(3), // BOUNCING_BAR
-                Constraint.length(3), // TOGGLE
-                Constraint.length(3) // GAUGE
-        ).split(cols.get(0));
+        var leftRows = Layout.vertical()
+            .constraints(
+                Constraint.length(3),  // DOTS
+                Constraint.length(3),  // LINE
+                Constraint.length(3),  // ARC
+                Constraint.length(3),  // CIRCLE
+                Constraint.length(3),  // BOUNCING_BAR
+                Constraint.length(3),  // TOGGLE
+                Constraint.length(3)   // GAUGE
+            )
+            .split(cols.get(0));
 
-        renderSpinnerRow(
-                frame, leftRows.get(0), "DOTS (braille)", Spinner.builder()
-                        .spinnerStyle(SpinnerStyle.DOTS).style(Style.EMPTY.fg(CYAN)).build(),
-                dotsState);
+        renderSpinnerRow(frame, leftRows.get(0), "DOTS (braille)",
+            Spinner.builder().spinnerStyle(SpinnerStyle.DOTS).style(Style.EMPTY.fg(CYAN)).build(),
+            dotsState);
 
-        renderSpinnerRow(
-                frame, leftRows.get(1), "LINE (-\\|/)", Spinner.builder()
-                        .spinnerStyle(SpinnerStyle.LINE).style(Style.EMPTY.fg(GREEN)).build(),
-                lineState);
+        renderSpinnerRow(frame, leftRows.get(1), "LINE (-\\|/)",
+            Spinner.builder().spinnerStyle(SpinnerStyle.LINE).style(Style.EMPTY.fg(GREEN)).build(),
+            lineState);
 
-        renderSpinnerRow(frame, leftRows.get(2), "ARC", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.ARC).style(Style.EMPTY.fg(YELLOW)).build(), arcState);
+        renderSpinnerRow(frame, leftRows.get(2), "ARC",
+            Spinner.builder().spinnerStyle(SpinnerStyle.ARC).style(Style.EMPTY.fg(YELLOW)).build(),
+            arcState);
 
-        renderSpinnerRow(
-                frame, leftRows.get(3), "CIRCLE", Spinner.builder()
-                        .spinnerStyle(SpinnerStyle.CIRCLE).style(Style.EMPTY.fg(MAGENTA)).build(),
-                circleState);
+        renderSpinnerRow(frame, leftRows.get(3), "CIRCLE",
+            Spinner.builder().spinnerStyle(SpinnerStyle.CIRCLE).style(Style.EMPTY.fg(MAGENTA)).build(),
+            circleState);
 
-        renderSpinnerRow(frame, leftRows.get(4), "BOUNCING_BAR", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.BOUNCING_BAR).style(Style.EMPTY.fg(BLUE)).build(),
-                bouncingBarState);
+        renderSpinnerRow(frame, leftRows.get(4), "BOUNCING_BAR",
+            Spinner.builder().spinnerStyle(SpinnerStyle.BOUNCING_BAR).style(Style.EMPTY.fg(BLUE)).build(),
+            bouncingBarState);
 
-        renderSpinnerRow(
-                frame, leftRows.get(5), "TOGGLE", Spinner.builder()
-                        .spinnerStyle(SpinnerStyle.TOGGLE).style(Style.EMPTY.fg(RED)).build(),
-                toggleState);
+        renderSpinnerRow(frame, leftRows.get(5), "TOGGLE",
+            Spinner.builder().spinnerStyle(SpinnerStyle.TOGGLE).style(Style.EMPTY.fg(RED)).build(),
+            toggleState);
 
-        renderSpinnerRow(
-                frame, leftRows.get(6), "GAUGE (block fill)", Spinner.builder()
-                        .spinnerStyle(SpinnerStyle.GAUGE).style(Style.EMPTY.fg(CYAN)).build(),
-                gaugeState);
+        renderSpinnerRow(frame, leftRows.get(6), "GAUGE (block fill)",
+            Spinner.builder().spinnerStyle(SpinnerStyle.GAUGE).style(Style.EMPTY.fg(CYAN)).build(),
+            gaugeState);
 
         // Right column - new styles
-        var rightRows = Layout.vertical().constraints(Constraint.length(3), // VERTICAL_GAUGE
-                Constraint.length(3), // ARROWS
-                Constraint.length(3), // CLOCK
-                Constraint.length(3), // MOON
-                Constraint.length(3), // SQUARE_CORNERS
-                Constraint.length(3), // GROWING_DOTS
-                Constraint.length(3), // BOUNCING_BALL
-                Constraint.length(3) // Custom FrameSet
-        ).split(cols.get(1));
+        var rightRows = Layout.vertical()
+            .constraints(
+                Constraint.length(3),  // VERTICAL_GAUGE
+                Constraint.length(3),  // ARROWS
+                Constraint.length(3),  // CLOCK
+                Constraint.length(3),  // MOON
+                Constraint.length(3),  // SQUARE_CORNERS
+                Constraint.length(3),  // GROWING_DOTS
+                Constraint.length(3),  // BOUNCING_BALL
+                Constraint.length(3)   // Custom FrameSet
+            )
+            .split(cols.get(1));
 
-        renderSpinnerRow(frame, rightRows.get(0), "VERTICAL_GAUGE", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.VERTICAL_GAUGE).style(Style.EMPTY.fg(GREEN)).build(),
-                verticalGaugeState);
+        renderSpinnerRow(frame, rightRows.get(0), "VERTICAL_GAUGE",
+            Spinner.builder().spinnerStyle(SpinnerStyle.VERTICAL_GAUGE).style(Style.EMPTY.fg(GREEN)).build(),
+            verticalGaugeState);
 
-        renderSpinnerRow(
-                frame, rightRows.get(1), "ARROWS", Spinner.builder()
-                        .spinnerStyle(SpinnerStyle.ARROWS).style(Style.EMPTY.fg(YELLOW)).build(),
-                arrowsState);
+        renderSpinnerRow(frame, rightRows.get(1), "ARROWS",
+            Spinner.builder().spinnerStyle(SpinnerStyle.ARROWS).style(Style.EMPTY.fg(YELLOW)).build(),
+            arrowsState);
 
-        renderSpinnerRow(frame, rightRows.get(2), "CLOCK", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.CLOCK).style(Style.EMPTY.fg(MAGENTA)).build(),
-                clockState);
+        renderSpinnerRow(frame, rightRows.get(2), "CLOCK",
+            Spinner.builder().spinnerStyle(SpinnerStyle.CLOCK).style(Style.EMPTY.fg(MAGENTA)).build(),
+            clockState);
 
-        renderSpinnerRow(frame, rightRows.get(3), "MOON", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.MOON).style(Style.EMPTY.fg(BLUE)).build(), moonState);
+        renderSpinnerRow(frame, rightRows.get(3), "MOON",
+            Spinner.builder().spinnerStyle(SpinnerStyle.MOON).style(Style.EMPTY.fg(BLUE)).build(),
+            moonState);
 
-        renderSpinnerRow(frame, rightRows.get(4), "SQUARE_CORNERS", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.SQUARE_CORNERS).style(Style.EMPTY.fg(RED)).build(),
-                squareCornersState);
+        renderSpinnerRow(frame, rightRows.get(4), "SQUARE_CORNERS",
+            Spinner.builder().spinnerStyle(SpinnerStyle.SQUARE_CORNERS).style(Style.EMPTY.fg(RED)).build(),
+            squareCornersState);
 
-        renderSpinnerRow(frame, rightRows.get(5), "GROWING_DOTS", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.GROWING_DOTS).style(Style.EMPTY.fg(ORANGE)).build(),
-                growingDotsState);
+        renderSpinnerRow(frame, rightRows.get(5), "GROWING_DOTS",
+            Spinner.builder().spinnerStyle(SpinnerStyle.GROWING_DOTS).style(Style.EMPTY.fg(ORANGE)).build(),
+            growingDotsState);
 
-        renderSpinnerRow(frame, rightRows.get(6), "BOUNCING_BALL", Spinner.builder()
-                .spinnerStyle(SpinnerStyle.BOUNCING_BALL).style(Style.EMPTY.fg(CYAN)).build(),
-                bouncingBallState);
+        renderSpinnerRow(frame, rightRows.get(6), "BOUNCING_BALL",
+            Spinner.builder().spinnerStyle(SpinnerStyle.BOUNCING_BALL).style(Style.EMPTY.fg(CYAN)).build(),
+            bouncingBallState);
 
         renderSpinnerRow(frame, rightRows.get(7), "Custom FrameSet",
-                Spinner.builder().frameSet(CUSTOM_FRAMES).style(Style.EMPTY.fg(MAGENTA)).build(),
-                customState);
+            Spinner.builder().frameSet(CUSTOM_FRAMES).style(Style.EMPTY.fg(MAGENTA)).build(),
+            customState);
     }
 
-    private void renderSpinnerRow(Frame frame, Rect area, String label, Spinner spinner,
-            SpinnerState state) {
+    private void renderSpinnerRow(Frame frame, Rect area, String label, Spinner spinner, SpinnerState state) {
         // Split into label and spinner areas
-        var cols = Layout.horizontal().constraints(Constraint.length(35), // Label
-                Constraint.length(10), // Spinner
-                Constraint.fill() // Spacer
-        ).split(area);
+        var cols = Layout.horizontal()
+            .constraints(
+                Constraint.length(35),  // Label
+                Constraint.length(10),  // Spinner
+                Constraint.fill()       // Spacer
+            )
+            .split(area);
 
         // Render label block
-        Block labelBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build();
+        Block labelBlock = Block.builder()
+            .borders(Borders.ALL)
+            .borderType(BorderType.ROUNDED)
+            .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+            .build();
         frame.renderWidget(labelBlock, cols.get(0));
 
         Rect labelInner = labelBlock.inner(cols.get(0));
-        frame.buffer().setString(labelInner.x(), labelInner.y(), label,
-                Style.EMPTY.fg(Color.WHITE));
+        frame.buffer().setString(labelInner.x(), labelInner.y(), label, Style.EMPTY.fg(Color.WHITE));
 
         // Render spinner block
-        Block spinnerBlock = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
-                .borderStyle(Style.EMPTY.fg(Color.BLUE)).build();
+        Block spinnerBlock = Block.builder()
+            .borders(Borders.ALL)
+            .borderType(BorderType.ROUNDED)
+            .borderStyle(Style.EMPTY.fg(Color.BLUE))
+            .build();
         frame.renderWidget(spinnerBlock, cols.get(1));
 
         Rect spinnerInner = spinnerBlock.inner(cols.get(1));
@@ -286,14 +304,22 @@ public class SpinnerDemo {
     }
 
     private void renderFooter(Frame frame, Rect area) {
-        Line helpLine = Line.from(Span.raw(" Frame: ").dim(),
-                Span.raw(String.valueOf(frameCount)).bold().cyan(), Span.raw("   "),
-                Span.raw("q").bold().yellow(), Span.raw(" Quit").dim());
+        Line helpLine = Line.from(
+            Span.raw(" Frame: ").dim(),
+            Span.raw(String.valueOf(frameCount)).bold().cyan(),
+            Span.raw("   "),
+            Span.raw("q").bold().yellow(),
+            Span.raw(" Quit").dim()
+        );
 
-        Paragraph footer = Paragraph.builder().text(Text.from(helpLine))
-                .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
-                .build();
+        Paragraph footer = Paragraph.builder()
+            .text(Text.from(helpLine))
+            .block(Block.builder()
+                .borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+                .build())
+            .build();
 
         frame.renderWidget(footer, area);
     }

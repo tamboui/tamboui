@@ -14,11 +14,9 @@ import java.nio.file.Path;
  * <p>
  * Provides pre-built handlers for common error handling scenarios:
  * <ul>
- * <li>{@link #displayAndQuit()} - Default: show error in UI, wait for
- * dismissal</li>
- * <li>{@link #logAndQuit(PrintStream)} - Log to stream and quit
- * immediately</li>
- * <li>{@link #writeToFile(Path)} - Write to file then display in UI</li>
+ *   <li>{@link #displayAndQuit()} - Default: show error in UI, wait for dismissal</li>
+ *   <li>{@link #logAndQuit(PrintStream)} - Log to stream and quit immediately</li>
+ *   <li>{@link #writeToFile(Path)} - Write to file then display in UI</li>
  * </ul>
  */
 public final class RenderErrorHandlers {
@@ -30,8 +28,8 @@ public final class RenderErrorHandlers {
     /**
      * Returns the default handler that displays the error in the UI.
      * <p>
-     * The error display shows the exception type, message, and a scrollable stack
-     * trace. Users can press 'q' to quit or use arrow keys to scroll.
+     * The error display shows the exception type, message, and a scrollable
+     * stack trace. Users can press 'q' to quit or use arrow keys to scroll.
      *
      * @return the default display-and-quit handler
      */
@@ -45,8 +43,7 @@ public final class RenderErrorHandlers {
      * The full stack trace is printed to the provided stream before the runner
      * quits. The terminal is cleaned up before printing.
      *
-     * @param output
-     *            the output stream to log to
+     * @param output the output stream to log to
      * @return a log-and-quit handler
      */
     public static RenderErrorHandler logAndQuit(PrintStream output) {
@@ -56,12 +53,11 @@ public final class RenderErrorHandlers {
     /**
      * Returns a handler that writes the error to a file, then displays in the UI.
      * <p>
-     * This is useful when you want both a log file for debugging and immediate user
-     * feedback. If the file cannot be written, the handler falls back to just
-     * displaying in the UI.
+     * This is useful when you want both a log file for debugging and immediate
+     * user feedback. If the file cannot be written, the handler falls back to
+     * just displaying in the UI.
      *
-     * @param logFile
-     *            the path to write the error log
+     * @param logFile the path to write the error log
      * @return a write-to-file-then-display handler
      */
     public static RenderErrorHandler writeToFile(Path logFile) {
@@ -72,8 +68,8 @@ public final class RenderErrorHandlers {
      * Returns a handler that suppresses errors and continues.
      * <p>
      * <strong>Warning:</strong> This is dangerous and should only be used in
-     * specific scenarios where you understand the implications. Errors are logged
-     * to the error output but rendering continues.
+     * specific scenarios where you understand the implications. Errors are
+     * logged to the error output but rendering continues.
      *
      * @return a suppress handler
      */
@@ -138,8 +134,7 @@ public final class RenderErrorHandlers {
                 }
             } catch (IOException e) {
                 // Failed to write to file - log to error output
-                context.errorOutput().println(
-                        "Warning: Could not write error to " + logFile + ": " + e.getMessage());
+                context.errorOutput().println("Warning: Could not write error to " + logFile + ": " + e.getMessage());
             }
             return ErrorAction.DISPLAY_AND_QUIT;
         }

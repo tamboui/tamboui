@@ -5,6 +5,8 @@
 package dev.tamboui.toolkit.elements;
 
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
@@ -18,8 +20,8 @@ import dev.tamboui.widgets.spinner.SpinnerStyle;
 /**
  * An element that displays an animated spinner with an optional label.
  * <p>
- * The spinner cycles through frame characters on each render tick, creating a
- * loading animation effect.
+ * The spinner cycles through frame characters on each render tick,
+ * creating a loading animation effect.
  *
  * <pre>{@code
  * // Simple spinner
@@ -42,14 +44,13 @@ import dev.tamboui.widgets.spinner.SpinnerStyle;
  * <p>
  * The spinner style and frames can be configured via CSS:
  * <ul>
- * <li>{@code spinner-style} - Predefined spinner style (e.g., {@code dots},
- * {@code line}, {@code bouncing-bar}, {@code gauge})</li>
- * <li>{@code spinner-frames} - Custom animation frames as quoted strings (e.g.,
- * {@code spinner-frames: "-" "\\" "|" "/"})</li>
+ *   <li>{@code spinner-style} - Predefined spinner style (e.g., {@code dots}, {@code line},
+ *       {@code bouncing-bar}, {@code gauge})</li>
+ *   <li>{@code spinner-frames} - Custom animation frames as quoted strings
+ *       (e.g., {@code spinner-frames: "-" "\\" "|" "/"})</li>
  * </ul>
  * <p>
  * Example CSS:
- * 
  * <pre>{@code
  * .my-spinner {
  *     spinner-style: line;
@@ -61,8 +62,8 @@ import dev.tamboui.widgets.spinner.SpinnerStyle;
  * }
  * }</pre>
  * <p>
- * Note: Programmatic styles set via {@link #spinnerStyle}, {@link #frameSet},
- * or {@link #frames} take precedence over CSS styles.
+ * Note: Programmatic styles set via {@link #spinnerStyle}, {@link #frameSet}, or
+ * {@link #frames} take precedence over CSS styles.
  *
  * @see Spinner
  * @see SpinnerStyle
@@ -85,8 +86,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     /**
      * Creates a spinner element with the given style.
      *
-     * @param spinnerStyle
-     *            the spinner style
+     * @param spinnerStyle the spinner style
      */
     public SpinnerElement(SpinnerStyle spinnerStyle) {
         this.spinnerStyle = spinnerStyle != null ? spinnerStyle : SpinnerStyle.DOTS;
@@ -96,8 +96,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     /**
      * Creates a spinner element with a label.
      *
-     * @param label
-     *            the label text
+     * @param label the label text
      */
     public SpinnerElement(String label) {
         this.label = label;
@@ -107,10 +106,8 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     /**
      * Creates a spinner element with a style and label.
      *
-     * @param spinnerStyle
-     *            the spinner style
-     * @param label
-     *            the label text
+     * @param spinnerStyle the spinner style
+     * @param label the label text
      */
     public SpinnerElement(SpinnerStyle spinnerStyle, String label) {
         this.spinnerStyle = spinnerStyle != null ? spinnerStyle : SpinnerStyle.DOTS;
@@ -121,8 +118,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     /**
      * Sets the spinner style.
      *
-     * @param spinnerStyle
-     *            the spinner style
+     * @param spinnerStyle the spinner style
      * @return this element for chaining
      */
     public SpinnerElement spinnerStyle(SpinnerStyle spinnerStyle) {
@@ -136,8 +132,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
      * <p>
      * This allows full control over the spinner animation frames.
      *
-     * @param frameSet
-     *            the frame set
+     * @param frameSet the frame set
      * @return this element for chaining
      */
     public SpinnerElement frameSet(SpinnerFrameSet frameSet) {
@@ -148,8 +143,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     /**
      * Sets custom frames for the spinner, overriding the style.
      *
-     * @param frames
-     *            the frame strings
+     * @param frames the frame strings
      * @return this element for chaining
      */
     public SpinnerElement frames(String... frames) {
@@ -162,8 +156,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     /**
      * Sets the label displayed next to the spinner.
      *
-     * @param label
-     *            the label text
+     * @param label the label text
      * @return this element for chaining
      */
     public SpinnerElement label(String label) {
@@ -176,8 +169,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
      * <p>
      * If not set, an internal state is used and advanced automatically.
      *
-     * @param state
-     *            the spinner state
+     * @param state the spinner state
      * @return this element for chaining
      */
     public SpinnerElement state(SpinnerState state) {
@@ -212,7 +204,8 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
         SpinnerFrameSet effectiveFrameSet = resolveFrameSet(context);
 
         // Build the spinner widget
-        Spinner.Builder builder = Spinner.builder().style(context.currentStyle())
+        Spinner.Builder builder = Spinner.builder()
+                .style(context.currentStyle())
                 .frameSet(effectiveFrameSet);
         Spinner spinner = builder.build();
 
@@ -235,17 +228,15 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     }
 
     /**
-     * Resolves the effective frame set with priority: explicit &gt; CSS &gt;
-     * default.
+     * Resolves the effective frame set with priority: explicit &gt; CSS &gt; default.
      * <p>
      * Resolution order:
      * <ol>
-     * <li>Explicit programmatic frame set (via {@link #frameSet} or
-     * {@link #frames})</li>
-     * <li>CSS {@code spinner-frames} property</li>
-     * <li>Explicit programmatic style (via {@link #spinnerStyle})</li>
-     * <li>CSS {@code spinner-style} property</li>
-     * <li>Default (DOTS)</li>
+     *   <li>Explicit programmatic frame set (via {@link #frameSet} or {@link #frames})</li>
+     *   <li>CSS {@code spinner-frames} property</li>
+     *   <li>Explicit programmatic style (via {@link #spinnerStyle})</li>
+     *   <li>CSS {@code spinner-style} property</li>
+     *   <li>Default (DOTS)</li>
      * </ol>
      */
     private SpinnerFrameSet resolveFrameSet(RenderContext context) {
@@ -279,9 +270,7 @@ public final class SpinnerElement extends StyledElement<SpinnerElement> {
     }
 
     private int computeMaxFrameWidth() {
-        SpinnerFrameSet frameSet = customFrameSet != null
-                ? customFrameSet
-                : spinnerStyle.frameSet();
+        SpinnerFrameSet frameSet = customFrameSet != null ? customFrameSet : spinnerStyle.frameSet();
         int max = 0;
         for (String f : frameSet.frames()) {
             max = Math.max(max, CharWidth.of(f));

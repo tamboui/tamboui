@@ -27,3 +27,5 @@ class CapabilitiesTest {
         assertThat(report.feature("tamboui-test", "feature.b", Boolean.class)).contains(false);
     }
 }
+
+

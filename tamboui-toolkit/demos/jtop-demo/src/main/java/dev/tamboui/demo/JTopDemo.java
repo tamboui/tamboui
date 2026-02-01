@@ -10,11 +10,12 @@
  */
 package dev.tamboui.demo;
 
-import java.time.Duration;
-
-import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitRunner;
+import dev.tamboui.style.Color;
 import dev.tamboui.tui.TuiConfig;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -23,18 +24,17 @@ import static dev.tamboui.toolkit.Toolkit.*;
  * <p>
  * Displays system metrics including:
  * <ul>
- * <li>CPU usage with toggleable views: bars, sparklines (all CPUs), or history
- * chart</li>
- * <li>Memory usage with sparkline chart showing history</li>
- * <li>Top processes by CPU/memory/PID (sortable)</li>
- * <li>System information</li>
+ *   <li>CPU usage with toggleable views: bars, sparklines (all CPUs), or history chart</li>
+ *   <li>Memory usage with sparkline chart showing history</li>
+ *   <li>Top processes by CPU/memory/PID (sortable)</li>
+ *   <li>System information</li>
  * </ul>
  * <p>
  * Controls:
  * <ul>
- * <li>[c] - Toggle CPU view (bars → sparklines → chart → bars)</li>
- * <li>[s] - Toggle sort mode (CPU → Memory → PID → CPU)</li>
- * <li>[q] - Quit</li>
+ *   <li>[c] - Toggle CPU view (bars → sparklines → chart → bars)</li>
+ *   <li>[s] - Toggle sort mode (CPU → Memory → PID → CPU)</li>
+ *   <li>[q] - Quit</li>
  * </ul>
  */
 public class JTopDemo {
@@ -47,14 +47,12 @@ public class JTopDemo {
 
     /**
      * Demo entry point.
-     * 
-     * @param args
-     *            the CLI arguments
-     * @throws Exception
-     *             on unexpected error
+     * @param args the CLI arguments
+     * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        var config = TuiConfig.builder().build();
+        var config = TuiConfig.builder()
+            .build();
 
         // Create stateful component outside the render supplier
         var systemMonitor = new SystemMonitor();
@@ -64,10 +62,15 @@ public class JTopDemo {
             runner.scheduleWithFixedDelay(systemMonitor::updateMetrics, UPDATE_INTERVAL);
 
             runner.run(() -> dock()
-                    .top(panel(() -> row(text(" JTop - System Monitor ").bold().cyan(), spacer(),
-                            text(" [s] Sort ").dim(), text(" [c] CPU View ").dim(),
-                            text(" [q] Quit ").dim())).rounded().borderColor(Color.DARK_GRAY))
-                    .center(systemMonitor));
+                .top(panel(() -> row(
+                    text(" JTop - System Monitor ").bold().cyan(),
+                    spacer(),
+                    text(" [s] Sort ").dim(),
+                    text(" [c] CPU View ").dim(),
+                    text(" [q] Quit ").dim()
+                )).rounded().borderColor(Color.DARK_GRAY))
+                .center(systemMonitor)
+            );
         }
     }
 }

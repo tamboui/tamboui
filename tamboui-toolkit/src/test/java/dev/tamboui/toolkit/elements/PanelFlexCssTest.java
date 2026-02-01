@@ -4,17 +4,19 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,7 +46,10 @@ class PanelFlexCssTest {
 
     @Test
     void panel_programmaticDirection_overridesCss() {
-        Panel panel = new Panel(new TextElement("A").length(5), new TextElement("B").length(5));
+        Panel panel = new Panel(
+            new TextElement("A").length(5),
+            new TextElement("B").length(5)
+        );
         panel.addClass("horizontal-panel");
         panel.vertical(); // Programmatic override
         Rect area = new Rect(0, 0, 40, 10);
@@ -69,7 +74,10 @@ class PanelFlexCssTest {
 
     @Test
     void panel_cssDirection_appliesWhenNoProgrammatic() {
-        Panel panel = new Panel(new TextElement("A").length(5), new TextElement("B").length(5));
+        Panel panel = new Panel(
+            new TextElement("A").length(5),
+            new TextElement("B").length(5)
+        );
         panel.addClass("horizontal-panel");
         // No programmatic direction - CSS should apply
         Rect area = new Rect(0, 0, 40, 5);
@@ -88,8 +96,7 @@ class PanelFlexCssTest {
                 break;
             }
         }
-        assertThat(foundB).as("Text B should be on same row as A (horizontal layout from CSS)")
-                .isTrue();
+        assertThat(foundB).as("Text B should be on same row as A (horizontal layout from CSS)").isTrue();
     }
 
     @Test
@@ -125,7 +132,10 @@ class PanelFlexCssTest {
 
     @Test
     void panel_programmaticFlex_overridesCss() {
-        Panel panel = new Panel(new TextElement("A").length(2), new TextElement("B").length(2));
+        Panel panel = new Panel(
+            new TextElement("A").length(2),
+            new TextElement("B").length(2)
+        );
         panel.addClass("centered-panel"); // CSS flex: center
         panel.flex(Flex.START); // Programmatic override
         Rect area = new Rect(0, 0, 20, 10);
@@ -139,7 +149,10 @@ class PanelFlexCssTest {
 
     @Test
     void panel_programmaticSpacing_overridesCss() {
-        Panel panel = new Panel(new TextElement("A").length(2), new TextElement("B").length(2));
+        Panel panel = new Panel(
+            new TextElement("A").length(2),
+            new TextElement("B").length(2)
+        );
         panel.addClass("horizontal-panel"); // CSS spacing: 2
         panel.horizontal();
         panel.spacing(0); // Programmatic override
@@ -166,10 +179,12 @@ class PanelFlexCssTest {
 
     @Test
     void panel_allFlexProperties_fromCss() {
-        Panel panel = new Panel(new TextElement("L").fill(), new TextElement("R").fill());
+        Panel panel = new Panel(
+            new TextElement("L").fill(),
+            new TextElement("R").fill()
+        );
         panel.addClass("full-flex-panel");
-        // full-flex-panel has: direction: horizontal, flex: space-between, spacing: 1,
-        // margin: 1 2 1 2
+        // full-flex-panel has: direction: horizontal, flex: space-between, spacing: 1, margin: 1 2 1 2
         Rect area = new Rect(0, 0, 30, 6);
 
         panel.render(frame, area, context);

@@ -14,8 +14,8 @@ import dev.tamboui.tui.event.KeyModifiers;
  * <p>
  * Key triggers can match:
  * <ul>
- * <li>A specific {@link KeyCode} (e.g., UP, ENTER)</li>
- * <li>A character with optional modifiers (e.g., 'k', Ctrl+'u')</li>
+ *   <li>A specific {@link KeyCode} (e.g., UP, ENTER)</li>
+ *   <li>A character with optional modifiers (e.g., 'k', Ctrl+'u')</li>
  * </ul>
  *
  * <pre>{@code
@@ -47,8 +47,8 @@ public final class KeyTrigger implements InputTrigger {
     private final boolean shift;
     private final boolean ignoreCase;
 
-    private KeyTrigger(KeyCode keyCode, Character character, boolean ctrl, boolean alt,
-            boolean shift, boolean ignoreCase) {
+    private KeyTrigger(KeyCode keyCode, Character character,
+                       boolean ctrl, boolean alt, boolean shift, boolean ignoreCase) {
         this.keyCode = keyCode;
         this.character = character;
         this.ctrl = ctrl;
@@ -60,8 +60,7 @@ public final class KeyTrigger implements InputTrigger {
     /**
      * Creates a trigger for a special key code without modifiers.
      *
-     * @param code
-     *            the key code
+     * @param code the key code
      * @return a trigger that matches the specified key
      */
     public static KeyTrigger key(KeyCode code) {
@@ -71,14 +70,10 @@ public final class KeyTrigger implements InputTrigger {
     /**
      * Creates a trigger for a special key code with modifiers.
      *
-     * @param code
-     *            the key code
-     * @param ctrl
-     *            true if Ctrl must be pressed
-     * @param alt
-     *            true if Alt must be pressed
-     * @param shift
-     *            true if Shift must be pressed
+     * @param code  the key code
+     * @param ctrl  true if Ctrl must be pressed
+     * @param alt   true if Alt must be pressed
+     * @param shift true if Shift must be pressed
      * @return a trigger that matches the specified key with modifiers
      */
     public static KeyTrigger key(KeyCode code, boolean ctrl, boolean alt, boolean shift) {
@@ -88,8 +83,7 @@ public final class KeyTrigger implements InputTrigger {
     /**
      * Creates a trigger for a character (case-sensitive).
      *
-     * @param c
-     *            the character to match
+     * @param c the character to match
      * @return a trigger that matches the exact character
      */
     public static KeyTrigger ch(char c) {
@@ -99,8 +93,7 @@ public final class KeyTrigger implements InputTrigger {
     /**
      * Creates a trigger for a character (case-insensitive).
      *
-     * @param c
-     *            the character to match (case-insensitive)
+     * @param c the character to match (case-insensitive)
      * @return a trigger that matches the character regardless of case
      */
     public static KeyTrigger chIgnoreCase(char c) {
@@ -110,8 +103,7 @@ public final class KeyTrigger implements InputTrigger {
     /**
      * Creates a trigger for Ctrl+character.
      *
-     * @param c
-     *            the character
+     * @param c the character
      * @return a trigger that matches Ctrl+c
      */
     public static KeyTrigger ctrl(char c) {
@@ -121,8 +113,7 @@ public final class KeyTrigger implements InputTrigger {
     /**
      * Creates a trigger for Alt+character.
      *
-     * @param c
-     *            the character
+     * @param c the character
      * @return a trigger that matches Alt+c
      */
     public static KeyTrigger alt(char c) {
@@ -142,15 +133,13 @@ public final class KeyTrigger implements InputTrigger {
      * <p>
      * Matching rules:
      * <ul>
-     * <li>Key code must match</li>
-     * <li>Ctrl and Alt modifiers must match exactly</li>
-     * <li>Shift is only checked if explicitly required by the trigger</li>
-     * <li>For character triggers, the character must match (respecting
-     * ignoreCase)</li>
+     *   <li>Key code must match</li>
+     *   <li>Ctrl and Alt modifiers must match exactly</li>
+     *   <li>Shift is only checked if explicitly required by the trigger</li>
+     *   <li>For character triggers, the character must match (respecting ignoreCase)</li>
      * </ul>
      *
-     * @param event
-     *            the key event to match against
+     * @param event the key event to match against
      * @return true if this trigger matches the event
      */
     public boolean matchesKey(KeyEvent event) {
@@ -207,35 +196,35 @@ public final class KeyTrigger implements InputTrigger {
 
     private static String formatKeyCode(KeyCode code) {
         switch (code) {
-            case UP :
+            case UP:
                 return "Up";
-            case DOWN :
+            case DOWN:
                 return "Down";
-            case LEFT :
+            case LEFT:
                 return "Left";
-            case RIGHT :
+            case RIGHT:
                 return "Right";
-            case PAGE_UP :
+            case PAGE_UP:
                 return "PageUp";
-            case PAGE_DOWN :
+            case PAGE_DOWN:
                 return "PageDown";
-            case HOME :
+            case HOME:
                 return "Home";
-            case END :
+            case END:
                 return "End";
-            case ENTER :
+            case ENTER:
                 return "Enter";
-            case ESCAPE :
+            case ESCAPE:
                 return "Escape";
-            case TAB :
+            case TAB:
                 return "Tab";
-            case BACKSPACE :
+            case BACKSPACE:
                 return "Backspace";
-            case DELETE :
+            case DELETE:
                 return "Delete";
-            case INSERT :
+            case INSERT:
                 return "Insert";
-            default :
+            default:
                 return code.name();
         }
     }
@@ -254,9 +243,12 @@ public final class KeyTrigger implements InputTrigger {
             return false;
         }
         KeyTrigger that = (KeyTrigger) o;
-        return ctrl == that.ctrl && alt == that.alt && shift == that.shift
-                && ignoreCase == that.ignoreCase && keyCode == that.keyCode
-                && (character == null ? that.character == null : character.equals(that.character));
+        return ctrl == that.ctrl &&
+               alt == that.alt &&
+               shift == that.shift &&
+               ignoreCase == that.ignoreCase &&
+               keyCode == that.keyCode &&
+               (character == null ? that.character == null : character.equals(that.character));
     }
 
     @Override

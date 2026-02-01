@@ -4,8 +4,6 @@
  */
 package dev.tamboui.tui.overlay;
 
-import java.time.Duration;
-
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -20,18 +18,20 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
+import java.time.Duration;
+
 /**
  * Debug overlay that displays performance metrics and system information.
  * <p>
  * Shows the backend name, actual frame rate (computed from render timing),
- * configured poll timeout, and tick rate. Toggle visibility with
- * CTRL+SHIFT+F12.
+ * configured poll timeout, and tick rate.
+ * Toggle visibility with CTRL+SHIFT+F12.
  */
 public final class DebugOverlay {
 
     private static final int OVERLAY_HEIGHT = 7;
     private static final int MIN_OVERLAY_WIDTH = 18;
-    private static final long MIN_WINDOW_NANOS = 2_000_000_000L; // 2 seconds minimum
+    private static final long MIN_WINDOW_NANOS = 2_000_000_000L;  // 2 seconds minimum
     private final int overlayWidth;
 
     private boolean visible;
@@ -50,12 +50,9 @@ public final class DebugOverlay {
     /**
      * Creates a new debug overlay.
      *
-     * @param backendName
-     *            the name of the backend being used
-     * @param pollTimeout
-     *            the configured poll timeout
-     * @param tickRate
-     *            the configured tick rate (may be null if ticks disabled)
+     * @param backendName the name of the backend being used
+     * @param pollTimeout the configured poll timeout
+     * @param tickRate the configured tick rate (may be null if ticks disabled)
      */
     public DebugOverlay(String backendName, Duration pollTimeout, Duration tickRate) {
         this.backendName = backendName;
@@ -93,8 +90,8 @@ public final class DebugOverlay {
     /**
      * Records a frame render for FPS calculation.
      * <p>
-     * This should be called once per actual frame render to compute the true frame
-     * rate.
+     * This should be called once per actual frame render to compute
+     * the true frame rate.
      */
     public void recordFrame() {
         renderCount++;
@@ -122,8 +119,8 @@ public final class DebugOverlay {
     /**
      * Returns the current FPS estimate.
      * <p>
-     * Uses the last completed window if available, otherwise calculates a
-     * preliminary estimate from the current incomplete window.
+     * Uses the last completed window if available, otherwise calculates
+     * a preliminary estimate from the current incomplete window.
      */
     private double computeFps() {
         if (lastFps > 0) {
@@ -143,8 +140,8 @@ public final class DebugOverlay {
     /**
      * Computes the color for the FPS display based on performance ratio.
      * <p>
-     * Returns RED if FPS is less than 50% of theoretical, YELLOW (orange) if less
-     * than 90%, GREEN otherwise.
+     * Returns RED if FPS is less than 50% of theoretical,
+     * YELLOW (orange) if less than 90%, GREEN otherwise.
      */
     private Color computeFpsColor(double actualFps, double theoreticalFps) {
         if (theoreticalFps <= 0) {
@@ -162,10 +159,8 @@ public final class DebugOverlay {
     /**
      * Renders the debug overlay in the top-right corner.
      *
-     * @param frame
-     *            the frame to render to
-     * @param area
-     *            the total available area
+     * @param frame the frame to render to
+     * @param area the total available area
      */
     public void render(Frame frame, Rect area) {
         if (!visible || area.isEmpty()) {
@@ -206,10 +201,11 @@ public final class DebugOverlay {
                 : "Tick: disabled";
 
         // Create block with rounded border
-        Block block = Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
+        Block block = Block.builder()
+                .borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED)
                 .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
-                .title(Title
-                        .from(Line.from(Span.styled("Debug", Style.EMPTY.fg(Color.CYAN).bold()))))
+                .title(Title.from(Line.from(Span.styled("Debug", Style.EMPTY.fg(Color.CYAN).bold()))))
                 .build();
 
         frame.renderWidget(block, overlayArea);
@@ -221,13 +217,17 @@ public final class DebugOverlay {
         }
 
         // Render debug text
-        Text content = Text.from(Line.from(Span.styled(backendLine, Style.EMPTY.fg(Color.MAGENTA))),
+        Text content = Text.from(
+                Line.from(Span.styled(backendLine, Style.EMPTY.fg(Color.MAGENTA))),
                 Line.from(Span.styled(runtimeLine, Style.EMPTY.fg(Color.WHITE))),
                 Line.from(Span.styled(fpsLine, Style.EMPTY.fg(fpsColor).bold())),
                 Line.from(Span.styled(pollLine, Style.EMPTY.fg(Color.GRAY))),
-                Line.from(Span.styled(tickLine, Style.EMPTY.fg(Color.GRAY))));
+                Line.from(Span.styled(tickLine, Style.EMPTY.fg(Color.GRAY)))
+        );
 
-        Paragraph paragraph = Paragraph.builder().text(content).build();
+        Paragraph paragraph = Paragraph.builder()
+                .text(content)
+                .build();
 
         frame.renderWidget(paragraph, innerArea);
     }

@@ -4,11 +4,6 @@
  */
 package dev.tamboui.widgets.error;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -20,20 +15,29 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A widget that displays error information with a stack trace.
  * <p>
  * Used to show exceptions that occur during rendering. The widget displays:
  * <ul>
- * <li>Exception type in red</li>
- * <li>Error message</li>
- * <li>Scrollable stack trace</li>
- * <li>Footer with instructions</li>
+ *   <li>Exception type in red</li>
+ *   <li>Error message</li>
+ *   <li>Scrollable stack trace</li>
+ *   <li>Footer with instructions</li>
  * </ul>
  *
  * <pre>{@code
- * ErrorDisplay display = ErrorDisplay.builder().error(exception).scroll(scrollOffset)
- *         .title(" ERROR ").footer(" Press 'q' to quit, arrows to scroll ").build();
+ * ErrorDisplay display = ErrorDisplay.builder()
+ *     .error(exception)
+ *     .scroll(scrollOffset)
+ *     .title(" ERROR ")
+ *     .footer(" Press 'q' to quit, arrows to scroll ")
+ *     .build();
  *
  * display.render(area, buffer);
  * }</pre>
@@ -66,8 +70,7 @@ public final class ErrorDisplay implements Widget {
     /**
      * Creates an ErrorDisplay for the given exception with default settings.
      *
-     * @param error
-     *            the exception to display
+     * @param error the exception to display
      * @return a new ErrorDisplay
      */
     public static ErrorDisplay from(Throwable error) {
@@ -84,8 +87,13 @@ public final class ErrorDisplay implements Widget {
         List<Line> lines = buildContentLines();
 
         // Create the block with border
-        Block block = Block.builder().title(title).titleBottom(footer).borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED).borderColor(borderColor).build();
+        Block block = Block.builder()
+                .title(title)
+                .titleBottom(footer)
+                .borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED)
+                .borderColor(borderColor)
+                .build();
 
         // Render the block
         block.render(area, buffer);
@@ -111,8 +119,7 @@ public final class ErrorDisplay implements Widget {
         List<Line> lines = new ArrayList<Line>();
 
         // Exception type
-        lines.add(
-                Line.from(new Span(error.getClass().getName(), Style.EMPTY.fg(Color.RED).bold())));
+        lines.add(Line.from(new Span(error.getClass().getName(), Style.EMPTY.fg(Color.RED).bold())));
         lines.add(Line.from(Span.raw("")));
 
         // Message
@@ -169,8 +176,7 @@ public final class ErrorDisplay implements Widget {
         /**
          * Sets the error to display.
          *
-         * @param error
-         *            the exception
+         * @param error the exception
          * @return this builder
          */
         public Builder error(Throwable error) {
@@ -181,8 +187,7 @@ public final class ErrorDisplay implements Widget {
         /**
          * Sets the title shown at the top of the border.
          *
-         * @param title
-         *            the title
+         * @param title the title
          * @return this builder
          */
         public Builder title(String title) {
@@ -193,8 +198,7 @@ public final class ErrorDisplay implements Widget {
         /**
          * Sets the footer shown at the bottom of the border.
          *
-         * @param footer
-         *            the footer
+         * @param footer the footer
          * @return this builder
          */
         public Builder footer(String footer) {
@@ -205,8 +209,7 @@ public final class ErrorDisplay implements Widget {
         /**
          * Sets the scroll offset.
          *
-         * @param scroll
-         *            the number of lines to scroll
+         * @param scroll the number of lines to scroll
          * @return this builder
          */
         public Builder scroll(int scroll) {
@@ -217,8 +220,7 @@ public final class ErrorDisplay implements Widget {
         /**
          * Sets the border color.
          *
-         * @param color
-         *            the border color
+         * @param color the border color
          * @return this builder
          */
         public Builder borderColor(Color color) {

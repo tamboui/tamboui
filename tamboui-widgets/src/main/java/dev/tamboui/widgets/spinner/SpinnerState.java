@@ -7,14 +7,14 @@ package dev.tamboui.widgets.spinner;
 /**
  * State for the {@link Spinner} widget, tracking animation progress.
  * <p>
- * The tick value controls which frame is currently displayed. Call
- * {@link #advance()} each frame to advance the animation.
+ * The tick value controls which frame is currently displayed.
+ * Call {@link #advance()} each frame to advance the animation.
  *
  * <pre>{@code
  * SpinnerState state = new SpinnerState();
  *
  * // In your render loop:
- * state.advance(); // Advance to next frame
+ * state.advance();  // Advance to next frame
  * frame.renderStatefulWidget(spinner, area, state);
  * }</pre>
  *
@@ -34,8 +34,7 @@ public final class SpinnerState {
     /**
      * Creates a new state with the given initial tick.
      *
-     * @param initialTick
-     *            the initial tick value
+     * @param initialTick the initial tick value
      */
     public SpinnerState(long initialTick) {
         this.tick = initialTick;
@@ -64,8 +63,7 @@ public final class SpinnerState {
     /**
      * Advances the tick by the given amount.
      *
-     * @param amount
-     *            the amount to advance
+     * @param amount the amount to advance
      */
     public void advance(long amount) {
         tick += amount;
@@ -74,8 +72,7 @@ public final class SpinnerState {
     /**
      * Sets the tick to a specific value.
      *
-     * @param tick
-     *            the new tick value
+     * @param tick the new tick value
      */
     public void setTick(long tick) {
         this.tick = tick;

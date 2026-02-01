@@ -4,13 +4,12 @@
  */
 package dev.tamboui.text;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.Tags;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -78,8 +77,7 @@ class MarkupParserTest {
         assertThat(text.lines().get(0).spans()).hasSize(3);
         assertThat(text.lines().get(0).spans().get(0).content()).isEqualTo("This is ");
         assertThat(text.lines().get(0).spans().get(1).content()).isEqualTo("bold");
-        assertThat(text.lines().get(0).spans().get(1).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+        assertThat(text.lines().get(0).spans().get(1).style().addModifiers()).contains(dev.tamboui.style.Modifier.BOLD);
         assertThat(text.lines().get(0).spans().get(2).content()).isEqualTo(" text");
     }
 
@@ -89,8 +87,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[b]bold[/b]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.BOLD);
     }
 
     @Test
@@ -99,8 +96,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[italic]italic[/italic]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.ITALIC);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.ITALIC);
     }
 
     @Test
@@ -109,8 +105,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[underlined]underlined[/underlined]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.UNDERLINED);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.UNDERLINED);
     }
 
     @Test
@@ -232,8 +227,7 @@ class MarkupParserTest {
         assertThat(text.lines()).hasSize(3);
         assertThat(text.lines().get(0).rawContent()).isEqualTo("Line 1");
         assertThat(text.lines().get(1).rawContent()).isEqualTo("Line 2");
-        assertThat(text.lines().get(1).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+        assertThat(text.lines().get(1).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.BOLD);
         assertThat(text.lines().get(2).rawContent()).isEqualTo("Line 3");
     }
 
@@ -305,17 +299,14 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[BOLD]text[/BOLD]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.BOLD);
     }
 
     @Test
     @DisplayName("parse all supported color tags")
     void parseAllColorTags() {
-        String[] colors = {"red", "green", "blue", "yellow", "cyan", "magenta", "white", "black",
-                "gray"};
-        Color[] expected = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN,
-                Color.MAGENTA, Color.WHITE, Color.BLACK, Color.GRAY};
+        String[] colors = {"red", "green", "blue", "yellow", "cyan", "magenta", "white", "black", "gray"};
+        Color[] expected = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.BLACK, Color.GRAY};
 
         for (int i = 0; i < colors.length; i++) {
             Text text = MarkupParser.parse("[" + colors[i] + "]text[/" + colors[i] + "]");
@@ -338,8 +329,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[crossed-out]struck[/crossed-out]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.CROSSED_OUT);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.CROSSED_OUT);
     }
 
     @Test
@@ -348,8 +338,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[strikethrough]struck[/strikethrough]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.CROSSED_OUT);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.CROSSED_OUT);
     }
 
     @Test
@@ -358,8 +347,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[dim]dimmed[/dim]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.DIM);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.DIM);
     }
 
     @Test
@@ -368,8 +356,7 @@ class MarkupParserTest {
         Text text = MarkupParser.parse("[reversed]reversed[/reversed]");
 
         assertThat(text.lines()).hasSize(1);
-        assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.REVERSED);
+        assertThat(text.lines().get(0).spans().get(0).style().addModifiers()).contains(dev.tamboui.style.Modifier.REVERSED);
     }
 
     @Test
@@ -381,8 +368,7 @@ class MarkupParserTest {
         assertThat(text.lines().get(0).spans()).hasSize(2);
         assertThat(text.lines().get(0).spans().get(0).content()).isEqualTo("Normal ");
         assertThat(text.lines().get(0).spans().get(1).content()).isEqualTo("bold till end");
-        assertThat(text.lines().get(0).spans().get(1).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+        assertThat(text.lines().get(0).spans().get(1).style().addModifiers()).contains(dev.tamboui.style.Modifier.BOLD);
     }
 
     @Test
@@ -394,10 +380,10 @@ class MarkupParserTest {
         assertThat(text.lines().get(0).spans()).hasSize(2);
         assertThat(text.lines().get(0).spans().get(0).content()).isEqualTo("Hello");
         assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+            .contains(dev.tamboui.style.Modifier.BOLD);
         assertThat(text.lines().get(0).spans().get(1).content()).isEqualTo(" World");
         assertThat(text.lines().get(0).spans().get(1).style().addModifiers())
-                .doesNotContain(dev.tamboui.style.Modifier.BOLD);
+            .doesNotContain(dev.tamboui.style.Modifier.BOLD);
     }
 
     @Test
@@ -407,8 +393,7 @@ class MarkupParserTest {
 
         assertThat(text.lines()).hasSize(1);
         Style style = text.lines().get(0).spans().get(0).style();
-        assertThat(style.addModifiers()).contains(dev.tamboui.style.Modifier.BOLD,
-                dev.tamboui.style.Modifier.ITALIC);
+        assertThat(style.addModifiers()).contains(dev.tamboui.style.Modifier.BOLD, dev.tamboui.style.Modifier.ITALIC);
     }
 
     @Test
@@ -438,7 +423,8 @@ class MarkupParserTest {
     void compoundStylePreservesTags() {
         Text text = MarkupParser.parse("[bold red]styled[/]");
 
-        Tags tags = text.lines().get(0).spans().get(0).style().extension(Tags.class, Tags.empty());
+        Tags tags = text.lines().get(0).spans().get(0).style()
+            .extension(Tags.class, Tags.empty());
         // All tokens become CSS classes
         assertThat(tags.contains("bold")).isTrue();
         assertThat(tags.contains("red")).isTrue();
@@ -449,7 +435,8 @@ class MarkupParserTest {
     void compoundStyleAllTokensBecomeTags() {
         Text text = MarkupParser.parse("[bold underlined yellow]Warning![/]");
 
-        Tags tags = text.lines().get(0).spans().get(0).style().extension(Tags.class, Tags.empty());
+        Tags tags = text.lines().get(0).spans().get(0).style()
+            .extension(Tags.class, Tags.empty());
         assertThat(tags.contains("bold")).isTrue();
         assertThat(tags.contains("underlined")).isTrue();
         assertThat(tags.contains("yellow")).isTrue();
@@ -460,7 +447,8 @@ class MarkupParserTest {
     void compoundStyleExcludesOnKeyword() {
         Text text = MarkupParser.parse("[white on blue]highlighted[/]");
 
-        Tags tags = text.lines().get(0).spans().get(0).style().extension(Tags.class, Tags.empty());
+        Tags tags = text.lines().get(0).spans().get(0).style()
+            .extension(Tags.class, Tags.empty());
         assertThat(tags.contains("white")).isTrue();
         assertThat(tags.contains("blue")).isTrue();
         assertThat(tags.contains("on")).isFalse();
@@ -512,7 +500,7 @@ class MarkupParserTest {
 
         Style style = text.lines().get(0).spans().get(0).style();
         assertThat(style.fg()).contains(Color.RED);
-        assertThat(style.bg()).isEmpty(); // "foo" is not a color
+        assertThat(style.bg()).isEmpty();  // "foo" is not a color
         // All tokens (except "on") become CSS classes
         Tags tags = style.extension(Tags.class, Tags.empty());
         assertThat(tags.contains("red")).isTrue();
@@ -523,12 +511,11 @@ class MarkupParserTest {
     @Test
     @DisplayName("custom tag with background color - all tokens become CSS classes")
     void customTagWithBackgroundColor() {
-        // [foo on red] - both "foo" and "red" become CSS classes, red becomes
-        // background
+        // [foo on red] - both "foo" and "red" become CSS classes, red becomes background
         Text text = MarkupParser.parse("[foo on red]text[/]");
 
         Style style = text.lines().get(0).spans().get(0).style();
-        assertThat(style.fg()).isEmpty(); // "foo" is not a color
+        assertThat(style.fg()).isEmpty();  // "foo" is not a color
         assertThat(style.bg()).contains(Color.RED);
         // All tokens (except "on") become CSS classes
         Tags tags = style.extension(Tags.class, Tags.empty());
@@ -585,7 +572,7 @@ class MarkupParserTest {
         // Resolver has priority: can redefine what "red" means
         MarkupParser.StyleResolver resolver = tagName -> {
             if ("red".equals(tagName)) {
-                return Style.EMPTY.fg(Color.BLUE).italic(); // Redefine "red" as blue+italic
+                return Style.EMPTY.fg(Color.BLUE).italic();  // Redefine "red" as blue+italic
             }
             return null;
         };
@@ -637,8 +624,10 @@ class MarkupParserTest {
 
         Style style = text.lines().get(0).spans().get(0).style();
         assertThat(style.fg()).contains(Color.CYAN);
-        assertThat(style.addModifiers()).contains(dev.tamboui.style.Modifier.BOLD,
-                dev.tamboui.style.Modifier.ITALIC);
+        assertThat(style.addModifiers()).contains(
+            dev.tamboui.style.Modifier.BOLD,
+            dev.tamboui.style.Modifier.ITALIC
+        );
     }
 
     @Test
@@ -667,7 +656,7 @@ class MarkupParserTest {
         assertThat(text.lines()).hasSize(1);
         assertThat(text.rawContent()).contains("⚠");
         assertThat(text.lines().get(0).spans().get(0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+            .contains(dev.tamboui.style.Modifier.BOLD);
     }
 
     @Test

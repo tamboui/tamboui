@@ -16,10 +16,8 @@ public interface Widget {
     /**
      * Renders this widget to the given buffer area.
      *
-     * @param area
-     *            the rectangular area to render into
-     * @param buffer
-     *            the buffer to write cells to
+     * @param area the rectangular area to render into
+     * @param buffer the buffer to write cells to
      */
     void render(Rect area, Buffer buffer);
 }

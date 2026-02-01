@@ -4,18 +4,19 @@
  */
 package dev.tamboui.css.selector;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
+import java.util.Objects;
 
 /**
  * A compound selector that combines multiple simple selectors.
  * <p>
- * All parts must match for the compound selector to match. Example:
- * {@code Panel.primary#sidebar:focus { ... }}
+ * All parts must match for the compound selector to match.
+ * Example: {@code Panel.primary#sidebar:focus { ... }}
  */
 public final class CompoundSelector implements Selector {
 
@@ -24,8 +25,7 @@ public final class CompoundSelector implements Selector {
     /**
      * Creates a compound selector from the given parts.
      *
-     * @param parts
-     *            the selector parts (must not be empty)
+     * @param parts the selector parts (must not be empty)
      */
     public CompoundSelector(List<Selector> parts) {
         if (parts.isEmpty()) {

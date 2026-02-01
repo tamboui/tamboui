@@ -13,22 +13,26 @@ import dev.tamboui.text.CharWidth;
 import dev.tamboui.widget.StatefulWidget;
 
 /**
- * A widget that renders an animated spinner by cycling through frame
- * characters.
+ * A widget that renders an animated spinner by cycling through frame characters.
  * <p>
- * The spinner displays one frame at a time, determined by the current tick in
- * the {@link SpinnerState}. Each tick advances to the next frame in the
- * sequence.
+ * The spinner displays one frame at a time, determined by the current tick
+ * in the {@link SpinnerState}. Each tick advances to the next frame in the sequence.
  *
  * <pre>{@code
  * // Create a spinner with the DOTS style
- * Spinner spinner = Spinner.builder().spinnerStyle(SpinnerStyle.DOTS).build();
+ * Spinner spinner = Spinner.builder()
+ *     .spinnerStyle(SpinnerStyle.DOTS)
+ *     .build();
  *
  * // Create a spinner with custom frames
- * Spinner spinner = Spinner.builder().frames("*", "+", "x", "+").build();
+ * Spinner spinner = Spinner.builder()
+ *     .frames("*", "+", "x", "+")
+ *     .build();
  *
  * // Create a spinner with a custom frame set
- * Spinner spinner = Spinner.builder().frameSet(SpinnerFrameSet.of("⠋", "⠙", "⠹", "⠸")).build();
+ * Spinner spinner = Spinner.builder()
+ *     .frameSet(SpinnerFrameSet.of("⠋", "⠙", "⠹", "⠸"))
+ *     .build();
  * }</pre>
  *
  * @see SpinnerStyle
@@ -43,16 +47,17 @@ public final class Spinner implements StatefulWidget<SpinnerState> {
      * CSS values are derived from enum names by converting to lowercase and
      * replacing underscores with hyphens. For example:
      * <ul>
-     * <li>{@code dots} - braille dot pattern (default)</li>
-     * <li>{@code line} - classic -\|/</li>
-     * <li>{@code bouncing-bar} - bouncing bar [=== ]</li>
-     * <li>{@code gauge} - horizontal block fill</li>
+     *   <li>{@code dots} - braille dot pattern (default)</li>
+     *   <li>{@code line} - classic -\|/</li>
+     *   <li>{@code bouncing-bar} - bouncing bar [=== ]</li>
+     *   <li>{@code gauge} - horizontal block fill</li>
      * </ul>
      * This property is NOT inheritable. Default: {@link SpinnerStyle#DOTS}
      */
-    public static final PropertyDefinition<SpinnerStyle> SPINNER_STYLE = PropertyDefinition
-            .builder("spinner-style", SpinnerStyleConverter.INSTANCE)
-            .defaultValue(SpinnerStyle.DOTS).build();
+    public static final PropertyDefinition<SpinnerStyle> SPINNER_STYLE =
+            PropertyDefinition.builder("spinner-style", SpinnerStyleConverter.INSTANCE)
+                    .defaultValue(SpinnerStyle.DOTS)
+                    .build();
 
     /**
      * The {@code spinner-frames} property for custom spinner frame characters.
@@ -61,11 +66,11 @@ public final class Spinner implements StatefulWidget<SpinnerState> {
      * <p>
      * Example: {@code spinner-frames: "-" "\\" "|" "/"}
      * <p>
-     * This property overrides {@code spinner-style} when set. This property is NOT
-     * inheritable.
+     * This property overrides {@code spinner-style} when set.
+     * This property is NOT inheritable.
      */
-    public static final PropertyDefinition<SpinnerFrameSet> SPINNER_FRAMES = PropertyDefinition
-            .of("spinner-frames", SpinnerFrameSetConverter.INSTANCE);
+    public static final PropertyDefinition<SpinnerFrameSet> SPINNER_FRAMES =
+            PropertyDefinition.of("spinner-frames", SpinnerFrameSetConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(SPINNER_STYLE, SPINNER_FRAMES);
@@ -154,8 +159,7 @@ public final class Spinner implements StatefulWidget<SpinnerState> {
         /**
          * Sets the spinner style (predefined frame set).
          *
-         * @param spinnerStyle
-         *            the spinner style
+         * @param spinnerStyle the spinner style
          * @return this builder
          */
         public Builder spinnerStyle(SpinnerStyle spinnerStyle) {
@@ -168,8 +172,7 @@ public final class Spinner implements StatefulWidget<SpinnerState> {
         /**
          * Sets the frame set for the spinner.
          *
-         * @param frameSet
-         *            the frame set
+         * @param frameSet the frame set
          * @return this builder
          */
         public Builder frameSet(SpinnerFrameSet frameSet) {
@@ -182,8 +185,7 @@ public final class Spinner implements StatefulWidget<SpinnerState> {
          * <p>
          * Custom frames override any previously set spinner style or frame set.
          *
-         * @param frames
-         *            the frame strings
+         * @param frames the frame strings
          * @return this builder
          */
         public Builder frames(String... frames) {
@@ -196,8 +198,7 @@ public final class Spinner implements StatefulWidget<SpinnerState> {
         /**
          * Sets the style for the spinner text.
          *
-         * @param style
-         *            the style
+         * @param style the style
          * @return this builder
          */
         public Builder style(Style style) {

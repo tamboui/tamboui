@@ -23,8 +23,7 @@ public final class ListState {
     }
 
     /**
-     * Returns the index of the currently selected item, or null if nothing is
-     * selected.
+     * Returns the index of the currently selected item, or null if nothing is selected.
      *
      * @return the selected item index, or null if nothing is selected
      */
@@ -44,8 +43,7 @@ public final class ListState {
     /**
      * Selects the item at the given index.
      *
-     * @param index
-     *            the item index to select
+     * @param index the item index to select
      */
     public void select(Integer index) {
         this.selected = index;
@@ -61,8 +59,7 @@ public final class ListState {
     /**
      * Selects the last item.
      *
-     * @param itemCount
-     *            the total number of items
+     * @param itemCount the total number of items
      */
     public void selectLast(int itemCount) {
         if (itemCount > 0) {
@@ -73,8 +70,7 @@ public final class ListState {
     /**
      * Selects the next item.
      *
-     * @param itemCount
-     *            the total number of items
+     * @param itemCount the total number of items
      */
     public void selectNext(int itemCount) {
         if (itemCount == 0) {
@@ -102,8 +98,7 @@ public final class ListState {
     /**
      * Sets the scroll offset directly.
      *
-     * @param offset
-     *            the scroll offset to set
+     * @param offset the scroll offset to set
      */
     public void setOffset(int offset) {
         this.offset = Math.max(0, offset);
@@ -112,10 +107,8 @@ public final class ListState {
     /**
      * Scrolls the list to ensure the selected item is visible.
      *
-     * @param visibleHeight
-     *            the visible height in the display area
-     * @param items
-     *            the list of items
+     * @param visibleHeight the visible height in the display area
+     * @param items the list of items
      */
     public void scrollToSelected(int visibleHeight, List<ListItem> items) {
         if (selected == null || items.isEmpty()) {
@@ -140,13 +133,11 @@ public final class ListState {
     /**
      * Scrolls the list to show the last items without changing selection.
      * <p>
-     * This is useful for chat messages, logs, or other content where you want to
-     * always show the most recent items without needing to select them.
+     * This is useful for chat messages, logs, or other content where you want
+     * to always show the most recent items without needing to select them.
      *
-     * @param visibleHeight
-     *            the visible height in the display area
-     * @param items
-     *            the list of items
+     * @param visibleHeight the visible height in the display area
+     * @param items the list of items
      */
     public void scrollToEnd(int visibleHeight, List<ListItem> items) {
         if (items.isEmpty()) {

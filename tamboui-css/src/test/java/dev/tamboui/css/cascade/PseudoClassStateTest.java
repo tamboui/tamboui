@@ -97,8 +97,9 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("Constructor sets all flags correctly")
         void constructorSetsAllFlags() {
-            PseudoClassState state = new PseudoClassState(true, true, true, true, true, true, true,
-                    5);
+            PseudoClassState state = new PseudoClassState(
+                    true, true, true, true, true, true, true, 5
+            );
 
             assertThat(state.isFocused()).isTrue();
             assertThat(state.isHovered()).isTrue();
@@ -113,8 +114,9 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("Constructor with mixed flags")
         void constructorWithMixedFlags() {
-            PseudoClassState state = new PseudoClassState(true, false, true, false, true, true,
-                    false, 0);
+            PseudoClassState state = new PseudoClassState(
+                    true, false, true, false, true, true, false, 0
+            );
 
             assertThat(state.isFocused()).isTrue();
             assertThat(state.isHovered()).isFalse();
@@ -204,8 +206,9 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("with* methods preserve other flags")
         void withMethodsPreserveOtherFlags() {
-            PseudoClassState state = new PseudoClassState(true, true, false, false, true, true,
-                    false, 0);
+            PseudoClassState state = new PseudoClassState(
+                    true, true, false, false, true, true, false, 0
+            );
 
             PseudoClassState modified = state.withDisabled(true);
 
@@ -221,8 +224,11 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("with* methods can be chained")
         void withMethodsCanBeChained() {
-            PseudoClassState state = PseudoClassState.NONE.withFocused(true).withHovered(true)
-                    .withSelected(true).withFirstChild(true);
+            PseudoClassState state = PseudoClassState.NONE
+                    .withFocused(true)
+                    .withHovered(true)
+                    .withSelected(true)
+                    .withFirstChild(true);
 
             assertThat(state.isFocused()).isTrue();
             assertThat(state.isHovered()).isTrue();
@@ -297,8 +303,9 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("has() returns false for unknown pseudo-class")
         void hasUnknown() {
-            PseudoClassState state = new PseudoClassState(true, true, true, true, true, true, true,
-                    0);
+            PseudoClassState state = new PseudoClassState(
+                    true, true, true, true, true, true, true, 0
+            );
 
             assertThat(state.has("unknown")).isFalse();
             assertThat(state.has("visited")).isFalse();
@@ -327,10 +334,12 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("equals() returns true for same state")
         void equalsForSameState() {
-            PseudoClassState state1 = new PseudoClassState(true, false, true, false, true, true,
-                    false, 3);
-            PseudoClassState state2 = new PseudoClassState(true, false, true, false, true, true,
-                    false, 3);
+            PseudoClassState state1 = new PseudoClassState(
+                    true, false, true, false, true, true, false, 3
+            );
+            PseudoClassState state2 = new PseudoClassState(
+                    true, false, true, false, true, true, false, 3
+            );
 
             assertThat(state1).isEqualTo(state2);
         }
@@ -371,10 +380,12 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("hashCode() is same for equal states")
         void hashCodeSameForEqualStates() {
-            PseudoClassState state1 = new PseudoClassState(true, true, false, false, true, true,
-                    true, 2);
-            PseudoClassState state2 = new PseudoClassState(true, true, false, false, true, true,
-                    true, 2);
+            PseudoClassState state1 = new PseudoClassState(
+                    true, true, false, false, true, true, true, 2
+            );
+            PseudoClassState state2 = new PseudoClassState(
+                    true, true, false, false, true, true, true, 2
+            );
 
             assertThat(state1.hashCode()).isEqualTo(state2.hashCode());
         }
@@ -458,8 +469,9 @@ class PseudoClassStateTest {
         @Test
         @DisplayName("toString() includes all flag values")
         void toStringIncludesAllFlags() {
-            PseudoClassState state = new PseudoClassState(true, false, true, false, true, true,
-                    false, 3);
+            PseudoClassState state = new PseudoClassState(
+                    true, false, true, false, true, true, false, 3
+            );
 
             String str = state.toString();
 

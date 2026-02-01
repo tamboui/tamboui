@@ -4,31 +4,32 @@
  */
 package dev.tamboui.layout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 import dev.tamboui.layout.cassowary.LayoutCache;
 import dev.tamboui.layout.cassowary.LayoutSolver;
 
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * A layout defines how to split a rectangular area into smaller areas based on
- * constraints.
+ * A layout defines how to split a rectangular area into smaller areas
+ * based on constraints.
  *
- * <p>
- * The layout uses a Cassowary constraint solver to compute sizes based on the
- * provided constraints, then positions the resulting rectangles according to
- * the {@link Flex} mode.
+ * <p>The layout uses a Cassowary constraint solver to compute sizes based on
+ * the provided constraints, then positions the resulting rectangles according
+ * to the {@link Flex} mode.
  *
- * <p>
- * Example usage:
- * 
+ * <p>Example usage:
  * <pre>
  * Layout layout = Layout.horizontal()
- *         .constraints(Constraint.length(20), Constraint.fill(), Constraint.percentage(30))
- *         .spacing(1).flex(Flex.CENTER);
+ *     .constraints(
+ *         Constraint.length(20),
+ *         Constraint.fill(),
+ *         Constraint.percentage(30))
+ *     .spacing(1)
+ *     .flex(Flex.CENTER);
  *
  * List&lt;Rect&gt; areas = layout.split(new Rect(0, 0, 100, 50));
  * </pre>
@@ -44,8 +45,8 @@ public final class Layout {
     private final int spacing;
     private final Flex flex;
 
-    private Layout(Direction direction, List<Constraint> constraints, Margin margin, int spacing,
-            Flex flex) {
+    private Layout(Direction direction, List<Constraint> constraints,
+                   Margin margin, int spacing, Flex flex) {
         this.direction = direction;
         this.constraints = listCopyOf(constraints);
         this.margin = margin;
@@ -74,8 +75,7 @@ public final class Layout {
     /**
      * Sets the constraints to apply when splitting.
      *
-     * @param constraints
-     *            ordered constraints corresponding to each split
+     * @param constraints ordered constraints corresponding to each split
      * @return a new layout with these constraints
      */
     public Layout constraints(Constraint... constraints) {
@@ -85,8 +85,7 @@ public final class Layout {
     /**
      * Sets the constraints to apply when splitting.
      *
-     * @param constraints
-     *            ordered constraints corresponding to each split
+     * @param constraints ordered constraints corresponding to each split
      * @return a new layout with these constraints
      */
     public Layout constraints(List<Constraint> constraints) {
@@ -96,8 +95,7 @@ public final class Layout {
     /**
      * Sets the outer margin.
      *
-     * @param margin
-     *            the margin to apply
+     * @param margin the margin to apply
      * @return a new layout with this margin
      */
     public Layout margin(Margin margin) {
@@ -107,8 +105,7 @@ public final class Layout {
     /**
      * Sets a uniform outer margin.
      *
-     * @param value
-     *            margin in cells applied to all sides
+     * @param value margin in cells applied to all sides
      * @return a new layout with this margin
      */
     public Layout margin(int value) {
@@ -118,8 +115,7 @@ public final class Layout {
     /**
      * Sets the spacing (in cells) between split areas.
      *
-     * @param spacing
-     *            spacing between adjacent areas
+     * @param spacing spacing between adjacent areas
      * @return a new layout with this spacing
      */
     public Layout spacing(int spacing) {
@@ -129,8 +125,7 @@ public final class Layout {
     /**
      * Sets the spacing between split areas using a Spacing object.
      *
-     * @param spacing
-     *            spacing between adjacent areas (can be Space or Overlap)
+     * @param spacing spacing between adjacent areas (can be Space or Overlap)
      * @return a new layout with this spacing
      */
     public Layout spacing(Spacing spacing) {
@@ -140,16 +135,14 @@ public final class Layout {
     /**
      * Sets how remaining space is distributed.
      *
-     * @param flex
-     *            flex mode for distributing extra space
+     * @param flex flex mode for distributing extra space
      * @return a new layout with this flex mode
      */
     public Layout flex(Flex flex) {
         return new Layout(direction, constraints, margin, spacing, flex);
     }
 
-    /**
-     * Returns the layout direction.
+    /** Returns the layout direction.
      *
      * @return the layout direction
      */
@@ -157,8 +150,7 @@ public final class Layout {
         return direction;
     }
 
-    /**
-     * Returns the constraints for the split.
+    /** Returns the constraints for the split.
      *
      * @return the constraints
      */
@@ -166,8 +158,7 @@ public final class Layout {
         return constraints;
     }
 
-    /**
-     * Returns the outer margin.
+    /** Returns the outer margin.
      *
      * @return the outer margin
      */
@@ -175,8 +166,7 @@ public final class Layout {
         return margin;
     }
 
-    /**
-     * Returns the spacing between areas.
+    /** Returns the spacing between areas.
      *
      * @return the spacing between areas
      */
@@ -184,8 +174,7 @@ public final class Layout {
         return spacing;
     }
 
-    /**
-     * Returns the flex mode used to distribute extra space.
+    /** Returns the flex mode used to distribute extra space.
      *
      * @return the flex mode
      */
@@ -196,13 +185,11 @@ public final class Layout {
     /**
      * Split the given area according to this layout's constraints.
      *
-     * <p>
-     * The method uses the Cassowary constraint solver to compute optimal sizes
+     * <p>The method uses the Cassowary constraint solver to compute optimal sizes
      * based on the provided constraints, then positions the resulting rectangles
      * according to the {@link Flex} mode.
      *
-     * @param area
-     *            the area to split
+     * @param area the area to split
      * @return rectangles representing each split region, in order
      */
     public List<Rect> split(Rect area) {
@@ -218,8 +205,9 @@ public final class Layout {
         int distributable = Math.max(0, available - totalSpacing);
 
         // Use cached solver results, computing on miss
-        int[] sizes = LayoutCache.instance().computeIfAbsent(constraints, distributable, spacing,
-                flex, () -> new LayoutSolver().solve(constraints, distributable, spacing, flex));
+        int[] sizes = LayoutCache.instance().computeIfAbsent(
+            constraints, distributable, spacing, flex,
+            () -> new LayoutSolver().solve(constraints, distributable, spacing, flex));
 
         // Calculate total size used and remaining space for flex positioning
         int totalSize = 0;
@@ -239,8 +227,8 @@ public final class Layout {
 
         for (int i = 0; i < sizes.length; i++) {
             Rect rect = direction == Direction.HORIZONTAL
-                    ? new Rect(pos, inner.y(), sizes[i], inner.height())
-                    : new Rect(inner.x(), pos, inner.width(), sizes[i]);
+                ? new Rect(pos, inner.y(), sizes[i], inner.height())
+                : new Rect(inner.x(), pos, inner.width(), sizes[i]);
             result.add(rect);
 
             // Calculate next position: current pos + size + spacing + flex gap
@@ -254,20 +242,16 @@ public final class Layout {
     /**
      * Computes the gaps for flex positioning.
      *
-     * <p>
-     * Returns an array where:
+     * <p>Returns an array where:
      * <ul>
-     * <li>gaps[0] is the gap before the first element</li>
-     * <li>gaps[1..n-1] are the gaps between elements (added to spacing)</li>
-     * <li>gaps[n] is the gap after the last element (not used in positioning)</li>
+     *   <li>gaps[0] is the gap before the first element</li>
+     *   <li>gaps[1..n-1] are the gaps between elements (added to spacing)</li>
+     *   <li>gaps[n] is the gap after the last element (not used in positioning)</li>
      * </ul>
      *
-     * @param count
-     *            number of elements
-     * @param remainingSpace
-     *            space available for distribution
-     * @param flex
-     *            the flex mode
+     * @param count          number of elements
+     * @param remainingSpace space available for distribution
+     * @param flex           the flex mode
      * @return array of gaps
      */
     private int[] computeFlexGaps(int count, int remainingSpace, Flex flex) {
@@ -278,23 +262,23 @@ public final class Layout {
         }
 
         switch (flex) {
-            case START :
+            case START:
                 // All elements packed at start, remaining space at end
                 gaps[count] = remainingSpace;
                 break;
 
-            case END :
+            case END:
                 // All elements packed at end, remaining space at start
                 gaps[0] = remainingSpace;
                 break;
 
-            case CENTER :
+            case CENTER:
                 // Elements centered, half the remaining space on each side
                 gaps[0] = remainingSpace / 2;
                 gaps[count] = remainingSpace - gaps[0];
                 break;
 
-            case SPACE_BETWEEN :
+            case SPACE_BETWEEN:
                 // Space distributed between elements (not at edges)
                 if (count > 1) {
                     int gapSize = remainingSpace / (count - 1);
@@ -309,7 +293,7 @@ public final class Layout {
                 }
                 break;
 
-            case SPACE_AROUND :
+            case SPACE_AROUND:
                 // Equal space around each element (half space at edges)
                 if (count > 0) {
                     // Total units = count * 2 (each element has space on both sides)
@@ -337,7 +321,7 @@ public final class Layout {
                 }
                 break;
 
-            case SPACE_EVENLY :
+            case SPACE_EVENLY:
                 // Equal space everywhere: at edges and between all elements
                 if (count > 0) {
                     int numGaps = count + 1;

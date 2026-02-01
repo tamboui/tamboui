@@ -4,12 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
@@ -18,6 +12,11 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,10 +34,13 @@ class FlowTest {
         Frame frame = Frame.forTesting(buffer);
 
         // "AB" (2) + "CD" (2) + "EF" (2) = 6, fits in 20
-        flow(text("AB"), text("CD"), text("EF")).render(frame, area, RenderContext.empty());
+        flow(text("AB"), text("CD"), text("EF"))
+            .render(frame, area, RenderContext.empty());
 
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(2, 0, "C")
-                .hasSymbolAt(4, 0, "E");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(2, 0, "C")
+            .hasSymbolAt(4, 0, "E");
     }
 
     @Test
@@ -49,10 +51,13 @@ class FlowTest {
         Frame frame = Frame.forTesting(buffer);
 
         // "AB"(2) + "CD"(2) = 4 fits in 5, "EF"(2) wraps to row 2
-        flow(text("AB"), text("CD"), text("EF")).render(frame, area, RenderContext.empty());
+        flow(text("AB"), text("CD"), text("EF"))
+            .render(frame, area, RenderContext.empty());
 
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(2, 0, "C")
-                .hasSymbolAt(0, 1, "E");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "A")
+            .hasSymbolAt(2, 0, "C")
+            .hasSymbolAt(0, 1, "E");
     }
 
     @Test
@@ -86,7 +91,8 @@ class FlowTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        flow().render(frame, area, RenderContext.empty());
+        flow()
+            .render(frame, area, RenderContext.empty());
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -101,8 +107,11 @@ class FlowTest {
     @Test
     @DisplayName("fluent API chains correctly")
     void fluentApiChaining() {
-        FlowElement f = flow(text("A")).spacing(1).rowSpacing(2).margin(1)
-                .margin(new Margin(1, 2, 3, 4));
+        FlowElement f = flow(text("A"))
+            .spacing(1)
+            .rowSpacing(2)
+            .margin(1)
+            .margin(new Margin(1, 2, 3, 4));
 
         assertThat(f).isInstanceOf(FlowElement.class);
     }
@@ -131,10 +140,14 @@ class FlowTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            flow(text("AB"), text("CD")).addClass("f").render(frame, area, ctx);
+            flow(text("AB"), text("CD"))
+                .addClass("f")
+                .render(frame, area, ctx);
 
             // "AB" at x=0, spacing=2, "CD" at x=4
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(4, 0, "C");
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "A")
+                .hasSymbolAt(4, 0, "C");
         }
 
         @Test
@@ -147,14 +160,13 @@ class FlowTest {
             Frame frame = Frame.forTesting(buffer);
 
             // "AB"(2) fits on row 0, "CD"(2) wraps to row with spacing
-            flow(text("AB"), text("CD")).addClass("f").render(frame, area, ctx);
+            flow(text("AB"), text("CD"))
+                .addClass("f")
+                .render(frame, area, ctx);
 
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(0, 2, "C"); // y=0+1+1=2
-                                                                                               // (height
-                                                                                               // 1
-                                                                                               // +
-                                                                                               // rowSpacing
-                                                                                               // 1)
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "A")
+                .hasSymbolAt(0, 2, "C");  // y=0+1+1=2 (height 1 + rowSpacing 1)
         }
 
         @Test
@@ -166,7 +178,9 @@ class FlowTest {
             Buffer buffer = Buffer.empty(area);
             Frame frame = Frame.forTesting(buffer);
 
-            flow(text("X")).addClass("f").render(frame, area, ctx);
+            flow(text("X"))
+                .addClass("f")
+                .render(frame, area, ctx);
 
             // With margin 1, text renders at (1,1)
             BufferAssertions.assertThat(buffer).hasSymbolAt(1, 1, "X");
@@ -182,10 +196,15 @@ class FlowTest {
             Frame frame = Frame.forTesting(buffer);
 
             // Programmatic spacing(0) overrides CSS spacing: 5
-            flow(text("AB"), text("CD")).addClass("f").spacing(0).render(frame, area, ctx);
+            flow(text("AB"), text("CD"))
+                .addClass("f")
+                .spacing(0)
+                .render(frame, area, ctx);
 
             // "AB" at x=0, "CD" at x=2 (no spacing)
-            BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "A").hasSymbolAt(2, 0, "C");
+            BufferAssertions.assertThat(buffer)
+                .hasSymbolAt(0, 0, "A")
+                .hasSymbolAt(2, 0, "C");
         }
     }
 }

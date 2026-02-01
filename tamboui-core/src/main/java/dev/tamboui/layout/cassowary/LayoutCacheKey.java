@@ -4,16 +4,15 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import java.util.List;
-
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
+
+import java.util.List;
 
 /**
  * Cache key for layout solver results.
  *
- * <p>
- * This key captures all inputs to the Cassowary solver that affect the output:
+ * <p>This key captures all inputs to the Cassowary solver that affect the output:
  * constraints, distributable space, spacing, and flex mode.
  */
 final class LayoutCacheKey {
@@ -56,7 +55,9 @@ final class LayoutCacheKey {
         if (cachedHashCode != that.cachedHashCode) {
             return false;
         }
-        return distributable == that.distributable && spacing == that.spacing && flex == that.flex
-                && constraints.equals(that.constraints);
+        return distributable == that.distributable
+            && spacing == that.spacing
+            && flex == that.flex
+            && constraints.equals(that.constraints);
     }
 }

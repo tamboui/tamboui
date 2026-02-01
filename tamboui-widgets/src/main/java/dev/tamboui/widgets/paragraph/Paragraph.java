@@ -17,9 +17,9 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Hyperlink;
 import dev.tamboui.style.Overflow;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
@@ -75,8 +75,7 @@ public final class Paragraph implements Widget {
     /**
      * Creates a paragraph from a string.
      *
-     * @param text
-     *            the text content
+     * @param text the text content
      * @return a new Paragraph
      */
     public static Paragraph from(String text) {
@@ -86,8 +85,7 @@ public final class Paragraph implements Widget {
     /**
      * Creates a paragraph from a text.
      *
-     * @param text
-     *            the text content
+     * @param text the text content
      * @return a new Paragraph
      */
     public static Paragraph from(Text text) {
@@ -97,8 +95,7 @@ public final class Paragraph implements Widget {
     /**
      * Creates a paragraph from a line.
      *
-     * @param line
-     *            the line content
+     * @param line the line content
      * @return a new Paragraph
      */
     public static Paragraph from(Line line) {
@@ -108,8 +105,7 @@ public final class Paragraph implements Widget {
     /**
      * Creates a paragraph from a span.
      *
-     * @param span
-     *            the span content
+     * @param span the span content
      * @return a new Paragraph
      */
     public static Paragraph from(Span span) {
@@ -154,14 +150,14 @@ public final class Paragraph implements Widget {
             int lineWidth = line.width();
             int x;
             switch (alignment) {
-                case LEFT :
+                case LEFT:
                     x = textArea.left();
                     break;
-                case CENTER :
+                case CENTER:
                     x = textArea.left() + (textArea.width() - lineWidth) / 2;
                     break;
-                case RIGHT :
-                default :
+                case RIGHT:
+                default:
                     x = textArea.right() - lineWidth;
                     break;
             }
@@ -176,17 +172,17 @@ public final class Paragraph implements Widget {
         }
 
         switch (overflow) {
-            case WRAP_CHARACTER :
-            case WRAP_WORD :
+            case WRAP_CHARACTER:
+            case WRAP_WORD:
                 return wrapLines(lines, maxWidth);
-            case ELLIPSIS :
+            case ELLIPSIS:
                 return truncateWithEllipsis(lines, maxWidth, EllipsisPosition.END);
-            case ELLIPSIS_START :
+            case ELLIPSIS_START:
                 return truncateWithEllipsis(lines, maxWidth, EllipsisPosition.START);
-            case ELLIPSIS_MIDDLE :
+            case ELLIPSIS_MIDDLE:
                 return truncateWithEllipsis(lines, maxWidth, EllipsisPosition.MIDDLE);
-            case CLIP :
-            default :
+            case CLIP:
+            default:
                 // Always clip as safety measure to prevent rendering outside bounds
                 return clipLines(lines, maxWidth);
         }
@@ -240,8 +236,7 @@ public final class Paragraph implements Widget {
         END
     }
 
-    private List<Line> truncateWithEllipsis(List<Line> lines, int maxWidth,
-            EllipsisPosition position) {
+    private List<Line> truncateWithEllipsis(List<Line> lines, int maxWidth, EllipsisPosition position) {
         List<Line> result = new ArrayList<>();
 
         for (Line line : lines) {
@@ -256,23 +251,22 @@ public final class Paragraph implements Widget {
 
             if (maxWidth <= ELLIPSIS.length()) {
                 // Not enough room for ellipsis, just clip
-                result.add(Line
-                        .from(new Span(CharWidth.substringByWidth(fullText, maxWidth), lineStyle)));
+                result.add(Line.from(new Span(CharWidth.substringByWidth(fullText, maxWidth), lineStyle)));
                 continue;
             }
 
             String truncated;
             switch (position) {
-                case END :
+                case END:
                     truncated = truncateEnd(fullText, maxWidth);
                     break;
-                case START :
+                case START:
                     truncated = truncateStart(fullText, maxWidth);
                     break;
-                case MIDDLE :
+                case MIDDLE:
                     truncated = truncateMiddle(fullText, maxWidth);
                     break;
-                default :
+                default:
                     truncated = truncateEnd(fullText, maxWidth);
             }
 
@@ -384,8 +378,7 @@ public final class Paragraph implements Widget {
                         currentSpans = new ArrayList<>();
                         currentWidth = 0;
                     } else {
-                        // Single character wider than maxWidth (shouldn't happen with maxWidth >=
-                        // 2)
+                        // Single character wider than maxWidth (shouldn't happen with maxWidth >= 2)
                         int codePoint = content.codePointAt(j);
                         chunk.appendCodePoint(codePoint);
                         currentSpans.add(new Span(chunk.toString(), wrappedStyle));
@@ -451,8 +444,7 @@ public final class Paragraph implements Widget {
 
         while (pos < cpCount) {
             // Find the next word break point
-            int lineEnd = findNextWordBreakByWidth(text, cpOffsets, cpWidths, pos, cpCount,
-                    maxWidth);
+            int lineEnd = findNextWordBreakByWidth(text, cpOffsets, cpWidths, pos, cpCount, maxWidth);
 
             // Extract the line and reconstruct spans with correct styles
             List<Span> lineSpans = new ArrayList<>();
@@ -463,8 +455,7 @@ public final class Paragraph implements Widget {
                 Style cpStyle = cpStyles.get(i);
                 if (!cpStyle.equals(currentStyle)) {
                     if (spanStart < i) {
-                        lineSpans.add(new Span(text.substring(cpOffsets[spanStart], cpOffsets[i]),
-                                currentStyle));
+                        lineSpans.add(new Span(text.substring(cpOffsets[spanStart], cpOffsets[i]), currentStyle));
                     }
                     spanStart = i;
                     currentStyle = cpStyle;
@@ -473,8 +464,7 @@ public final class Paragraph implements Widget {
 
             // Add the final span
             if (spanStart < lineEnd) {
-                lineSpans.add(new Span(text.substring(cpOffsets[spanStart], cpOffsets[lineEnd]),
-                        currentStyle));
+                lineSpans.add(new Span(text.substring(cpOffsets[spanStart], cpOffsets[lineEnd]), currentStyle));
             }
 
             wrapped.add(Line.from(lineSpans));
@@ -484,8 +474,7 @@ public final class Paragraph implements Widget {
             if (lineEnd < cpCount && lineEnd > 0) {
                 int prevCp = text.codePointAt(cpOffsets[lineEnd - 1]);
                 if (Character.isWhitespace(prevCp)) {
-                    while (pos < cpCount
-                            && Character.isWhitespace(text.codePointAt(cpOffsets[pos]))) {
+                    while (pos < cpCount && Character.isWhitespace(text.codePointAt(cpOffsets[pos]))) {
                         pos++;
                     }
                 }
@@ -498,8 +487,12 @@ public final class Paragraph implements Widget {
     /**
      * Finds the next word break point for word wrapping using display widths.
      */
-    private int findNextWordBreakByWidth(String text, int[] cpOffsets, List<Integer> cpWidths,
-            int startPos, int cpCount, int maxWidth) {
+    private int findNextWordBreakByWidth(String text,
+                                         int[] cpOffsets,
+                                         List<Integer> cpWidths,
+                                         int startPos,
+                                         int cpCount,
+                                         int maxWidth) {
         // Find max end position that fits within maxWidth display columns
         int width = 0;
         int maxEnd = startPos;
@@ -539,17 +532,13 @@ public final class Paragraph implements Widget {
 
     /**
      * Ensures that a hyperlink has an ID when it will wrap across multiple lines.
-     * This allows all wrapped chunks to share the same ID and form one continuous
-     * link.
+     * This allows all wrapped chunks to share the same ID and form one continuous link.
      *
-     * @param style
-     *            the style that may contain a hyperlink
-     * @param hyperlinkIds
-     *            a map to track and reuse IDs for the same URL
+     * @param style the style that may contain a hyperlink
+     * @param hyperlinkIds a map to track and reuse IDs for the same URL
      * @return a style with an ID-assigned hyperlink if needed
      */
-    private Style ensureHyperlinkIdForWrapping(Style style,
-            java.util.Map<String, String> hyperlinkIds) {
+    private Style ensureHyperlinkIdForWrapping(Style style, java.util.Map<String, String> hyperlinkIds) {
         Optional<Hyperlink> hyperlinkOpt = style.hyperlink();
         if (!hyperlinkOpt.isPresent()) {
             return style;
@@ -575,8 +564,7 @@ public final class Paragraph implements Widget {
     }
 
     // Java 8 compatible alternatives to String.stripLeading() and stripTrailing()
-    // These implementations use code points to properly handle UTF-16 surrogate
-    // pairs
+    // These implementations use code points to properly handle UTF-16 surrogate pairs
     private static String stripLeading(String s) {
         if (s == null || s.isEmpty()) {
             return s;
@@ -625,14 +613,12 @@ public final class Paragraph implements Widget {
         private Color background;
         private Color foreground;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Sets the text content.
          *
-         * @param text
-         *            the text content
+         * @param text the text content
          * @return this builder
          */
         public Builder text(Text text) {
@@ -643,8 +629,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the text content from a string.
          *
-         * @param text
-         *            the text content
+         * @param text the text content
          * @return this builder
          */
         public Builder text(String text) {
@@ -655,8 +640,7 @@ public final class Paragraph implements Widget {
         /**
          * Wraps the paragraph in a block.
          *
-         * @param block
-         *            the block to wrap in
+         * @param block the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -667,8 +651,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the base style.
          *
-         * @param style
-         *            the base style
+         * @param style the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -679,8 +662,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the text alignment.
          *
-         * @param alignment
-         *            the text alignment
+         * @param alignment the text alignment
          * @return this builder
          */
         public Builder alignment(Alignment alignment) {
@@ -718,8 +700,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the overflow mode.
          *
-         * @param overflow
-         *            the overflow mode
+         * @param overflow the overflow mode
          * @return this builder
          */
         public Builder overflow(Overflow overflow) {
@@ -730,8 +711,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the background color.
          *
-         * @param color
-         *            the background color
+         * @param color the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -742,8 +722,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the foreground (text) color.
          *
-         * @param color
-         *            the foreground color
+         * @param color the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {
@@ -754,8 +733,7 @@ public final class Paragraph implements Widget {
         /**
          * Sets the scroll offset.
          *
-         * @param scroll
-         *            the number of lines to skip from the top
+         * @param scroll the number of lines to skip from the top
          * @return this builder
          */
         public Builder scroll(int scroll) {
@@ -766,11 +744,10 @@ public final class Paragraph implements Widget {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code text-overflow} and {@code text-align} will
-         * fall back to resolved values if not set programmatically.
+         * When set, properties like {@code text-overflow} and {@code text-align}
+         * will fall back to resolved values if not set programmatically.
          *
-         * @param resolver
-         *            the property resolver
+         * @param resolver the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {

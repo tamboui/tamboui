@@ -15,9 +15,9 @@ import dev.tamboui.tui.event.MouseEventKind;
  * <p>
  * Mouse triggers can match combinations of:
  * <ul>
- * <li>Event kind (PRESS, RELEASE, SCROLL_UP, SCROLL_DOWN, etc.)</li>
- * <li>Button (LEFT, RIGHT, MIDDLE)</li>
- * <li>Keyboard modifiers (Ctrl, Alt, Shift held during mouse action)</li>
+ *   <li>Event kind (PRESS, RELEASE, SCROLL_UP, SCROLL_DOWN, etc.)</li>
+ *   <li>Button (LEFT, RIGHT, MIDDLE)</li>
+ *   <li>Keyboard modifiers (Ctrl, Alt, Shift held during mouse action)</li>
  * </ul>
  *
  * <pre>{@code
@@ -45,8 +45,8 @@ public final class MouseTrigger implements InputTrigger {
     private final boolean alt;
     private final boolean shift;
 
-    private MouseTrigger(MouseEventKind kind, MouseButton button, boolean ctrl, boolean alt,
-            boolean shift) {
+    private MouseTrigger(MouseEventKind kind, MouseButton button,
+                         boolean ctrl, boolean alt, boolean shift) {
         this.kind = kind;
         this.button = button;
         this.ctrl = ctrl;
@@ -57,8 +57,7 @@ public final class MouseTrigger implements InputTrigger {
     /**
      * Creates a trigger for a mouse button press.
      *
-     * @param button
-     *            the mouse button
+     * @param button the mouse button
      * @return a trigger that matches the button press
      */
     public static MouseTrigger press(MouseButton button) {
@@ -68,14 +67,10 @@ public final class MouseTrigger implements InputTrigger {
     /**
      * Creates a trigger for a mouse button press with modifiers.
      *
-     * @param button
-     *            the mouse button
-     * @param ctrl
-     *            true if Ctrl must be pressed
-     * @param alt
-     *            true if Alt must be pressed
-     * @param shift
-     *            true if Shift must be pressed
+     * @param button the mouse button
+     * @param ctrl   true if Ctrl must be pressed
+     * @param alt    true if Alt must be pressed
+     * @param shift  true if Shift must be pressed
      * @return a trigger that matches the button press with modifiers
      */
     public static MouseTrigger press(MouseButton button, boolean ctrl, boolean alt, boolean shift) {
@@ -85,8 +80,7 @@ public final class MouseTrigger implements InputTrigger {
     /**
      * Creates a trigger for a mouse button release.
      *
-     * @param button
-     *            the mouse button
+     * @param button the mouse button
      * @return a trigger that matches the button release
      */
     public static MouseTrigger release(MouseButton button) {
@@ -168,8 +162,7 @@ public final class MouseTrigger implements InputTrigger {
     /**
      * Creates a trigger for a drag event.
      *
-     * @param button
-     *            the button held during drag
+     * @param button the button held during drag
      * @return a trigger that matches the drag
      */
     public static MouseTrigger drag(MouseButton button) {
@@ -179,20 +172,15 @@ public final class MouseTrigger implements InputTrigger {
     /**
      * Creates a mouse trigger with all parameters specified.
      *
-     * @param kind
-     *            the event kind
-     * @param button
-     *            the mouse button
-     * @param ctrl
-     *            true if Ctrl must be pressed
-     * @param alt
-     *            true if Alt must be pressed
-     * @param shift
-     *            true if Shift must be pressed
+     * @param kind   the event kind
+     * @param button the mouse button
+     * @param ctrl   true if Ctrl must be pressed
+     * @param alt    true if Alt must be pressed
+     * @param shift  true if Shift must be pressed
      * @return a trigger that matches the specified combination
      */
-    public static MouseTrigger of(MouseEventKind kind, MouseButton button, boolean ctrl,
-            boolean alt, boolean shift) {
+    public static MouseTrigger of(MouseEventKind kind, MouseButton button,
+                                  boolean ctrl, boolean alt, boolean shift) {
         return new MouseTrigger(kind, button, ctrl, alt, shift);
     }
 
@@ -207,8 +195,7 @@ public final class MouseTrigger implements InputTrigger {
     /**
      * Returns true if this trigger matches the given mouse event.
      *
-     * @param event
-     *            the mouse event to match against
+     * @param event the mouse event to match against
      * @return true if this trigger matches the event
      */
     public boolean matchesMouse(MouseEvent event) {
@@ -260,8 +247,11 @@ public final class MouseTrigger implements InputTrigger {
             return false;
         }
         MouseTrigger that = (MouseTrigger) o;
-        return ctrl == that.ctrl && alt == that.alt && shift == that.shift && kind == that.kind
-                && button == that.button;
+        return ctrl == that.ctrl &&
+               alt == that.alt &&
+               shift == that.shift &&
+               kind == that.kind &&
+               button == that.button;
     }
 
     @Override

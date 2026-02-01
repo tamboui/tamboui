@@ -4,19 +4,19 @@
  */
 package dev.tamboui.tui.event;
 
-import java.util.Optional;
-
 import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.bindings.BindingSets;
+
+import java.util.Optional;
 
 /**
  * Represents a keyboard input event.
  * <p>
  * KeyEvent is associated with {@link Bindings} that determine how semantic
  * actions (like "move up" or "quit") are mapped to key presses. Use the
- * convenience methods like {@link #isUp()}, {@link #isDown()}, etc. to check if
- * this event matches a semantic action according to the configured bindings.
+ * convenience methods like {@link #isUp()}, {@link #isDown()}, etc. to check
+ * if this event matches a semantic action according to the configured bindings.
  *
  * <pre>{@code
  * // Check semantic actions
@@ -48,13 +48,9 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event with the default bindings.
      *
-     * @param code
-     *            the key code ({@link KeyCode#CHAR} for printable characters)
-     * @param modifiers
-     *            modifier state
-     * @param character
-     *            the character when {@code code} is {@link KeyCode#CHAR}, otherwise
-     *            ignored
+     * @param code the key code ({@link KeyCode#CHAR} for printable characters)
+     * @param modifiers modifier state
+     * @param character the character when {@code code} is {@link KeyCode#CHAR}, otherwise ignored
      */
     public KeyEvent(KeyCode code, KeyModifiers modifiers, char character) {
         this(code, modifiers, character, BindingSets.defaults());
@@ -63,15 +59,10 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event with specific bindings.
      *
-     * @param code
-     *            the key code ({@link KeyCode#CHAR} for printable characters)
-     * @param modifiers
-     *            modifier state
-     * @param character
-     *            the character when {@code code} is {@link KeyCode#CHAR}, otherwise
-     *            ignored
-     * @param bindings
-     *            the bindings for semantic action matching
+     * @param code the key code ({@link KeyCode#CHAR} for printable characters)
+     * @param modifiers modifier state
+     * @param character the character when {@code code} is {@link KeyCode#CHAR}, otherwise ignored
+     * @param bindings the bindings for semantic action matching
      */
     public KeyEvent(KeyCode code, KeyModifiers modifiers, char character, Bindings bindings) {
         this.code = code;
@@ -83,8 +74,7 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event for a printable character with the default bindings.
      *
-     * @param c
-     *            the character
+     * @param c the character
      * @return key event representing the character with no modifiers
      */
     public static KeyEvent ofChar(char c) {
@@ -92,13 +82,10 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Creates a key event for a printable character with modifiers and the default
-     * bindings.
+     * Creates a key event for a printable character with modifiers and the default bindings.
      *
-     * @param c
-     *            the character
-     * @param modifiers
-     *            modifier state
+     * @param c         the character
+     * @param modifiers modifier state
      * @return key event representing the character
      */
     public static KeyEvent ofChar(char c, KeyModifiers modifiers) {
@@ -108,10 +95,8 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event for a printable character with specific bindings.
      *
-     * @param c
-     *            the character
-     * @param bindings
-     *            the bindings for semantic action matching
+     * @param c        the character
+     * @param bindings the bindings for semantic action matching
      * @return key event representing the character with no modifiers
      */
     public static KeyEvent ofChar(char c, Bindings bindings) {
@@ -119,15 +104,11 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Creates a key event for a printable character with modifiers and specific
-     * bindings.
+     * Creates a key event for a printable character with modifiers and specific bindings.
      *
-     * @param c
-     *            the character
-     * @param modifiers
-     *            modifier state
-     * @param bindings
-     *            the bindings for semantic action matching
+     * @param c         the character
+     * @param modifiers modifier state
+     * @param bindings  the bindings for semantic action matching
      * @return key event representing the character
      */
     public static KeyEvent ofChar(char c, KeyModifiers modifiers, Bindings bindings) {
@@ -137,8 +118,7 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event for a special key with the default bindings.
      *
-     * @param code
-     *            the key code
+     * @param code the key code
      * @return key event with no modifiers
      */
     public static KeyEvent ofKey(KeyCode code) {
@@ -146,13 +126,10 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Creates a key event for a special key with modifiers and the default
-     * bindings.
+     * Creates a key event for a special key with modifiers and the default bindings.
      *
-     * @param code
-     *            the key code
-     * @param modifiers
-     *            modifier state
+     * @param code      the key code
+     * @param modifiers modifier state
      * @return key event
      */
     public static KeyEvent ofKey(KeyCode code, KeyModifiers modifiers) {
@@ -162,10 +139,8 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event for a special key with specific bindings.
      *
-     * @param code
-     *            the key code
-     * @param bindings
-     *            the bindings for semantic action matching
+     * @param code     the key code
+     * @param bindings the bindings for semantic action matching
      * @return key event with no modifiers
      */
     public static KeyEvent ofKey(KeyCode code, Bindings bindings) {
@@ -175,12 +150,9 @@ public final class KeyEvent implements Event {
     /**
      * Creates a key event for a special key with modifiers and specific bindings.
      *
-     * @param code
-     *            the key code
-     * @param modifiers
-     *            modifier state
-     * @param bindings
-     *            the bindings for semantic action matching
+     * @param code      the key code
+     * @param modifiers modifier state
+     * @param bindings  the bindings for semantic action matching
      * @return key event
      */
     public static KeyEvent ofKey(KeyCode code, KeyModifiers modifiers, Bindings bindings) {
@@ -188,11 +160,9 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a character event matching the given character
-     * (case-sensitive).
+     * Returns true if this is a character event matching the given character (case-sensitive).
      *
-     * @param c
-     *            character to compare
+     * @param c character to compare
      * @return true if matches
      */
     public boolean isChar(char c) {
@@ -200,11 +170,9 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a character event matching the given character
-     * (case-insensitive).
+     * Returns true if this is a character event matching the given character (case-insensitive).
      *
-     * @param c
-     *            character to compare (case-insensitive)
+     * @param c character to compare (case-insensitive)
      * @return true if matches ignoring case
      */
     public boolean isCharIgnoreCase(char c) {
@@ -214,8 +182,7 @@ public final class KeyEvent implements Event {
     /**
      * Returns true if this is a key event matching the given key code.
      *
-     * @param keyCode
-     *            key code to compare
+     * @param keyCode key code to compare
      * @return true if matches
      */
     public boolean isKey(KeyCode keyCode) {
@@ -277,8 +244,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns the character for {@link KeyCode#CHAR} events, or {@code '\0'}
-     * otherwise.
+     * Returns the character for {@link KeyCode#CHAR} events, or {@code '\0'} otherwise.
      *
      * @return the character value
      */
@@ -298,12 +264,9 @@ public final class KeyEvent implements Event {
     // ========== Semantic Action Methods (delegating to bindings) ==========
 
     /**
-     * Returns true if this event matches the given action in the configured
-     * bindings.
+     * Returns true if this event matches the given action in the configured bindings.
      *
-     * @param action
-     *            the action to check (use {@link Actions} constants or custom
-     *            strings)
+     * @param action the action to check (use {@link Actions} constants or custom strings)
      * @return true if this event triggers the action
      */
     public boolean matches(String action) {
@@ -356,8 +319,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "page up" navigation event according to the
-     * bindings.
+     * Returns true if this is a "page up" navigation event according to the bindings.
      *
      * @return true if this event triggers the page-up action
      */
@@ -366,8 +328,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "page down" navigation event according to the
-     * bindings.
+     * Returns true if this is a "page down" navigation event according to the bindings.
      *
      * @return true if this event triggers the page-down action
      */
@@ -394,8 +355,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "select" event (Enter or Space) according to the
-     * bindings.
+     * Returns true if this is a "select" event (Enter or Space) according to the bindings.
      *
      * @return true if this event triggers the select action
      */
@@ -440,8 +400,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "focus previous" event (Shift+Tab) according to the
-     * bindings.
+     * Returns true if this is a "focus previous" event (Shift+Tab) according to the bindings.
      *
      * @return true if this event triggers the focus-previous action
      */
@@ -450,8 +409,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "delete backward" event (Backspace) according to
-     * the bindings.
+     * Returns true if this is a "delete backward" event (Backspace) according to the bindings.
      *
      * @return true if this event triggers the delete-backward action
      */
@@ -460,8 +418,7 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns true if this is a "delete forward" event (Delete) according to the
-     * bindings.
+     * Returns true if this is a "delete forward" event (Delete) according to the bindings.
      *
      * @return true if this event triggers the delete-forward action
      */
@@ -478,8 +435,9 @@ public final class KeyEvent implements Event {
             return false;
         }
         KeyEvent keyEvent = (KeyEvent) o;
-        return character == keyEvent.character && code == keyEvent.code
-                && modifiers.equals(keyEvent.modifiers);
+        return character == keyEvent.character
+            && code == keyEvent.code
+            && modifiers.equals(keyEvent.modifiers);
     }
 
     @Override
@@ -492,7 +450,6 @@ public final class KeyEvent implements Event {
 
     @Override
     public String toString() {
-        return String.format("KeyEvent[code=%s, modifiers=%s, character=%s]", code, modifiers,
-                character);
+        return String.format("KeyEvent[code=%s, modifiers=%s, character=%s]", code, modifiers, character);
     }
 }

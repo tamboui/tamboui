@@ -4,19 +4,17 @@
  */
 package dev.tamboui.widgets.table;
 
+import dev.tamboui.style.Style;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import dev.tamboui.style.Style;
-
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 /**
  * A row in a {@link Table}.
  * <p>
- * A row is a collection of {@link Cell}s with optional styling and height
- * configuration.
+ * A row is a collection of {@link Cell}s with optional styling and height configuration.
  *
  * <pre>{@code
  * // Simple row
@@ -49,8 +47,7 @@ public final class Row {
     /**
      * Creates a row from cells.
      *
-     * @param cells
-     *            the cells to include in the row
+     * @param cells the cells to include in the row
      * @return a new row
      */
     public static Row from(Cell... cells) {
@@ -60,8 +57,7 @@ public final class Row {
     /**
      * Creates a row from cells.
      *
-     * @param cells
-     *            the cells to include in the row
+     * @param cells the cells to include in the row
      * @return a new row
      */
     public static Row from(List<Cell> cells) {
@@ -71,8 +67,7 @@ public final class Row {
     /**
      * Creates a row from strings (each string becomes a cell).
      *
-     * @param contents
-     *            the string contents for each cell
+     * @param contents the string contents for each cell
      * @return a new row
      */
     public static Row from(String... contents) {
@@ -139,8 +134,7 @@ public final class Row {
     /**
      * Returns a new row with the given style.
      *
-     * @param style
-     *            the style to apply
+     * @param style the style to apply
      * @return a new row with the style
      */
     public Row style(Style style) {
@@ -150,8 +144,7 @@ public final class Row {
     /**
      * Returns a new row with the given height.
      *
-     * @param height
-     *            the height to set
+     * @param height the height to set
      * @return a new row with the height
      */
     public Row height(int height) {
@@ -161,8 +154,7 @@ public final class Row {
     /**
      * Returns a new row with the given bottom margin.
      *
-     * @param margin
-     *            the bottom margin to set
+     * @param margin the bottom margin to set
      * @return a new row with the bottom margin
      */
     public Row bottomMargin(int margin) {

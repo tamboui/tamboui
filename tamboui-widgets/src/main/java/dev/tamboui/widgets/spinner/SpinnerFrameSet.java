@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * A set of frames that define a spinner animation.
  * <p>
- * Each frame is a string that will be displayed in sequence to create the
- * animation effect. Frames are cycled through repeatedly.
+ * Each frame is a string that will be displayed in sequence to create
+ * the animation effect. Frames are cycled through repeatedly.
  *
  * <pre>{@code
  * // Use a predefined style
@@ -22,7 +22,11 @@ import java.util.List;
  * SpinnerFrameSet custom = SpinnerFrameSet.of("*", "+", "x", "+");
  *
  * // Use builder for more control
- * SpinnerFrameSet custom = SpinnerFrameSet.builder().frame("⠋").frame("⠙").frame("⠹").build();
+ * SpinnerFrameSet custom = SpinnerFrameSet.builder()
+ *     .frame("⠋")
+ *     .frame("⠙")
+ *     .frame("⠹")
+ *     .build();
  * }</pre>
  */
 public final class SpinnerFrameSet {
@@ -39,11 +43,9 @@ public final class SpinnerFrameSet {
     /**
      * Creates a frame set from the given frames.
      *
-     * @param frames
-     *            the frame strings
+     * @param frames the frame strings
      * @return a new frame set
-     * @throws IllegalArgumentException
-     *             if frames is null or empty
+     * @throws IllegalArgumentException if frames is null or empty
      */
     public static SpinnerFrameSet of(String... frames) {
         return new SpinnerFrameSet(frames);
@@ -52,11 +54,9 @@ public final class SpinnerFrameSet {
     /**
      * Creates a frame set from a list of frames.
      *
-     * @param frames
-     *            the frame strings
+     * @param frames the frame strings
      * @return a new frame set
-     * @throws IllegalArgumentException
-     *             if frames is null or empty
+     * @throws IllegalArgumentException if frames is null or empty
      */
     public static SpinnerFrameSet of(List<String> frames) {
         if (frames == null || frames.isEmpty()) {
@@ -86,8 +86,7 @@ public final class SpinnerFrameSet {
     /**
      * Returns the frame at the given index (wrapping around).
      *
-     * @param index
-     *            the frame index
+     * @param index the frame index
      * @return the frame string
      */
     public String frame(int index) {
@@ -137,8 +136,7 @@ public final class SpinnerFrameSet {
         /**
          * Adds a frame to the set.
          *
-         * @param frame
-         *            the frame string
+         * @param frame the frame string
          * @return this builder
          */
         public Builder frame(String frame) {
@@ -151,8 +149,7 @@ public final class SpinnerFrameSet {
         /**
          * Adds multiple frames to the set.
          *
-         * @param frames
-         *            the frame strings
+         * @param frames the frame strings
          * @return this builder
          */
         public Builder frames(String... frames) {
@@ -170,8 +167,7 @@ public final class SpinnerFrameSet {
          * Builds the SpinnerFrameSet.
          *
          * @return the configured SpinnerFrameSet
-         * @throws IllegalStateException
-         *             if no frames have been added
+         * @throws IllegalStateException if no frames have been added
          */
         public SpinnerFrameSet build() {
             if (frames.isEmpty()) {

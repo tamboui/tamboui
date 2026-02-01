@@ -4,15 +4,14 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,15 +24,13 @@ class TextInputElementTest {
     @Test
     @DisplayName("styleAttributes exposes title")
     void styleAttributes_exposesTitle() {
-        assertThat(textInput().title("Username").styleAttributes()).containsEntry("title",
-                "Username");
+        assertThat(textInput().title("Username").styleAttributes()).containsEntry("title", "Username");
     }
 
     @Test
     @DisplayName("styleAttributes exposes placeholder")
     void styleAttributes_exposesPlaceholder() {
-        assertThat(textInput().placeholder("Enter...").styleAttributes())
-                .containsEntry("placeholder", "Enter...");
+        assertThat(textInput().placeholder("Enter...").styleAttributes()).containsEntry("placeholder", "Enter...");
     }
 
     @Test
@@ -46,8 +43,7 @@ class TextInputElementTest {
     @DisplayName("Attribute selector [title] affects TextInput border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "TextInputElement[title=\"Username\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test", "TextInputElement[title=\"Username\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();
@@ -66,8 +62,7 @@ class TextInputElementTest {
     @DisplayName("Attribute selector [placeholder] affects TextInput border color")
     void attributeSelector_placeholder_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "TextInputElement[placeholder=\"Enter...\"] { border-color: yellow; }");
+        styleEngine.addStylesheet("test", "TextInputElement[placeholder=\"Enter...\"] { border-color: yellow; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

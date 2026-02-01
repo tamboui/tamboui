@@ -4,15 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.spinner.SpinnerState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
@@ -25,8 +25,11 @@ class SpinnerElementTest {
     @Test
     @DisplayName("SpinnerElement fluent API chains correctly")
     void fluentApiChaining() {
-        SpinnerElement element = spinner().spinnerStyle(SpinnerStyle.LINE).label("Loading...")
-                .cyan().bold();
+        SpinnerElement element = spinner()
+                .spinnerStyle(SpinnerStyle.LINE)
+                .label("Loading...")
+                .cyan()
+                .bold();
 
         assertThat(element).isInstanceOf(SpinnerElement.class);
     }
@@ -66,7 +69,8 @@ class SpinnerElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        spinner(SpinnerStyle.LINE, "Working...").render(frame, area, RenderContext.empty());
+        spinner(SpinnerStyle.LINE, "Working...")
+                .render(frame, area, RenderContext.empty());
 
         // Should render something (not all spaces)
         boolean hasContent = false;
@@ -87,7 +91,8 @@ class SpinnerElementTest {
         Frame frame = Frame.forTesting(buffer);
 
         // Should not throw
-        spinner("Loading").render(frame, emptyArea, RenderContext.empty());
+        spinner("Loading")
+                .render(frame, emptyArea, RenderContext.empty());
     }
 
     @Test
@@ -97,7 +102,8 @@ class SpinnerElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        spinner(SpinnerStyle.LINE, "Hello").render(frame, area, RenderContext.empty());
+        spinner(SpinnerStyle.LINE, "Hello")
+                .render(frame, area, RenderContext.empty());
 
         // Find "Hello" in the buffer
         StringBuilder rendered = new StringBuilder();
@@ -110,7 +116,9 @@ class SpinnerElementTest {
     @Test
     @DisplayName("Custom frames override style")
     void customFramesOverrideStyle() {
-        SpinnerElement element = spinner().spinnerStyle(SpinnerStyle.LINE).frames("*", "+", "x");
+        SpinnerElement element = spinner()
+                .spinnerStyle(SpinnerStyle.LINE)
+                .frames("*", "+", "x");
 
         assertThat(element).isNotNull();
     }
@@ -142,7 +150,8 @@ class SpinnerElementTest {
     @DisplayName("External state is used when set")
     void externalState() {
         SpinnerState state = new SpinnerState(5);
-        SpinnerElement element = spinner().state(state);
+        SpinnerElement element = spinner()
+                .state(state);
 
         assertThat(element).isNotNull();
 

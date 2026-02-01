@@ -4,6 +4,8 @@
  */
 package dev.tamboui.demo.filemanager;
 
+import dev.tamboui.widgets.input.TextInputState;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -12,15 +14,13 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import dev.tamboui.widgets.input.TextInputState;
-
 /**
- * Main application state coordinating two directory browsers and file
- * operations. Manages which browser is active and handles copy/move/delete
- * operations.
+ * Main application state coordinating two directory browsers and file operations.
+ * Manages which browser is active and handles copy/move/delete operations.
  */
 public class FileManagerController {
 
@@ -67,13 +67,10 @@ public class FileManagerController {
     private int textScrollPosition = 0;
 
     /**
-     * Creates a new FileManagerController with the given starting directories for
-     * the left and right browsers.
+     * Creates a new FileManagerController with the given starting directories for the left and right browsers.
      *
-     * @param leftStart
-     *            starting path for the left browser
-     * @param rightStart
-     *            starting path for the right browser
+     * @param leftStart  starting path for the left browser
+     * @param rightStart starting path for the right browser
      */
     public FileManagerController(Path leftStart, Path rightStart) {
         this.leftBrowser = new DirectoryBrowserController(leftStart);
@@ -123,8 +120,7 @@ public class FileManagerController {
     /**
      * Checks whether the given side (LEFT or RIGHT) is currently active.
      *
-     * @param side
-     *            the Side to check
+     * @param side the Side to check
      * @return true if the provided side is active
      */
     public boolean isActive(Side side) {
@@ -206,8 +202,7 @@ public class FileManagerController {
     /**
      * Sets the text viewer scroll position, clamped to zero or greater.
      *
-     * @param position
-     *            desired scroll position
+     * @param position desired scroll position
      */
     public void setTextScrollPosition(int position) {
         this.textScrollPosition = Math.max(0, position);
@@ -230,8 +225,7 @@ public class FileManagerController {
     /**
      * Scrolls the file viewer up by a page (pageSize lines).
      *
-     * @param pageSize
-     *            number of lines to move up
+     * @param pageSize number of lines to move up
      */
     public void scrollTextPageUp(int pageSize) {
         textScrollPosition = Math.max(0, textScrollPosition - pageSize);
@@ -240,16 +234,14 @@ public class FileManagerController {
     /**
      * Scrolls the file viewer down by a page (pageSize lines).
      *
-     * @param pageSize
-     *            number of lines to move down
+     * @param pageSize number of lines to move down
      */
     public void scrollTextPageDown(int pageSize) {
         textScrollPosition = Math.max(0, textScrollPosition + pageSize);
     }
 
     /**
-     * Returns the list of files to operate on: the marked files (if any), otherwise
-     * the currently selected file.
+     * Returns the list of files to operate on: the marked files (if any), otherwise the currently selected file.
      *
      * @return list of Paths to operate on (may be empty)
      */
@@ -279,8 +271,7 @@ public class FileManagerController {
     /**
      * Sets the active side explicitly.
      *
-     * @param side
-     *            the Side to activate
+     * @param side the Side to activate
      */
     public void setActiveSide(Side side) {
         activeSide = side;
@@ -291,8 +282,8 @@ public class FileManagerController {
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * Prompts a confirmation dialog to copy the selected/marked items to the
-     * inactive pane. If there are no files to operate on, this does nothing.
+     * Prompts a confirmation dialog to copy the selected/marked items to the inactive pane.
+     * If there are no files to operate on, this does nothing.
      */
     public void promptCopy() {
         List<Path> files = filesToOperate();
@@ -302,13 +293,14 @@ public class FileManagerController {
 
         int count = files.size();
         Path target = inactiveBrowser().currentDirectory();
-        dialogMessage = String.format("Copy %d item%s to %s?", count, count > 1 ? "s" : "", target);
+        dialogMessage = String.format("Copy %d item%s to %s?",
+            count, count > 1 ? "s" : "", target);
         currentDialog = DialogType.COPY_CONFIRM;
     }
 
     /**
-     * Prompts a confirmation dialog to move the selected/marked items to the
-     * inactive pane. If there are no files to operate on, this does nothing.
+     * Prompts a confirmation dialog to move the selected/marked items to the inactive pane.
+     * If there are no files to operate on, this does nothing.
      */
     public void promptMove() {
         List<Path> files = filesToOperate();
@@ -318,13 +310,14 @@ public class FileManagerController {
 
         int count = files.size();
         Path target = inactiveBrowser().currentDirectory();
-        dialogMessage = String.format("Move %d item%s to %s?", count, count > 1 ? "s" : "", target);
+        dialogMessage = String.format("Move %d item%s to %s?",
+            count, count > 1 ? "s" : "", target);
         currentDialog = DialogType.MOVE_CONFIRM;
     }
 
     /**
-     * Prompts a confirmation dialog to delete the selected/marked items
-     * permanently. If there are no files to operate on, this does nothing.
+     * Prompts a confirmation dialog to delete the selected/marked items permanently.
+     * If there are no files to operate on, this does nothing.
      */
     public void promptDelete() {
         List<Path> files = filesToOperate();
@@ -333,34 +326,34 @@ public class FileManagerController {
         }
 
         int count = files.size();
-        dialogMessage = String.format("Delete %d item%s permanently?", count, count > 1 ? "s" : "");
+        dialogMessage = String.format("Delete %d item%s permanently?",
+            count, count > 1 ? "s" : "");
         currentDialog = DialogType.DELETE_CONFIRM;
     }
 
     /**
-     * Confirms and executes the current confirmation dialog (copy/move/delete) if
-     * applicable. After execution the dialog is dismissed.
+     * Confirms and executes the current confirmation dialog (copy/move/delete) if applicable.
+     * After execution the dialog is dismissed.
      */
     public void confirmDialog() {
         switch (currentDialog) {
-            case COPY_CONFIRM :
+            case COPY_CONFIRM:
                 executeCopy();
                 break;
-            case MOVE_CONFIRM :
+            case MOVE_CONFIRM:
                 executeMove();
                 break;
-            case DELETE_CONFIRM :
+            case DELETE_CONFIRM:
                 executeDelete();
                 break;
-            default :
+            default:
                 break;
         }
         dismissDialog();
     }
 
     /**
-     * Dismisses any active dialog and clears related transient state (input,
-     * viewer, scroll).
+     * Dismisses any active dialog and clears related transient state (input, viewer, scroll).
      */
     public void dismissDialog() {
         currentDialog = DialogType.NONE;
@@ -380,8 +373,8 @@ public class FileManagerController {
     }
 
     /**
-     * Confirms the mkdir input dialog and attempts to create the directory. On
-     * success the active browser is refreshed, on failure an error dialog is shown.
+     * Confirms the mkdir input dialog and attempts to create the directory.
+     * On success the active browser is refreshed, on failure an error dialog is shown.
      */
     public void confirmMkdir() {
         if (inputState.length() > 0) {
@@ -398,8 +391,8 @@ public class FileManagerController {
     }
 
     /**
-     * Opens an input dialog for going to a specific directory. The input is
-     * prefilled with the current directory path.
+     * Opens an input dialog for going to a specific directory.
+     * The input is prefilled with the current directory path.
      */
     public void promptGoto() {
         inputState.setText(activeBrowser().currentDirectory().toString());
@@ -408,8 +401,8 @@ public class FileManagerController {
     }
 
     /**
-     * Confirms the goto input dialog and navigates the active browser to the
-     * provided path. If the path is not a directory, an error dialog is shown.
+     * Confirms the goto input dialog and navigates the active browser to the provided path.
+     * If the path is not a directory, an error dialog is shown.
      */
     public void confirmGoto() {
         if (inputState.length() > 0) {
@@ -427,8 +420,7 @@ public class FileManagerController {
     /**
      * Shows an error dialog with the provided message.
      *
-     * @param message
-     *            the error message to display
+     * @param message the error message to display
      */
     public void showError(String message) {
         dialogMessage = message;
@@ -436,8 +428,8 @@ public class FileManagerController {
     }
 
     /**
-     * Opens the file viewer for the currently selected file if it is not a
-     * directory. If the selection is invalid or a directory, this does nothing.
+     * Opens the file viewer for the currently selected file if it is not a directory.
+     * If the selection is invalid or a directory, this does nothing.
      */
     public void promptViewFile() {
         Path selected = activeBrowser().selectedPath();
@@ -517,16 +509,14 @@ public class FileManagerController {
     private void copyDirectoryRecursively(Path source, Path target) throws IOException {
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-                    throws IOException {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 Path targetDir = target.resolve(source.relativize(dir));
                 Files.createDirectories(targetDir);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Path targetFile = target.resolve(source.relativize(file));
                 Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
                 return FileVisitResult.CONTINUE;
@@ -537,15 +527,13 @@ public class FileManagerController {
     private void deleteDirectoryRecursively(Path directory) throws IOException {
         Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                    throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Files.delete(file);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc)
-                    throws IOException {
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }

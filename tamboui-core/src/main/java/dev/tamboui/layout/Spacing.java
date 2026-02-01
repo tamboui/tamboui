@@ -7,8 +7,8 @@ package dev.tamboui.layout;
 /**
  * Represents the spacing between segments in a layout.
  * <p>
- * Can represent either positive spacing (space between segments) or negative
- * spacing (overlap between segments).
+ * Can represent either positive spacing (space between segments) or negative spacing
+ * (overlap between segments).
  */
 public abstract class Spacing {
 
@@ -19,11 +19,10 @@ public abstract class Spacing {
     }
 
     /**
-     * Creates spacing from an integer value. Negative values create overlap,
-     * non-negative values create space.
+     * Creates spacing from an integer value.
+     * Negative values create overlap, non-negative values create space.
      *
-     * @param value
-     *            the spacing value
+     * @param value the spacing value
      * @return a new spacing instance
      */
     public static Spacing from(int value) {
@@ -37,8 +36,7 @@ public abstract class Spacing {
     /**
      * Creates spacing with a fixed number of cells between segments.
      *
-     * @param value
-     *            the number of cells
+     * @param value the number of cells
      * @return a new space spacing
      */
     public static Spacing space(int value) {
@@ -48,8 +46,7 @@ public abstract class Spacing {
     /**
      * Creates overlap with a fixed number of overlapping cells.
      *
-     * @param value
-     *            the number of overlapping cells
+     * @param value the number of overlapping cells
      * @return a new overlap spacing
      */
     public static Spacing overlap(int value) {
@@ -57,8 +54,8 @@ public abstract class Spacing {
     }
 
     /**
-     * Returns the spacing value as an integer. Positive for space, negative for
-     * overlap.
+     * Returns the spacing value as an integer.
+     * Positive for space, negative for overlap.
      *
      * @return the spacing value
      */
@@ -146,3 +143,4 @@ public abstract class Spacing {
         }
     }
 }
+

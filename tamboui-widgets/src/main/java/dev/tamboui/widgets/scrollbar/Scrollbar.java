@@ -4,36 +4,40 @@
  */
 package dev.tamboui.widgets.scrollbar;
 
-import java.util.Objects;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.Style;
 import dev.tamboui.widget.StatefulWidget;
+
+import java.util.Objects;
 
 /**
  * A scrollbar widget for displaying scroll position.
  * <p>
- * The scrollbar can be oriented vertically (left/right) or horizontally
- * (top/bottom). It consists of:
+ * The scrollbar can be oriented vertically (left/right) or horizontally (top/bottom).
+ * It consists of:
  * <ul>
- * <li><b>track</b> - the background line</li>
- * <li><b>thumb</b> - the position indicator that moves along the track</li>
- * <li><b>begin/end symbols</b> - optional arrows at the ends</li>
+ *   <li><b>track</b> - the background line</li>
+ *   <li><b>thumb</b> - the position indicator that moves along the track</li>
+ *   <li><b>begin/end symbols</b> - optional arrows at the ends</li>
  * </ul>
  *
  * <pre>{@code
  * // Create a vertical scrollbar
- * Scrollbar scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT)
- *         .thumbStyle(Style.EMPTY.fg(Color.YELLOW)).build();
+ * Scrollbar scrollbar = Scrollbar.builder()
+ *     .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+ *     .thumbStyle(Style.EMPTY.fg(Color.YELLOW))
+ *     .build();
  *
  * // Create state for 100 items
- * ScrollbarState state = new ScrollbarState().contentLength(100).position(currentScrollPosition);
+ * ScrollbarState state = new ScrollbarState()
+ *     .contentLength(100)
+ *     .position(currentScrollPosition);
  *
  * // Render in a frame
  * frame.renderStatefulWidget(scrollbar, area, state);
@@ -49,16 +53,16 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
      * <p>
      * CSS property name: {@code thumb-color}
      */
-    public static final PropertyDefinition<Color> THUMB_COLOR = PropertyDefinition.of("thumb-color",
-            ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> THUMB_COLOR =
+            PropertyDefinition.of("thumb-color", ColorConverter.INSTANCE);
 
     /**
      * Property key for the track (background) color.
      * <p>
      * CSS property name: {@code track-color}
      */
-    public static final PropertyDefinition<Color> TRACK_COLOR = PropertyDefinition.of("track-color",
-            ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> TRACK_COLOR =
+            PropertyDefinition.of("track-color", ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.registerAll(THUMB_COLOR, TRACK_COLOR);
@@ -69,11 +73,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
      * <p>
      * Contains characters used for track, thumb, and optional begin/end markers:
      * <ul>
-     * <li><b>track</b> - the character for the scrollbar track/background</li>
-     * <li><b>thumb</b> - the character for the thumb/position indicator</li>
-     * <li><b>begin</b> - the optional character for the start marker (can be
-     * null)</li>
-     * <li><b>end</b> - the optional character for the end marker (can be null)</li>
+     *   <li><b>track</b> - the character for the scrollbar track/background</li>
+     *   <li><b>thumb</b> - the character for the thumb/position indicator</li>
+     *   <li><b>begin</b> - the optional character for the start marker (can be null)</li>
+     *   <li><b>end</b> - the optional character for the end marker (can be null)</li>
      * </ul>
      */
     public static final class SymbolSet {
@@ -85,14 +88,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Creates a new symbol set.
          *
-         * @param track
-         *            the track character
-         * @param thumb
-         *            the thumb character
-         * @param begin
-         *            the begin marker character, or null
-         * @param end
-         *            the end marker character, or null
+         * @param track the track character
+         * @param thumb the thumb character
+         * @param begin the begin marker character, or null
+         * @param end   the end marker character, or null
          */
         public SymbolSet(String track, String thumb, String begin, String end) {
             this.track = track;
@@ -123,10 +122,8 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Creates a symbol set without begin/end markers.
          *
-         * @param track
-         *            the track character
-         * @param thumb
-         *            the thumb character
+         * @param track the track character
+         * @param thumb the thumb character
          * @return a new SymbolSet
          */
         public static SymbolSet of(String track, String thumb) {
@@ -136,14 +133,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Creates a symbol set with all components.
          *
-         * @param track
-         *            the track character
-         * @param thumb
-         *            the thumb character
-         * @param begin
-         *            the begin marker character
-         * @param end
-         *            the end marker character
+         * @param track the track character
+         * @param thumb the thumb character
+         * @param begin the begin marker character
+         * @param end   the end marker character
          * @return a new SymbolSet
          */
         public static SymbolSet of(String track, String thumb, String begin, String end) {
@@ -204,8 +197,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
                 return false;
             }
             SymbolSet symbolSet = (SymbolSet) o;
-            return track.equals(symbolSet.track) && thumb.equals(symbolSet.thumb)
-                    && Objects.equals(begin, symbolSet.begin) && Objects.equals(end, symbolSet.end);
+            return track.equals(symbolSet.track)
+                && thumb.equals(symbolSet.thumb)
+                && Objects.equals(begin, symbolSet.begin)
+                && Objects.equals(end, symbolSet.end);
         }
 
         @Override
@@ -219,8 +214,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         @Override
         public String toString() {
-            return String.format("SymbolSet[track=%s, thumb=%s, begin=%s, end=%s]", track, thumb,
-                    begin, end);
+            return String.format("SymbolSet[track=%s, thumb=%s, begin=%s, end=%s]", track, thumb, begin, end);
         }
     }
 
@@ -344,12 +338,11 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         // Calculate thumb position and size
         int contentLength = state.contentLength();
         int viewportLength = state.viewportContentLength() > 0
-                ? state.viewportContentLength()
-                : trackLength;
+            ? state.viewportContentLength()
+            : trackLength;
 
         // Thumb size proportional to viewport/content ratio
-        int thumbSize = Math.max(1,
-                (int) Math.ceil((double) viewportLength / contentLength * trackLength));
+        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
         thumbSize = Math.min(thumbSize, trackLength);
 
         // Thumb position
@@ -366,34 +359,27 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         // Get effective styles
         Style effectiveStyle = style != null ? style : Style.EMPTY;
-        Style effectiveThumbStyle = thumbStyle != null
-                ? thumbStyle.patch(effectiveStyle)
-                : effectiveStyle;
-        Style effectiveTrackStyle = trackStyle != null
-                ? trackStyle.patch(effectiveStyle)
-                : effectiveStyle;
-        Style effectiveBeginStyle = beginStyle != null
-                ? beginStyle.patch(effectiveStyle)
-                : effectiveStyle;
-        Style effectiveEndStyle = endStyle != null
-                ? endStyle.patch(effectiveStyle)
-                : effectiveStyle;
+        Style effectiveThumbStyle = thumbStyle != null ? thumbStyle.patch(effectiveStyle) : effectiveStyle;
+        Style effectiveTrackStyle = trackStyle != null ? trackStyle.patch(effectiveStyle) : effectiveStyle;
+        Style effectiveBeginStyle = beginStyle != null ? beginStyle.patch(effectiveStyle) : effectiveStyle;
+        Style effectiveEndStyle = endStyle != null ? endStyle.patch(effectiveStyle) : effectiveStyle;
 
         // Render based on orientation
         if (orientation.isVertical()) {
-            renderVertical(buffer, trackArea, effectiveTrack, effectiveThumb, effectiveBegin,
-                    effectiveEnd, effectiveTrackStyle, effectiveThumbStyle, effectiveBeginStyle,
-                    effectiveEndStyle, beginOffset, thumbPosition, thumbSize, trackLength);
+            renderVertical(buffer, trackArea, effectiveTrack, effectiveThumb,
+                effectiveBegin, effectiveEnd, effectiveTrackStyle, effectiveThumbStyle,
+                effectiveBeginStyle, effectiveEndStyle, beginOffset, thumbPosition, thumbSize, trackLength);
         } else {
-            renderHorizontal(buffer, trackArea, effectiveTrack, effectiveThumb, effectiveBegin,
-                    effectiveEnd, effectiveTrackStyle, effectiveThumbStyle, effectiveBeginStyle,
-                    effectiveEndStyle, beginOffset, thumbPosition, thumbSize, trackLength);
+            renderHorizontal(buffer, trackArea, effectiveTrack, effectiveThumb,
+                effectiveBegin, effectiveEnd, effectiveTrackStyle, effectiveThumbStyle,
+                effectiveBeginStyle, effectiveEndStyle, beginOffset, thumbPosition, thumbSize, trackLength);
         }
     }
 
-    private void renderVertical(Buffer buffer, Rect area, String track, String thumb, String begin,
-            String end, Style trackStyle, Style thumbStyle, Style beginStyle, Style endStyle,
-            int beginOffset, int thumbPos, int thumbSize, int trackLength) {
+    private void renderVertical(Buffer buffer, Rect area, String track, String thumb,
+                                 String begin, String end, Style trackStyle, Style thumbStyle,
+                                 Style beginStyle, Style endStyle, int beginOffset,
+                                 int thumbPos, int thumbSize, int trackLength) {
         int x = area.x();
         int y = area.y();
 
@@ -419,8 +405,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
     }
 
     private void renderHorizontal(Buffer buffer, Rect area, String track, String thumb,
-            String begin, String end, Style trackStyle, Style thumbStyle, Style beginStyle,
-            Style endStyle, int beginOffset, int thumbPos, int thumbSize, int trackLength) {
+                                   String begin, String end, Style trackStyle, Style thumbStyle,
+                                   Style beginStyle, Style endStyle, int beginOffset,
+                                   int thumbPos, int thumbSize, int trackLength) {
         int x = area.x();
         int y = area.y();
 
@@ -447,14 +434,14 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
     private Rect calculateTrackArea(Rect area) {
         switch (orientation) {
-            case VERTICAL_RIGHT :
+            case VERTICAL_RIGHT:
                 return new Rect(area.right() - 1, area.y(), 1, area.height());
-            case VERTICAL_LEFT :
+            case VERTICAL_LEFT:
                 return new Rect(area.x(), area.y(), 1, area.height());
-            case HORIZONTAL_BOTTOM :
+            case HORIZONTAL_BOTTOM:
                 return new Rect(area.x(), area.bottom() - 1, area.width(), 1);
-            case HORIZONTAL_TOP :
-            default :
+            case HORIZONTAL_TOP:
+            default:
                 return new Rect(area.x(), area.y(), area.width(), 1);
         }
     }
@@ -494,14 +481,12 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         private Color thumbColor;
         private Color trackColor;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Sets the scrollbar orientation.
          *
-         * @param orientation
-         *            the scrollbar orientation
+         * @param orientation the scrollbar orientation
          * @return this builder
          */
         public Builder orientation(ScrollbarOrientation orientation) {
@@ -514,8 +499,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * <p>
          * This sets all symbols at once. Individual symbol setters override these.
          *
-         * @param symbols
-         *            the symbol set
+         * @param symbols the symbol set
          * @return this builder
          */
         public Builder symbols(SymbolSet symbols) {
@@ -532,8 +516,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the thumb (position indicator) symbol.
          *
-         * @param thumbSymbol
-         *            the thumb symbol
+         * @param thumbSymbol the thumb symbol
          * @return this builder
          */
         public Builder thumbSymbol(String thumbSymbol) {
@@ -544,8 +527,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the track (background) symbol.
          *
-         * @param trackSymbol
-         *            the track symbol
+         * @param trackSymbol the track symbol
          * @return this builder
          */
         public Builder trackSymbol(String trackSymbol) {
@@ -558,8 +540,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * <p>
          * Set to null to disable the begin marker.
          *
-         * @param beginSymbol
-         *            the begin marker symbol, or null
+         * @param beginSymbol the begin marker symbol, or null
          * @return this builder
          */
         public Builder beginSymbol(String beginSymbol) {
@@ -572,8 +553,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * <p>
          * Set to null to disable the end marker.
          *
-         * @param endSymbol
-         *            the end marker symbol, or null
+         * @param endSymbol the end marker symbol, or null
          * @return this builder
          */
         public Builder endSymbol(String endSymbol) {
@@ -584,8 +564,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the base style applied to all scrollbar components.
          *
-         * @param style
-         *            the base style
+         * @param style the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -596,8 +575,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the style for the thumb (position indicator).
          *
-         * @param thumbStyle
-         *            the thumb style
+         * @param thumbStyle the thumb style
          * @return this builder
          */
         public Builder thumbStyle(Style thumbStyle) {
@@ -608,8 +586,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the style for the track (background).
          *
-         * @param trackStyle
-         *            the track style
+         * @param trackStyle the track style
          * @return this builder
          */
         public Builder trackStyle(Style trackStyle) {
@@ -620,8 +597,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the style for the begin marker.
          *
-         * @param beginStyle
-         *            the begin marker style
+         * @param beginStyle the begin marker style
          * @return this builder
          */
         public Builder beginStyle(Style beginStyle) {
@@ -632,8 +608,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the style for the end marker.
          *
-         * @param endStyle
-         *            the end marker style
+         * @param endStyle the end marker style
          * @return this builder
          */
         public Builder endStyle(Style endStyle) {
@@ -644,11 +619,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code thumb-color} and {@code track-color} will be
-         * resolved if not set programmatically.
+         * When set, properties like {@code thumb-color} and {@code track-color}
+         * will be resolved if not set programmatically.
          *
-         * @param resolver
-         *            the property resolver
+         * @param resolver the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -661,8 +635,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the thumb color
+         * @param color the thumb color
          * @return this builder
          */
         public Builder thumbColor(Color color) {
@@ -675,8 +648,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the track color
+         * @param color the track color
          * @return this builder
          */
         public Builder trackColor(Color color) {

@@ -4,6 +4,8 @@
  */
 package dev.tamboui.widgets.list;
 
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,17 +15,15 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Width;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
-
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A list widget for displaying selectable items.
@@ -158,15 +158,13 @@ public final class ListWidget implements StatefulWidget<ListState> {
                 int startLine = Math.max(0, offset - itemStartOffset);
 
                 boolean isSelected = selectedIndex != null && selectedIndex == i;
-                Style itemStyle = style.patch(item.style())
-                        .patch(isSelected ? highlightStyle : Style.EMPTY);
+                Style itemStyle = style.patch(item.style()).patch(isSelected ? highlightStyle : Style.EMPTY);
 
                 // Draw item content from bottom to top
                 List<Line> lines = item.content().lines();
                 int itemY = y;
 
-                for (int lineIdx = itemHeight - 1; lineIdx >= startLine
-                        && itemY >= listArea.top(); lineIdx--) {
+                for (int lineIdx = itemHeight - 1; lineIdx >= startLine && itemY >= listArea.top(); lineIdx--) {
                     if (lineIdx >= lines.size()) {
                         itemY--;
                         continue;
@@ -180,8 +178,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
                     int availableWidth = contentWidth;
 
                     // Fill the content area background based on width property (default: fill)
-                    // Only fill the content area, not the symbol area, so symbol keeps its own
-                    // style
+                    // Only fill the content area, not the symbol area, so symbol keeps its own style
                     Width widthBtt = itemStyle.extension(Width.class, Width.FILL);
                     if (widthBtt.isFill()) {
                         Rect rowArea = new Rect(contentX, itemY, contentWidth, 1);
@@ -189,10 +186,9 @@ public final class ListWidget implements StatefulWidget<ListState> {
                     }
 
                     // Draw highlight symbol on each line if selected
-                    // If repeatHighlightSymbol is true, show on all lines; otherwise only on first
-                    // line (top visually)
+                    // If repeatHighlightSymbol is true, show on all lines; otherwise only on first line (top visually)
                     boolean shouldShowSymbol = isSelected && symbolWidth > 0
-                            && (lineIdx == 0 || repeatHighlightSymbol);
+                        && (lineIdx == 0 || repeatHighlightSymbol);
                     if (shouldShowSymbol) {
                         buffer.setLine(listArea.left(), itemY, highlightSymbol);
                     }
@@ -229,14 +225,12 @@ public final class ListWidget implements StatefulWidget<ListState> {
                 int visibleHeight = Math.min(itemHeight - startLine, listArea.bottom() - y);
 
                 boolean isSelected = selectedIndex != null && selectedIndex == i;
-                Style itemStyle = style.patch(item.style())
-                        .patch(isSelected ? highlightStyle : Style.EMPTY);
+                Style itemStyle = style.patch(item.style()).patch(isSelected ? highlightStyle : Style.EMPTY);
 
                 // Draw item content
                 List<Line> lines = item.content().lines();
 
-                for (int lineIdx = startLine; lineIdx < startLine + visibleHeight
-                        && lineIdx < lines.size(); lineIdx++) {
+                for (int lineIdx = startLine; lineIdx < startLine + visibleHeight && lineIdx < lines.size(); lineIdx++) {
                     // Always reserve space for symbol on all lines to keep content aligned
                     int contentX = listArea.left() + symbolWidth;
                     int availableWidth = contentWidth;
@@ -259,10 +253,9 @@ public final class ListWidget implements StatefulWidget<ListState> {
                     }
 
                     // Draw highlight symbol on each line if selected
-                    // If repeatHighlightSymbol is true, show on all lines; otherwise only on first
-                    // line
+                    // If repeatHighlightSymbol is true, show on all lines; otherwise only on first line
                     boolean shouldShowSymbol = isSelected && symbolWidth > 0
-                            && (lineIdx == startLine || repeatHighlightSymbol);
+                        && (lineIdx == startLine || repeatHighlightSymbol);
                     if (shouldShowSymbol) {
                         buffer.setLine(listArea.left(), y, highlightSymbol);
                     }
@@ -289,19 +282,19 @@ public final class ListWidget implements StatefulWidget<ListState> {
         }
 
         switch (overflow) {
-            case CLIP :
+            case CLIP:
                 return clipLine(line, maxWidth);
-            case ELLIPSIS :
+            case ELLIPSIS:
                 return truncateWithEllipsis(line, maxWidth, EllipsisPosition.END);
-            case ELLIPSIS_START :
+            case ELLIPSIS_START:
                 return truncateWithEllipsis(line, maxWidth, EllipsisPosition.START);
-            case ELLIPSIS_MIDDLE :
+            case ELLIPSIS_MIDDLE:
                 return truncateWithEllipsis(line, maxWidth, EllipsisPosition.MIDDLE);
-            case WRAP_CHARACTER :
-            case WRAP_WORD :
+            case WRAP_CHARACTER:
+            case WRAP_WORD:
                 // Wrapping not supported for list items - fall back to clip
                 return clipLine(line, maxWidth);
-            default :
+            default:
                 return clipLine(line, maxWidth);
         }
     }
@@ -332,9 +325,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         return Line.from(clippedSpans);
     }
 
-    private enum EllipsisPosition {
-        START, MIDDLE, END
-    }
+    private enum EllipsisPosition { START, MIDDLE, END }
 
     private Line truncateWithEllipsis(Line line, int maxWidth, EllipsisPosition position) {
         if (maxWidth <= CharWidth.of(ELLIPSIS)) {
@@ -347,16 +338,16 @@ public final class ListWidget implements StatefulWidget<ListState> {
 
         String truncated;
         switch (position) {
-            case END :
+            case END:
                 truncated = truncateEnd(fullText, maxWidth);
                 break;
-            case START :
+            case START:
                 truncated = truncateStart(fullText, maxWidth);
                 break;
-            case MIDDLE :
+            case MIDDLE:
                 truncated = truncateMiddle(fullText, maxWidth);
                 break;
-            default :
+            default:
                 truncated = truncateEnd(fullText, maxWidth);
         }
 
@@ -377,8 +368,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         int availableWidth = maxWidth - CharWidth.of(ELLIPSIS);
         int leftWidth = (availableWidth + 1) / 2;
         int rightWidth = availableWidth / 2;
-        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS
-                + CharWidth.substringByWidthFromEnd(text, rightWidth);
+        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS + CharWidth.substringByWidthFromEnd(text, rightWidth);
     }
 
     private String lineToString(Line line) {
@@ -413,14 +403,12 @@ public final class ListWidget implements StatefulWidget<ListState> {
         private Color background;
         private Color foreground;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Sets the list items.
          *
-         * @param items
-         *            the items to display
+         * @param items the items to display
          * @return this builder
          */
         public Builder items(List<ListItem> items) {
@@ -431,8 +419,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the list items.
          *
-         * @param items
-         *            the items to display
+         * @param items the items to display
          * @return this builder
          */
         public Builder items(ListItem... items) {
@@ -443,8 +430,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Adds an item to the list.
          *
-         * @param item
-         *            the item to add
+         * @param item the item to add
          * @return this builder
          */
         public Builder addItem(ListItem item) {
@@ -455,8 +441,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Adds an item from a string.
          *
-         * @param text
-         *            the item text
+         * @param text the item text
          * @return this builder
          */
         public Builder addItem(String text) {
@@ -467,8 +452,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Wraps the list in a block.
          *
-         * @param block
-         *            the block to wrap in
+         * @param block the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -479,8 +463,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the base style.
          *
-         * @param style
-         *            the base style
+         * @param style the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -491,8 +474,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the style for the selected item.
          *
-         * @param highlightStyle
-         *            the highlight style
+         * @param highlightStyle the highlight style
          * @return this builder
          */
         public Builder highlightStyle(Style highlightStyle) {
@@ -503,12 +485,11 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets a function to resolve styles for each item based on position.
          * <p>
-         * The function receives the item index (0-based) and total item count, and
-         * returns a Style to apply to that item. This enables positional styling like
-         * alternating row colors.
+         * The function receives the item index (0-based) and total item count,
+         * and returns a Style to apply to that item. This enables positional
+         * styling like alternating row colors.
          *
-         * @param resolver
-         *            function that takes (index, totalCount) and returns a Style
+         * @param resolver function that takes (index, totalCount) and returns a Style
          * @return this builder
          */
         public Builder itemStyleResolver(BiFunction<Integer, Integer, Style> resolver) {
@@ -519,11 +500,10 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code color} and {@code background} will be
-         * resolved if not set programmatically.
+         * When set, properties like {@code color} and {@code background}
+         * will be resolved if not set programmatically.
          *
-         * @param resolver
-         *            the property resolver
+         * @param resolver the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -534,8 +514,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the background color for items.
          *
-         * @param color
-         *            the background color
+         * @param color the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -546,8 +525,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the foreground (text) color for items.
          *
-         * @param color
-         *            the foreground color
+         * @param color the foreground color
          * @return this builder
          */
         public Builder foreground(Color color) {
@@ -558,8 +536,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the highlight symbol as a Line (which can include styling).
          *
-         * @param highlightSymbol
-         *            the line to use as the highlight symbol
+         * @param highlightSymbol the line to use as the highlight symbol
          * @return this builder
          */
         public Builder highlightSymbol(Line highlightSymbol) {
@@ -570,8 +547,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the highlight symbol as a string (convenience method).
          *
-         * @param highlightSymbol
-         *            the string to use as the highlight symbol
+         * @param highlightSymbol the string to use as the highlight symbol
          * @return this builder
          */
         public Builder highlightSymbol(String highlightSymbol) {
@@ -582,8 +558,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets the direction for rendering list items.
          *
-         * @param direction
-         *            the direction (default: TOP_TO_BOTTOM)
+         * @param direction the direction (default: TOP_TO_BOTTOM)
          * @return this builder
          */
         public Builder direction(ListDirection direction) {
@@ -594,8 +569,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         /**
          * Sets whether to repeat the highlight symbol on all lines of multiline items.
          *
-         * @param repeatHighlightSymbol
-         *            if true, repeat symbol on all lines (default: false)
+         * @param repeatHighlightSymbol if true, repeat symbol on all lines (default: false)
          * @return this builder
          */
         public Builder repeatHighlightSymbol(boolean repeatHighlightSymbol) {
@@ -608,15 +582,14 @@ public final class ListWidget implements StatefulWidget<ListState> {
          * <p>
          * Controls how text is handled when it exceeds the available width:
          * <ul>
-         * <li>{@code CLIP} - silently truncate at boundary (default)</li>
-         * <li>{@code ELLIPSIS} - truncate with "..." at end</li>
-         * <li>{@code ELLIPSIS_START} - truncate with "..." at start</li>
-         * <li>{@code ELLIPSIS_MIDDLE} - truncate with "..." in middle</li>
+         *   <li>{@code CLIP} - silently truncate at boundary (default)</li>
+         *   <li>{@code ELLIPSIS} - truncate with "..." at end</li>
+         *   <li>{@code ELLIPSIS_START} - truncate with "..." at start</li>
+         *   <li>{@code ELLIPSIS_MIDDLE} - truncate with "..." in middle</li>
          * </ul>
          * Note: WRAP_CHARACTER and WRAP_WORD are not supported for list items.
          *
-         * @param overflow
-         *            the overflow mode
+         * @param overflow the overflow mode
          * @return this builder
          */
         public Builder overflow(Overflow overflow) {

@@ -4,14 +4,13 @@
  */
 package dev.tamboui.tui.overlay;
 
-import java.time.Duration;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -23,16 +22,14 @@ class DebugOverlayTest {
     @Test
     @DisplayName("Overlay is initially not visible")
     void initiallyNotVisible() {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
         assertThat(overlay.isVisible()).isFalse();
     }
 
     @Test
     @DisplayName("toggle() changes visibility")
     void toggleChangesVisibility() {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
 
         overlay.toggle();
         assertThat(overlay.isVisible()).isTrue();
@@ -44,8 +41,7 @@ class DebugOverlayTest {
     @Test
     @DisplayName("recordFrame() records FPS samples")
     void recordFrameRecordsFps() throws InterruptedException {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
 
         // Simulate frame renders with delays
         for (int i = 0; i < 5; i++) {
@@ -61,8 +57,7 @@ class DebugOverlayTest {
     @Test
     @DisplayName("render() does nothing when not visible")
     void renderDoesNothingWhenNotVisible() {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
 
         Rect area = new Rect(0, 0, 40, 10);
         Buffer buffer = Buffer.empty(area);
@@ -77,8 +72,7 @@ class DebugOverlayTest {
     @Test
     @DisplayName("render() draws overlay when visible")
     void renderDrawsOverlayWhenVisible() throws InterruptedException {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
 
         // Record some frames
         overlay.recordFrame();
@@ -103,8 +97,7 @@ class DebugOverlayTest {
     @Test
     @DisplayName("render() handles empty area gracefully")
     void renderHandlesEmptyArea() {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
         overlay.toggle();
 
         Rect emptyArea = new Rect(0, 0, 0, 0);
@@ -133,8 +126,7 @@ class DebugOverlayTest {
     @Test
     @DisplayName("FPS calculation uses actual frame timing")
     void fpsCalculationUsesActualFrameTiming() throws InterruptedException {
-        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100),
-                Duration.ofMillis(100));
+        DebugOverlay overlay = new DebugOverlay("test", Duration.ofMillis(100), Duration.ofMillis(100));
 
         // Record multiple frames with ~100ms intervals (roughly 10 FPS)
         for (int i = 0; i < 5; i++) {

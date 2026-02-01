@@ -19,10 +19,8 @@ public final class Size {
     /**
      * Creates a size.
      *
-     * @param width
-     *            the width
-     * @param height
-     *            the height
+     * @param width  the width
+     * @param height the height
      */
     public Size(int width, int height) {
         this.width = width;

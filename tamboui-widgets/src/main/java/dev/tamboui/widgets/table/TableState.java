@@ -35,8 +35,7 @@ public final class TableState {
     }
 
     /**
-     * Returns the index of the currently selected row, or null if nothing is
-     * selected.
+     * Returns the index of the currently selected row, or null if nothing is selected.
      *
      * @return the selected row index, or null if nothing is selected
      */
@@ -56,8 +55,7 @@ public final class TableState {
     /**
      * Selects the row at the given index.
      *
-     * @param index
-     *            the row index to select
+     * @param index the row index to select
      */
     public void select(int index) {
         this.selected = Math.max(0, index);
@@ -80,8 +78,7 @@ public final class TableState {
     /**
      * Selects the last row.
      *
-     * @param rowCount
-     *            the total number of rows
+     * @param rowCount the total number of rows
      */
     public void selectLast(int rowCount) {
         if (rowCount > 0) {
@@ -92,8 +89,7 @@ public final class TableState {
     /**
      * Selects the next row.
      *
-     * @param rowCount
-     *            the total number of rows
+     * @param rowCount the total number of rows
      */
     public void selectNext(int rowCount) {
         if (selected == null) {
@@ -119,10 +115,8 @@ public final class TableState {
     /**
      * Scrolls to make the selected row visible.
      *
-     * @param visibleRows
-     *            the number of rows visible in the display area
-     * @param rows
-     *            the list of rows
+     * @param visibleRows the number of rows visible in the display area
+     * @param rows the list of rows
      */
     public void scrollToSelected(int visibleRows, List<Row> rows) {
         if (selected == null || rows.isEmpty()) {
@@ -154,8 +148,7 @@ public final class TableState {
     /**
      * Sets the scroll offset directly.
      *
-     * @param offset
-     *            the scroll offset to set
+     * @param offset the scroll offset to set
      */
     public void setOffset(int offset) {
         this.offset = Math.max(0, offset);

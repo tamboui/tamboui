@@ -4,20 +4,13 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.barchart.Bar;
 import dev.tamboui.widgets.barchart.BarChart;
 import dev.tamboui.widgets.barchart.BarGroup;
@@ -26,13 +19,24 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * A DSL wrapper for the BarChart widget.
  * <p>
  * Displays grouped bar charts.
- * 
  * <pre>{@code
- * barChart().data(10, 20, 30, 40).barWidth(3).barColor(Color.CYAN).title("Sales").rounded()
+ * barChart()
+ *     .data(10, 20, 30, 40)
+ *     .barWidth(3)
+ *     .barColor(Color.CYAN)
+ *     .title("Sales")
+ *     .rounded()
  * }</pre>
  */
 public final class BarChartElement extends StyledElement<BarChartElement> {
@@ -60,8 +64,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Adds data as simple values (single group).
      *
-     * @param values
-     *            the data values
+     * @param values the data values
      * @return this element
      */
     public BarChartElement data(long... values) {
@@ -73,8 +76,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Adds data as bars with labels.
      *
-     * @param bars
-     *            the bars to display
+     * @param bars the bars to display
      * @return this element
      */
     public BarChartElement data(Bar... bars) {
@@ -86,8 +88,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Adds a bar group.
      *
-     * @param group
-     *            the bar group to add
+     * @param group the bar group to add
      * @return this element
      */
     public BarChartElement group(BarGroup group) {
@@ -98,8 +99,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Adds bar groups.
      *
-     * @param groups
-     *            the bar groups to set
+     * @param groups the bar groups to set
      * @return this element
      */
     public BarChartElement groups(BarGroup... groups) {
@@ -111,8 +111,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Adds bar groups from a list.
      *
-     * @param groups
-     *            the bar groups to set
+     * @param groups the bar groups to set
      * @return this element
      */
     public BarChartElement groups(List<BarGroup> groups) {
@@ -124,8 +123,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the maximum value for scaling.
      *
-     * @param max
-     *            the maximum value
+     * @param max the maximum value
      * @return this element
      */
     public BarChartElement max(long max) {
@@ -146,8 +144,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the bar width.
      *
-     * @param width
-     *            the bar width in columns
+     * @param width the bar width in columns
      * @return this element
      */
     public BarChartElement barWidth(int width) {
@@ -158,8 +155,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the gap between bars in a group.
      *
-     * @param gap
-     *            the gap between bars
+     * @param gap the gap between bars
      * @return this element
      */
     public BarChartElement barGap(int gap) {
@@ -170,8 +166,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the gap between groups.
      *
-     * @param gap
-     *            the gap between groups
+     * @param gap the gap between groups
      * @return this element
      */
     public BarChartElement groupGap(int gap) {
@@ -202,8 +197,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the direction.
      *
-     * @param direction
-     *            the chart direction
+     * @param direction the chart direction
      * @return this element
      */
     public BarChartElement direction(Direction direction) {
@@ -214,8 +208,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the bar style.
      *
-     * @param style
-     *            the bar style
+     * @param style the bar style
      * @return this element
      */
     public BarChartElement barStyle(Style style) {
@@ -226,8 +219,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the bar color.
      *
-     * @param color
-     *            the bar foreground color
+     * @param color the bar foreground color
      * @return this element
      */
     public BarChartElement barColor(Color color) {
@@ -238,8 +230,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the value display style.
      *
-     * @param style
-     *            the value label style
+     * @param style the value label style
      * @return this element
      */
     public BarChartElement valueStyle(Style style) {
@@ -250,8 +241,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the label style.
      *
-     * @param style
-     *            the bar label style
+     * @param style the bar label style
      * @return this element
      */
     public BarChartElement labelStyle(Style style) {
@@ -272,8 +262,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the bar character set.
      *
-     * @param barSet
-     *            the bar character set to use
+     * @param barSet the bar character set to use
      * @return this element
      */
     public BarChartElement barSet(BarChart.BarSet barSet) {
@@ -284,8 +273,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the title.
      *
-     * @param title
-     *            the chart title
+     * @param title the chart title
      * @return this element
      */
     public BarChartElement title(String title) {
@@ -306,8 +294,7 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
     /**
      * Sets the border color.
      *
-     * @param color
-     *            the border color
+     * @param color the border color
      * @return this element
      */
     public BarChartElement borderColor(Color color) {
@@ -380,9 +367,14 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
             return;
         }
 
-        BarChart.Builder builder = BarChart.builder().data(groups).barWidth(barWidth).barGap(barGap)
-                .groupGap(groupGap).direction(direction).barSet(barSet)
-                .style(context.currentStyle());
+        BarChart.Builder builder = BarChart.builder()
+            .data(groups)
+            .barWidth(barWidth)
+            .barGap(barGap)
+            .groupGap(groupGap)
+            .direction(direction)
+            .barSet(barSet)
+            .style(context.currentStyle());
 
         if (max != null) {
             builder.max(max);
@@ -401,7 +393,8 @@ public final class BarChartElement extends StyledElement<BarChartElement> {
         }
 
         if (title != null || borderType != null) {
-            Block.Builder blockBuilder = Block.builder().borders(Borders.ALL)
+            Block.Builder blockBuilder = Block.builder()
+                    .borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
             if (title != null) {
                 blockBuilder.title(Title.from(title));

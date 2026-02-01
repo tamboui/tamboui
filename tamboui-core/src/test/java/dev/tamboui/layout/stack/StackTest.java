@@ -4,15 +4,14 @@
  */
 package dev.tamboui.layout.stack;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.ContentAlignment;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.widget.Widget;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,12 +50,16 @@ class StackTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        Stack.builder().children(fillingWidget("A"), fillingWidget("B")).build().render(area,
-                buffer);
+        Stack.builder()
+            .children(fillingWidget("A"), fillingWidget("B"))
+            .build()
+            .render(area, buffer);
 
         // B should overwrite A everywhere
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "B").hasSymbolAt(5, 2, "B")
-                .hasSymbolAt(9, 4, "B");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "B")
+            .hasSymbolAt(5, 2, "B")
+            .hasSymbolAt(9, 4, "B");
     }
 
     @Test
@@ -65,7 +68,10 @@ class StackTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        Stack.builder().children(charWidget("X")).build().render(area, buffer);
+        Stack.builder()
+            .children(charWidget("X"))
+            .build()
+            .render(area, buffer);
 
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "X");
     }
@@ -76,7 +82,9 @@ class StackTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        Stack.builder().build().render(area, buffer);
+        Stack.builder()
+            .build()
+            .render(area, buffer);
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(area));
     }
@@ -87,7 +95,10 @@ class StackTest {
         Rect emptyArea = new Rect(0, 0, 0, 0);
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 5));
 
-        Stack.builder().children(charWidget("A")).build().render(emptyArea, buffer);
+        Stack.builder()
+            .children(charWidget("A"))
+            .build()
+            .render(emptyArea, buffer);
 
         BufferAssertions.assertThat(buffer).isEqualTo(Buffer.empty(new Rect(0, 0, 10, 5)));
     }
@@ -98,17 +109,24 @@ class StackTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        Stack.builder().children(fillingWidget("S")).alignment(ContentAlignment.STRETCH).build()
-                .render(area, buffer);
+        Stack.builder()
+            .children(fillingWidget("S"))
+            .alignment(ContentAlignment.STRETCH)
+            .build()
+            .render(area, buffer);
 
         // All cells should be "S"
-        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "S").hasSymbolAt(9, 4, "S");
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "S")
+            .hasSymbolAt(9, 4, "S");
     }
 
     @Test
     @DisplayName("default alignment is STRETCH")
     void defaultAlignmentIsStretch() {
-        Stack stack = Stack.builder().children(charWidget("A")).build();
+        Stack stack = Stack.builder()
+            .children(charWidget("A"))
+            .build();
 
         assertThat(stack.alignment()).isEqualTo(ContentAlignment.STRETCH);
     }
@@ -119,10 +137,14 @@ class StackTest {
         Rect area = new Rect(0, 0, 10, 5);
         Buffer buffer = Buffer.empty(area);
 
-        java.util.List<Widget> widgets = java.util.Arrays.asList(fillingWidget("A"),
-                fillingWidget("B"));
+        java.util.List<Widget> widgets = java.util.Arrays.asList(
+            fillingWidget("A"), fillingWidget("B")
+        );
 
-        Stack.builder().children(widgets).build().render(area, buffer);
+        Stack.builder()
+            .children(widgets)
+            .build()
+            .render(area, buffer);
 
         // B should overwrite A
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "B");

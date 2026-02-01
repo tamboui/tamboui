@@ -4,16 +4,15 @@
  */
 package dev.tamboui.widgets.sparkline;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.Block;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -36,7 +35,10 @@ class SparklineTest {
     @Test
     @DisplayName("Sparkline renders with max value")
     void rendersWithMaxValue() {
-        Sparkline sparkline = Sparkline.builder().data(50, 100).max(100).build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(50, 100)
+            .max(100)
+            .build();
         Rect area = new Rect(0, 0, 2, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -65,7 +67,10 @@ class SparklineTest {
     @DisplayName("Sparkline renders with style")
     void rendersWithStyle() {
         Style style = Style.EMPTY.fg(Color.CYAN);
-        Sparkline sparkline = Sparkline.builder().data(5).style(style).build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(5)
+            .style(style)
+            .build();
         Rect area = new Rect(0, 0, 1, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -77,7 +82,11 @@ class SparklineTest {
     @Test
     @DisplayName("Sparkline renders with block")
     void rendersWithBlock() {
-        Sparkline sparkline = Sparkline.builder().data(8).max(8).block(Block.bordered()).build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(8)
+            .max(8)
+            .block(Block.bordered())
+            .build();
         Rect area = new Rect(0, 0, 5, 3);
         Buffer buffer = Buffer.empty(area);
 
@@ -109,8 +118,10 @@ class SparklineTest {
     @Test
     @DisplayName("Sparkline renders right-to-left")
     void rendersRightToLeft() {
-        Sparkline sparkline = Sparkline.builder().data(0, 8)
-                .direction(Sparkline.RenderDirection.RIGHT_TO_LEFT).build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(0, 8)
+            .direction(Sparkline.RenderDirection.RIGHT_TO_LEFT)
+            .build();
         Rect area = new Rect(0, 0, 2, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -124,8 +135,10 @@ class SparklineTest {
     @Test
     @DisplayName("Sparkline with THREE_LEVELS bar set")
     void withThreeLevelsBarSet() {
-        Sparkline sparkline = Sparkline.builder().data(0, 4, 8)
-                .barSet(Sparkline.BarSet.THREE_LEVELS).build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(0, 4, 8)
+            .barSet(Sparkline.BarSet.THREE_LEVELS)
+            .build();
         Rect area = new Rect(0, 0, 3, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -191,7 +204,9 @@ class SparklineTest {
     @Test
     @DisplayName("Sparkline builder with int array")
     void builderWithIntArray() {
-        Sparkline sparkline = Sparkline.builder().data(0, 4, 8).build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(0, 4, 8)
+            .build();
         Rect area = new Rect(0, 0, 3, 1);
         Buffer buffer = Buffer.empty(area);
 
@@ -258,7 +273,11 @@ class SparklineTest {
     @Test
     @DisplayName("autoMax clears explicit max")
     void autoMaxClearsExplicitMax() {
-        Sparkline sparkline = Sparkline.builder().data(50, 100).max(200).autoMax().build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(50, 100)
+            .max(200)
+            .autoMax()
+            .build();
         Rect area = new Rect(0, 0, 2, 1);
         Buffer buffer = Buffer.empty(area);
 

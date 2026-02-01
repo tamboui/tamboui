@@ -7,11 +7,10 @@ package dev.tamboui.text;
 /**
  * A wrapper around a string that is masked when displayed.
  * <p>
- * The masked string is displayed as a series of the same character. This might
- * be used to display a password field or similar secure data.
+ * The masked string is displayed as a series of the same character. This might be used to display
+ * a password field or similar secure data.
  * <p>
  * Example:
- * 
  * <pre>{@code
  * Masked password = new Masked("secret123", '*');
  * Span span = Span.styled(password.value(), Style.EMPTY.fg(Color.RED));
@@ -26,10 +25,8 @@ public final class Masked {
     /**
      * Creates a new masked string.
      *
-     * @param text
-     *            the text to mask
-     * @param maskChar
-     *            the character to use for masking
+     * @param text the text to mask
+     * @param maskChar the character to use for masking
      */
     public Masked(String text, char maskChar) {
         this.inner = text != null ? text : "";
@@ -46,8 +43,8 @@ public final class Masked {
     }
 
     /**
-     * Returns the underlying string, with all characters masked. Uses code point
-     * count to handle Unicode properly.
+     * Returns the underlying string, with all characters masked.
+     * Uses code point count to handle Unicode properly.
      *
      * @return the masked string
      */
@@ -64,8 +61,8 @@ public final class Masked {
     }
 
     /**
-     * Returns the original (unmasked) text. Use with caution - this exposes the
-     * sensitive data.
+     * Returns the original (unmasked) text.
+     * Use with caution - this exposes the sensitive data.
      *
      * @return the original unmasked text
      */
@@ -97,3 +94,4 @@ public final class Masked {
         return result;
     }
 }
+

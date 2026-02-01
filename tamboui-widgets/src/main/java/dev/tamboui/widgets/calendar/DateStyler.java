@@ -4,15 +4,15 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import java.time.LocalDate;
-
 import dev.tamboui.style.Style;
+
+import java.time.LocalDate;
 
 /**
  * Provides styling for specific dates in a {@link Monthly} calendar.
  * <p>
- * Implement this interface to customize how individual dates are rendered in
- * the calendar widget.
+ * Implement this interface to customize how individual dates are rendered
+ * in the calendar widget.
  *
  * <pre>{@code
  * DateStyler styler = date -> {
@@ -34,8 +34,7 @@ public interface DateStyler {
      * <p>
      * Return {@link Style#EMPTY} if no special styling is needed.
      *
-     * @param date
-     *            the date to style
+     * @param date the date to style
      * @return the style to apply to the date
      */
     Style getStyle(LocalDate date);

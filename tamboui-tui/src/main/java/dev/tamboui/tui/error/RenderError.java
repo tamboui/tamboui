@@ -29,15 +29,17 @@ public final class RenderError {
     /**
      * Creates a RenderError from the given exception.
      *
-     * @param cause
-     *            the exception that occurred
+     * @param cause the exception that occurred
      * @return a new RenderError
-     * @throws NullPointerException
-     *             if cause is null
+     * @throws NullPointerException if cause is null
      */
     public static RenderError from(Throwable cause) {
         Objects.requireNonNull(cause, "cause");
-        return new RenderError(cause, System.currentTimeMillis(), formatStackTrace(cause));
+        return new RenderError(
+                cause,
+                System.currentTimeMillis(),
+                formatStackTrace(cause)
+        );
     }
 
     /**
@@ -105,6 +107,7 @@ public final class RenderError {
 
     @Override
     public String toString() {
-        return String.format("RenderError[%s: %s at %d]", exceptionType(), message(), timestamp);
+        return String.format("RenderError[%s: %s at %d]",
+                exceptionType(), message(), timestamp);
     }
 }

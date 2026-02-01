@@ -4,18 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.RenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -29,8 +28,11 @@ class SparklineElementTest {
     @Test
     @DisplayName("SparklineElement fluent API chains correctly")
     void fluentApiChaining() {
-        SparklineElement element = sparkline(1, 2, 3, 4, 5).color(Color.CYAN).title("CPU Usage")
-                .rounded().borderColor(Color.GREEN);
+        SparklineElement element = sparkline(1, 2, 3, 4, 5)
+            .color(Color.CYAN)
+            .title("CPU Usage")
+            .rounded()
+            .borderColor(Color.GREEN);
 
         assertThat(element).isInstanceOf(SparklineElement.class);
     }
@@ -77,8 +79,10 @@ class SparklineElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        sparkline(1, 2, 3, 4, 5, 6, 7, 8).title("Chart").rounded().render(frame, area,
-                RenderContext.empty());
+        sparkline(1, 2, 3, 4, 5, 6, 7, 8)
+            .title("Chart")
+            .rounded()
+            .render(frame, area, RenderContext.empty());
 
         // Check border is rendered
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
@@ -102,8 +106,9 @@ class SparklineElementTest {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
 
-        sparkline(8, 8, 8, 8, 8, 8, 8, 8).color(Color.MAGENTA).render(frame, area,
-                RenderContext.empty());
+        sparkline(8, 8, 8, 8, 8, 8, 8, 8)
+            .color(Color.MAGENTA)
+            .render(frame, area, RenderContext.empty());
 
         // The sparkline data should have the color applied
         // (checking that rendering completes without error)
@@ -127,8 +132,7 @@ class SparklineElementTest {
     @DisplayName("Attribute selector [title] affects Sparkline border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();
-        styleEngine.addStylesheet("test",
-                "SparklineElement[title=\"CPU\"] { border-color: cyan; }");
+        styleEngine.addStylesheet("test", "SparklineElement[title=\"CPU\"] { border-color: cyan; }");
         styleEngine.setActiveStylesheet("test");
 
         DefaultRenderContext context = DefaultRenderContext.createEmpty();

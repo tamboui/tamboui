@@ -4,6 +4,31 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Layout;
+import dev.tamboui.layout.Margin;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderSet;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.layout.Padding;
+import dev.tamboui.widgets.block.Title;
+import dev.tamboui.style.Overflow;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,30 +36,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Direction;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.layout.Layout;
-import dev.tamboui.layout.Margin;
-import dev.tamboui.layout.Padding;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.Style;
-import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.Line;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderSet;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
-import dev.tamboui.widgets.block.Title;
 
 /**
  * A container element with borders and title.
@@ -44,13 +45,10 @@ import dev.tamboui.widgets.block.Title;
  * <p>
  * Layout properties can be set via CSS or programmatically:
  * <ul>
- * <li>{@code direction} - Layout direction: "horizontal"/"row" or
- * "vertical"/"column"</li>
- * <li>{@code flex} - Flex positioning mode: "start", "center", "end",
- * "space-between", "space-around", "space-evenly"</li>
- * <li>{@code margin} - Margin around the panel: single value or CSS-style
- * shorthand</li>
- * <li>{@code spacing} - Gap between children in cells</li>
+ *   <li>{@code direction} - Layout direction: "horizontal"/"row" or "vertical"/"column"</li>
+ *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
+ *   <li>{@code margin} - Margin around the panel: single value or CSS-style shorthand</li>
+ *   <li>{@code spacing} - Gap between children in cells</li>
  * </ul>
  * <p>
  * Programmatic values override CSS values when both are set.
@@ -77,10 +75,8 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Creates a panel with a title and children.
      *
-     * @param title
-     *            the panel title
-     * @param children
-     *            the child elements
+     * @param title the panel title
+     * @param children the child elements
      */
     public Panel(String title, Element... children) {
         this.title = Line.from(title);
@@ -90,8 +86,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Creates a panel with children.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      */
     public Panel(Element... children) {
         this.children.addAll(Arrays.asList(children));
@@ -100,8 +95,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the panel title.
      *
-     * @param title
-     *            the panel title text
+     * @param title the panel title text
      * @return this panel for chaining
      */
     public Panel title(String title) {
@@ -113,7 +107,6 @@ public final class Panel extends ContainerElement<Panel> {
      * Sets the panel title with styled text.
      * <p>
      * Example:
-     * 
      * <pre>{@code
      * panel(...)
      *     .title(Line.from(
@@ -123,8 +116,7 @@ public final class Panel extends ContainerElement<Panel> {
      *     ))
      * }</pre>
      *
-     * @param title
-     *            the styled title line
+     * @param title the styled title line
      * @return this panel for chaining
      */
     public Panel title(Line title) {
@@ -135,8 +127,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the bottom title.
      *
-     * @param title
-     *            the bottom title text
+     * @param title the bottom title text
      * @return this panel for chaining
      */
     public Panel bottomTitle(String title) {
@@ -147,8 +138,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the bottom title with styled text.
      *
-     * @param title
-     *            the styled title line
+     * @param title the styled title line
      * @return this panel for chaining
      */
     public Panel bottomTitle(Line title) {
@@ -159,8 +149,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the title overflow mode.
      *
-     * @param overflow
-     *            the overflow mode for the title
+     * @param overflow the overflow mode for the title
      * @return this panel for chaining
      */
     public Panel titleOverflow(Overflow overflow) {
@@ -233,8 +222,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the border type.
      *
-     * @param type
-     *            the border type
+     * @param type the border type
      * @return this panel for chaining
      */
     public Panel borderType(BorderType type) {
@@ -245,8 +233,8 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Makes this panel borderless.
      * <p>
-     * This sets the border type to {@link BorderType#NONE}, which renders no
-     * borders but still reserves space for them if borders are enabled.
+     * This sets the border type to {@link BorderType#NONE}, which renders
+     * no borders but still reserves space for them if borders are enabled.
      *
      * @return this panel for chaining
      */
@@ -258,8 +246,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the border color.
      *
-     * @param color
-     *            the border color
+     * @param color the border color
      * @return this panel for chaining
      */
     public Panel borderColor(Color color) {
@@ -270,8 +257,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the border color when focused.
      *
-     * @param color
-     *            the focused border color
+     * @param color the focused border color
      * @return this panel for chaining
      */
     public Panel focusedBorderColor(Color color) {
@@ -282,8 +268,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets uniform padding inside the panel.
      *
-     * @param value
-     *            the padding value for all sides
+     * @param value the padding value for all sides
      * @return this panel for chaining
      */
     public Panel padding(int value) {
@@ -294,8 +279,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets the padding inside the panel.
      *
-     * @param padding
-     *            the padding
+     * @param padding the padding
      * @return this panel for chaining
      */
     public Panel padding(Padding padding) {
@@ -308,8 +292,7 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * Can also be set via CSS {@code direction} property.
      *
-     * @param direction
-     *            the layout direction
+     * @param direction the layout direction
      * @return this panel for chaining
      */
     public Panel direction(Direction direction) {
@@ -342,8 +325,7 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * Can also be set via CSS {@code flex} property.
      *
-     * @param flex
-     *            the flex mode
+     * @param flex the flex mode
      * @return this panel for chaining
      */
     public Panel flex(Flex flex) {
@@ -356,8 +338,7 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * Can also be set via CSS {@code margin} property.
      *
-     * @param margin
-     *            the margin
+     * @param margin the margin
      * @return this panel for chaining
      */
     public Panel margin(Margin margin) {
@@ -368,8 +349,7 @@ public final class Panel extends ContainerElement<Panel> {
     /**
      * Sets uniform margin around the panel.
      *
-     * @param value
-     *            the margin value for all sides
+     * @param value the margin value for all sides
      * @return this panel for chaining
      */
     public Panel margin(int value) {
@@ -382,8 +362,7 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * Can also be set via CSS {@code spacing} property.
      *
-     * @param spacing
-     *            the spacing in cells
+     * @param spacing the spacing in cells
      * @return this panel for chaining
      */
     public Panel spacing(int spacing) {
@@ -396,14 +375,14 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * When enabled, the constraint is computed dynamically based on:
      * <ul>
-     * <li>Border overhead: 2 rows (top and bottom borders)</li>
-     * <li>Padding overhead: vertical padding if set</li>
-     * <li>Children height: sum of child heights (1 row each by default, or the
-     * length from their constraint if specified)</li>
+     *   <li>Border overhead: 2 rows (top and bottom borders)</li>
+     *   <li>Padding overhead: vertical padding if set</li>
+     *   <li>Children height: sum of child heights (1 row each by default,
+     *       or the length from their constraint if specified)</li>
      * </ul>
      * <p>
-     * The height is computed when {@link #constraint()} is called, so children can
-     * be added before or after calling this method.
+     * The height is computed when {@link #constraint()} is called, so children
+     * can be added before or after calling this method.
      *
      * @return this panel for chaining
      */
@@ -503,8 +482,7 @@ public final class Panel extends ContainerElement<Panel> {
             int childWidth = Math.max(1, (contentWidth - totalSpacing) / children.size());
             int maxChildHeight = 1;
             for (Element child : children) {
-                maxChildHeight = Math.max(maxChildHeight,
-                        child.preferredHeight(childWidth, context));
+                maxChildHeight = Math.max(maxChildHeight, child.preferredHeight(childWidth, context));
             }
             height += maxChildHeight;
         }
@@ -526,8 +504,7 @@ public final class Panel extends ContainerElement<Panel> {
             height += padding.verticalTotal();
         }
 
-        // Use a large estimate for available width since we don't have actual
-        // dimensions yet
+        // Use a large estimate for available width since we don't have actual dimensions yet
         int estimatedWidth = 1000;
 
         // Children height: sum of child heights using preferredHeight
@@ -588,8 +565,11 @@ public final class Panel extends ContainerElement<Panel> {
         }
 
         // Build the block - CSS properties are resolved by the widget
-        Block.Builder blockBuilder = Block.builder().borders(Borders.ALL).padding(effectivePadding)
-                .style(effectiveStyle).styleResolver(resolver);
+        Block.Builder blockBuilder = Block.builder()
+                .borders(Borders.ALL)
+                .padding(effectivePadding)
+                .style(effectiveStyle)
+                .styleResolver(resolver);
 
         // Set programmatic overrides if specified
         if (borderType != null) {
@@ -647,8 +627,7 @@ public final class Panel extends ContainerElement<Panel> {
         boolean isHorizontal = effectiveDirection == Direction.HORIZONTAL;
         for (Element child : children) {
             Constraint c = child.constraint();
-            // Check CSS constraint if programmatic is null (width for horizontal, height
-            // for vertical)
+            // Check CSS constraint if programmatic is null (width for horizontal, height for vertical)
             if (c == null && child instanceof Styleable) {
                 CssStyleResolver childCss = context.resolveStyle((Styleable) child).orElse(null);
                 if (childCss != null) {
@@ -693,10 +672,9 @@ public final class Panel extends ContainerElement<Panel> {
      * <p>
      * Priority (most specific wins):
      * <ol>
-     * <li>Individual properties (border-top, border-left, border-top-left,
-     * etc.)</li>
-     * <li>border-chars shorthand</li>
-     * <li>border-type (defaults to PLAIN if not set)</li>
+     *   <li>Individual properties (border-top, border-left, border-top-left, etc.)</li>
+     *   <li>border-chars shorthand</li>
+     *   <li>border-type (defaults to PLAIN if not set)</li>
      * </ol>
      */
     private BorderSet resolveCustomBorderSet(CssStyleResolver cssResolver) {
@@ -706,12 +684,14 @@ public final class Panel extends ContainerElement<Panel> {
 
         // Check if any border customization is present
         Optional<String> borderChars = cssResolver.borderChars();
-        boolean hasIndividualOverrides = cssResolver.borderTop().isPresent()
-                || cssResolver.borderBottom().isPresent() || cssResolver.borderLeft().isPresent()
-                || cssResolver.borderRight().isPresent() || cssResolver.borderTopLeft().isPresent()
-                || cssResolver.borderTopRight().isPresent()
-                || cssResolver.borderBottomLeft().isPresent()
-                || cssResolver.borderBottomRight().isPresent();
+        boolean hasIndividualOverrides = cssResolver.borderTop().isPresent() ||
+                cssResolver.borderBottom().isPresent() ||
+                cssResolver.borderLeft().isPresent() ||
+                cssResolver.borderRight().isPresent() ||
+                cssResolver.borderTopLeft().isPresent() ||
+                cssResolver.borderTopRight().isPresent() ||
+                cssResolver.borderBottomLeft().isPresent() ||
+                cssResolver.borderBottomRight().isPresent();
 
         if (!borderChars.isPresent() && !hasIndividualOverrides) {
             return null;
@@ -746,8 +726,8 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     /**
-     * Parses border-chars CSS value into a BorderSet. Format: 8 quoted strings
-     * (top-h, bottom-h, left-v, right-v, tl, tr, bl, br)
+     * Parses border-chars CSS value into a BorderSet.
+     * Format: 8 quoted strings (top-h, bottom-h, left-v, right-v, tl, tr, bl, br)
      */
     private BorderSet parseBorderChars(String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -776,8 +756,10 @@ public final class Panel extends ContainerElement<Panel> {
             return null;
         }
 
-        return new BorderSet(chars.get(0), chars.get(1), chars.get(2), chars.get(3), chars.get(4),
-                chars.get(5), chars.get(6), chars.get(7));
+        return new BorderSet(
+                chars.get(0), chars.get(1), chars.get(2), chars.get(3),
+                chars.get(4), chars.get(5), chars.get(6), chars.get(7)
+        );
     }
 
 }

@@ -19,10 +19,8 @@ public final class Stylesheet {
     /**
      * Creates a new stylesheet.
      *
-     * @param variables
-     *            the CSS variables ($name: value)
-     * @param rules
-     *            the CSS rules
+     * @param variables the CSS variables ($name: value)
+     * @param rules     the CSS rules
      */
     public Stylesheet(Map<String, String> variables, List<Rule> rules) {
         this.variables = Collections.unmodifiableMap(new LinkedHashMap<>(variables));
@@ -59,8 +57,7 @@ public final class Stylesheet {
     /**
      * Resolves a variable reference.
      *
-     * @param name
-     *            the variable name (without $)
+     * @param name the variable name (without $)
      * @return the variable value, or empty if not defined
      */
     public Optional<String> resolveVariable(String name) {
@@ -70,8 +67,7 @@ public final class Stylesheet {
     /**
      * Returns a new stylesheet with the given rules appended.
      *
-     * @param additionalRules
-     *            the rules to add
+     * @param additionalRules the rules to add
      * @return a new stylesheet with all rules
      */
     public Stylesheet withRules(List<Rule> additionalRules) {
@@ -83,8 +79,7 @@ public final class Stylesheet {
     /**
      * Returns a new stylesheet with the given variables merged.
      *
-     * @param additionalVariables
-     *            the variables to add (overwrite existing)
+     * @param additionalVariables the variables to add (overwrite existing)
      * @return a new stylesheet with merged variables
      */
     public Stylesheet withVariables(Map<String, String> additionalVariables) {
@@ -96,11 +91,10 @@ public final class Stylesheet {
     /**
      * Merges another stylesheet into this one.
      * <p>
-     * Variables from the other stylesheet override this one's variables. Rules from
-     * the other stylesheet are appended after this one's rules.
+     * Variables from the other stylesheet override this one's variables.
+     * Rules from the other stylesheet are appended after this one's rules.
      *
-     * @param other
-     *            the stylesheet to merge
+     * @param other the stylesheet to merge
      * @return a new merged stylesheet
      */
     public Stylesheet merge(Stylesheet other) {
@@ -128,8 +122,7 @@ public final class Stylesheet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : variables.entrySet()) {
-            sb.append("$").append(entry.getKey()).append(": ").append(entry.getValue())
-                    .append(";\n");
+            sb.append("$").append(entry.getKey()).append(": ").append(entry.getValue()).append(";\n");
         }
         if (!variables.isEmpty()) {
             sb.append("\n");

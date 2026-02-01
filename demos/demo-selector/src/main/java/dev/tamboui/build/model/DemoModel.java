@@ -47,8 +47,7 @@ public interface DemoModel {
     Set<String> getTags();
 
     /**
-     * Returns the Gradle project path (e.g.,
-     * ":tamboui-widgets:demos:barchart-demo").
+     * Returns the Gradle project path (e.g., ":tamboui-widgets:demos:barchart-demo").
      *
      * @return the project path
      */

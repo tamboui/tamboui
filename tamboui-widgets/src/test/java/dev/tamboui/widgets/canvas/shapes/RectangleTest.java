@@ -4,14 +4,13 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.Painter;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +40,7 @@ class RectangleTest {
 
     @Test
     void draw_rectangle() {
-        Context ctx = new Context(20, 20, new double[]{0, 20}, new double[]{0, 20}, Marker.DOT);
+        Context ctx = new Context(20, 20, new double[] {0, 20}, new double[] {0, 20}, Marker.DOT);
         Rectangle rect = new Rectangle(5, 5, 10, 10, Color.GREEN);
 
         rect.draw(new Painter(ctx));
@@ -52,7 +51,7 @@ class RectangleTest {
 
     @Test
     void draw_small_rectangle() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
         Rectangle rect = new Rectangle(2, 2, 2, 2, Color.YELLOW);
 
         rect.draw(new Painter(ctx));
@@ -63,7 +62,7 @@ class RectangleTest {
 
     @Test
     void draw_rectangle_at_origin() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
         Rectangle rect = new Rectangle(0, 0, 5, 5, Color.CYAN);
 
         rect.draw(new Painter(ctx));
@@ -72,7 +71,7 @@ class RectangleTest {
 
     @Test
     void draw_rectangle_partial_visible() {
-        Context ctx = new Context(10, 10, new double[]{0, 10}, new double[]{0, 10}, Marker.DOT);
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
         Rectangle rect = new Rectangle(-5, -5, 10, 10, Color.MAGENTA);
 
         rect.draw(new Painter(ctx));

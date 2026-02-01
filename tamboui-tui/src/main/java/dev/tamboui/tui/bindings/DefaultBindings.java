@@ -4,7 +4,10 @@
  */
 package dev.tamboui.tui.bindings;
 
+import dev.tamboui.tui.event.Event;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,14 +16,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import dev.tamboui.tui.event.Event;
-
 /**
- * Default implementation of {@link Bindings} using a HashMap of actions to
- * triggers.
+ * Default implementation of {@link Bindings} using a HashMap of actions to triggers.
  * <p>
- * Instances are immutable; use {@link #toBuilder()} to create modified
- * versions.
+ * Instances are immutable; use {@link #toBuilder()} to create modified versions.
  */
 public final class DefaultBindings implements Bindings {
 
@@ -29,8 +28,8 @@ public final class DefaultBindings implements Bindings {
     private DefaultBindings(Map<String, List<InputTrigger>> triggers) {
         // Create immutable copy
         Map<String, List<InputTrigger>> copy = new HashMap<>();
-        triggers.forEach((action, list) -> copy.put(action,
-                Collections.unmodifiableList(new ArrayList<>(list))));
+        triggers.forEach((action, list) ->
+            copy.put(action, Collections.unmodifiableList(new ArrayList<>(list))));
         this.triggers = Collections.unmodifiableMap(copy);
     }
 
@@ -108,7 +107,8 @@ public final class DefaultBindings implements Bindings {
         }
 
         BuilderImpl(DefaultBindings source) {
-            source.triggers.forEach((action, list) -> triggers.put(action, new ArrayList<>(list)));
+            source.triggers.forEach((action, list) ->
+                triggers.put(action, new ArrayList<>(list)));
         }
 
         private static String validateActionName(String action) {
@@ -116,8 +116,7 @@ public final class DefaultBindings implements Bindings {
                 throw new IllegalArgumentException("Action name cannot be null");
             }
             if (!action.matches("[a-zA-Z0-9_]+")) {
-                throw new IllegalArgumentException(
-                        "Action name must be alphanumeric with underscores only: " + action);
+                throw new IllegalArgumentException("Action name must be alphanumeric with underscores only: " + action);
             }
             return action;
         }

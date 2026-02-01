@@ -4,17 +4,16 @@
  */
 package dev.tamboui.tui.bindings;
 
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -191,8 +190,10 @@ class BindingsTest {
     @Test
     @DisplayName("Custom bindings can be built")
     void customBindingsCanBeBuilt() {
-        Bindings custom = BindingSets.standard().toBuilder().bind(KeyTrigger.ch('x'), Actions.QUIT)
-                .build();
+        Bindings custom = BindingSets.standard()
+            .toBuilder()
+            .bind(KeyTrigger.ch('x'), Actions.QUIT)
+            .build();
 
         KeyEvent x = KeyEvent.ofChar('x', custom);
         assertThat(x.isQuit()).isTrue();
@@ -247,8 +248,10 @@ class BindingsTest {
     @Test
     @DisplayName("Custom bindings can include mouse triggers")
     void customBindingsCanIncludeMouseTriggers() {
-        Bindings custom = BindingSets.standard().toBuilder()
-                .bind(MouseTrigger.click(), "customAction").build();
+        Bindings custom = BindingSets.standard()
+            .toBuilder()
+            .bind(MouseTrigger.click(), "customAction")
+            .build();
 
         MouseEvent click = MouseEvent.press(MouseButton.LEFT, 0, 0, custom);
         assertThat(click.matches("customAction")).isTrue();
@@ -269,8 +272,8 @@ class BindingsTest {
     @DisplayName("Ctrl+click matches Ctrl+left press")
     void ctrlClickMatchesCtrlLeftPress() {
         MouseTrigger trigger = MouseTrigger.ctrlClick();
-        MouseEvent ctrlClick = new MouseEvent(MouseEventKind.PRESS, MouseButton.LEFT, 10, 20,
-                KeyModifiers.CTRL);
+        MouseEvent ctrlClick = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.LEFT, 10, 20, KeyModifiers.CTRL);
 
         assertThat(trigger.matches(ctrlClick)).isTrue();
     }
@@ -279,8 +282,8 @@ class BindingsTest {
     @DisplayName("Ctrl+click does not match plain click")
     void ctrlClickDoesNotMatchPlainClick() {
         MouseTrigger trigger = MouseTrigger.ctrlClick();
-        MouseEvent plainClick = new MouseEvent(MouseEventKind.PRESS, MouseButton.LEFT, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent plainClick = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.LEFT, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(plainClick)).isFalse();
     }
@@ -289,8 +292,8 @@ class BindingsTest {
     @DisplayName("Shift+click matches Shift+left press")
     void shiftClickMatchesShiftLeftPress() {
         MouseTrigger trigger = MouseTrigger.shiftClick();
-        MouseEvent shiftClick = new MouseEvent(MouseEventKind.PRESS, MouseButton.LEFT, 10, 20,
-                KeyModifiers.SHIFT);
+        MouseEvent shiftClick = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.LEFT, 10, 20, KeyModifiers.SHIFT);
 
         assertThat(trigger.matches(shiftClick)).isTrue();
     }
@@ -299,8 +302,8 @@ class BindingsTest {
     @DisplayName("Alt+click matches Alt+left press")
     void altClickMatchesAltLeftPress() {
         MouseTrigger trigger = MouseTrigger.altClick();
-        MouseEvent altClick = new MouseEvent(MouseEventKind.PRESS, MouseButton.LEFT, 10, 20,
-                KeyModifiers.ALT);
+        MouseEvent altClick = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.LEFT, 10, 20, KeyModifiers.ALT);
 
         assertThat(trigger.matches(altClick)).isTrue();
     }
@@ -309,8 +312,8 @@ class BindingsTest {
     @DisplayName("Middle click matches middle button press")
     void middleClickMatchesMiddlePress() {
         MouseTrigger trigger = MouseTrigger.middleClick();
-        MouseEvent middleClick = new MouseEvent(MouseEventKind.PRESS, MouseButton.MIDDLE, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent middleClick = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.MIDDLE, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(middleClick)).isTrue();
     }
@@ -319,8 +322,8 @@ class BindingsTest {
     @DisplayName("Release trigger matches release events")
     void releaseTriggerMatchesReleaseEvents() {
         MouseTrigger trigger = MouseTrigger.release(MouseButton.LEFT);
-        MouseEvent release = new MouseEvent(MouseEventKind.RELEASE, MouseButton.LEFT, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent release = new MouseEvent(
+            MouseEventKind.RELEASE, MouseButton.LEFT, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(release)).isTrue();
     }
@@ -329,8 +332,8 @@ class BindingsTest {
     @DisplayName("Release trigger does not match press events")
     void releaseTriggerDoesNotMatchPressEvents() {
         MouseTrigger trigger = MouseTrigger.release(MouseButton.LEFT);
-        MouseEvent press = new MouseEvent(MouseEventKind.PRESS, MouseButton.LEFT, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent press = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.LEFT, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(press)).isFalse();
     }
@@ -339,8 +342,8 @@ class BindingsTest {
     @DisplayName("Scroll up trigger matches scroll up event")
     void scrollUpTriggerMatchesScrollUpEvent() {
         MouseTrigger trigger = MouseTrigger.scrollUp();
-        MouseEvent scrollUp = new MouseEvent(MouseEventKind.SCROLL_UP, MouseButton.NONE, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent scrollUp = new MouseEvent(
+            MouseEventKind.SCROLL_UP, MouseButton.NONE, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(scrollUp)).isTrue();
     }
@@ -349,8 +352,8 @@ class BindingsTest {
     @DisplayName("Scroll down trigger matches scroll down event")
     void scrollDownTriggerMatchesScrollDownEvent() {
         MouseTrigger trigger = MouseTrigger.scrollDown();
-        MouseEvent scrollDown = new MouseEvent(MouseEventKind.SCROLL_DOWN, MouseButton.NONE, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent scrollDown = new MouseEvent(
+            MouseEventKind.SCROLL_DOWN, MouseButton.NONE, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(scrollDown)).isTrue();
     }
@@ -359,8 +362,8 @@ class BindingsTest {
     @DisplayName("Drag trigger matches drag events")
     void dragTriggerMatchesDragEvents() {
         MouseTrigger trigger = MouseTrigger.drag(MouseButton.LEFT);
-        MouseEvent drag = new MouseEvent(MouseEventKind.DRAG, MouseButton.LEFT, 10, 20,
-                KeyModifiers.NONE);
+        MouseEvent drag = new MouseEvent(
+            MouseEventKind.DRAG, MouseButton.LEFT, 10, 20, KeyModifiers.NONE);
 
         assertThat(trigger.matches(drag)).isTrue();
     }
@@ -368,10 +371,11 @@ class BindingsTest {
     @Test
     @DisplayName("MouseTrigger.of creates custom trigger")
     void mouseTriggerOfCreatesCustomTrigger() {
-        MouseTrigger trigger = MouseTrigger.of(MouseEventKind.PRESS, MouseButton.RIGHT, true, true,
-                false);
-        MouseEvent event = new MouseEvent(MouseEventKind.PRESS, MouseButton.RIGHT, 0, 0,
-                KeyModifiers.of(true, true, false));
+        MouseTrigger trigger = MouseTrigger.of(
+            MouseEventKind.PRESS, MouseButton.RIGHT, true, true, false);
+        MouseEvent event = new MouseEvent(
+            MouseEventKind.PRESS, MouseButton.RIGHT, 0, 0,
+            KeyModifiers.of(true, true, false));
 
         assertThat(trigger.matches(event)).isTrue();
     }
@@ -454,7 +458,7 @@ class BindingsTest {
         assertThat(KeyTrigger.alt('v').describe()).isEqualTo("Alt+v");
         assertThat(KeyTrigger.ch(' ').describe()).isEqualTo("Space");
         assertThat(KeyTrigger.key(KeyCode.TAB, false, false, true).describe())
-                .isEqualTo("Shift+Tab");
+            .isEqualTo("Shift+Tab");
     }
 
     // ========== Bindings Interface Tests ==========

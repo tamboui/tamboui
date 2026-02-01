@@ -4,11 +4,6 @@
  */
 package dev.tamboui.widgets.table;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiFunction;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
@@ -17,17 +12,21 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
-import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
+import dev.tamboui.text.Span;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
-
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * A table widget for displaying data in rows and columns.
@@ -36,12 +35,22 @@ import static dev.tamboui.util.CollectionUtil.listCopyOf;
  * row selection with highlighting, and scrolling for large datasets.
  *
  * <pre>{@code
- * Table table = Table.builder().header(Row.from("Name", "Age", "City").style(Style.EMPTY.bold()))
- *         .rows(List.of(Row.from("Alice", "30", "New York"), Row.from("Bob", "25", "Los Angeles"),
- *                 Row.from("Charlie", "35", "Chicago")))
- *         .widths(Constraint.percentage(40), Constraint.length(10), Constraint.fill())
- *         .highlightStyle(Style.EMPTY.bg(Color.BLUE)).highlightSymbol(">> ")
- *         .block(Block.bordered().title("Users")).build();
+ * Table table = Table.builder()
+ *     .header(Row.from("Name", "Age", "City").style(Style.EMPTY.bold()))
+ *     .rows(List.of(
+ *         Row.from("Alice", "30", "New York"),
+ *         Row.from("Bob", "25", "Los Angeles"),
+ *         Row.from("Charlie", "35", "Chicago")
+ *     ))
+ *     .widths(
+ *         Constraint.percentage(40),
+ *         Constraint.length(10),
+ *         Constraint.fill()
+ *     )
+ *     .highlightStyle(Style.EMPTY.bg(Color.BLUE))
+ *     .highlightSymbol(">> ")
+ *     .block(Block.bordered().title("Users"))
+ *     .build();
  *
  * frame.renderStatefulWidget(table, area, tableState);
  * }</pre>
@@ -53,8 +62,8 @@ public final class Table implements StatefulWidget<TableState> {
      * <p>
      * CSS property name: {@code highlight-color}
      */
-    public static final PropertyDefinition<Color> HIGHLIGHT_COLOR = PropertyDefinition
-            .of("highlight-color", ColorConverter.INSTANCE);
+    public static final PropertyDefinition<Color> HIGHLIGHT_COLOR =
+            PropertyDefinition.of("highlight-color", ColorConverter.INSTANCE);
 
     static {
         PropertyRegistry.register(HIGHLIGHT_COLOR);
@@ -182,8 +191,7 @@ public final class Table implements StatefulWidget<TableState> {
 
         // Render header
         if (header != null) {
-            y = renderRow(buffer, tableArea, y, header, columnWidths, highlightWidth, false,
-                    Style.EMPTY);
+            y = renderRow(buffer, tableArea, y, header, columnWidths, highlightWidth, false, Style.EMPTY);
         }
 
         // Calculate available height for data rows
@@ -196,8 +204,7 @@ public final class Table implements StatefulWidget<TableState> {
         int offset = state.offset();
         int currentOffset = 0;
 
-        for (int i = 0; i < rows.size() && y < tableArea.top() + tableArea.height()
-                - (footer != null ? footer.totalHeight() : 0); i++) {
+        for (int i = 0; i < rows.size() && y < tableArea.top() + tableArea.height() - (footer != null ? footer.totalHeight() : 0); i++) {
             Row row = rows.get(i);
             int rowHeight = row.totalHeight();
 
@@ -215,27 +222,25 @@ public final class Table implements StatefulWidget<TableState> {
                 buffer.setString(tableArea.left(), y, highlightSymbol, rowHighlightStyle);
             }
 
-            y = renderRow(buffer, tableArea, y, row, columnWidths, highlightWidth, isSelected,
-                    highlightStyle);
+            y = renderRow(buffer, tableArea, y, row, columnWidths, highlightWidth, isSelected, highlightStyle);
             currentOffset += rowHeight;
         }
 
         // Render footer at the bottom
         if (footer != null) {
             int footerY = tableArea.bottom() - footer.totalHeight();
-            renderRow(buffer, tableArea, footerY, footer, columnWidths, highlightWidth, false,
-                    Style.EMPTY);
+            renderRow(buffer, tableArea, footerY, footer, columnWidths, highlightWidth, false, Style.EMPTY);
         }
     }
 
     private int calculateHighlightWidth(TableState state) {
         switch (highlightSpacing) {
-            case ALWAYS :
+            case ALWAYS:
                 return CharWidth.of(highlightSymbol);
-            case WHEN_SELECTED :
+            case WHEN_SELECTED:
                 return state.selected() != null ? CharWidth.of(highlightSymbol) : 0;
-            case NEVER :
-            default :
+            case NEVER:
+            default:
                 return 0;
         }
     }
@@ -243,7 +248,9 @@ public final class Table implements StatefulWidget<TableState> {
     private List<Integer> calculateColumnWidths(int availableWidth) {
         // Use Layout to calculate column widths based on constraints
         Rect fakeArea = new Rect(0, 0, availableWidth, 1);
-        List<Rect> columnRects = Layout.horizontal().constraints(widths).split(fakeArea);
+        List<Rect> columnRects = Layout.horizontal()
+            .constraints(widths)
+            .split(fakeArea);
 
         List<Integer> widthList = new ArrayList<>(columnRects.size());
         for (Rect rect : columnRects) {
@@ -252,15 +259,16 @@ public final class Table implements StatefulWidget<TableState> {
         return widthList;
     }
 
-    private int renderRow(Buffer buffer, Rect tableArea, int y, Row row, List<Integer> columnWidths,
-            int highlightWidth, boolean isSelected, Style highlightStyle) {
+    private int renderRow(Buffer buffer, Rect tableArea, int y, Row row,
+                          List<Integer> columnWidths, int highlightWidth,
+                          boolean isSelected, Style highlightStyle) {
         int rowHeight = row.height();
         Style rowStyle = row.style().patch(highlightStyle);
 
         // Apply row style to the entire row area
         if (!rowStyle.equals(Style.EMPTY)) {
             Rect rowArea = new Rect(tableArea.left() + highlightWidth, y,
-                    tableArea.width() - highlightWidth, rowHeight);
+                                    tableArea.width() - highlightWidth, rowHeight);
             buffer.setStyle(rowArea, rowStyle);
         }
 
@@ -293,9 +301,7 @@ public final class Table implements StatefulWidget<TableState> {
                         int textWidth = CharWidth.of(text);
                         int remainingWidth = colWidth - (col_x - x);
                         if (remainingWidth > 0 && textWidth > 0) {
-                            String toRender = textWidth <= remainingWidth
-                                    ? text
-                                    : CharWidth.substringByWidth(text, remainingWidth);
+                            String toRender = textWidth <= remainingWidth ? text : CharWidth.substringByWidth(text, remainingWidth);
                             buffer.setString(col_x, lineY, toRender, span.style());
                             col_x += CharWidth.of(toRender);
                         }
@@ -342,14 +348,12 @@ public final class Table implements StatefulWidget<TableState> {
         private Color background;
         private Color highlightColor;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /**
          * Sets the data rows.
          *
-         * @param rows
-         *            the rows to display
+         * @param rows the rows to display
          * @return this builder
          */
         public Builder rows(List<Row> rows) {
@@ -360,8 +364,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the data rows.
          *
-         * @param rows
-         *            the rows to display
+         * @param rows the rows to display
          * @return this builder
          */
         public Builder rows(Row... rows) {
@@ -372,8 +375,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Adds a row.
          *
-         * @param row
-         *            the row to add
+         * @param row the row to add
          * @return this builder
          */
         public Builder addRow(Row row) {
@@ -386,8 +388,7 @@ public final class Table implements StatefulWidget<TableState> {
          * <p>
          * This is required - columns will have 0 width without constraints.
          *
-         * @param widths
-         *            the column width constraints
+         * @param widths the column width constraints
          * @return this builder
          */
         public Builder widths(List<Constraint> widths) {
@@ -398,8 +399,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the column width constraints.
          *
-         * @param widths
-         *            the column width constraints
+         * @param widths the column width constraints
          * @return this builder
          */
         public Builder widths(Constraint... widths) {
@@ -410,8 +410,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the header row.
          *
-         * @param header
-         *            the header row
+         * @param header the header row
          * @return this builder
          */
         public Builder header(Row header) {
@@ -422,8 +421,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the footer row.
          *
-         * @param footer
-         *            the footer row
+         * @param footer the footer row
          * @return this builder
          */
         public Builder footer(Row footer) {
@@ -434,8 +432,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Wraps the table in a block.
          *
-         * @param block
-         *            the block to wrap in
+         * @param block the block to wrap in
          * @return this builder
          */
         public Builder block(Block block) {
@@ -446,8 +443,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the base style.
          *
-         * @param style
-         *            the base style
+         * @param style the base style
          * @return this builder
          */
         public Builder style(Style style) {
@@ -458,8 +454,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the style for the selected row.
          *
-         * @param style
-         *            the highlight style
+         * @param style the highlight style
          * @return this builder
          */
         public Builder highlightStyle(Style style) {
@@ -470,8 +465,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the symbol displayed before the selected row.
          *
-         * @param symbol
-         *            the highlight symbol
+         * @param symbol the highlight symbol
          * @return this builder
          */
         public Builder highlightSymbol(String symbol) {
@@ -482,8 +476,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the spacing between columns.
          *
-         * @param spacing
-         *            the column spacing
+         * @param spacing the column spacing
          * @return this builder
          */
         public Builder columnSpacing(int spacing) {
@@ -494,8 +487,7 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets when to allocate space for the highlight symbol.
          *
-         * @param spacing
-         *            the highlight spacing mode
+         * @param spacing the highlight spacing mode
          * @return this builder
          */
         public Builder highlightSpacing(HighlightSpacing spacing) {
@@ -506,11 +498,10 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets the property resolver for style-aware properties.
          * <p>
-         * When set, properties like {@code background} and {@code highlight-color} will
-         * be resolved if not set programmatically.
+         * When set, properties like {@code background} and {@code highlight-color}
+         * will be resolved if not set programmatically.
          *
-         * @param resolver
-         *            the property resolver
+         * @param resolver the property resolver
          * @return this builder
          */
         public Builder styleResolver(StylePropertyResolver resolver) {
@@ -523,8 +514,7 @@ public final class Table implements StatefulWidget<TableState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the background color
+         * @param color the background color
          * @return this builder
          */
         public Builder background(Color color) {
@@ -537,8 +527,7 @@ public final class Table implements StatefulWidget<TableState> {
          * <p>
          * This takes precedence over values from the style resolver.
          *
-         * @param color
-         *            the highlight color
+         * @param color the highlight color
          * @return this builder
          */
         public Builder highlightColor(Color color) {
@@ -549,12 +538,11 @@ public final class Table implements StatefulWidget<TableState> {
         /**
          * Sets a function to resolve styles for each row based on position.
          * <p>
-         * The function receives the row index (0-based) and total row count, and
-         * returns a Style to apply to that row. This enables positional styling like
-         * alternating row colors.
+         * The function receives the row index (0-based) and total row count,
+         * and returns a Style to apply to that row. This enables positional
+         * styling like alternating row colors.
          *
-         * @param resolver
-         *            function that takes (index, totalCount) and returns a Style
+         * @param resolver function that takes (index, totalCount) and returns a Style
          * @return this builder
          */
         public Builder rowStyleResolver(BiFunction<Integer, Integer, Style> resolver) {

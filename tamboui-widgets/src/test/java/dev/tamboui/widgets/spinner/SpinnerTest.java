@@ -4,12 +4,11 @@
  */
 package dev.tamboui.widgets.spinner;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -106,7 +105,9 @@ class SpinnerTest {
     @Test
     @DisplayName("Spinner renders correct frame for given tick")
     void rendersCorrectFrame() {
-        Spinner spinner = Spinner.builder().frames("A", "B", "C").build();
+        Spinner spinner = Spinner.builder()
+                .frames("A", "B", "C")
+                .build();
 
         SpinnerState state = new SpinnerState(0);
         Rect area = new Rect(0, 0, 5, 1);
@@ -130,7 +131,9 @@ class SpinnerTest {
     @Test
     @DisplayName("Spinner wraps frame index")
     void wrapsFrameIndex() {
-        Spinner spinner = Spinner.builder().frames("X", "Y").build();
+        Spinner spinner = Spinner.builder()
+                .frames("X", "Y")
+                .build();
 
         SpinnerState state = new SpinnerState(2); // wraps to index 0
         Rect area = new Rect(0, 0, 5, 1);
@@ -143,7 +146,9 @@ class SpinnerTest {
     @Test
     @DisplayName("Spinner with DOTS style renders braille character")
     void dotsStyleRendersBraille() {
-        Spinner spinner = Spinner.builder().spinnerStyle(SpinnerStyle.DOTS).build();
+        Spinner spinner = Spinner.builder()
+                .spinnerStyle(SpinnerStyle.DOTS)
+                .build();
 
         SpinnerState state = new SpinnerState(0);
         Rect area = new Rect(0, 0, 5, 1);
@@ -168,21 +173,25 @@ class SpinnerTest {
     @Test
     @DisplayName("Spinner applies style")
     void appliesStyle() {
-        Spinner spinner = Spinner.builder().frames("X").style(Style.EMPTY.bold()).build();
+        Spinner spinner = Spinner.builder()
+                .frames("X")
+                .style(Style.EMPTY.bold())
+                .build();
 
         SpinnerState state = new SpinnerState(0);
         Rect area = new Rect(0, 0, 5, 1);
         Buffer buffer = Buffer.empty(area);
 
         spinner.render(area, buffer, state);
-        assertThat(buffer.get(0, 0).style().addModifiers())
-                .contains(dev.tamboui.style.Modifier.BOLD);
+        assertThat(buffer.get(0, 0).style().addModifiers()).contains(dev.tamboui.style.Modifier.BOLD);
     }
 
     @Test
     @DisplayName("maxFrameWidth calculates maximum display width")
     void maxFrameWidth() {
-        Spinner spinner = Spinner.builder().frames("A", "AB", "ABC").build();
+        Spinner spinner = Spinner.builder()
+                .frames("A", "AB", "ABC")
+                .build();
 
         assertThat(spinner.maxFrameWidth()).isEqualTo(3);
     }
@@ -197,7 +206,9 @@ class SpinnerTest {
     @Test
     @DisplayName("Custom frames override style")
     void customFramesOverrideStyle() {
-        Spinner spinner = Spinner.builder().spinnerStyle(SpinnerStyle.LINE).frames("1", "2", "3")
+        Spinner spinner = Spinner.builder()
+                .spinnerStyle(SpinnerStyle.LINE)
+                .frames("1", "2", "3")
                 .build();
 
         assertThat(spinner.frames()).containsExactly("1", "2", "3");
@@ -206,7 +217,9 @@ class SpinnerTest {
     @Test
     @DisplayName("Spinner truncates frame to available width")
     void truncatesFrameToWidth() {
-        Spinner spinner = Spinner.builder().frames("[====]").build();
+        Spinner spinner = Spinner.builder()
+                .frames("[====]")
+                .build();
 
         SpinnerState state = new SpinnerState(0);
         Rect area = new Rect(0, 0, 3, 1);

@@ -4,36 +4,23 @@
  */
 package dev.tamboui.toolkit;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Supplier;
-
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.style.Color;
-import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.BarChartElement;
 import dev.tamboui.toolkit.elements.CalendarElement;
 import dev.tamboui.toolkit.elements.CanvasElement;
 import dev.tamboui.toolkit.elements.ChartElement;
+import dev.tamboui.toolkit.elements.GenericWidgetElement;
+import dev.tamboui.toolkit.elements.DockElement;
+import dev.tamboui.toolkit.elements.FlowElement;
+import dev.tamboui.toolkit.elements.GridElement;
 import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.ColumnsElement;
 import dev.tamboui.toolkit.elements.DialogElement;
-import dev.tamboui.toolkit.elements.DockElement;
-import dev.tamboui.toolkit.elements.FlowElement;
 import dev.tamboui.toolkit.elements.GaugeElement;
-import dev.tamboui.toolkit.elements.GenericWidgetElement;
-import dev.tamboui.toolkit.elements.GridElement;
 import dev.tamboui.toolkit.elements.LazyElement;
 import dev.tamboui.toolkit.elements.LineGaugeElement;
 import dev.tamboui.toolkit.elements.ListElement;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
-import dev.tamboui.toolkit.elements.MarkupTextElement;
 import dev.tamboui.toolkit.elements.Panel;
-import dev.tamboui.toolkit.elements.RichTextAreaElement;
-import dev.tamboui.toolkit.elements.RichTextElement;
 import dev.tamboui.toolkit.elements.Row;
 import dev.tamboui.toolkit.elements.ScrollbarElement;
 import dev.tamboui.toolkit.elements.Spacer;
@@ -42,21 +29,33 @@ import dev.tamboui.toolkit.elements.SpinnerElement;
 import dev.tamboui.toolkit.elements.StackElement;
 import dev.tamboui.toolkit.elements.TableElement;
 import dev.tamboui.toolkit.elements.TabsElement;
-import dev.tamboui.toolkit.elements.TextAreaElement;
 import dev.tamboui.toolkit.elements.TextElement;
+import dev.tamboui.toolkit.elements.TextAreaElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.widget.Widget;
+import dev.tamboui.toolkit.elements.RichTextElement;
+import dev.tamboui.toolkit.elements.RichTextAreaElement;
+import dev.tamboui.toolkit.elements.MarkupTextElement;
+import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.text.Text;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.style.Color;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
+import dev.tamboui.widget.Widget;
+import dev.tamboui.tui.event.KeyEvent;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
- * Static factory methods for building UI elements with the DSL. Import
- * statically to use:
- * 
+ * Static factory methods for building UI elements with the DSL.
+ * Import statically to use:
  * <pre>
  * import static toolkit.dev.tamboui.Toolkit.*;
  *
@@ -81,8 +80,7 @@ public final class Toolkit {
     /**
      * Creates a text element with the given content.
      *
-     * @param content
-     *            the text content
+     * @param content the text content
      * @return a new text element
      */
     public static TextElement text(String content) {
@@ -92,8 +90,7 @@ public final class Toolkit {
     /**
      * Creates a text element from any value (uses toString).
      *
-     * @param value
-     *            the value to convert to text
+     * @param value the value to convert to text
      * @return a new text element
      */
     public static TextElement text(Object value) {
@@ -103,8 +100,7 @@ public final class Toolkit {
     /**
      * Creates a text element with multiple values concatenated.
      *
-     * @param values
-     *            the values to concatenate
+     * @param values the values to concatenate
      * @return a new text element
      */
     public static TextElement text(Object... values) {
@@ -121,14 +117,12 @@ public final class Toolkit {
      * Creates a wave text element with the given text.
      * <p>
      * By default, a dark "shadow" moves through otherwise bright text.
-     * 
      * <pre>{@code
      * waveText("Loading...").color(Color.CYAN)
      * waveText("Thinking...").inverted()  // Bright peak on dim text
      * }</pre>
      *
-     * @param text
-     *            the text to display
+     * @param text the text to display
      * @return a new wave text element
      */
     public static WaveTextElement waveText(String text) {
@@ -138,10 +132,8 @@ public final class Toolkit {
     /**
      * Creates a wave text element with the given text and color.
      *
-     * @param text
-     *            the text to display
-     * @param color
-     *            the base color
+     * @param text the text to display
+     * @param color the base color
      * @return a new wave text element
      */
     public static WaveTextElement waveText(String text, Color color) {
@@ -154,7 +146,6 @@ public final class Toolkit {
      * Creates a simple inline rich text element with styled text.
      * <p>
      * For scrollable rich text with borders, use {@link #richTextArea(Text)}.
-     * 
      * <pre>{@code
      * Text styledText = Text.from(
      *     Line.from(Span.styled("Hello", Style.EMPTY.bold()), Span.raw(" World"))
@@ -162,8 +153,7 @@ public final class Toolkit {
      * richText(styledText).centered()
      * }</pre>
      *
-     * @param text
-     *            the styled text to display
+     * @param text the styled text to display
      * @return a new rich text element
      */
     public static RichTextElement richText(Text text) {
@@ -173,8 +163,7 @@ public final class Toolkit {
     /**
      * Creates a simple inline rich text element from a plain string.
      *
-     * @param content
-     *            the text content
+     * @param content the text content
      * @return a new rich text element
      */
     public static RichTextElement richText(String content) {
@@ -194,13 +183,14 @@ public final class Toolkit {
      * Creates a scrollable rich text area with styled text.
      * <p>
      * Rich text areas support scrolling, borders, line numbers, and focus.
-     * 
      * <pre>{@code
-     * richTextArea(styledText).showLineNumbers().scrollbar(ScrollBarPolicy.AS_NEEDED).rounded()
+     * richTextArea(styledText)
+     *     .showLineNumbers()
+     *     .scrollbar(ScrollBarPolicy.AS_NEEDED)
+     *     .rounded()
      * }</pre>
      *
-     * @param text
-     *            the styled text to display
+     * @param text the styled text to display
      * @return a new rich text area element
      */
     public static RichTextAreaElement richTextArea(Text text) {
@@ -210,8 +200,7 @@ public final class Toolkit {
     /**
      * Creates a scrollable rich text area from a plain string.
      *
-     * @param content
-     *            the text content
+     * @param content the text content
      * @return a new rich text area element
      */
     public static RichTextAreaElement richTextArea(String content) {
@@ -236,21 +225,17 @@ public final class Toolkit {
      * <p>
      * Supported markup:
      * <ul>
-     * <li>Modifiers: {@code [bold]}, {@code [italic]}, {@code [underlined]},
-     * {@code [dim]}</li>
-     * <li>Colors: {@code [red]}, {@code [green]}, {@code [blue]}, {@code [yellow]},
-     * etc.</li>
-     * <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
-     * <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
-     * <li>Escaped brackets: {@code [[} and {@code ]]}</li>
+     *   <li>Modifiers: {@code [bold]}, {@code [italic]}, {@code [underlined]}, {@code [dim]}</li>
+     *   <li>Colors: {@code [red]}, {@code [green]}, {@code [blue]}, {@code [yellow]}, etc.</li>
+     *   <li>Hyperlinks: {@code [link=URL]text[/link]}</li>
+     *   <li>Nested tags: {@code [red][bold]text[/bold][/red]}</li>
+     *   <li>Escaped brackets: {@code [[} and {@code ]]}</li>
      * </ul>
-     * 
      * <pre>{@code
      * markupText("This is [red]red[/red] and [bold]bold[/bold].")
      * }</pre>
      *
-     * @param markup
-     *            the markup text to parse and display
+     * @param markup the markup text to parse and display
      * @return a new markup text element
      */
     public static MarkupTextElement markupText(String markup) {
@@ -270,14 +255,14 @@ public final class Toolkit {
      * Creates a scrollable markup text area that parses BBCode-style markup.
      * <p>
      * Markup text areas support scrolling, borders, and focus.
-     * 
      * <pre>{@code
-     * markupTextArea("[bold]Hello[/bold] World").scrollbar(ScrollBarPolicy.AS_NEEDED).rounded()
-     *         .focusable()
+     * markupTextArea("[bold]Hello[/bold] World")
+     *     .scrollbar(ScrollBarPolicy.AS_NEEDED)
+     *     .rounded()
+     *     .focusable()
      * }</pre>
      *
-     * @param markup
-     *            the markup text to parse and display
+     * @param markup the markup text to parse and display
      * @return a new markup text area element
      */
     public static MarkupTextAreaElement markupTextArea(String markup) {
@@ -298,10 +283,8 @@ public final class Toolkit {
     /**
      * Creates a panel with a title and children.
      *
-     * @param title
-     *            the panel title
-     * @param children
-     *            the child elements
+     * @param title the panel title
+     * @param children the child elements
      * @return a new panel
      */
     public static Panel panel(String title, Element... children) {
@@ -311,8 +294,7 @@ public final class Toolkit {
     /**
      * Creates a panel without a title.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new panel
      */
     public static Panel panel(Element... children) {
@@ -331,8 +313,7 @@ public final class Toolkit {
     /**
      * Creates a horizontal row layout.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new row
      */
     public static Row row(Element... children) {
@@ -351,8 +332,7 @@ public final class Toolkit {
     /**
      * Creates a vertical column layout.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new column
      */
     public static Column column(Element... children) {
@@ -373,8 +353,7 @@ public final class Toolkit {
     /**
      * Creates a multi-column grid layout.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new columns layout
      */
     public static ColumnsElement columns(Element... children) {
@@ -393,8 +372,7 @@ public final class Toolkit {
     /**
      * Creates a multi-column grid layout from a collection.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new columns layout
      */
     public static ColumnsElement columns(Collection<? extends Element> children) {
@@ -404,8 +382,7 @@ public final class Toolkit {
     /**
      * Creates a columns layout with lazy content.
      *
-     * @param contentSupplier
-     *            the supplier that provides the content
+     * @param contentSupplier the supplier that provides the content
      * @return a new columns layout
      */
     public static ColumnsElement columns(Supplier<? extends Element> contentSupplier) {
@@ -417,8 +394,7 @@ public final class Toolkit {
     /**
      * Creates a CSS Grid-inspired grid layout.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new grid layout
      */
     public static GridElement grid(Element... children) {
@@ -437,8 +413,7 @@ public final class Toolkit {
     /**
      * Creates a grid layout from a collection.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new grid layout
      */
     public static GridElement grid(Collection<? extends Element> children) {
@@ -448,8 +423,7 @@ public final class Toolkit {
     /**
      * Creates a grid layout with lazy content.
      *
-     * @param contentSupplier
-     *            the supplier that provides the content
+     * @param contentSupplier the supplier that provides the content
      * @return a new grid layout
      */
     public static GridElement grid(Supplier<? extends Element> contentSupplier) {
@@ -462,9 +436,12 @@ public final class Toolkit {
      * Creates an empty dock layout.
      * <p>
      * Regions are added via named methods:
-     * 
      * <pre>{@code
-     * dock().top(text("Header")).bottom(text("Footer")).left(text("Sidebar")).center(text("Content"))
+     * dock()
+     *     .top(text("Header"))
+     *     .bottom(text("Footer"))
+     *     .left(text("Sidebar"))
+     *     .center(text("Content"))
      * }</pre>
      *
      * @return a new dock layout
@@ -480,8 +457,7 @@ public final class Toolkit {
      * <p>
      * Children render on top of each other (painter's algorithm).
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new stack layout
      */
     public static StackElement stack(Element... children) {
@@ -500,8 +476,7 @@ public final class Toolkit {
     /**
      * Creates a stack layout from a collection.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new stack layout
      */
     public static StackElement stack(Collection<? extends Element> children) {
@@ -513,11 +488,10 @@ public final class Toolkit {
     /**
      * Creates a flow layout with the given children.
      * <p>
-     * Children flow left-to-right and wrap to the next line when exceeding the
-     * available width.
+     * Children flow left-to-right and wrap to the next line
+     * when exceeding the available width.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new flow layout
      */
     public static FlowElement flow(Element... children) {
@@ -536,8 +510,7 @@ public final class Toolkit {
     /**
      * Creates a flow layout from a collection.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new flow layout
      */
     public static FlowElement flow(Collection<? extends Element> children) {
@@ -551,10 +524,8 @@ public final class Toolkit {
      * <p>
      * Dialogs auto-center in their parent area and clear the background.
      *
-     * @param title
-     *            the dialog title
-     * @param children
-     *            the child elements
+     * @param title the dialog title
+     * @param children the child elements
      * @return a new dialog element
      */
     public static DialogElement dialog(String title, Element... children) {
@@ -564,8 +535,7 @@ public final class Toolkit {
     /**
      * Creates a dialog without a title.
      *
-     * @param children
-     *            the child elements
+     * @param children the child elements
      * @return a new dialog element
      */
     public static DialogElement dialog(Element... children) {
@@ -595,8 +565,7 @@ public final class Toolkit {
     /**
      * Creates a spacer with a fixed length.
      *
-     * @param length
-     *            the fixed length
+     * @param length the fixed length
      * @return a new spacer
      */
     public static Spacer spacer(int length) {
@@ -608,8 +577,7 @@ public final class Toolkit {
     /**
      * Creates a length constraint.
      *
-     * @param value
-     *            the length value
+     * @param value the length value
      * @return a new length constraint
      */
     public static Constraint length(int value) {
@@ -619,8 +587,7 @@ public final class Toolkit {
     /**
      * Creates a percentage constraint.
      *
-     * @param value
-     *            the percentage value
+     * @param value the percentage value
      * @return a new percentage constraint
      */
     public static Constraint percent(int value) {
@@ -639,8 +606,7 @@ public final class Toolkit {
     /**
      * Creates a fill constraint with the given weight.
      *
-     * @param weight
-     *            the fill weight
+     * @param weight the fill weight
      * @return a new fill constraint
      */
     public static Constraint fill(int weight) {
@@ -650,8 +616,7 @@ public final class Toolkit {
     /**
      * Creates a minimum constraint.
      *
-     * @param value
-     *            the minimum value
+     * @param value the minimum value
      * @return a new minimum constraint
      */
     public static Constraint min(int value) {
@@ -661,8 +626,7 @@ public final class Toolkit {
     /**
      * Creates a maximum constraint.
      *
-     * @param value
-     *            the maximum value
+     * @param value the maximum value
      * @return a new maximum constraint
      */
     public static Constraint max(int value) {
@@ -672,10 +636,8 @@ public final class Toolkit {
     /**
      * Creates a ratio constraint.
      *
-     * @param numerator
-     *            the numerator
-     * @param denominator
-     *            the denominator
+     * @param numerator the numerator
+     * @param denominator the denominator
      * @return a new ratio constraint
      */
     public static Constraint ratio(int numerator, int denominator) {
@@ -688,14 +650,12 @@ public final class Toolkit {
      * Creates a lazy element that evaluates the supplier on each render.
      * <p>
      * This allows state to be captured in the closure:
-     * 
      * <pre>{@code
      * int count = 0;
      * lazy(() -> text("Count: " + count))
      * }</pre>
      *
-     * @param supplier
-     *            the supplier that provides the element
+     * @param supplier the supplier that provides the element
      * @return a new lazy element
      */
     public static Element lazy(Supplier<? extends Element> supplier) {
@@ -703,17 +663,14 @@ public final class Toolkit {
     }
 
     /**
-     * Creates a panel with a title and lazy content. The content supplier is
-     * evaluated on each render.
-     * 
+     * Creates a panel with a title and lazy content.
+     * The content supplier is evaluated on each render.
      * <pre>{@code
      * panel("Counter", () -> text("Count: " + count))
      * }</pre>
      *
-     * @param title
-     *            the panel title
-     * @param contentSupplier
-     *            the supplier that provides the content
+     * @param title the panel title
+     * @param contentSupplier the supplier that provides the content
      * @return a new panel
      */
     public static Panel panel(String title, Supplier<? extends Element> contentSupplier) {
@@ -723,8 +680,7 @@ public final class Toolkit {
     /**
      * Creates a panel with lazy content (no title).
      *
-     * @param contentSupplier
-     *            the supplier that provides the content
+     * @param contentSupplier the supplier that provides the content
      * @return a new panel
      */
     public static Panel panel(Supplier<? extends Element> contentSupplier) {
@@ -734,8 +690,7 @@ public final class Toolkit {
     /**
      * Creates a row with lazy content.
      *
-     * @param contentSupplier
-     *            the supplier that provides the content
+     * @param contentSupplier the supplier that provides the content
      * @return a new row
      */
     public static Row row(Supplier<? extends Element> contentSupplier) {
@@ -745,8 +700,7 @@ public final class Toolkit {
     /**
      * Creates a column with lazy content.
      *
-     * @param contentSupplier
-     *            the supplier that provides the content
+     * @param contentSupplier the supplier that provides the content
      * @return a new column
      */
     public static Column column(Supplier<? extends Element> contentSupplier) {
@@ -758,8 +712,7 @@ public final class Toolkit {
     /**
      * Creates a gauge with the given ratio (0.0-1.0).
      *
-     * @param ratio
-     *            the ratio value (0.0-1.0)
+     * @param ratio the ratio value (0.0-1.0)
      * @return a new gauge element
      */
     public static GaugeElement gauge(double ratio) {
@@ -769,8 +722,7 @@ public final class Toolkit {
     /**
      * Creates a gauge with the given percentage (0-100).
      *
-     * @param percent
-     *            the percentage value (0-100)
+     * @param percent the percentage value (0-100)
      * @return a new gauge element
      */
     public static GaugeElement gauge(int percent) {
@@ -791,8 +743,7 @@ public final class Toolkit {
     /**
      * Creates a line gauge with the given ratio (0.0-1.0).
      *
-     * @param ratio
-     *            the ratio value (0.0-1.0)
+     * @param ratio the ratio value (0.0-1.0)
      * @return a new line gauge element
      */
     public static LineGaugeElement lineGauge(double ratio) {
@@ -802,8 +753,7 @@ public final class Toolkit {
     /**
      * Creates a line gauge with the given percentage (0-100).
      *
-     * @param percent
-     *            the percentage value (0-100)
+     * @param percent the percentage value (0-100)
      * @return a new line gauge element
      */
     public static LineGaugeElement lineGauge(int percent) {
@@ -824,8 +774,7 @@ public final class Toolkit {
     /**
      * Creates a sparkline with the given data values.
      *
-     * @param data
-     *            the data values
+     * @param data the data values
      * @return a new sparkline element
      */
     public static SparklineElement sparkline(long... data) {
@@ -835,8 +784,7 @@ public final class Toolkit {
     /**
      * Creates a sparkline with the given data values.
      *
-     * @param data
-     *            the data values
+     * @param data the data values
      * @return a new sparkline element
      */
     public static SparklineElement sparkline(int... data) {
@@ -846,8 +794,7 @@ public final class Toolkit {
     /**
      * Creates a sparkline with the given data values.
      *
-     * @param data
-     *            the data values
+     * @param data the data values
      * @return a new sparkline element
      */
     public static SparklineElement sparkline(Collection<? extends Number> data) {
@@ -868,8 +815,7 @@ public final class Toolkit {
     /**
      * Creates a list with the given items.
      *
-     * @param items
-     *            the list items
+     * @param items the list items
      * @return a new list element
      */
     public static ListElement<?> list(String... items) {
@@ -879,8 +825,7 @@ public final class Toolkit {
     /**
      * Creates a list with the given items.
      *
-     * @param items
-     *            the list items
+     * @param items the list items
      * @return a new list container
      */
     public static ListElement<?> list(List<String> items) {
@@ -900,13 +845,14 @@ public final class Toolkit {
      * Creates a list with styled element items.
      * <p>
      * This allows using styled elements directly:
-     * 
      * <pre>{@code
-     * list(text("Hello").green(), text("World").cyan())
+     * list(
+     *     text("Hello").green(),
+     *     text("World").cyan()
+     * )
      * }</pre>
      *
-     * @param elements
-     *            the list items as styled elements
+     * @param elements the list items as styled elements
      * @return a new list container
      */
     public static ListElement<?> list(StyledElement<?>... elements) {
@@ -929,8 +875,7 @@ public final class Toolkit {
     /**
      * Creates tabs with the given titles.
      *
-     * @param titles
-     *            the tab titles
+     * @param titles the tab titles
      * @return a new tabs element
      */
     public static TabsElement tabs(String... titles) {
@@ -940,8 +885,7 @@ public final class Toolkit {
     /**
      * Creates tabs with the given titles.
      *
-     * @param titles
-     *            the tab titles
+     * @param titles the tab titles
      * @return a new tabs element
      */
     public static TabsElement tabs(List<String> titles) {
@@ -962,8 +906,7 @@ public final class Toolkit {
     /**
      * Creates a text input with the given state.
      *
-     * @param state
-     *            the text input state
+     * @param state the text input state
      * @return a new text input element
      */
     public static TextInputElement textInput(TextInputState state) {
@@ -984,8 +927,7 @@ public final class Toolkit {
     /**
      * Creates a text area with the given state.
      *
-     * @param state
-     *            the text area state
+     * @param state the text area state
      * @return a new text area element
      */
     public static TextAreaElement textArea(TextAreaState state) {
@@ -1006,8 +948,7 @@ public final class Toolkit {
     /**
      * Creates a bar chart with the given values.
      *
-     * @param values
-     *            the bar chart values
+     * @param values the bar chart values
      * @return a new bar chart element
      */
     public static BarChartElement barChart(long... values) {
@@ -1039,14 +980,10 @@ public final class Toolkit {
     /**
      * Creates a canvas with the given bounds.
      *
-     * @param xMin
-     *            the minimum x coordinate
-     * @param xMax
-     *            the maximum x coordinate
-     * @param yMin
-     *            the minimum y coordinate
-     * @param yMax
-     *            the maximum y coordinate
+     * @param xMin the minimum x coordinate
+     * @param xMax the maximum x coordinate
+     * @param yMin the minimum y coordinate
+     * @param yMax the maximum y coordinate
      * @return a new canvas element
      */
     public static CanvasElement canvas(double xMin, double xMax, double yMin, double yMax) {
@@ -1067,8 +1004,7 @@ public final class Toolkit {
     /**
      * Creates a calendar showing the given date's month.
      *
-     * @param date
-     *            the date to display
+     * @param date the date to display
      * @return a new calendar element
      */
     public static CalendarElement calendar(LocalDate date) {
@@ -1089,8 +1025,7 @@ public final class Toolkit {
     /**
      * Creates a scrollbar with the given state.
      *
-     * @param state
-     *            the scrollbar state
+     * @param state the scrollbar state
      * @return a new scrollbar element
      */
     public static ScrollbarElement scrollbar(ScrollbarState state) {
@@ -1100,12 +1035,9 @@ public final class Toolkit {
     /**
      * Creates a scrollbar with the given parameters.
      *
-     * @param contentLength
-     *            the total content length
-     * @param viewportLength
-     *            the visible viewport length
-     * @param position
-     *            the current scroll position
+     * @param contentLength the total content length
+     * @param viewportLength the visible viewport length
+     * @param position the current scroll position
      * @return a new scrollbar element
      */
     public static ScrollbarElement scrollbar(int contentLength, int viewportLength, int position) {
@@ -1135,8 +1067,7 @@ public final class Toolkit {
     /**
      * Creates a spinner with the given style.
      *
-     * @param style
-     *            the spinner style
+     * @param style the spinner style
      * @return a new spinner element
      */
     public static SpinnerElement spinner(SpinnerStyle style) {
@@ -1146,8 +1077,7 @@ public final class Toolkit {
     /**
      * Creates a spinner with a label (DOTS style).
      *
-     * @param label
-     *            the label text
+     * @param label the label text
      * @return a new spinner element
      */
     public static SpinnerElement spinner(String label) {
@@ -1157,10 +1087,8 @@ public final class Toolkit {
     /**
      * Creates a spinner with the given style and label.
      *
-     * @param style
-     *            the spinner style
-     * @param label
-     *            the label text
+     * @param style the spinner style
+     * @param label the label text
      * @return a new spinner element
      */
     public static SpinnerElement spinner(SpinnerStyle style, String label) {
@@ -1173,24 +1101,22 @@ public final class Toolkit {
      * Wraps any low-level {@link Widget} as a {@link GenericWidgetElement}.
      * <p>
      * This is useful when you need to use a widget that doesn't have a dedicated
-     * element wrapper, allowing it to participate in the toolkit's styling and
-     * layout system.
-     * 
+     * element wrapper, allowing it to participate in the toolkit's styling and layout system.
      * <pre>{@code
-     * widget(someWidget).fg(Color.RED).addClass("custom-class").fill()
+     * widget(someWidget)
+     *     .fg(Color.RED)
+     *     .addClass("custom-class")
+     *     .fill()
      * }</pre>
      * <p>
-     * Note: The styling applied to this element affects the element itself but may
-     * not propagate to the wrapped widget's internal rendering, as the widget
-     * renders directly to the buffer.
+     * Note: The styling applied to this element affects the element itself but may not
+     * propagate to the wrapped widget's internal rendering, as the widget renders directly
+     * to the buffer.
      *
-     * @param <T>
-     *            the type of the widget
-     * @param widget
-     *            the widget to wrap
+     * @param <T> the type of the widget
+     * @param widget the widget to wrap
      * @return a new generic widget element
-     * @throws IllegalArgumentException
-     *             if widget is null
+     * @throws IllegalArgumentException if widget is null
      */
     public static <T extends Widget> GenericWidgetElement<T> widget(T widget) {
         return GenericWidgetElement.of(widget);
@@ -1203,35 +1129,32 @@ public final class Toolkit {
      * <p>
      * Handles: character input, backspace, delete, left/right arrows, home/end.
      *
-     * @param state
-     *            the text input state to modify
-     * @param event
-     *            the key event to handle
+     * @param state the text input state to modify
+     * @param event the key event to handle
      * @return true if the event was handled, false otherwise
      */
     public static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
         switch (event.code()) {
-            case BACKSPACE :
+            case BACKSPACE:
                 state.deleteBackward();
                 return true;
-            case DELETE :
+            case DELETE:
                 state.deleteForward();
                 return true;
-            case LEFT :
+            case LEFT:
                 state.moveCursorLeft();
                 return true;
-            case RIGHT :
+            case RIGHT:
                 state.moveCursorRight();
                 return true;
-            case HOME :
+            case HOME:
                 state.moveCursorToStart();
                 return true;
-            case END :
+            case END:
                 state.moveCursorToEnd();
                 return true;
-            case CHAR :
-                // Don't consume characters with Ctrl or Alt modifiers - those are control
-                // sequences
+            case CHAR:
+                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
                 if (event.modifiers().ctrl() || event.modifiers().alt()) {
                     return false;
                 }
@@ -1241,7 +1164,7 @@ public final class Toolkit {
                     return true;
                 }
                 return false;
-            default :
+            default:
                 return false;
         }
     }

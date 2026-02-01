@@ -17,8 +17,8 @@ import static dev.tamboui.toolkit.Toolkit.*;
  * <p>
  * Uses the Component base class which automatically:
  * <ul>
- * <li>Registers @OnAction annotated methods for event handling</li>
- * <li>Manages focus state via isFocused()</li>
+ *   <li>Registers @OnAction annotated methods for event handling</li>
+ *   <li>Manages focus state via isFocused()</li>
  * </ul>
  */
 public final class ProgressCard extends Component<ProgressCard> {
@@ -70,8 +70,7 @@ public final class ProgressCard extends Component<ProgressCard> {
     /**
      * Sets the card title.
      *
-     * @param title
-     *            the title
+     * @param title the title
      * @return this ProgressCard
      */
     public ProgressCard title(String title) {
@@ -82,8 +81,7 @@ public final class ProgressCard extends Component<ProgressCard> {
     /**
      * Sets the card description.
      *
-     * @param description
-     *            the description
+     * @param description the description
      * @return this ProgressCard
      */
     public ProgressCard description(String description) {
@@ -94,8 +92,7 @@ public final class ProgressCard extends Component<ProgressCard> {
     /**
      * Sets the progress value (0.0 to 1.0).
      *
-     * @param progress
-     *            the progress
+     * @param progress the progress
      * @return this ProgressCard
      */
     public ProgressCard progress(double progress) {
@@ -106,7 +103,6 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Returns the current progress value.
-     * 
      * @return the progress value
      */
     public double progress() {
@@ -115,7 +111,6 @@ public final class ProgressCard extends Component<ProgressCard> {
 
     /**
      * Returns the current status.
-     * 
      * @return the status
      */
     public Status status() {
@@ -143,17 +138,21 @@ public final class ProgressCard extends Component<ProgressCard> {
     @Override
     protected Element render() {
         // All styling is via CSS classes - no programmatic styling here
-        // Constraints (length, fill) are kept programmatic as they have no CSS
-        // equivalent
+        // Constraints (length, fill) are kept programmatic as they have no CSS equivalent
         var panel = panel(() -> column(
                 // Title - styling via CSS (.card-title)
                 text(title).addClass("card-title").length(1),
                 // Description - styling via CSS (.card-description)
                 text(description).addClass("card-description").length(1),
                 // Progress bar - styling via CSS (.progress-complete, .progress-in-progress)
-                gauge(progress).label(String.format("%.0f%%", progress * 100))
-                        .addClass("progress-" + status.cssClass()).fill()))
-                .title(status.name()).addClass(status.cssClass()).cssParent(this);
+                gauge(progress)
+                        .label(String.format("%.0f%%", progress * 100))
+                        .addClass("progress-" + status.cssClass())
+                        .fill()
+        ))
+                .title(status.name())
+                .addClass(status.cssClass())
+                .cssParent(this);
 
         return panel.fill();
     }

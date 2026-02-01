@@ -16,9 +16,10 @@ public enum ExpandDirection {
      * Expands horizontally from center (left and right simultaneously).
      */
     HORIZONTAL,
-
+    
     /**
      * Expands vertically from center (up and down simultaneously).
      */
     VERTICAL
 }
+

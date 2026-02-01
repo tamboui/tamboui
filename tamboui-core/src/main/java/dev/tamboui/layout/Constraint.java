@@ -18,8 +18,7 @@ public interface Constraint {
         /**
          * Creates a fixed length constraint.
          *
-         * @param value
-         *            size in cells (>= 0)
+         * @param value size in cells (>= 0)
          */
         public Length(int value) {
             if (value < 0) {
@@ -69,13 +68,11 @@ public interface Constraint {
         /**
          * Creates a percentage constraint.
          *
-         * @param value
-         *            percentage 0-100
+         * @param value percentage 0-100
          */
         public Percentage(int value) {
             if (value < 0 || value > 100) {
-                throw new IllegalArgumentException(
-                        "Percentage must be between 0 and 100: " + value);
+                throw new IllegalArgumentException("Percentage must be between 0 and 100: " + value);
             }
             this.value = value;
         }
@@ -122,10 +119,8 @@ public interface Constraint {
         /**
          * Creates a ratio constraint.
          *
-         * @param numerator
-         *            numerator (>=0)
-         * @param denominator
-         *            denominator (>0)
+         * @param numerator   numerator (>=0)
+         * @param denominator denominator (>0)
          */
         public Ratio(int numerator, int denominator) {
             if (denominator <= 0) {
@@ -199,8 +194,7 @@ public interface Constraint {
         /**
          * Creates a minimum size constraint.
          *
-         * @param value
-         *            minimum size (>=0)
+         * @param value minimum size (>=0)
          */
         public Min(int value) {
             if (value < 0) {
@@ -250,8 +244,7 @@ public interface Constraint {
         /**
          * Creates a maximum size constraint.
          *
-         * @param value
-         *            maximum size (>=0)
+         * @param value maximum size (>=0)
          */
         public Max(int value) {
             if (value < 0) {
@@ -295,8 +288,8 @@ public interface Constraint {
     /**
      * Fit to content size.
      * <p>
-     * When used, the container will query the element for its preferred size (via
-     * {@code preferredWidth()} or {@code preferredHeight()}).
+     * When used, the container will query the element for its preferred size
+     * (via {@code preferredWidth()} or {@code preferredHeight()}).
      */
     final class Fit implements Constraint {
         private static final Fit INSTANCE = new Fit();
@@ -329,8 +322,7 @@ public interface Constraint {
         /**
          * Creates a fill constraint.
          *
-         * @param weight
-         *            weight for distributing remaining space (>=0)
+         * @param weight weight for distributing remaining space (>=0)
          */
         public Fill(int weight) {
             if (weight < 0) {
@@ -382,8 +374,7 @@ public interface Constraint {
     /**
      * Creates a fixed length constraint.
      *
-     * @param value
-     *            length in cells
+     * @param value length in cells
      * @return length constraint
      */
     static Constraint length(int value) {
@@ -393,8 +384,7 @@ public interface Constraint {
     /**
      * Creates a percentage constraint.
      *
-     * @param value
-     *            percentage 0-100
+     * @param value percentage 0-100
      * @return percentage constraint
      */
     static Constraint percentage(int value) {
@@ -404,10 +394,8 @@ public interface Constraint {
     /**
      * Creates a ratio constraint.
      *
-     * @param numerator
-     *            numerator
-     * @param denominator
-     *            denominator
+     * @param numerator   numerator
+     * @param denominator denominator
      * @return ratio constraint
      */
     static Constraint ratio(int numerator, int denominator) {
@@ -417,8 +405,7 @@ public interface Constraint {
     /**
      * Creates a minimum size constraint.
      *
-     * @param value
-     *            minimum size
+     * @param value minimum size
      * @return min constraint
      */
     static Constraint min(int value) {
@@ -428,8 +415,7 @@ public interface Constraint {
     /**
      * Creates a maximum size constraint.
      *
-     * @param value
-     *            maximum size
+     * @param value maximum size
      * @return max constraint
      */
     static Constraint max(int value) {
@@ -439,8 +425,7 @@ public interface Constraint {
     /**
      * Creates a fill constraint with a custom weight.
      *
-     * @param weight
-     *            fill weight
+     * @param weight fill weight
      * @return fill constraint
      */
     static Constraint fill(int weight) {
