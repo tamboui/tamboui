@@ -173,10 +173,12 @@ public final class FormTableDemo {
                 panel("Profile (Text Fields)", column(
                         formField("Full name", FORM.textField("fullName"))
                                 .id("full-name").labelWidth(LABEL_WIDTH).rounded()
-                                .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN),
+                                .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                .arrowNavigation(true),
                         formField("Email", FORM.textField("email"))
                                 .id("email").labelWidth(LABEL_WIDTH).rounded()
                                 .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                .arrowNavigation(true)
                 ))
                 .rounded()
                 .borderColor(Color.CYAN)
@@ -188,9 +190,11 @@ public final class FormTableDemo {
                                         .id("theme").labelWidth(LABEL_WIDTH),
                                 formField("Notifications", FORM.booleanField("notifications"), FieldType.CHECKBOX)
                                         .id("notifications").labelWidth(LABEL_WIDTH)
-                                        .checkedColor(Color.GREEN),
+                                        .checkedColor(Color.GREEN)
+                                        .arrowNavigation(true),
                                 formField("Dark Mode", FORM.booleanField("darkMode"), FieldType.TOGGLE)
                                         .id("dark-mode").labelWidth(LABEL_WIDTH)
+                                        .arrowNavigation(true)
                         ))
                         .rounded()
                         .borderColor(Color.GREEN)
@@ -199,10 +203,12 @@ public final class FormTableDemo {
                         panel("Security (Checkbox + Text)", column(
                                 formField("2FA Enabled", FORM.booleanField("twoFa"), FieldType.CHECKBOX)
                                         .id("2fa").labelWidth(LABEL_WIDTH)
-                                        .bulletStyle().checkedColor(Color.GREEN),
+                                        .bulletStyle().checkedColor(Color.GREEN)
+                                        .arrowNavigation(true),
                                 formField("Sessions", FORM.textField("sessions"))
                                         .id("sessions").labelWidth(LABEL_WIDTH).rounded()
                                         .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .arrowNavigation(true)
                         ))
                         .rounded()
                         .borderColor(Color.YELLOW)
@@ -228,7 +234,8 @@ public final class FormTableDemo {
                                         .errorBorderColor(Color.RED)
                                         .placeholder("3-20 characters")
                                         .validate(Validators.required(), Validators.minLength(3), Validators.maxLength(20))
-                                        .showInlineErrors(true),
+                                        .showInlineErrors(true)
+                                        .arrowNavigation(true),
                                 formField("Password", VALIDATION_FORM.textField("password"))
                                         .formState(VALIDATION_FORM, "password")
                                         .id("val-password").labelWidth(LABEL_WIDTH).rounded()
@@ -237,6 +244,7 @@ public final class FormTableDemo {
                                         .placeholder("min 8 characters")
                                         .validate(Validators.required("Password is required"), Validators.minLength(8))
                                         .showInlineErrors(true)
+                                        .arrowNavigation(true)
                         ))
                         .rounded()
                         .borderColor(Color.CYAN)
@@ -250,7 +258,8 @@ public final class FormTableDemo {
                                         .errorBorderColor(Color.RED)
                                         .placeholder("you@example.com")
                                         .validate(Validators.required(), Validators.email())
-                                        .showInlineErrors(true),
+                                        .showInlineErrors(true)
+                                        .arrowNavigation(true),
                                 formField("Phone", VALIDATION_FORM.textField("phone"))
                                         .formState(VALIDATION_FORM, "phone")
                                         .id("val-phone").labelWidth(LABEL_WIDTH).rounded()
@@ -259,6 +268,7 @@ public final class FormTableDemo {
                                         .placeholder("123-456-7890")
                                         .validate(Validators.pattern("\\d{3}-\\d{3}-\\d{4}", "Format: 123-456-7890"))
                                         .showInlineErrors(true)
+                                        .arrowNavigation(true)
                         ))
                         .rounded()
                         .borderColor(Color.GREEN)
@@ -275,6 +285,7 @@ public final class FormTableDemo {
                                         .placeholder("18-120")
                                         .validate(Validators.required(), Validators.range(18, 120))
                                         .showInlineErrors(true)
+                                        .arrowNavigation(true)
                         ))
                         .rounded()
                         .borderColor(Color.YELLOW)
@@ -289,6 +300,7 @@ public final class FormTableDemo {
                                         .placeholder("https://example.com")
                                         .validate(Validators.pattern("https?://.*", "Must start with http(s)://"))
                                         .showInlineErrors(true)
+                                        .arrowNavigation(true)
                         ))
                         .rounded()
                         .borderColor(Color.MAGENTA)

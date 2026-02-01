@@ -90,7 +90,7 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
 
         // Forward to children (they inherit focused state from parent)
         for (Element child : children) {
-            if (child.handleKeyEvent(event, true) == EventResult.HANDLED) {
+            if (child.handleKeyEvent(event, focused) == EventResult.HANDLED) {
                 return EventResult.HANDLED;
             }
         }

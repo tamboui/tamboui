@@ -445,6 +445,26 @@ form(formState)
     .onSubmit(state -> save(state))  // always called
 ----
 
+=== Arrow Key Navigation
+
+By default, Up/Down arrow keys only work in select fields (to change selection).
+Enable `arrowNavigation` to allow Up/Down to move between fields:
+
+[source,java]
+----
+form(formState)
+    .field("username", "Username")
+    .field("email", "Email")
+    .field("role", "Role", FieldType.SELECT)
+    .arrowNavigation(true)  // Up/Down navigate between fields
+----
+
+When enabled:
+
+* **Text fields**: Up/Down navigate to previous/next field (like Tab/Shift+Tab)
+* **Boolean fields** (checkbox, toggle): Up/Down navigate to previous/next field
+* **Select fields**: Up/Down still change the selection (unchanged behavior)
+
 == Complete Example
 
 Here's a complete form example using all the abstractions:

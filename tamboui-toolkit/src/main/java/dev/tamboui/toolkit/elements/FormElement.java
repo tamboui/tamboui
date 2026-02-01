@@ -110,6 +110,9 @@ public final class FormElement extends StyledElement<FormElement> {
     private boolean submitOnEnter = false;
     private boolean validateOnSubmit = true;
 
+    // Navigation options
+    private boolean arrowNavigation = false;
+
     // Current group being built
     private String currentGroup = null;
 
@@ -370,6 +373,23 @@ public final class FormElement extends StyledElement<FormElement> {
      */
     public FormElement validateOnSubmit(boolean enabled) {
         this.validateOnSubmit = enabled;
+        return this;
+    }
+
+    /**
+     * Enables arrow key navigation between form fields.
+     * <p>
+     * When enabled, pressing Up/Down arrows in text fields and boolean fields
+     * (checkboxes, toggles) will navigate to the previous/next field, similar to Tab.
+     * Select fields still use Up/Down for changing their selection.
+     * <p>
+     * Default is {@code false}.
+     *
+     * @param enabled true to enable arrow navigation
+     * @return this element for chaining
+     */
+    public FormElement arrowNavigation(boolean enabled) {
+        this.arrowNavigation = enabled;
         return this;
     }
 
@@ -636,6 +656,11 @@ public final class FormElement extends StyledElement<FormElement> {
         // Submit on Enter handling
         if (submitOnEnter) {
             field.onSubmit(() -> this.submit());
+        }
+
+        // Arrow navigation
+        if (arrowNavigation) {
+            field.arrowNavigation(true);
         }
 
         return field;

@@ -14,9 +14,14 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -374,6 +379,57 @@ class DockTest {
             BufferAssertions.assertThat(buffer).hasSymbolAt(1, 8, "F");
             // Bottom panel bottom border at y=9
             BufferAssertions.assertThat(buffer).hasSymbolAt(0, 9, "└");
+        }
+    }
+
+    // ==================== Event handling tests ====================
+
+    @Nested
+    @DisplayName("Key event handling")
+    class KeyEventTests {
+
+        @Test
+        @DisplayName("dock does not forward key events to child regions")
+        void dockDoesNotForwardKeyEvents() {
+            // Create a text element that tracks if it received events
+            AtomicBoolean centerReceivedEvent = new AtomicBoolean(false);
+
+            DockElement d = dock()
+                .center(text("C").onKeyEvent(event -> {
+                    centerReceivedEvent.set(true);
+                    return EventResult.HANDLED;
+                }));
+
+            // Send a key event to the dock (not focused)
+            KeyEvent event = KeyEvent.ofKey(
+                KeyCode.DOWN);
+            EventResult result = d.handleKeyEvent(event, false);
+
+            // Dock should not forward to children
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(centerReceivedEvent.get()).isFalse();
+        }
+
+        @Test
+        @DisplayName("dock handles its own key handler")
+        void dockHandlesOwnKeyHandler() {
+            AtomicBoolean dockHandlerCalled =
+                new AtomicBoolean(false);
+
+            DockElement d = dock()
+                .center(text("C"))
+                .onKeyEvent(event -> {
+                    dockHandlerCalled.set(true);
+                    return EventResult.HANDLED;
+                });
+
+            KeyEvent event = KeyEvent.ofKey(
+                KeyCode.DOWN);
+            EventResult result = d.handleKeyEvent(event, true);
+
+            // Dock's own handler should be called
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(dockHandlerCalled.get()).isTrue();
         }
     }
 }

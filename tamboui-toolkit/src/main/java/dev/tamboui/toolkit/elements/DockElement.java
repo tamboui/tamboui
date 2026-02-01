@@ -19,7 +19,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.widget.Widget;
 
@@ -304,22 +303,6 @@ public final class DockElement extends StyledElement<DockElement> {
             height += margin.verticalTotal();
         }
         return height;
-    }
-
-    @Override
-    public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        EventResult result = super.handleKeyEvent(event, focused);
-        if (result.isHandled()) {
-            return result;
-        }
-        // Forward to all non-null child regions
-        Element[] regions = {topElement, bottomElement, leftElement, rightElement, centerElement};
-        for (Element region : regions) {
-            if (region != null && region.handleKeyEvent(event, true) == EventResult.HANDLED) {
-                return EventResult.HANDLED;
-            }
-        }
-        return EventResult.UNHANDLED;
     }
 
     @Override

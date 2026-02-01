@@ -118,6 +118,9 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     // Callbacks
     private Runnable onSubmit;
 
+    // Navigation
+    private boolean arrowNavigation = false;
+
     /**
      * Creates a new form field with the given label and text input state.
      *
@@ -544,6 +547,21 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         return this;
     }
 
+    /**
+     * Enables arrow key navigation for this field.
+     * <p>
+     * When enabled, pressing Up/Down arrows in text fields and boolean fields
+     * will return {@link EventResult#FOCUS_PREVIOUS}/{@link EventResult#FOCUS_NEXT}
+     * to navigate between fields. Select fields still use Up/Down for selection.
+     *
+     * @param enabled true to enable arrow navigation
+     * @return this element for chaining
+     */
+    public FormFieldElement arrowNavigation(boolean enabled) {
+        this.arrowNavigation = enabled;
+        return this;
+    }
+
     // ==================== Sizing ====================
 
     @Override
@@ -607,6 +625,16 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
             return EventResult.HANDLED;
         }
 
+        // Arrow navigation for text fields
+        if (arrowNavigation) {
+            if (event.isUp()) {
+                return EventResult.FOCUS_PREVIOUS;
+            }
+            if (event.isDown()) {
+                return EventResult.FOCUS_NEXT;
+            }
+        }
+
         boolean handled = handleTextInputKey(textState, event);
         if (handled) {
             // Re-validate on change if we have validators
@@ -626,6 +654,16 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         if (event.isConfirm() || event.character() == ' ') {
             booleanState.toggle();
             return EventResult.HANDLED;
+        }
+
+        // Arrow navigation for boolean fields
+        if (arrowNavigation) {
+            if (event.isUp()) {
+                return EventResult.FOCUS_PREVIOUS;
+            }
+            if (event.isDown()) {
+                return EventResult.FOCUS_NEXT;
+            }
         }
 
         // For toggle in inline choice mode, allow left/right to switch
