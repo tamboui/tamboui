@@ -7,6 +7,9 @@
     "error-handling-demo": {
       "script-ref": "demos/error-handling-demo/src/main/java/dev/tamboui/demo/errorhandling/ErrorHandlingDemo.java"
     },
+    "export-demo": {
+      "script-ref": "demos/export-demo/src/main/java/dev/tamboui/demo/ExportDemo.java"
+    },
     "fakodex-demo": {
       "script-ref": "demos/fakodex-demo/src/main/java/dev/tamboui/demo/coding/CodingAssistantDemo.java"
     },
