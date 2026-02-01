@@ -1,0 +1,49 @@
+name: Shared Build Setup
+description: Setup the build environment for the shared build commands
+
+inputs:
+  add-job-summary:
+    description: Add the job summary to the output
+    required: false
+    default: 'always'
+  java-version:
+    description: The Java version to use for building
+    required: false
+    default: '25'
+outputs:
+  github-short-sha:
+    description: The short github.sha
+    value: ${{ steps.git-short-sha.outputs.github-short-sha }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Set short git commit SHA
+      shell: bash
+      id: git-short-sha
+      run: |
+        calculatedSha=$(git rev-parse --short ${{ github.sha }})
+        echo "github-short-sha=$calculatedSha" >> $GITHUB_OUTPUT
+    - uses: graalvm/setup-graalvm@v1
+      with:
+        distribution: 'graalvm-community'
+        java-version: '25'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: gradle/actions/wrapper-validation@v4
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Set up JBang
+      uses: jbangdev/setup-jbang@main
+    
+    - name: setup-gradle
+      uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4
+      with:
+          cache-overwrite-existing: true
+          add-job-summary: ${{ inputs.add-job-summary }}
+    - name: Setup upterm session
+      uses: owenthereal/action-upterm@v1
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+      with:
+        limit-access-to-actor: true
+        ## Shut down the server if unconnected after 5 minutes.
+        wait-timeout-minutes: 5

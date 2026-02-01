@@ -6,8 +6,22 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs: &inputs
+      debug_enabled:
+        description: 'Run the build with upterm debugging enabled (https://github.com/owenthereal/action-upterm)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: ./.github/actions/shared-build-setup
+      - name: check formatting and comment on PR if failed
+        id: check-formatting
+        run: ./gradlew --no-daemon spotlessCheck
   build:
     strategy:
       matrix:
@@ -15,17 +29,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          distribution: 'graalvm'
-          java-version: '25'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: gradle/actions/wrapper-validation@v4
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Set up JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/shared-build-setup
 
       - name: Execute Gradle build
         run: ./gradlew build
