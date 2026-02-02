@@ -20,18 +20,8 @@ import java.util.Map;
 
 /**
  * Renders a source string as TamboUI markup using lumis4j for syntax highlighting.
- *
- * <p>Converts source to HTML via lumis4j (html-linked), then to BBCode-style markup, and provides a
- * {@link MarkupParser.StyleResolver} that maps lumis4j highlight class names to terminal styles.
- *
- * <p>Example:
- *
- * <pre>{@code
- * String markup = Lumis4jMarkup.sourceToMarkup(sourceCode, "java");
- * Text text = MarkupParser.parse(markup, Lumis4jMarkup.lumis4jStyleResolver());
- * }</pre>
  */
-public final class Lumis4jMarkup {
+public final class Lumis4jMarkup implements AutoCloseable {
 
   /**
    * Map from file extension (lowercase) to lumis4j language identifier. Mirrors the suffix-to-
@@ -127,7 +117,12 @@ public final class Lumis4jMarkup {
     EXT_TO_LANG = Collections.unmodifiableMap(m);
   }
 
-  private Lumis4jMarkup() {}
+  private final Lumis lumis = Lumis.builder().build();
+
+  /**
+   * Creates a new Lumis4jMarkup.
+   */
+  public Lumis4jMarkup() {}
 
   /**
    * Converts source code to BBCode-style markup using lumis4j syntax highlighting.
@@ -137,23 +132,19 @@ public final class Lumis4jMarkup {
    * @return markup string with {@code [class]content[/class]} tags, or plain source if highlighting
    *     fails
    */
-  public static String sourceToMarkup(String source, String lang) {
+  public String sourceToMarkup(String source, String lang) {
     if (source == null) {
       return "";
     }
     Lang lumisLang = langToLang(lang);
-    try (Lumis lumis =
-        Lumis.builder()
-            .withLang(lumisLang)
-            .withTheme(Theme.GITHUB_DARK)
-            .withFormatter(Formatter.HTML_LINKED)
-            .build()) {
-      LumisResult result = lumis.highlight(source);
-      if (result.success()) {
-        return HtmlToBbcode.convert(result.string());
-      }
-    } catch (Exception ignored) {
-      // fall through to plain
+    LumisResult result = lumis.highlight(
+            source,
+            Theme.GITHUB_DARK,
+            lumisLang,
+            Formatter.BBCODE
+            );
+    if (result.success()) {
+      return result.string();
     }
     return source;
   }
@@ -178,7 +169,7 @@ public final class Lumis4jMarkup {
    * @param lang the language identifier (e.g. "java", "python"), or null for plaintext
    * @return styled text suitable for Paragraph or other widgets
    */
-  public static Text sourceToText(String source, String lang) {
+  public Text sourceToText(String source, String lang) {
     String markup = sourceToMarkup(source, lang);
     return MarkupParser.parse(markup, lumis4jStyleResolver(), false);
   }
@@ -276,5 +267,12 @@ public final class Lumis4jMarkup {
     }
     // Default: dim gray for unknown
     return Style.EMPTY.fg(Color.GRAY).dim();
+  }
+
+  @Override
+  public void close() {
+    if (lumis != null) {
+      lumis.close();
+    }
   }
 }

@@ -39,6 +39,7 @@ public class FileManagerView implements Element {
 
     private final FileManagerController manager;
     private final FileManagerKeyHandler keyHandler;
+    private final Lumis4jMarkup lumis4jMarkup;
     private DialogElement currentDialog;
 
     /**
@@ -48,6 +49,7 @@ public class FileManagerView implements Element {
     public FileManagerView(FileManagerController manager) {
         this.manager = manager;
         this.keyHandler = new FileManagerKeyHandler(manager);
+        this.lumis4jMarkup = new Lumis4jMarkup();
     }
 
     /**
@@ -419,7 +421,7 @@ public class FileManagerView implements Element {
             String lang = Lumis4jMarkup.guessLangFromFileName(textPath.getFileName().toString());
             Text textContent =
                     lang != null
-                            ? Lumis4jMarkup.sourceToText(content, lang)
+                            ? lumis4jMarkup.sourceToText(content, lang)
                             : Text.from(content);
 
             Paragraph paragraph =
@@ -445,6 +447,10 @@ public class FileManagerView implements Element {
         if (event.isCancel()) {
             manager.dismissDialog();
             return EventResult.HANDLED;
+        }
+
+        if (lumis4jMarkup != null) {
+            lumis4jMarkup.close();
         }
 
         Path file = manager.viewingFile();

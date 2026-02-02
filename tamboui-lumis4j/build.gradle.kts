@@ -8,11 +8,6 @@ repositories {
     mavenCentral()
 }
 
-// lumis4j requires Java 11+
-tasks.withType<JavaCompile>().configureEach {
-    options.release = 11
-}
-
 dependencies {
     api(projects.tambouiCore)
     implementation(libs.lumis4j)
