@@ -189,4 +189,165 @@ class DialogElementTest {
         // Fixed width overrides all calculations
         assertThat(dialog.preferredWidth()).isEqualTo(30);
     }
+
+    // ============ height calculation tests ============
+
+    @Test
+    @DisplayName("Dialog height uses children's preferredHeight in vertical layout")
+    void height_verticalChildren() {
+        // Each text element has preferredHeight() = 1
+        DialogElement dialog = dialog(
+            text("Line 1"),
+            text("Line 2"),
+            text("Line 3")
+        );
+        // Render to a large area and check the dialog's actual rendered height
+        Rect area = new Rect(0, 0, 40, 20);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+
+        dialog.render(frame, area, context);
+
+        // Find the dialog bounds by looking for border characters
+        int topY = findTopBorder(buffer, area);
+        int bottomY = findBottomBorder(buffer, area);
+
+        // Height = borders (2) + children (3) = 5
+        assertThat(bottomY - topY + 1).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("Dialog height with multi-line markup text")
+    void height_multiLineMarkupText() {
+        // MarkupTextElement with 4 lines
+        DialogElement dialog = dialog(
+            markupText("Line 1\nLine 2\nLine 3\nLine 4")
+        );
+
+        Rect area = new Rect(0, 0, 40, 20);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+
+        dialog.render(frame, area, context);
+
+        int topY = findTopBorder(buffer, area);
+        int bottomY = findBottomBorder(buffer, area);
+
+        // Height = borders (2) + content (4 lines) = 6
+        assertThat(bottomY - topY + 1).isEqualTo(6);
+
+        // Verify all 4 lines are actually rendered (not just the first one)
+        assertThat(bufferContainsText(buffer, "Line 1")).as("Buffer should contain 'Line 1'").isTrue();
+        assertThat(bufferContainsText(buffer, "Line 2")).as("Buffer should contain 'Line 2'").isTrue();
+        assertThat(bufferContainsText(buffer, "Line 3")).as("Buffer should contain 'Line 3'").isTrue();
+        assertThat(bufferContainsText(buffer, "Line 4")).as("Buffer should contain 'Line 4'").isTrue();
+    }
+
+    @Test
+    @DisplayName("Dialog height with fixed height overrides calculation")
+    void height_fixedHeightOverrides() {
+        DialogElement dialog = dialog(
+            text("Line 1"),
+            text("Line 2"),
+            text("Line 3")
+        ).height(10);
+
+        Rect area = new Rect(0, 0, 40, 20);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+
+        dialog.render(frame, area, context);
+
+        int topY = findTopBorder(buffer, area);
+        int bottomY = findBottomBorder(buffer, area);
+
+        // Fixed height = 10
+        assertThat(bottomY - topY + 1).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("Dialog height horizontal layout uses max child height")
+    void height_horizontalChildren() {
+        // With horizontal layout, dialog height should be max of children
+        DialogElement dialog = dialog(
+            text("A"),           // height 1
+            markupText("B\nC")   // height 2
+        ).horizontal();
+
+        Rect area = new Rect(0, 0, 40, 20);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+
+        dialog.render(frame, area, context);
+
+        int topY = findTopBorder(buffer, area);
+        int bottomY = findBottomBorder(buffer, area);
+
+        // Height = borders (2) + max(1, 2) = 4
+        assertThat(bottomY - topY + 1).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Dialog height vertical layout with spacing")
+    void height_verticalWithSpacing() {
+        DialogElement dialog = dialog(
+            text("Line 1"),
+            text("Line 2"),
+            text("Line 3")
+        ).spacing(1);  // 1 cell spacing between each child
+
+        Rect area = new Rect(0, 0, 40, 20);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+
+        dialog.render(frame, area, context);
+
+        int topY = findTopBorder(buffer, area);
+        int bottomY = findBottomBorder(buffer, area);
+
+        // Height = borders (2) + children (3) + spacing (2 gaps * 1) = 7
+        assertThat(bottomY - topY + 1).isEqualTo(7);
+    }
+
+    private int findTopBorder(Buffer buffer, Rect area) {
+        for (int y = 0; y < area.height(); y++) {
+            for (int x = 0; x < area.width(); x++) {
+                String symbol = buffer.get(x, y).symbol();
+                if ("╭".equals(symbol) || "┌".equals(symbol) || "╔".equals(symbol)) {
+                    return y;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private int findBottomBorder(Buffer buffer, Rect area) {
+        for (int y = area.height() - 1; y >= 0; y--) {
+            for (int x = 0; x < area.width(); x++) {
+                String symbol = buffer.get(x, y).symbol();
+                if ("╰".equals(symbol) || "└".equals(symbol) || "╚".equals(symbol)) {
+                    return y;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private boolean bufferContainsText(Buffer buffer, String text) {
+        for (int y = 0; y < buffer.height(); y++) {
+            StringBuilder row = new StringBuilder();
+            for (int x = 0; x < buffer.width(); x++) {
+                row.append(buffer.get(x, y).symbol());
+            }
+            if (row.toString().contains(text)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

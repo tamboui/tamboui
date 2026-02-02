@@ -31,6 +31,9 @@
     "rflex-demo": {
       "script-ref": "demos/rflex-demo/src/main/java/dev/tamboui/demo/flex/RFlexDemo.java"
     },
+    "toolkit-export-demo": {
+      "script-ref": "demos/toolkit-export-demo/src/main/java/dev/tamboui/demo/ToolkitExportDemo.java"
+    },
     "unicode-demo": {
       "script-ref": "demos/unicode-demo/src/main/java/dev/tamboui/demo/UnicodeDemo.java"
     },
@@ -39,6 +42,9 @@
     },
     "dock-demo": {
       "script-ref": "tamboui-core/demos/dock-demo/src/main/java/dev/tamboui/demo/DockDemo.java"
+    },
+    "export-demo": {
+      "script-ref": "tamboui-core/demos/export-demo/src/main/java/dev/tamboui/demo/ExportDemo.java"
     },
     "flow-demo": {
       "script-ref": "tamboui-core/demos/flow-demo/src/main/java/dev/tamboui/demo/FlowDemo.java"

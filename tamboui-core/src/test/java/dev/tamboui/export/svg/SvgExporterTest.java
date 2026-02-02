@@ -2,17 +2,20 @@
  * Copyright (c) 2026 TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.export;
+package dev.tamboui.export.svg;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.export.Formats;
+import static dev.tamboui.export.ExportRequest.export;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-final class BufferSvgExporterTest {
+final class SvgExporterTest {
 
     @Test
     void exportsSvgWithStylesAndBackgrounds() {
@@ -21,9 +24,9 @@ final class BufferSvgExporterTest {
         buffer.setString(0, 1, "AB", Style.EMPTY.onBlue().bold());
         buffer.setString(2, 1, "CD", Style.EMPTY.italic().underlined());
 
-        String svg = BufferSvgExporter.exportSvg(buffer, new BufferSvgExporter.Options()
-            .title("Test")
-            .uniqueId("test"));
+        String svg = export(buffer).as(Formats.SVG)
+            .options(o -> o.title("Test").uniqueId("test"))
+            .toString();
 
         // Basic structure
         assertTrue(svg.contains("<svg"));
@@ -44,5 +47,21 @@ final class BufferSvgExporterTest {
         assertTrue(svg.contains(">AB<") || svg.contains("AB"));
         assertTrue(svg.contains(">CD<") || svg.contains("CD"));
     }
-}
 
+    @Test
+    void cropExportsOnlyRegion() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 4));
+        buffer.setString(0, 0, "Row0", Style.EMPTY);
+        buffer.setString(0, 1, "Row1", Style.EMPTY);
+        buffer.setString(0, 2, "Row2", Style.EMPTY);
+        buffer.setString(0, 3, "Row3", Style.EMPTY);
+
+        Rect crop = new Rect(0, 1, 4, 2);  // Row1 and Row2, first 4 cols
+        String svg = export(buffer).crop(crop).svg().options(o -> o.uniqueId("crop")).toString();
+
+        assertTrue(svg.contains("Row1"));
+        assertTrue(svg.contains("Row2"));
+        assertFalse(svg.contains("Row0"));
+        assertFalse(svg.contains("Row3"));
+    }
+}

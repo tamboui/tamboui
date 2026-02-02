@@ -142,6 +142,183 @@ if (x >= area.x() && x < area.right() &&
 }
 ----
 
+== Exporting Buffer Content
+
+You can export a `Buffer` to SVG, HTML, or plain/ANSI text for screenshots, documentation, or sharing. The API is fluent: start from `export(buffer)` (static import {@code ExportRequest.export}), choose a format, optionally configure options, then write to a file, stream, or string.
+
+=== Fluent API
+
+[source,java]
+----
+import dev.tamboui.buffer.Buffer;
+import java.nio.file.Path;
+
+import static dev.tamboui.export.ExportRequest.export;
+
+// Start from a buffer (e.g. after rendering widgets)
+Buffer buffer = ...;
+
+// Shorthand: export as SVG with default options
+export(buffer).svg().toFile(Path.of("output.svg"));
+
+// Configure options via options(Consumer)
+export(buffer).svg()
+    .options(o -> o.title("My App"))
+    .toFile(Path.of("output.svg"));
+
+// Export to string or bytes
+String svgString = export(buffer).svg().toString();
+byte[] htmlBytes = export(buffer).html().options(o -> o.inlineStyles(true)).toBytes();
+
+// Write to an OutputStream or Writer
+export(buffer).text().to(outputStream);
+----
+
+=== Format Selection
+
+Use the shorthand methods for the built-in formats:
+
+* `export(buffer).svg()` — SVG (scalable vector graphic)
+* `export(buffer).html()` — HTML document (with embedded or external CSS)
+* `export(buffer).text()` — Plain text or ANSI-styled text
+
+To use a custom format, pass it to `as(Format)`:
+
+[source,java]
+----
+export(buffer).as(Formats.SVG).toFile(path);
+----
+
+You can also export by file path and let the extension choose the format:
+
+[source,java]
+----
+export(buffer).toFile(Path.of("screenshot.svg"));   // SVG
+export(buffer).toFile(Path.of("page.html"));       // HTML
+export(buffer).toFile(Path.of("dump.txt"));        // Plain text
+export(buffer).toFile(Path.of("styled.ansi"));     // ANSI-styled text
+----
+
+Extension mapping: `.svg` → SVG; `.html` / `.htm` → HTML; `.txt` / `.asc` → plain text; `.ans` / `.ansi` → ANSI text. Unknown extensions default to SVG.
+
+=== Output Methods
+
+After choosing a format (and optionally configuring options), use:
+
+* `toFile(Path path)` — write to a file (UTF-8)
+* `to(OutputStream out)` — write to a stream (UTF-8)
+* `to(Writer out)` — write to a writer (caller controls charset; writer is not closed)
+* `toString()` — return the exported string
+* `toBytes()` — return UTF-8 bytes
+
+=== Cropping to a region
+
+Use `crop(Rect)` to export only part of the buffer. The rect is clipped to buffer bounds. Returns a new request (immutable); chain with format and output as usual.
+
+[source,java]
+----
+import dev.tamboui.layout.Rect;
+
+// Export a single region (e.g. title, table, or footer)
+Rect titleRect = new Rect(0, 0, 80, 3);
+export(buffer).crop(titleRect).svg().toFile(Path.of("title.svg"));
+
+// Combined rectangle of multiple elements: union of two rects
+Rect tableRect = new Rect(22, 3, 58, 12);
+Rect footerRect = new Rect(0, 15, 80, 2);
+Rect tableAndFooter = tableRect.union(footerRect);
+export(buffer).crop(tableAndFooter).svg().toFile(Path.of("table_and_footer.svg"));
+----
+
+In Toolkit apps, use `Element.renderedArea()` after a frame is rendered to get an element's last rendered rect, then crop to that rect to export just that element:
+
+[source,java]
+----
+// After rendering (e.g. in an action handler with access to buffer and element)
+Rect area = myPanel.renderedArea();
+if (area != null && !area.isEmpty()) {
+    export(buffer).crop(area).svg().toFile(Path.of("panel.svg"));
+}
+----
+
+=== Default export colors
+
+Export formats use a default foreground and background when a cell style does not specify colors (e.g. after RESET). When you do not pass a resolver, export uses those property defaults.
+
+To supply custom defaults (e.g. from the toolkit style engine), pass a `StylePropertyResolver` via `styles(...)`. The resolver can provide values for the properties `export-foreground` and `export-background`:
+
+[source,java]
+----
+import dev.tamboui.export.ExportProperties;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.StylePropertyResolver;
+
+// Use property defaults (dark theme) — no resolver
+export(buffer).svg().toFile(path);
+
+// Custom defaults via a resolver (e.g. from toolkit StyleEngine)
+StylePropertyResolver myResolver = ...;  // e.g. styleEngine.resolver()
+export(buffer).svg().options(o -> o.styles(myResolver)).toFile(path);
+----
+
+=== SVG Export
+
+SVG export produces a standalone SVG document suitable for embedding or conversion to PNG/PDF.
+
+Options (`SvgOptions`), via `.options(o -> ...)`:
+
+* `title(String)` — window/title text (default: `"TamboUI"`)
+* `chrome(boolean)` — include window frame, title, and traffic-light buttons (default: `true`); `false` for content only
+* `styles(StylePropertyResolver)` — style resolver for default export foreground/background (properties `export-foreground`, `export-background`); when `null` (default), uses `ExportProperties` defaults (dark theme)
+* `fontAspectRatio(double)` — character width-to-height ratio for layout (default: 0.61)
+* `uniqueId(String)` — prefix for CSS classes and clip paths, or `null` for auto-generated
+
+[source,java]
+----
+export(buffer).svg()
+    .options(o -> o.title("Dashboard"))
+    .toFile(Path.of("dashboard.svg"));
+----
+
+=== HTML Export
+
+HTML export produces a full HTML document with styled `<pre>` content. Styles can be embedded in each `<span>` or placed in a `<style>` block.
+
+Options (`HtmlOptions`):
+
+* `styles(StylePropertyResolver)` — style resolver for default export foreground/background (same as SVG); when `null` (default), uses `ExportProperties` defaults
+* `inlineStyles(boolean)` — `true` for inline styles on each span (single-file, larger); `false` for a stylesheet (default, smaller HTML)
+
+[source,java]
+----
+// One file with external stylesheet (default)
+export(buffer).html().toFile(Path.of("output.html"));
+
+// Inline styles (self-contained, no separate CSS)
+export(buffer).html()
+    .options(o -> o.inlineStyles(true))
+    .toFile(Path.of("output_inline.html"));
+----
+
+=== Text Export
+
+Text export produces plain text or ANSI-escape-styled text (e.g. for pasting into terminals or logs).
+
+Options (`TextOptions`):
+
+* `styles(boolean)` — `true` to include ANSI escape codes for colors and modifiers; `false` for plain text only (default)
+
+[source,java]
+----
+// Plain text
+String plain = export(buffer).text().toString();
+export(buffer).text().toFile(Path.of("dump.txt"));
+
+// ANSI-styled (e.g. for .ansi files or terminal paste)
+String ansi = export(buffer).text().options(o -> o.styles(true)).toString();
+export(buffer).text().options(o -> o.styles(true)).toFile(Path.of("styled.ansi"));
+----
+
 == Creating Toolkit Components
 
 For Toolkit DSL integration, extend the `Component` class.
@@ -545,5 +722,6 @@ For more details, explore the source code:
 * `tamboui-widgets/src/main/java/dev/tamboui/widgets/` - Widget implementations
 * `tamboui-toolkit/src/main/java/dev/tamboui/toolkit/` - Toolkit components
 * `tamboui-core/src/main/java/dev/tamboui/buffer/` - Buffer and Cell
+* `tamboui-core/src/main/java/dev/tamboui/export/` - Export API (SVG, HTML, text)
 * `tamboui-core/src/main/java/dev/tamboui/text/CharWidth.java` - Unicode display width utilities
 * `tamboui-widgets/src/main/java/dev/tamboui/widgets/paragraph/Paragraph.java` - Reference implementation for CharWidth usage

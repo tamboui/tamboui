@@ -453,7 +453,12 @@ public final class DialogElement extends ContainerElement<DialogElement> {
                             : childCss.heightConstraint().orElse(null);
                 }
             }
-            constraints.add(c != null ? c : Constraint.length(1));
+            if (c == null) {
+                // Use child's preferred size when no constraint is specified
+                int preferredSize = isHorizontal ? child.preferredWidth() : child.preferredHeight();
+                c = Constraint.length(Math.max(1, preferredSize));
+            }
+            constraints.add(c);
         }
 
         Layout layout = effectiveDirection == Direction.HORIZONTAL
@@ -490,7 +495,31 @@ public final class DialogElement extends ContainerElement<DialogElement> {
             return fixedHeight;
         }
 
-        // 2 for borders + number of children (1 line each by default)
-        return 2 + children.size();
+        // Calculate based on children's preferred heights
+        int childrenHeight = 0;
+        if (!children.isEmpty()) {
+            Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
+
+            if (effectiveDirection == Direction.HORIZONTAL) {
+                // Horizontal: max height of all children
+                for (Element child : children) {
+                    childrenHeight = Math.max(childrenHeight, child.preferredHeight());
+                }
+            } else {
+                // Vertical: sum heights of all children
+                for (Element child : children) {
+                    childrenHeight += child.preferredHeight();
+                }
+
+                // Add spacing between children (n-1 spacings)
+                int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+                if (children.size() > 1) {
+                    childrenHeight += effectiveSpacing * (children.size() - 1);
+                }
+            }
+        }
+
+        // 2 for borders + children height
+        return 2 + childrenHeight;
     }
 }
