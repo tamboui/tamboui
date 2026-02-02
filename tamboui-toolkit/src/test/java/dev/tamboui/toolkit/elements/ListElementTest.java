@@ -4,20 +4,21 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.tui.error.TuiException;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.style.Overflow;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.tui.error.TuiException;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;

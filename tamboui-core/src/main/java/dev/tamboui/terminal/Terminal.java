@@ -4,16 +4,16 @@
  */
 package dev.tamboui.terminal;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * The main terminal abstraction. Manages the rendering lifecycle and

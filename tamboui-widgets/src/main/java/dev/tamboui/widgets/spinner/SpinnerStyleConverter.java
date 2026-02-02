@@ -4,11 +4,11 @@
  */
 package dev.tamboui.widgets.spinner;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link SpinnerStyle} enum values.

@@ -4,15 +4,15 @@
  */
 package dev.tamboui.image.capability;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
 import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * Detects and caches terminal image capabilities.

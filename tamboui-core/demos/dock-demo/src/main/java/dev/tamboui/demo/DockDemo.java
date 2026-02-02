@@ -11,6 +11,7 @@ package dev.tamboui.demo;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.dock.Dock;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
@@ -24,7 +25,6 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
-import dev.tamboui.layout.dock.Dock;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**

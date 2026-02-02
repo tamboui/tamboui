@@ -4,11 +4,15 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.List;
+
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.style.RichTextState;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
@@ -29,10 +33,6 @@ import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.RichTextState;
-
-import java.util.List;
 
 
 /**

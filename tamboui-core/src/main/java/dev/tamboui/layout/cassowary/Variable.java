@@ -4,9 +4,9 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.concurrent.atomic.AtomicLong;
+
+import dev.tamboui.layout.Fraction;
 
 /**
  * A variable in the Cassowary constraint system.

@@ -4,12 +4,12 @@
  */
 package dev.tamboui.widgets.canvas;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The drawing context for a {@link Canvas}.

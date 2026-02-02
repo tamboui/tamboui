@@ -7,6 +7,9 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -26,9 +29,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.tabs.Tabs;
 import dev.tamboui.widgets.tabs.TabsState;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Demo TUI application showcasing the Tabs widget.

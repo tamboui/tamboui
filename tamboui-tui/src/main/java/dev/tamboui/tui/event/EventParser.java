@@ -4,11 +4,11 @@
  */
 package dev.tamboui.tui.event;
 
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-
 import java.io.IOException;
+
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 
 /**
  * Parses raw terminal input into typed {@link Event} objects.

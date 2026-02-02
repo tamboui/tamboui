@@ -7,6 +7,9 @@
  */
 package dev.tamboui.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Alignment;
@@ -20,10 +23,6 @@ import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Demo TUI application showcasing RGB color support.
@@ -281,4 +280,3 @@ public class ColorsRgbDemo {
         }
     }
 }
-

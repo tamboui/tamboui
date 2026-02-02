@@ -508,4 +508,3 @@ public enum TFxColorSpace {
         return instance.rgbToHsv(rgb[0], rgb[1], rgb[2]);
     }
 }
-

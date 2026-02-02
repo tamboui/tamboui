@@ -4,16 +4,17 @@
  */
 package dev.tamboui.buffer;
 
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 import static dev.tamboui.assertj.BufferAssertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 class BufferTest {
 

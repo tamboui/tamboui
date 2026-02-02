@@ -54,4 +54,3 @@ public interface CapabilityProvider {
      */
     void contribute(CapabilityReportBuilder report);
 }
-

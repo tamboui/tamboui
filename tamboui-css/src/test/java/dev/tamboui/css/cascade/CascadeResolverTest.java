@@ -4,13 +4,14 @@
  */
 package dev.tamboui.css.cascade;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.style.Style;
+import java.util.*;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.style.Style;
+import dev.tamboui.widgets.block.BorderType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

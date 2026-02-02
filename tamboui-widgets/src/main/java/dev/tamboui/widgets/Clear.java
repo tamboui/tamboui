@@ -4,10 +4,10 @@
  */
 package dev.tamboui.widgets;
 
-import dev.tamboui.terminal.Terminal;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Terminal;
 import dev.tamboui.widget.Widget;
 
 /**

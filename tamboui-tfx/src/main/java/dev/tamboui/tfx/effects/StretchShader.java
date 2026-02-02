@@ -338,4 +338,3 @@ public final class StretchShader implements Shader {
         }
     }
 }
-

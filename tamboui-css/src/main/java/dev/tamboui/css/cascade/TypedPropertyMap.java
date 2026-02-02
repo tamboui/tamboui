@@ -4,9 +4,9 @@
  */
 package dev.tamboui.css.cascade;
 
-import dev.tamboui.style.PropertyDefinition;
-
 import java.util.*;
+
+import dev.tamboui.style.PropertyDefinition;
 
 /**
  * A type-safe heterogeneous map for CSS property values.

@@ -4,16 +4,17 @@
  */
 package dev.tamboui.css.cascade;
 
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Padding;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.layout.Padding;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

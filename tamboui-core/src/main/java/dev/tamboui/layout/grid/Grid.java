@@ -4,6 +4,12 @@
  */
 package dev.tamboui.layout.grid;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
@@ -11,12 +17,6 @@ import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.LayoutException;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 

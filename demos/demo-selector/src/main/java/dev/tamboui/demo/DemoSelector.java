@@ -4,19 +4,6 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.build.model.DemosModel;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.style.Color;
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.toolkit.elements.ListElement;
-import dev.tamboui.style.Overflow;
-import org.gradle.tooling.GradleConnector;
-
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -29,6 +16,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.gradle.tooling.GradleConnector;
+
+import dev.tamboui.build.model.DemosModel;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.toolkit.app.ToolkitApp;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.elements.ListElement;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

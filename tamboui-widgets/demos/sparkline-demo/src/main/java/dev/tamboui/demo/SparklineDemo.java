@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.Random;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -26,9 +28,6 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.sparkline.Sparkline;
-
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * Demo TUI application showcasing the Sparkline widget.

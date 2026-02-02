@@ -4,7 +4,6 @@
  */
 package dev.tamboui.error;
 
-import dev.tamboui.error.TamboUIException;
 
 /**
  * Exception thrown when a terminal I/O operation fails.

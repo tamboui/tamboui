@@ -4,6 +4,9 @@
  */
 package dev.tamboui.tfx.tui;
 
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
@@ -11,11 +14,7 @@ import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tui.EventHandler;
 import dev.tamboui.tui.Renderer;
 import dev.tamboui.tui.TuiRunner;
-import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.TickEvent;
-
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Integrates TFX effects with the TuiRunner event loop.

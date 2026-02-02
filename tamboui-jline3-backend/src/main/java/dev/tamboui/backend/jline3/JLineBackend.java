@@ -4,6 +4,18 @@
  */
 package dev.tamboui.backend.jline3;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.EnumSet;
+import java.util.Objects;
+
+import org.jline.terminal.Attributes;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.Terminal.Signal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.InfoCmp;
+import org.jline.utils.NonBlockingReader;
+
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.layout.Position;
@@ -15,17 +27,6 @@ import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.Mode2027Status;
 import dev.tamboui.terminal.Mode2027Support;
-import org.jline.terminal.Attributes;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.Terminal.Signal;
-import org.jline.terminal.TerminalBuilder;
-import org.jline.utils.InfoCmp;
-import org.jline.utils.NonBlockingReader;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * JLine 3 based backend for terminal operations.

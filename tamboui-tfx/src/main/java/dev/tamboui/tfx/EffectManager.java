@@ -4,11 +4,11 @@
  */
 package dev.tamboui.tfx;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.layout.Rect;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
 
 /**
  * Manages a collection of terminal UI effects and their lifecycle.
@@ -123,5 +123,3 @@ public final class EffectManager {
         effects.clear();
     }
 }
-
-

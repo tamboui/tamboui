@@ -8,13 +8,17 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Spacing;
-import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
@@ -23,14 +27,10 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
  * Demo TUI application showcasing collapsed borders with Block widgets.
@@ -251,4 +251,3 @@ public class CollapsedBordersDemo {
         };
     }
 }
-

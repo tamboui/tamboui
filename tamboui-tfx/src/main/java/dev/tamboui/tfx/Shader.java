@@ -268,4 +268,3 @@ public interface Shader {
      */
     Shader copy();
 }
-

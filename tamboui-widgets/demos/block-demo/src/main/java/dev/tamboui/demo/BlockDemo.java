@@ -396,4 +396,3 @@ public class BlockDemo {
         frame.renderWidget(footer, area);
     }
 }
-

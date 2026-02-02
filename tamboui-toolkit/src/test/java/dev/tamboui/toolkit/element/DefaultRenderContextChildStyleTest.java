@@ -4,18 +4,18 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

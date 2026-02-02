@@ -35,5 +35,3 @@ public final class IdentityPattern implements Pattern {
         return "identity";
     }
 }
-
-

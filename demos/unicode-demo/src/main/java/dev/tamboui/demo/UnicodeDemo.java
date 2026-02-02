@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -24,9 +26,6 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Demonstrates correct rendering of wide Unicode characters (emoji, CJK, Arabic).

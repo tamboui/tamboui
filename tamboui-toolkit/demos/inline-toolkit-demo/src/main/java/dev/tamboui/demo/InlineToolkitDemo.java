@@ -6,6 +6,10 @@
  */
 package dev.tamboui.demo;
 
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.toolkit.app.InlineApp;
@@ -14,10 +18,6 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.InlineTuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
-
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
 
 import static dev.tamboui.toolkit.InlineToolkit.*;
 import static dev.tamboui.toolkit.Toolkit.*;

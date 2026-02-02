@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Flex;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Flex;
 
 /**
  * Converts CSS flex values to Flex enum.

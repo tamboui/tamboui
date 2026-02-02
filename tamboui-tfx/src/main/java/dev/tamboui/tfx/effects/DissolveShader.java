@@ -146,5 +146,3 @@ public final class DissolveShader implements Shader {
         return copy;
     }
 }
-
-

@@ -4,11 +4,12 @@
  */
 package dev.tamboui.picocli;
 
+import java.util.concurrent.Callable;
+
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
-import picocli.CommandLine.Mixin;
 
-import java.util.concurrent.Callable;
+import picocli.CommandLine.Mixin;
 
 /**
  * Base class for PicoCLI commands that run TUI applications.

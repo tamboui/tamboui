@@ -4,21 +4,21 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.layout.Rect;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.layout.Rect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

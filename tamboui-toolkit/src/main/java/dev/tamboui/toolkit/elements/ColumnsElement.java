@@ -4,28 +4,28 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.columns.ColumnOrder;
+import dev.tamboui.layout.columns.Columns;
 import dev.tamboui.style.IntegerConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widget.Widget;
-import dev.tamboui.layout.columns.ColumnOrder;
-import dev.tamboui.layout.columns.Columns;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A multi-column grid layout container that arranges children into columns.

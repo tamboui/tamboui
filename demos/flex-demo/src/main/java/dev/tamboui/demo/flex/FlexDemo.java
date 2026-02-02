@@ -6,15 +6,15 @@
  */
 package dev.tamboui.demo.flex;
 
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import dev.tamboui.layout.Flex;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
-
-import java.time.Duration;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

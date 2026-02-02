@@ -4,13 +4,14 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.BorderSet;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.widgets.block.BorderSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

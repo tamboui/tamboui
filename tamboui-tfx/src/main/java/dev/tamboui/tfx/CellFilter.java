@@ -4,13 +4,13 @@
  */
 package dev.tamboui.tfx;
 
+import java.util.List;
+
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-
-import java.util.List;
 
 /**
  * A filter that enables effects to operate on specific cells based on various criteria.
@@ -502,4 +502,3 @@ public abstract class CellFilter {
         }
     }
 }
-

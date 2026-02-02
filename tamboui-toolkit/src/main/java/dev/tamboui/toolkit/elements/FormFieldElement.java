@@ -4,8 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Layout;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -31,10 +33,6 @@ import dev.tamboui.widgets.select.Select;
 import dev.tamboui.widgets.select.SelectState;
 import dev.tamboui.widgets.toggle.Toggle;
 import dev.tamboui.widgets.toggle.ToggleState;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 

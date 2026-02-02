@@ -4,12 +4,12 @@
  */
 package dev.tamboui.widgets.chart;
 
-import dev.tamboui.style.Style;
-import dev.tamboui.text.Line;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.style.Style;
+import dev.tamboui.text.Line;
 
 /**
  * A dataset to be plotted in a {@link Chart}.

@@ -4,11 +4,12 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
@@ -16,10 +17,9 @@ import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
 
 /**
  * A vertical layout container that arranges children in a column.

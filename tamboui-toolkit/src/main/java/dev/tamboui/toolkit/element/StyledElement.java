@@ -4,25 +4,6 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.toolkit.event.DragHandler;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.toolkit.event.KeyEventHandler;
-import dev.tamboui.toolkit.event.MouseEventHandler;
-import dev.tamboui.toolkit.id.IdGenerator;
-import dev.tamboui.tui.bindings.ActionHandler;
-import dev.tamboui.tui.error.TuiException;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.tui.event.MouseEvent;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -30,6 +11,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.event.DragHandler;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.event.KeyEventHandler;
+import dev.tamboui.toolkit.event.MouseEventHandler;
+import dev.tamboui.toolkit.id.IdGenerator;
+import dev.tamboui.tui.bindings.ActionHandler;
+import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.MouseEvent;
 
 /**
  * Abstract base for elements that support styling and event handling.

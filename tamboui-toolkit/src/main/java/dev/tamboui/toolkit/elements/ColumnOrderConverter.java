@@ -4,10 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.style.PropertyConverter;
-import dev.tamboui.layout.columns.ColumnOrder;
-
 import java.util.Optional;
+
+import dev.tamboui.layout.columns.ColumnOrder;
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link ColumnOrder} enum values.

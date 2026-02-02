@@ -4,6 +4,8 @@
  */
 package dev.tamboui.widgets.checkbox;
 
+import java.util.Optional;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -13,8 +15,6 @@ import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.widget.StatefulWidget;
-
-import java.util.Optional;
 
 /**
  * A checkbox widget that displays a toggleable checked/unchecked state.

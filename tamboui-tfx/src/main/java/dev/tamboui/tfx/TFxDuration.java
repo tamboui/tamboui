@@ -217,4 +217,3 @@ public final class TFxDuration {
         return "TFxDuration{ms=" + milliseconds + "}";
     }
 }
-

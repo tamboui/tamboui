@@ -4,14 +4,14 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
-
-import java.io.IOException;
-import java.util.function.Consumer;
 
 /**
  * Frame-compatible wrapper around {@link InlineDisplay}.

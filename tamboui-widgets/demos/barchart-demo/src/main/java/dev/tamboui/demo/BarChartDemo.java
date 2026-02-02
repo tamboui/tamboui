@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.Random;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Layout;
@@ -21,17 +23,14 @@ import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
+import dev.tamboui.widgets.barchart.Bar;
+import dev.tamboui.widgets.barchart.BarChart;
+import dev.tamboui.widgets.barchart.BarGroup;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
-import dev.tamboui.widgets.barchart.Bar;
-import dev.tamboui.widgets.barchart.BarChart;
-import dev.tamboui.widgets.barchart.BarGroup;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * Demo TUI application showcasing the BarChart widget.

@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.selector;
 
+import java.util.List;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
-
-import java.util.List;
 
 /**
  * A universal selector that matches all elements.

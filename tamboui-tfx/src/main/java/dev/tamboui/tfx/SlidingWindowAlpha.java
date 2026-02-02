@@ -145,5 +145,3 @@ public final class SlidingWindowAlpha {
         }
     }
 }
-
-

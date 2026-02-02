@@ -4,11 +4,11 @@
  */
 package dev.tamboui.css.selector;
 
+import java.util.List;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.css.cascade.PseudoClassStateProvider;
-
-import java.util.List;
 
 /**
  * Represents a CSS selector that matches elements.

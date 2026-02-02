@@ -6,20 +6,6 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.buffer.Buffer;
-import static dev.tamboui.export.ExportRequest.export;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.StyledAreaRegistry;
-import dev.tamboui.toolkit.app.ToolkitPostRenderProcessor;
-import dev.tamboui.toolkit.app.ToolkitRunner;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.ElementRegistry;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.terminal.Frame;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.StyledAreaRegistry;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.app.ToolkitRunner;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.ElementRegistry;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.tui.TuiConfig;
+
+import static dev.tamboui.export.ExportRequest.export;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**

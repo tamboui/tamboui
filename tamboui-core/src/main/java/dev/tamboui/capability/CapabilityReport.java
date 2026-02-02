@@ -176,5 +176,3 @@ public final class CapabilityReport {
         }
     }
 }
-
-

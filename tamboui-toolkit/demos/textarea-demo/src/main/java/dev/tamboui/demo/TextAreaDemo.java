@@ -6,18 +6,17 @@
  */
 package dev.tamboui.demo;
 
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
 import dev.tamboui.widgets.input.TextAreaState;
-
-import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

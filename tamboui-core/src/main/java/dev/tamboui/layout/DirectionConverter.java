@@ -4,9 +4,9 @@
  */
 package dev.tamboui.layout;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.Optional;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link Direction} enum values.

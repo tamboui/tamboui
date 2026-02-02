@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Alignment;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Alignment;
 
 /**
  * Converts CSS text-align values to Alignment enum.

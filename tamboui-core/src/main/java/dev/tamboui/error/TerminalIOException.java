@@ -4,9 +4,7 @@
  */
 package dev.tamboui.error;
 
-import java.io.IOException;
 
-import dev.tamboui.error.TamboUIException;
 
 /**
  * Exception thrown when a terminal I/O operation fails.

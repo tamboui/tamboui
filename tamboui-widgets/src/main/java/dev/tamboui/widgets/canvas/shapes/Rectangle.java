@@ -4,11 +4,11 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.Optional;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Painter;
 import dev.tamboui.widgets.canvas.Shape;
-
-import java.util.Optional;
 
 /**
  * A rectangle defined by position and size.

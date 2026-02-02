@@ -4,14 +4,15 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-import org.junit.jupiter.api.Test;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -4,12 +4,12 @@
  */
 package dev.tamboui.backend.panama.unix;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

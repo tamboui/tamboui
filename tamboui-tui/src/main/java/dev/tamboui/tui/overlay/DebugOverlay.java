@@ -4,6 +4,8 @@
  */
 package dev.tamboui.tui.overlay;
 
+import java.time.Duration;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -17,8 +19,6 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.time.Duration;
 
 /**
  * Debug overlay that displays performance metrics and system information.

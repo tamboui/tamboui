@@ -4,10 +4,10 @@
  */
 package dev.tamboui.widgets.barchart;
 
+import java.util.Optional;
+
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
-
-import java.util.Optional;
 
 /**
  * A single bar in a {@link BarChart}.

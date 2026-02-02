@@ -4,13 +4,14 @@
  */
 package dev.tamboui.widgets.barchart;
 
-import dev.tamboui.text.Line;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.text.Line;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A group of {@link Bar}s in a {@link BarChart}.

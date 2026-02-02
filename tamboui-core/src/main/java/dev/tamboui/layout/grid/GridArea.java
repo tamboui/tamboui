@@ -4,12 +4,12 @@
  */
 package dev.tamboui.layout.grid;
 
-import dev.tamboui.layout.LayoutException;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import dev.tamboui.layout.LayoutException;
 
 /**
  * Parses and validates CSS grid-template-areas style layout definitions.

@@ -76,4 +76,3 @@ public final class DirectionalVariance {
         return new int[]{pos.x(), pos.y()};
     }
 }
-

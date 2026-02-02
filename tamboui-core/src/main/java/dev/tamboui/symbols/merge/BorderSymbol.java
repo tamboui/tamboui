@@ -181,4 +181,3 @@ final class BorderSymbol {
         return SymbolRegistry.toString(this);
     }
 }
-

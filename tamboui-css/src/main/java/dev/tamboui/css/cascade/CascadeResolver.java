@@ -4,16 +4,16 @@
  */
 package dev.tamboui.css.cascade;
 
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.property.PropertyConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Resolves CSS cascade and specificity to produce final computed styles.

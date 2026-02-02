@@ -4,10 +4,6 @@
  */
 package dev.tamboui.image;
 
-import javax.imageio.ImageIO;
-
-import dev.tamboui.error.RuntimeIOException;
-
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -18,6 +14,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.imageio.ImageIO;
+
+import dev.tamboui.error.RuntimeIOException;
 
 /**
  * Immutable holder for image pixel data.

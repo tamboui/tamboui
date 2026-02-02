@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.time.Duration;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.tfx.Fx;
@@ -17,8 +19,6 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
-
-import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

@@ -4,11 +4,11 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Rect;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import dev.tamboui.layout.Rect;
 
 /**
  * Default implementation of {@link StyledAreaRegistry}.

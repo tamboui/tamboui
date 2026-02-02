@@ -4,14 +4,13 @@
  */
 package dev.tamboui.terminal;
 
-import dev.tamboui.error.TamboUIException;
-import dev.tamboui.internal.record.RecordingBackend;
-import dev.tamboui.internal.record.RecordingConfig;
-import dev.tamboui.util.SafeServiceLoader;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import dev.tamboui.internal.record.RecordingBackend;
+import dev.tamboui.internal.record.RecordingConfig;
+import dev.tamboui.util.SafeServiceLoader;
 
 /**
  * Factory for creating {@link Backend} instances using the {@link java.util.ServiceLoader} mechanism.

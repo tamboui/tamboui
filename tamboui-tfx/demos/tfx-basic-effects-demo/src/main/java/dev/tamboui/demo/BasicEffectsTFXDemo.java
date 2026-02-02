@@ -9,23 +9,33 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.TFxColorSpace;
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.Effect;
-import dev.tamboui.tfx.EffectManager;
-import dev.tamboui.tfx.Fx;
-import dev.tamboui.tfx.Interpolation;
-import dev.tamboui.tfx.Motion;
-import dev.tamboui.tfx.pattern.DiagonalPattern;
-import dev.tamboui.tfx.pattern.RadialPattern;
-import dev.tamboui.tfx.pattern.SweepPattern;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.text.Text;
+import dev.tamboui.tfx.CellFilter;
+import dev.tamboui.tfx.Effect;
+import dev.tamboui.tfx.EffectManager;
+import dev.tamboui.tfx.Fx;
+import dev.tamboui.tfx.Interpolation;
+import dev.tamboui.tfx.Motion;
+import dev.tamboui.tfx.TFxColorSpace;
+import dev.tamboui.tfx.TFxDuration;
+import dev.tamboui.tfx.pattern.DiagonalPattern;
+import dev.tamboui.tfx.pattern.RadialPattern;
+import dev.tamboui.tfx.pattern.SweepPattern;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.event.KeyEvent;
@@ -37,16 +47,6 @@ import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.text.Line;
-import dev.tamboui.text.Span;
-import dev.tamboui.text.Text;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.buffer.Cell;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Interactive demo showcasing TamboUI TFX effects.

@@ -8,23 +8,6 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.text.Line;
-import dev.tamboui.text.Span;
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.widgets.canvas.Context;
-import dev.tamboui.widgets.canvas.Marker;
-import dev.tamboui.widgets.canvas.shapes.Points;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,6 +22,24 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
+
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.toolkit.app.ToolkitApp;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.widgets.canvas.Context;
+import dev.tamboui.widgets.canvas.Marker;
+import dev.tamboui.widgets.canvas.shapes.Points;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -1035,4 +1036,3 @@ public final class NewYearDemo extends ToolkitApp {
         }
     }
 }
-

@@ -4,10 +4,11 @@
  */
 package dev.tamboui.buffer;
 
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Style;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

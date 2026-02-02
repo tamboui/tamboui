@@ -4,15 +4,15 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.event.Event;
-import dev.tamboui.tui.event.EventParser;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.EventParser;
 
 /**
  * A dedicated thread for reading terminal input.

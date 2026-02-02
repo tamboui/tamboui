@@ -3,10 +3,10 @@
 //DEPS dev.tamboui:tamboui-panama-backend:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
 
+import java.util.Map;
+
 import dev.tamboui.text.Emoji;
 import dev.tamboui.toolkit.app.InlineToolkitRunner;
-
-import java.util.Map;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

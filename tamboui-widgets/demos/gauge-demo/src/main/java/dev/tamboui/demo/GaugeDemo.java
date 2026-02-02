@@ -8,6 +8,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -27,9 +29,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.gauge.Gauge;
 import dev.tamboui.widgets.gauge.LineGauge;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Demo TUI application showcasing Gauge and LineGauge widgets.

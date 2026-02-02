@@ -6,12 +6,15 @@
  */
 package dev.tamboui.demo.layout;
 
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import dev.tamboui.layout.Flex;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.elements.FormFieldElement;
 import dev.tamboui.toolkit.elements.Panel;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
@@ -21,10 +24,6 @@ import dev.tamboui.widgets.form.FieldType;
 import dev.tamboui.widgets.form.FormState;
 import dev.tamboui.widgets.form.Validators;
 import dev.tamboui.widgets.table.TableState;
-
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

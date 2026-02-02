@@ -4,6 +4,10 @@
  */
 package dev.tamboui.backend.panama;
 
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Objects;
+
 import dev.tamboui.backend.panama.unix.PlatformConstants;
 import dev.tamboui.backend.panama.unix.UnixTerminal;
 import dev.tamboui.backend.panama.windows.WindowsTerminal;
@@ -18,10 +22,6 @@ import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.Mode2027Status;
 import dev.tamboui.terminal.Mode2027Support;
-
-import java.io.IOException;
-import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * Terminal backend implementation using Panama FFI.

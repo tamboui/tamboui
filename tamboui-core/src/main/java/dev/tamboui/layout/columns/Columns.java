@@ -4,16 +4,16 @@
  */
 package dev.tamboui.layout.columns;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static dev.tamboui.util.CollectionUtil.listCopyOf;
 

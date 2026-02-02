@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.barchart;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Rect;
@@ -11,16 +14,14 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.List;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A bar chart widget for displaying grouped data.

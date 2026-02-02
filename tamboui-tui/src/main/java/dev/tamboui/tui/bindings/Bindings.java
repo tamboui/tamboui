@@ -4,10 +4,10 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.tui.event.Event;
-
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.tui.event.Event;
 
 /**
  * Maps input events to semantic actions.

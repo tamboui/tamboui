@@ -4,9 +4,9 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.Optional;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts CSS string values to {@link Gutter} objects.

@@ -4,31 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Direction;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.layout.Layout;
-import dev.tamboui.layout.Margin;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.Line;
-import dev.tamboui.text.Span;
-import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderSet;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.block.Borders;
-import dev.tamboui.layout.Padding;
-import dev.tamboui.widgets.block.Title;
-import dev.tamboui.style.Overflow;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +11,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Layout;
+import dev.tamboui.layout.Margin;
+import dev.tamboui.layout.Padding;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Line;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderSet;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.block.Title;
 
 /**
  * A container element with borders and title.

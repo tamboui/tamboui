@@ -11,15 +11,20 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.EnumSet;
+
 import dev.tamboui.image.Image;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
-import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
+import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
-import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
+import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.internal.record.RecordingBackend;
@@ -39,11 +44,6 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.EnumSet;
 
 /**
  * Demo TUI application showcasing image rendering capabilities.

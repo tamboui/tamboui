@@ -4,16 +4,16 @@
  */
 package dev.tamboui.assertj;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
 
 /**
  * Utility class for formatting buffer differences in a readable way,
@@ -191,5 +191,3 @@ final class BufferDiffFormatter {
         return String.join(" | ", modifierNames);
     }
 }
-
-

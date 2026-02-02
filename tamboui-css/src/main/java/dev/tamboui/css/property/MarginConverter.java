@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Margin;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Margin;
 
 /**
  * Converts CSS margin values to Margin objects.

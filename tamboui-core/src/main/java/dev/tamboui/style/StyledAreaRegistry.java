@@ -4,9 +4,9 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Rect;
-
 import java.util.List;
+
+import dev.tamboui.layout.Rect;
 
 /**
  * Registry that stores information about styled areas rendered to a buffer.

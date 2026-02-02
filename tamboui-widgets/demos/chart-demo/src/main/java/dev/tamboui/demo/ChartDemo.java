@@ -7,6 +7,8 @@
  */
 package dev.tamboui.demo;
 
+import java.util.Random;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -29,9 +31,6 @@ import dev.tamboui.widgets.chart.Dataset;
 import dev.tamboui.widgets.chart.GraphType;
 import dev.tamboui.widgets.chart.LegendPosition;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * Demo TUI application showcasing the Chart widget.

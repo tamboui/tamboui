@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.block;
 
+import java.util.EnumSet;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Padding;
@@ -23,9 +26,6 @@ import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
-
-import java.util.EnumSet;
-import java.util.List;
 
 /**
  * A block is a container widget with optional borders and titles.

@@ -4,24 +4,24 @@
  */
 package dev.tamboui.css.integration;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Modifier;
-import dev.tamboui.style.Style;
-import dev.tamboui.layout.Padding;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -4,11 +4,11 @@
  */
 package dev.tamboui.terminal;
 
+import java.util.EnumSet;
+
 import dev.tamboui.style.Hyperlink;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
-
-import java.util.EnumSet;
 
 /**
  * Utility class for building ANSI-escaped strings from styled content.

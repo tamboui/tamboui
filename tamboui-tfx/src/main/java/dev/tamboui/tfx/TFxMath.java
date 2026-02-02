@@ -118,4 +118,3 @@ public final class TFxMath {
         return TAU;
     }
 }
-

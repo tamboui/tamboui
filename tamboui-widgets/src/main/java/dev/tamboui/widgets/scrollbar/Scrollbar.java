@@ -4,17 +4,17 @@
  */
 package dev.tamboui.widgets.scrollbar;
 
+import java.util.Objects;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.widget.StatefulWidget;
-
-import java.util.Objects;
 
 /**
  * A scrollbar widget for displaying scroll position.

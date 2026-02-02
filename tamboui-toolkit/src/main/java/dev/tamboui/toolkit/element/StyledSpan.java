@@ -4,12 +4,12 @@
  */
 package dev.tamboui.toolkit.element;
 
+import java.util.Optional;
+import java.util.Set;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.StyledAreaInfo;
-
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * A styled span that can be targeted by CSS selectors.

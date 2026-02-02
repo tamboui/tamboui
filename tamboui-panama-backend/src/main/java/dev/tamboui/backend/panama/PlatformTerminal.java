@@ -4,10 +4,10 @@
  */
 package dev.tamboui.backend.panama;
 
-import dev.tamboui.layout.Size;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import dev.tamboui.layout.Size;
 
 /**
  * Platform-independent terminal operations interface.

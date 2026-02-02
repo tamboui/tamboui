@@ -4,13 +4,6 @@
  */
 package dev.tamboui.internal.record;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.buffer.CellUpdate;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.layout.Size;
-import dev.tamboui.terminal.Backend;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,6 +11,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.layout.Position;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.Size;
+import dev.tamboui.terminal.Backend;
 
 /**
  * A backend wrapper that records frames to an Asciinema cast file.

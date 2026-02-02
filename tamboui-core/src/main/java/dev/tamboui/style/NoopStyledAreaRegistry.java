@@ -4,10 +4,10 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Rect;
-
 import java.util.Collections;
 import java.util.List;
+
+import dev.tamboui.layout.Rect;
 
 /**
  * A no-op implementation of {@link StyledAreaRegistry} that ignores all operations.

@@ -58,4 +58,3 @@ public class LogoDemo {
         frame.renderWidget(Logo.of(size), areas.get(1));
     }
 }
-

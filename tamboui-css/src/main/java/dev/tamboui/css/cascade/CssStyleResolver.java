@@ -4,23 +4,6 @@
  */
 package dev.tamboui.css.cascade;
 
-import dev.tamboui.style.StandardProperties;
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Direction;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.layout.Margin;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Modifier;
-import dev.tamboui.style.Overflow;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.StylePropertyResolver;
-import dev.tamboui.style.Style;
-import dev.tamboui.widgets.block.Block;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.layout.Padding;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -28,6 +11,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Direction;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Margin;
+import dev.tamboui.layout.Padding;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
+import dev.tamboui.style.Overflow;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.StandardProperties;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderType;
 
 /**
  * Represents the computed style for an element after CSS cascade resolution.

@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Direction;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Direction;
 
 /**
  * Converts CSS direction values to Direction enum.

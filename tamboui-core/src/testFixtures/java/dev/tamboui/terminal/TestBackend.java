@@ -4,14 +4,14 @@
  */
 package dev.tamboui.terminal;
 
-import dev.tamboui.buffer.CellUpdate;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Size;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.layout.Position;
+import dev.tamboui.layout.Size;
 
 /**
  * A test backend that captures all terminal operations for assertion.

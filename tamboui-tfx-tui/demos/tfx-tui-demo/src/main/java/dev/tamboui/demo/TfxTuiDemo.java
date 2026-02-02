@@ -6,6 +6,9 @@
  */
 package dev.tamboui.demo;
 
+import java.time.Duration;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Margin;
@@ -27,9 +30,6 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.time.Duration;
-import java.util.List;
 
 /**
  * Demo showcasing TFX integration with TuiRunner.

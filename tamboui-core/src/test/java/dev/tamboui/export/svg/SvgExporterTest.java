@@ -4,14 +4,15 @@
  */
 package dev.tamboui.export.svg;
 
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.export.Formats;
-import static dev.tamboui.export.ExportRequest.export;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import org.junit.jupiter.api.Test;
 
+import static dev.tamboui.export.ExportRequest.export;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -4,9 +4,9 @@
  */
 package dev.tamboui.tui.event;
 
-import dev.tamboui.tui.TuiConfig;
-
 import java.time.Duration;
+
+import dev.tamboui.tui.TuiConfig;
 
 /**
  * Represents an animation timer tick event.

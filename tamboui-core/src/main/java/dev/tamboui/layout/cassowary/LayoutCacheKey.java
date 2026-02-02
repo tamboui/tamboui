@@ -4,10 +4,10 @@
  */
 package dev.tamboui.layout.cassowary;
 
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
-
-import java.util.List;
 
 /**
  * Cache key for layout solver results.

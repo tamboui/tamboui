@@ -4,11 +4,12 @@
  */
 package dev.tamboui.assertj;
 
+import org.assertj.core.api.AbstractAssert;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import org.assertj.core.api.AbstractAssert;
 
 /**
  * AssertJ custom assertion for {@link Buffer}.
@@ -361,5 +362,3 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
         return BufferDiffFormatter.formatBuffer(buffer);
     }
 }
-
-

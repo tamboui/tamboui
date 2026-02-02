@@ -4,6 +4,11 @@
  */
 package dev.tamboui.inline;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.function.BiConsumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
@@ -14,11 +19,6 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Text;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.function.BiConsumer;
 
 /**
  * Manages a fixed-height inline display area for Gradle/NPM-style progress UX.

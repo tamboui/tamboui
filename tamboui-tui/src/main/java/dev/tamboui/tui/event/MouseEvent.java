@@ -4,11 +4,11 @@
  */
 package dev.tamboui.tui.event;
 
-import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-
 import java.util.Optional;
+
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 
 /**
  * Represents a mouse input event.

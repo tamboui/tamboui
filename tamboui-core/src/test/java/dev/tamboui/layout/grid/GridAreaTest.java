@@ -4,9 +4,10 @@
  */
 package dev.tamboui.layout.grid;
 
-import dev.tamboui.layout.LayoutException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.LayoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

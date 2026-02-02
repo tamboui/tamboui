@@ -4,18 +4,17 @@
  */
 package dev.tamboui.tfx.effects;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.TFxColorSpace;
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.Effect;
-import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Interpolation;
-import dev.tamboui.tfx.Shader;
-import dev.tamboui.layout.Rect;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.tfx.CellFilter;
+import dev.tamboui.tfx.Effect;
+import dev.tamboui.tfx.EffectTimer;
+import dev.tamboui.tfx.Shader;
+import dev.tamboui.tfx.TFxColorSpace;
+import dev.tamboui.tfx.TFxDuration;
 
 /**
  * Shader implementation that runs multiple effects in parallel, simultaneously.
@@ -186,4 +185,3 @@ public final class ParallelEffect implements Shader {
         return new ParallelEffect(copiedEffects);
     }
 }
-

@@ -4,9 +4,9 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.style.Style;
-
 import java.time.LocalDate;
+
+import dev.tamboui.style.Style;
 
 /**
  * Provides styling for specific dates in a {@link Monthly} calendar.

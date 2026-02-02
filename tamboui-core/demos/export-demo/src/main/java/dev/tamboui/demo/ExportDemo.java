@@ -6,8 +6,13 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
-import static dev.tamboui.export.ExportRequest.export;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -26,11 +31,7 @@ import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.Table;
 import dev.tamboui.widgets.table.TableState;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+import static dev.tamboui.export.ExportRequest.export;
 
 /**
  * Export demo: renders with widgets (no Toolkit), then exports the full buffer

@@ -4,19 +4,17 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Direction;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.layout.Margin;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
+import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

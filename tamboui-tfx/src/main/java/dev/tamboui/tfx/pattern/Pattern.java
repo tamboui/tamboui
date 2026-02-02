@@ -90,5 +90,3 @@ public interface Pattern {
      */
     String name();
 }
-
-

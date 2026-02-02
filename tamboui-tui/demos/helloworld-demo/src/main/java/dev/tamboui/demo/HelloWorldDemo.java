@@ -7,8 +7,8 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
-import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.text.Text;
+import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
  * Minimal Hello World demo using immediate mode rendering.
@@ -64,4 +64,3 @@ public class HelloWorldDemo {
         frame.renderWidget(paragraph, frame.area());
     }
 }
-

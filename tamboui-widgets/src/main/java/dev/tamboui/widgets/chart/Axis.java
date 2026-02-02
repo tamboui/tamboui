@@ -4,15 +4,16 @@
  */
 package dev.tamboui.widgets.chart;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * An axis configuration for a {@link Chart}.

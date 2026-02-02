@@ -93,4 +93,3 @@ public enum Motion {
         return this == RIGHT_TO_LEFT || this == DOWN_TO_UP;
     }
 }
-

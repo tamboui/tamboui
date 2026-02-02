@@ -4,10 +4,10 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.style.Color;
-
 import java.util.function.Supplier;
+
+import dev.tamboui.style.Color;
+import dev.tamboui.toolkit.element.Element;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

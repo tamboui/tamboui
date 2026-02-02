@@ -4,13 +4,13 @@
  */
 package dev.tamboui.export.text;
 
+import java.util.Objects;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.AnsiStringBuilder;
-
-import java.util.Objects;
 
 /**
  * Exports a {@link Buffer} to text in the same spirit as Rich's {@code Console.export_text}.

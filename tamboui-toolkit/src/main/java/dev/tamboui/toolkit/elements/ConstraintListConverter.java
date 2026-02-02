@@ -4,13 +4,13 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.ConstraintConverter;
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.ConstraintConverter;
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts a space-separated string of constraint tokens to a {@code List<Constraint>}.

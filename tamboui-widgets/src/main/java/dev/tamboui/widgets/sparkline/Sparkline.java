@@ -4,17 +4,17 @@
  */
 package dev.tamboui.widgets.sparkline;
 
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A sparkline widget for displaying data trends in a compact form.

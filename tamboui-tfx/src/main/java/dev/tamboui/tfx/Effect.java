@@ -243,4 +243,3 @@ public final class Effect {
         return new Effect(newShader);
     }
 }
-

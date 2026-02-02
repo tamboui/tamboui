@@ -8,11 +8,13 @@
  */
 package dev.tamboui.demo;
 
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
@@ -27,9 +29,6 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.style.Overflow;
-
-import java.io.IOException;
 
 /**
  * Demo TUI application showcasing the Paragraph widget.
@@ -246,4 +245,3 @@ public class ParagraphDemo {
         frame.renderWidget(footer, area);
     }
 }
-

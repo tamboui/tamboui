@@ -4,6 +4,9 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.ContentAlignment;
 import dev.tamboui.layout.ContentAlignmentConverter;
@@ -16,9 +19,6 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * An overlapping layers layout element where children render on top of each

@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Padding;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Padding;
 
 /**
  * Converts CSS padding/margin values to Padding objects.

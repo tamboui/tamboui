@@ -4,25 +4,38 @@
  */
 package dev.tamboui.toolkit;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
+
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.style.Color;
+import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.BarChartElement;
 import dev.tamboui.toolkit.elements.CalendarElement;
 import dev.tamboui.toolkit.elements.CanvasElement;
 import dev.tamboui.toolkit.elements.ChartElement;
-import dev.tamboui.toolkit.elements.GenericWidgetElement;
+import dev.tamboui.toolkit.elements.Column;
+import dev.tamboui.toolkit.elements.ColumnsElement;
+import dev.tamboui.toolkit.elements.DialogElement;
 import dev.tamboui.toolkit.elements.DockElement;
 import dev.tamboui.toolkit.elements.FlowElement;
 import dev.tamboui.toolkit.elements.FormElement;
 import dev.tamboui.toolkit.elements.FormFieldElement;
-import dev.tamboui.toolkit.elements.GridElement;
-import dev.tamboui.toolkit.elements.Column;
-import dev.tamboui.toolkit.elements.ColumnsElement;
-import dev.tamboui.toolkit.elements.DialogElement;
 import dev.tamboui.toolkit.elements.GaugeElement;
+import dev.tamboui.toolkit.elements.GenericWidgetElement;
+import dev.tamboui.toolkit.elements.GridElement;
 import dev.tamboui.toolkit.elements.LazyElement;
 import dev.tamboui.toolkit.elements.LineGaugeElement;
 import dev.tamboui.toolkit.elements.ListElement;
+import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.toolkit.elements.MarkupTextElement;
 import dev.tamboui.toolkit.elements.Panel;
+import dev.tamboui.toolkit.elements.RichTextAreaElement;
+import dev.tamboui.toolkit.elements.RichTextElement;
 import dev.tamboui.toolkit.elements.Row;
 import dev.tamboui.toolkit.elements.ScrollbarElement;
 import dev.tamboui.toolkit.elements.Spacer;
@@ -31,35 +44,22 @@ import dev.tamboui.toolkit.elements.SpinnerElement;
 import dev.tamboui.toolkit.elements.StackElement;
 import dev.tamboui.toolkit.elements.TableElement;
 import dev.tamboui.toolkit.elements.TabsElement;
-import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextAreaElement;
+import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
-import dev.tamboui.widgets.tree.TreeNode;
-import dev.tamboui.toolkit.elements.RichTextElement;
-import dev.tamboui.toolkit.elements.RichTextAreaElement;
-import dev.tamboui.toolkit.elements.MarkupTextElement;
-import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
 import dev.tamboui.widgets.form.FieldType;
 import dev.tamboui.widgets.form.FormState;
 import dev.tamboui.widgets.form.SelectFieldState;
-import dev.tamboui.text.Text;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.style.Color;
-import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
-import dev.tamboui.widget.Widget;
-import dev.tamboui.tui.event.KeyEvent;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Supplier;
+import dev.tamboui.widgets.tree.TreeNode;
 
 /**
  * Static factory methods for building UI elements with the DSL.

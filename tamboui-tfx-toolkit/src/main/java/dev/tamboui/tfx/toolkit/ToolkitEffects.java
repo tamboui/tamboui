@@ -4,6 +4,8 @@
  */
 package dev.tamboui.tfx.toolkit;
 
+import java.time.Duration;
+
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.TFxDuration;
@@ -14,8 +16,6 @@ import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.EventHandler;
 import dev.tamboui.tui.Renderer;
 import dev.tamboui.tui.event.TickEvent;
-
-import java.time.Duration;
 
 /**
  * High-level API for integrating TFX effects with the Toolkit DSL.

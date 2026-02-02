@@ -4,10 +4,10 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import dev.tamboui.layout.Fraction;
 
 /**
  * A row in the simplex tableau.

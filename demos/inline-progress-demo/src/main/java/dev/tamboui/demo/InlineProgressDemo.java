@@ -6,23 +6,23 @@
  */
 package dev.tamboui.demo;
 
+import java.util.Arrays;
+
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import dev.tamboui.inline.InlineDisplay;
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.widgets.gauge.Gauge;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.util.Arrays;
 
 /**
  * Demonstrates the InlineDisplay class for NPM/Gradle-style progress UX.

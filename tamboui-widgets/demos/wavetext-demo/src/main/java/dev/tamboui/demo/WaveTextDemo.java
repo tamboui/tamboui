@@ -8,6 +8,7 @@
  */
 package dev.tamboui.demo;
 
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -27,8 +28,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.wavetext.WaveText;
 import dev.tamboui.widgets.wavetext.WaveTextState;
-
-import java.io.IOException;
 
 /**
  * Demo TUI application showcasing the WaveText widget.

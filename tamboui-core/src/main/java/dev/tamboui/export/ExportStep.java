@@ -4,8 +4,6 @@
  */
 package dev.tamboui.export;
 
-import dev.tamboui.buffer.Buffer;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -16,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
+
 
 /**
  * Fluent step after selecting a format. Allows configuring options and writing output.

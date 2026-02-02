@@ -4,12 +4,6 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.tui.error.TuiException;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.MouseButton;
-import dev.tamboui.tui.event.MouseEventKind;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -17,6 +11,12 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.MouseButton;
+import dev.tamboui.tui.event.MouseEventKind;
 
 /**
  * Factory for predefined binding sets.

@@ -164,5 +164,3 @@ public final class PaintShader implements Shader {
         return copy;
     }
 }
-
-

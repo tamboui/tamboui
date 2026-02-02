@@ -137,4 +137,3 @@ public final class RadialPattern implements Pattern {
         return "radial";
     }
 }
-

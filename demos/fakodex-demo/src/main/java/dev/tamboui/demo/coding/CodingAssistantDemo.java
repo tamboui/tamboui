@@ -8,6 +8,12 @@
  */
 package dev.tamboui.demo.coding;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
@@ -23,12 +29,6 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.spinner.SpinnerState;
 import dev.tamboui.widgets.wavetext.WaveTextState;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

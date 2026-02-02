@@ -498,5 +498,3 @@ public enum Interpolation {
         return -TFxMath.cos(t * TFxMath.pi()) / 2.0f + 0.5f;
     }
 }
-
-

@@ -4,14 +4,15 @@
  */
 package dev.tamboui.image;
 
+import java.awt.image.BufferedImage;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widgets.block.Block;
-import org.junit.jupiter.api.Test;
-
-import java.awt.image.BufferedImage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

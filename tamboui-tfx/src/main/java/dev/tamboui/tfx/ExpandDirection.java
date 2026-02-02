@@ -22,4 +22,3 @@ public enum ExpandDirection {
      */
     VERTICAL
 }
-

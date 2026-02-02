@@ -4,12 +4,12 @@
  */
 package dev.tamboui.capability;
 
-import dev.tamboui.util.SafeServiceLoader;
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import dev.tamboui.util.SafeServiceLoader;
 
 /**
  * Convenience entrypoints for capability inspection.
@@ -70,5 +70,3 @@ public final class Capabilities {
         print(System.out);
     }
 }
-
-

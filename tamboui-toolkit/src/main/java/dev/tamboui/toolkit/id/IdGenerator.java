@@ -1,8 +1,8 @@
 package dev.tamboui.toolkit.id;
 
-import dev.tamboui.toolkit.element.Element;
-
 import java.util.concurrent.atomic.AtomicLong;
+
+import dev.tamboui.toolkit.element.Element;
 
 /**
  * Generates unique IDs for elements and components.

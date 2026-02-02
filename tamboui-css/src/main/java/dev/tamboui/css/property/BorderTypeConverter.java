@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.widgets.block.BorderType;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.widgets.block.BorderType;
 
 /**
  * Converts CSS border-type values to BorderType enum.

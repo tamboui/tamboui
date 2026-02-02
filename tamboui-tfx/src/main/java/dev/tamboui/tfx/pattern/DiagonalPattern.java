@@ -134,5 +134,3 @@ public final class DiagonalPattern implements Pattern {
         return "diagonal_" + direction.name().toLowerCase();
     }
 }
-
-

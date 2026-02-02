@@ -4,18 +4,18 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.function.Supplier;
+
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.toolkit.event.MouseEventHandler;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.terminal.Frame;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
-
-import java.util.function.Supplier;
 
 /**
  * An element that lazily evaluates its content on each render.

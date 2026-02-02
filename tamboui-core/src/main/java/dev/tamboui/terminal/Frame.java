@@ -4,6 +4,11 @@
  */
 package dev.tamboui.terminal;
 
+import java.io.OutputStream;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
@@ -12,11 +17,6 @@ import dev.tamboui.style.Tags;
 import dev.tamboui.widget.RawOutputCapable;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widget.Widget;
-
-import java.io.OutputStream;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
 
 /**
  * A frame represents a single render cycle.

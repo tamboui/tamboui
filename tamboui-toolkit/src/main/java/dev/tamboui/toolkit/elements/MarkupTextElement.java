@@ -8,13 +8,13 @@ import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.style.Overflow;
 
 /**
  * A simple inline element that parses BBCode-style markup and displays styled text.

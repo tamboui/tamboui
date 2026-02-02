@@ -4,9 +4,9 @@
  */
 package dev.tamboui.image;
 
-import org.junit.jupiter.api.Test;
-
 import java.awt.image.BufferedImage;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

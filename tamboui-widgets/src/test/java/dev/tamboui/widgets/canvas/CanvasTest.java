@@ -4,6 +4,8 @@
  */
 package dev.tamboui.widgets.canvas;
 
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -12,7 +14,6 @@ import dev.tamboui.widgets.canvas.shapes.Circle;
 import dev.tamboui.widgets.canvas.shapes.Line;
 import dev.tamboui.widgets.canvas.shapes.Points;
 import dev.tamboui.widgets.canvas.shapes.Rectangle;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import dev.tamboui.buffer.Buffer;
+
 import static dev.tamboui.export.ExportRequest.export;
 /**
  * Plays back scripted interactions for demo recording.

@@ -5,14 +5,14 @@
 package dev.tamboui.tfx.effects;
 
 import dev.tamboui.buffer.Buffer;
-import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.ExpandDirection;
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Motion;
-import dev.tamboui.tfx.Shader;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
+import dev.tamboui.tfx.CellFilter;
+import dev.tamboui.tfx.EffectTimer;
+import dev.tamboui.tfx.ExpandDirection;
+import dev.tamboui.tfx.Motion;
+import dev.tamboui.tfx.Shader;
+import dev.tamboui.tfx.TFxDuration;
 
 /**
  * A shader that applies bidirectional expansion effects using two opposing stretch shaders.
@@ -159,4 +159,3 @@ public final class ExpandShader implements Shader {
         return copy;
     }
 }
-

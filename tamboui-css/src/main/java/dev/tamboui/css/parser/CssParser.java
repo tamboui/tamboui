@@ -4,12 +4,12 @@
  */
 package dev.tamboui.css.parser;
 
+import java.util.*;
+
 import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.model.Stylesheet;
 import dev.tamboui.css.selector.*;
-
-import java.util.*;
 
 /**
  * Recursive descent parser for Textual-style CSS.

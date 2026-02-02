@@ -4,14 +4,14 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.layout.grid.GridArea;
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import dev.tamboui.layout.grid.GridArea;
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts CSS grid-template-areas value to {@link GridArea}.

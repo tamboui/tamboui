@@ -4,24 +4,23 @@
  */
 package dev.tamboui.toolkit.event;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Set;
+
 import dev.tamboui.css.Styleable;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.layout.Rect;
-
-import java.util.Collections;
-import java.util.Set;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
-
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
 
 /**
  * Routes events to elements based on focus and position.

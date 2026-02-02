@@ -53,4 +53,3 @@ enum LineStyle {
         return other == NOTHING ? this : other;
     }
 }
-

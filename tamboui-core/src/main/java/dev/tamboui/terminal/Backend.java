@@ -4,12 +4,12 @@
  */
 package dev.tamboui.terminal;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Backend interface for terminal operations.

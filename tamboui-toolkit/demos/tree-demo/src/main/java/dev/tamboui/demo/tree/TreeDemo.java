@@ -8,6 +8,9 @@
  */
 package dev.tamboui.demo.tree;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.style.Color;
@@ -15,12 +18,9 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.TreeElement;
-import dev.tamboui.widgets.tree.TreeNode;
-import dev.tamboui.widgets.tree.GuideStyle;
 import dev.tamboui.tui.TuiConfig;
-
-import java.io.IOException;
-import java.util.Arrays;
+import dev.tamboui.widgets.tree.GuideStyle;
+import dev.tamboui.widgets.tree.TreeNode;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

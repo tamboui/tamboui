@@ -4,12 +4,12 @@
  */
 package dev.tamboui.toolkit.app;
 
+import java.time.Duration;
+
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.focus.FocusManager;
-
-import java.time.Duration;
 
 /**
  * Processor called after each frame is rendered.

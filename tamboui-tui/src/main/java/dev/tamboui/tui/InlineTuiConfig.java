@@ -4,10 +4,10 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-
 import java.time.Duration;
+
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 
 /**
  * Configuration options for {@link InlineTuiRunner}.

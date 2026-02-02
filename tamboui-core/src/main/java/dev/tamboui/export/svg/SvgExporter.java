@@ -4,6 +4,13 @@
  */
 package dev.tamboui.export.svg;
 
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.zip.Adler32;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.export.ExportProperties;
@@ -12,13 +19,6 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
-
-import java.nio.charset.StandardCharsets;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.zip.Adler32;
 
 /**
  * Exports a {@link Buffer} to an SVG in the same spirit as Rich's {@code Console.export_svg}.

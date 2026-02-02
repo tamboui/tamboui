@@ -4,14 +4,14 @@
  */
 package dev.tamboui.layout.dock;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.Widget;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A 5-region dock layout widget that arranges children into top, bottom,

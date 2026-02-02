@@ -13,6 +13,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.MarkupParser;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
@@ -25,7 +26,6 @@ import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.tabs.TabsState;
-import dev.tamboui.text.MarkupParser;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

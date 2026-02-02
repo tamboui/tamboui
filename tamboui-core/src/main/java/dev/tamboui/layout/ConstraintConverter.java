@@ -4,11 +4,11 @@
  */
 package dev.tamboui.layout;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link Constraint} objects.

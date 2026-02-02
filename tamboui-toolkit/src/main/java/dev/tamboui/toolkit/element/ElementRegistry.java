@@ -4,14 +4,6 @@
  */
 package dev.tamboui.toolkit.element;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.selector.Selector;
-import dev.tamboui.css.selector.SelectorParser;
-import dev.tamboui.layout.Rect;
-
-import dev.tamboui.tui.RenderThread;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.css.selector.Selector;
+import dev.tamboui.css.selector.SelectorParser;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.tui.RenderThread;
 
 /**
  * Registry that maps elements to their rendered areas with full CSS selector support.

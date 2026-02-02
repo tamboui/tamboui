@@ -35,5 +35,3 @@ public final class BufferAssertions {
     }
 
 }
-
-

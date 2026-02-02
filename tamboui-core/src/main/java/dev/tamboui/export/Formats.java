@@ -37,4 +37,3 @@ public final class Formats {
     /** Text format (plain or ANSI). Options: styles (true = include ANSI codes). */
     public static final Format<TextOptions> TEXT = TextFormat.instance();
 }
-

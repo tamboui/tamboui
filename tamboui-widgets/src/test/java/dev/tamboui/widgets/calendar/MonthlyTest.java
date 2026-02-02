@@ -4,16 +4,17 @@
  */
 package dev.tamboui.widgets.calendar;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.Block;
-import org.junit.jupiter.api.Test;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

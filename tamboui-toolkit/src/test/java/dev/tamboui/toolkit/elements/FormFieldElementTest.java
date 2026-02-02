@@ -4,6 +4,9 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
@@ -15,8 +18,6 @@ import dev.tamboui.widgets.form.SelectFieldState;
 import dev.tamboui.widgets.form.ValidationResult;
 import dev.tamboui.widgets.form.Validators;
 import dev.tamboui.widgets.input.TextInputState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;

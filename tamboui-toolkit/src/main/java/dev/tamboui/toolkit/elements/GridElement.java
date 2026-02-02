@@ -4,29 +4,29 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.toolkit.element.ContainerElement;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.layout.Layout;
-import dev.tamboui.layout.Margin;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.widget.Widget;
-import dev.tamboui.layout.grid.Grid;
-import dev.tamboui.layout.grid.GridArea;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
+import dev.tamboui.layout.Layout;
+import dev.tamboui.layout.Margin;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.grid.Grid;
+import dev.tamboui.layout.grid.GridArea;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.ContainerElement;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.widget.Widget;
 
 /**
  * A CSS Grid-inspired layout container that arranges children into a grid

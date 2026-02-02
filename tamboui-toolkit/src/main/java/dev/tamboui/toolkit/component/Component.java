@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit.component;
 
+import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
@@ -12,8 +14,6 @@ import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.focus.Focusable;
 import dev.tamboui.toolkit.id.IdGenerator;
 import dev.tamboui.tui.bindings.ActionHandler;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.terminal.Frame;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 

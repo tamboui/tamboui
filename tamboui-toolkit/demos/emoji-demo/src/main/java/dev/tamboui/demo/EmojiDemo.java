@@ -8,22 +8,6 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Flex;
-import dev.tamboui.text.CharWidth;
-import dev.tamboui.text.Emoji;
-import dev.tamboui.toolkit.app.ToolkitRunner;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.tui.event.MouseEvent;
-import dev.tamboui.tui.event.MouseEventKind;
-import dev.tamboui.widgets.input.TextInputState;
-import dev.tamboui.widgets.table.Row;
-import dev.tamboui.widgets.table.TableState;
-import dev.tamboui.style.Color;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +15,21 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.style.Color;
+import dev.tamboui.text.CharWidth;
+import dev.tamboui.text.Emoji;
+import dev.tamboui.toolkit.app.ToolkitRunner;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.event.MouseEventKind;
+import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.table.Row;
+import dev.tamboui.widgets.table.TableState;
+
 import static dev.tamboui.layout.Constraint.*;
+import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
  * Demo showcasing emoji table with filtering.

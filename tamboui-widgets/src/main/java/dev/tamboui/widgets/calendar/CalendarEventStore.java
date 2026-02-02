@@ -4,12 +4,13 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.mapCopyOf;
-
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.mapCopyOf;
 
 /**
  * A simple {@link DateStyler} implementation backed by a {@link HashMap}.

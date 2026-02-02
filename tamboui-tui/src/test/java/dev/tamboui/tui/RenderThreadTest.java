@@ -4,17 +4,16 @@
  */
 package dev.tamboui.tui;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
-import dev.tamboui.tui.error.TuiException;
-
-import org.junit.jupiter.api.DisplayName;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.tui.error.TuiException;
 
 import static org.assertj.core.api.Assertions.*;
 

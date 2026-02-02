@@ -7,6 +7,10 @@
  */
 package dev.tamboui.demo;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -26,11 +30,6 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.calendar.CalendarEventStore;
 import dev.tamboui.widgets.calendar.Monthly;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.YearMonth;
 
 /**
  * Demo TUI application showcasing the Calendar widget.

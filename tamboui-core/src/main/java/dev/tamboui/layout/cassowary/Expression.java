@@ -4,13 +4,13 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Fraction;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import dev.tamboui.layout.Fraction;
 
 /**
  * A linear expression of the form: constant + c1*v1 + c2*v2 + ... + cn*vn.

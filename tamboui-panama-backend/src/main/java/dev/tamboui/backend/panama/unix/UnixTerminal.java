@@ -4,11 +4,6 @@
  */
 package dev.tamboui.backend.panama.unix;
 
-import dev.tamboui.terminal.BackendException;
-import dev.tamboui.backend.panama.PlatformTerminal;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.layout.Size;
-
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
@@ -20,6 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
+
+import dev.tamboui.backend.panama.PlatformTerminal;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.layout.Size;
+import dev.tamboui.terminal.BackendException;
 
 /**
  * Unix terminal operations using Panama FFI.

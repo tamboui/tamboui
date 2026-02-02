@@ -4,11 +4,12 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

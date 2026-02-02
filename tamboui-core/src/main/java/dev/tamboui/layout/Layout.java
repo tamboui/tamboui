@@ -4,14 +4,14 @@
  */
 package dev.tamboui.layout;
 
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import dev.tamboui.layout.cassowary.LayoutCache;
 import dev.tamboui.layout.cassowary.LayoutSolver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A layout defines how to split a rectangular area into smaller areas

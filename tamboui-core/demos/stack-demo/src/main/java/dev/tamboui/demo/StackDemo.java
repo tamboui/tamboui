@@ -9,9 +9,9 @@
 package dev.tamboui.demo;
 
 import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.ContentAlignment;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.stack.Stack;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
@@ -26,7 +26,6 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.layout.stack.Stack;
 
 /**
  * Demo TUI application showcasing the Stack widget.

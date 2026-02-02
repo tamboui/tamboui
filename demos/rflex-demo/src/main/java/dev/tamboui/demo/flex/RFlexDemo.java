@@ -6,6 +6,10 @@
  */
 package dev.tamboui.demo.flex;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Alignment;
@@ -35,10 +39,6 @@ import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.tabs.Tabs;
 import dev.tamboui.widgets.tabs.TabsState;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Ratatui-like flex demo (ported as closely as possible).
@@ -641,4 +641,3 @@ public final class RFlexDemo {
         }
     }
 }
-

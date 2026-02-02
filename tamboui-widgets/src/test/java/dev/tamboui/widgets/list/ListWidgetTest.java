@@ -4,22 +4,23 @@
  */
 package dev.tamboui.widgets.list;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Text;
-import dev.tamboui.style.Overflow;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ListWidgetTest {
 

@@ -4,12 +4,13 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.inline.InlineDisplay;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.TestBackend;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.inline.InlineDisplay;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.TestBackend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

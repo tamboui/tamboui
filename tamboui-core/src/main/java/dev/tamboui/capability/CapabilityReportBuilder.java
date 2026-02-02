@@ -91,5 +91,3 @@ public final class CapabilityReportBuilder {
         return new CapabilityReport(environmentBySource, propertiesBySource, featuresBySource);
     }
 }
-
-

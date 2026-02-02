@@ -4,12 +4,12 @@
  */
 package dev.tamboui.css.selector;
 
+import java.util.List;
+import java.util.Objects;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.css.cascade.PseudoClassStateProvider;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * A descendant combinator selector that matches nested elements.

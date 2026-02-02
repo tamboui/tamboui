@@ -9,19 +9,29 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.tfx.Effect;
-import dev.tamboui.tfx.EffectManager;
-import dev.tamboui.tfx.ExpandDirection;
-import dev.tamboui.tfx.Fx;
-import dev.tamboui.tfx.Interpolation;
-import dev.tamboui.tfx.Motion;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Supplier;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.text.Text;
+import dev.tamboui.tfx.Effect;
+import dev.tamboui.tfx.EffectManager;
+import dev.tamboui.tfx.ExpandDirection;
+import dev.tamboui.tfx.Fx;
+import dev.tamboui.tfx.Interpolation;
+import dev.tamboui.tfx.Motion;
+import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.event.KeyCode;
@@ -30,16 +40,6 @@ import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.text.Line;
-import dev.tamboui.text.Span;
-import dev.tamboui.text.Text;
-import dev.tamboui.terminal.Frame;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Supplier;
 
 /**
  * Basic effects demo ported from Rust tachyonfx basic-effects example.
@@ -421,4 +421,3 @@ public class TFXEffectsDemo {
         }
     }
 }
-

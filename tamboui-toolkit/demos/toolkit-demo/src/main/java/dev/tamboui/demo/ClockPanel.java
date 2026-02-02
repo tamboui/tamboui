@@ -4,12 +4,12 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.style.Color;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+
+import dev.tamboui.style.Color;
+import dev.tamboui.toolkit.element.Element;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

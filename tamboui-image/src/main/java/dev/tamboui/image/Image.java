@@ -4,6 +4,10 @@
  */
 package dev.tamboui.image;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
@@ -12,10 +16,6 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.RawOutputCapable;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Path;
 
 /**
  * A widget for displaying images in the terminal.

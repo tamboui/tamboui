@@ -4,9 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.layout.Constraint;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Constraint;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;

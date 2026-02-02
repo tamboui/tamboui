@@ -4,8 +4,6 @@
  */
 package dev.tamboui.widgets.form;
 
-import dev.tamboui.widgets.input.TextInputState;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -13,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import dev.tamboui.widgets.input.TextInputState;
 
 /**
  * Centralized state container for all fields in a form.

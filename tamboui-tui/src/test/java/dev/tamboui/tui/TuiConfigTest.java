@@ -4,14 +4,15 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.tui.error.ErrorAction;
-import dev.tamboui.tui.error.RenderErrorHandlers;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.tui.error.ErrorAction;
+import dev.tamboui.tui.error.RenderErrorHandlers;
 
 import static org.assertj.core.api.Assertions.*;
 

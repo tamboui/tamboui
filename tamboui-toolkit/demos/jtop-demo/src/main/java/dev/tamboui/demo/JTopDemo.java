@@ -10,12 +10,11 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.toolkit.app.ToolkitRunner;
-import dev.tamboui.style.Color;
-import dev.tamboui.tui.TuiConfig;
-
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+
+import dev.tamboui.style.Color;
+import dev.tamboui.toolkit.app.ToolkitRunner;
+import dev.tamboui.tui.TuiConfig;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

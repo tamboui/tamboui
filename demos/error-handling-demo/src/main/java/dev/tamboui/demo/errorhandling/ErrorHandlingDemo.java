@@ -6,6 +6,8 @@
  */
 package dev.tamboui.demo.errorhandling;
 
+import java.time.Duration;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
@@ -15,8 +17,6 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
-
-import java.time.Duration;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

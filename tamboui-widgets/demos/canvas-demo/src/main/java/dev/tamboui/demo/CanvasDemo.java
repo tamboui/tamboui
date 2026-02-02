@@ -7,7 +7,8 @@
  */
 package dev.tamboui.demo;
 
-import dev.tamboui.widgets.canvas.shapes.Line;
+import java.util.Random;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -26,12 +27,10 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.canvas.Canvas;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.shapes.Circle;
+import dev.tamboui.widgets.canvas.shapes.Line;
 import dev.tamboui.widgets.canvas.shapes.Points;
 import dev.tamboui.widgets.canvas.shapes.Rectangle;
 import dev.tamboui.widgets.paragraph.Paragraph;
-
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * Demo TUI application showcasing the Canvas widget.

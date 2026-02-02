@@ -4,11 +4,6 @@
  */
 package dev.tamboui.text;
 
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -17,6 +12,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * Multi-line styled text, composed of Lines.

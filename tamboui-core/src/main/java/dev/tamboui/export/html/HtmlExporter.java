@@ -4,6 +4,11 @@
  */
 package dev.tamboui.export.html;
 
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.export.ExportProperties;
@@ -12,11 +17,6 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
-
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Exports a {@link Buffer} to HTML in the same spirit as Rich's {@code Console.export_html}.

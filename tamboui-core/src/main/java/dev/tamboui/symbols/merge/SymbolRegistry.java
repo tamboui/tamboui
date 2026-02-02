@@ -163,4 +163,3 @@ final class SymbolRegistry {
         return SYMBOL_TO_STRING.containsKey(symbol);
     }
 }
-

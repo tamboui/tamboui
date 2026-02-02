@@ -4,12 +4,13 @@
  */
 package dev.tamboui.widgets.table;
 
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A row in a {@link Table}.

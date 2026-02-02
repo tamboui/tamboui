@@ -4,10 +4,7 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.tui.event.Event;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
+
+import dev.tamboui.tui.event.Event;
 
 /**
  * Default implementation of {@link Bindings} using a HashMap of actions to triggers.

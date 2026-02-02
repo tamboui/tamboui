@@ -109,5 +109,3 @@ public final class TransitionProgress {
         return transitionWidth;
     }
 }
-
-

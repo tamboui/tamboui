@@ -4,6 +4,13 @@
  */
 package dev.tamboui.tfx.toolkit;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.css.cascade.PseudoClassStateProvider;
@@ -15,19 +22,11 @@ import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
 import dev.tamboui.tfx.TFxDuration;
-import dev.tamboui.buffer.Buffer;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.element.StyledSpan;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.RenderThread;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Registry for effects that target specific elements by ID.

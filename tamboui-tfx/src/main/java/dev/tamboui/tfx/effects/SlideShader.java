@@ -6,19 +6,17 @@ package dev.tamboui.tfx.effects;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
+import dev.tamboui.layout.Position;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 import dev.tamboui.tfx.CellFilter;
-import dev.tamboui.tfx.CellIterator;
-import dev.tamboui.tfx.TFxDuration;
+import dev.tamboui.tfx.DirectionalVariance;
 import dev.tamboui.tfx.EffectTimer;
 import dev.tamboui.tfx.Motion;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.SimpleRng;
 import dev.tamboui.tfx.SlidingWindowAlpha;
-import dev.tamboui.tfx.DirectionalVariance;
-import dev.tamboui.layout.Position;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
+import dev.tamboui.tfx.TFxDuration;
 
 /**
  * A slide effect that uses block characters to create a "shutter" animation.
@@ -241,4 +239,3 @@ public final class SlideShader implements Shader {
         return copy;
     }
 }
-

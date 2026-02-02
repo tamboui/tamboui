@@ -4,6 +4,9 @@
  */
 package dev.tamboui.widgets.canvas;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -12,9 +15,6 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * A widget for drawing arbitrary shapes on a terminal grid.

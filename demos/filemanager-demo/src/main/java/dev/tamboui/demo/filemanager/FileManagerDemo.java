@@ -14,12 +14,12 @@
  */
 package dev.tamboui.demo.filemanager;
 
-import dev.tamboui.toolkit.app.ToolkitRunner;
-import dev.tamboui.tui.TuiConfig;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+
+import dev.tamboui.toolkit.app.ToolkitRunner;
+import dev.tamboui.tui.TuiConfig;
 
 /**
  * Two-panel file manager demo showcasing MVC architecture.

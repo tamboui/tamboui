@@ -4,9 +4,10 @@
  */
 package dev.tamboui.widgets.block;
 
-import dev.tamboui.layout.Padding;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import dev.tamboui.layout.Padding;
 
 import static org.assertj.core.api.Assertions.*;
 

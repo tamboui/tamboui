@@ -4,18 +4,6 @@
  */
 package dev.tamboui.css.engine;
 
-import dev.tamboui.css.Styleable;
-import dev.tamboui.css.cascade.CascadeResolver;
-import dev.tamboui.css.cascade.PseudoClassState;
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.css.model.Rule;
-import dev.tamboui.css.model.Stylesheet;
-import dev.tamboui.css.parser.CssParser;
-import dev.tamboui.css.property.PropertyConverter;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.ColorConverter;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,6 +11,18 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+
+import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.CascadeResolver;
+import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.css.model.Rule;
+import dev.tamboui.css.model.Stylesheet;
+import dev.tamboui.css.parser.CssParser;
+import dev.tamboui.css.property.PropertyConverter;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
 
 /**
  * Main entry point for CSS styling.

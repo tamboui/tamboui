@@ -4,12 +4,12 @@
  */
 package dev.tamboui.css.model;
 
-import dev.tamboui.css.selector.Selector;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import dev.tamboui.css.selector.Selector;
 
 /**
  * Represents a CSS rule consisting of a selector and declarations.

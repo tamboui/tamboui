@@ -4,9 +4,9 @@
  */
 package dev.tamboui.widgets.canvas;
 
-import dev.tamboui.style.Color;
-
 import java.util.Optional;
+
+import dev.tamboui.style.Color;
 
 /**
  * Provides an interface for drawing on a {@link Canvas} grid.

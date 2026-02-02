@@ -4,13 +4,13 @@
  */
 package dev.tamboui.layout.cassowary;
 
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Flex;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Flex;
 
 /**
  * Thread-local cache for layout solver results.

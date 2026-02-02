@@ -4,14 +4,14 @@
  */
 package dev.tamboui.demo.actionhandler;
 
+import java.util.function.Consumer;
+
+import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.component.Component;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.tui.event.Event;
-
-import java.util.function.Consumer;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

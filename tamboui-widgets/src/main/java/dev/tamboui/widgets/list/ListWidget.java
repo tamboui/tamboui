@@ -4,8 +4,6 @@
  */
 package dev.tamboui.widgets.list;
 
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,15 +13,17 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
-import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.style.Width;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A list widget for displaying selectable items.

@@ -4,9 +4,9 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.style.Modifier;
-
 import java.util.*;
+
+import dev.tamboui.style.Modifier;
 
 /**
  * Converts CSS text-style values to TamboUI Modifier sets.

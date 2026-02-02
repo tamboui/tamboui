@@ -66,4 +66,3 @@ public enum MergeStrategy {
         return SymbolRegistry.fromString(symbol) != null;
     }
 }
-

@@ -4,11 +4,11 @@
  */
 package dev.tamboui.widgets.spinner;
 
-import dev.tamboui.style.PropertyConverter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import dev.tamboui.style.PropertyConverter;
 
 /**
  * Converts string values to {@link SpinnerFrameSet}.

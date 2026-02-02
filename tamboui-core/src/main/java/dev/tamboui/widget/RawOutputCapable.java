@@ -4,10 +4,10 @@
  */
 package dev.tamboui.widget;
 
+import java.io.OutputStream;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
-
-import java.io.OutputStream;
 
 /**
  * Interface for widgets that can render using raw terminal output.

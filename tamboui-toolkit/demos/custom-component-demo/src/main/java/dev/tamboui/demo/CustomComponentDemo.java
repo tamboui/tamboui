@@ -7,10 +7,18 @@
  */
 package dev.tamboui.demo;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.css.parser.CssParseException;
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.export.ExportRequest;
 import dev.tamboui.export.Formats;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -26,16 +34,6 @@ import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextAreaState;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 import static dev.tamboui.export.ExportRequest.export;
 import static dev.tamboui.toolkit.Toolkit.*;

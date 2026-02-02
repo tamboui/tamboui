@@ -4,16 +4,16 @@
  */
 package dev.tamboui.export;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Locale;
+import java.util.Objects;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.export.html.HtmlOptions;
 import dev.tamboui.export.svg.SvgOptions;
 import dev.tamboui.export.text.TextOptions;
 import dev.tamboui.layout.Rect;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Objects;
 
 /**
  * Entry point for the fluent export API after selecting a buffer.

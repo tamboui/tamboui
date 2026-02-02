@@ -4,9 +4,9 @@
  */
 package dev.tamboui.widgets.tree;
 
-import dev.tamboui.widget.Widget;
-
 import java.util.Objects;
+
+import dev.tamboui.widget.Widget;
 
 /**
  * Pairs a {@link Widget} with optional explicit width and height dimensions.

@@ -6,7 +6,6 @@ package dev.tamboui.export.text;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.export.Encoder;
-import dev.tamboui.export.ExportOptions;
 import dev.tamboui.export.Format;
 import dev.tamboui.layout.Rect;
 

@@ -8,6 +8,9 @@
  */
 package dev.tamboui.demo.actionhandler;
 
+import java.util.ArrayList;
+import java.util.function.Consumer;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
@@ -15,9 +18,6 @@ import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.KeyTrigger;
-
-import java.util.ArrayList;
-import java.util.function.Consumer;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 

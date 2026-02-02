@@ -4,9 +4,9 @@
  */
 package dev.tamboui.tfx.pattern;
 
-import dev.tamboui.tfx.Motion;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.tfx.Motion;
 
 /**
  * Pattern implementation for linear sweep effects in cardinal directions.
@@ -136,5 +136,3 @@ public final class SweepPattern implements Pattern {
         return "sweep_" + direction.name().toLowerCase();
     }
 }
-
-

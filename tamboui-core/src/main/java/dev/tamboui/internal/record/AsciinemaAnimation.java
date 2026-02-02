@@ -4,15 +4,15 @@
  */
 package dev.tamboui.internal.record;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.error.RuntimeIOException;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.error.RuntimeIOException;
 
 /**
  * Converts multiple Buffer frames into an Asciinema cast file.

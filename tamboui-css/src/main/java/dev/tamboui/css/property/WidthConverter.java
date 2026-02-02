@@ -4,10 +4,10 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.style.Width;
-
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.style.Width;
 
 /**
  * Converts CSS width values to Width.

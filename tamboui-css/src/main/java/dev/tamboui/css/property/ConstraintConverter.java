@@ -4,12 +4,12 @@
  */
 package dev.tamboui.css.property;
 
-import dev.tamboui.layout.Constraint;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import dev.tamboui.layout.Constraint;
 
 /**
  * Converts CSS constraint values to Constraint objects.

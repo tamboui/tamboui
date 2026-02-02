@@ -4,16 +4,16 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-import dev.tamboui.tui.error.RenderErrorHandler;
-import dev.tamboui.tui.error.RenderErrorHandlers;
-
 import java.io.PrintStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.error.RenderErrorHandler;
+import dev.tamboui.tui.error.RenderErrorHandlers;
 
 /**
  * Configuration options for {@link TuiRunner}.

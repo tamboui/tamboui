@@ -120,4 +120,3 @@ public final class SimpleRng {
         return "SimpleRng{state=" + state + "}";
     }
 }
-

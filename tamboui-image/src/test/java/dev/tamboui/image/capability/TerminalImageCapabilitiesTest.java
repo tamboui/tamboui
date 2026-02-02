@@ -4,15 +4,16 @@
  */
 package dev.tamboui.image.capability;
 
+import java.util.EnumSet;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
 import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
-import org.junit.jupiter.api.Test;
-
-import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

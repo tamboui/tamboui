@@ -4,10 +4,11 @@
  */
 package dev.tamboui.picocli;
 
-import dev.tamboui.tui.TuiConfig;
-import picocli.CommandLine.Option;
-
 import java.time.Duration;
+
+import dev.tamboui.tui.TuiConfig;
+
+import picocli.CommandLine.Option;
 
 /**
  * PicoCLI mixin that provides common TUI-related command line options.

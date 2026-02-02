@@ -59,4 +59,3 @@ final class BorderSymbolMerger {
         return result;
     }
 }
-

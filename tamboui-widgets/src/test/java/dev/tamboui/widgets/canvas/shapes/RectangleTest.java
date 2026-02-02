@@ -4,13 +4,14 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.Painter;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

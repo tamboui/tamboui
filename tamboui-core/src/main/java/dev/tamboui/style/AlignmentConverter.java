@@ -4,11 +4,11 @@
  */
 package dev.tamboui.style;
 
-import dev.tamboui.layout.Alignment;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import dev.tamboui.layout.Alignment;
 
 /**
  * Converts string values to {@link Alignment} enum values.

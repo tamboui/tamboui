@@ -94,4 +94,3 @@ public final class Masked {
         return result;
     }
 }
-

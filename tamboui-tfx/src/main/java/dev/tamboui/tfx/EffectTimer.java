@@ -321,4 +321,3 @@ public final class EffectTimer {
                ", loopMode=" + loopMode + "}";
     }
 }
-

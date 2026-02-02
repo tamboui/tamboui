@@ -4,12 +4,12 @@
  */
 package dev.tamboui.layout.cassowary;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Fraction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Bridge between TamboUI layout constraints and the Cassowary solver.

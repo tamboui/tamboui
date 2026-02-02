@@ -4,11 +4,6 @@
  */
 package dev.tamboui.text;
 
-import dev.tamboui.style.Color;
-import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.Style;
-import dev.tamboui.style.Tags;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +14,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.Style;
+import dev.tamboui.style.Tags;
 
 /**
  * Parses BBCode-style markup text and converts it to styled {@link Text} objects.

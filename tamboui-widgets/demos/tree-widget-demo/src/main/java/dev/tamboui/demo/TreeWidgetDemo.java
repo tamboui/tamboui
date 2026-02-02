@@ -8,10 +8,12 @@
  */
 package dev.tamboui.demo;
 
+import java.io.IOException;
+import java.util.List;
+
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.widgets.tree.TreeNode;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
@@ -28,11 +30,9 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.tree.GuideStyle;
 import dev.tamboui.widgets.tree.SizedWidget;
+import dev.tamboui.widgets.tree.TreeNode;
 import dev.tamboui.widgets.tree.TreeState;
 import dev.tamboui.widgets.tree.TreeWidget;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Demo TUI application showcasing the TreeWidget.

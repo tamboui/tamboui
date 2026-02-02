@@ -127,4 +127,3 @@ public final class Logo implements Widget {
         abstract String getText();
     }
 }
-

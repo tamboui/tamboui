@@ -4,17 +4,17 @@
  */
 package dev.tamboui.widgets.calendar;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Style;
-import dev.tamboui.widget.Widget;
-import dev.tamboui.widgets.block.Block;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.Locale;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
+import dev.tamboui.widget.Widget;
+import dev.tamboui.widgets.block.Block;
 
 /**
  * A calendar widget displaying a single month.

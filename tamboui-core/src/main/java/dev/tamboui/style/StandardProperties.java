@@ -4,6 +4,15 @@
  */
 package dev.tamboui.style;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.ConstraintConverter;
@@ -15,15 +24,6 @@ import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.MarginConverter;
 import dev.tamboui.layout.Padding;
 import dev.tamboui.layout.PaddingConverter;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Central registry of all standard property definitions.

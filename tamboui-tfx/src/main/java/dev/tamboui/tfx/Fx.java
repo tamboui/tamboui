@@ -4,8 +4,8 @@
  */
 package dev.tamboui.tfx;
 
-import dev.tamboui.tfx.effects.FadeShader;
 import dev.tamboui.style.Color;
+import dev.tamboui.tfx.effects.FadeShader;
 
 /**
  * Factory class providing static methods for creating common effects.
@@ -518,4 +518,3 @@ public final class Fx {
         return expand(direction, style, EffectTimer.fromMs(durationMs, interpolation));
     }
 }
-

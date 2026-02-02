@@ -4,6 +4,10 @@
  */
 package dev.tamboui.widgets.chart;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -12,11 +16,8 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A chart widget for plotting datasets in a cartesian coordinate system.

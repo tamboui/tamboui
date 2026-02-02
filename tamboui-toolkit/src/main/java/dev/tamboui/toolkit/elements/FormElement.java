@@ -4,23 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import dev.tamboui.css.cascade.CssStyleResolver;
-import dev.tamboui.layout.Constraint;
-import dev.tamboui.layout.Layout;
-import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.widgets.block.BorderType;
-import dev.tamboui.widgets.form.FieldType;
-import dev.tamboui.widgets.form.FormState;
-import dev.tamboui.widgets.form.ValidationResult;
-import dev.tamboui.widgets.form.Validator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +12,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.form.FieldType;
+import dev.tamboui.widgets.form.FormState;
+import dev.tamboui.widgets.form.ValidationResult;
+import dev.tamboui.widgets.form.Validator;
 
 /**
  * A form container that manages multiple form fields with grouping support.

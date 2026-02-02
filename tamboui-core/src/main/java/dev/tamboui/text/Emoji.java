@@ -6,10 +6,7 @@ package dev.tamboui.text;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Replaces emoji codes (e.g. {@code :smiley:}, {@code :warning:}) with Unicode

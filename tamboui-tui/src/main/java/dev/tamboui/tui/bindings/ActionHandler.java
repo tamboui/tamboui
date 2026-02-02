@@ -4,9 +4,6 @@
  */
 package dev.tamboui.tui.bindings;
 
-import dev.tamboui.annotations.bindings.OnAction;
-import dev.tamboui.tui.event.Event;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +13,9 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import dev.tamboui.annotations.bindings.OnAction;
+import dev.tamboui.tui.event.Event;
 
 /**
  * Dispatches events to registered action handlers.

@@ -4,11 +4,11 @@
  */
 package dev.tamboui.image.capability;
 
-import dev.tamboui.capability.CapabilityProvider;
-import dev.tamboui.capability.CapabilityReportBuilder;
-
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import dev.tamboui.capability.CapabilityProvider;
+import dev.tamboui.capability.CapabilityReportBuilder;
 
 /**
  * Capability contributor for {@code tamboui-image}.
@@ -39,5 +39,3 @@ public final class ImageCapabilityProvider implements CapabilityProvider {
         report.feature(source(), "supports_native_images", caps.supportsNativeImages());
     }
 }
-
-

@@ -4,17 +4,18 @@
  */
 package dev.tamboui.text;
 
-import dev.tamboui.layout.Alignment;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Style;
-import static dev.tamboui.util.CollectionUtil.listCopyOf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import dev.tamboui.layout.Alignment;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+import static dev.tamboui.util.CollectionUtil.listCopyOf;
 
 /**
  * A single line of text composed of styled spans.

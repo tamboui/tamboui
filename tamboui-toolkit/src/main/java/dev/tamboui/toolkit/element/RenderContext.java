@@ -4,14 +4,14 @@
  */
 package dev.tamboui.toolkit.element;
 
+import java.util.Optional;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
-
-import java.util.Optional;
 
 /**
  * Context provided during rendering, giving access to focus state and CSS styling.

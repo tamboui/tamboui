@@ -4,13 +4,6 @@
  */
 package dev.tamboui.demo;
 
-import static dev.tamboui.toolkit.Toolkit.column;
-import static dev.tamboui.toolkit.Toolkit.gauge;
-import static dev.tamboui.toolkit.Toolkit.panel;
-import static dev.tamboui.toolkit.Toolkit.row;
-import static dev.tamboui.toolkit.Toolkit.sparkline;
-import static dev.tamboui.toolkit.Toolkit.text;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +29,13 @@ import dev.tamboui.widgets.chart.Axis;
 import dev.tamboui.widgets.chart.Chart;
 import dev.tamboui.widgets.chart.Dataset;
 import dev.tamboui.widgets.chart.GraphType;
+
+import static dev.tamboui.toolkit.Toolkit.column;
+import static dev.tamboui.toolkit.Toolkit.gauge;
+import static dev.tamboui.toolkit.Toolkit.panel;
+import static dev.tamboui.toolkit.Toolkit.row;
+import static dev.tamboui.toolkit.Toolkit.sparkline;
+import static dev.tamboui.toolkit.Toolkit.text;
 
 /**
  * UI component that displays system metrics.

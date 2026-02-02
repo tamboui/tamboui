@@ -4,18 +4,19 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.widgets.form.FieldType;
 import dev.tamboui.widgets.form.FormState;
 import dev.tamboui.widgets.form.ValidationResult;
 import dev.tamboui.widgets.form.Validator;
 import dev.tamboui.widgets.form.Validators;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;

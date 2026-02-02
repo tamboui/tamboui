@@ -4,6 +4,11 @@
  */
 package dev.tamboui.buffer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiConsumer;
+
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
@@ -11,11 +16,6 @@ import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiConsumer;
 
 /**
  * A buffer that stores cells for a rectangular area.

@@ -4,9 +4,16 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.flow.Flow;
+import dev.tamboui.layout.flow.FlowItem;
 import dev.tamboui.style.IntegerConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
@@ -16,13 +23,6 @@ import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widget.Widget;
-import dev.tamboui.layout.flow.Flow;
-import dev.tamboui.layout.flow.FlowItem;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A wrap layout element where children flow left-to-right and wrap to the

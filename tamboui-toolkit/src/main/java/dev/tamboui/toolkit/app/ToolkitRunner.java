@@ -4,23 +4,6 @@
  */
 package dev.tamboui.toolkit.app;
 
-import dev.tamboui.css.engine.StyleEngine;
-import dev.tamboui.style.StyledAreaRegistry;
-import dev.tamboui.toolkit.element.DefaultRenderContext;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.toolkit.element.ElementRegistry;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.toolkit.event.EventRouter;
-import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.tui.TuiConfig;
-import dev.tamboui.tui.TuiRunner;
-import dev.tamboui.tui.bindings.ActionHandler;
-import dev.tamboui.tui.bindings.Bindings;
-import dev.tamboui.tui.bindings.BindingSets;
-import dev.tamboui.tui.event.Event;
-import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.tui.event.TickEvent;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
@@ -32,6 +15,23 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.style.StyledAreaRegistry;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.element.ElementRegistry;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.event.EventRouter;
+import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.TuiRunner;
+import dev.tamboui.tui.bindings.ActionHandler;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
+import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.TickEvent;
 
 /**
  * Runner for DSL applications with automatic event routing.

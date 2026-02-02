@@ -4,18 +4,18 @@
  */
 package dev.tamboui.image.protocol;
 
-import dev.tamboui.buffer.Buffer;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.image.ImageData;
-import dev.tamboui.image.capability.TerminalImageProtocol;
-import dev.tamboui.layout.Rect;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.image.ImageData;
+import dev.tamboui.image.capability.TerminalImageProtocol;
+import dev.tamboui.layout.Rect;
 
 /**
  * Renders images using the Sixel graphics protocol.

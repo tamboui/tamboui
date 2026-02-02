@@ -4,6 +4,14 @@
  */
 package dev.tamboui.inline;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
@@ -13,13 +21,6 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -4,15 +4,15 @@
  */
 package dev.tamboui.tfx;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * An iterator over terminal cells within a rectangular area.
@@ -347,4 +347,3 @@ public final class CellIterator implements Iterable<CellIterator.CellEntry> {
         }
     }
 }
-
