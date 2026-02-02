@@ -67,6 +67,9 @@
     "picocli-demo": {
       "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     },
+    "pygments-demo": {
+      "script-ref": "tamboui-pygments/demos/pygments-demo/src/main/java/dev/tamboui/demo/PygmentsDemo.java"
+    },
     "tfx-basic-effects-demo": {
       "script-ref": "tamboui-tfx/demos/tfx-basic-effects-demo/src/main/java/dev/tamboui/demo/BasicEffectsTFXDemo.java"
     },
