@@ -4,19 +4,20 @@
  */
 package dev.tamboui.lumis4j;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Text;
+
 import io.roastedroot.lumis4j.core.Formatter;
 import io.roastedroot.lumis4j.core.Lang;
 import io.roastedroot.lumis4j.core.Lumis;
 import io.roastedroot.lumis4j.core.LumisResult;
 import io.roastedroot.lumis4j.core.Theme;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Renders a source string as TamboUI markup using lumis4j for syntax highlighting.
