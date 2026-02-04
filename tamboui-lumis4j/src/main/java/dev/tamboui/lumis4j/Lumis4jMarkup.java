@@ -17,7 +17,6 @@ import io.roastedroot.lumis4j.core.Formatter;
 import io.roastedroot.lumis4j.core.Lang;
 import io.roastedroot.lumis4j.core.Lumis;
 import io.roastedroot.lumis4j.core.LumisResult;
-import io.roastedroot.lumis4j.core.Theme;
 
 /**
  * Renders a source string as TamboUI markup using lumis4j for syntax highlighting.
@@ -138,12 +137,12 @@ public final class Lumis4jMarkup implements AutoCloseable {
       return "";
     }
     Lang lumisLang = langToLang(lang);
-    LumisResult result = lumis.highlight(
-            source,
-            Theme.GITHUB_DARK,
-            lumisLang,
-            Formatter.BBCODE
-            );
+    LumisResult result = lumis
+            .highlighter()
+            .withLang(lumisLang)
+            .withFormatter(Formatter.BBCODE)
+            .build()
+            .highlight(source);
     if (result.success()) {
       return result.string();
     }
