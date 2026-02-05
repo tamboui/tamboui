@@ -1,6 +1,6 @@
 [versions]
 jline = "3.25.1"
-aesh-readline = "2.6"
+aesh-terminal = "3.0"
 junit = "5.14.1"
 assertj = "3.27.6"
 native-build-tools = "0.11.1"
@@ -17,7 +17,7 @@ spotless = "8.2.1"
 
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }
-aesh-readline = { module = "org.aesh:readline", version.ref = "aesh-readline" }
+aesh-terminal = { module = "org.aesh:terminal-tty", version.ref = "aesh-terminal" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "picocli" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }

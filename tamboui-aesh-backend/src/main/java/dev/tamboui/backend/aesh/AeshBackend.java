@@ -15,8 +15,10 @@ import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.Mode2027Status;
 import dev.tamboui.terminal.Mode2027Support;
-import org.aesh.readline.tty.terminal.TerminalConnection;
 import org.aesh.terminal.tty.Point;
+import org.aesh.terminal.tty.TerminalConnection;
+import org.aesh.terminal.Connection;
+
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +39,7 @@ public class AeshBackend implements Backend {
     private static final String ESC = "\033";
     private static final String CSI = ESC + "[";
 
-    private final TerminalConnection connection;
+    private final Connection connection;
     private final StringBuilder outputBuffer;
     private final BlockingQueue<Integer> inputQueue;
     private boolean inAlternateScreen;
@@ -419,7 +421,7 @@ public class AeshBackend implements Backend {
      *
      * @return the TerminalConnection instance
      */
-    public TerminalConnection terminalConnection() {
+    public Connection terminalConnection() {
         return connection;
     }
 }

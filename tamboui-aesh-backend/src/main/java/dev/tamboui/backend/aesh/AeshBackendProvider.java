@@ -16,6 +16,10 @@ import java.io.IOException;
  */
 public class AeshBackendProvider implements BackendProvider {
 
+    /** Creates a new Aesh backend provider. */
+    public AeshBackendProvider() {
+    }
+
     @Override
     public String name() {
         return "aesh";
