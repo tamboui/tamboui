@@ -88,7 +88,7 @@ The `tamboui-tui` module provides a high-level framework that eliminates boilerp
 package dev.tamboui.demo;
 
 import dev.tamboui.tui.TuiRunner;
-import dev.tamboui.tui.Keys;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.text.Text;
 
@@ -97,7 +97,7 @@ public class HelloWorldTuiDemo {
         try (var tui = TuiRunner.create()) {
             tui.run(
                 (event, runner) -> {
-                    if (Keys.isQuit(event)) {
+                    if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
                         runner.quit();
                         return false;
                     }
