@@ -1,6 +1,6 @@
 [versions]
 jline = "3.25.1"
-lumis4j = "0.0.2"
+lumis4j = "0.0.3"
 junit = "5.14.1"
 assertj = "3.27.6"
 native-build-tools = "0.11.1"
