@@ -48,12 +48,24 @@ public class AeshBackend implements Backend {
     private Runnable resizeHandler;
 
     /**
-     * Creates a new Aesh backend.
+     * Creates a new Aesh backend using a default TerminalConnection.
      *
      * @throws IOException if the terminal cannot be initialized
      */
     public AeshBackend() throws IOException {
-        this.connection = new TerminalConnection();
+        this(new TerminalConnection());
+    }
+
+    /**
+     * Creates a new Aesh backend using the provided Connection.
+     * <p>
+     * This constructor allows creating backends from SSH or HTTP connections.
+     *
+     * @param connection the connection to use for terminal I/O
+     * @throws IOException if the terminal cannot be initialized
+     */
+    public AeshBackend(Connection connection) throws IOException {
+        this.connection = Objects.requireNonNull(connection, "connection cannot be null");
         this.connection.openNonBlocking();
         this.outputBuffer = new StringBuilder();
         this.inputQueue = new LinkedBlockingQueue<>();
@@ -74,7 +86,6 @@ public class AeshBackend implements Backend {
                 resizeHandler.run();
             }
         });
-
     }
 
     @Override

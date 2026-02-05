@@ -4,6 +4,9 @@
       "script-ref": ".jbang/tambouiDemos.java",
       "description": "Run TamboUI demos interactively"
     },
+    "aesh-ssh-http-demo": {
+      "script-ref": "demos/aesh-ssh-http-demo/src/main/java/dev/tamboui/demo/aesh/AeshSshHttpDemo.java"
+    },
     "error-handling-demo": {
       "script-ref": "demos/error-handling-demo/src/main/java/dev/tamboui/demo/errorhandling/ErrorHandlingDemo.java"
     },

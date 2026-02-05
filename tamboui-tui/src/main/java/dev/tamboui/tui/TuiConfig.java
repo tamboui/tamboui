@@ -4,12 +4,17 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.RenderErrorHandler;
@@ -42,7 +47,7 @@ public final class TuiConfig {
     private final PrintStream errorOutput;
     private final boolean fpsOverlayEnabled;
     private final List<PostRenderProcessor> postRenderProcessors;
-
+    private final Backend backend;
     /**
      * Creates a new TUI configuration with the specified options.
      * <p>
@@ -61,6 +66,7 @@ public final class TuiConfig {
      * @param errorOutput the output stream for error logging
      * @param fpsOverlayEnabled whether to show the FPS overlay
      * @param postRenderProcessors list of post-render processors
+     * @param backend the backend to use (optional)
      */
     public TuiConfig(
             boolean rawMode,
@@ -75,7 +81,7 @@ public final class TuiConfig {
             RenderErrorHandler errorHandler,
             PrintStream errorOutput,
             boolean fpsOverlayEnabled,
-            List<PostRenderProcessor> postRenderProcessors
+            List<PostRenderProcessor> postRenderProcessors, Backend backend 
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -92,6 +98,7 @@ public final class TuiConfig {
         this.postRenderProcessors = postRenderProcessors != null
                 ? Collections.unmodifiableList(new ArrayList<>(postRenderProcessors))
                 : Collections.emptyList();
+        this.backend = backend;
     }
 
     /**
@@ -116,8 +123,9 @@ public final class TuiConfig {
                 RenderErrorHandlers.displayAndQuit(),  // errorHandler
                 System.err,                  // errorOutput
                 false,                       // fpsOverlayEnabled
-                Collections.emptyList()      // postRenderProcessors
-        );
+                Collections.emptyList(),      // postRenderProcessors
+                null                           // backend (allows for lazy backend creation)
+            );
     }
 
     /**
@@ -276,6 +284,19 @@ public final class TuiConfig {
         return postRenderProcessors;
     }
 
+    /**
+     * Returns the configured backend, or null if not set.
+     * <p>
+     * If null, a backend will be created using {@link BackendFactory#create()}
+     * when the TUI is started.
+     *
+     * @return the configured backend, or null
+     */
+    public Backend backend() {
+        return backend;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -293,7 +314,8 @@ public final class TuiConfig {
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
                 && (resizeGracePeriod != null ? resizeGracePeriod.equals(that.resizeGracePeriod) : that.resizeGracePeriod == null)
                 && bindings.equals(that.bindings)
-                && fpsOverlayEnabled == that.fpsOverlayEnabled;
+                && fpsOverlayEnabled == that.fpsOverlayEnabled
+                && Objects.equals(backend, that.backend);
     }
 
     @Override
@@ -307,6 +329,7 @@ public final class TuiConfig {
         result = 31 * result + (resizeGracePeriod != null ? resizeGracePeriod.hashCode() : 0);
         result = 31 * result + bindings.hashCode();
         result = 31 * result + Boolean.hashCode(fpsOverlayEnabled);
+        result = 31 * result + Objects.hashCode(backend);
         return result;
     }
 
@@ -344,8 +367,22 @@ public final class TuiConfig {
         private PrintStream errorOutput = System.err;
         private boolean fpsOverlayEnabled = false;
         private final List<PostRenderProcessor> postRenderProcessors = new ArrayList<>();
+        private Backend backend;
 
         private Builder() {
+        }
+
+        /**
+         * Sets the backend to use.
+         * <p>
+         * If not set, a backend will be created using {@link BackendFactory#create()}.
+         *
+         * @param backend the backend to use
+         * @return this builder
+         */
+        public Builder backend(Backend backend) {
+            this.backend = backend;
+            return this;
         }
 
         /**
@@ -551,8 +588,10 @@ public final class TuiConfig {
                     errorHandler,
                     errorOutput,
                     fpsOverlayEnabled,
-                    postRenderProcessors
+                    postRenderProcessors,
+                    backend
             );
         }
     }
 }
+

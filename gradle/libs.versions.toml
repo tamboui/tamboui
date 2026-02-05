@@ -18,6 +18,8 @@ spotless = "8.2.1"
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }
 aesh-terminal = { module = "org.aesh:terminal-tty", version.ref = "aesh-terminal" }
+aesh-terminal-ssh = { module = "org.aesh:terminal-ssh", version.ref = "aesh-terminal" }
+aesh-terminal-http = { module = "org.aesh:terminal-http", version.ref = "aesh-terminal" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "picocli" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }

@@ -190,7 +190,7 @@ public final class TuiRunner implements AutoCloseable {
      * @throws Exception if terminal initialization fails
      */
     public static TuiRunner create(TuiConfig config) throws Exception {
-        Backend backend = BackendFactory.create();
+        Backend backend = config.backend() != null ? config.backend() : BackendFactory.create();
 
         try {
             if (config.rawMode()) {
