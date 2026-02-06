@@ -17,6 +17,7 @@ import io.roastedroot.lumis4j.core.Formatter;
 import io.roastedroot.lumis4j.core.Lang;
 import io.roastedroot.lumis4j.core.Lumis;
 import io.roastedroot.lumis4j.core.LumisResult;
+import io.roastedroot.lumis4j.core.Theme;
 
 /**
  * Renders a source string as TamboUI markup using lumis4j for syntax highlighting.
@@ -117,7 +118,8 @@ public final class Lumis4jMarkup implements AutoCloseable {
     EXT_TO_LANG = Collections.unmodifiableMap(m);
   }
 
-  private final Lumis lumis = Lumis.builder().build();
+  private final Lumis lumis =
+      Lumis.builder().build();
 
   /**
    * Creates a new Lumis4jMarkup.
@@ -140,6 +142,7 @@ public final class Lumis4jMarkup implements AutoCloseable {
     LumisResult result = lumis
             .highlighter()
             .withLang(lumisLang)
+            .withTheme(Theme.DRACULA)
             .withFormatter(Formatter.BBCODE)
             .build()
             .highlight(source);
