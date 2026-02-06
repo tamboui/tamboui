@@ -96,13 +96,14 @@ public class HelloWorldTuiDemo {
     public static void main(String[] args) throws Exception {
         try (var tui = TuiRunner.create()) {
             tui.run(
-                (event, runner) -> {
-                    if (event instanceof KeyEvent && ((KeyEvent) event).isQuit()) {
-                        runner.quit();
-                        return false;
-                    }
-                    return false;
-                },
+                (event, runner) ->
+                    switch (event) {
+                        case KeyEvent k when k.isQuit() -> {
+                            runner.quit();
+                            yield false;
+                        }
+                        default -> false;
+                    },
                 frame -> {
                     var paragraph = Paragraph.builder()
                         .text(Text.from("Hello, TamboUI! Press 'q' to quit."))
