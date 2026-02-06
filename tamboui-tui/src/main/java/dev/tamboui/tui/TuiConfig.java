@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
@@ -42,6 +43,7 @@ public final class TuiConfig {
     private final PrintStream errorOutput;
     private final boolean fpsOverlayEnabled;
     private final List<PostRenderProcessor> postRenderProcessors;
+    private final ScheduledExecutorService scheduler;
 
     /**
      * Creates a new TUI configuration with the specified options.
@@ -61,6 +63,7 @@ public final class TuiConfig {
      * @param errorOutput the output stream for error logging
      * @param fpsOverlayEnabled whether to show the FPS overlay
      * @param postRenderProcessors list of post-render processors
+     * @param scheduler external scheduler to use, or null to create an internal one
      */
     public TuiConfig(
             boolean rawMode,
@@ -75,7 +78,8 @@ public final class TuiConfig {
             RenderErrorHandler errorHandler,
             PrintStream errorOutput,
             boolean fpsOverlayEnabled,
-            List<PostRenderProcessor> postRenderProcessors
+            List<PostRenderProcessor> postRenderProcessors,
+            ScheduledExecutorService scheduler
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -92,6 +96,7 @@ public final class TuiConfig {
         this.postRenderProcessors = postRenderProcessors != null
                 ? Collections.unmodifiableList(new ArrayList<>(postRenderProcessors))
                 : Collections.emptyList();
+        this.scheduler = scheduler;
     }
 
     /**
@@ -116,7 +121,8 @@ public final class TuiConfig {
                 RenderErrorHandlers.displayAndQuit(),  // errorHandler
                 System.err,                  // errorOutput
                 false,                       // fpsOverlayEnabled
-                Collections.emptyList()      // postRenderProcessors
+                Collections.emptyList(),     // postRenderProcessors
+                null                         // scheduler
         );
     }
 
@@ -276,6 +282,18 @@ public final class TuiConfig {
         return postRenderProcessors;
     }
 
+    /**
+     * Returns the externally-managed scheduler, or null if the runner should create its own.
+     * <p>
+     * When an external scheduler is provided, the runner will NOT shut it down on close -
+     * the caller retains ownership and is responsible for its lifecycle.
+     *
+     * @return the external scheduler, or null to use an internally-managed one
+     */
+    public ScheduledExecutorService scheduler() {
+        return scheduler;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -344,6 +362,7 @@ public final class TuiConfig {
         private PrintStream errorOutput = System.err;
         private boolean fpsOverlayEnabled = false;
         private final List<PostRenderProcessor> postRenderProcessors = new ArrayList<>();
+        private ScheduledExecutorService scheduler;
 
         private Builder() {
         }
@@ -533,6 +552,23 @@ public final class TuiConfig {
         }
 
         /**
+         * Sets an externally-managed scheduler.
+         * <p>
+         * When an external scheduler is provided, the runner will NOT shut it down
+         * on close - the caller retains ownership and is responsible for its lifecycle.
+         * <p>
+         * This is useful when multiple runners should share a single scheduler,
+         * or when integrating with frameworks that manage their own thread pools.
+         *
+         * @param scheduler the scheduler to use, or null to create an internal one
+         * @return this builder
+         */
+        public Builder scheduler(ScheduledExecutorService scheduler) {
+            this.scheduler = scheduler;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          *
          * @return the constructed TuiConfig
@@ -551,7 +587,8 @@ public final class TuiConfig {
                     errorHandler,
                     errorOutput,
                     fpsOverlayEnabled,
-                    postRenderProcessors
+                    postRenderProcessors,
+                    scheduler
             );
         }
     }

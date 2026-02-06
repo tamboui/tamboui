@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -71,6 +70,7 @@ public final class InlineTuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final ScheduledExecutorService scheduler;
+    private final boolean schedulerOwned;
     private final AtomicLong frameCount;
     private final Thread shutdownHook;
     private final AtomicReference<Instant> lastTick;
@@ -89,17 +89,15 @@ public final class InlineTuiRunner implements AutoCloseable {
         this.nextTickTime = new AtomicReference<>(
                 config.tickRate() != null ? Instant.now().plus(config.tickRate()) : null);
 
-        // Set up scheduler for ticks if enabled
+        // Set up scheduler - use provided scheduler or create one
+        Schedulers.Scheduler scheduler = Schedulers.resolve(config.scheduler());
+        this.scheduler = scheduler.scheduler();
+        this.schedulerOwned = scheduler.owned();
+
+        // Only schedule the internal callback if ticks are enabled
         if (config.ticksEnabled() && config.tickRate() != null) {
-            this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
-                Thread t = new Thread(r, "inline-tui-scheduler");
-                t.setDaemon(true);
-                return t;
-            });
             long periodMs = config.tickRate().toMillis();
-            scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
-        } else {
-            this.scheduler = null;
+            this.scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
         }
 
         // Create and start the input reader thread
@@ -341,6 +339,19 @@ public final class InlineTuiRunner implements AutoCloseable {
     }
 
     /**
+     * Returns the shared scheduler for scheduling tasks.
+     * <p>
+     * This scheduler runs on a dedicated daemon thread. Tasks scheduled here
+     * execute on the scheduler thread, not the render thread. To modify UI state
+     * from a scheduled task, use {@link #runOnRenderThread(Runnable)}.
+     *
+     * @return the scheduler (never null)
+     */
+    public ScheduledExecutorService scheduler() {
+        return scheduler;
+    }
+
+    /**
      * Scheduler callback that generates tick events.
      */
     private void schedulerCallback() {
@@ -364,6 +375,13 @@ public final class InlineTuiRunner implements AutoCloseable {
         }
     }
 
+    /**
+     * Closes this runner and releases resources.
+     * <p>
+     * If a scheduler was provided via configuration, it is NOT shut down -
+     * the caller retains ownership and is responsible for its lifecycle.
+     * If no scheduler was provided, the internally-created scheduler is shut down.
+     */
     @Override
     public void close() {
         running.set(false);
@@ -380,8 +398,8 @@ public final class InlineTuiRunner implements AutoCloseable {
             // JVM is already shutting down
         }
 
-        // Shutdown scheduler
-        if (scheduler != null) {
+        // Shutdown scheduler only if we own it
+        if (schedulerOwned) {
             scheduler.shutdownNow();
             try {
                 scheduler.awaitTermination(100, TimeUnit.MILLISECONDS);

@@ -10,9 +10,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -79,7 +77,6 @@ public final class ToolkitRunner implements AutoCloseable {
     private final ElementRegistry elementRegistry;
     private final StyledAreaRegistry styledAreaRegistry;
     private final DefaultRenderContext renderContext;
-    private final ScheduledExecutorService scheduler;
     private final boolean faultTolerant;
     private final List<ToolkitPostRenderProcessor> postRenderProcessors;
     private volatile Duration lastElapsed = Duration.ZERO;
@@ -95,11 +92,6 @@ public final class ToolkitRunner implements AutoCloseable {
         this.eventRouter = new EventRouter(focusManager, elementRegistry);
         this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
         this.renderContext.setFaultTolerant(faultTolerant);
-        this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
-            Thread t = new Thread(r, "toolkit-scheduler");
-            t.setDaemon(true);
-            return t;
-        });
         this.faultTolerant = faultTolerant;
         this.postRenderProcessors = toolkitPostRenderProcessors;
     }
@@ -252,7 +244,7 @@ public final class ToolkitRunner implements AutoCloseable {
      * @return a handle that can be used to cancel the scheduled action
      */
     public ScheduledAction schedule(Runnable action, Duration delay) {
-        ScheduledFuture<?> future = scheduler.schedule(action, delay.toMillis(), TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = tuiRunner.scheduler().schedule(action, delay.toMillis(), TimeUnit.MILLISECONDS);
         return new ScheduledAction(future);
     }
 
@@ -276,7 +268,7 @@ public final class ToolkitRunner implements AutoCloseable {
      * @return a handle that can be used to cancel the scheduled action
      */
     public ScheduledAction scheduleRepeating(Runnable action, Duration interval) {
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
+        ScheduledFuture<?> future = tuiRunner.scheduler().scheduleAtFixedRate(
                 action, interval.toMillis(), interval.toMillis(), TimeUnit.MILLISECONDS);
         return new ScheduledAction(future);
     }
@@ -296,7 +288,7 @@ public final class ToolkitRunner implements AutoCloseable {
      * @return a handle that can be used to cancel the scheduled action
      */
     public ScheduledAction scheduleWithFixedDelay(Runnable action, Duration delay) {
-        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(
+        ScheduledFuture<?> future = tuiRunner.scheduler().scheduleWithFixedDelay(
                 action, delay.toMillis(), delay.toMillis(), TimeUnit.MILLISECONDS);
         return new ScheduledAction(future);
     }
@@ -430,7 +422,6 @@ public final class ToolkitRunner implements AutoCloseable {
 
     @Override
     public void close() {
-        scheduler.shutdownNow();
         tuiRunner.close();
     }
 

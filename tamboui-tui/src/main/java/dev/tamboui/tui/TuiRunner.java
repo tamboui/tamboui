@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -85,6 +84,7 @@ public final class TuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final ScheduledExecutorService scheduler;
+    private final boolean schedulerOwned;
     private final AtomicLong frameCount;
     private final Thread shutdownHook;
     private final RenderErrorHandler errorHandler;
@@ -139,18 +139,16 @@ public final class TuiRunner implements AutoCloseable {
             }
         });
 
-        // Set up scheduler for ticks and/or resize checks
+        // Set up scheduler - use provided scheduler or create one
+        Schedulers.Scheduler schedulerResult = Schedulers.resolve(config.scheduler());
+        this.scheduler = schedulerResult.scheduler();
+        this.schedulerOwned = schedulerResult.owned();
+
+        // Only schedule the internal callback if tick/resize needed
         Duration schedulerPeriod = computeSchedulerPeriod(config);
         if (schedulerPeriod != null) {
-            this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
-                Thread t = new Thread(r, "tui-scheduler");
-                t.setDaemon(true);
-                return t;
-            });
             long periodMs = schedulerPeriod.toMillis();
             scheduler.scheduleAtFixedRate(this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
-        } else {
-            this.scheduler = null;
         }
 
         // Create and start the input reader thread
@@ -603,6 +601,19 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
+     * Returns the shared scheduler for scheduling tasks.
+     * <p>
+     * This scheduler runs on a dedicated daemon thread. Tasks scheduled here
+     * execute on the scheduler thread, not the render thread. To modify UI state
+     * from a scheduled task, use {@link #runOnRenderThread(Runnable)}.
+     *
+     * @return the scheduler (never null)
+     */
+    public ScheduledExecutorService scheduler() {
+        return scheduler;
+    }
+
+    /**
      * Computes the scheduler period based on tick rate and resize grace period.
      *
      * @param config the TUI configuration
@@ -666,6 +677,13 @@ public final class TuiRunner implements AutoCloseable {
         }
     }
 
+    /**
+     * Closes this runner and releases resources.
+     * <p>
+     * If a scheduler was provided via configuration, it is NOT shut down -
+     * the caller retains ownership and is responsible for its lifecycle.
+     * If no scheduler was provided, the internally-created scheduler is shut down.
+     */
     @Override
     public void close() {
         running.set(false);
@@ -684,8 +702,8 @@ public final class TuiRunner implements AutoCloseable {
             }
         }
 
-        // Shutdown scheduler
-        if (scheduler != null) {
+        // Shutdown scheduler only if we own it
+        if (schedulerOwned) {
             scheduler.shutdownNow();
             try {
                 scheduler.awaitTermination(100, TimeUnit.MILLISECONDS);

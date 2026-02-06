@@ -5,6 +5,7 @@
 package dev.tamboui.tui;
 
 import java.time.Duration;
+import java.util.concurrent.ScheduledExecutorService;
 
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
@@ -41,14 +42,16 @@ public final class InlineTuiConfig {
     private final Duration pollTimeout;
     private final boolean clearOnClose;
     private final Bindings bindings;
+    private final ScheduledExecutorService scheduler;
 
     private InlineTuiConfig(int height, Duration tickRate, Duration pollTimeout,
-                            boolean clearOnClose, Bindings bindings) {
+                            boolean clearOnClose, Bindings bindings, ScheduledExecutorService scheduler) {
         this.height = height;
         this.tickRate = tickRate;
         this.pollTimeout = pollTimeout;
         this.clearOnClose = clearOnClose;
         this.bindings = bindings;
+        this.scheduler = scheduler;
     }
 
     /**
@@ -71,7 +74,8 @@ public final class InlineTuiConfig {
                 Duration.ofMillis(DEFAULT_TICK_RATE),
                 Duration.ofMillis(DEFAULT_POLL_TIMEOUT),
                 false,
-                BindingSets.defaults()
+                BindingSets.defaults(),
+                null
         );
     }
 
@@ -139,6 +143,18 @@ public final class InlineTuiConfig {
         return bindings;
     }
 
+    /**
+     * Returns the externally-managed scheduler, or null if the runner should create its own.
+     * <p>
+     * When an external scheduler is provided, the runner will NOT shut it down on close -
+     * the caller retains ownership and is responsible for its lifecycle.
+     *
+     * @return the external scheduler, or null to use an internally-managed one
+     */
+    public ScheduledExecutorService scheduler() {
+        return scheduler;
+    }
+
     @Override
     public String toString() {
         return String.format(
@@ -155,6 +171,7 @@ public final class InlineTuiConfig {
         private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private boolean clearOnClose = false;
         private Bindings bindings = BindingSets.defaults();
+        private ScheduledExecutorService scheduler;
 
         private Builder(int height) {
             if (height <= 0) {
@@ -231,12 +248,29 @@ public final class InlineTuiConfig {
         }
 
         /**
+         * Sets an externally-managed scheduler.
+         * <p>
+         * When an external scheduler is provided, the runner will NOT shut it down
+         * on close - the caller retains ownership and is responsible for its lifecycle.
+         * <p>
+         * This is useful when multiple runners should share a single scheduler,
+         * or when integrating with frameworks that manage their own thread pools.
+         *
+         * @param scheduler the scheduler to use, or null to create an internal one
+         * @return this builder
+         */
+        public Builder scheduler(ScheduledExecutorService scheduler) {
+            this.scheduler = scheduler;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          *
          * @return a new InlineTuiConfig
          */
         public InlineTuiConfig build() {
-            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bindings);
+            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bindings, scheduler);
         }
     }
 }

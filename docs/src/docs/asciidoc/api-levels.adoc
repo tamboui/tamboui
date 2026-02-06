@@ -390,6 +390,57 @@ runner.scheduleRepeating(() -> {
 
 This explicit approach gives you control - you can do background work in the scheduled action and only post the UI update portion to the render thread.
 
+==== Scheduler Management
+
+Each runner maintains a single shared scheduler that handles both internal tasks (tick events, resize detection) and user-scheduled actions.
+By default, this scheduler is created internally when the runner starts and shut down when the runner closes.
+
+===== External Scheduler Injection
+
+For integration with frameworks that provide their own thread pools, you can inject an external scheduler via configuration:
+
+[source,java]
+----
+ScheduledExecutorService myScheduler = Executors.newSingleThreadScheduledExecutor();
+
+var config = TuiConfig.builder()
+    .scheduler(myScheduler)  // Use externally-managed scheduler
+    .build();
+
+try (var tui = TuiRunner.create(config)) {
+    tui.run(handler, renderer);
+}
+
+// myScheduler is NOT shut down when TuiRunner closes - caller retains ownership
+myScheduler.shutdown();
+----
+
+===== Closing Semantics
+
+When closing runners:
+
+* **Internally-created scheduler**: Shut down automatically when the runner closes
+* **Externally-provided scheduler**: NOT shut down - the caller retains ownership and is responsible for its lifecycle
+
+This allows frameworks to manage scheduler lifecycles independently of individual runner instances.
+
+===== Multiple Runners
+
+When using multiple runners in a single application (e.g., multiple `InlineTuiRunner` instances for different inline displays), there are two approaches:
+
+[cols="1,2",options="header"]
+|===
+|Approach |Behavior
+
+|Default (no external scheduler)
+|Each runner creates and owns its own scheduler. Closing one runner shuts down only its scheduler.
+
+|Shared external scheduler
+|All runners share the provided scheduler. Runners do not shut it down; the caller manages its lifecycle.
+|===
+
+For multiple runners that should share a scheduler, provide an externally-managed scheduler via config to avoid premature shutdown when one runner closes.
+
 === Semantic Key Checks
 
 `KeyEvent` provides semantic methods that respect the configured bindings:
