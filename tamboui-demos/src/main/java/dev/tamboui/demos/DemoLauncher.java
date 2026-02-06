@@ -18,6 +18,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Layout;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
+import dev.tamboui.tui.InlineEventHandler;
+import dev.tamboui.tui.InlineTuiRunner;
+import dev.tamboui.tui.InlineTuiConfig;
+import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.BorderType;
+import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.input.TextInput;
+import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.list.ListItem;
+import dev.tamboui.widgets.list.ListState;
+import dev.tamboui.widgets.list.ListWidget;
 
 /**
  * Main launcher for the TamboUI demos fat jar.
@@ -27,6 +52,7 @@ import java.util.TreeMap;
  *   <li>{@code java -jar tamboui-demos.jar} - List all available demos</li>
  *   <li>{@code java -jar tamboui-demos.jar <demo-name>} - Run a specific demo</li>
  *   <li>{@code java -jar tamboui-demos.jar <demo-name> [args...]} - Run a demo with arguments</li>
+ *   <li>{@code java -jar tamboui-demos.jar -i} or {@code --interactive} - Interactive demo selector</li>
  * </ul>
  */
 public class DemoLauncher {
@@ -126,7 +152,7 @@ public class DemoLauncher {
         Map<String, DemoEntry> demos = loadDemoManifest();
 
         if (args.length == 0) {
-            printUsage(demos);
+            runInteractiveMode(demos);
             System.exit(0);
         }
 
@@ -139,6 +165,11 @@ public class DemoLauncher {
 
         if ("--list".equals(demoName) || "-l".equals(demoName)) {
             printDemoList(demos);
+            System.exit(0);
+        }
+
+        if ("--interactive".equals(demoName) || "-i".equals(demoName)) {
+            runInteractiveMode(demos);
             System.exit(0);
         }
 
@@ -250,8 +281,9 @@ public class DemoLauncher {
         System.out.println("Usage: java -jar tamboui-demos.jar [options] [demo-name] [demo-args...]");
         System.out.println();
         System.out.println("Options:");
-        System.out.println("  -h, --help    Show this help message");
-        System.out.println("  -l, --list    List all available demos");
+        System.out.println("  -h, --help       Show this help message");
+        System.out.println("  -l, --list       List all available demos");
+        System.out.println("  -i, --interactive Interactive demo selector");
         System.out.println();
         System.out.println("Available demos (" + demos.size() + "):");
         System.out.println();
@@ -327,5 +359,256 @@ public class DemoLauncher {
         Class<?> clazz = Class.forName(demo.mainClass());
         Method main = clazz.getMethod("main", String[].class);
         main.invoke(null, (Object) args);
+    }
+
+    /**
+     * Runs the interactive demo selector mode using InlineTuiRunner.
+     * Provides a filterable list interface for selecting demos.
+     * Loops back to the selector after each demo exits.
+     *
+     * @param demos the map of available demos
+     * @throws Exception if an error occurs
+     */
+    private static void runInteractiveMode(Map<String, DemoEntry> demos) throws Exception {
+        // Convert demos to a sorted list
+        List<DemoEntry> allDemos = demos.values().stream()
+                .sorted(Comparator.comparing(DemoEntry::module)
+                        .thenComparing(DemoEntry::displayName))
+                .collect(Collectors.toList());
+
+        // Create inline TUI runner configuration
+        int displayHeight = Math.min(20, allDemos.size() + 4); // Input + list + borders
+        InlineTuiConfig config = InlineTuiConfig.builder(displayHeight)
+                .noTick()
+                .clearOnClose(true)
+                .build();
+
+        // Main loop: keep showing selector until user quits
+        while (true) {
+            // State for filtering and selection (reset each iteration)
+            TextInputState filterState = new TextInputState();
+            ListState listState = new ListState();
+            @SuppressWarnings("unchecked")
+            List<DemoEntry>[] filteredDemosRef = (List<DemoEntry>[]) new List<?>[]{new ArrayList<>(allDemos)};
+            DemoEntry[] selectedDemoRef = new DemoEntry[1];
+            boolean[] shouldQuitRef = new boolean[1];
+
+            // Select first item initially
+            if (!filteredDemosRef[0].isEmpty()) {
+                listState.selectFirst();
+            }
+
+            // Create and run the inline TUI runner for this iteration
+            try (InlineTuiRunner runner = InlineTuiRunner.create(config)) {
+                runner.run(
+                        (event, r) -> {
+                            if (event instanceof KeyEvent) {
+                                KeyEvent keyEvent = (KeyEvent) event;
+
+                                // Quit on Ctrl+C or Escape
+                                if (keyEvent.isQuit() || keyEvent.isCancel()) {
+                                    shouldQuitRef[0] = true;
+                                    r.quit();
+                                    return true;
+                                }
+
+                                // Handle Enter to select demo
+                                if (keyEvent.isConfirm()) {
+                                    Integer selected = listState.selected();
+                                    if (selected != null && selected < filteredDemosRef[0].size()) {
+                                        selectedDemoRef[0] = filteredDemosRef[0].get(selected);
+                                        r.quit();
+                                        return true;
+                                    }
+                                    return false;
+                                }
+
+                                // Handle list navigation
+                                if (keyEvent.isUp()) {
+                                    listState.selectPrevious();
+                                    return true;
+                                }
+                                if (keyEvent.isDown()) {
+                                    listState.selectNext(filteredDemosRef[0].size());
+                                    return true;
+                                }
+                                if (keyEvent.isHome()) {
+                                    listState.selectFirst();
+                                    return true;
+                                }
+                                if (keyEvent.isEnd()) {
+                                    listState.selectLast(filteredDemosRef[0].size());
+                                    return true;
+                                }
+
+                                // Handle text input for filtering
+                                if (handleTextInputKey(filterState, keyEvent)) {
+                                    // Filter demos based on input
+                                    String filter = filterState.text().toLowerCase();
+                                    List<DemoEntry> filtered = new ArrayList<>();
+                                    if (filter.isEmpty()) {
+                                        filtered.addAll(allDemos);
+                                    } else {
+                                        for (DemoEntry demo : allDemos) {
+                                            if (demo.id().toLowerCase().contains(filter) ||
+                                                    demo.displayName().toLowerCase().contains(filter) ||
+                                                    (demo.description() != null && demo.description().toLowerCase().contains(filter)) ||
+                                                    demo.module().toLowerCase().contains(filter)) {
+                                                filtered.add(demo);
+                                            }
+                                        }
+                                    }
+                                    filteredDemosRef[0] = filtered;
+                                    // Reset selection to first item after filtering
+                                    if (!filteredDemosRef[0].isEmpty()) {
+                                        listState.selectFirst();
+                                    } else {
+                                        listState.select(null);
+                                    }
+                                    return true;
+                                }
+                            }
+                            return false;
+                        },
+                        frame -> {
+                            Rect area = frame.area();
+                            int width = area.width();
+                            int height = area.height();
+
+                            // Layout: filter input at top, list below
+                            List<Rect> layout = Layout.vertical()
+                                    .constraints(
+                                            Constraint.length(3),  // Filter input with border
+                                            Constraint.fill()      // List
+                                    )
+                                    .split(area);
+
+                            Rect filterArea = layout.get(0);
+                            Rect listArea = layout.get(1);
+
+                            // Render filter input
+                            renderFilterInput(frame, filterArea, filterState, filteredDemosRef[0].size(), allDemos.size());
+
+                            // Render demo list
+                            renderDemoList(frame, listArea, filteredDemosRef[0], listState);
+                        }
+                );
+            }
+            // Runner is now closed
+
+            // Check if user wants to quit
+            if (shouldQuitRef[0]) {
+                break;
+            }
+
+            // Launch selected demo if one was chosen
+            if (selectedDemoRef[0] != null) {
+                System.out.println();
+                System.out.println("Launching: " + selectedDemoRef[0].displayName() + " (" + selectedDemoRef[0].module() + ")");
+                System.out.println();
+                launchDemo(demos, selectedDemoRef[0].id(), new String[0]);
+                // After demo exits, loop will automatically return to selector (creating a new runner)
+            }
+        }
+    }
+
+    /**
+     * Renders the filter input widget.
+     */
+    private static void renderFilterInput(Frame frame, Rect area, TextInputState state, int filteredCount, int totalCount) {
+        String title = String.format("Filter (%d/%d)", filteredCount, totalCount);
+        TextInput input = TextInput.builder()
+                .placeholder("Type to filter demos...")
+                .block(Block.builder()
+                        .borders(Borders.ALL)
+                        .borderType(BorderType.ROUNDED)
+                        .title(Title.from(title))
+                        .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                        .build())
+                .build();
+
+        frame.renderStatefulWidget(input, area, state);
+    }
+
+    /**
+     * Renders the demo list widget.
+     */
+    private static void renderDemoList(Frame frame, Rect area, List<DemoEntry> demos, ListState state) {
+        if (demos.isEmpty()) {
+            // Show empty message
+            Block emptyBlock = Block.builder()
+                    .borders(Borders.ALL)
+                    .borderType(BorderType.ROUNDED)
+                    .title(Title.from("No demos found"))
+                    .borderStyle(Style.EMPTY.fg(Color.RED))
+                    .build();
+            frame.renderWidget(emptyBlock, area);
+            return;
+        }
+
+        // Convert demos to list items
+        List<ListItem> items = new ArrayList<>();
+        for (DemoEntry demo : demos) {
+            // Format: "Module: Display Name - Description"
+            String description = demo.description() != null && !demo.description().isEmpty()
+                    ? " - " + demo.description()
+                    : "";
+            String itemText = String.format("%s: %s%s", demo.module(), demo.displayName(), description);
+            items.add(ListItem.from(itemText));
+        }
+
+        ListWidget list = ListWidget.builder()
+                .items(items)
+                .highlightStyle(Style.EMPTY.reversed().fg(Color.YELLOW))
+                .highlightSymbol("> ")
+                .block(Block.builder()
+                        .borders(Borders.ALL)
+                        .borderType(BorderType.ROUNDED)
+                        .title(Title.from("Select a demo (Enter to launch, Esc to quit launcher)"))
+                        .borderStyle(Style.EMPTY.fg(Color.CYAN))
+                        .build())
+                .build();
+
+        frame.renderStatefulWidget(list, area, state);
+    }
+
+    /**
+     * Handles key events for text input, similar to Toolkit.handleTextInputKey.
+     * This is a simplified version that doesn't require the Toolkit dependency.
+     */
+    private static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
+        switch (event.code()) {
+            case BACKSPACE:
+                state.deleteBackward();
+                return true;
+            case DELETE:
+                state.deleteForward();
+                return true;
+            case LEFT:
+                state.moveCursorLeft();
+                return true;
+            case RIGHT:
+                state.moveCursorRight();
+                return true;
+            case HOME:
+                state.moveCursorToStart();
+                return true;
+            case END:
+                state.moveCursorToEnd();
+                return true;
+            case CHAR:
+                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
+                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                    return false;
+                }
+                char c = event.character();
+                if (c >= 32 && c < 127) {
+                    state.insert(c);
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
     }
 }
