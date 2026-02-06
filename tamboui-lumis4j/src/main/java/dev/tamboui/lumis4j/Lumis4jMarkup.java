@@ -32,7 +32,6 @@ public final class Lumis4jMarkup implements AutoCloseable {
 
   static {
     Map<String, String> m = new HashMap<>();
-    m.put("java", Lang.JAVA.value());
     m.put("py", Lang.PYTHON.value());
     m.put("pyw", Lang.PYTHON.value());
     m.put("js", Lang.JAVASCRIPT.value());
@@ -40,81 +39,36 @@ public final class Lumis4jMarkup implements AutoCloseable {
     m.put("cjs", Lang.JAVASCRIPT.value());
     m.put("ts", Lang.TYPESCRIPT.value());
     m.put("tsx", Lang.TSX.value());
-    m.put("go", Lang.GO.value());
-    m.put("rs", Lang.RUST.value());
     m.put("rb", Lang.RUBY.value());
     m.put("kt", Lang.KOTLIN.value());
     m.put("kts", Lang.KOTLIN.value());
-    m.put("sql", Lang.SQL.value());
-    m.put("html", Lang.HTML.value());
     m.put("htm", Lang.HTML.value());
-    m.put("css", Lang.CSS.value());
     m.put("scss", Lang.SCSS.value());
-    m.put("json", Lang.JSON.value());
-    m.put("xml", Lang.XML.value());
-    m.put("yaml", Lang.YAML.value());
     m.put("yml", Lang.YAML.value());
-    m.put("md", Lang.MARKDOWN.value());
-    m.put("markdown", Lang.MARKDOWN.value());
     m.put("mdx", Lang.MARKDOWN.value());
-    m.put("sh", Lang.BASH.value());
     m.put("bash", Lang.BASH.value());
-    m.put("c", Lang.C.value());
     m.put("h", Lang.C.value());
-    m.put("cpp", Lang.CPP.value());
     m.put("cc", Lang.CPP.value());
     m.put("cxx", Lang.CPP.value());
     m.put("hpp", Lang.CPP.value());
-    m.put("cs", Lang.C_SHARP.value());
     m.put("csx", Lang.C_SHARP.value());
-    m.put("clj", Lang.CLOJURE.value());
     m.put("cljc", Lang.CLOJURE.value());
-    m.put("ex", Lang.ELIXIR.value());
     m.put("exs", Lang.ELIXIR.value());
-    m.put("erl", Lang.ERLANG.value());
     m.put("hrl", Lang.ERLANG.value());
-    m.put("fs", Lang.F_SHARP.value());
     m.put("fsx", Lang.F_SHARP.value());
-    m.put("hs", Lang.HASKELL.value());
     m.put("lhs", Lang.HASKELL.value());
-    m.put("elm", Lang.ELM.value());
-    m.put("lua", Lang.LUA.value());
-    m.put("ml", Lang.OCAML.value());
     m.put("mli", Lang.OCAML_INTERFACE.value());
-    m.put("ps1", Lang.POWERSHELL.value());
-    m.put("toml", Lang.TOML.value());
-    m.put("vue", Lang.VUE.value());
-    m.put("dart", Lang.DART.value());
-    m.put("swift", Lang.SWIFT.value());
-    m.put("zig", Lang.ZIG.value());
-    m.put("scala", Lang.SCALA.value());
     m.put("sc", Lang.SCALA.value());
-    m.put("php", Lang.PHP.value());
-    m.put("pl", Lang.PERL.value());
     m.put("tf", Lang.HCL.value());
-    m.put("graphql", Lang.GRAPHQL.value());
     m.put("gql", Lang.GRAPHQL.value());
-    m.put("r", Lang.R.value());
     m.put("asm", Lang.ASSEMBLY.value());
     m.put("s", Lang.ASSEMBLY.value());
-    m.put("nix", Lang.NIX.value());
-    m.put("tex", Lang.LATEX.value());
-    m.put("vim", Lang.VIM.value());
-    m.put("diff", Lang.DIFF.value());
     m.put("patch", Lang.DIFF.value());
-    m.put("csv", Lang.CSV.value());
     m.put("proto", Lang.PROTO_BUF.value());
-    m.put("eex", Lang.EEX.value());
     m.put("heex", Lang.HEX.value());
-    m.put("erb", Lang.ERB.value());
-    m.put("ejs", Lang.EJS.value());
     m.put("svelte", Lang.SVELTE.value());
     m.put("astro", Lang.ASTRO.value());
-    m.put("m", Lang.OBJ_C.value());
     m.put("mm", Lang.OBJ_C.value());
-    m.put("gleam", Lang.GLEAM.value());
-    m.put("dockerfile", Lang.DOCKERFILE.value());
-    m.put("makefile", Lang.MAKE.value());
     EXT_TO_LANG = Collections.unmodifiableMap(m);
   }
 
@@ -200,7 +154,7 @@ public final class Lumis4jMarkup implements AutoCloseable {
       return null;
     }
     String ext = name.substring(dot + 1);
-    return EXT_TO_LANG.get(ext);
+    return EXT_TO_LANG.getOrDefault(ext, ext);
   }
 
   private static Lang langToLang(String lang) {
