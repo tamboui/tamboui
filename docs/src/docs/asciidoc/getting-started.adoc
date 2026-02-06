@@ -116,59 +116,15 @@ The simplest way to build a TUI application:
 
 [source,java]
 ----
-import static dev.tamboui.toolkit.Toolkit.*;
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
-
-public class HelloDsl extends ToolkitApp {
-
-    @Override
-    protected Element render() {
-        return panel("Hello",
-            text("Welcome to TamboUI DSL!").bold().cyan(),
-            spacer(),
-            text("Press 'q' to quit").dim()
-        ).rounded();
-    }
-
-    public static void main(String[] args) throws Exception {
-        new HelloDsl().run();
-    }
-}
+include::code/getting-started/Hellodsl.java[lines=3..-1]
 ----
 
-=== Using TuiRunner
 
 For more control over the event loop:
 
 [source,java]
 ----
-import dev.tamboui.tui.TuiRunner;
-import dev.tamboui.tui.Keys;
-import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.text.Text;
-
-public class HelloTuiRunner {
-    public static void main(String[] args) throws Exception {
-        try (var tui = TuiRunner.create()) {
-            tui.run(
-                (event, runner) -> {
-                    if (event.isQuit()) {
-                        runner.quit();
-                        return false;
-                    }
-                    return false;
-                },
-                frame -> {
-                    var paragraph = Paragraph.builder()
-                        .text(Text.from("Hello, TamboUI! Press 'q' to quit."))
-                        .build();
-                    frame.renderWidget(paragraph, frame.area());
-                }
-            );
-        }
-    }
-}
+include::code/getting-started/HelloTuiRunner.java[lines=3..-1]
 ----
 
 === Using Immediate Mode
@@ -177,31 +133,7 @@ For maximum control over the terminal:
 
 [source,java]
 ----
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.terminal.BackendFactory;
-import dev.tamboui.terminal.Terminal;
-import dev.tamboui.widgets.paragraph.Paragraph;
-import dev.tamboui.text.Text;
-
-public class HelloImmediate {
-    public static void main(String[] args) throws Exception {
-        try (var backend = BackendFactory.create()) {
-            backend.enableRawMode();
-            backend.enterAlternateScreen();
-
-            var terminal = new Terminal<>(backend);
-            terminal.draw(frame -> {
-                var paragraph = Paragraph.builder()
-                    .text(Text.from("Hello, Immediate Mode!"))
-                    .build();
-                frame.renderWidget(paragraph, frame.area());
-            });
-
-            // Wait for user input
-            Thread.sleep(2000);
-        }
-    }
-}
+include::code/getting-started/HelloImmediate.java[lines=3..-1]
 ----
 
 === Using Inline Display
@@ -210,27 +142,7 @@ For CLI tools that show progress while preserving terminal history:
 
 [source,java]
 ----
-import dev.tamboui.inline.InlineDisplay;
-import dev.tamboui.widgets.gauge.Gauge;
-
-public class HelloInline {
-    public static void main(String[] args) throws Exception {
-        try (var display = InlineDisplay.create(2)) {
-            for (int i = 0; i <= 100; i += 5) {
-                int progress = i;
-                display.render((area, buffer) -> {
-                    var gauge = Gauge.builder()
-                        .ratio(progress / 100.0)
-                        .label("Progress: " + progress + "%")
-                        .build();
-                    gauge.render(area, buffer);
-                });
-                Thread.sleep(50);
-            }
-            display.println("Done!");
-        }
-    }
-}
+include::code/getting-started/HelloInline.java[lines=3..-1]
 ----
 
 == Running the Demos
