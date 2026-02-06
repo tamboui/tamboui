@@ -45,6 +45,7 @@ public final class Lumis4jMarkup implements AutoCloseable {
     m.put("htm", Lang.HTML.value());
     m.put("scss", Lang.SCSS.value());
     m.put("yml", Lang.YAML.value());
+    m.put("md", Lang.MARKDOWN.value());
     m.put("mdx", Lang.MARKDOWN.value());
     m.put("bash", Lang.BASH.value());
     m.put("h", Lang.C.value());

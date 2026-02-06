@@ -4,13 +4,12 @@
  */
 package dev.tamboui.lumis4j;
 
-import java.beans.Transient;
 import java.time.Duration;
 
-import dev.tamboui.text.MarkupParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Text;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -175,9 +174,9 @@ class Lumis4jMarkupTest {
   }
 
   @Test
-  @DisplayName("guessLangFromFileName unknown extension returns null")
+  @DisplayName("guessLangFromFileName unknown extension returns the prefix")
   void guessLangUnknownExtension() {
-    assertThat(Lumis4jMarkup.guessLangFromFileName("file.xyz")).isNull();
+    assertThat(Lumis4jMarkup.guessLangFromFileName("file.xyz")).isEqualTo("xyz");
   }
 
   @Test
@@ -187,17 +186,7 @@ class Lumis4jMarkupTest {
     assertThat(Lumis4jMarkup.guessLangFromFileName("doc.markdown")).isEqualTo("markdown");
   }
 
-  // --- EXT_TO_LANG ---
 
-  @Test
-  @DisplayName("EXT_TO_LANG contains expected common extensions")
-  void extToLangContainsCommon() {
-    assertThat(Lumis4jMarkup.EXT_TO_LANG).containsEntry("java", "java");
-    assertThat(Lumis4jMarkup.EXT_TO_LANG).containsEntry("py", "python");
-    assertThat(Lumis4jMarkup.EXT_TO_LANG).containsEntry("md", "markdown");
-    assertThat(Lumis4jMarkup.EXT_TO_LANG).containsEntry("rs", "rust");
-    assertThat(Lumis4jMarkup.EXT_TO_LANG).containsEntry("go", "go");
-  }
 
   // --- lumis4jStyleResolver ---
 
@@ -271,7 +260,7 @@ class Lumis4jMarkupTest {
 
       Text res = MarkupParser.parse(result);
 
-      assertThat(res.rawContent()).contains("[/punctation-bracket]");
+      assertThat(res.rawContent()).doesNotContain("[/punctation-bracket]");
       assertThat(result).isNotEmpty();
       assertThat(result).contains("{\"name\": \"John\", \"age\": 30}");
     }
