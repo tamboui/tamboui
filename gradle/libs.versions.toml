@@ -1,5 +1,6 @@
 [versions]
 jline = "3.25.1"
+lumis4j = "0.0.3"
 junit = "5.14.1"
 assertj = "3.27.6"
 native-build-tools = "0.11.1"
@@ -31,6 +32,7 @@ compile-testing = { module = "com.google.testing.compile:compile-testing", versi
 gradle-tooling-api = { module = "org.gradle:gradle-tooling-api", version.ref = "gradle-tooling-api" }
 asciidoctor-plugin = { module = "org.asciidoctor:asciidoctor-gradle-jvm", version.ref = "asciidoctor" }
 git-publish-plugin = { module = "org.ajoberstar.git-publish:org.ajoberstar.git-publish.gradle.plugin", version.ref = "git-publish" }
+lumis4j = { module = "io.roastedroot:lumis4j", version.ref = "lumis4j" }
 spotless-gradle-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
 
 [bundles]
