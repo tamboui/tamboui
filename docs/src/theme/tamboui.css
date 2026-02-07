@@ -3,34 +3,43 @@
 
 /* CSS Custom Properties */
 :root {
-    /* Colors - Light Mode */
-    --sl-color-white: #fff;
-    --sl-color-gray-1: #f5f6f8;
-    --sl-color-gray-2: #eceef2;
-    --sl-color-gray-3: #c2c6cf;
-    --sl-color-gray-4: #878d99;
-    --sl-color-gray-5: #545b68;
-    --sl-color-gray-6: #353a46;
-    --sl-color-black: #17191e;
+    /* Brand colors (shared across light/dark) */
+    --tamboui-accent-primary: #00d4ff;
+    --tamboui-accent-secondary: #7c3aed;
+    --tamboui-success: #10b981;
+    --tamboui-warning: #f59e0b;
 
-    --sl-color-accent: #0073e6;
-    --sl-color-accent-high: #0060bf;
-    --sl-color-accent-low: rgba(0, 115, 230, 0.1);
+    /* Colors - Light Mode */
+    /* A "day" variant that stays connected to the dark theme:
+       keep the same purple secondary, and use a slightly deeper cyan for readability. */
+    --sl-color-white: #ffffff;
+    --sl-color-gray-1: #f1f5f9; /* slate-100 */
+    --sl-color-gray-2: #e2e8f0; /* slate-200 */
+    --sl-color-gray-3: #cbd5e1; /* slate-300 */
+    --sl-color-gray-4: #64748b; /* slate-500 */
+    --sl-color-gray-5: #475569; /* slate-600 */
+    --sl-color-gray-6: #1e293b; /* slate-800 */
+    --sl-color-black: #0f172a;  /* slate-900 */
+
+    /* Accent */
+    --sl-color-accent: #0891b2; /* cyan-600 */
+    --sl-color-accent-high: #0e7490; /* cyan-700 */
+    --sl-color-accent-low: rgba(8, 145, 178, 0.12);
 
     /* Semantic colors */
-    --sl-color-bg: var(--sl-color-white);
-    --sl-color-bg-nav: var(--sl-color-gray-1);
+    --sl-color-bg: #f8fafc; /* slate-50 */
+    --sl-color-bg-nav: rgba(248, 250, 252, 0.88);
     --sl-color-bg-sidebar: var(--sl-color-gray-1);
     --sl-color-bg-inline-code: var(--sl-color-gray-2);
-    --sl-color-hairline: var(--sl-color-gray-2);
-    --sl-color-hairline-light: var(--sl-color-gray-1);
-    --sl-color-text: var(--sl-color-gray-6);
+    --sl-color-hairline: var(--sl-color-gray-3);
+    --sl-color-hairline-light: var(--sl-color-gray-2);
+    --sl-color-text: var(--sl-color-black);
     --sl-color-text-accent: var(--sl-color-accent-high);
     --sl-color-text-invert: var(--sl-color-white);
 
     /* Code block colors */
-    --sl-color-bg-code: #1e1e2e;
-    --sl-color-text-code: #cdd6f4;
+    --sl-color-bg-code: #0f172a; /* matches landing page code background */
+    --sl-color-text-code: #e2e8f0;
 
     /* Layout */
     --sl-nav-height: 3.5rem;
@@ -50,39 +59,53 @@
 /* Dark Mode */
 [data-theme="dark"],
 .dark {
-    --sl-color-bg: #17191e;
-    --sl-color-bg-nav: #1e2027;
-    --sl-color-bg-sidebar: #1e2027;
-    --sl-color-bg-inline-code: #282a36;
-    --sl-color-hairline: #2e3038;
-    --sl-color-hairline-light: #252730;
-    --sl-color-text: #e0e2e7;
-    --sl-color-text-accent: #58a6ff;
+    /* Match landing page dark palette */
+    --sl-color-bg: #0a0e27;
+    --sl-color-bg-nav: rgba(10, 14, 39, 0.78);
+    --sl-color-bg-sidebar: #141b2d;
+    --sl-color-bg-inline-code: #0f172a;
+    --sl-color-hairline: #334155;
+    --sl-color-hairline-light: #1e293b;
+    --sl-color-text: #e2e8f0;
 
-    --sl-color-gray-1: #252730;
-    --sl-color-gray-2: #2e3038;
-    --sl-color-gray-3: #454952;
-    --sl-color-gray-4: #7c8191;
-    --sl-color-gray-5: #a8aebb;
+    /* Accent matches landing page */
+    --sl-color-accent: var(--tamboui-accent-primary);
+    --sl-color-accent-high: var(--tamboui-accent-primary);
+    --sl-color-accent-low: rgba(0, 212, 255, 0.12);
+    --sl-color-text-accent: var(--sl-color-accent-high);
+
+    /* Slate-like grays for dark UI surfaces */
+    --sl-color-gray-1: #141b2d;
+    --sl-color-gray-2: #0f172a;
+    --sl-color-gray-3: #1e293b;
+    --sl-color-gray-4: #64748b;
+    --sl-color-gray-5: #94a3b8;
+    --sl-color-gray-6: #cbd5e1;
 }
 
 /* Prefer dark mode by default for terminal tool docs */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --sl-color-bg: #17191e;
-        --sl-color-bg-nav: #1e2027;
-        --sl-color-bg-sidebar: #1e2027;
-        --sl-color-bg-inline-code: #282a36;
-        --sl-color-hairline: #2e3038;
-        --sl-color-hairline-light: #252730;
-        --sl-color-text: #e0e2e7;
-        --sl-color-text-accent: #58a6ff;
+        /* Keep in sync with [data-theme="dark"] */
+        --sl-color-bg: #0a0e27;
+        --sl-color-bg-nav: rgba(10, 14, 39, 0.78);
+        --sl-color-bg-sidebar: #141b2d;
+        --sl-color-bg-inline-code: #0f172a;
+        --sl-color-hairline: #334155;
+        --sl-color-hairline-light: #1e293b;
+        --sl-color-text: #e2e8f0;
 
-        --sl-color-gray-1: #252730;
-        --sl-color-gray-2: #2e3038;
-        --sl-color-gray-3: #454952;
-        --sl-color-gray-4: #7c8191;
-        --sl-color-gray-5: #a8aebb;
+        --sl-color-accent: var(--tamboui-accent-primary);
+        --sl-color-accent-high: var(--tamboui-accent-primary);
+        --sl-color-accent-low: rgba(0, 212, 255, 0.12);
+        --sl-color-text-accent: var(--sl-color-accent-high);
+
+        --sl-color-gray-1: #141b2d;
+        --sl-color-gray-2: #0f172a;
+        --sl-color-gray-3: #1e293b;
+        --sl-color-gray-4: #64748b;
+        --sl-color-gray-5: #94a3b8;
+        --sl-color-gray-6: #cbd5e1;
     }
 }
 
@@ -148,7 +171,7 @@ body {
     display: inline-block;
     width: 1.5rem;
     height: 1.5rem;
-    background: linear-gradient(135deg, var(--sl-color-accent) 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, var(--sl-color-accent) 0%, var(--tamboui-accent-secondary) 100%);
     border-radius: 4px;
 }
 
@@ -456,7 +479,7 @@ a:hover {
     line-height: 1.7;
     overflow-x: auto;
     border-radius: 0.5rem;
-    border: 1px solid #313244;
+    border: 1px solid var(--sl-color-hairline);
 }
 
 .listingblock .title + .content pre {
