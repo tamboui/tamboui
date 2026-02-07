@@ -65,7 +65,7 @@ public class ToolkitDemo {
                             text(" [Tab] Focus ").dim(),
                             text(" [Drag] Move ").dim(),
                             text(" [x] Delete ").dim(),
-                            text(" [q] Quit ").dim()
+                            text(" [CTRL+c] Quit ").dim()
                     )).rounded().borderColor(Color.DARK_GRAY))
                     .center(panels)
             );

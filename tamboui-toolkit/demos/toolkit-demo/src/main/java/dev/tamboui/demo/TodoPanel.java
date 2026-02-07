@@ -99,6 +99,9 @@ final class TodoPanel extends PanelContent {
 
     @Override
     EventResult handleKey(KeyEvent event) {
+        if (event.hasAlt() || event.hasCtrl() || event.hasShift()) {
+            return EventResult.UNHANDLED;
+        }
         // Navigation
         if (event.isUp()) {
             if (selectedIndex > -1) {
