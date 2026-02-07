@@ -7,6 +7,7 @@ description = "Demo showcasing TamboUI app accessible via SSH and HTTP/WebSocket
 demo {
     displayName = "Aesh SSH/HTTP Demo"
     tags = setOf("aesh", "ssh", "http", "websocket", "toolkit", "network")
+    internal = true
 }
 
 dependencies {

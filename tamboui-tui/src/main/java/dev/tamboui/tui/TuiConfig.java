@@ -4,14 +4,12 @@
  */
 package dev.tamboui.tui;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.concurrent.ScheduledExecutorService;
 
 import dev.tamboui.terminal.Backend;
@@ -85,8 +83,8 @@ public final class TuiConfig {
             RenderErrorHandler errorHandler,
             PrintStream errorOutput,
             boolean fpsOverlayEnabled,
-            List<PostRenderProcessor> postRenderProcessors, Backend backend 
-            List<PostRenderProcessor> postRenderProcessors,
+            List<PostRenderProcessor> postRenderProcessors, 
+            Backend backend,
             ScheduledExecutorService scheduler
     ) {
         this.rawMode = rawMode;
@@ -130,12 +128,10 @@ public final class TuiConfig {
                 RenderErrorHandlers.displayAndQuit(),  // errorHandler
                 System.err,                  // errorOutput
                 false,                       // fpsOverlayEnabled
-                Collections.emptyList(),      // postRenderProcessors
-                null                           // backend (allows for lazy backend creation)
-            );
                 Collections.emptyList(),     // postRenderProcessors
+                null,                          // backend (allows for lazy backend creation)
                 null                         // scheduler
-        );
+            );
     }
 
     /**
@@ -306,7 +302,7 @@ public final class TuiConfig {
         return backend;
     }
 
-
+    /**
      * Returns the externally-managed scheduler, or null if the runner should create its own.
      * <p>
      * When an external scheduler is provided, the runner will NOT shut it down on close -
@@ -628,10 +624,9 @@ public final class TuiConfig {
                     errorOutput,
                     fpsOverlayEnabled,
                     postRenderProcessors,
-                    backend
+                    backend,
                     scheduler
             );
         }
     }
 }
-

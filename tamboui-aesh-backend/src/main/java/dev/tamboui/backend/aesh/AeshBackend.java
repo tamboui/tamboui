@@ -4,6 +4,18 @@
  */
 package dev.tamboui.backend.aesh;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.aesh.terminal.Connection;
+import org.aesh.terminal.tty.Point;
+import org.aesh.terminal.tty.TerminalConnection;
+
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.layout.Position;
@@ -15,18 +27,6 @@ import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.Mode2027Status;
 import dev.tamboui.terminal.Mode2027Support;
-import org.aesh.terminal.tty.Point;
-import org.aesh.terminal.tty.TerminalConnection;
-import org.aesh.terminal.Connection;
-
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Aesh Readline based backend for terminal operations.

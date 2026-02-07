@@ -4,10 +4,10 @@
  */
 package dev.tamboui.backend.aesh;
 
+import java.io.IOException;
+
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendProvider;
-
-import java.io.IOException;
 
 /**
  * {@link BackendProvider} implementation for Aesh Readline.

@@ -11,6 +11,14 @@
  */
 package dev.tamboui.demo.aesh;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.aesh.terminal.Connection;
+import org.aesh.terminal.http.netty.NettyWebsocketTtyBootstrap;
+import org.aesh.terminal.ssh.netty.NettySshTtyBootstrap;
+
 import dev.tamboui.backend.aesh.AeshBackend;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitApp;
@@ -21,13 +29,6 @@ import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.widgets.input.TextAreaState;
-import org.aesh.terminal.Connection;
-import org.aesh.terminal.ssh.netty.NettySshTtyBootstrap;
-import org.aesh.terminal.http.netty.NettyWebsocketTtyBootstrap;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -48,6 +49,12 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> {
 
+    /**
+     * Creates a new AeshSshHttpDemo instance.
+     */
+    public AeshSshHttpDemo() {
+       
+    }
     // ==================== Server Configuration ====================
 
     private static final int SSH_PORT = 2222;
@@ -59,6 +66,12 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
 
     // ==================== Main Entry Point ====================
 
+    /**
+     * Main entry point for the demo.
+     * Starts the SSH and HTTP servers and keeps the program running until interrupted.
+     * @param args the command line arguments
+     * @throws Exception if an error occurs
+     */
     public static void main(String[] args) throws Exception {
         var demo = new AeshSshHttpDemo();
         try {
