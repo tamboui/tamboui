@@ -1,0 +1,258 @@
+= Pilot Testing
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+
+include::_attributes.adoc[]
+
+The Pilot is a fluent API for driving a TUI application in tests. It lets you simulate key presses, mouse events, and terminal resizes so you can verify behavior without manual interaction. This guide explains how Pilot works and how to use it, using the RGB color switcher example and its tests as the main reference.
+
+== Overview
+
+Pilot provides:
+
+* **Key input** — `press(char)`, `press(KeyCode)`, `press(String...)` for single or multiple keys
+* **Mouse input** — `click(x, y)`, `doubleClick`, `tripleClick`, `hover`, or by element ID when using the Toolkit
+* **Terminal** — `resize(width, height)`, `pause()` for event processing, `quit()`
+* **Widget selection by ID** (Toolkit only) — `click("element-id")`, `findElement("id")`, `hasElement("id")`
+
+There are two integration points:
+
+* **TuiTestRunner** — For applications built with `TuiRunner` (event handler + renderer). The pilot can send keys, mouse, and resize; assertions are typically on data your handler updates or on events you collect.
+* **ToolkitTestRunner** — For applications built with `ToolkitRunner` and the Toolkit DSL. In addition to keys and mouse, the pilot can target elements by ID (e.g. `click("submit-button")`), which makes tests stable and readable.
+
+The examples in this document use the Toolkit and `ToolkitTestRunner` with the RGB app and its tests.
+
+== Dependencies
+
+To write tests that use Pilot with the Toolkit, add the Toolkit module and its test fixtures:
+
+* **Gradle:**  
+  Add the following to your `build.gradle` (Groovy DSL):
+
+  [source,groovy]
+  ----
+  testImplementation "dev.tamboui:tamboui-toolkit-test-fixtures:VERSION"
+  ----
+
+* **Maven:**  
+  Add the following to your `pom.xml` dependencies (replace `VERSION` accordingly):
+
+  [source,xml]
+  ----
+  <dependency>
+    <groupId>dev.tamboui</groupId>
+    <artifactId>tamboui-toolkit-test-fixtures</artifactId>
+    <version>VERSION</version>
+    <scope>test</scope>
+  </dependency>
+  ----
+
+The test fixtures expose `ToolkitTestRunner`, `Pilot`, and related types. For raw `TuiRunner` tests you need the TUI module’s test fixtures (`tamboui-tui` testFixtures) which provide `TuiTestRunner` and `TuiPilot`.
+
+== Example App: RGB Color Switcher
+
+The RGB example is a small Toolkit app used to demonstrate Pilot. The app is implemented in `RgbAppExample` (in the `tamboui-tui` test sources) and tested in `RgbAppTest`.
+
+=== What the app does
+
+* Renders a "RGB Color Switcher" title and three focusable text elements: "Red", "Green", "Blue", with IDs `red-button`, `green-button`, `blue-button`.
+* Key bindings: `r` → set red, `g` → set green, `b` → set blue.
+* Clicking a button or pressing the corresponding key changes the background color (via a CSS class on the root panel).
+* The app exposes `getCurrentColor()`, `styleEngine()`, and `actionHandler()` so tests can wire the runner and assert state.
+
+=== Relevant app code
+
+The root element is built with the Toolkit DSL; buttons have `.id("red-button")` (and similarly for green/blue) so tests can use `pilot.click("red-button")`. The app uses a `StyleEngine` and an `ActionHandler` for key actions; the test runner must be configured with these so that key events and focus/actions work as in production.
+
+[source,java]
+----
+// RgbAppExample builds the UI and exposes state for tests
+public Element render() {
+    return panel()
+            .id("root")
+            .addClass(colorClass)
+            .fill()
+            .onAction(actionHandler)
+            .add(
+                    column(
+                            text("RGB Color Switcher").addClass("title"),
+                            spacer(),
+                            text("Red").id("red-button").focusable().onAction(...),
+                            text("Green").id("green-button").focusable().onAction(...),
+                            text("Blue").id("blue-button").focusable().onAction(...),
+                            ...
+                    )
+            );
+}
+----
+
+The app can also be run standalone via `RgbAppExample.main()` (or with JBang using the `//DEPS` in that file) to try the same behavior manually.
+
+== Example Tests: RgbAppTest
+
+`RgbAppTest` shows the standard pattern: create the app, start a test runner with the app’s render supplier, configure the runner (style engine, global action handler), then use the pilot to drive the UI and assert on app state.
+
+=== Starting the test and getting the pilot
+
+Use `ToolkitTestRunner.runTest(Supplier<Element>)` (or the overload with `Size` or `TuiConfig`) inside a try-with-resources so the runner is closed after the test. Then configure the runner and get the pilot:
+
+[source,java]
+----
+RgbAppExample app = new RgbAppExample();
+
+try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render)) {
+    test.runner().styleEngine(app.styleEngine());
+    test.runner().eventRouter().addGlobalHandler(app.actionHandler());
+    Pilot pilot = test.pilot();
+
+    // ... drive UI and assert
+}
+----
+
+* `test.runner()` — the underlying `ToolkitRunner`; set its style engine and add the app’s action handler so keys and focus work.
+* `test.pilot()` — the Pilot instance (a `ToolkitPilot`) that supports both coordinate-based input and by-ID methods like `click("red-button")`.
+
+After each interaction that should be processed, call `pilot.pause()` so the runner thread can handle events and re-render before you assert.
+
+=== Testing key presses (testKeys)
+
+This test verifies that pressing `r`, `g`, and `b` changes the current color, that an unbound key (`x`) does nothing, and that `q` quits:
+
+[source,java]
+----
+@Test
+void testKeys() throws Exception {
+    RgbAppExample app = new RgbAppExample();
+
+    try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render)) {
+        test.runner().styleEngine(app.styleEngine());
+        test.runner().eventRouter().addGlobalHandler(app.actionHandler());
+        Pilot pilot = test.pilot();
+
+        pilot.press('r');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.RED, app.getCurrentColor());
+
+        pilot.press('g');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.GREEN, app.getCurrentColor());
+
+        pilot.press('b');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+
+        pilot.press('x');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+
+        pilot.press('q');
+        pilot.pause();
+    }
+}
+----
+
+=== Testing button clicks by ID (testButtons)
+
+This test uses the pilot’s by-ID API to click the red, green, and blue buttons and asserts the resulting color. No global action handler is required for button clicks when the buttons have their own handlers; the style engine is still set so styling is correct:
+
+[source,java]
+----
+@Test
+void testButtons() throws Exception {
+    RgbAppExample app = new RgbAppExample();
+
+    try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render)) {
+        test.runner().styleEngine(app.styleEngine());
+        Pilot pilot = test.pilot();
+
+        pilot.click("red-button");
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.RED, app.getCurrentColor());
+
+        pilot.click("green-button");
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.GREEN, app.getCurrentColor());
+
+        pilot.click("blue-button");
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+
+        pilot.press('q');
+        pilot.pause();
+    }
+}
+----
+
+=== Multiple keys (testMultipleKeys)
+
+You can send a sequence of keys in one call; the pilot processes them in order:
+
+[source,java]
+----
+pilot.press("r", "g", "b");
+pilot.pause();
+assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+----
+
+=== Custom terminal size (testCustomSize)
+
+Use the `runTest(Supplier<Element>, Size)` overload to run with a specific size:
+
+[source,java]
+----
+try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render, new Size(100, 50))) {
+    test.runner().styleEngine(app.styleEngine());
+    test.runner().eventRouter().addGlobalHandler(app.actionHandler());
+    Pilot pilot = test.pilot();
+    pilot.press('r');
+    pilot.pause();
+    assertEquals(RgbAppExample.BackgroundColor.RED, app.getCurrentColor());
+    pilot.press('q');
+    pilot.pause();
+}
+----
+
+== Pilot API summary
+
+|===
+| Method | Description
+
+| `press(char)`, `press(KeyCode)`, `press(String... keys)`
+| Simulate key press(es). Use `pause()` after to let the app process.
+
+| `click(x, y)` / `click("element-id")`
+| Left click at coordinates or at the center of the element with the given ID (Toolkit only).
+
+| `doubleClick`, `tripleClick`, `hover`
+| Coordinate and (where supported) by-ID variants.
+
+| `resize(width, height)` / `resize(Size)`
+| Simulate terminal resize.
+
+| `pause()` / `pause(Duration)`
+| Brief delay so the runner thread can process events and redraw.
+
+| `quit()`
+| Request the application to quit.
+|===
+
+By-ID methods (`click("id")`, `findElement("id")`, `hasElement("id")`) are supported only when using `ToolkitTestRunner`; the default `Pilot` implementation throws or returns false for them. For raw `TuiRunner` tests, use `TuiTestRunner` and drive the UI with keys and coordinates only, and assert on your own event list or application state.
+
+== Running the example tests
+
+From the project root:
+
+----
+./gradlew :tamboui-tui:test --tests "dev.tamboui.tui.pilot.RgbAppTest"
+----
+
+To run all Pilot-related tests:
+
+----
+./gradlew :tamboui-tui:test --tests "dev.tamboui.tui.pilot.*"
+----
+
+The RGB app can be run interactively via `RgbAppExample.main()` or with JBang using the `//DEPS` and `//FILES` in that class, so you can compare manual behavior with the tests.
