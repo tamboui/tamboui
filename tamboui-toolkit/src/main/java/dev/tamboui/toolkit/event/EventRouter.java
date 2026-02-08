@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.layout.Rect;
@@ -27,21 +28,24 @@ import dev.tamboui.tui.event.MouseEventKind;
  * <p>
  * Events are routed as follows:
  * <ul>
- *   <li>Key events go to the focused element</li>
- *   <li>Mouse events go to the element at the mouse position</li>
- *   <li>Tab/Shift+Tab navigate focus</li>
- *   <li>Drag events are tracked and routed to the dragged element</li>
+ * <li>Key events go to the focused element</li>
+ * <li>Mouse events go to the element at the mouse position</li>
+ * <li>Tab/Shift+Tab navigate focus</li>
+ * <li>Drag events are tracked and routed to the dragged element</li>
  * </ul>
  * <p>
  * Events can be consumed by handlers to stop propagation.
  * <p>
  * The router uses an {@link ElementRegistry} to track element areas by ID,
- * which can be used by external systems (like effects) to look up element positions.
+ * which can be used by external systems (like effects) to look up element
+ * positions.
  */
 public final class EventRouter {
 
     private final FocusManager focusManager;
     private final ElementRegistry elementRegistry;
+    private final EventTracer tracer;
+    private final AtomicLong routeIdCounter = new AtomicLong();
     private final List<Element> elements = new ArrayList<>();
     private final IdentityHashMap<Element, Rect> elementAreas = new IdentityHashMap<>();
     private final List<GlobalEventHandler> globalHandlers = new ArrayList<>();
@@ -53,14 +57,26 @@ public final class EventRouter {
     private int dragStartY;
 
     /**
-     * Creates a new event router.
+     * Creates a new event router without tracing.
      *
      * @param focusManager    the focus manager for focus navigation
      * @param elementRegistry the registry for tracking element areas by ID
      */
     public EventRouter(FocusManager focusManager, ElementRegistry elementRegistry) {
+        this(focusManager, elementRegistry, null);
+    }
+
+    /**
+     * Creates a new event router with optional tracing.
+     *
+     * @param focusManager    the focus manager for focus navigation
+     * @param elementRegistry the registry for tracking element areas by ID
+     * @param tracer          optional event tracer (null for no tracing)
+     */
+    public EventRouter(FocusManager focusManager, ElementRegistry elementRegistry, EventTracer tracer) {
         this.focusManager = focusManager;
         this.elementRegistry = elementRegistry;
+        this.tracer = tracer != null ? tracer : EventTracer.NOOP;
     }
 
     /**
@@ -108,7 +124,7 @@ public final class EventRouter {
      * for CSS-like queries by external systems (like effects).
      *
      * @param element the element to register
-     * @param area the element's rendered area
+     * @param area    the element's rendered area
      */
     public void registerElement(Element element, Rect area) {
         // Prevent duplicate registration (element identity check)
@@ -139,6 +155,13 @@ public final class EventRouter {
     }
 
     /**
+     * Gets the fully qualified class name of an element.
+     */
+    private String elementTypeOf(Element element) {
+        return element.getClass().getName();
+    }
+
+    /**
      * Clears all registered elements.
      * Should be called at the start of each render cycle.
      */
@@ -151,43 +174,72 @@ public final class EventRouter {
     /**
      * Routes an event to the appropriate element(s).
      * <p>
-     * For key events, the focused element is given first chance to handle the event.
-     * This allows text inputs to consume character keys before global handlers see them.
+     * For key events, the focused element is given first chance to handle the
+     * event.
+     * This allows text inputs to consume character keys before global handlers see
+     * them.
      * Global handlers are called after element routing if the event wasn't handled.
      *
      * @param event the event to route
      * @return HANDLED if any handler handled the event, UNHANDLED otherwise
      */
     public EventResult route(Event event) {
-        if (event instanceof KeyEvent) {
-            return routeKeyEvent((KeyEvent) event);
-        }
+        long routeId = routeIdCounter.incrementAndGet();
+        tracer.traceRouteStart(routeId, event, focusManager.focusedId(), elements.size());
+        EventResult result = EventResult.UNHANDLED;
 
-        // For non-key events, call global handlers first
-        for (GlobalEventHandler handler : globalHandlers) {
-            EventResult result = handler.handle(event);
+        try {
+            if (event instanceof KeyEvent) {
+                result = routeKeyEvent(routeId, (KeyEvent) event);
+            } else if (event instanceof MouseEvent) {
+                // For non-key events, call global handlers first
+                result = routeGlobalHandlers(routeId, event);
+                if (result.isUnhandled()) {
+                    result = routeMouseEvent(routeId, (MouseEvent) event);
+                }
+            } else {
+                // For non-key events, call global handlers first
+                result = routeGlobalHandlers(routeId, event);
+            }
+        } finally {
+            tracer.traceRouteEnd(routeId, event, result);
+        }
+        return result;
+    }
+
+    private EventResult routeGlobalHandlers(long routeId, Event event) {
+        for (int i = 0; i < globalHandlers.size(); i++) {
+            EventResult result = globalHandlers.get(i).handle(event);
+            tracer.traceGlobalHandler(routeId, i, result);
             if (result.isHandled()) {
                 return result;
             }
         }
-
-        if (event instanceof MouseEvent) {
-            return routeMouseEvent((MouseEvent) event);
-        }
         return EventResult.UNHANDLED;
     }
 
-    private EventResult routeKeyEvent(KeyEvent event) {
+    private EventResult routeKeyEvent(long routeId, KeyEvent event) {
         // Handle focus navigation first
-        if (event.isFocusNext()) {
-            if (focusManager.focusNext()) {
+        // Check focusPrevious before focusNext because Shift+Tab is more specific than Tab
+        if (event.isFocusPrevious()) {
+            String fromId = focusManager.focusedId();
+            boolean success = focusManager.focusPrevious();
+            String toId = focusManager.focusedId();
+            tracer.traceFocusNavigation(routeId, "focusPrevious", success, fromId, toId);
+            if (success) {
+                tracer.traceFocusChange(routeId, fromId, toId, "Shift+Tab navigation");
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
         }
 
-        if (event.isFocusPrevious()) {
-            if (focusManager.focusPrevious()) {
+        if (event.isFocusNext()) {
+            String fromId = focusManager.focusedId();
+            boolean success = focusManager.focusNext();
+            String toId = focusManager.focusedId();
+            tracer.traceFocusNavigation(routeId, "focusNext", success, fromId, toId);
+            if (success) {
+                tracer.traceFocusChange(routeId, fromId, toId, "Tab navigation");
                 return EventResult.HANDLED;
             }
             return EventResult.UNHANDLED;
@@ -195,6 +247,7 @@ public final class EventRouter {
 
         // Escape cancels drag first
         if (event.isCancel() && draggingElement != null) {
+            tracer.traceDragState(routeId, "cancel", draggingElement.id(), -1, -1);
             endDrag(-1, -1);
             return EventResult.HANDLED;
         }
@@ -204,9 +257,11 @@ public final class EventRouter {
         if (focusedId != null) {
             for (Element element : elements) {
                 if (focusedId.equals(element.id())) {
+                    tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "focused", "tried", "element is focused");
                     // Try element's handler
                     EventResult result = element.handleKeyEvent(event, true);
                     if (result.isHandled()) {
+                        tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "focused", "handled", "handleKeyEvent returned HANDLED");
                         return result;
                     }
                     // Handle focus navigation requests
@@ -223,18 +278,28 @@ public final class EventRouter {
                     if (handler != null) {
                         result = handler.handle(event);
                         if (result.isHandled()) {
+                            tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "focused", "handled", "keyEventHandler returned HANDLED");
                             return result;
                         }
                         // Handle focus navigation requests from lambda handler
                         if (result == EventResult.FOCUS_NEXT) {
-                            focusManager.focusNext();
+                            boolean success = focusManager.focusNext();
+                            tracer.traceFocusNavigation(routeId, "focusNext", success, element.id(), focusManager.focusedId());
+                            if (success) {
+                                tracer.traceFocusChange(routeId, element.id(), focusManager.focusedId(), "lambda handler requested FOCUS_NEXT");
+                            }
                             return EventResult.HANDLED;
                         }
                         if (result == EventResult.FOCUS_PREVIOUS) {
-                            focusManager.focusPrevious();
+                            boolean success = focusManager.focusPrevious();
+                            tracer.traceFocusNavigation(routeId, "focusPrevious", success, element.id(), focusManager.focusedId());
+                            if (success) {
+                                tracer.traceFocusChange(routeId, element.id(), focusManager.focusedId(), "lambda handler requested FOCUS_PREVIOUS");
+                            }
                             return EventResult.HANDLED;
                         }
                     }
+                    tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "focused", "unhandled", null);
                 }
             }
         }
@@ -267,16 +332,18 @@ public final class EventRouter {
         return EventResult.UNHANDLED;
     }
 
-    private EventResult routeMouseEvent(MouseEvent event) {
+    private EventResult routeMouseEvent(long routeId, MouseEvent event) {
         // Handle ongoing drag
         if (draggingElement != null) {
             if (event.kind() == MouseEventKind.DRAG) {
                 int deltaX = event.x() - dragStartX;
                 int deltaY = event.y() - dragStartY;
+                tracer.traceDragState(routeId, "drag", draggingElement.id(), event.x(), event.y());
                 dragHandler.onDrag(event.x(), event.y(), deltaX, deltaY);
                 return EventResult.HANDLED;
             }
             if (event.kind() == MouseEventKind.RELEASE) {
+                tracer.traceDragState(routeId, "end", draggingElement.id(), event.x(), event.y());
                 endDrag(event.x(), event.y());
                 return EventResult.HANDLED;
             }
@@ -289,11 +356,17 @@ public final class EventRouter {
                 Element element = elements.get(i);
                 Rect area = getArea(element);
                 if (area != null && area.contains(event.x(), event.y())) {
+                    tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "mouse_press", "hit", "at (" + event.x() + "," + event.y() + ")");
+
                     // Focus the element first (before potential drag)
                     boolean wasFocused = false;
                     if (element.isFocusable() && element.id() != null) {
+                        String prevFocus = focusManager.focusedId();
                         focusManager.setFocus(element.id());
                         wasFocused = true;
+                        if (!element.id().equals(prevFocus)) {
+                            tracer.traceFocusChange(routeId, prevFocus, element.id(), "click to focus");
+                        }
                     }
 
                     // Check if draggable
@@ -301,7 +374,7 @@ public final class EventRouter {
                         StyledElement<?> styled = (StyledElement<?>) element;
                         DragHandler handler = styled.dragHandler();
                         if (handler != null) {
-                            startDrag(element, handler, event.x(), event.y());
+                            startDrag(routeId, element, handler, event.x(), event.y());
                             return EventResult.HANDLED;
                         }
                     }
@@ -309,12 +382,14 @@ public final class EventRouter {
                     // Route to element's handler
                     EventResult result = element.handleMouseEvent(event);
                     if (result.isHandled()) {
+                        tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "handleMouseEvent returned HANDLED");
                         return result;
                     }
                     MouseEventHandler handler = element.mouseEventHandler();
                     if (handler != null) {
                         result = handler.handle(event);
                         if (result.isHandled()) {
+                            tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "mouseEventHandler returned HANDLED");
                             return result;
                         }
                     }
@@ -322,6 +397,7 @@ public final class EventRouter {
                     // Only stop here if we actually did something (focused or had handlers)
                     // Otherwise continue to check elements underneath
                     if (wasFocused) {
+                        tracer.traceCandidate(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "click focused element");
                         return EventResult.HANDLED;
                     }
                     // Continue checking other elements - this one didn't handle the click
@@ -329,7 +405,11 @@ public final class EventRouter {
             }
 
             // Clicked outside all elements - clear focus
-            focusManager.clearFocus();
+            String prevFocus = focusManager.focusedId();
+            if (prevFocus != null) {
+                focusManager.clearFocus();
+                tracer.traceFocusChange(routeId, prevFocus, null, "clicked outside all elements");
+            }
         }
 
         // Route other mouse events to element at position
@@ -359,11 +439,12 @@ public final class EventRouter {
         return EventResult.UNHANDLED;
     }
 
-    private void startDrag(Element element, DragHandler handler, int x, int y) {
+    private void startDrag(long routeId, Element element, DragHandler handler, int x, int y) {
         this.draggingElement = element;
         this.dragHandler = handler;
         this.dragStartX = x;
         this.dragStartY = y;
+        tracer.traceDragState(routeId, "start", element.id(), x, y);
         handler.onDragStart(x, y);
     }
 

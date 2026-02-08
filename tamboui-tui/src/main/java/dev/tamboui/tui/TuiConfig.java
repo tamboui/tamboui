@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
@@ -18,6 +21,9 @@ import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.RenderErrorHandler;
 import dev.tamboui.tui.error.RenderErrorHandlers;
+import dev.tamboui.tui.trace.FileTraceSink;
+import dev.tamboui.tui.trace.TraceSink;
+import dev.tamboui.tui.trace.TuiEventTracer;
 
 /**
  * Configuration options for {@link TuiRunner}.
@@ -46,8 +52,10 @@ public final class TuiConfig {
     private final PrintStream errorOutput;
     private final boolean fpsOverlayEnabled;
     private final List<PostRenderProcessor> postRenderProcessors;
-    private final Backend backend;
     private final ScheduledExecutorService scheduler;
+    private final Backend backend;
+    private final TraceSink traceSink;
+    private final TuiEventTracer tuiEventTracer;
 
     /**
      * Creates a new TUI configuration with the specified options.
@@ -67,8 +75,10 @@ public final class TuiConfig {
      * @param errorOutput the output stream for error logging
      * @param fpsOverlayEnabled whether to show the FPS overlay
      * @param postRenderProcessors list of post-render processors
-     * @param backend the backend to use (optional)
+     * @param backend optional backend to use instead of creating one via BackendFactory (for testing); when set, the runner takes ownership and closes it on close()
      * @param scheduler external scheduler to use, or null to create an internal one
+     * @param traceSink optional sink for event tracing; when set (and tuiEventTracer is null), runner uses a default tracer writing to this sink
+     * @param tuiEventTracer optional TUI-level event tracer; when set, used instead of traceSink-based tracer
      */
     public TuiConfig(
             boolean rawMode,
@@ -85,7 +95,9 @@ public final class TuiConfig {
             boolean fpsOverlayEnabled,
             List<PostRenderProcessor> postRenderProcessors, 
             Backend backend,
-            ScheduledExecutorService scheduler
+            ScheduledExecutorService scheduler,
+            TraceSink traceSink,
+            TuiEventTracer tuiEventTracer
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -104,6 +116,8 @@ public final class TuiConfig {
                 : Collections.emptyList();
         this.backend = backend;
         this.scheduler = scheduler;
+        this.traceSink = traceSink;
+        this.tuiEventTracer = tuiEventTracer;
     }
 
     /**
@@ -111,27 +125,15 @@ public final class TuiConfig {
      * <p>
      * By default, tick events are generated every 100ms to ensure periodic UI refresh.
      * Use {@link Builder#noTick()} to disable automatic ticking.
+     * <p>
+     * If the {@code TAMBOUI_EVENT_TRACE} environment variable is set to a file path,
+     * event tracing is enabled automatically (same as calling
+     * {@link Builder#traceFromEnvironment()} on the builder).
      *
      * @return the default TUI configuration
      */
     public static TuiConfig defaults() {
-        return new TuiConfig(
-                true,                        // rawMode
-                true,                        // alternateScreen
-                true,                        // hideCursor
-                false,                       // mouseCapture
-                Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
-                Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
-                Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD),  // resizeGracePeriod
-                true,                        // shutdownHook
-                BindingSets.defaults(),      // bindings
-                RenderErrorHandlers.displayAndQuit(),  // errorHandler
-                System.err,                  // errorOutput
-                false,                       // fpsOverlayEnabled
-                Collections.emptyList(),     // postRenderProcessors
-                null,                          // backend (allows for lazy backend creation)
-                null                         // scheduler
-            );
+        return builder().traceFromEnvironment().build();
     }
 
     /**
@@ -291,12 +293,14 @@ public final class TuiConfig {
     }
 
     /**
-     * Returns the configured backend, or null if not set.
+     * Returns the optional backend to use instead of creating one via BackendFactory.
      * <p>
-     * If null, a backend will be created using {@link BackendFactory#create()}
-     * when the TUI is started.
+     * When null, a backend will be created using {@link BackendFactory#create()}
+     * when the TUI is started. When non-null, the runner uses this backend and
+     * takes ownership of it: the runner will close it on {@link TuiRunner#close()}.
+     * Primarily intended for testing with a headless backend.
      *
-     * @return the configured backend, or null
+     * @return the configured backend, or null to create one via BackendFactory
      */
     public Backend backend() {
         return backend;
@@ -312,6 +316,31 @@ public final class TuiConfig {
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    /**
+     * Returns the optional trace sink for event tracing.
+     * <p>
+     * When set and {@link #tuiEventTracer()} is null, the runner uses a default
+     * tracer that writes to this sink. The same sink can be shared with the
+     * toolkit layer for one chronological trace stream.
+     *
+     * @return the trace sink, or null
+     */
+    public TraceSink traceSink() {
+        return traceSink;
+    }
+
+    /**
+     * Returns the optional TUI-level event tracer.
+     * <p>
+     * When set, the runner uses this tracer; otherwise if {@link #traceSink()} is set
+     * a default sink-based tracer is used.
+     *
+     * @return the tracer, or null
+     */
+    public TuiEventTracer tuiEventTracer() {
+        return tuiEventTracer;
     }
 
     @Override
@@ -384,18 +413,22 @@ public final class TuiConfig {
         private PrintStream errorOutput = System.err;
         private boolean fpsOverlayEnabled = false;
         private final List<PostRenderProcessor> postRenderProcessors = new ArrayList<>();
-        private Backend backend;
         private ScheduledExecutorService scheduler;
+        private Backend backend;
+        private TraceSink traceSink;
+        private TuiEventTracer tuiEventTracer;
 
         private Builder() {
         }
 
         /**
-         * Sets the backend to use.
+         * Sets the backend to use instead of creating one via BackendFactory.
          * <p>
          * If not set, a backend will be created using {@link BackendFactory#create()}.
+         * When set, the runner takes ownership and will close the backend on close().
+         * Primarily for testing with a headless backend.
          *
-         * @param backend the backend to use
+         * @param backend the backend to use, or null to create one via BackendFactory
          * @return this builder
          */
         public Builder backend(Backend backend) {
@@ -605,11 +638,80 @@ public final class TuiConfig {
         }
 
         /**
+         * Sets the trace sink for event tracing.
+         * <p>
+         * When set (and {@link #tuiEventTracer(TuiEventTracer)} is not set),
+         * the runner will use a default tracer that writes to this sink.
+         *
+         * @param traceSink the sink, or null to disable
+         * @return this builder
+         */
+        public Builder traceSink(TraceSink traceSink) {
+            this.traceSink = traceSink;
+            return this;
+        }
+
+        /**
+         * Enables event tracing from the environment when available.
+         * <p>
+         * If the {@code TAMBOUI_EVENT_TRACE} environment variable is set to a file path,
+         * opens that file as the trace sink (same as {@link #traceSink(TraceSink)} with
+         * a sink from {@link FileTraceSink#fromEnvironment()}). If the variable is unset
+         * or the file cannot be opened, tracing remains disabled and a warning may be logged.
+         * <p>
+         * Use this so callers do not need to create the sink themselves. When using
+         * {@code ToolkitRunner} with this config, the toolkit's event router is
+         * wired to the same sink automatically for one chronological trace file.
+         *
+         * @return this builder
+         */
+        public Builder traceFromEnvironment() {
+            try {
+                TraceSink sink = FileTraceSink.fromEnvironment();
+                if (sink != null) {
+                    this.traceSink = sink;
+                }
+            } catch (IOException e) {
+                Logger.getLogger(TuiConfig.class.getName())
+                    .log(Level.WARNING, "Failed to open trace file from TAMBOUI_EVENT_TRACE. Event tracing is disabled.", e);
+            }
+            return this;
+        }
+
+        /**
+         * Sets the TUI-level event tracer.
+         * <p>
+         * When set, this tracer is used; otherwise if traceSink is set
+         * a default sink-based tracer is used.
+         *
+         * @param tuiEventTracer the tracer, or null
+         * @return this builder
+         */
+        public Builder tuiEventTracer(TuiEventTracer tuiEventTracer) {
+            this.tuiEventTracer = tuiEventTracer;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
+         * <p>
+         * If no trace sink was set and {@code TAMBOUI_EVENT_TRACE} is set (or blank
+         * for a timestamped file), a sink from the environment is used so that
+         * TuiRunner apps get env-based tracing without calling
+         * {@link #traceFromEnvironment()} explicitly.
          *
          * @return the constructed TuiConfig
          */
         public TuiConfig build() {
+            TraceSink resolvedTraceSink = this.traceSink;
+            if (resolvedTraceSink == null) {
+                try {
+                    resolvedTraceSink = FileTraceSink.fromEnvironment();
+                } catch (IOException e) {
+                    Logger.getLogger(TuiConfig.class.getName())
+                        .log(Level.WARNING, "Failed to open trace file from TAMBOUI_EVENT_TRACE. Event tracing is disabled.", e);
+                }
+            }
             return new TuiConfig(
                     rawMode,
                     alternateScreen,
@@ -625,7 +727,9 @@ public final class TuiConfig {
                     fpsOverlayEnabled,
                     postRenderProcessors,
                     backend,
-                    scheduler
+                    scheduler,
+                    resolvedTraceSink,
+                    tuiEventTracer
             );
         }
     }

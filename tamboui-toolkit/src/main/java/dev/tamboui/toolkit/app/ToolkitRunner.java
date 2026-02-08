@@ -21,6 +21,8 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.event.EventRouter;
+import dev.tamboui.toolkit.event.EventTracer;
+import dev.tamboui.toolkit.event.SinkEventTracer;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
@@ -84,12 +86,15 @@ public final class ToolkitRunner implements AutoCloseable {
     private ToolkitRunner(TuiRunner tuiRunner,
                           boolean faultTolerant,
                           PrintStream errorOutput,
-                          List<ToolkitPostRenderProcessor> toolkitPostRenderProcessors) {
+                          List<ToolkitPostRenderProcessor> toolkitPostRenderProcessors,
+                          EventTracer eventTracer) {
         this.tuiRunner = tuiRunner;
         this.focusManager = new FocusManager();
         this.elementRegistry = new ElementRegistry();
         this.styledAreaRegistry = StyledAreaRegistry.create();
-        this.eventRouter = new EventRouter(focusManager, elementRegistry);
+        this.eventRouter = eventTracer != null
+                ? new EventRouter(focusManager, elementRegistry, eventTracer)
+                : new EventRouter(focusManager, elementRegistry);
         this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
         this.renderContext.setFaultTolerant(faultTolerant);
         this.faultTolerant = faultTolerant;
@@ -97,7 +102,7 @@ public final class ToolkitRunner implements AutoCloseable {
     }
 
     private ToolkitRunner(TuiRunner tuiRunner) {
-        this(tuiRunner, false, NULL_OUTPUT, Collections.emptyList());
+        this(tuiRunner, false, NULL_OUTPUT, Collections.emptyList(), null);
     }
 
     /**
@@ -112,6 +117,9 @@ public final class ToolkitRunner implements AutoCloseable {
 
     /**
      * Creates a ToolkitRunner with the specified configuration.
+     * <p>
+     * If the config has a trace sink (e.g. from {@link TuiConfig.Builder#traceFromEnvironment()}),
+     * the toolkit's event router uses the same sink so TUI and toolkit traces go to one file.
      *
      * @param config the configuration to use
      * @return a new ToolkitRunner
@@ -119,7 +127,8 @@ public final class ToolkitRunner implements AutoCloseable {
      */
     public static ToolkitRunner create(TuiConfig config) throws Exception {
         TuiRunner tuiRunner = TuiRunner.create(config);
-        return new ToolkitRunner(tuiRunner);
+        EventTracer tracer = config.traceSink() != null ? new SinkEventTracer(config.traceSink()) : null;
+        return new ToolkitRunner(tuiRunner, false, NULL_OUTPUT, Collections.emptyList(), tracer);
     }
 
     /**
@@ -580,7 +589,8 @@ public final class ToolkitRunner implements AutoCloseable {
          */
         public ToolkitRunner build() throws Exception {
             TuiRunner tuiRunner = TuiRunner.create(config);
-            ToolkitRunner runner = new ToolkitRunner(tuiRunner, faultTolerant, errorOutput, toolkitPostRenderProcessors);
+            EventTracer tracer = config.traceSink() != null ? new SinkEventTracer(config.traceSink()) : null;
+            ToolkitRunner runner = new ToolkitRunner(tuiRunner, faultTolerant, errorOutput, toolkitPostRenderProcessors, tracer);
 
             // Set bindings on render context for Component auto-registration
             runner.renderContext.setBindings(bindings);
