@@ -46,6 +46,8 @@ import dev.tamboui.tui.event.ResizeEvent;
 import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.tui.event.UiRunnable;
 import dev.tamboui.tui.overlay.DebugOverlay;
+import dev.tamboui.tui.trace.SinkTuiEventTracer;
+import dev.tamboui.tui.trace.TuiEventTracer;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -97,6 +99,7 @@ public final class TuiRunner implements AutoCloseable {
     private final TerminalInputReader inputReader;
     private final DebugOverlay debugOverlay;
     private final List<PostRenderProcessor> postRenderProcessors;
+    private final TuiEventTracer eventTracer;
     private volatile RenderError lastError;
     private volatile boolean inErrorState;
     private volatile int errorScroll;
@@ -161,6 +164,13 @@ public final class TuiRunner implements AutoCloseable {
         // Store post-render processors
         this.postRenderProcessors = config.postRenderProcessors();
 
+        // Resolve event tracer: explicit > traceSink > no-op
+        TuiEventTracer tracer = config.tuiEventTracer();
+        if (tracer == null && config.traceSink() != null) {
+            tracer = new SinkTuiEventTracer(config.traceSink());
+        }
+        this.eventTracer = tracer != null ? tracer : TuiEventTracer.NOOP;
+
         // Register shutdown hook if enabled
         if (config.shutdownHook()) {
             this.shutdownHook = new Thread(this::cleanup, "tui-shutdown-hook");
@@ -182,6 +192,10 @@ public final class TuiRunner implements AutoCloseable {
 
     /**
      * Creates a TuiRunner with the specified configuration.
+     * <p>
+     * If {@link TuiConfig#backend()} is non-null, that backend is used and the runner
+     * takes ownership (closes it on {@link #close()}). Otherwise a backend is
+     * created via {@link BackendFactory#create()}.
      *
      * @param config the configuration to use
      * @return a new TuiRunner
@@ -189,6 +203,7 @@ public final class TuiRunner implements AutoCloseable {
      */
     public static TuiRunner create(TuiConfig config) throws Exception {
         Backend backend = config.backend() != null ? config.backend() : BackendFactory.create();
+        boolean createdBackend = (config.backend() == null);
 
         try {
             if (config.rawMode()) {
@@ -207,7 +222,9 @@ public final class TuiRunner implements AutoCloseable {
             Terminal<Backend> terminal = new Terminal<>(backend);
             return new TuiRunner(backend, terminal, config);
         } catch (Exception e) {
-            backend.close();
+            if (createdBackend) {
+                backend.close();
+            }
             throw e;
         }
     }
@@ -281,6 +298,7 @@ public final class TuiRunner implements AutoCloseable {
                         continue;
                     }
 
+                    eventTracer.traceEvent(event);
                     boolean shouldRedraw;
                     try {
                         shouldRedraw = handler.handle(event, this);
@@ -288,6 +306,7 @@ public final class TuiRunner implements AutoCloseable {
                         handleRenderError(t);
                         continue;
                     }
+                    eventTracer.traceHandlerResult(shouldRedraw);
                     if (shouldRedraw && running.get() && !inErrorState) {
                         safeRender(wrappedRenderer);
                     }
@@ -301,10 +320,13 @@ public final class TuiRunner implements AutoCloseable {
 
     private void safeRender(Renderer renderer) {
         RenderThread.checkRenderThread();
+        eventTracer.traceRenderStart();
         try {
             terminal.draw(renderer::render);
         } catch (Throwable t) {
             handleRenderError(t);
+        } finally {
+            eventTracer.traceRenderEnd();
         }
     }
 
@@ -598,6 +620,21 @@ public final class TuiRunner implements AutoCloseable {
      */
     public Backend backend() {
         return backend;
+    }
+
+    /**
+     * Dispatches an event into the event queue.
+     * <p>
+     * Primarily for testing: allows tests to inject key, mouse, or resize events
+     * without going through the backend. The event is processed on the next
+     * iteration of the event loop. Has no effect if the runner is not running.
+     *
+     * @param event the event to dispatch
+     */
+    public void dispatch(Event event) {
+        if (running.get()) {
+            eventQueue.offer(event);
+        }
     }
 
     /**
