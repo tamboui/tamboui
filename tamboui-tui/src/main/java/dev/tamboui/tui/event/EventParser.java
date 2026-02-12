@@ -124,11 +124,8 @@ public final class EventParser {
 
         // Alt+key
         backend.read(PEEK_TIMEOUT); // consume the character
-        if (next >= 'a' && next <= 'z') {
+        if (next >= 32 && next < 127) {
             return KeyEvent.ofChar((char) next, KeyModifiers.ALT, bindings);
-        }
-        if (next >= 'A' && next <= 'Z') {
-            return KeyEvent.ofChar((char) next, KeyModifiers.of(false, true, true), bindings); // Alt+Shift
         }
 
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);

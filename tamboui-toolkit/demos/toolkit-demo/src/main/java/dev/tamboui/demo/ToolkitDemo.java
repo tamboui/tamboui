@@ -61,11 +61,11 @@ public class ToolkitDemo {
                     .top(panel(() -> row(
                             text(" TamboUI Widget Playground ").bold().cyan(),
                             spacer(),
-                            text(" [1-6] Add Panel ").dim(),
+                            text(" [ALT 1-6] Add Panel ").dim(),
                             text(" [Tab] Focus ").dim(),
                             text(" [Drag] Move ").dim(),
-                            text(" [x] Delete ").dim(),
-                            text(" [CTRL+c] Quit ").dim()
+                            text(" [ALT x] Delete ").dim(),
+                            text(" [CTRL c] Quit ").dim()
                     )).rounded().borderColor(Color.DARK_GRAY))
                     .center(panels)
             );

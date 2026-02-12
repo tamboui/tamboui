@@ -123,7 +123,7 @@ final class FloatingPanelsArea implements Element {
             return EventResult.HANDLED;
         }
 
-        if (event.isCharIgnoreCase('x')) {
+        if (event.isCharIgnoreCase('x') && event.hasAlt()) {
             panels.removeIf(p -> p.id == fp.id);
             return EventResult.HANDLED;
         }
@@ -148,7 +148,7 @@ final class FloatingPanelsArea implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (event.code() == KeyCode.CHAR) {
+        if (event.code() == KeyCode.CHAR && event.hasAlt()) {
             switch (event.character()) {
                 case '1': createPanel(new ClockPanel()); return EventResult.HANDLED;
                 case '2': createPanel(new CounterPanel()); return EventResult.HANDLED;

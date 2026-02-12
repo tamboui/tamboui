@@ -54,6 +54,53 @@ KeyTrigger.ctrl('u')                 // Ctrl+U
 KeyTrigger.alt('x')                  // Alt+X
 ----
 
+=== Terminal Compatibility
+
+[IMPORTANT]
+====
+**Ctrl key bindings have significant limitations** due to how terminals encode keyboard input.
+
+When you press a key combination like Ctrl+A, the terminal does not send "Ctrl" + "A" separately.
+Instead, it sends a single ASCII control character (byte value 1 for Ctrl+A).
+This encoding dates back to the 1970s and causes several problems:
+
+* **Ctrl+letter (a-z)**: Works, but case information is lost. Ctrl+a and Ctrl+Shift+A send the same byte.
+* **Ctrl+number**: Unreliable. Ctrl+2, Ctrl+@, and Ctrl+Space all send the same byte (0). The original key cannot be determined.
+* **Ctrl+Alt+key**: Inconsistent across terminals.
+
+**Alt key bindings are more reliable** because terminals send ESC followed by the actual character:
+
+* Alt+a sends `ESC` + `'a'` - we know it was lowercase 'a'
+* Alt+A sends `ESC` + `'A'` - we know it was uppercase 'A' (shifted)
+* Alt+2 sends `ESC` + `'2'` - we know it was '2'
+====
+
+**Recommendation for custom bindings:**
+
+[cols="1,1,2",options="header"]
+|===
+|Modifier |Reliability |Notes
+
+|`Alt+letter`
+|Excellent
+|Preserves case, works consistently
+
+|`Alt+number`
+|Excellent
+|Fully distinguishable
+
+|`Ctrl+letter`
+|Good
+|Works but loses shift information
+
+|`Ctrl+number`
+|Poor
+|Avoid - ambiguous with other combinations
+|===
+
+For maximum compatibility, prefer `Alt+key` bindings for custom actions.
+Use `Ctrl+key` only for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, etc.).
+
 == Mouse Triggers
 
 [source,java]
