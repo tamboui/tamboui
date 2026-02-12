@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.layout.Size;
 import dev.tamboui.terminal.TestBackend;
 import dev.tamboui.toolkit.element.Element;
@@ -24,6 +25,7 @@ import dev.tamboui.tui.pilot.TestRunner;
 public final class ToolkitTestRunner implements TestRunner {
 
     private static final Size DEFAULT_SIZE = new Size(80, 24);
+    private static final int CLOSE_TIMEOUT_MS = 1000;
 
     private final ToolkitRunner runner;
     private final TestBackend backend;
@@ -142,15 +144,15 @@ public final class ToolkitTestRunner implements TestRunner {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() throws RuntimeIOException {
         if (running) {
             running = false;
             runner.quit();
             try {
-                runnerThread.join(1000);
+                runnerThread.join(CLOSE_TIMEOUT_MS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new IOException("Interrupted while closing test runner", e);
+                throw new RuntimeIOException("Interrupted while closing test runner", e);
             }
             runner.close();
         }

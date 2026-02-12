@@ -6,6 +6,8 @@ package dev.tamboui.tui.pilot;
 
 import java.io.IOException;
 
+import dev.tamboui.error.TamboUIException;
+
 /**
  * Test runner that hosts a TUI application with a test backend and provides
  * a {@link Pilot} to drive it programmatically.
@@ -25,5 +27,5 @@ public interface TestRunner extends AutoCloseable {
      * @throws IOException if an error occurs during close
      */
     @Override
-    void close() throws IOException;
+    void close() throws TamboUIException;
 }

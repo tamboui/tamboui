@@ -34,7 +34,7 @@ To write tests that use Pilot with the Toolkit, add the Toolkit module and its t
 
   [source,groovy]
   ----
-  testImplementation "dev.tamboui:tamboui-toolkit-test-fixtures:VERSION"
+  testImplementation(testFixtures("dev.tamboui:tamboui-toolkit"))
   ----
 
 * **Maven:**  
