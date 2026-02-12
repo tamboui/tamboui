@@ -4,7 +4,6 @@
  */
 package dev.tamboui.toolkit.app;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.function.Supplier;
 

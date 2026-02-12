@@ -4,11 +4,9 @@
  */
 package dev.tamboui.tui.pilot;
 
-import java.io.IOException;
 import java.time.Duration;
 
 import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.error.TamboUIException;
 import dev.tamboui.layout.Size;
 import dev.tamboui.terminal.TestBackend;
 import dev.tamboui.tui.EventHandler;
