@@ -120,7 +120,7 @@ demoExtension.internal.convention(false)
 
 val tape = rootProject.layout.projectDirectory.file("docs/video/${project.name}.tape")
 
-// Task to record the demo to cast file
+// Task to record the demo to cast file (only when docs/video/<name>.tape exists)
 val recordDemo = tasks.register<RecordDemoTask>("recordDemo") {
     val outputDir = layout.buildDirectory.dir("generated/casts")
 
@@ -138,6 +138,8 @@ val recordDemo = tasks.register<RecordDemoTask>("recordDemo") {
     if (tapeFile.exists()) {
         configFile.set(tapeFile)
     }
+
+    onlyIf("Tape file exists") { tape.asFile.exists() }
 }
 
 // Task to generate metadata file
