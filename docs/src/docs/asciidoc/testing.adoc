@@ -1,0 +1,43 @@
+= Testing and Tracing
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+
+include::_attributes.adoc[]
+
+TamboUI provides test fixtures and an event tracer so you can assert on TUI applications and trace events for debugging.
+
+== Event tracer
+
+Tracing writes a single chronological stream of events from both the TUI layer and the toolkit layer so you can debug focus and routing. One sink (e.g. one file) receives all records; the record `type` distinguishes layers.
+
+Tracing is optional and can be enabled from the environment with `TAMBOUI_EVENT_TRACE` set to a file path or if blank a timestamped file is created. When set, the runner writes records with types such as `event`, `handler_result`, `render_start`, `render_end`.
+
+Format: one line per record JSON with `ts`, `rid`, `type` and `payload`.
+
+== Event router testing harness (Toolkit)
+
+This is mostly for unit testing of TamboUI toolkit itself. 
+
+For focus and routing tests without starting a full runner or backend, use the headless *EventRouterTestHarness* and *TestElement* from `tamboui-toolkit` test fixtures:
+
+* **EventRouterTestHarness** – Headless harness holding a `FocusManager`, `ElementRegistry`, and `EventRouter` (no `TuiRunner`). Register elements with `withElement(TestElement, Rect)`, optionally `withFocus(id)` or `withGlobalHandler(...)`, then `send(Event)` to route one event. Returns an **EventRouterResult** for assertions.
+
+* **TestElement** – Mock `Element` with fluent config: `id(...)`, `focusable()`, `keyEventResult(HANDLED/UNHANDLED)`, `onKeyEvent(...)`, `onMouseEvent(...)`, and recording of received key/mouse events via `keyEventsReceived()` / `mouseEventsReceived()`.
+
+* **EventRouterResult** – Wraps the result of one `send(Event)` with fluent assertions: `assertHandled()`, `assertUnhandled()`, `assertFocusMovedTo(id)`, `assertFocusIs(id)`, `assertFocusUnchanged()`, `assertNoFocus()`.
+
+Example:
+
+[source,java]
+----
+TestElement a = new TestElement("a").focusable();
+TestElement b = new TestElement("b").focusable();
+EventRouterTestHarness harness = EventRouterTestHarness.create()
+    .withElement(a, new Rect(0, 0, 10, 1))
+    .withElement(b, new Rect(0, 1, 10, 1));
+
+harness.send(KeyEvent.ofKey(KeyCode.TAB))
+    .assertHandled()
+    .assertFocusMovedTo("b");
+----

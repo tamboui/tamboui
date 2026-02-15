@@ -102,6 +102,9 @@ Architecture patterns for building maintainable TUI applications.
 === link:developer-guide.html[Developer Guide]
 Creating custom widgets and components.
 
+=== link:testing.html[Testing]
+Headless unit harness and optional event tracing.
+
 == Quick Example
 
 Here's a minimal example using the Toolkit DSL:
