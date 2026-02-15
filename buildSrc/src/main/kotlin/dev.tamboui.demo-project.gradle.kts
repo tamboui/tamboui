@@ -138,8 +138,6 @@ val recordDemo = tasks.register<RecordDemoTask>("recordDemo") {
     if (tapeFile.exists()) {
         configFile.set(tapeFile)
     }
-
-    onlyIf("Tape file exists") { tape.asFile.exists() }
 }
 
 // Task to generate metadata file

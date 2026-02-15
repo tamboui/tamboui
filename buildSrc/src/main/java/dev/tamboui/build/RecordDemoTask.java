@@ -144,6 +144,8 @@ public abstract class RecordDemoTask extends DefaultTask {
         var totalWaitMs = 0L;
         if (configFileObj != null && configFileObj.exists()) {
             totalWaitMs = calculateTotalWaitTime(configFileObj);
+        } else {
+            return;
         }
 
         // Duration should be at least the total wait time plus buffer for processing
