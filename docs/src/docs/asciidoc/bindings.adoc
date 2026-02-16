@@ -16,9 +16,7 @@ Several binding presets are available:
 
 [source,java]
 ----
-Bindings standard = BindingSets.standard();  // Arrow keys, Enter, Escape
-Bindings vim = BindingSets.vim();            // hjkl navigation, Ctrl+u/d
-Bindings emacs = BindingSets.emacs();        // Ctrl+n/p/f/b navigation
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=predefined-binding-sets]
 ----
 
 == Matching Actions in Events
@@ -27,14 +25,7 @@ Events carry binding information. Use semantic checks instead of hardcoding keys
 
 [source,java]
 ----
-// Semantic - works with any binding set
-if (event.isUp()) { }
-if (event.isSelect()) { }
-if (event.matches("delete")) { }
-
-// Low-level - when you need specific keys
-if (event.isChar('x')) { }
-if (event.isKey(KeyCode.F1)) { }
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=matching-actions]
 ----
 
 The `is*()` methods delegate to the current bindings.
@@ -47,11 +38,7 @@ With standard bindings, it only matches the Up arrow.
 
 [source,java]
 ----
-KeyTrigger.key(KeyCode.UP)           // Arrow key
-KeyTrigger.ch('j')                   // Character
-KeyTrigger.chIgnoreCase('j')         // j or J
-KeyTrigger.ctrl('u')                 // Ctrl+U
-KeyTrigger.alt('x')                  // Alt+X
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=key-triggers]
 ----
 
 === Terminal Compatibility
@@ -105,11 +92,7 @@ Use `Ctrl+key` only for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, et
 
 [source,java]
 ----
-MouseTrigger.click()                 // Left click
-MouseTrigger.rightClick()            // Right click
-MouseTrigger.ctrlClick()             // Ctrl+click
-MouseTrigger.scrollUp()              // Scroll wheel
-MouseTrigger.drag(MouseButton.LEFT)  // Dragging
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=mouse-triggers]
 ----
 
 == Custom Bindings
@@ -118,13 +101,7 @@ Start from a preset and customize:
 
 [source,java]
 ----
-Bindings custom = BindingSets.standard()
-    .toBuilder()
-    .bind(KeyTrigger.ch('d'), "delete")
-    .bind(KeyTrigger.key(KeyCode.DELETE), "delete")
-    .bind(KeyTrigger.ctrl('s'), "save")
-    .bind(MouseTrigger.rightClick(), "contextMenu")
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=custom-bindings]
 ----
 
 == ActionHandler
@@ -133,30 +110,19 @@ For centralized action handling, use `ActionHandler`:
 
 [source,java]
 ----
-ActionHandler actions = new ActionHandler(BindingSets.vim())
-    .on(Actions.QUIT, e -> runner.quit())
-    .on("save", e -> save())
-    .on("delete", e -> deleteSelected());
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=action-handler]
+----
 
-// In your event handler:
-(event, runner) -> {
-    if (actions.dispatch(event)) {
-        return true;  // Action was handled
-    }
-    // Handle other events...
-    return false;
-}
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=action-handler-event]
 ----
 
 Handlers can optionally receive the action name that triggered them:
 
 [source,java]
 ----
-// Handler with action name (useful when same handler serves multiple actions)
-ActionHandler actions = new ActionHandler(bindings)
-    .on("red", (event, action) -> setColor(action))
-    .on("blue", (event, action) -> setColor(action))
-    .on("green", (event, action) -> setColor(action));
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=action-handler-with-name]
 ----
 
 == @OnAction Annotation
@@ -169,27 +135,7 @@ In Toolkit components, annotate methods to handle actions:
 
 [source,java]
 ----
-public class EditorComponent extends Component<EditorComponent> {
-    private List<String> lines = new ArrayList<>();
-    private int cursor = 0;
-
-    @OnAction(Actions.MOVE_UP)
-    void moveCursorUp(Event event) {
-        if (cursor > 0) cursor--;
-    }
-
-    @OnAction(Actions.MOVE_DOWN)
-    void moveCursorDown(Event event) {
-        if (cursor < lines.size() - 1) cursor++;
-    }
-
-    @OnAction("delete")
-    void deleteLine(Event event) {
-        if (!lines.isEmpty()) {
-            lines.remove(cursor);
-        }
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=on-action-annotation]
 ----
 
 The component framework discovers these methods and dispatches events automatically.
@@ -260,11 +206,7 @@ Bindings can be externalized to properties files:
 
 [source,java]
 ----
-// From classpath
-Bindings bindings = BindingSets.loadResource("/my-bindings.properties");
-
-// From filesystem
-Bindings bindings = BindingSets.load(Paths.get("~/.config/myapp/bindings.properties"));
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=loading-bindings]
 ----
 
 Property file format:

@@ -14,16 +14,7 @@ This is a convenient alternative to building `Line` and `Span` objects manually.
 
 [source,java]
 ----
-import dev.tamboui.text.MarkupParser;
-import dev.tamboui.text.Text;
-
-// Parse markup into styled Text
-Text text = MarkupParser.parse("This is [bold]bold[/bold] and [red]red[/red].");
-
-// Use with widgets
-Paragraph paragraph = new Paragraph(
-    MarkupParser.parse("[cyan]Status:[/cyan] [bold green]Ready[/]")
-);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=basic-usage]
 ----
 
 == Syntax Reference
@@ -173,20 +164,7 @@ A `StyleResolver` lets you define custom tags that map to styles:
 
 [source,java]
 ----
-MarkupParser.StyleResolver resolver = tagName -> {
-    switch (tagName) {
-        case "keyword": return Style.EMPTY.fg(Color.CYAN).bold();
-        case "string": return Style.EMPTY.fg(Color.GREEN);
-        case "comment": return Style.EMPTY.fg(Color.GRAY).italic();
-        case "error": return Style.EMPTY.fg(Color.WHITE).bg(Color.RED).bold();
-        default: return null;
-    }
-};
-
-Text code = MarkupParser.parse(
-    "[keyword]public[/] [keyword]void[/] main([string]\"Hello\"[/]) [comment]// entry point[/]",
-    resolver
-);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=custom-style-resolver]
 ----
 
 === Resolver Priority
@@ -196,16 +174,7 @@ This means you can redefine what built-in color names mean:
 
 [source,java]
 ----
-// Redefine "red" to mean something else in your theme
-MarkupParser.StyleResolver themeResolver = tagName -> {
-    if ("red".equals(tagName)) {
-        return Style.EMPTY.fg(Color.hex("#ff6b6b"));  // Custom red
-    }
-    return null;
-};
-
-// Now [red] uses your custom color instead of Color.RED
-Text text = MarkupParser.parse("[red]Custom red[/]", themeResolver);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=resolver-priority]
 ----
 
 === Merging Resolver and Compound Styles
@@ -215,27 +184,7 @@ Inline styles (from the compound) override the resolver's base style, similar to
 
 [source,java]
 ----
-MarkupParser.StyleResolver resolver = tagName -> {
-    if ("error".equals(tagName)) {
-        return Style.EMPTY.fg(Color.CYAN).bold();
-    }
-    return null;
-};
-
-// [error] alone: cyan foreground + bold (from resolver)
-Text t1 = MarkupParser.parse("[error]Message[/]", resolver);
-
-// [error on red]: cyan foreground + bold + red background
-// The resolver provides the base, compound adds the background
-Text t2 = MarkupParser.parse("[error on red]Message[/]", resolver);
-
-// [error yellow]: yellow foreground + bold
-// Compound's yellow overrides resolver's cyan, but bold is kept
-Text t3 = MarkupParser.parse("[error yellow]Message[/]", resolver);
-
-// [error italic]: cyan foreground + bold + italic
-// Compound adds italic to resolver's style
-Text t4 = MarkupParser.parse("[error italic]Message[/]", resolver);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=merging-resolver-compound]
 ----
 
 == CSS Class Targeting
@@ -245,14 +194,7 @@ For compound styles, every token (except `on`) becomes a CSS class:
 
 [source,java]
 ----
-Text text = MarkupParser.parse("[error]message[/]");
-// The span has Tags extension containing "error"
-
-Text compound = MarkupParser.parse("[bold underlined yellow]Warning![/]");
-// The span has Tags extension containing "bold", "underlined", "yellow"
-
-Text background = MarkupParser.parse("[white on blue]text[/]");
-// The span has Tags extension containing "white", "blue" (not "on")
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=css-class-targeting]
 ----
 
 This allows external CSS to target any style token:
@@ -282,11 +224,7 @@ Tags that aren't recognized as built-in styles and aren't resolved by a custom r
 
 [source,java]
 ----
-// "custom" is unknown, but tracked as a CSS class
-Text text = MarkupParser.parse("[custom]styled by CSS[/custom]");
-
-// Can be styled via CSS:
-// .custom { color: magenta; }
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=unknown-tags]
 ----
 
 == Multi-line Text
@@ -295,13 +233,7 @@ Markup can span multiple lines:
 
 [source,java]
 ----
-Text multiline = MarkupParser.parse("""
-    [bold]Header[/]
-
-    [dim]This is a paragraph with [cyan]highlighted[/] text.[/]
-
-    [italic]Footer note[/]
-    """);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=multi-line-text]
 ----
 
 == Examples
@@ -310,39 +242,21 @@ Text multiline = MarkupParser.parse("""
 
 [source,java]
 ----
-MarkupParser.parse("[green]SUCCESS[/] Operation completed")
-MarkupParser.parse("[yellow]WARNING[/] Disk space low")
-MarkupParser.parse("[bold red]ERROR[/] Connection failed")
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=status-messages]
 ----
 
 === Syntax Highlighting
 
 [source,java]
 ----
-MarkupParser.StyleResolver syntax = tag -> switch (tag) {
-    case "kw" -> Style.EMPTY.fg(Color.MAGENTA).bold();
-    case "str" -> Style.EMPTY.fg(Color.GREEN);
-    case "num" -> Style.EMPTY.fg(Color.CYAN);
-    case "cmt" -> Style.EMPTY.fg(Color.GRAY).italic();
-    default -> null;
-};
-
-Text code = MarkupParser.parse(
-    "[kw]int[/] x = [num]42[/]; [cmt]// answer[/]",
-    syntax
-);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=syntax-highlighting]
 ----
 
 === Rich Notifications
 
 [source,java]
 ----
-MarkupParser.parse("""
-    [bold white on blue] NOTICE [/]
-
-    Your session will expire in [bold yellow]5 minutes[/].
-    Please [link=https://example.com/save]save your work[/link].
-    """);
+include::{snippets-dir}/dev/tamboui/docs/snippets/MarkupSnippets.java[tags=rich-notifications]
 ----
 
 == Summary Table

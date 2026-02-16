@@ -54,30 +54,14 @@ The `Terminal` wraps a `Backend` that handles the actual terminal I/O:
 
 [source,java]
 ----
-import dev.tamboui.jline.JLineBackend;
-import dev.tamboui.terminal.Terminal;
-
-try (var backend = new JLineBackend()) {
-    var terminal = new Terminal<>(backend);
-    // ...
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=terminal-and-backend]
 ----
 
 Before you can draw anything useful, you need to set up the terminal:
 
 [source,java]
 ----
-// Raw mode disables line buffering - keys are available immediately
-backend.enableRawMode();
-
-// Alternate screen preserves the user's terminal content
-backend.enterAlternateScreen();
-
-// Hide the cursor for a cleaner look
-backend.hideCursor();
-
-// Mouse support is optional
-backend.enableMouseCapture();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=backend-setup]
 ----
 
 The try-with-resources pattern ensures cleanup happens automatically.
@@ -89,16 +73,7 @@ All rendering goes through `terminal.draw()`:
 
 [source,java]
 ----
-terminal.draw(frame -> {
-    Rect area = frame.area();  // Full terminal size
-
-    var paragraph = Paragraph.builder()
-        .text(Text.from("Hello, TamboUI!"))
-        .style(Style.EMPTY.bold().fg(Color.CYAN))
-        .build();
-
-    frame.renderWidget(paragraph, area);
-});
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=drawing]
 ----
 
 The `Frame` gives you:
@@ -111,71 +86,14 @@ For pixel-level control, work with the buffer directly:
 
 [source,java]
 ----
-terminal.draw(frame -> {
-    Buffer buffer = frame.buffer();
-    buffer.setCell(0, 0, Cell.of('X', Style.EMPTY.bold()));
-
-    Cell cell = buffer.cell(5, 5);
-    // ...
-});
-----
-
-=== Event Loop
-
-You own the event loop entirely:
-
-[source,java]
-----
-boolean running = true;
-
-while (running) {
-    Event event = backend.pollEvent(Duration.ofMillis(100));
-
-    if (event instanceof KeyEvent key) {
-        if (key.code() == KeyCode.CHAR && key.character() == 'q') {
-            running = false;
-        }
-    } else if (event instanceof ResizeEvent) {
-        // Terminal resized - might want to redraw
-    }
-
-    terminal.draw(frame -> renderUI(frame));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=buffer-manipulation]
 ----
 
 === Putting It Together
 
 [source,java]
 ----
-public class ImmediateModeExample {
-    public static void main(String[] args) throws Exception {
-        try (var backend = new JLineBackend()) {
-            backend.enableRawMode();
-            backend.enterAlternateScreen();
-            backend.hideCursor();
-
-            var terminal = new Terminal<>(backend);
-            boolean running = true;
-
-            while (running) {
-                Event event = backend.pollEvent(Duration.ofMillis(100));
-                if (event instanceof KeyEvent key) {
-                    if (key.code() == KeyCode.CHAR && key.character() == 'q') {
-                        running = false;
-                    }
-                }
-
-                terminal.draw(frame -> {
-                    var widget = Paragraph.builder()
-                        .text(Text.from("Press 'q' to quit"))
-                        .style(Style.EMPTY.fg(Color.CYAN))
-                        .build();
-                    frame.renderWidget(widget, frame.area());
-                });
-            }
-        }
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=immediate-mode-example]
 ----
 
 This is verbose, but you have complete control.
@@ -188,18 +106,7 @@ You provide two callbacks: one for handling events, one for rendering.
 
 [source,java]
 ----
-try (var tui = TuiRunner.create()) {
-    tui.run(
-        (event, runner) -> {
-            if (event instanceof KeyEvent key && key.isQuit()) {
-                runner.quit();
-                return false;
-            }
-            return handleEvent(event);
-        },
-        frame -> renderUI(frame)
-    );
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=tui-runner-basic]
 ----
 
 The event handler returns `true` to request a redraw, `false` otherwise.
@@ -209,15 +116,7 @@ This avoids unnecessary redraws when nothing changed.
 
 [source,java]
 ----
-var config = TuiConfig.builder()
-    .mouseCapture(true)
-    .tickRate(Duration.ofMillis(16))  // ~60fps for animations
-    .pollTimeout(Duration.ofMillis(50))
-    .build();
-
-try (var tui = TuiRunner.create(config)) {
-    tui.run(handler, renderer);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=tui-config]
 ----
 
 Tick events fire at the configured rate - useful for animations, clocks, or any periodic updates.
@@ -228,9 +127,7 @@ For purely event-driven UIs that only need to refresh on user input, you can dis
 
 [source,java]
 ----
-var config = TuiConfig.builder()
-    .noTick()
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=tui-no-tick]
 ----
 
 Even with ticks disabled, the UI automatically redraws on terminal resize within the configured grace period (default 250ms).
@@ -238,10 +135,7 @@ You can customize this:
 
 [source,java]
 ----
-var config = TuiConfig.builder()
-    .noTick()
-    .resizeGracePeriod(Duration.ofMillis(100))  // Faster resize response
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=tui-resize-grace-period]
 ----
 
 Set `resizeGracePeriod(null)` to disable automatic resize handling entirely (not recommended).
@@ -253,27 +147,14 @@ By default, errors are shown in-app with options to scroll and dismiss:
 
 [source,java]
 ----
-// Default: errors display in UI, press 'q' to quit
-try (var tui = TuiRunner.create()) {
-    tui.run(handler, renderer);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=error-handling-default]
 ----
 
 Configure error handling behavior via `TuiConfig`:
 
 [source,java]
 ----
-import dev.tamboui.tui.error.RenderErrorHandlers;
-
-// Log errors to a file and quit immediately
-var config = TuiConfig.builder()
-    .errorHandler(RenderErrorHandlers.logAndQuit(new PrintStream("/tmp/tui-errors.log")))
-    .build();
-
-// Write error details to a file, then show in-app error display
-var config = TuiConfig.builder()
-    .errorHandler(RenderErrorHandlers.writeToFile(Path.of("/tmp/crash.log")))
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=error-handler-config]
 ----
 
 Available error handlers:
@@ -299,15 +180,7 @@ Custom error handlers implement `RenderErrorHandler`:
 
 [source,java]
 ----
-var config = TuiConfig.builder()
-    .errorHandler((error, context) -> {
-        // Log error details
-        context.errorOutput().println("Error: " + error.message());
-        error.cause().printStackTrace(context.errorOutput());
-        // Return the action to take
-        return ErrorAction.QUIT_IMMEDIATELY;
-    })
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=custom-error-handler]
 ----
 
 === Threading Model
@@ -329,15 +202,7 @@ When `run()` exits, the render thread is cleared.
 
 [source,java]
 ----
-// Check if on render thread
-if (runner.isRenderThread()) {
-    // Safe to modify UI state
-}
-
-// Or use the static utility
-if (RenderThread.isRenderThread()) {
-    // ...
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=render-thread-check]
 ----
 
 ==== Updating UI from Background Threads
@@ -346,12 +211,7 @@ To safely update UI state from background threads (network callbacks, timers, as
 
 [source,java]
 ----
-// From a background thread:
-runner.runOnRenderThread(() -> {
-    // This runs on the render thread
-    status = "Download complete";
-    // UI will redraw on next event
-});
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=run-on-render-thread]
 ----
 
 If called from the render thread, the action executes immediately.
@@ -361,11 +221,7 @@ For actions that should always be deferred (even when on render thread), use `ru
 
 [source,java]
 ----
-// Always queues, never executes immediately
-runner.runLater(() -> {
-    // Runs after current event handling completes
-    processNextItem();
-});
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=run-later]
 ----
 
 ==== Scheduled Actions
@@ -375,17 +231,7 @@ If they modify UI state, use `runOnRenderThread()`:
 
 [source,java]
 ----
-// Action runs on scheduler thread - use runOnRenderThread for UI state
-runner.schedule(() -> {
-    runner.runOnRenderThread(() -> {
-        countdown--;
-    });
-}, Duration.ofSeconds(1));
-
-// Same pattern for repeating actions
-runner.scheduleRepeating(() -> {
-    runner.runOnRenderThread(() -> animationFrame++);
-}, Duration.ofMillis(16));
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=scheduled-actions]
 ----
 
 This explicit approach gives you control - you can do background work in the scheduled action and only post the UI update portion to the render thread.
@@ -401,18 +247,7 @@ For integration with frameworks that provide their own thread pools, you can inj
 
 [source,java]
 ----
-ScheduledExecutorService myScheduler = Executors.newSingleThreadScheduledExecutor();
-
-var config = TuiConfig.builder()
-    .scheduler(myScheduler)  // Use externally-managed scheduler
-    .build();
-
-try (var tui = TuiRunner.create(config)) {
-    tui.run(handler, renderer);
-}
-
-// myScheduler is NOT shut down when TuiRunner closes - caller retains ownership
-myScheduler.shutdown();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=external-scheduler-injection]
 ----
 
 ===== Closing Semantics
@@ -447,13 +282,7 @@ For multiple runners that should share a scheduler, provide an externally-manage
 
 [source,java]
 ----
-if (key.isQuit()) { }      // q, Q, Ctrl+C
-if (key.isUp()) { }        // Up arrow, k, Ctrl+P (with vim bindings)
-if (key.isDown()) { }      // Down arrow, j, Ctrl+N
-if (key.isSelect()) { }    // Enter, Space
-if (key.isCancel()) { }    // Escape
-if (key.isPageUp()) { }    // PageUp, Ctrl+B
-if (key.isPageDown()) { }  // PageDown, Ctrl+F
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=semantic-key-checks]
 ----
 
 These delegate to the link:bindings.html[bindings system] - with vim bindings, `isUp()` matches `k`, with standard bindings it only matches the Up arrow.
@@ -464,15 +293,7 @@ Pattern matching works well with the event types:
 
 [source,java]
 ----
-(event, runner) -> {
-    return switch (event) {
-        case KeyEvent k -> handleKey(k);
-        case MouseEvent m -> handleMouse(m);
-        case TickEvent t -> { animationFrame++; yield true; }
-        case ResizeEvent r -> true;  // Always redraw on resize
-        default -> false;
-    };
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=event-pattern-matching]
 ----
 
 === Layout in the Renderer
@@ -482,78 +303,14 @@ Combine it with the layout system:
 
 [source,java]
 ----
-frame -> {
-    var areas = Layout.builder()
-        .direction(Direction.VERTICAL)
-        .constraints(
-            Constraint.length(3),
-            Constraint.fill(),
-            Constraint.length(1)
-        )
-        .build()
-        .split(frame.area());
-
-    frame.renderWidget(header, areas.get(0));
-    frame.renderWidget(content, areas.get(1));
-    frame.renderWidget(statusBar, areas.get(2));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=layout-in-renderer]
 ----
 
 === Example: Counter with Animation
 
 [source,java]
 ----
-public class CounterDemo {
-    private int counter = 0;
-    private int ticks = 0;
-
-    /**
-     * Runs the demo application.
-     *
-     * @throws Exception if an error occurs
-     */
-     public void run() throws Exception {
-        var config = TuiConfig.builder()
-            .tickRate(Duration.ofMillis(100))
-            .build();
-
-        try (var tui = TuiRunner.create(config)) {
-            tui.run(this::handleEvent, this::render);
-        }
-    }
-
-    private boolean handleEvent(Event event, TuiRunner.Runner runner) {
-        if (event instanceof KeyEvent key && key.isQuit()) {
-            runner.quit();
-            return false;
-        }
-        if (event instanceof TickEvent) {
-            ticks++;
-            return true;
-        }
-        if (event instanceof KeyEvent key) {
-            if (key.isChar('+')) { counter++; return true; }
-            if (key.isChar('-')) { counter--; return true; }
-        }
-        return false;
-    }
-
-    private void render(Frame frame) {
-        var text = String.format("Counter: %d (ticks: %d)%n%nPress +/- to change, q to quit",
-            counter, ticks);
-
-        var widget = Paragraph.builder()
-            .text(Text.from(text))
-            .block(Block.builder()
-                .title(Text.from("Demo"))
-                .borders(Borders.ALL)
-                .borderType(BorderType.ROUNDED)
-                .build())
-            .build();
-
-        frame.renderWidget(widget, frame.area());
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=counter-demo]
 ----
 
 TuiRunner hits a sweet spot: less boilerplate than immediate mode, but you still control the event handling and rendering logic.
@@ -565,24 +322,7 @@ Instead of writing render callbacks, you describe your UI declaratively and let 
 
 [source,java]
 ----
-import static dev.tamboui.toolkit.Toolkit.*;
-import dev.tamboui.toolkit.app.ToolkitApp;
-
-public class MyApp extends ToolkitApp {
-
-    @Override
-    protected Element render() {
-        return panel("My App",
-            text("Hello!").bold().cyan(),
-            spacer(),
-            text("Press 'q' to quit").dim()
-        ).rounded();
-    }
-
-    public static void main(String[] args) throws Exception {
-        new MyApp().run();
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=toolkit-app-example]
 ----
 
 The static import `dev.tamboui.toolkit.Toolkit.*` gives you all the element factories: `text()`, `panel()`, `row()`, `column()`, `columns()`, `list()`, `table()`, and more.
@@ -593,34 +333,14 @@ Rows and columns work as you'd expect:
 
 [source,java]
 ----
-row(
-    panel("Left").fill(),
-    panel("Right").fill()
-)
-
-column(
-    text("Header"),
-    content().fill(),
-    text("Footer")
-)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=row-column-layout]
 ----
 
 For multi-column grid layouts, use `columns()`:
 
 [source,java]
 ----
-// Auto-detects column count based on available width and child widths
-columns(item1, item2, item3, item4, item5, item6)
-    .spacing(1)
-
-// Explicit column count
-columns(item1, item2, item3, item4)
-    .columnCount(2)
-
-// Column-first ordering (fills top-to-bottom, then left-to-right)
-columns(item1, item2, item3, item4)
-    .columnCount(2)
-    .columnFirst()
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=columns-layout]
 ----
 
 CSS properties for columns: `column-count`, `column-order` ("row-first" or "column-first"), `spacing`, `margin`, `flex`.
@@ -629,29 +349,14 @@ Use `spacer()` to push things apart:
 
 [source,java]
 ----
-row(
-    text("Left"),
-    spacer(),
-    text("Right")
-)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=spacer-usage]
 ----
 
 Control positioning with flex:
 
 [source,java]
 ----
-import dev.tamboui.layout.Flex;
-
-row(
-    text("Item 1"),
-    text("Item 2"),
-    text("Item 3")
-).flex(Flex.CENTER)  // Center items horizontally
-
-column(
-    panel("Top"),
-    panel("Bottom")
-).flex(Flex.SPACE_BETWEEN)  // Spread items vertically
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=flex-positioning]
 ----
 
 See link:styling.html#_flex_layout[Flex Layout] for detailed documentation on all flex modes and usage patterns.
@@ -662,17 +367,14 @@ Style methods chain naturally:
 
 [source,java]
 ----
-text("Styled").bold().italic().cyan().onBlue()
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=styling-chain]
 ----
 
 Panels support border styling:
 
 [source,java]
 ----
-panel("Title", content)
-    .rounded()
-    .borderColor(Color.CYAN)
-    .focusedBorderColor(Color.YELLOW)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=panel-border-styling]
 ----
 
 === Sizing
@@ -681,13 +383,7 @@ Control how elements fill space:
 
 [source,java]
 ----
-panel("Fixed width").length(30)
-panel("Half the space").percentage(50)
-panel("Take what's left").fill()
-panel("Twice the weight").fill(2)
-panel("One third").ratio(1, 3)
-panel("At least 10").min(10)
-panel("At most 50").max(50)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=sizing-options]
 ----
 
 === Stateful Widgets
@@ -696,33 +392,14 @@ Tables and text inputs need state objects. Lists manage their own state internal
 
 [source,java]
 ----
-private ListElement<?> myList = list("Apple", "Banana", "Cherry")
-    .highlightColor(Color.CYAN)
-    .autoScroll();
-
-private TableState tableState = new TableState();
-private TextInputState inputState = new TextInputState();
-
-// In render():
-myList  // ListElement manages selection and scroll internally
-
-table()
-    .header("Name", "Age")
-    .row("Alice", "30")
-    .row("Bob", "25")
-    .state(tableState)
-
-textInput(inputState)
-    .placeholder("Type here...")
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=stateful-widgets]
 ----
 
 ListElement provides methods for navigation:
+
 [source,java]
 ----
-myList.selectNext(itemCount);  // Move selection down
-myList.selectPrevious();       // Move selection up
-myList.selected();             // Get current selection index
-myList.selected(index);        // Set selection to specific index
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=list-element-navigation]
 ----
 
 === Event Handling
@@ -731,16 +408,7 @@ Attach handlers to elements:
 
 [source,java]
 ----
-panel("Interactive")
-    .id("main")
-    .focusable()
-    .onKeyEvent(event -> {
-        if (event.isChar('a')) {
-            addItem();
-            return EventResult.HANDLED;
-        }
-        return EventResult.UNHANDLED;
-    })
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=event-handling]
 ----
 
 Return `EventResult.HANDLED` to stop propagation, `UNHANDLED` to let it bubble up.
@@ -751,10 +419,7 @@ For Tab/Shift+Tab navigation, elements need both an ID and the focusable flag:
 
 [source,java]
 ----
-column(
-    panel("First").id("first").focusable(),
-    panel("Second").id("second").focusable()
-)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=focus-navigation]
 ----
 
 The `focusedBorderColor()` method lets you provide visual feedback.
@@ -763,13 +428,7 @@ The `focusedBorderColor()` method lets you provide visual feedback.
 
 [source,java]
 ----
-gauge(0.75).label("Progress").gaugeColor(Color.GREEN)
-
-sparkline(1, 4, 2, 8, 5, 7).color(Color.CYAN)
-
-barChart(10, 20, 30)
-    .labels("A", "B", "C")
-    .barColor(Color.BLUE)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=data-visualization]
 ----
 
 === Wrapping Low-Level Widgets
@@ -778,16 +437,7 @@ If you have a custom widget or a widget that doesn't yet have a dedicated Toolki
 
 [source,java]
 ----
-// Wrap any Widget for use in the Toolkit DSL
-widget(myCustomWidget)
-    .addClass("custom")
-    .fill()
-
-// Use in layouts like any other element
-row(
-    widget(customWidget1).fill(),
-    widget(customWidget2).fill()
-)
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=widget-wrapper]
 ----
 
 This is only useful when:
@@ -811,14 +461,7 @@ For full styling support, consider creating a dedicated element wrapper for your
 
 [source,java]
 ----
-var config = TuiConfig.builder()
-    .mouseCapture(true)
-    .tickRate(Duration.ofMillis(50))
-    .build();
-
-try (var runner = ToolkitRunner.create(config)) {
-    runner.run(() -> panel("App", content()));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=toolkit-runner-direct]
 ----
 
 === Fault-Tolerant Rendering
@@ -828,11 +471,7 @@ The rest of the UI continues to render normally.
 
 [source,java]
 ----
-try (var runner = ToolkitRunner.builder()
-        .faultTolerant(true)
-        .build()) {
-    runner.run(() -> render());
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=fault-tolerant-rendering]
 ----
 
 With fault-tolerant mode:
@@ -851,56 +490,7 @@ Without fault-tolerant mode (default):
 
 [source,java]
 ----
-import static dev.tamboui.toolkit.Toolkit.*;
-
-public class TodoApp extends ToolkitApp {
-    private final List<String> items = new ArrayList<>(List.of(
-        "Learn TamboUI",
-        "Build something cool"
-    ));
-    private final ListElement<?> todoList = list()
-        .highlightColor(Color.CYAN)
-        .autoScroll();
-
-    @Override
-    protected Element render() {
-        return panel("Todo",
-            items.isEmpty()
-                ? text("Empty - press 'a' to add").dim()
-                : todoList.items(items.toArray(new String[0])),
-            spacer(),
-            text("[a]dd [d]elete [q]uit").dim()
-        )
-        .rounded()
-        .id("main")
-        .focusable()
-        .onKeyEvent(this::handleKey);
-    }
-
-    private EventResult handleKey(KeyEvent event) {
-        if (event.isChar('a')) {
-            items.add("New item");
-            return EventResult.HANDLED;
-        }
-        if (event.isChar('d') && !items.isEmpty()) {
-            items.remove(todoList.selected());
-            return EventResult.HANDLED;
-        }
-        if (event.isDown()) {
-            todoList.selectNext(items.size());
-            return EventResult.HANDLED;
-        }
-        if (event.isUp()) {
-            todoList.selectPrevious();
-            return EventResult.HANDLED;
-        }
-        return EventResult.UNHANDLED;
-    }
-
-    public static void main(String[] args) throws Exception {
-        new TodoApp().run();
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=todo-app]
 ----
 
 == Inline Display Mode
@@ -921,18 +511,7 @@ This is the pattern used by Gradle, npm, and other build tools: a fixed status a
 
 [source,java]
 ----
-try (var display = InlineDisplay.create(3)) {  // Reserve 3 lines
-    for (int i = 0; i <= 100; i += 10) {
-        display.render((area, buffer) -> {
-            var gauge = Gauge.builder()
-                .ratio(i / 100.0)
-                .label("Processing: " + i + "%")
-                .build();
-            gauge.render(area, buffer);
-        });
-        Thread.sleep(100);
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-display-basic]
 ----
 
 The display reserves lines at the current cursor position.
@@ -944,36 +523,14 @@ Use `println()` to add output that scrolls above the fixed status:
 
 [source,java]
 ----
-try (var display = InlineDisplay.create(4)) {
-    for (var task : tasks) {
-        // Update status area
-        display.render((area, buffer) -> {
-            renderProgress(area, buffer, task, progress);
-        });
-
-        processTask(task);
-
-        // Log completion - scrolls above, status stays fixed
-        display.println(Text.from(Line.from(
-            Span.styled("✓ ", Style.EMPTY.fg(Color.GREEN)),
-            Span.raw(task.name())
-        )));
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-println]
 ----
 
 === Configuration Options
 
 [source,java]
 ----
-// Fixed height (width matches terminal)
-var display = InlineDisplay.create(4);
-
-// Fixed height and width
-var display = InlineDisplay.create(4, 80);
-
-// Clear the status area when done
-var display = InlineDisplay.create(4).clearOnClose();
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-display-config]
 ----
 
 === Setting Lines Directly
@@ -982,9 +539,7 @@ For simple status updates, set lines without a full render:
 
 [source,java]
 ----
-display.setLine(0, "Building module: core");
-display.setLine(1, "Progress: 45%");
-display.setLine(2, Text.from(Span.styled("No errors", Style.EMPTY.fg(Color.GREEN))));
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-set-line]
 ----
 
 === Inline vs Alternate Screen
@@ -1024,68 +579,28 @@ It handles keyboard and mouse events, tick-based animations, and thread-safe upd
 
 [source,java]
 ----
-try (var runner = InlineTuiRunner.create(4)) {
-    runner.run(
-        // Event handler
-        event -> {
-            if (event instanceof KeyEvent key && key.character() == 'q') {
-                runner.quit();
-                return EventResult.HANDLED;
-            }
-            return EventResult.UNHANDLED;
-        },
-        // Renderer
-        frame -> {
-            var gauge = Gauge.builder()
-                .ratio(progress / 100.0)
-                .build();
-            gauge.render(frame.area(), frame.buffer());
-        }
-    );
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-tui-runner-basic]
 ----
 
 === Configuration
 
 [source,java]
 ----
-var config = InlineTuiConfig.builder(4)  // 4 lines
-    .tickRate(Duration.ofMillis(50))     // For animations
-    .clearOnClose(true)                   // Clear viewport on exit
-    .build();
-
-try (var runner = InlineTuiRunner.create(config)) {
-    // ...
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-tui-config]
 ----
 
 === Printing Above the Viewport
 
 [source,java]
 ----
-// Plain text
-runner.println("Task completed!");
-
-// Styled text
-runner.println(Text.from(
-    Span.styled("✓ ", Style.EMPTY.fg(Color.GREEN)),
-    Span.raw("Build successful")
-));
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-runner-println]
 ----
 
 === Thread-Safe Updates
 
 [source,java]
 ----
-// Run code on the render thread
-runner.runOnRenderThread(() -> {
-    progress = newValue;
-});
-
-// Schedule for later
-runner.runLater(() -> {
-    cleanup();
-});
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-thread-safe-updates]
 ----
 
 [[inline-toolkit]]
@@ -1100,39 +615,7 @@ The easiest way to create an inline application:
 
 [source,java]
 ----
-public class MyProgressApp extends InlineApp {
-
-    private double progress = 0.0;
-
-    public static void main(String[] args) throws Exception {
-        new MyProgressApp().run();
-    }
-
-    @Override
-    protected int height() {
-        return 3;  // Reserve 3 lines
-    }
-
-    @Override
-    protected Element render() {
-        return column(
-            text("Installing packages...").bold(),
-            gauge(progress).green(),
-            text(String.format("%.0f%% complete", progress * 100)).dim()
-        );
-    }
-
-    @Override
-    protected void onStart() {
-        // Schedule periodic updates
-        runner().scheduleRepeating(() -> {
-            runner().runOnRenderThread(() -> {
-                progress += 0.01;
-                if (progress >= 1.0) quit();
-            });
-        }, Duration.ofMillis(50));
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-app-example]
 ----
 
 === Configuration
@@ -1141,13 +624,7 @@ Override `configure()` to customize behavior:
 
 [source,java]
 ----
-@Override
-protected InlineTuiConfig configure(int height) {
-    return InlineTuiConfig.builder(height)
-        .tickRate(Duration.ofMillis(30))  // Faster for smooth animations
-        .clearOnClose(false)               // Keep output visible
-        .build();
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-app-configure]
 ----
 
 === Printing Elements
@@ -1156,15 +633,7 @@ Print styled content above the viewport:
 
 [source,java]
 ----
-// Print a styled element
-println(row(
-    text("✓ ").green().fit(),
-    text("lodash").fit(),
-    text("@4.17.21").dim().fit()
-).flex(Flex.START));
-
-// Print plain text
-println("Step completed");
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-print-elements]
 ----
 
 === Handling Key Events
@@ -1173,24 +642,7 @@ Use focusable elements or global key handlers:
 
 [source,java]
 ----
-@Override
-protected Element render() {
-    return column(
-        text("Continue? [Y/n]").cyan(),
-        spacer()
-    )
-    .focusable()
-    .onKeyEvent(event -> {
-        if (event.character() == 'y' || event.character() == 'Y') {
-            startNextPhase();
-            return EventResult.HANDLED;
-        } else if (event.character() == 'n') {
-            quit();
-            return EventResult.HANDLED;
-        }
-        return EventResult.UNHANDLED;
-    });
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-key-handling]
 ----
 
 === Text Input in Inline Mode
@@ -1199,22 +651,7 @@ Text inputs work with proper focus management:
 
 [source,java]
 ----
-private final TextInputState nameState = new TextInputState();
-
-@Override
-protected Element render() {
-    return column(
-        row(
-            text("Name: ").bold().fit(),
-            textInput(nameState)
-                .id("name-input")
-                .placeholder("Enter name...")
-                .constraint(Constraint.length(20))
-                .onSubmit(this::handleSubmit)
-        ).flex(Flex.START),
-        text("[Enter] Submit  [Tab] Next field").dim()
-    );
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-text-input]
 ----
 
 === Using InlineToolkitRunner Directly
@@ -1223,13 +660,7 @@ For more control, use `InlineToolkitRunner` with a render function:
 
 [source,java]
 ----
-try (var runner = InlineToolkitRunner.create(3)) {
-    runner.run(() -> column(
-        waveText("Processing...").cyan(),
-        gauge(progress),
-        text("Please wait").dim()
-    ));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-toolkit-runner-direct]
 ----
 
 === Scopes for Dynamic Regions
@@ -1238,24 +669,7 @@ Use `scope()` from `InlineToolkit` to create collapsible regions:
 
 [source,java]
 ----
-import static dev.tamboui.toolkit.InlineToolkit.*;
-
-private boolean downloading = true;
-
-@Override
-protected Element render() {
-    return column(
-        text("Package Installation").bold(),
-
-        // This section collapses when downloading becomes false
-        scope(downloading,
-            row(text("file1.zip: "), gauge(progress1)),
-            row(text("file2.zip: "), gauge(progress2))
-        ),
-
-        text(downloading ? "Downloading..." : "Complete!").dim()
-    );
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=inline-scopes]
 ----
 
 When `downloading` becomes `false`, the scope collapses to zero height and the layout adjusts automatically.

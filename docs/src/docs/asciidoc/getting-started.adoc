@@ -116,7 +116,7 @@ The simplest way to build a TUI application:
 
 [source,java]
 ----
-include::code/getting-started/Hellodsl.java[lines=3..-1]
+include::{snippets-dir}/dev/tamboui/docs/snippets/GettingStartedSnippets.java[tags=hello-dsl]
 ----
 
 
@@ -124,7 +124,7 @@ For more control over the event loop:
 
 [source,java]
 ----
-include::code/getting-started/HelloTuiRunner.java[lines=3..-1]
+include::{snippets-dir}/dev/tamboui/docs/snippets/GettingStartedSnippets.java[tags=hello-tui-runner]
 ----
 
 === Using Immediate Mode
@@ -133,7 +133,7 @@ For maximum control over the terminal:
 
 [source,java]
 ----
-include::code/getting-started/HelloImmediate.java[lines=3..-1]
+include::{snippets-dir}/dev/tamboui/docs/snippets/GettingStartedSnippets.java[tags=hello-immediate]
 ----
 
 === Using Inline Display
@@ -142,7 +142,7 @@ For CLI tools that show progress while preserving terminal history:
 
 [source,java]
 ----
-include::code/getting-started/HelloInline.java[lines=3..-1]
+include::{snippets-dir}/dev/tamboui/docs/snippets/GettingStartedSnippets.java[tags=hello-inline]
 ----
 
 == Running the Demos

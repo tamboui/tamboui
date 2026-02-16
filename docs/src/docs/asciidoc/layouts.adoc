@@ -45,14 +45,7 @@ Children are placed into cells whose positions are determined by the ordering mo
 
 [source,java]
 ----
-Columns columns = Columns.builder()
-    .children(widget1, widget2, widget3, widget4)
-    .columnCount(2)
-    .spacing(1)
-    .order(ColumnOrder.ROW_FIRST)
-    .build();
-
-columns.render(area, buffer);
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=columns-basic]
 ----
 
 Column ordering modes:
@@ -72,21 +65,7 @@ Builder options:
 
 [source,java]
 ----
-// Custom column widths and row-first ordering
-Columns grid = Columns.builder()
-    .children(headerWidget, contentWidget, sidebarWidget, footerWidget)
-    .columnCount(2)
-    .columnWidths(Constraint.length(20), Constraint.fill())
-    .rowHeights(3, 10)
-    .spacing(1)
-    .build();
-
-// Column-first ordering: fills top-to-bottom per column
-Columns newspaperLayout = Columns.builder()
-    .children(article1, article2, article3, article4)
-    .columnCount(2)
-    .order(ColumnOrder.COLUMN_FIRST)
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=columns-advanced]
 ----
 
 NOTE: The widget-level `Columns` requires an explicit column count. For auto-detection based on child widths, use `ColumnsElement` in the Toolkit DSL (via the `columns()` factory method), which computes the column count from available width and child preferred widths.
@@ -108,14 +87,7 @@ The staged builder pattern ensures compile-time safety — you cannot mix modes.
 
 [source,java]
 ----
-Grid grid = Grid.builder()
-    .children(widget1, widget2, widget3, widget4, widget5, widget6)
-    .columnCount(3)
-    .horizontalGutter(1)
-    .verticalGutter(1)
-    .build();
-
-grid.render(area, buffer);
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=grid-children-basic]
 ----
 
 ChildrenBuilder options:
@@ -132,33 +104,7 @@ ChildrenBuilder options:
 
 [source,java]
 ----
-// Grid with custom column widths and gutter
-Grid dashboard = Grid.builder()
-    .children(cpuPanel, memoryPanel, diskPanel,
-              netUpPanel, netDownPanel, uptimePanel)
-    .columnCount(3)
-    .columnConstraints(
-        Constraint.length(16),  // fixed first column
-        Constraint.fill(),      // remaining columns fill
-        Constraint.fill()
-    )
-    .horizontalGutter(2)
-    .verticalGutter(1)
-    .build();
-
-// Grid with row constraints
-Grid sized = Grid.builder()
-    .children(header, content, sidebar, footer)
-    .columnCount(2)
-    .rowConstraints(Constraint.length(3), Constraint.fill())
-    .build();
-
-// Column constraint cycling: single constraint applied to all columns
-Grid uniform = Grid.builder()
-    .children(a, b, c, d, e, f)
-    .columnCount(3)
-    .columnConstraints(Constraint.length(10))  // all 3 cols get length(10)
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=grid-children-advanced]
 ----
 
 === Area Mode (Grid Template Areas)
@@ -168,21 +114,7 @@ Named areas must form contiguous rectangles — L-shapes and disconnected region
 
 [source,java]
 ----
-// "Holy grail" layout with spanning regions
-Grid layout = Grid.builder()
-    .gridAreas("header header header",
-               "nav    main   main",
-               "nav    main   main",
-               "footer footer footer")
-    .area("header", headerWidget)
-    .area("nav", navWidget)
-    .area("main", mainWidget)
-    .area("footer", footerWidget)
-    .horizontalGutter(1)
-    .verticalGutter(1)
-    .build();
-
-layout.render(area, buffer);
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=grid-area-basic]
 ----
 
 AreaBuilder options:
@@ -205,27 +137,7 @@ Template rules:
 
 [source,java]
 ----
-// Dashboard with 2x2 spanning main area
-Grid dashboard = Grid.builder()
-    .gridAreas("A A B",
-               "A A C",
-               "D D D")
-    .area("A", mainPanel)    // 2x2 span
-    .area("B", sidePanel1)
-    .area("C", sidePanel2)
-    .area("D", statusBar)    // full-width span
-    .horizontalGutter(1)
-    .verticalGutter(1)
-    .build();
-
-// Empty cells with dot notation
-Grid sparse = Grid.builder()
-    .gridAreas("A . B",
-               ". C .")
-    .area("A", widget1)
-    .area("B", widget2)
-    .area("C", widget3)
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=grid-area-advanced]
 ----
 
 NOTE: Areas without assigned widgets render as empty space. Assigning a widget to an undefined area throws `LayoutException`.
@@ -239,19 +151,7 @@ A 5-region dock layout widget that arranges children into top, bottom, left, rig
 
 [source,java]
 ----
-Dock dock = Dock.builder()
-    .top(headerWidget)
-    .bottom(statusBarWidget)
-    .left(sidebarWidget)
-    .right(outlineWidget)
-    .center(editorWidget)
-    .topHeight(Constraint.length(3))
-    .bottomHeight(Constraint.length(1))
-    .leftWidth(Constraint.length(20))
-    .rightWidth(Constraint.length(20))
-    .build();
-
-dock.render(area, buffer);
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=dock]
 ----
 
 Builder options:
@@ -271,12 +171,7 @@ An overlapping layers widget where children render on top of each other using a 
 
 [source,java]
 ----
-Stack stack = Stack.builder()
-    .children(backgroundWidget, dialogWidget)
-    .alignment(ContentAlignment.STRETCH)
-    .build();
-
-stack.render(area, buffer);
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=stack]
 ----
 
 Builder options:
@@ -293,15 +188,7 @@ A wrap layout widget where items flow left-to-right and wrap to the next line wh
 
 [source,java]
 ----
-Flow flow = Flow.builder()
-    .item(tag1Widget, 8)
-    .item(tag2Widget, 12)
-    .item(tag3Widget, 6)
-    .horizontalSpacing(1)
-    .verticalSpacing(1)
-    .build();
-
-flow.render(area, buffer);
+include::{snippets-dir}/dev/tamboui/docs/snippets/LayoutsSnippets.java[tags=flow]
 ----
 
 Builder options:

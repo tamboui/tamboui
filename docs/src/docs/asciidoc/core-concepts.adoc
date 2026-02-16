@@ -42,14 +42,7 @@ A `Buffer` is a 2D grid of `Cell` objects representing the terminal screen:
 
 [source,java]
 ----
-// A Buffer is created for each frame
-Buffer buffer = new Buffer(width, height);
-
-// Set a cell at position (x, y)
-buffer.setCell(x, y, Cell.of('A', Style.EMPTY.fg(Color.RED)));
-
-// Get a cell
-Cell cell = buffer.cell(x, y);
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=buffer-basics,indent=0]
 ----
 
 === Cell
@@ -58,12 +51,7 @@ A `Cell` represents a single character with styling:
 
 [source,java]
 ----
-// Create a cell with character and style
-Cell cell = Cell.of('X', Style.EMPTY.bold().fg(Color.CYAN));
-
-// Get properties
-char symbol = cell.symbol();
-Style style = cell.style();
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=cell-basics,indent=0]
 ----
 
 === Frame
@@ -72,17 +60,7 @@ A `Frame` wraps a buffer and provides rendering helpers:
 
 [source,java]
 ----
-terminal.draw(frame -> {
-    // Get the renderable area
-    Rect area = frame.area();
-
-    // Render a widget to the frame
-    frame.renderWidget(myWidget, area);
-
-    // Or render to a sub-area
-    Rect subArea = new Rect(0, 0, 40, 10);
-    frame.renderWidget(headerWidget, subArea);
-});
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=frame-basics,indent=0]
 ----
 
 == Layout System
@@ -93,19 +71,7 @@ A `Rect` defines a rectangular region with position and size:
 
 [source,java]
 ----
-// Create a rectangle
-Rect rect = new Rect(x, y, width, height);
-
-// Properties
-int x = rect.x();
-int y = rect.y();
-int width = rect.width();
-int height = rect.height();
-
-// Derived values
-int right = rect.right();    // x + width
-int bottom = rect.bottom();  // y + height
-Position center = rect.center();
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=rect-basics,indent=0]
 ----
 
 === Constraints
@@ -149,71 +115,21 @@ The core operation is `split()`: it takes a `Rect` and returns a `List<Rect>` - 
 
 [source,java]
 ----
-Layout layout = Layout.builder()
-    .direction(Direction.VERTICAL)
-    .constraints(
-        Constraint.length(3),   // First area: 3 cells tall
-        Constraint.fill()       // Second area: takes remaining space
-    )
-    .build();
-
-// Split a 80x24 area into two rectangles
-Rect area = new Rect(0, 0, 80, 24);
-List<Rect> areas = layout.split(area);
-
-// Result:
-// areas.get(0) = Rect(0, 0, 80, 3)   - header area
-// areas.get(1) = Rect(0, 3, 80, 21)  - content area
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=layout-basics,indent=0]
 ----
 
 Complete example with rendering:
 
 [source,java]
 ----
-// Split vertically into header (3 lines) and content (rest)
-Layout layout = Layout.builder()
-    .direction(Direction.VERTICAL)
-    .constraints(
-        Constraint.length(3),
-        Constraint.fill()
-    )
-    .build();
-
-List<Rect> areas = layout.split(frame.area());
-Rect headerArea = areas.get(0);
-Rect contentArea = areas.get(1);
-
-// Render widgets into the split areas
-Paragraph header = new Paragraph("Header Text");
-header.render(headerArea, frame.buffer());
-
-Paragraph content = new Paragraph("Main content goes here...");
-content.render(contentArea, frame.buffer());
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=layout-complete,indent=0]
 ----
 
 Layouts can be nested:
 
 [source,java]
 ----
-// Split horizontally with percentages
-Layout horizontalLayout = Layout.builder()
-    .direction(Direction.HORIZONTAL)
-    .constraints(
-        Constraint.percentage(30),
-        Constraint.percentage(70)
-    )
-    .build();
-
-List<Rect> columns = horizontalLayout.split(contentArea);
-
-// Render sidebar and main area
-List sidebar = List.builder()
-    .items("Item 1", "Item 2", "Item 3")
-    .build();
-sidebar.render(columns.get(0), frame.buffer());
-
-Paragraph mainArea = new Paragraph("Main content");
-mainArea.render(columns.get(1), frame.buffer());
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=layout-nested,indent=0]
 ----
 
 ==== Flex Positioning
@@ -222,37 +138,7 @@ When layout children don't fill the entire container (e.g., fixed-size elements 
 
 [source,java]
 ----
-import dev.tamboui.layout.Flex;
-
-// Center three fixed-width buttons in a toolbar
-Layout toolbar = Layout.builder()
-    .direction(Direction.HORIZONTAL)
-    .constraints(
-        Constraint.length(10),  // Button 1
-        Constraint.length(10),  // Button 2
-        Constraint.length(10)   // Button 3
-    )
-    .flex(Flex.CENTER)  // Center the buttons, space on both sides
-    .build();
-
-List<Rect> buttonAreas = toolbar.split(toolbarArea);
-renderButton("Save", buttonAreas.get(0), frame.buffer());
-renderButton("Cancel", buttonAreas.get(1), frame.buffer());
-renderButton("Help", buttonAreas.get(2), frame.buffer());
-
-// Spread menu items across a navigation bar
-Layout navbar = Layout.builder()
-    .direction(Direction.HORIZONTAL)
-    .constraints(
-        Constraint.length(8),   // "File"
-        Constraint.length(8)    // "Edit"
-    )
-    .flex(Flex.SPACE_BETWEEN)  // Push to edges with gap between
-    .build();
-
-List<Rect> menuAreas = navbar.split(navbarArea);
-renderMenuItem("File", menuAreas.get(0), frame.buffer());
-renderMenuItem("Edit", menuAreas.get(1), frame.buffer());
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=layout-flex,indent=0]
 ----
 
 Available flex modes: `START`, `CENTER`, `END`, `SPACE_BETWEEN`, `SPACE_AROUND`, `SPACE_EVENLY`.
@@ -272,10 +158,7 @@ Add spacing around layouts:
 
 [source,java]
 ----
-Layout.builder()
-    .margin(new Margin(1, 2, 1, 2))  // top, right, bottom, left
-    .constraints(...)
-    .build()
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=layout-margin,indent=0]
 ----
 
 == Styling
@@ -286,15 +169,7 @@ Layout.builder()
 
 [source,java]
 ----
-// Create a style
-Style style = Style.EMPTY
-    .fg(Color.CYAN)
-    .bg(Color.BLACK)
-    .bold()
-    .underlined();
-
-// Styles are immutable - methods return new instances
-Style dimStyle = style.dim();
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=style-basics,indent=0]
 ----
 
 === Color
@@ -303,18 +178,7 @@ Colors can be specified in multiple ways:
 
 [source,java]
 ----
-// Named ANSI colors
-Color.RED
-Color.GREEN
-Color.CYAN
-Color.WHITE
-Color.GRAY
-
-// Indexed colors (0-255)
-Color.indexed(196)
-
-// RGB colors (true color)
-Color.rgb(255, 128, 0)
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=color-basics,indent=0]
 ----
 
 === Modifiers
@@ -323,16 +187,7 @@ Text modifiers change how text is displayed:
 
 [source,java]
 ----
-Style.EMPTY
-    .bold()       // Bold text
-    .dim()        // Dimmed/faint
-    .italic()     // Italic (terminal support varies)
-    .underlined() // Underlined
-    .slowBlink()  // Slow blinking
-    .rapidBlink() // Rapid blinking
-    .reversed()   // Swap fg/bg colors
-    .hidden()     // Hidden text
-    .crossedOut() // Strikethrough
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=modifier-basics,indent=0]
 ----
 
 == Text System
@@ -346,17 +201,7 @@ For a convenient way to create styled text from markup strings, see link:markup.
 
 [source,java]
 ----
-// Simple text
-Text text = Text.from("Hello, World!");
-
-// Multi-line text
-Text multiLine = Text.of(
-    Line.from("First line"),
-    Line.from("Second line")
-);
-
-// With alignment
-Text centered = Text.from("Centered").centered();
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=text-basics,indent=0]
 ----
 
 === Line
@@ -365,11 +210,7 @@ A `Line` is a single line composed of `Span` objects:
 
 [source,java]
 ----
-Line line = Line.from(
-    Span.styled("Bold", Style.EMPTY.bold()),
-    Span.raw(" and "),
-    Span.styled("Red", Style.EMPTY.fg(Color.RED))
-);
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=line-basics,indent=0]
 ----
 
 === Span
@@ -378,11 +219,7 @@ A `Span` is a styled piece of text:
 
 [source,java]
 ----
-// Unstyled span
-Span plain = Span.raw("plain text");
-
-// Styled span
-Span styled = Span.styled("styled", Style.EMPTY.cyan().bold());
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=span-basics,indent=0]
 ----
 
 == Widget Interfaces
@@ -393,9 +230,7 @@ Stateless widgets implement the `Widget` interface:
 
 [source,java]
 ----
-public interface Widget {
-    void render(Rect area, Buffer buffer);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=widget-interface,indent=0]
 ----
 
 Examples: `Paragraph`, `Gauge`, `Block`, `Clear`
@@ -406,23 +241,14 @@ Stateful widgets carry external state:
 
 [source,java]
 ----
-public interface StatefulWidget<S> {
-    void render(Rect area, Buffer buffer, S state);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=stateful-widget-interface,indent=0]
 ----
 
 The state object tracks selection, scroll position, etc:
 
 [source,java]
 ----
-// Create state
-ListState listState = new ListState();
-
-// Render with state
-listWidget.render(area, buffer, listState);
-
-// Modify state based on user input
-listState.selectNext(items.size());
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=stateful-widget-usage,indent=0]
 ----
 
 Examples: `ListWidget`, `Table`, `Tabs`, `TextInput`
@@ -435,29 +261,14 @@ Examples: `ListWidget`, `Table`, `Tabs`, `TextInput`
 
 [source,java]
 ----
-// Check specific keys
-if (event.code() == KeyCode.ENTER) { ... }
-if (event.code() == KeyCode.CHAR && event.character() == 'q') { ... }
-
-// Check modifiers
-if (event.modifiers().contains(KeyModifiers.CTRL)) { ... }
-
-// Using Keys utility
-if (event.isQuit()) { ... }
-if (event.isUp()) { ... }
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=key-event-basics,indent=0]
 ----
 
 === MouseEvent
 
 [source,java]
 ----
-int x = event.x();
-int y = event.y();
-MouseEventKind kind = event.kind();
-
-if (kind == MouseEventKind.DOWN && event.button() == MouseButton.LEFT) {
-    handleClick(x, y);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=mouse-event-basics,indent=0]
 ----
 
 === TickEvent
@@ -466,16 +277,7 @@ Tick events fire periodically for animations:
 
 [source,java]
 ----
-// Configure tick rate
-TuiConfig config = TuiConfig.builder()
-    .tickRate(Duration.ofMillis(16))  // ~60fps
-    .build();
-
-// Handle tick
-if (event instanceof TickEvent) {
-    updateAnimation();
-    return true;  // redraw
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=tick-event-basics,indent=0]
 ----
 
 === Exceptions

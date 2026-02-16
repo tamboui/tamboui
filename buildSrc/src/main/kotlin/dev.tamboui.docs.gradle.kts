@@ -4,12 +4,19 @@ import dev.tamboui.build.JavadocAggregatorPlugin
 plugins {
     id("org.asciidoctor.jvm.convert")
     id("org.ajoberstar.git-publish")
+    `java-base`  // For source set infrastructure (snippets compilation)
 }
 
 pluginManager.apply(JavadocAggregatorPlugin::class)
 
 repositories {
     mavenCentral()
+}
+
+// Source set for documentation code snippets
+// These are compiled to ensure code examples in documentation are valid
+val snippets = the<SourceSetContainer>().create("snippets") {
+    java.srcDir("src/snippets/java")
 }
 
 // Configuration to resolve demo cast files from demo projects
@@ -74,10 +81,13 @@ val prepareAsciidocSources = tasks.register<Sync>("prepareAsciidocSources") {
 
 tasks.asciidoctor {
     val javadoc = tasks.named<Javadoc>("javadoc")
+    val snippetsClasses = tasks.named("snippetsClasses")
     inputs.files(prepareAsciidocSources)
     inputs.files(copyCasts)
     inputs.files(copyScreenshots)
     inputs.files(javadoc)
+    // Ensure code snippets compile before building docs
+    dependsOn(snippetsClasses)
 
     setSourceDir(layout.buildDirectory.dir("asciidoc-sources").get().asFile)
     setBaseDir(layout.buildDirectory.dir("asciidoc-sources").get().asFile)
@@ -123,7 +133,9 @@ tasks.asciidoctor {
             // Project info
             "project-version" to project.version,
             "project-name" to "TamboUI",
-            "github-repo" to "tamboui/tamboui"
+            "github-repo" to "tamboui/tamboui",
+            // Snippet source directory for include directives
+            "snippets-dir" to project.file("src/snippets/java").absolutePath
         )
     )
 }

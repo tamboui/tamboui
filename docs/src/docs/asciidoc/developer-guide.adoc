@@ -19,30 +19,14 @@ For widgets that render the same output given the same inputs:
 
 [source,java]
 ----
-public interface Widget {
-    void render(Rect area, Buffer buffer);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=widget-interface]
 ----
 
 Example: A custom separator widget:
 
 [source,java]
 ----
-public class Separator implements Widget {
-    private final Style style;
-
-    public Separator(Style style) {
-        this.style = style;
-    }
-
-    @Override
-    public void render(Rect area, Buffer buffer) {
-        // Fill the entire width with a horizontal line
-        for (int x = area.x(); x < area.right(); x++) {
-            buffer.setCell(x, area.y(), Cell.of('─', style));
-        }
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=separator-widget]
 ----
 
 === Stateful Widgets
@@ -51,46 +35,21 @@ For widgets that need to track selection, scroll position, or other state:
 
 [source,java]
 ----
-public interface StatefulWidget<S> {
-    void render(Rect area, Buffer buffer, S state);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=stateful-widget-interface]
 ----
 
 Example: A custom counter widget:
 
 [source,java]
 ----
-public class Counter implements StatefulWidget<Counter.State> {
-    private final Style style;
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=counter-widget]
+----
 
-    public static class State {
-        private int value = 0;
+Usage:
 
-        public int value() { return value; }
-        public void increment() { value++; }
-        public void decrement() { if (value > 0) value--; }
-    }
-
-    public Counter(Style style) {
-        this.style = style;
-    }
-
-    @Override
-    public void render(Rect area, Buffer buffer, State state) {
-        String text = "Count: " + state.value();
-        int x = area.x();
-        for (char c : text.toCharArray()) {
-            if (x < area.right()) {
-                buffer.setCell(x++, area.y(), Cell.of(c, style));
-            }
-        }
-    }
-}
-
-// Usage:
-Counter.State counterState = new Counter.State();
-Counter counter = new Counter(Style.EMPTY.bold());
-counter.render(area, buffer, counterState);
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=counter-usage]
 ----
 
 == Buffer Operations
@@ -99,35 +58,21 @@ counter.render(area, buffer, counterState);
 
 [source,java]
 ----
-// Set a single cell
-buffer.setCell(x, y, Cell.of('X', style));
-
-// Set a string
-int col = x;
-for (char c : "Hello".toCharArray()) {
-    buffer.setCell(col++, y, Cell.of(c, style));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=setting-cells]
 ----
 
 === Reading Cells
 
 [source,java]
 ----
-Cell cell = buffer.cell(x, y);
-char symbol = cell.symbol();
-Style style = cell.style();
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=reading-cells]
 ----
 
 === Filling Areas
 
 [source,java]
 ----
-// Fill a rectangle with a character
-for (int row = area.y(); row < area.bottom(); row++) {
-    for (int col = area.x(); col < area.right(); col++) {
-        buffer.setCell(col, row, Cell.of(' ', bgStyle));
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=filling-areas]
 ----
 
 === Bounds Checking
@@ -136,10 +81,7 @@ Always check bounds before writing:
 
 [source,java]
 ----
-if (x >= area.x() && x < area.right() &&
-    y >= area.y() && y < area.bottom()) {
-    buffer.setCell(x, y, cell);
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=bounds-checking]
 ----
 
 == Exporting Buffer Content
@@ -150,66 +92,42 @@ You can export a `Buffer` to SVG, HTML, or plain/ANSI text for screenshots, docu
 
 [source,java]
 ----
-import dev.tamboui.buffer.Buffer;
-import java.nio.file.Path;
-
-import static dev.tamboui.export.ExportRequest.export;
-
-// Start from a buffer (e.g. after rendering widgets)
-Buffer buffer = ...;
-
-// Shorthand: export as SVG with default options
-export(buffer).svg().toFile(Path.of("output.svg"));
-
-// Configure options via options(Consumer)
-export(buffer).svg()
-    .options(o -> o.title("My App"))
-    .toFile(Path.of("output.svg"));
-
-// Export to string or bytes
-String svgString = export(buffer).svg().toString();
-byte[] htmlBytes = export(buffer).html().options(o -> o.inlineStyles(true)).toBytes();
-
-// Write to an OutputStream or Writer
-export(buffer).text().to(outputStream);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-fluent-api]
 ----
 
 === Format Selection
 
 Use the shorthand methods for the built-in formats:
 
-* `export(buffer).svg()` — SVG (scalable vector graphic)
-* `export(buffer).html()` — HTML document (with embedded or external CSS)
-* `export(buffer).text()` — Plain text or ANSI-styled text
+* `export(buffer).svg()` -- SVG (scalable vector graphic)
+* `export(buffer).html()` -- HTML document (with embedded or external CSS)
+* `export(buffer).text()` -- Plain text or ANSI-styled text
 
 To use a custom format, pass it to `as(Format)`:
 
 [source,java]
 ----
-export(buffer).as(Formats.SVG).toFile(path);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-custom-format]
 ----
 
 You can also export by file path and let the extension choose the format:
 
 [source,java]
 ----
-export(buffer).toFile(Path.of("screenshot.svg"));   // SVG
-export(buffer).toFile(Path.of("page.html"));       // HTML
-export(buffer).toFile(Path.of("dump.txt"));        // Plain text
-export(buffer).toFile(Path.of("styled.ansi"));     // ANSI-styled text
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-by-extension]
 ----
 
-Extension mapping: `.svg` → SVG; `.html` / `.htm` → HTML; `.txt` / `.asc` → plain text; `.ans` / `.ansi` → ANSI text. Unknown extensions default to SVG.
+Extension mapping: `.svg` -> SVG; `.html` / `.htm` -> HTML; `.txt` / `.asc` -> plain text; `.ans` / `.ansi` -> ANSI text. Unknown extensions default to SVG.
 
 === Output Methods
 
 After choosing a format (and optionally configuring options), use:
 
-* `toFile(Path path)` — write to a file (UTF-8)
-* `to(OutputStream out)` — write to a stream (UTF-8)
-* `to(Writer out)` — write to a writer (caller controls charset; writer is not closed)
-* `toString()` — return the exported string
-* `toBytes()` — return UTF-8 bytes
+* `toFile(Path path)` -- write to a file (UTF-8)
+* `to(OutputStream out)` -- write to a stream (UTF-8)
+* `to(Writer out)` -- write to a writer (caller controls charset; writer is not closed)
+* `toString()` -- return the exported string
+* `toBytes()` -- return UTF-8 bytes
 
 === Cropping to a region
 
@@ -217,28 +135,14 @@ Use `crop(Rect)` to export only part of the buffer. The rect is clipped to buffe
 
 [source,java]
 ----
-import dev.tamboui.layout.Rect;
-
-// Export a single region (e.g. title, table, or footer)
-Rect titleRect = new Rect(0, 0, 80, 3);
-export(buffer).crop(titleRect).svg().toFile(Path.of("title.svg"));
-
-// Combined rectangle of multiple elements: union of two rects
-Rect tableRect = new Rect(22, 3, 58, 12);
-Rect footerRect = new Rect(0, 15, 80, 2);
-Rect tableAndFooter = tableRect.union(footerRect);
-export(buffer).crop(tableAndFooter).svg().toFile(Path.of("table_and_footer.svg"));
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-cropping]
 ----
 
 In Toolkit apps, use `Element.renderedArea()` after a frame is rendered to get an element's last rendered rect, then crop to that rect to export just that element:
 
 [source,java]
 ----
-// After rendering (e.g. in an action handler with access to buffer and element)
-Rect area = myPanel.renderedArea();
-if (area != null && !area.isEmpty()) {
-    export(buffer).crop(area).svg().toFile(Path.of("panel.svg"));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-element-area]
 ----
 
 === Default export colors
@@ -249,16 +153,7 @@ To supply custom defaults (e.g. from the toolkit style engine), pass a `StylePro
 
 [source,java]
 ----
-import dev.tamboui.export.ExportProperties;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.StylePropertyResolver;
-
-// Use property defaults (dark theme) — no resolver
-export(buffer).svg().toFile(path);
-
-// Custom defaults via a resolver (e.g. from toolkit StyleEngine)
-StylePropertyResolver myResolver = ...;  // e.g. styleEngine.resolver()
-export(buffer).svg().options(o -> o.styles(myResolver)).toFile(path);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-default-colors]
 ----
 
 === SVG Export
@@ -267,17 +162,15 @@ SVG export produces a standalone SVG document suitable for embedding or conversi
 
 Options (`SvgOptions`), via `.options(o -> ...)`:
 
-* `title(String)` — window/title text (default: `"TamboUI"`)
-* `chrome(boolean)` — include window frame, title, and traffic-light buttons (default: `true`); `false` for content only
-* `styles(StylePropertyResolver)` — style resolver for default export foreground/background (properties `export-foreground`, `export-background`); when `null` (default), uses `ExportProperties` defaults (dark theme)
-* `fontAspectRatio(double)` — character width-to-height ratio for layout (default: 0.61)
-* `uniqueId(String)` — prefix for CSS classes and clip paths, or `null` for auto-generated
+* `title(String)` -- window/title text (default: `"TamboUI"`)
+* `chrome(boolean)` -- include window frame, title, and traffic-light buttons (default: `true`); `false` for content only
+* `styles(StylePropertyResolver)` -- style resolver for default export foreground/background (properties `export-foreground`, `export-background`); when `null` (default), uses `ExportProperties` defaults (dark theme)
+* `fontAspectRatio(double)` -- character width-to-height ratio for layout (default: 0.61)
+* `uniqueId(String)` -- prefix for CSS classes and clip paths, or `null` for auto-generated
 
 [source,java]
 ----
-export(buffer).svg()
-    .options(o -> o.title("Dashboard"))
-    .toFile(Path.of("dashboard.svg"));
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-svg-options]
 ----
 
 === HTML Export
@@ -286,18 +179,12 @@ HTML export produces a full HTML document with styled `<pre>` content. Styles ca
 
 Options (`HtmlOptions`):
 
-* `styles(StylePropertyResolver)` — style resolver for default export foreground/background (same as SVG); when `null` (default), uses `ExportProperties` defaults
-* `inlineStyles(boolean)` — `true` for inline styles on each span (single-file, larger); `false` for a stylesheet (default, smaller HTML)
+* `styles(StylePropertyResolver)` -- style resolver for default export foreground/background (same as SVG); when `null` (default), uses `ExportProperties` defaults
+* `inlineStyles(boolean)` -- `true` for inline styles on each span (single-file, larger); `false` for a stylesheet (default, smaller HTML)
 
 [source,java]
 ----
-// One file with external stylesheet (default)
-export(buffer).html().toFile(Path.of("output.html"));
-
-// Inline styles (self-contained, no separate CSS)
-export(buffer).html()
-    .options(o -> o.inlineStyles(true))
-    .toFile(Path.of("output_inline.html"));
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-html-options]
 ----
 
 === Text Export
@@ -306,17 +193,11 @@ Text export produces plain text or ANSI-escape-styled text (e.g. for pasting int
 
 Options (`TextOptions`):
 
-* `styles(boolean)` — `true` to include ANSI escape codes for colors and modifiers; `false` for plain text only (default)
+* `styles(boolean)` -- `true` to include ANSI escape codes for colors and modifiers; `false` for plain text only (default)
 
 [source,java]
 ----
-// Plain text
-String plain = export(buffer).text().toString();
-export(buffer).text().toFile(Path.of("dump.txt"));
-
-// ANSI-styled (e.g. for .ansi files or terminal paste)
-String ansi = export(buffer).text().options(o -> o.styles(true)).toString();
-export(buffer).text().options(o -> o.styles(true)).toFile(Path.of("styled.ansi"));
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=export-text-options]
 ----
 
 == Creating Toolkit Components
@@ -326,39 +207,7 @@ Components use the link:bindings.html[@OnAction annotation] to handle input thro
 
 [source,java]
 ----
-import dev.tamboui.toolkit.component.Component;
-import dev.tamboui.toolkit.element.Element;
-import dev.tamboui.tui.bindings.OnAction;
-import dev.tamboui.tui.event.Event;
-
-import static dev.tamboui.toolkit.Toolkit.*;
-
-public class CounterCard extends Component<CounterCard> {
-    private int count = 0;
-
-    @OnAction("increment")
-    void onIncrement(Event event) {
-        count++;
-    }
-
-    @OnAction("decrement")
-    void onDecrement(Event event) {
-        count--;
-    }
-
-    @Override
-    protected Element render() {
-        var borderColor = isFocused() ? Color.CYAN : Color.GRAY;
-
-        return panel(() -> column(
-                text("Count: " + count).bold(),
-                text("Press +/- to change").dim()
-        ))
-        .rounded()
-        .borderColor(borderColor)
-        .fill();
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=counter-card]
 ----
 
 === Using Components
@@ -367,23 +216,7 @@ Components require an ID:
 
 [source,java]
 ----
-var counter1 = new CounterCard().id("counter-1");
-var counter2 = new CounterCard().id("counter-2");
-
-// Define bindings
-var bindings = BindingSets.standard()
-    .toBuilder()
-    .bind(KeyTrigger.ch('+'), "increment")
-    .bind(KeyTrigger.ch('='), "increment")
-    .bind(KeyTrigger.ch('-'), "decrement")
-    .bind(KeyTrigger.ch('_'), "decrement")
-    .build();
-
-try (var runner = ToolkitRunner.builder()
-        .bindings(bindings)
-        .build()) {
-    runner.run(() -> row(counter1, counter2));
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=using-components]
 ----
 
 == CSS Property Support
@@ -396,23 +229,7 @@ Define custom properties as static constants using `PropertyDefinition` and regi
 
 [source,java]
 ----
-import dev.tamboui.style.PropertyDefinition;
-import dev.tamboui.style.PropertyRegistry;
-import dev.tamboui.style.ColorConverter;
-import dev.tamboui.style.Color;
-
-public class MyGauge implements Widget {
-    // Define a custom property for the filled bar color
-    public static final PropertyDefinition<Color> BAR_COLOR =
-        PropertyDefinition.of("bar-color", ColorConverter.INSTANCE);
-
-    // Register the property so style resolvers recognize it
-    static {
-        PropertyRegistry.register(BAR_COLOR);
-    }
-
-    // ...
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=custom-properties]
 ----
 
 TIP: For multiple properties, use `PropertyRegistry.registerAll(PROP1, PROP2, ...)`.
@@ -438,40 +255,7 @@ Widgets accept a `StylePropertyResolver` through their builder to resolve CSS va
 
 [source,java]
 ----
-public class MyGauge implements Widget {
-    public static final PropertyDefinition<Color> BAR_COLOR =
-        PropertyDefinition.of("bar-color", ColorConverter.INSTANCE);
-
-    private final Color barColor;
-
-    private MyGauge(Builder builder) {
-        // Resolve: programmatic value → CSS value → property default
-        this.barColor = builder.resolveBarColor();
-    }
-
-    public static final class Builder {
-        private Color barColor;  // Programmatic value
-        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
-
-        public Builder barColor(Color color) {
-            this.barColor = color;
-            return this;
-        }
-
-        public Builder styleResolver(StylePropertyResolver resolver) {
-            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
-            return this;
-        }
-
-        private Color resolveBarColor() {
-            return styleResolver.resolve(BAR_COLOR, barColor);
-        }
-
-        public MyGauge build() {
-            return new MyGauge(this);
-        }
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=style-property-resolver]
 ----
 
 The resolution order is:
@@ -486,11 +270,7 @@ For common properties like `color` and `background`, use `StandardProperties`:
 
 [source,java]
 ----
-import dev.tamboui.style.StandardProperties;
-
-// In your resolution method:
-Color bg = styleResolver.resolve(StandardProperties.BACKGROUND, this.background);
-Color fg = styleResolver.resolve(StandardProperties.COLOR, this.foreground);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=standard-properties]
 ----
 
 === Inheritable vs Non-Inheritable
@@ -536,14 +316,14 @@ Java's `String.length()` returns the number of UTF-16 code units, not terminal d
 
 | ASCII | "A" | 1 | 1
 | CJK | "世" | 1 | 2
-| Simple Emoji | "🔥" | 2 | 2
-| ZWJ Emoji | "👨‍🦲" | 5 | 2
-| Flag Emoji | "🇬🇱" | 4 | 2
+| Simple Emoji | "火" | 2 | 2
+| ZWJ Emoji | "man-bald" | 5 | 2
+| Flag Emoji | "flag-GL" | 4 | 2
 |===
 
 Using `length()` or `substring()` for display calculations causes:
 
-* ZWJ emoji like "👨‍🦲" to display as "👨?" (truncated mid-sequence)
+* ZWJ emoji like "man-bald" to display as "man?" (truncated mid-sequence)
 * CJK characters to overflow cells (width 2 treated as width 1)
 * Incorrect cursor positioning and alignment
 
@@ -553,26 +333,7 @@ The `CharWidth` class provides display-width-aware string operations:
 
 [source,java]
 ----
-import dev.tamboui.text.CharWidth;
-
-// Get display width of a string
-int width = CharWidth.of("Hello 世界 🔥");  // Returns 14, not 11
-
-// Get display width of a code point
-int cpWidth = CharWidth.of(0x4E16);  // Returns 2 (CJK character)
-
-// Truncate to fit display width (preserves grapheme clusters)
-String truncated = CharWidth.substringByWidth("Hello 👨‍🦲 World", 8);  // "Hello 👨‍🦲"
-
-// Truncate from the end
-String suffix = CharWidth.substringByWidthFromEnd("Hello World", 5);  // "World"
-
-// Truncate with ellipsis
-String ellipsized = CharWidth.truncateWithEllipsis(
-    "Very long text here",
-    10,
-    CharWidth.TruncatePosition.END
-);  // "Very lo..."
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-basics]
 ----
 
 === Common Patterns
@@ -581,67 +342,35 @@ String ellipsized = CharWidth.truncateWithEllipsis(
 
 [source,java]
 ----
-// WRONG - breaks emoji and CJK
-int width = text.length();
-
-// CORRECT - respects display width
-int width = CharWidth.of(text);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-calculation]
 ----
 
 ==== Text Truncation
 
 [source,java]
 ----
-// WRONG - may break mid-grapheme cluster
-String truncated = text.substring(0, maxWidth);
-
-// CORRECT - preserves grapheme boundaries
-String truncated = CharWidth.substringByWidth(text, maxWidth);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-truncation]
 ----
 
 ==== Position Tracking
 
 [source,java]
 ----
-// WRONG - position drift with wide characters
-int col = x;
-buffer.setString(col, y, text, style);
-col += text.length();
-
-// CORRECT - use display width
-int col = x;
-buffer.setString(col, y, text, style);
-col += CharWidth.of(text);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-position-tracking]
 ----
 
 ==== Centering Text
 
 [source,java]
 ----
-// WRONG - misaligned with CJK/emoji
-int labelX = x + (width - label.length()) / 2;
-
-// CORRECT - proper centering
-int labelX = x + (width - CharWidth.of(label)) / 2;
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-centering]
 ----
 
 ==== Truncation with Ellipsis
 
 [source,java]
 ----
-// WRONG - char count, not display width
-if (text.length() > maxWidth) {
-    text = text.substring(0, maxWidth - 3) + "...";
-}
-
-// CORRECT - using CharWidth utilities
-text = CharWidth.truncateWithEllipsis(text, maxWidth, CharWidth.TruncatePosition.END);
-
-// Or manually:
-if (CharWidth.of(text) > maxWidth) {
-    int ellipsisWidth = CharWidth.of("...");
-    text = CharWidth.substringByWidth(text, maxWidth - ellipsisWidth) + "...";
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-ellipsis]
 ----
 
 === Ellipsis Truncation Positions
@@ -650,23 +379,14 @@ if (CharWidth.of(text) > maxWidth) {
 
 [source,java]
 ----
-String text = "Hello World Example";
-
-// END: "Hello Wor..."
-CharWidth.truncateWithEllipsis(text, 12, CharWidth.TruncatePosition.END);
-
-// START: "...d Example"
-CharWidth.truncateWithEllipsis(text, 12, CharWidth.TruncatePosition.START);
-
-// MIDDLE: "Hell...ample"
-CharWidth.truncateWithEllipsis(text, 12, CharWidth.TruncatePosition.MIDDLE);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-truncate-positions]
 ----
 
 You can also use a custom ellipsis string:
 
 [source,java]
 ----
-CharWidth.truncateWithEllipsis(text, 12, "…", CharWidth.TruncatePosition.END);
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-custom-ellipsis]
 ----
 
 === ZWJ Sequence Safety
@@ -676,11 +396,7 @@ Zero-Width Joiner (ZWJ) sequences combine multiple code points into a single vis
 
 [source,java]
 ----
-// "👨‍🦲" is: man (👨) + ZWJ + bald (🦲) = 5 code units, 2 display columns
-
-// Safe truncation - won't break mid-sequence
-String result = CharWidth.substringByWidth("A👨‍🦲B", 3);
-// Returns "A👨‍🦲" (width 3), not "A👨" (broken sequence showing "?")
+include::{snippets-dir}/dev/tamboui/docs/snippets/DeveloperGuideSnippets.java[tags=charwidth-zwj-safety]
 ----
 
 === Reference Implementation

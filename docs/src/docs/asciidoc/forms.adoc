@@ -26,20 +26,7 @@ The form abstractions reduce this to concise, declarative code:
 
 [source,java]
 ----
-// Centralized state for all form fields
-FormState form = FormState.builder()
-    .textField("fullName", "Ada Lovelace")
-    .textField("email", "ada@example.com")
-    .booleanField("subscribe", true)
-    .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
-    .build();
-
-// Simple field declarations
-formField("Full Name", form.textField("fullName"))
-    .labelWidth(12)
-    .rounded()
-    .borderColor(Color.DARK_GRAY)
-    .focusedBorderColor(Color.CYAN)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=overview]
 ----
 
 == Form Fields
@@ -52,13 +39,7 @@ The `formField()` factory creates a labeled input field that pairs a label with 
 ----
 import static dev.tamboui.toolkit.Toolkit.*;
 
-// With TextInputState
-TextInputState nameState = new TextInputState("John");
-formField("Name", nameState)
-
-// Creates internal state automatically
-formField("Email")
-    .placeholder("you@example.com")
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=basic-usage]
 ----
 
 === Field Types
@@ -90,10 +71,7 @@ FormFieldElement supports multiple input types:
 
 [source,java]
 ----
-TextInputState emailState = new TextInputState("");
-formField("Email", emailState)
-    .placeholder("you@example.com")
-    .rounded()
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=text-fields]
 ----
 
 ==== Password Fields
@@ -102,10 +80,7 @@ Use `maskedField()` in the FormState builder for password fields:
 
 [source,java]
 ----
-FormState form = FormState.builder()
-    .textField("username", "")
-    .maskedField("password", "")  // automatically masked with '*'
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=password-fields-builder]
 ----
 
 When used with `FormElement`, masking is applied automatically.
@@ -113,14 +88,7 @@ For `formField()`, you can use `.masked()` explicitly:
 
 [source,java]
 ----
-formField("Password", passwordState)
-    .placeholder("Enter password")
-    .masked()          // displays '*' for each character
-    .rounded()
-
-// Or with a custom mask character
-formField("PIN", pinState)
-    .masked('●')       // displays '●' for each character
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=password-fields-masked]
 ----
 
 The actual text is stored in the state; only the display is masked.
@@ -129,21 +97,14 @@ The actual text is stored in the state; only the display is masked.
 
 [source,java]
 ----
-BooleanFieldState subscribeState = new BooleanFieldState(false);
-
-// Checkbox style: [x] or [ ]
-formField("Subscribe", subscribeState)
-
-// Toggle style: [ON] or [OFF]
-formField("Dark Mode", subscribeState, FieldType.TOGGLE)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=boolean-fields]
 ----
 
 ==== Select Fields
 
 [source,java]
 ----
-SelectFieldState countryState = new SelectFieldState("USA", "UK", "Germany");
-formField("Country", countryState)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=select-fields]
 ----
 
 === Styling
@@ -152,13 +113,7 @@ FormFieldElement supports comprehensive styling options:
 
 [source,java]
 ----
-formField("Email", emailState)
-    .labelWidth(14)           // Fixed label width for alignment
-    .spacing(2)               // Gap between label and input
-    .rounded()                // Rounded border
-    .borderColor(Color.DARK_GRAY)
-    .focusedBorderColor(Color.CYAN)
-    .errorBorderColor(Color.RED)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=styling-options]
 ----
 
 === CSS Selectors
@@ -200,46 +155,14 @@ FormFieldElement-error {
 
 [source,java]
 ----
-FormState form = FormState.builder()
-    // Text fields
-    .textField("username", "")
-    .textField("email", "user@example.com")
-
-    // Boolean fields
-    .booleanField("newsletter", true)
-    .booleanField("darkMode", false)
-
-    // Select fields
-    .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
-    .selectField("role", Arrays.asList("Admin", "User", "Guest"))  // defaults to index 0
-
-    .build();
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=form-state-creation]
 ----
 
 === Accessing Values
 
 [source,java]
 ----
-// Get state objects for UI binding
-TextInputState usernameState = form.textField("username");
-BooleanFieldState newsletterState = form.booleanField("newsletter");
-SelectFieldState countryState = form.selectField("country");
-
-// Get/set text values directly
-String email = form.textValue("email");
-form.setTextValue("email", "new@example.com");
-
-// Get/set boolean values
-boolean subscribed = form.booleanValue("newsletter");
-form.setBooleanValue("newsletter", false);
-
-// Get/set select values
-String country = form.selectValue("country");
-int countryIndex = form.selectIndex("country");
-form.selectIndex("country", 2);  // Select "Germany"
-
-// Get all text values as map
-Map<String, String> allText = form.textValues();
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=accessing-values]
 ----
 
 == Validation
@@ -281,10 +204,7 @@ The validation framework provides built-in validators and supports custom valida
 
 [source,java]
 ----
-formField("Email", emailState)
-    .validate(Validators.required(), Validators.email())
-    .errorBorderColor(Color.RED)
-    .showInlineErrors(true)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=using-validators]
 ----
 
 === Custom Error Messages
@@ -293,28 +213,14 @@ All built-in validators accept an optional custom message:
 
 [source,java]
 ----
-Validators.required("Please enter your name")
-Validators.email("Invalid email format")
-Validators.minLength(3, "Username must be at least 3 characters")
-Validators.range(1, 100, "Age must be between 1 and 100")
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=custom-error-messages]
 ----
 
 === Triggering Validation
 
 [source,java]
 ----
-FormFieldElement field = formField("Email", emailState)
-    .validate(Validators.required(), Validators.email());
-
-// Validate and get result
-ValidationResult result = field.validateField();
-
-if (!result.isValid()) {
-    String error = result.errorMessage();  // "Field is required" or "Invalid email"
-}
-
-// Get last validation result
-ValidationResult lastResult = field.lastValidation();
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=triggering-validation]
 ----
 
 === Custom Validators
@@ -323,15 +229,7 @@ Create custom validators using the `Validator` functional interface:
 
 [source,java]
 ----
-Validator usernameAvailable = value -> {
-    if (userService.exists(value)) {
-        return ValidationResult.invalid("Username already taken");
-    }
-    return ValidationResult.valid();
-};
-
-formField("Username", usernameState)
-    .validate(Validators.required(), usernameAvailable)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=custom-validators]
 ----
 
 === Composing Validators
@@ -340,12 +238,7 @@ Validators can be composed using `and()`:
 
 [source,java]
 ----
-Validator emailValidator = Validators.required()
-    .and(Validators.email())
-    .and(Validators.maxLength(100));
-
-formField("Email", emailState)
-    .validate(emailValidator)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=composing-validators]
 ----
 
 == Form Container
@@ -356,28 +249,14 @@ formField("Email", emailState)
 
 [source,java]
 ----
-form(formState)
-    .field("fullName", "Full Name")
-    .field("email", "Email")
-    .field("role", "Role")
-    .labelWidth(14)
-    .rounded()
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=form-container-basic]
 ----
 
 === Grouping Fields
 
 [source,java]
 ----
-form(formState)
-    .group("Personal Info")
-        .field("fullName", "Full Name")
-        .field("email", "Email")
-        .field("phone", "Phone")
-    .group("Preferences")
-        .field("newsletter", "Newsletter", FieldType.CHECKBOX)
-        .field("darkMode", "Dark Mode", FieldType.TOGGLE)
-    .labelWidth(14)
-    .spacing(1)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=grouping-fields]
 ----
 
 === Form Submission
@@ -390,15 +269,7 @@ When enabled, pressing Enter in any text field triggers form submission:
 
 [source,java]
 ----
-form(formState)
-    .field("username", "Username")
-    .field("password", "Password")
-    .submitOnEnter(true)
-    .onSubmit(state -> {
-        String user = state.textValue("username");
-        String pass = state.textValue("password");
-        authenticate(user, pass);
-    })
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=submit-on-enter]
 ----
 
 ==== Programmatic Submit (Button)
@@ -407,16 +278,7 @@ Call `submit()` from a button or other trigger:
 
 [source,java]
 ----
-FormElement loginForm = form(formState)
-    .field("username", "Username", Validators.required())
-    .field("password", "Password", Validators.required())
-    .onSubmit(state -> authenticate(state));
-
-// Render form with submit button
-column(
-    loginForm,
-    button("Login", () -> loginForm.submit())
-)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=programmatic-submit]
 ----
 
 ==== Validation on Submit
@@ -427,26 +289,14 @@ IMPORTANT: If validation fails, the `onSubmit` callback is *not* called and `sub
 
 [source,java]
 ----
-FormElement form = form(formState)
-    .field("email", "Email", Validators.required(), Validators.email())
-    .validateOnSubmit(true)  // default behavior
-    .onSubmit(state -> {
-        // This is only called if ALL validations pass
-        save(state);
-    });
-
-boolean success = form.submit();
-// success == true  -> validation passed, onSubmit was called
-// success == false -> validation failed, onSubmit was NOT called
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=validation-on-submit]
 ----
 
 To always call `onSubmit` regardless of validation:
 
 [source,java]
 ----
-form(formState)
-    .validateOnSubmit(false)  // skip validation
-    .onSubmit(state -> save(state))  // always called
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=skip-validation-on-submit]
 ----
 
 === Arrow Key Navigation
@@ -456,11 +306,7 @@ Enable `arrowNavigation` to allow Up/Down to move between fields:
 
 [source,java]
 ----
-form(formState)
-    .field("username", "Username")
-    .field("email", "Email")
-    .field("role", "Role", FieldType.SELECT)
-    .arrowNavigation(true)  // Up/Down navigate between fields
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=arrow-navigation]
 ----
 
 When enabled:
@@ -475,54 +321,7 @@ Here's a complete form example using all the abstractions:
 
 [source,java]
 ----
-public class SettingsForm {
-
-    private static final FormState FORM = FormState.builder()
-        // Profile
-        .textField("fullName", "Ada Lovelace")
-        .textField("email", "ada@analytical.io")
-        .textField("role", "Research")
-        .textField("timezone", "UTC+1")
-        // Preferences
-        .textField("theme", "Nord")
-        .booleanField("notifications", true)
-        // Security
-        .textField("twoFa", "Enabled")
-        .build();
-
-    public static Element render() {
-        return column(
-            panel("Profile", column(
-                formField("Full name", FORM.textField("fullName"))
-                    .labelWidth(14).rounded()
-                    .borderColor(Color.DARK_GRAY)
-                    .focusedBorderColor(Color.CYAN),
-                formField("Email", FORM.textField("email"))
-                    .labelWidth(14).rounded()
-                    .borderColor(Color.DARK_GRAY)
-                    .focusedBorderColor(Color.CYAN)
-                    .validate(Validators.required(), Validators.email()),
-                formField("Role", FORM.textField("role"))
-                    .labelWidth(14).rounded()
-                    .borderColor(Color.DARK_GRAY)
-                    .focusedBorderColor(Color.CYAN)
-            ).spacing(1)).rounded().borderColor(Color.CYAN),
-
-            panel("Preferences", column(
-                formField("Theme", FORM.textField("theme"))
-                    .labelWidth(14).rounded()
-                    .borderColor(Color.DARK_GRAY),
-                formField("Notifications", FORM.booleanField("notifications"))
-                    .labelWidth(14)
-            ).spacing(1)).rounded().borderColor(Color.GREEN),
-
-            row(
-                text(" Save ").bold().black().onGreen(),
-                text(" Cancel ").bold().white().bg(Color.DARK_GRAY)
-            ).spacing(2)
-        ).spacing(1).fill();
-    }
-}
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=complete-example]
 ----
 
 == State Classes Reference
@@ -531,52 +330,21 @@ public class SettingsForm {
 
 [source,java]
 ----
-TextInputState state = new TextInputState("initial");
-
-// Get/set text
-String text = state.text();
-state.setText("new value");
-
-// Cursor operations
-state.insert('c');
-state.deleteBackward();
-state.deleteForward();
-state.moveCursorLeft();
-state.moveCursorRight();
-state.clear();
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=text-input-state-reference]
 ----
 
 === BooleanFieldState
 
 [source,java]
 ----
-BooleanFieldState state = new BooleanFieldState(false);
-
-// Get/set value
-boolean value = state.value();
-state.setValue(true);
-
-// Toggle
-state.toggle();  // Flips the value
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=boolean-field-state-reference]
 ----
 
 === SelectFieldState
 
 [source,java]
 ----
-SelectFieldState state = new SelectFieldState("A", "B", "C");
-// Or with List
-SelectFieldState state = new SelectFieldState(options, 1);  // Select index 1
-
-// Get values
-String selected = state.selectedValue();  // "A"
-int index = state.selectedIndex();        // 0
-List<String> options = state.options();   // ["A", "B", "C"]
-
-// Change selection
-state.selectIndex(2);    // Select "C"
-state.selectNext();      // Move to next option (wraps)
-state.selectPrevious();  // Move to previous option (wraps)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=select-field-state-reference]
 ----
 
 == Migration Guide
@@ -587,38 +355,12 @@ To migrate from manual form construction to the new abstractions:
 
 [source,java]
 ----
-// Individual state declarations
-private static final TextInputState FULL_NAME = new TextInputState("Ada");
-private static final TextInputState EMAIL = new TextInputState("ada@example.com");
-private static final TextInputState ROLE = new TextInputState("Research");
-
-// Custom helper
-private static Element formRow(String label, TextInputState state) {
-    return row(
-        text(label).dim().length(14),
-        textInput(state).rounded().borderColor(Color.DARK_GRAY).fill()
-    ).spacing(1).length(3);
-}
-
-// Usage
-formRow("Full name", FULL_NAME)
-formRow("Email", EMAIL)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=migration-before]
 ----
 
 === After
 
 [source,java]
 ----
-// Centralized state
-private static final FormState FORM = FormState.builder()
-    .textField("fullName", "Ada")
-    .textField("email", "ada@example.com")
-    .textField("role", "Research")
-    .build();
-
-// Usage - no helper needed
-formField("Full name", FORM.textField("fullName"))
-    .labelWidth(14).rounded().borderColor(Color.DARK_GRAY)
-formField("Email", FORM.textField("email"))
-    .labelWidth(14).rounded().borderColor(Color.DARK_GRAY)
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=migration-after]
 ----
