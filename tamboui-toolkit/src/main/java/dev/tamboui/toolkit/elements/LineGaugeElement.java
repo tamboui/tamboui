@@ -13,6 +13,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.gauge.LineGauge;
 
@@ -182,16 +183,12 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Label width + a reasonable gauge width
         int labelWidth = label != null ? label.length() : 0;
-        return labelWidth + 20;
-    }
-
-    @Override
-    public int preferredHeight() {
+        int width = labelWidth + 20;
         // LineGauge is always 1 row
-        return 1;
+        return Size.of(width, 1);
     }
 
     @Override

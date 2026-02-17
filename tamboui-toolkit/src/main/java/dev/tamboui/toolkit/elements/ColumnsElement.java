@@ -25,6 +25,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.widget.Widget;
 
 /**
@@ -195,81 +196,66 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (children.isEmpty()) {
-            return 0;
+            return Size.ZERO;
         }
 
+        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+
+        // Calculate width
         int maxChildWidth = 0;
         for (Element child : children) {
-            maxChildWidth = Math.max(maxChildWidth, child.preferredWidth());
+            maxChildWidth = Math.max(maxChildWidth, child.preferredSize(availableWidth, availableHeight, context).widthOr(0));
         }
 
         int cols = columnCount != null ? columnCount : children.size();
         cols = Math.min(cols, children.size());
 
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
         int width = maxChildWidth * cols + effectiveSpacing * (cols - 1);
 
         if (margin != null) {
             width += margin.left() + margin.right();
         }
 
-        return width;
-    }
+        // Calculate height
+        int totalHeight;
+        if (availableWidth > 0 && context != null) {
+            // Context-aware height calculation
+            cols = computeColumnCount(availableWidth, effectiveSpacing, this.columnCount);
+            int rows = (children.size() + cols - 1) / cols;
+            ColumnOrder effectiveOrder = this.order != null ? this.order : ColumnOrder.ROW_FIRST;
 
-    @Override
-    public int preferredHeight() {
-        if (children.isEmpty()) {
-            return 0;
-        }
-
-        int cols = columnCount != null ? columnCount : children.size();
-        cols = Math.min(cols, children.size());
-        int rows = (children.size() + cols - 1) / cols;
-
-        // For each row, compute max child height
-        int totalHeight = 0;
-        for (int row = 0; row < rows; row++) {
-            int rowHeight = 1;
-            for (int col = 0; col < cols; col++) {
-                int childIndex = row * cols + col;
-                if (childIndex < children.size()) {
-                    rowHeight = Math.max(rowHeight, children.get(childIndex).preferredHeight());
+            totalHeight = 0;
+            for (int row = 0; row < rows; row++) {
+                int rowHeight = 1;
+                for (int col = 0; col < cols; col++) {
+                    int childIndex = effectiveOrder.resolveIndex(row, col, rows, cols);
+                    if (childIndex < children.size()) {
+                        Element child = children.get(childIndex);
+                        int childWidth = Math.max(1, (availableWidth - effectiveSpacing * (cols - 1)) / cols);
+                        rowHeight = Math.max(rowHeight, child.preferredSize(childWidth, -1, context).heightOr(1));
+                    }
                 }
+                totalHeight += rowHeight;
             }
-            totalHeight += rowHeight;
-        }
-
-        return totalHeight;
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (children.isEmpty() || availableWidth <= 0) {
-            return 0;
-        }
-
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-        int cols = computeColumnCount(availableWidth, effectiveSpacing, this.columnCount);
-        int rows = (children.size() + cols - 1) / cols;
-        ColumnOrder effectiveOrder = this.order != null ? this.order : ColumnOrder.ROW_FIRST;
-
-        int totalHeight = 0;
-        for (int row = 0; row < rows; row++) {
-            int rowHeight = 1;
-            for (int col = 0; col < cols; col++) {
-                int childIndex = effectiveOrder.resolveIndex(row, col, rows, cols);
-                if (childIndex < children.size()) {
-                    Element child = children.get(childIndex);
-                    int childWidth = Math.max(1, (availableWidth - effectiveSpacing * (cols - 1)) / cols);
-                    rowHeight = Math.max(rowHeight, child.preferredHeight(childWidth, context));
+        } else {
+            // Simple height calculation without context
+            int rows = (children.size() + cols - 1) / cols;
+            totalHeight = 0;
+            for (int row = 0; row < rows; row++) {
+                int rowHeight = 1;
+                for (int col = 0; col < cols; col++) {
+                    int childIndex = row * cols + col;
+                    if (childIndex < children.size()) {
+                        rowHeight = Math.max(rowHeight, children.get(childIndex).preferredSize(-1, -1, null).heightOr(1));
+                    }
                 }
+                totalHeight += rowHeight;
             }
-            totalHeight += rowHeight;
         }
 
-        return totalHeight;
+        return Size.of(width, totalHeight);
     }
 
     /**
@@ -287,7 +273,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
 
         int maxChildWidth = 0;
         for (Element child : children) {
-            maxChildWidth = Math.max(maxChildWidth, child.preferredWidth());
+            maxChildWidth = Math.max(maxChildWidth, child.preferredSize(-1, -1, null).widthOr(0));
         }
 
         if (maxChildWidth <= 0) {
@@ -392,7 +378,7 @@ public final class ColumnsElement extends ContainerElement<ColumnsElement> {
                 if (childIndex < children.size()) {
                     Element child = children.get(childIndex);
                     int colWidth = col < columnRects.size() ? columnRects.get(col).width() : 1;
-                    rowHeight = Math.max(rowHeight, child.preferredHeight(colWidth, context));
+                    rowHeight = Math.max(rowHeight, child.preferredSize(colWidth, -1, context).heightOr(1));
                 }
             }
             rowHeights[row] = rowHeight;

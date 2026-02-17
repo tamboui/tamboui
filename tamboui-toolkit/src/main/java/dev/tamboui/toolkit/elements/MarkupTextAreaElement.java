@@ -19,6 +19,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.bindings.Actions;
@@ -446,9 +447,10 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     }
 
     @Override
-    public int preferredWidth() {
-        // Return max line width from parsed text
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         ensureTextParsed();
+
+        // Calculate width: max line width from parsed text
         int maxWidth = 0;
         for (Line line : parsedText.lines()) {
             maxWidth = Math.max(maxWidth, line.width());
@@ -456,7 +458,28 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         // Add line number width and border
         int lineNumWidth = showLineNumbers ? String.valueOf(parsedText.lines().size()).length() + lineNumberSeparator.length() : 0;
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
-        return maxWidth + lineNumWidth + borderWidth;
+        int width = maxWidth + lineNumWidth + borderWidth;
+
+        // Calculate height
+        int height;
+        Overflow effectiveOverflow = overflow != null ? overflow : Overflow.CLIP;
+        if (availableWidth > 0 && (effectiveOverflow == Overflow.WRAP_CHARACTER || effectiveOverflow == Overflow.WRAP_WORD)) {
+            // Calculate wrapped height
+            int totalLines = 0;
+            for (Line line : parsedText.lines()) {
+                int lineWidth = line.width();
+                if (lineWidth <= availableWidth || availableWidth <= 0) {
+                    totalLines++;
+                } else {
+                    totalLines += (lineWidth + availableWidth - 1) / availableWidth;
+                }
+            }
+            height = Math.max(1, totalLines);
+        } else {
+            height = parsedText.height();
+        }
+
+        return Size.of(width, height);
     }
 
     @Override
@@ -471,33 +494,6 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
             return Constraint.min(parsedText.height());
         }
         return null;
-    }
-
-    @Override
-    public int preferredHeight() {
-        ensureTextParsed();
-        return parsedText.height();
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        ensureTextParsed();
-        Overflow effectiveOverflow = overflow != null ? overflow : Overflow.CLIP;
-        if (effectiveOverflow != Overflow.WRAP_CHARACTER && effectiveOverflow != Overflow.WRAP_WORD) {
-            return parsedText.height();
-        }
-
-        // Calculate wrapped height
-        int totalLines = 0;
-        for (Line line : parsedText.lines()) {
-            int lineWidth = line.width();
-            if (lineWidth <= availableWidth || availableWidth <= 0) {
-                totalLines++;
-            } else {
-                totalLines += (lineWidth + availableWidth - 1) / availableWidth;
-            }
-        }
-        return Math.max(1, totalLines);
     }
 
     @Override

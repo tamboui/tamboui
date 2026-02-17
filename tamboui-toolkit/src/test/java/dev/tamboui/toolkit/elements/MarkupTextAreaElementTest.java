@@ -206,7 +206,7 @@ class MarkupTextAreaElementTest {
     void preferredHeightReturnsLineCount() {
         MarkupTextAreaElement element = markupTextArea("Line 1\nLine 2\nLine 3");
 
-        assertThat(element.preferredHeight()).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test

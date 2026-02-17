@@ -21,6 +21,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.DialogElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
@@ -159,13 +160,8 @@ public class FileManagerView implements Element {
     }
 
     @Override
-    public int preferredWidth() {
-        return 0;
-    }
-
-    @Override
-    public int preferredHeight() {
-        return 0;
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        return Size.UNKNOWN;
     }
 
     /**
@@ -242,13 +238,8 @@ public class FileManagerView implements Element {
             }
 
             @Override
-            public int preferredWidth() {
-                return 0;
-            }
-
-            @Override
-            public int preferredHeight() {
-                return 0;
+            public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+                return Size.UNKNOWN;
             }
 
             @Override
@@ -385,13 +376,8 @@ public class FileManagerView implements Element {
             }
 
             @Override
-            public int preferredWidth() {
-                return 0;
-            }
-
-            @Override
-            public int preferredHeight() {
-                return 0;
+            public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+                return Size.UNKNOWN;
             }
 
             @Override
@@ -409,7 +395,7 @@ public class FileManagerView implements Element {
         ).rounded()
                 .borderColor(Color.CYAN)
                 .width(dialogWidth)
-                .height(dialogHeight)
+                .length(dialogHeight)
                 .onCancel(manager::dismissDialog);
 
         currentDialog.render(frame, area, context);

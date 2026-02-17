@@ -58,7 +58,7 @@ class FormFieldElementTest {
     void formFieldWithLabelWidth() {
         FormFieldElement field = formField("Name", new TextInputState("test")).labelWidth(20);
         // Preferred width should include label width
-        assertThat(field.preferredWidth()).isGreaterThanOrEqualTo(20);
+        assertThat(field.preferredSize(-1, -1, null).widthOr(0)).isGreaterThanOrEqualTo(20);
     }
 
     @Test
@@ -154,11 +154,11 @@ class FormFieldElementTest {
         FormFieldElement field = formField("Name", new TextInputState("test"));
 
         // Without border: 1 row
-        assertThat(field.preferredHeight()).isEqualTo(1);
+        assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
 
         // With border: 3 rows
         field.rounded();
-        assertThat(field.preferredHeight()).isEqualTo(3);
+        assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -177,11 +177,11 @@ class FormFieldElementTest {
 
         assertThat(field.isFocusable()).isTrue();
         // Before validation, no error row is shown
-        assertThat(field.preferredHeight()).isEqualTo(3); // 3 for bordered
+        assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3); // 3 for bordered
 
         // After validation fails, error row is added
         field.validateField();
-        assertThat(field.preferredHeight()).isEqualTo(4); // 3 for bordered + 1 for error
+        assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(4); // 3 for bordered + 1 for error
     }
 
     @Test

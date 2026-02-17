@@ -69,7 +69,7 @@ class DialogElementTest {
     @DisplayName("preferredWidth() returns fixedWidth when set")
     void preferredWidth_fixedWidth() {
         DialogElement dialog = dialog().width(50);
-        assertThat(dialog.preferredWidth()).isEqualTo(50);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(50);
     }
 
     @Test
@@ -77,7 +77,7 @@ class DialogElementTest {
     void preferredWidth_noTitle() {
         DialogElement dialog = dialog();  // minWidth default = 20
         // minWidth (20) + padding*2 (2*2=4) + borders (2) = 26
-        assertThat(dialog.preferredWidth()).isEqualTo(26);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(26);
     }
 
     @Test
@@ -85,7 +85,7 @@ class DialogElementTest {
     void preferredWidth_withTitle() {
         DialogElement dialog = dialog("Short");  // "Short" = 5
         // max(minWidth=20, titleWidth=5) + padding*2 (4) + borders (2) = 26
-        assertThat(dialog.preferredWidth()).isEqualTo(26);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(26);
     }
 
     @Test
@@ -93,7 +93,7 @@ class DialogElementTest {
     void preferredWidth_longTitle() {
         DialogElement dialog = dialog("This is a very long dialog title");  // 32
         // max(minWidth=20, titleWidth=32) + padding*2 (4) + borders (2) = 38
-        assertThat(dialog.preferredWidth()).isEqualTo(38);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(38);
     }
 
     @Test
@@ -101,7 +101,7 @@ class DialogElementTest {
     void preferredWidth_customMinWidth() {
         DialogElement dialog = dialog().minWidth(30);
         // minWidth (30) + padding*2 (4) + borders (2) = 36
-        assertThat(dialog.preferredWidth()).isEqualTo(36);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(36);
     }
 
     @Test
@@ -109,7 +109,7 @@ class DialogElementTest {
     void preferredWidth_customPadding() {
         DialogElement dialog = dialog().padding(3);
         // minWidth (20) + padding*2 (3*2=6) + borders (2) = 28
-        assertThat(dialog.preferredWidth()).isEqualTo(28);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(28);
     }
 
     @Test
@@ -120,7 +120,7 @@ class DialogElementTest {
             text("Much longer text")  // 16
         );
         // max(minWidth=20, max(5,16)=16) + padding*2 (4) + borders (2) = 26
-        assertThat(dialog.preferredWidth()).isEqualTo(26);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(26);
     }
 
     @Test
@@ -131,7 +131,7 @@ class DialogElementTest {
             text("No")          // 2
         ).horizontal();
         // max(minWidth=20, 3+2=5) + padding*2 (4) + borders (2) = 26
-        assertThat(dialog.preferredWidth()).isEqualTo(26);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(26);
     }
 
     @Test
@@ -143,7 +143,7 @@ class DialogElementTest {
             text("Button3")     // 7
         ).horizontal().spacing(2);
         // max(minWidth=20, 7+2+7+2+7=25) + padding*2 (4) + borders (2) = 31
-        assertThat(dialog.preferredWidth()).isEqualTo(31);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(31);
     }
 
     @Test
@@ -153,7 +153,7 @@ class DialogElementTest {
             text("This is a very long line that exceeds minWidth")  // 46
         );
         // max(minWidth=20, 46) + padding*2 (4) + borders (2) = 52
-        assertThat(dialog.preferredWidth()).isEqualTo(52);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(52);
     }
 
     @Test
@@ -163,7 +163,7 @@ class DialogElementTest {
             tabs("Save", "Cancel").divider(" | ")  // 13
         ).minWidth(10);
         // max(minWidth=10, 13) + padding*2 (4) + borders (2) = 19
-        assertThat(dialog.preferredWidth()).isEqualTo(19);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(19);
     }
 
     @Test
@@ -175,9 +175,9 @@ class DialogElementTest {
             .direction(Direction.HORIZONTAL);
 
         // Vertical: max(minWidth=20, max(1,3)=3) + padding*2 (4) + borders (2) = 26
-        assertThat(vertical.preferredWidth()).isEqualTo(26);
+        assertThat(vertical.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(26);
         // Horizontal: max(minWidth=20, 1+3=4) + padding*2 (4) + borders (2) = 26
-        assertThat(horizontal.preferredWidth()).isEqualTo(26);
+        assertThat(horizontal.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(26);
     }
 
     @Test
@@ -188,14 +188,14 @@ class DialogElementTest {
             .minWidth(40)
             .padding(5);
         // Fixed width overrides all calculations
-        assertThat(dialog.preferredWidth()).isEqualTo(30);
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(30);
     }
 
     // ============ height calculation tests ============
 
     @Test
     @DisplayName("Dialog height uses children's preferredHeight in vertical layout")
-    void height_verticalChildren() {
+    void length_verticalChildren() {
         // Each text element has preferredHeight() = 1
         DialogElement dialog = dialog(
             text("Line 1"),
@@ -220,7 +220,7 @@ class DialogElementTest {
 
     @Test
     @DisplayName("Dialog height with multi-line markup text")
-    void height_multiLineMarkupText() {
+    void length_multiLineMarkupText() {
         // MarkupTextElement with 4 lines
         DialogElement dialog = dialog(
             markupText("Line 1\nLine 2\nLine 3\nLine 4")
@@ -248,12 +248,12 @@ class DialogElementTest {
 
     @Test
     @DisplayName("Dialog height with fixed height overrides calculation")
-    void height_fixedHeightOverrides() {
+    void height_fixedLengthOverrides() {
         DialogElement dialog = dialog(
             text("Line 1"),
             text("Line 2"),
             text("Line 3")
-        ).height(10);
+        ).length(10);
 
         Rect area = new Rect(0, 0, 40, 20);
         Buffer buffer = Buffer.empty(area);
@@ -271,7 +271,7 @@ class DialogElementTest {
 
     @Test
     @DisplayName("Dialog height horizontal layout uses max child height")
-    void height_horizontalChildren() {
+    void length_horizontalChildren() {
         // With horizontal layout, dialog height should be max of children
         DialogElement dialog = dialog(
             text("A"),           // height 1
@@ -294,7 +294,7 @@ class DialogElementTest {
 
     @Test
     @DisplayName("Dialog height vertical layout with spacing")
-    void height_verticalWithSpacing() {
+    void length_verticalWithSpacing() {
         DialogElement dialog = dialog(
             text("Line 1"),
             text("Line 2"),

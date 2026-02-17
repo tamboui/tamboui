@@ -77,7 +77,7 @@ class PanelTest {
     void preferredWidth_emptyPanel() {
         Panel panel = panel();
         // Empty panel with default border = 2
-        assertThat(panel.preferredWidth()).isEqualTo(2);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(2);
     }
 
     @Test
@@ -89,7 +89,7 @@ class PanelTest {
             text("CC")          // 2
         );
         // Max of 1, 3, 2 = 3, plus borders (2) = 5
-        assertThat(panel.preferredWidth()).isEqualTo(5);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -101,7 +101,7 @@ class PanelTest {
             text("CCC")         // 3
         ).horizontal();
         // 1 + 2 + 3 = 6, plus borders (2) = 8
-        assertThat(panel.preferredWidth()).isEqualTo(8);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(8);
     }
 
     @Test
@@ -113,7 +113,7 @@ class PanelTest {
             text("C")           // 1
         ).horizontal().spacing(2);
         // 1 + 2 + 1 + 2 + 1 = 7, plus borders (2) = 9
-        assertThat(panel.preferredWidth()).isEqualTo(9);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
     }
 
     @Test
@@ -123,7 +123,7 @@ class PanelTest {
             text("Hello")       // 5
         ).padding(new Padding(1, 2, 1, 3)); // top, right, bottom, left
         // 5 + 2 (right padding) + 3 (left padding) + 2 (borders) = 12
-        assertThat(panel.preferredWidth()).isEqualTo(12);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(12);
     }
 
     @Test
@@ -133,7 +133,7 @@ class PanelTest {
             text("Test")        // 4
         ).padding(1);
         // 4 + 1 (left) + 1 (right) + 2 (borders) = 8
-        assertThat(panel.preferredWidth()).isEqualTo(8);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(8);
     }
 
     @Test
@@ -143,7 +143,7 @@ class PanelTest {
             text("Hi")          // 2
         ).margin(new Margin(1, 2, 1, 3)); // top, right, bottom, left
         // 2 + 2 (borders) + 2 (right margin) + 3 (left margin) = 9
-        assertThat(panel.preferredWidth()).isEqualTo(9);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
     }
 
     @Test
@@ -151,7 +151,7 @@ class PanelTest {
     void preferredWidth_nested() {
         Panel innerPanel = panel(text("ABCD"));     // 4 + 2 (borders) = 6
         Panel outerPanel = panel(innerPanel);       // 6 + 2 (borders) = 8
-        assertThat(outerPanel.preferredWidth()).isEqualTo(8);
+        assertThat(outerPanel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(8);
     }
 
     @Test
@@ -161,7 +161,7 @@ class PanelTest {
             tabs("Home", "Settings").divider(" | ")  // 15
         );
         // 15 + 2 (borders) = 17
-        assertThat(panel.preferredWidth()).isEqualTo(17);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(17);
     }
 
     @Test
@@ -173,7 +173,7 @@ class PanelTest {
             waveText("Loading")                     // 7
         ).horizontal().spacing(1);
         // 6 + 1 + 3 + 1 + 7 = 18, plus borders (2) = 20
-        assertThat(panel.preferredWidth()).isEqualTo(20);
+        assertThat(panel.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(20);
     }
 
     @Test
@@ -184,7 +184,7 @@ class PanelTest {
         Panel horizontal = panel(text("A"), text("B"))
             .direction(Direction.HORIZONTAL);
 
-        assertThat(vertical.preferredWidth()).isEqualTo(3); // max(1,1) + 2 borders
-        assertThat(horizontal.preferredWidth()).isEqualTo(4); // 1+1 + 2 borders
+        assertThat(vertical.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3); // max(1,1) + 2 borders
+        assertThat(horizontal.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(4); // 1+1 + 2 borders
     }
 }

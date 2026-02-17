@@ -26,6 +26,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.widget.Widget;
 
 /**
@@ -303,14 +304,17 @@ public final class GridElement extends ContainerElement<GridElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (children.isEmpty()) {
-            return 0;
+            return Size.ZERO;
         }
 
         int cols = resolveColumns(children.size());
+        int rows = resolveRows(children.size(), cols);
         int hGutter = this.gutter != null ? this.gutter.horizontal() : 0;
+        int vGutter = this.gutter != null ? this.gutter.vertical() : 0;
 
+        // Calculate width
         int width;
         if (gridColumns != null && !gridColumns.isEmpty()) {
             // Sum constraint hints from gridColumns (cycling)
@@ -322,76 +326,24 @@ public final class GridElement extends ContainerElement<GridElement> {
         } else {
             int maxChildWidth = 0;
             for (Element child : children) {
-                maxChildWidth = Math.max(maxChildWidth, child.preferredWidth());
+                maxChildWidth = Math.max(maxChildWidth, child.preferredSize(availableWidth, availableHeight, context).widthOr(0));
             }
             width = maxChildWidth * cols;
         }
-
         width += hGutter * (cols - 1);
-
         if (margin != null) {
             width += margin.left() + margin.right();
         }
 
-        return width;
-    }
-
-    @Override
-    public int preferredHeight() {
-        if (children.isEmpty()) {
-            return 0;
-        }
-
-        int cols = resolveColumns(children.size());
-        int rows = resolveRows(children.size(), cols);
-        int vGutter = this.gutter != null ? this.gutter.vertical() : 0;
-
+        // Calculate height
         int totalHeight = 0;
         if (gridRows != null && !gridRows.isEmpty()) {
             for (int r = 0; r < rows; r++) {
                 Constraint constraint = gridRows.get(r % gridRows.size());
                 totalHeight += constraintHint(constraint);
             }
-        } else {
-            for (int row = 0; row < rows; row++) {
-                int rowHeight = 1;
-                for (int col = 0; col < cols; col++) {
-                    int childIndex = row * cols + col;
-                    if (childIndex < children.size()) {
-                        rowHeight = Math.max(rowHeight, children.get(childIndex).preferredHeight());
-                    }
-                }
-                totalHeight += rowHeight;
-            }
-        }
-
-        totalHeight += vGutter * (rows - 1);
-
-        if (margin != null) {
-            totalHeight += margin.verticalTotal();
-        }
-
-        return totalHeight;
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (children.isEmpty() || availableWidth <= 0) {
-            return 0;
-        }
-
-        int cols = resolveColumns(children.size());
-        int rows = resolveRows(children.size(), cols);
-        int vGutter = this.gutter != null ? this.gutter.vertical() : 0;
-
-        int totalHeight = 0;
-        if (gridRows != null && !gridRows.isEmpty()) {
-            for (int r = 0; r < rows; r++) {
-                Constraint constraint = gridRows.get(r % gridRows.size());
-                totalHeight += constraintHint(constraint);
-            }
-        } else {
-            int hGutter = this.gutter != null ? this.gutter.horizontal() : 0;
+        } else if (availableWidth > 0) {
+            // Context-aware height calculation
             int effectiveWidth = availableWidth;
             if (margin != null) {
                 effectiveWidth -= margin.horizontalTotal();
@@ -404,7 +356,19 @@ public final class GridElement extends ContainerElement<GridElement> {
                     int childIndex = row * cols + col;
                     if (childIndex < children.size()) {
                         Element child = children.get(childIndex);
-                        rowHeight = Math.max(rowHeight, child.preferredHeight(colWidth, context));
+                        rowHeight = Math.max(rowHeight, child.preferredSize(colWidth, -1, context).heightOr(1));
+                    }
+                }
+                totalHeight += rowHeight;
+            }
+        } else {
+            // Simple height calculation
+            for (int row = 0; row < rows; row++) {
+                int rowHeight = 1;
+                for (int col = 0; col < cols; col++) {
+                    int childIndex = row * cols + col;
+                    if (childIndex < children.size()) {
+                        rowHeight = Math.max(rowHeight, children.get(childIndex).preferredSize(-1, -1, null).heightOr(1));
                     }
                 }
                 totalHeight += rowHeight;
@@ -412,12 +376,11 @@ public final class GridElement extends ContainerElement<GridElement> {
         }
 
         totalHeight += vGutter * (rows - 1);
-
         if (margin != null) {
             totalHeight += margin.verticalTotal();
         }
 
-        return totalHeight;
+        return Size.of(width, totalHeight);
     }
 
     /**
@@ -614,7 +577,7 @@ public final class GridElement extends ContainerElement<GridElement> {
                     for (int row = 0; row < rows; row++) {
                         int childIndex = row * cols + c;
                         if (childIndex < childCount) {
-                            maxPreferred = Math.max(maxPreferred, children.get(childIndex).preferredWidth());
+                            maxPreferred = Math.max(maxPreferred, children.get(childIndex).preferredSize(-1, -1, context).widthOr(0));
                         }
                     }
                     hConstraints.add(maxPreferred > 0 ? Constraint.length(maxPreferred) : Constraint.fill());
@@ -646,7 +609,7 @@ public final class GridElement extends ContainerElement<GridElement> {
                     if (childIndex < childCount) {
                         Element child = children.get(childIndex);
                         int colWidth = col < columnRects.size() ? columnRects.get(col).width() : 1;
-                        rowHeight = Math.max(rowHeight, child.preferredHeight(colWidth, context));
+                        rowHeight = Math.max(rowHeight, child.preferredSize(colWidth, -1, context).heightOr(1));
                     }
                 }
                 rowHeights[row] = rowHeight;

@@ -288,20 +288,20 @@ class GenericWidgetElementTest {
 
     @Nested
     @DisplayName("Preferred size")
-    class PreferredSizeTests {
+    class SizeTests {
 
         @Test
         @DisplayName("preferredWidth returns 0 (widget size unknown)")
         void preferredWidth() {
             Widget testWidget = (area, buffer) -> {};
-            assertThat(widget(testWidget).preferredWidth()).isEqualTo(0);
+            assertThat(widget(testWidget).preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
         }
 
         @Test
         @DisplayName("preferredHeight returns 0 (widget size unknown)")
         void preferredHeight() {
             Widget testWidget = (area, buffer) -> {};
-            assertThat(widget(testWidget).preferredHeight()).isEqualTo(0);
+            assertThat(widget(testWidget).preferredSize(-1, -1, null).heightOr(0)).isEqualTo(0);
         }
     }
 

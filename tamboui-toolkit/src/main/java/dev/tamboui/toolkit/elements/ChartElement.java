@@ -15,6 +15,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -183,17 +184,9 @@ public final class ChartElement extends StyledElement<ChartElement> {
     }
 
     @Override
-    public int preferredWidth() {
-        // Charts need reasonable width for axis labels and data display
-        int borderWidth = (title != null || borderType != null) ? 2 : 0;
-        return 40 + borderWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
-        // Charts need reasonable height for visibility
-        int borderHeight = (title != null || borderType != null) ? 2 : 0;
-        return 10 + borderHeight;
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        int borderSize = (title != null || borderType != null) ? 2 : 0;
+        return Size.of(40 + borderSize, 10 + borderSize);
     }
 
     @Override

@@ -13,6 +13,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -206,39 +207,26 @@ public final class CanvasElement extends StyledElement<CanvasElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Canvas width based on x bounds range, scaled for marker resolution
-        double range = xMax - xMin;
+        double xRange = xMax - xMin;
+        double yRange = yMax - yMin;
         int width;
-        if (marker == Marker.BRAILLE) {
-            // Braille has 2x2 dots per cell
-            width = (int) Math.ceil(range / 2);
-        } else if (marker == Marker.HALF_BLOCK) {
-            // Half block is 1x2 pixels per cell
-            width = (int) Math.ceil(range);
-        } else {
-            width = (int) Math.ceil(range);
-        }
-        int borderWidth = (title != null || borderType != null) ? 2 : 0;
-        return Math.max(width, 20) + borderWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
-        // Canvas height based on y bounds range, scaled for marker resolution
-        double range = yMax - yMin;
         int height;
         if (marker == Marker.BRAILLE) {
-            // Braille has 4 dots vertically per cell
-            height = (int) Math.ceil(range / 4);
+            // Braille has 2x2 dots per cell horizontally, 4 vertically
+            width = (int) Math.ceil(xRange / 2);
+            height = (int) Math.ceil(yRange / 4);
         } else if (marker == Marker.HALF_BLOCK) {
-            // Half block has 2 dots vertically per cell
-            height = (int) Math.ceil(range / 2);
+            // Half block is 1x2 pixels per cell
+            width = (int) Math.ceil(xRange);
+            height = (int) Math.ceil(yRange / 2);
         } else {
-            height = (int) Math.ceil(range);
+            width = (int) Math.ceil(xRange);
+            height = (int) Math.ceil(yRange);
         }
-        int borderHeight = (title != null || borderType != null) ? 2 : 0;
-        return Math.max(height, 10) + borderHeight;
+        int borderSize = (title != null || borderType != null) ? 2 : 0;
+        return Size.of(Math.max(width, 20) + borderSize, Math.max(height, 10) + borderSize);
     }
 
     @Override

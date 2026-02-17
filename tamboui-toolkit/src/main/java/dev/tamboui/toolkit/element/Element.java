@@ -43,36 +43,39 @@ public interface Element {
     }
 
     /**
-     * Returns the preferred width of this element in cells.
-     * Used when the element has a {@link Constraint.Fit} constraint.
-     *
-     * @return the preferred width, or 0 if not applicable
-     */
-    int preferredWidth();
-
-    /**
-     * Returns the preferred height of this element in cells.
-     * Used when the element has a {@link Constraint.Fit} constraint.
-     *
-     * @return the preferred height, or 0 if not applicable
-     */
-    int preferredHeight();
-
-    /**
-     * Returns the preferred height of this element given an available width and render context.
+     * Returns the preferred size of this element.
      * <p>
-     * This is useful for elements that may wrap content (like text) where the
-     * height depends on the available width. The render context allows CSS-aware
-     * height calculation where properties like {@code text-overflow} may be set via CSS.
+     * The availableWidth/Height parameters allow elements to adapt their
+     * dimensions based on constraints. Use -1 for unconstrained.
      * <p>
-     * When context is null, implementations should use programmatic property values only.
+     * Common patterns:
+     * <ul>
+     *   <li>Text elements: height depends on width (text wrapping)</li>
+     *   <li>Aspect-ratio elements: both dimensions interrelated</li>
+     *   <li>Fixed elements: ignore available dimensions</li>
+     * </ul>
+     * <p>
+     * Return value semantics:
+     * <ul>
+     *   <li>Positive values = known size (use as constraint)</li>
+     *   <li>Zero = explicitly zero-sized (element should collapse)</li>
+     *   <li>Negative (-1) = unknown size (element should fill available space)</li>
+     * </ul>
      *
-     * @param availableWidth the available width in cells
+     * @param availableWidth the available width in cells, or -1 if unconstrained
+     * @param availableHeight the available height in cells, or -1 if unconstrained
      * @param context the render context for CSS resolution, may be null
-     * @return the preferred height given the available width
+     * @return the preferred size
      */
-    default int preferredHeight(int availableWidth, RenderContext context) {
-        return preferredHeight();
+    Size preferredSize(int availableWidth, int availableHeight, RenderContext context);
+
+    /**
+     * Convenience method for unconstrained preferred size.
+     *
+     * @return the preferred size with no constraints
+     */
+    default Size preferredSize() {
+        return preferredSize(-1, -1, null);
     }
 
     /**

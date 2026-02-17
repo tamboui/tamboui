@@ -28,7 +28,6 @@ import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.TableState;
 
-import static dev.tamboui.layout.Constraint.*;
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**

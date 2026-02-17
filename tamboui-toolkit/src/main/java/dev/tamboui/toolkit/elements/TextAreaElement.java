@@ -13,6 +13,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
@@ -252,31 +253,25 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Calculate max line width from content
         int maxWidth = 0;
+        int lineCount = 1;
         if (state != null) {
             String text = state.text();
             for (String line : text.split("\n", -1)) {
                 maxWidth = Math.max(maxWidth, line.length());
             }
+            lineCount = text.isEmpty() ? 1 : text.split("\n", -1).length;
         }
         // Add minimum width, line number width if applicable, and border
         int lineNumWidth = showLineNumbers ? 5 : 0;
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
-        return Math.max(maxWidth, 20) + lineNumWidth + borderWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
-        // Return line count plus border
-        int lineCount = 1;
-        if (state != null) {
-            String text = state.text();
-            lineCount = text.isEmpty() ? 1 : text.split("\n", -1).length;
-        }
+        int width = Math.max(maxWidth, 20) + lineNumWidth + borderWidth;
+        // Add border height
         int borderHeight = (title != null || borderType != null) ? 2 : 0;
-        return lineCount + borderHeight;
+        int height = lineCount + borderHeight;
+        return Size.of(width, height);
     }
 
     @Override

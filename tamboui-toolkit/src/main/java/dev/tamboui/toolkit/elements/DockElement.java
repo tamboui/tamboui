@@ -17,6 +17,7 @@ import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.MouseEvent;
@@ -275,60 +276,57 @@ public final class DockElement extends StyledElement<DockElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         StylePropertyResolver resolver = StylePropertyResolver.empty();
+
+        // Calculate width
         int leftW = leftElement != null ? constraintHint(resolveLeftWidth(resolver)) : 0;
-        int centerW = centerElement != null ? centerElement.preferredWidth() : 0;
+        int centerW = centerElement != null ? centerElement.preferredSize(availableWidth, availableHeight, context).widthOr(0) : 0;
         int rightW = rightElement != null ? constraintHint(resolveRightWidth(resolver)) : 0;
         int width = leftW + centerW + rightW;
         if (margin != null) {
             width += margin.left() + margin.right();
         }
-        return width;
-    }
 
-    @Override
-    public int preferredHeight() {
-        StylePropertyResolver resolver = StylePropertyResolver.empty();
-        int topH = topElement != null ? constraintHint(resolver.resolve(DOCK_TOP_HEIGHT, this.topHeight)) : 0;
-        int bottomH = bottomElement != null ? constraintHint(resolver.resolve(DOCK_BOTTOM_HEIGHT, this.bottomHeight)) : 0;
+        // Calculate height
+        int height;
+        if (availableWidth > 0 && context != null) {
+            // Context-aware height calculation
+            int topH = topElement != null ? constraintHint(resolveTopHeight(resolver, topElement, availableWidth, context)) : 0;
+            int bottomH = bottomElement != null ? constraintHint(resolveBottomHeight(resolver, bottomElement, availableWidth, context)) : 0;
 
-        int leftH = leftElement != null ? leftElement.preferredHeight() : 0;
-        int centerH = centerElement != null ? centerElement.preferredHeight() : 0;
-        int rightH = rightElement != null ? rightElement.preferredHeight() : 0;
-        int middleH = Math.max(leftH, Math.max(centerH, rightH));
+            int leftH = leftElement != null ? leftElement.preferredSize(availableWidth, -1, context).heightOr(0) : 0;
+            int centerH = centerElement != null ? centerElement.preferredSize(availableWidth, -1, context).heightOr(0) : 0;
+            int rightH = rightElement != null ? rightElement.preferredSize(availableWidth, -1, context).heightOr(0) : 0;
+            int middleH = Math.max(leftH, Math.max(centerH, rightH));
 
-        // Fall back to element preferred height if constraints resolve to null
-        if (topElement != null && topH == 0) {
-            topH = topElement.preferredHeight();
+            height = topH + middleH + bottomH;
+        } else {
+            // Simple height calculation
+            int topH = topElement != null ? constraintHint(resolver.resolve(DOCK_TOP_HEIGHT, this.topHeight)) : 0;
+            int bottomH = bottomElement != null ? constraintHint(resolver.resolve(DOCK_BOTTOM_HEIGHT, this.bottomHeight)) : 0;
+
+            int leftH = leftElement != null ? leftElement.preferredSize(-1, -1, null).heightOr(0) : 0;
+            int centerH = centerElement != null ? centerElement.preferredSize(-1, -1, null).heightOr(0) : 0;
+            int rightH = rightElement != null ? rightElement.preferredSize(-1, -1, null).heightOr(0) : 0;
+            int middleH = Math.max(leftH, Math.max(centerH, rightH));
+
+            // Fall back to element preferred height if constraints resolve to null
+            if (topElement != null && topH == 0) {
+                topH = topElement.preferredSize(-1, -1, null).heightOr(0);
+            }
+            if (bottomElement != null && bottomH == 0) {
+                bottomH = bottomElement.preferredSize(-1, -1, null).heightOr(0);
+            }
+
+            height = topH + middleH + bottomH;
         }
-        if (bottomElement != null && bottomH == 0) {
-            bottomH = bottomElement.preferredHeight();
-        }
 
-        int height = topH + middleH + bottomH;
         if (margin != null) {
             height += margin.verticalTotal();
         }
-        return height;
-    }
 
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        StylePropertyResolver resolver = StylePropertyResolver.empty();
-        int topH = topElement != null ? constraintHint(resolveTopHeight(resolver, topElement, availableWidth, context)) : 0;
-        int bottomH = bottomElement != null ? constraintHint(resolveBottomHeight(resolver, bottomElement, availableWidth, context)) : 0;
-
-        int leftH = leftElement != null ? leftElement.preferredHeight(availableWidth, context) : 0;
-        int centerH = centerElement != null ? centerElement.preferredHeight(availableWidth, context) : 0;
-        int rightH = rightElement != null ? rightElement.preferredHeight(availableWidth, context) : 0;
-        int middleH = Math.max(leftH, Math.max(centerH, rightH));
-
-        int height = topH + middleH + bottomH;
-        if (margin != null) {
-            height += margin.verticalTotal();
-        }
-        return height;
+        return Size.of(width, height);
     }
 
     @Override
@@ -421,7 +419,7 @@ public final class DockElement extends StyledElement<DockElement> {
         }
         // Fall back to element's preferred height
         if (element != null) {
-            int preferredHeight = element.preferredHeight(availableWidth, context);
+            int preferredHeight = element.preferredSize(availableWidth, -1, context).heightOr(0);
             if (preferredHeight > 0) {
                 return Constraint.length(preferredHeight);
             }
@@ -437,7 +435,7 @@ public final class DockElement extends StyledElement<DockElement> {
         }
         // Fall back to element's preferred height
         if (element != null) {
-            int preferredHeight = element.preferredHeight(availableWidth, context);
+            int preferredHeight = element.preferredSize(availableWidth, -1, context).heightOr(0);
             if (preferredHeight > 0) {
                 return Constraint.length(preferredHeight);
             }

@@ -29,7 +29,7 @@ class RowTest {
     @DisplayName("preferredWidth() returns 0 for empty row")
     void preferredWidth_emptyRow() {
         Row row = row();
-        assertThat(row.preferredWidth()).isEqualTo(0);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -37,7 +37,7 @@ class RowTest {
     void preferredWidth_singleChild() {
         Row row = row(text("Hello"));
         // "Hello" = 5 characters
-        assertThat(row.preferredWidth()).isEqualTo(5);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -49,7 +49,7 @@ class RowTest {
             text("CCC")     // 3
         );
         // 1 + 2 + 3 = 6
-        assertThat(row.preferredWidth()).isEqualTo(6);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -61,7 +61,7 @@ class RowTest {
             text("C")       // 1
         ).spacing(2);
         // 1 + 2 + 1 + 2 + 1 = 7 (three children, two gaps of 2)
-        assertThat(row.preferredWidth()).isEqualTo(7);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(7);
     }
 
     @Test
@@ -71,7 +71,7 @@ class RowTest {
             text("Hello")   // 5
         ).margin(new Margin(1, 2, 1, 3)); // top, right, bottom, left
         // 5 + 2 (right) + 3 (left) = 10
-        assertThat(row.preferredWidth()).isEqualTo(10);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -81,7 +81,7 @@ class RowTest {
             text("Test")    // 4
         ).margin(1);
         // 4 + 1 (left) + 1 (right) = 6
-        assertThat(row.preferredWidth()).isEqualTo(6);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -92,7 +92,7 @@ class RowTest {
             text("B")       // 1
         ).spacing(2).margin(1);
         // 1 + 2 + 1 + 1 (left) + 1 (right) = 6
-        assertThat(row.preferredWidth()).isEqualTo(6);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -100,7 +100,7 @@ class RowTest {
     void preferredWidth_nested() {
         Row innerRow = row(text("AB"), text("CD"));  // 2 + 2 = 4
         Row outerRow = row(text("X"), innerRow);     // 1 + 4 = 5
-        assertThat(outerRow.preferredWidth()).isEqualTo(5);
+        assertThat(outerRow.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -112,7 +112,7 @@ class RowTest {
             text("Status")                              // 6
         );
         // 5 + 10 + 6 = 21
-        assertThat(row.preferredWidth()).isEqualTo(21);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(21);
     }
 
     @Test
@@ -123,7 +123,7 @@ class RowTest {
             text(" Done")                // 5
         );
         // 10 + 5 = 15
-        assertThat(row.preferredWidth()).isEqualTo(15);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(15);
     }
 
     @Test
@@ -169,7 +169,7 @@ class RowTest {
         Row row = row(text("Hello"), text("World")).addClass("myrow");
 
         // When queried
-        int width = row.preferredWidth();
+        int width = row.preferredSize(-1, -1, null).widthOr(0);
 
         // Then should return sum of children
         // "Hello" + "World" = 5 + 5 = 10
@@ -234,7 +234,7 @@ class RowTest {
     void preferredHeight_maxOfChildren() {
         Row row = row(text("A"), text("B"), text("C"));
         // All height 1
-        assertThat(row.preferredHeight()).isEqualTo(1);
+        assertThat(row.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test
@@ -242,6 +242,6 @@ class RowTest {
     void preferredHeight_emptyRow() {
         Row row = row();
         // Minimum height for a row is 1
-        assertThat(row.preferredHeight()).isEqualTo(1);
+        assertThat(row.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 }

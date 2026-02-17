@@ -166,13 +166,8 @@ class FaultTolerantRenderingTest {
             }
 
             @Override
-            public int preferredWidth() {
-                return 0;
-            }
-
-            @Override
-            public int preferredHeight() {
-                return 0;
+            public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+                return Size.ZERO;
             }
 
             @Override
@@ -190,13 +185,8 @@ class FaultTolerantRenderingTest {
             }
 
             @Override
-            public int preferredWidth() {
-                return 0;
-            }
-
-            @Override
-            public int preferredHeight() {
-                return 0;
+            public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+                return Size.ZERO;
             }
 
             @Override

@@ -128,7 +128,7 @@ class SpinnerElementTest {
     void preferredWidthIncludesLabel() {
         SpinnerElement element = spinner("Test");
         // DOTS max frame width (1) + space (1) + "Test" (4) = 6
-        assertThat(element.preferredWidth()).isEqualTo(6);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -136,14 +136,14 @@ class SpinnerElementTest {
     void preferredWidthWithoutLabel() {
         SpinnerElement element = spinner();
         // DOTS max frame width = 1
-        assertThat(element.preferredWidth()).isEqualTo(1);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(1);
     }
 
     @Test
     @DisplayName("preferredHeight is always 1")
     void preferredHeight() {
-        assertThat(spinner().preferredHeight()).isEqualTo(1);
-        assertThat(spinner("Loading").preferredHeight()).isEqualTo(1);
+        assertThat(spinner().preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
+        assertThat(spinner("Loading").preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test

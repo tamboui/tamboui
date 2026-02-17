@@ -20,6 +20,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ChildPosition;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.bindings.Actions;
@@ -516,7 +517,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Calculate max width from items
         int maxWidth = 0;
         List<StyledElement<?>> effectiveItems;
@@ -530,19 +531,16 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         }
 
         for (StyledElement<?> item : effectiveItems) {
-            maxWidth = Math.max(maxWidth, item.preferredWidth());
+            Size itemSize = item.preferredSize(availableWidth, availableHeight, context);
+            maxWidth = Math.max(maxWidth, itemSize.widthOr(0));
         }
 
         // Add highlight symbol width and border width if present
         String effectiveSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
         int symbolWidth = effectiveSymbol.length();
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
+        int width = maxWidth + symbolWidth + borderWidth;
 
-        return maxWidth + symbolWidth + borderWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
         // Return number of items + border height if present
         int itemCount;
         if (data != null) {
@@ -551,7 +549,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             itemCount = items.size();
         }
         int borderHeight = (title != null || borderType != null) ? 2 : 0;
-        return itemCount + borderHeight;
+        int height = itemCount + borderHeight;
+
+        return Size.of(width, height);
     }
 
     @Override
@@ -804,8 +804,9 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             return ((Constraint.Length) c).value();
         }
         // Use width-aware preferred height with context for CSS property resolution
-        int preferred = item.preferredHeight(contentWidth, context);
-        return preferred > 0 ? preferred : 1;
+        Size size = item.preferredSize(contentWidth, -1, context);
+        int preferred = size.height();
+        return preferred >= 0 ? preferred : 1;
     }
 
     /**

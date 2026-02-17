@@ -22,6 +22,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.widget.Widget;
 
 /**
@@ -134,17 +135,17 @@ public final class FlowElement extends ContainerElement<FlowElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (children.isEmpty()) {
-            return 0;
+            return Size.ZERO;
         }
 
         int effectiveSpacing = this.spacing != null ? this.spacing : 0;
 
-        // Single-row estimate: sum of all children widths + spacing
+        // Calculate width: Single-row estimate (sum of all children widths + spacing)
         int totalWidth = 0;
         for (int i = 0; i < children.size(); i++) {
-            totalWidth += children.get(i).preferredWidth();
+            totalWidth += children.get(i).preferredSize(availableWidth, availableHeight, context).widthOr(0);
             if (i < children.size() - 1) {
                 totalWidth += effectiveSpacing;
             }
@@ -154,70 +155,62 @@ public final class FlowElement extends ContainerElement<FlowElement> {
             totalWidth += margin.left() + margin.right();
         }
 
-        return totalWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
-        if (children.isEmpty()) {
-            return 0;
-        }
-        // Without available width, assume single row (max height of children)
-        int maxHeight = 1;
-        for (Element child : children) {
-            maxHeight = Math.max(maxHeight, child.preferredHeight());
-        }
-        if (margin != null) {
-            maxHeight += margin.verticalTotal();
-        }
-        return maxHeight;
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (children.isEmpty() || availableWidth <= 0) {
-            return 0;
-        }
-
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-        int effectiveRowSpacing = this.rowSpacing != null ? this.rowSpacing : 0;
-
-        int effectiveWidth = availableWidth;
-        if (margin != null) {
-            effectiveWidth -= margin.horizontalTotal();
-        }
-        if (effectiveWidth <= 0) {
-            return 0;
-        }
-
-        // Simulate flow to count rows
-        int currentX = 0;
-        int totalHeight = 0;
-        int rowHeight = 0;
-
-        for (Element child : children) {
-            int childWidth = child.preferredWidth();
-
-            // Wrap check
-            if (currentX + childWidth > effectiveWidth && currentX > 0) {
-                totalHeight += rowHeight + effectiveRowSpacing;
-                currentX = 0;
-                rowHeight = 0;
+        // Calculate height
+        int height;
+        if (availableWidth > 0) {
+            // Context-aware height calculation with wrapping
+            int effectiveRowSpacing = this.rowSpacing != null ? this.rowSpacing : 0;
+            int effectiveWidth = availableWidth;
+            if (margin != null) {
+                effectiveWidth -= margin.horizontalTotal();
             }
 
-            int childHeight = child.preferredHeight(childWidth, context);
-            rowHeight = Math.max(rowHeight, childHeight);
-            currentX += childWidth + effectiveSpacing;
+            if (effectiveWidth <= 0) {
+                height = 0;
+            } else {
+                // Simulate flow to count rows
+                int currentX = 0;
+                int totalHeight = 0;
+                int rowHeight = 0;
+
+                for (Element child : children) {
+                    Size childSize = child.preferredSize(-1, -1, context);
+                    int childWidth = childSize.widthOr(0);
+
+                    // Wrap check
+                    if (currentX + childWidth > effectiveWidth && currentX > 0) {
+                        totalHeight += rowHeight + effectiveRowSpacing;
+                        currentX = 0;
+                        rowHeight = 0;
+                    }
+
+                    int childHeight = child.preferredSize(childWidth, -1, context).heightOr(1);
+                    rowHeight = Math.max(rowHeight, childHeight);
+                    currentX += childWidth + effectiveSpacing;
+                }
+
+                // Add last row
+                totalHeight += rowHeight;
+
+                if (margin != null) {
+                    totalHeight += margin.verticalTotal();
+                }
+
+                height = totalHeight;
+            }
+        } else {
+            // Without available width, assume single row (max height of children)
+            int maxHeight = 1;
+            for (Element child : children) {
+                maxHeight = Math.max(maxHeight, child.preferredSize(-1, -1, null).heightOr(1));
+            }
+            if (margin != null) {
+                maxHeight += margin.verticalTotal();
+            }
+            height = maxHeight;
         }
 
-        // Add last row
-        totalHeight += rowHeight;
-
-        if (margin != null) {
-            totalHeight += margin.verticalTotal();
-        }
-
-        return totalHeight;
+        return Size.of(totalWidth, height);
     }
 
     @Override
@@ -259,8 +252,9 @@ public final class FlowElement extends ContainerElement<FlowElement> {
         List<Widget> childWidgets = new ArrayList<>(children.size());
 
         for (Element child : children) {
-            int childWidth = Math.max(1, child.preferredWidth());
-            int childHeight = Math.max(1, child.preferredHeight(childWidth, context));
+            Size childSize = child.preferredSize(-1, -1, context);
+            int childWidth = Math.max(1, childSize.widthOr(1));
+            int childHeight = Math.max(1, child.preferredSize(childWidth, -1, context).heightOr(1));
             Widget widget = (a, b) -> context.renderChild(child, frame, a);
             flowItems.add(FlowItem.of(widget, childWidth, childHeight));
         }

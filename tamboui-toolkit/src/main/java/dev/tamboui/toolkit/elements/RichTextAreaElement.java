@@ -16,6 +16,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.bindings.Actions;
@@ -408,8 +409,8 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
     }
 
     @Override
-    public int preferredWidth() {
-        // Return max line width from text
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        // Calculate width: max line width from text
         int maxWidth = 0;
         for (Line line : text.lines()) {
             maxWidth = Math.max(maxWidth, line.width());
@@ -417,7 +418,28 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
         // Add line number width and border
         int lineNumWidth = showLineNumbers ? String.valueOf(text.lines().size()).length() + lineNumberSeparator.length() : 0;
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
-        return maxWidth + lineNumWidth + borderWidth;
+        int width = maxWidth + lineNumWidth + borderWidth;
+
+        // Calculate height
+        int height;
+        Overflow effectiveOverflow = overflow != null ? overflow : Overflow.CLIP;
+        if (availableWidth > 0 && (effectiveOverflow == Overflow.WRAP_CHARACTER || effectiveOverflow == Overflow.WRAP_WORD)) {
+            // Calculate wrapped height
+            int totalLines = 0;
+            for (Line line : text.lines()) {
+                int lineWidth = line.width();
+                if (lineWidth <= availableWidth || availableWidth <= 0) {
+                    totalLines++;
+                } else {
+                    totalLines += (lineWidth + availableWidth - 1) / availableWidth;
+                }
+            }
+            height = Math.max(1, totalLines);
+        } else {
+            height = text.height();
+        }
+
+        return Size.of(width, height);
     }
 
     @Override
@@ -431,31 +453,6 @@ public final class RichTextAreaElement extends StyledElement<RichTextAreaElement
             return Constraint.min(text.height());
         }
         return null;
-    }
-
-    @Override
-    public int preferredHeight() {
-        return text.height();
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        Overflow effectiveOverflow = overflow != null ? overflow : Overflow.CLIP;
-        if (effectiveOverflow != Overflow.WRAP_CHARACTER && effectiveOverflow != Overflow.WRAP_WORD) {
-            return text.height();
-        }
-
-        // Calculate wrapped height
-        int totalLines = 0;
-        for (Line line : text.lines()) {
-            int lineWidth = line.width();
-            if (lineWidth <= availableWidth || availableWidth <= 0) {
-                totalLines++;
-            } else {
-                totalLines += (lineWidth + availableWidth - 1) / availableWidth;
-            }
-        }
-        return Math.max(1, totalLines);
     }
 
     @Override

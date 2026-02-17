@@ -193,7 +193,7 @@ class RichTextAreaElementTest {
     void preferredHeightReturnsLineCount() {
         RichTextAreaElement element = richTextArea("Line 1\nLine 2\nLine 3");
 
-        assertThat(element.preferredHeight()).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test

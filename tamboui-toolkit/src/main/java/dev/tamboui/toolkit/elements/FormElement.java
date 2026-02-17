@@ -18,6 +18,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.form.FieldType;
@@ -491,37 +492,37 @@ public final class FormElement extends StyledElement<FormElement> {
     // ==================== Sizing ====================
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         int inputWidth = 20; // Reasonable default
         int borderWidth = borderType != null ? 2 : 0;
-        return labelWidth + spacing + inputWidth + borderWidth;
-    }
+        int width = labelWidth + spacing + inputWidth + borderWidth;
 
-    @Override
-    public int preferredHeight() {
+        int height;
         if (fields.isEmpty()) {
-            return 1;
+            height = 1;
+        } else {
+            int fieldHeight = borderType != null ? 3 : 1;
+            int errorHeight = showInlineErrors ? 1 : 0;
+            int totalHeight = 0;
+
+            // Count unique groups for group titles
+            long groupCount = groups.size();
+
+            // Fields
+            totalHeight += fields.size() * (fieldHeight + errorHeight);
+
+            // Spacing between fields
+            if (fields.size() > 1) {
+                totalHeight += (fields.size() - 1) * fieldSpacing;
+            }
+
+            // Group titles (1 row each + spacing)
+            totalHeight += (int) groupCount * 2;
+
+            height = totalHeight;
         }
 
-        int fieldHeight = borderType != null ? 3 : 1;
-        int errorHeight = showInlineErrors ? 1 : 0;
-        int totalHeight = 0;
-
-        // Count unique groups for group titles
-        long groupCount = groups.size();
-
-        // Fields
-        totalHeight += fields.size() * (fieldHeight + errorHeight);
-
-        // Spacing between fields
-        if (fields.size() > 1) {
-            totalHeight += (fields.size() - 1) * fieldSpacing;
-        }
-
-        // Group titles (1 row each + spacing)
-        totalHeight += (int) groupCount * 2;
-
-        return totalHeight;
+        return Size.of(width, height);
     }
 
     // ==================== Rendering ====================

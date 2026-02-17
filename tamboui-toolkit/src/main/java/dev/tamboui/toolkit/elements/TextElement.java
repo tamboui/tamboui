@@ -17,6 +17,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
@@ -226,8 +227,8 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     @Override
-    public int preferredWidth() {
-        // For multi-line text, return the longest line by display width
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        // Width: longest line by display width
         int maxWidth = 0;
         int lineStart = 0;
         for (int i = 0; i <= content.length(); i++) {
@@ -238,18 +239,17 @@ public final class TextElement extends StyledElement<TextElement> {
                 lineStart = i + 1;
             }
         }
-        return maxWidth;
-    }
 
-    @Override
-    public int preferredHeight() {
-        return countLines();
-    }
+        // Height: depends on wrapping and available width
+        int height;
+        if (availableWidth > 0) {
+            Overflow effectiveOverflow = resolveOverflow(context);
+            height = calculateWrappedHeight(availableWidth, effectiveOverflow);
+        } else {
+            height = countLines();
+        }
 
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        Overflow effectiveOverflow = resolveOverflow(context);
-        return calculateWrappedHeight(availableWidth, effectiveOverflow);
+        return Size.of(maxWidth, height);
     }
 
     /**

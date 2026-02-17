@@ -35,7 +35,7 @@ class GridTest {
     @DisplayName("preferredWidth() returns 0 for empty grid")
     void preferredWidth_emptyGrid() {
         GridElement g = grid();
-        assertThat(g.preferredWidth()).isEqualTo(0);
+        assertThat(g.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -43,7 +43,7 @@ class GridTest {
     void preferredWidth_singleChild() {
         GridElement g = grid(text("Hello"));
         // "Hello" = 5, 1 col (ceil(sqrt(1))=1)
-        assertThat(g.preferredWidth()).isEqualTo(5);
+        assertThat(g.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -52,7 +52,7 @@ class GridTest {
         // 4 items -> ceil(sqrt(4))=2 columns, max child width=1
         // 1*2 + 2*(2-1) = 4
         GridElement g = grid(text("A"), text("B"), text("C"), text("D")).gutter(2);
-        assertThat(g.preferredWidth()).isEqualTo(4);
+        assertThat(g.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(4);
     }
 
     @Test
@@ -60,7 +60,7 @@ class GridTest {
     void preferredWidth_withMargin() {
         GridElement g = grid(text("Hello")).margin(new Margin(1, 2, 1, 3));
         // 5 + 2 (right) + 3 (left) = 10
-        assertThat(g.preferredWidth()).isEqualTo(10);
+        assertThat(g.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -441,6 +441,6 @@ class GridTest {
     @DisplayName("Grid created from collection")
     void gridFromCollection() {
         GridElement g = grid(Arrays.asList(text("A"), text("B"), text("C")));
-        assertThat(g.preferredWidth()).isGreaterThan(0);
+        assertThat(g.preferredSize(-1, -1, null).widthOr(0)).isGreaterThan(0);
     }
 }

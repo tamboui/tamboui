@@ -21,42 +21,42 @@ class SpacerTest {
     @DisplayName("preferredWidth() returns 0 for fill spacer")
     void preferredWidth_fillSpacer() {
         Spacer spacer = spacer();
-        assertThat(spacer.preferredWidth()).isEqualTo(0);
+        assertThat(spacer.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredWidth() returns length for fixed spacer")
     void preferredWidth_fixedLength() {
         Spacer spacer = Spacer.length(4);
-        assertThat(spacer.preferredWidth()).isEqualTo(4);
+        assertThat(spacer.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(4);
     }
 
     @Test
     @DisplayName("preferredWidth() returns length for spacer constructor")
     void preferredWidth_constructor() {
         Spacer spacer = new Spacer(10);
-        assertThat(spacer.preferredWidth()).isEqualTo(10);
+        assertThat(spacer.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
     @DisplayName("preferredWidth() returns 0 for percentage spacer")
     void preferredWidth_percentage() {
         Spacer spacer = spacer().percent(50);
-        assertThat(spacer.preferredWidth()).isEqualTo(0);
+        assertThat(spacer.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredHeight() returns 0 for fill spacer")
     void preferredHeight_fillSpacer() {
         Spacer spacer = spacer();
-        assertThat(spacer.preferredHeight()).isEqualTo(0);
+        assertThat(spacer.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredHeight() returns length for fixed spacer")
     void preferredHeight_fixedLength() {
         Spacer spacer = Spacer.length(5);
-        assertThat(spacer.preferredHeight()).isEqualTo(5);
+        assertThat(spacer.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -68,7 +68,7 @@ class SpacerTest {
             text("Right")      // 5
         );
         // 4 + 4 + 5 = 13
-        assertThat(row.preferredWidth()).isEqualTo(13);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(13);
     }
 
     @Test
@@ -80,7 +80,7 @@ class SpacerTest {
             text("Right")      // 5
         );
         // 4 + 0 + 5 = 9
-        assertThat(row.preferredWidth()).isEqualTo(9);
+        assertThat(row.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
     }
 
     @Test

@@ -25,6 +25,7 @@ import dev.tamboui.text.Span;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
@@ -171,7 +172,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
      * @param height the fixed height in cells
      * @return this element
      */
-    public DialogElement height(int height) {
+    public DialogElement length(int height) {
         this.fixedHeight = height;
         return this;
     }
@@ -320,46 +321,48 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        // Calculate width
+        int width;
         if (fixedWidth != null) {
-            return fixedWidth;
-        }
+            width = fixedWidth;
+        } else {
+            // Calculate based on children, title, and minimum
+            int childrenWidth = 0;
+            if (!children.isEmpty()) {
+                Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
 
-        // Calculate based on children, title, and minimum
-        int childrenWidth = 0;
-        if (!children.isEmpty()) {
-            Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
+                if (effectiveDirection == Direction.HORIZONTAL) {
+                    // Horizontal: sum widths of all children
+                    for (Element child : children) {
+                        childrenWidth += child.preferredSize(availableWidth, availableHeight, context).widthOr(0);
+                    }
 
-            if (effectiveDirection == Direction.HORIZONTAL) {
-                // Horizontal: sum widths of all children
-                for (Element child : children) {
-                    childrenWidth += child.preferredWidth();
-                }
-
-                // Add spacing between children (n-1 spacings)
-                int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-                if (children.size() > 1) {
-                    childrenWidth += effectiveSpacing * (children.size() - 1);
-                }
-            } else {
-                // Vertical: max width of all children
-                for (Element child : children) {
-                    childrenWidth = Math.max(childrenWidth, child.preferredWidth());
+                    // Add spacing between children (n-1 spacings)
+                    int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+                    if (children.size() > 1) {
+                        childrenWidth += effectiveSpacing * (children.size() - 1);
+                    }
+                } else {
+                    // Vertical: max width of all children
+                    for (Element child : children) {
+                        childrenWidth = Math.max(childrenWidth, child.preferredSize(availableWidth, availableHeight, context).widthOr(0));
+                    }
                 }
             }
+
+            // Calculate title width (same logic as calculateWidth private method)
+            int titleWidth = title != null ? title.length() : 0;
+            int contentWidth = Math.max(Math.max(minWidth, titleWidth), childrenWidth);
+
+            // Add padding (left and right) and borders (2)
+            width = contentWidth + padding * 2 + 2;
         }
 
-        // Calculate title width (same logic as calculateWidth private method)
-        int titleWidth = title != null ? title.length() : 0;
-        int contentWidth = Math.max(Math.max(minWidth, titleWidth), childrenWidth);
+        // Calculate height
+        int height = calculateHeight();
 
-        // Add padding (left and right) and borders (2)
-        return contentWidth + padding * 2 + 2;
-    }
-
-    @Override
-    public int preferredHeight() {
-        return calculateHeight();
+        return Size.of(width, height);
     }
 
     @Override
@@ -460,8 +463,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
             }
             if (c == null) {
                 // Use child's preferred size when no constraint is specified
-                int preferredSize = isHorizontal ? child.preferredWidth() : child.preferredHeight();
-                c = Constraint.length(Math.max(1, preferredSize));
+                Size childSize = child.preferredSize(-1, -1, context);
+                int preferredSizeValue = isHorizontal ? childSize.widthOr(1) : childSize.heightOr(1);
+                c = Constraint.length(Math.max(1, preferredSizeValue));
             }
             constraints.add(c);
         }
@@ -508,12 +512,12 @@ public final class DialogElement extends ContainerElement<DialogElement> {
             if (effectiveDirection == Direction.HORIZONTAL) {
                 // Horizontal: max height of all children
                 for (Element child : children) {
-                    childrenHeight = Math.max(childrenHeight, child.preferredHeight());
+                    childrenHeight = Math.max(childrenHeight, child.preferredSize(-1, -1, null).heightOr(1));
                 }
             } else {
                 // Vertical: sum heights of all children
                 for (Element child : children) {
-                    childrenHeight += child.preferredHeight();
+                    childrenHeight += child.preferredSize(-1, -1, null).heightOr(1);
                 }
 
                 // Add spacing between children (n-1 spacings)

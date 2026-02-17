@@ -276,7 +276,7 @@ class TabsElementTest {
     @DisplayName("preferredWidth() returns 0 for empty tabs")
     void preferredWidth_emptyTabs() {
         TabsElement element = tabs();
-        assertThat(element.preferredWidth()).isEqualTo(0);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -284,7 +284,7 @@ class TabsElementTest {
     void preferredWidth_singleTab() {
         TabsElement element = tabs("Home");
         // "Home" = 4 characters
-        assertThat(element.preferredWidth()).isEqualTo(4);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(4);
     }
 
     @Test
@@ -292,7 +292,7 @@ class TabsElementTest {
     void preferredWidth_withDividers() {
         TabsElement element = tabs("A", "B", "C").divider(" | ");
         // "A" + " | " + "B" + " | " + "C" = 1 + 3 + 1 + 3 + 1 = 9
-        assertThat(element.preferredWidth()).isEqualTo(9);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
     }
 
     @Test
@@ -300,7 +300,7 @@ class TabsElementTest {
     void preferredWidth_withPadding() {
         TabsElement element = tabs("A", "B").divider("|").padding(" ", " ");
         // " A " + "|" + " B " = 3 + 1 + 3 = 7
-        assertThat(element.preferredWidth()).isEqualTo(7);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(7);
     }
 
     @Test
@@ -308,7 +308,7 @@ class TabsElementTest {
     void preferredWidth_withBorder() {
         TabsElement element = tabs("A", "B").divider("|").rounded();
         // "A" + "|" + "B" = 3, plus 2 for borders = 5
-        assertThat(element.preferredWidth()).isEqualTo(5);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -316,7 +316,7 @@ class TabsElementTest {
     void preferredWidth_withTitle() {
         TabsElement element = tabs("A", "B").divider("|").title("Nav");
         // "A" + "|" + "B" = 3, plus 2 for borders = 5
-        assertThat(element.preferredWidth()).isEqualTo(5);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -328,7 +328,7 @@ class TabsElementTest {
             .rounded();
         // " Home " + " | " + " Settings " + " | " + " About " = 6 + 3 + 10 + 3 + 7 = 29
         // Plus 2 for borders = 31
-        assertThat(element.preferredWidth()).isEqualTo(31);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(31);
     }
 
     @Test
@@ -363,7 +363,7 @@ class TabsElementTest {
         // Then tabs should only take width needed (not fill the row)
         // "App" + " | " + "Logs" = 3 + 3 + 4 = 10
         // Tabs element should have been allocated exactly 10 cells
-        assertThat(tabsElement.preferredWidth()).isEqualTo(10);
+        assertThat(tabsElement.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -373,7 +373,7 @@ class TabsElementTest {
         // Divider " | " = 3 cells, "Logs" = 4 cells
         // Total: 5 + 3 + 4 = 12
         TabsElement element = tabs("\uD83D\uDD25App", "Logs").divider(" | ");
-        assertThat(element.preferredWidth()).isEqualTo(12);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(12);
     }
 
     @Test
@@ -382,35 +382,35 @@ class TabsElementTest {
         // Programmatic constraint
         TabsElement tabsElement = tabs("Home", "About").divider(" | ");
 
-        assertThat(tabsElement.preferredWidth()).isEqualTo(12); // "Home" + " | " + "About" = 4 + 3 + 5 = 12
+        assertThat(tabsElement.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(12); // "Home" + " | " + "About" = 4 + 3 + 5 = 12
     }
 
     @Test
     @DisplayName("preferredHeight() returns 1 without borders")
     void preferredHeight_noBorder() {
         TabsElement element = tabs("A", "B", "C");
-        assertThat(element.preferredHeight()).isEqualTo(1);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test
     @DisplayName("preferredHeight() returns 3 with borders")
     void preferredHeight_withBorder() {
         TabsElement element = tabs("A", "B", "C").rounded();
-        assertThat(element.preferredHeight()).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test
     @DisplayName("preferredHeight() returns 3 with title")
     void preferredHeight_withTitle() {
         TabsElement element = tabs("A", "B", "C").title("Nav");
-        assertThat(element.preferredHeight()).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test
     @DisplayName("preferredHeight() returns 1 for tabs without border")
     void preferredHeight_noBorderNoTitle() {
         TabsElement element = tabs("A");
-        assertThat(element.preferredHeight()).isEqualTo(1);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test
@@ -418,8 +418,8 @@ class TabsElementTest {
     void rendersAtPreferredSize() {
         TabsElement element = tabs("A", "B").divider("|").selected(0);
 
-        int w = element.preferredWidth();
-        int h = element.preferredHeight();
+        int w = element.preferredSize(-1, -1, null).widthOr(0);
+        int h = element.preferredSize(-1, -1, null).heightOr(0);
         Rect area = new Rect(0, 0, w, h);
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);

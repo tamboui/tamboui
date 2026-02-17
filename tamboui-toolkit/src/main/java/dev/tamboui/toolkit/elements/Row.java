@@ -20,6 +20,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 
 /**
  * A horizontal layout container that arranges children in a row.
@@ -109,64 +110,43 @@ public final class Row extends ContainerElement<Row> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (children.isEmpty()) {
-            return 0;
+            return Size.of(0, 1);
         }
 
-        int width = 0;
-
-        // Sum preferred widths of all children
-        for (Element child : children) {
-            width += child.preferredWidth();
-        }
-
-        // Add spacing between children (n-1 spacings)
         int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+
+        // Calculate width: sum of children widths + spacing
+        int width = 0;
+        for (Element child : children) {
+            Size childSize = child.preferredSize(availableWidth, availableHeight, context);
+            width += childSize.widthOr(0);
+        }
         if (children.size() > 1) {
             width += effectiveSpacing * (children.size() - 1);
         }
-
-        // Add margin width if present
         if (margin != null) {
             width += margin.left() + margin.right();
         }
 
-        return width;
-    }
-
-    @Override
-    public int preferredHeight() {
-        if (children.isEmpty()) {
-            return 1;
-        }
-        // Horizontal layout: max height of children
-        int maxHeight = 1;
-        for (Element child : children) {
-            maxHeight = Math.max(maxHeight, child.preferredHeight());
-        }
-        return maxHeight;
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (children.isEmpty() || availableWidth <= 0) {
-            return 1;
-        }
-
-        // For a row, calculate max height of children
-        // Give each child an equal share of width as a reasonable approximation
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        // Calculate height: max of children heights
         int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
-        int contentWidth = Math.max(1, availableWidth - totalSpacing);
-        int childWidth = Math.max(1, contentWidth / children.size());
+        int contentWidth = availableWidth > 0 ? Math.max(1, availableWidth - totalSpacing) : -1;
+        int childWidth = contentWidth > 0 ? Math.max(1, contentWidth / children.size()) : -1;
 
         int maxHeight = 1;
         for (Element child : children) {
-            maxHeight = Math.max(maxHeight, child.preferredHeight(childWidth, context));
+            Size childSize = child.preferredSize(childWidth, availableHeight, context);
+            maxHeight = Math.max(maxHeight, childSize.heightOr(1));
         }
 
-        return maxHeight;
+        // If a length constraint is set, use it for height (Row uses constraint for height in vertical parent)
+        if (layoutConstraint instanceof Constraint.Length) {
+            maxHeight = Math.max(maxHeight, ((Constraint.Length) layoutConstraint).value());
+        }
+
+        return Size.of(width, maxHeight);
     }
 
     @Override
@@ -226,12 +206,10 @@ public final class Row extends ContainerElement<Row> {
                 }
             }
             // Handle null or Fit constraint by querying preferred width
-            if (c == null) {
-                int preferred = child.preferredWidth();
-                c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
-            } else if (c instanceof Constraint.Fit) {
-                int preferred = child.preferredWidth();
-                c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+            if (c == null || c instanceof Constraint.Fit) {
+                Size size = child.preferredSize(-1, -1, context);
+                int preferred = size.width();
+                c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
             }
             constraints.add(c);
 

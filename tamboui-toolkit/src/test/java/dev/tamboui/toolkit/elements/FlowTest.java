@@ -66,7 +66,7 @@ class FlowTest {
     void preferredWidth() {
         FlowElement f = flow(text("AB"), text("CD"), text("EF"));
         // 2 + 2 + 2 = 6
-        assertThat(f.preferredWidth()).isEqualTo(6);
+        assertThat(f.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -74,7 +74,7 @@ class FlowTest {
     void preferredWidthWithSpacing() {
         FlowElement f = flow(text("AB"), text("CD"), text("EF")).spacing(1);
         // 2 + 1 + 2 + 1 + 2 = 8
-        assertThat(f.preferredWidth()).isEqualTo(8);
+        assertThat(f.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(8);
     }
 
     @Test
@@ -82,7 +82,7 @@ class FlowTest {
     void preferredWidthWithMargin() {
         FlowElement f = flow(text("AB")).margin(new Margin(0, 2, 0, 3));
         // 2 + 2 + 3 = 7
-        assertThat(f.preferredWidth()).isEqualTo(7);
+        assertThat(f.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(7);
     }
 
     @Test
@@ -102,7 +102,7 @@ class FlowTest {
     @DisplayName("flow created from collection")
     void flowFromCollection() {
         FlowElement f = flow(Arrays.asList(text("A"), text("BB")));
-        assertThat(f.preferredWidth()).isEqualTo(3);
+        assertThat(f.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -214,14 +214,14 @@ class FlowTest {
     void preferredHeight() {
         FlowElement f = flow(text("A"), text("B"), text("C"));
         // All height 1
-        assertThat(f.preferredHeight()).isEqualTo(1);
+        assertThat(f.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test
     @DisplayName("preferredHeight returns 0 for empty flow")
     void preferredHeightEmpty() {
         FlowElement f = flow();
-        assertThat(f.preferredHeight()).isEqualTo(0);
+        assertThat(f.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -229,7 +229,7 @@ class FlowTest {
     void preferredHeightWithMargin() {
         FlowElement f = flow(text("A")).margin(new Margin(2, 0, 3, 0));
         // 1 + 2 + 3 = 6
-        assertThat(f.preferredHeight()).isEqualTo(6);
+        assertThat(f.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -238,7 +238,7 @@ class FlowTest {
         // "AB"(2) + "CD"(2) = 4, fits in 5
         // "EF"(2) wraps to row 2
         FlowElement f = flow(text("AB"), text("CD"), text("EF"));
-        int height = f.preferredHeight(5, RenderContext.empty());
+        int height = f.preferredSize(5, -1, RenderContext.empty()).heightOr(0);
         assertThat(height).isEqualTo(2);
     }
 }

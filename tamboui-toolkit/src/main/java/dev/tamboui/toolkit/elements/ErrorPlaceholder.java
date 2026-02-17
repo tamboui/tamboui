@@ -14,6 +14,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -64,7 +65,7 @@ public final class ErrorPlaceholder implements Element {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Title + error message + borders
         String titleText = elementId != null ? " Error: " + elementId + " " : " Error ";
         String message = cause.getClass().getSimpleName();
@@ -76,13 +77,10 @@ public final class ErrorPlaceholder implements Element {
             message = message + ": " + shortMessage;
         }
         // "! " prefix + message inside borders
-        return Math.max(titleText.length(), message.length() + 2) + 2;
-    }
-
-    @Override
-    public int preferredHeight() {
+        int width = Math.max(titleText.length(), message.length() + 2) + 2;
         // Border top + content line + border bottom
-        return 3;
+        int height = 3;
+        return Size.of(width, height);
     }
 
     @Override

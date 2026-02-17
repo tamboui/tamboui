@@ -9,6 +9,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 
 /**
  * An empty element that takes up space in layouts.
@@ -78,23 +79,14 @@ public final class Spacer implements Element {
     }
 
     @Override
-    public int preferredWidth() {
-        // If spacer has a fixed length constraint, return it
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        // If spacer has a fixed length constraint, return it for both dimensions
         if (layoutConstraint instanceof Constraint.Length) {
-            return ((Constraint.Length) layoutConstraint).value();
+            int value = ((Constraint.Length) layoutConstraint).value();
+            return Size.of(value, value);
         }
-        // For fill() and other constraints, return 0 (will expand during layout)
-        return 0;
-    }
-
-    @Override
-    public int preferredHeight() {
-        // If spacer has a fixed length constraint, return it
-        if (layoutConstraint instanceof Constraint.Length) {
-            return ((Constraint.Length) layoutConstraint).value();
-        }
-        // For fill() and other constraints, return 0 (will expand during layout)
-        return 0;
+        // For fill() and other constraints, return UNKNOWN (will expand during layout)
+        return Size.UNKNOWN;
     }
 
     @Override

@@ -15,6 +15,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -237,16 +238,13 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
     }
 
     @Override
-    public int preferredWidth() {
-        // Calendar shows 7 days * 3 chars each (day number + spaces) = 21 chars
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        // Width: 7 days * 3 chars each (day number + spaces) = 21 chars
         int width = 7 * 3;
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
-        return width + borderWidth;
-    }
+        width += borderWidth;
 
-    @Override
-    public int preferredHeight() {
-        // Calendar shows: month header (optional) + weekday header (optional) + 6 weeks max
+        // Height: month header (optional) + weekday header (optional) + 6 weeks max
         int height = 6; // 6 week rows
         if (monthHeaderStyle != null) {
             height++;
@@ -255,7 +253,9 @@ public final class CalendarElement extends StyledElement<CalendarElement> {
             height++;
         }
         int borderHeight = (title != null || borderType != null) ? 2 : 0;
-        return height + borderHeight;
+        height += borderHeight;
+
+        return Size.of(width, height);
     }
 
     @Override

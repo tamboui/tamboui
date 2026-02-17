@@ -17,6 +17,7 @@ import dev.tamboui.text.MarkupParser;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
 import dev.tamboui.toolkit.elements.RichTextAreaElement;
 import dev.tamboui.tui.TuiConfig;
@@ -236,10 +237,10 @@ public class RichTextDemo implements Element {
     private String getInitialMarkup() {
         return """
                 [bold]Welcome to MarkupText![/bold]
-                
+
                 This is a [cyan]live editor[/cyan] for BBCode-style markup.
                 Edit this text and watch the preview update!
-                
+
                 [bold]Try these styles:[/bold]
                 - [red]Red text[/red]
                 - [green][bold]Green and bold[/bold][/green]
@@ -247,35 +248,30 @@ public class RichTextDemo implements Element {
                 - [underlined]Underlined[/underlined]
                 - [dim]Dimmed text[/dim]
                 - [magenta]Magenta[/magenta] and [yellow]Yellow[/yellow]
-                
+
                 [bold]Nesting works:[/bold]
                 [red][bold][italic]Red, bold, and italic![/italic][/bold][/red]
-                
+
                 [bold]Links:[/bold]
                 [link=https://example.com]Click here[/link]
-                
+
                 [bold]Escape brackets:[/bold]
                 Use [[double brackets]] to show literal [brackets]
-                
+
                 [bold]True colors:[/bold]
                 [ #FF5733]Red[/#FF5733]
                 [rgb(255, 238, 51)]RGB[/]
                 [rgb(41, 52, 204) on rgb(255, 87, 51)]Blue on RGB[/]
                 [ #0A2]simple hex[/] color
-                
+
                 [bold]Custom CSS tags:[/bold]
                 Switch to CSS tab and define styles for custom tags!
                 Try: [keyword]function[/keyword] [string]"hello"[/string]""";
     }
 
     @Override
-    public int preferredWidth() {
-        return 0;
-    }
-
-    @Override
-    public int preferredHeight() {
-        return 0;
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        return Size.UNKNOWN;
     }
 
     @Override

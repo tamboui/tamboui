@@ -106,7 +106,7 @@ class DockTest {
             .rightWidth(Constraint.length(5));
 
         // leftWidth(5) + "Center"(6) + rightWidth(5) = 16
-        assertThat(d.preferredWidth()).isEqualTo(16);
+        assertThat(d.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(16);
     }
 
     @Test
@@ -117,7 +117,7 @@ class DockTest {
             .margin(new Margin(1, 2, 1, 3));
 
         // "Hello"(5) + left(3) + right(2) = 10
-        assertThat(d.preferredWidth()).isEqualTo(10);
+        assertThat(d.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test

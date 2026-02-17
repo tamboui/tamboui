@@ -113,7 +113,7 @@ class ErrorPlaceholderTest {
         );
 
         // Width should accommodate the wider of title/message + border (2)
-        int width = placeholder.preferredWidth();
+        int width = placeholder.preferredSize(-1, -1, null).widthOr(0);
         assertThat(width).isGreaterThan(2);
     }
 
@@ -122,7 +122,7 @@ class ErrorPlaceholderTest {
     void preferredHeight() {
         ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("Error"));
 
-        assertThat(placeholder.preferredHeight()).isEqualTo(3);
+        assertThat(placeholder.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test

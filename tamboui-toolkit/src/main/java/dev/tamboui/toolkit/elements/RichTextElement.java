@@ -15,6 +15,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
@@ -205,7 +206,7 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         int maxWidth = 0;
         for (Line line : text.lines()) {
             int width = 0;
@@ -214,12 +215,7 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
             }
             maxWidth = Math.max(maxWidth, width);
         }
-        return maxWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
-        return text.lines().size();
+        return Size.of(maxWidth, text.lines().size());
     }
 
     @Override

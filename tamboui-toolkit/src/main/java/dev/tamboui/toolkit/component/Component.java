@@ -9,6 +9,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.focus.Focusable;
@@ -51,13 +52,8 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
     }
 
     @Override
-    public int preferredWidth() {
-        return 0;
-    }
-
-    @Override
-    public int preferredHeight() {
-        return 0;
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        return Size.ZERO;
     }
 
     private ActionHandler actionHandler;

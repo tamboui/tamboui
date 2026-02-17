@@ -19,6 +19,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Span;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -219,16 +220,16 @@ public final class TabsElement extends StyledElement<TabsElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (titles.isEmpty()) {
-            return 0;
+            return Size.of(0, 1);
         }
 
         int width = 0;
 
         // Calculate width of all tab titles
-        for (String title : titles) {
-            width += CharWidth.of(title);
+        for (String tabTitle : titles) {
+            width += CharWidth.of(tabTitle);
         }
 
         // Add padding for each tab
@@ -246,13 +247,10 @@ public final class TabsElement extends StyledElement<TabsElement> {
             width += 2;
         }
 
-        return width;
-    }
-
-    @Override
-    public int preferredHeight() {
         // Tabs are 1 row, or 3 with borders (top + content + bottom)
-        return (borderType != null || title != null) ? 3 : 1;
+        int height = (borderType != null || title != null) ? 3 : 1;
+
+        return Size.of(width, height);
     }
 
     @Override

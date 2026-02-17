@@ -295,17 +295,17 @@ class TextElementTest {
         @DisplayName("preferredHeight(width) returns 1 for short text without wrapping")
         void shortTextNoWrapping() {
             TextElement element = text("Hello");
-            assertThat(element.preferredHeight(20, null)).isEqualTo(1);
+            assertThat(element.preferredSize(20, -1, null).heightOr(0)).isEqualTo(1);
         }
 
         @Test
         @DisplayName("preferredHeight(width) returns line count for non-wrapping overflow modes")
         void nonWrappingModes() {
             TextElement element = text("Hello\nWorld").overflow(Overflow.CLIP);
-            assertThat(element.preferredHeight(5, null)).isEqualTo(2);
+            assertThat(element.preferredSize(5, -1, null).heightOr(0)).isEqualTo(2);
 
             TextElement ellipsis = text("Hello\nWorld\nTest").overflow(Overflow.ELLIPSIS);
-            assertThat(ellipsis.preferredHeight(5, null)).isEqualTo(3);
+            assertThat(ellipsis.preferredSize(5, -1, null).heightOr(0)).isEqualTo(3);
         }
 
         @Test
@@ -313,11 +313,11 @@ class TextElementTest {
         void wrapCharacterCalculation() {
             // 20 chars should wrap to 2 lines at width 10
             TextElement element = text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(element.preferredHeight(10, null)).isEqualTo(2);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(2);
 
             // 25 chars should wrap to 3 lines at width 10
             TextElement longer = text("1234567890123456789012345").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(longer.preferredHeight(10, null)).isEqualTo(3);
+            assertThat(longer.preferredSize(10, -1, null).heightOr(0)).isEqualTo(3);
         }
 
         @Test
@@ -325,7 +325,7 @@ class TextElementTest {
         void wrapWordCalculation() {
             // Same calculation as WRAP_CHARACTER for preferredHeight
             TextElement element = text("12345678901234567890").overflow(Overflow.WRAP_WORD);
-            assertThat(element.preferredHeight(10, null)).isEqualTo(2);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(2);
         }
 
         @Test
@@ -333,22 +333,22 @@ class TextElementTest {
         void multiLineWithWrapping() {
             // Two lines, each 15 chars, should wrap to 4 lines at width 10
             TextElement element = text("123456789012345\n123456789012345").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(element.preferredHeight(10, null)).isEqualTo(4);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(4);
         }
 
         @Test
         @DisplayName("preferredHeight(width) returns 1 for empty content")
         void emptyContent() {
             TextElement element = text("").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(element.preferredHeight(10, null)).isEqualTo(1);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(1);
         }
 
         @Test
         @DisplayName("preferredHeight(width) returns 1 for zero or negative width")
         void zeroWidth() {
             TextElement element = text("Hello World").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(element.preferredHeight(0, null)).isEqualTo(1);
-            assertThat(element.preferredHeight(-5, null)).isEqualTo(1);
+            assertThat(element.preferredSize(0, -1, null).heightOr(0)).isEqualTo(1);
+            assertThat(element.preferredSize(-5, -1, null).heightOr(0)).isEqualTo(1);
         }
 
         @Test
@@ -356,24 +356,24 @@ class TextElementTest {
         void exactWidthMatch() {
             // 10 chars at width 10 should be exactly 1 line
             TextElement element = text("1234567890").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(element.preferredHeight(10, null)).isEqualTo(1);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(1);
         }
 
         @Test
         @DisplayName("preferredHeight(width) handles width of 1")
         void widthOfOne() {
             TextElement element = text("ABC").overflow(Overflow.WRAP_CHARACTER);
-            assertThat(element.preferredHeight(1, null)).isEqualTo(3);
+            assertThat(element.preferredSize(1, -1, null).heightOr(0)).isEqualTo(3);
         }
 
         @Test
         @DisplayName("preferredHeight() without width delegates to line count")
         void preferredHeightWithoutWidth() {
             TextElement single = text("Hello World");
-            assertThat(single.preferredHeight()).isEqualTo(1);
+            assertThat(single.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
 
             TextElement multi = text("Line1\nLine2\nLine3");
-            assertThat(multi.preferredHeight()).isEqualTo(3);
+            assertThat(multi.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
         }
 
         @Test
@@ -406,10 +406,10 @@ class TextElementTest {
             };
 
             // Without CSS (null context), should return 1 (CLIP mode)
-            assertThat(element.preferredHeight(10, null)).isEqualTo(1);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(1);
 
             // With CSS providing wrap-character, should wrap to 2 lines
-            assertThat(element.preferredHeight(10, context)).isEqualTo(2);
+            assertThat(element.preferredSize(10, -1, context).heightOr(0)).isEqualTo(2);
         }
     }
 }

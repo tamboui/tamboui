@@ -55,38 +55,38 @@ class WaveTextElementTest {
     @DisplayName("preferredWidth() returns 0 for null text")
     void preferredWidth_nullText() {
         WaveTextElement element = waveText("test").text(null);
-        assertThat(element.preferredWidth()).isEqualTo(0);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredWidth() returns text length")
     void preferredWidth_withText() {
         WaveTextElement element = waveText("Hello");
-        assertThat(element.preferredWidth()).isEqualTo(5);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
     @DisplayName("preferredWidth() handles empty text")
     void preferredWidth_emptyText() {
         WaveTextElement element = waveText("");
-        assertThat(element.preferredWidth()).isEqualTo(0);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredWidth() handles longer text")
     void preferredWidth_longerText() {
         WaveTextElement element = waveText("Loading... Please wait");
-        assertThat(element.preferredWidth()).isEqualTo(22);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(22);
     }
 
     @Test
     @DisplayName("preferredWidth() updates when text changes")
     void preferredWidth_textChanges() {
         WaveTextElement element = waveText("Short");
-        assertThat(element.preferredWidth()).isEqualTo(5);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
 
         element.text("Much longer text here");
-        assertThat(element.preferredWidth()).isEqualTo(21);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(21);
     }
 
     @Test
@@ -169,7 +169,7 @@ class WaveTextElementTest {
     @DisplayName("preferredHeight() returns 1")
     void preferredHeight() {
         WaveTextElement element = waveText("Loading...");
-        assertThat(element.preferredHeight()).isEqualTo(1);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test

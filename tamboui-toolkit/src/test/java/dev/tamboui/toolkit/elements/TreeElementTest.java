@@ -701,14 +701,14 @@ class TreeElementTest {
     @DisplayName("preferredWidth returns 0 for empty tree")
     void preferredWidth_emptyTree() {
         TreeElement<Void> element = tree();
-        assertThat(element.preferredWidth()).isEqualTo(0);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredHeight returns 0 for empty tree")
     void preferredHeight_emptyTree() {
         TreeElement<Void> element = tree();
-        assertThat(element.preferredHeight()).isEqualTo(0);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -721,7 +721,7 @@ class TreeElementTest {
 
         TreeElement<Void> element = tree(root);
         // Root + 2 children = 3
-        assertThat(element.preferredHeight()).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -734,7 +734,7 @@ class TreeElementTest {
 
         TreeElement<Void> element = tree(root);
         // Only root visible
-        assertThat(element.preferredHeight()).isEqualTo(1);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test
@@ -744,7 +744,7 @@ class TreeElementTest {
 
         TreeElement<Void> element = tree(root).title("Tree").rounded();
         // 1 (root) + 2 (borders) = 3
-        assertThat(element.preferredHeight()).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -754,7 +754,7 @@ class TreeElementTest {
 
         TreeElement<Void> element = tree(root).highlightSymbol(">> ").rounded();
         // "Root" = 4, highlight ">> " = 3, borders = 2 → 4 + 3 + 2 = 9
-        assertThat(element.preferredWidth()).isEqualTo(9);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
     }
 
     @Test
@@ -772,7 +772,7 @@ class TreeElementTest {
         // Depth 1: 4 + "BB" = 6
         // Depth 2: 8 + "CCC" = 11
         // Max = 11 (no borders, no highlight)
-        assertThat(element.preferredWidth()).isEqualTo(11);
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(11);
     }
 
     @Test

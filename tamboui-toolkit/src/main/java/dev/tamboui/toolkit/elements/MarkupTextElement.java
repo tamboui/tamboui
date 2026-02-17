@@ -14,6 +14,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.MarkupParser;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 
 /**
@@ -200,15 +201,9 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         ensureTextParsed();
-        return delegate.preferredWidth();
-    }
-
-    @Override
-    public int preferredHeight() {
-        ensureTextParsed();
-        return delegate.preferredHeight();
+        return delegate.preferredSize(availableWidth, availableHeight, context);
     }
 
     private void ensureTextParsed() {

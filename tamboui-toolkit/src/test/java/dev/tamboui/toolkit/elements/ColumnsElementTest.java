@@ -34,7 +34,7 @@ class ColumnsElementTest {
     @DisplayName("preferredWidth() returns 0 for empty columns")
     void preferredWidth_emptyColumns() {
         ColumnsElement cols = columns();
-        assertThat(cols.preferredWidth()).isEqualTo(0);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -42,7 +42,7 @@ class ColumnsElementTest {
     void preferredWidth_singleChild() {
         ColumnsElement cols = columns(text("Hello"));
         // "Hello" = 5 characters, 1 column
-        assertThat(cols.preferredWidth()).isEqualTo(5);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -54,7 +54,7 @@ class ColumnsElementTest {
             text("CCC")      // 3
         );
         // max width = 3, 3 cols => 3 * 3 = 9
-        assertThat(cols.preferredWidth()).isEqualTo(9);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
     }
 
     @Test
@@ -66,7 +66,7 @@ class ColumnsElementTest {
             text("CC")       // 2
         ).spacing(1);
         // max width = 2, 3 cols => 2 * 3 + 1 * 2 = 8
-        assertThat(cols.preferredWidth()).isEqualTo(8);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(8);
     }
 
     @Test
@@ -76,7 +76,7 @@ class ColumnsElementTest {
             text("Hello")    // 5
         ).margin(new Margin(1, 2, 1, 3)); // top, right, bottom, left
         // 5 + 2 (right) + 3 (left) = 10
-        assertThat(cols.preferredWidth()).isEqualTo(10);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -89,7 +89,7 @@ class ColumnsElementTest {
             text("D")        // 1
         ).columnCount(2);
         // max width = 4, 2 cols => 4 * 2 = 8
-        assertThat(cols.preferredWidth()).isEqualTo(8);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(8);
     }
 
     @Test
@@ -224,7 +224,7 @@ class ColumnsElementTest {
         assertThat(columns(
             text("AAAAAAAAAA"), text("BBBBBBBBBB"),
             text("CCCCCCCCCC"), text("DDDDDDDDDD")
-        ).columnCount(2).preferredHeight(100, RenderContext.empty())).isEqualTo(2);
+        ).columnCount(2).preferredSize(100, -1, RenderContext.empty()).heightOr(0)).isEqualTo(2);
     }
 
     @Test
@@ -282,7 +282,7 @@ class ColumnsElementTest {
     @DisplayName("Columns created from collection")
     void columnsFromCollection() {
         ColumnsElement cols = columns(Arrays.asList(text("A"), text("B"), text("C")));
-        assertThat(cols.preferredWidth()).isEqualTo(3);
+        assertThat(cols.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -295,7 +295,7 @@ class ColumnsElementTest {
         ).columnCount(2);
 
         int width = 20;
-        int height = cols.preferredHeight(width, RenderContext.empty());
+        int height = cols.preferredSize(width, -1, RenderContext.empty()).heightOr(0);
         assertThat(height).isEqualTo(2);
 
         // Render into a buffer sized by preferredHeight (as println now does)

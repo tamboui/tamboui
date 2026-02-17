@@ -27,7 +27,7 @@ class InlineScopeElementTest {
             text("Line 3")
         ).visible(false);
 
-        int height = scope.preferredHeight(80, RenderContext.empty());
+        int height = scope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(height).isEqualTo(0);
     }
 
@@ -36,7 +36,7 @@ class InlineScopeElementTest {
     void preferredHeightReturnsZeroWhenNoChildren() {
         InlineScopeElement scope = new InlineScopeElement();
 
-        int height = scope.preferredHeight(80, RenderContext.empty());
+        int height = scope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(height).isEqualTo(0);
     }
 
@@ -49,7 +49,7 @@ class InlineScopeElementTest {
             text("Line 3")
         ).visible(true);
 
-        int height = scope.preferredHeight(80, RenderContext.empty());
+        int height = scope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         // Each text element should have height 1
         assertThat(height).isEqualTo(3);
     }
@@ -91,17 +91,17 @@ class InlineScopeElementTest {
         );
 
         // Initially visible (default)
-        int heightWhenVisible = scope.preferredHeight(80, RenderContext.empty());
+        int heightWhenVisible = scope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(heightWhenVisible).isEqualTo(3);
 
         // Hide
         scope.hide();
-        int heightWhenHidden = scope.preferredHeight(80, RenderContext.empty());
+        int heightWhenHidden = scope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(heightWhenHidden).isEqualTo(0);
 
         // Show again
         scope.show();
-        int heightWhenVisibleAgain = scope.preferredHeight(80, RenderContext.empty());
+        int heightWhenVisibleAgain = scope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(heightWhenVisibleAgain).isEqualTo(3);
     }
 
@@ -120,17 +120,17 @@ class InlineScopeElementTest {
         );
 
         // Both visible: 1 + 2 + 1 = 4
-        int heightBothVisible = outerScope.preferredHeight(80, RenderContext.empty());
+        int heightBothVisible = outerScope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(heightBothVisible).isEqualTo(4);
 
         // Hide inner scope: 1 + 0 + 1 = 2
         innerScope.hide();
-        int heightInnerHidden = outerScope.preferredHeight(80, RenderContext.empty());
+        int heightInnerHidden = outerScope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(heightInnerHidden).isEqualTo(2);
 
         // Hide outer scope: 0
         outerScope.hide();
-        int heightOuterHidden = outerScope.preferredHeight(80, RenderContext.empty());
+        int heightOuterHidden = outerScope.preferredSize(80, -1, RenderContext.empty()).heightOr(0);
         assertThat(heightOuterHidden).isEqualTo(0);
     }
 
@@ -178,7 +178,7 @@ class InlineScopeElementTest {
             text("BBB"),
             text("CC")
         );
-        assertThat(scope.preferredWidth()).isEqualTo(3);
+        assertThat(scope.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -187,6 +187,6 @@ class InlineScopeElementTest {
         InlineScopeElement scope = new InlineScopeElement(
             text("Hello")
         ).visible(false);
-        assertThat(scope.preferredWidth()).isEqualTo(0);
+        assertThat(scope.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 }

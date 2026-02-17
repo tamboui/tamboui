@@ -20,6 +20,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 
 /**
  * A vertical layout container that arranges children in a column.
@@ -111,57 +112,38 @@ public final class Column extends ContainerElement<Column> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (children.isEmpty()) {
-            return 0;
+            return Size.of(0, 0);
         }
 
-        // Column stacks children vertically, so width is the maximum child width
+        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
+
+        // Calculate width: max of children widths
         int maxWidth = 0;
         for (Element child : children) {
-            maxWidth = Math.max(maxWidth, child.preferredWidth());
+            Size childSize = child.preferredSize(availableWidth, availableHeight, context);
+            maxWidth = Math.max(maxWidth, childSize.widthOr(0));
         }
-
-        // Add margin width if present
         if (margin != null) {
             maxWidth += margin.left() + margin.right();
         }
 
-        return maxWidth;
-    }
-
-    @Override
-    public int preferredHeight() {
-        if (children.isEmpty()) {
-            return 0;
-        }
-        // Vertical layout: sum of children heights + spacing
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-        int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
+        // Calculate height: sum of children heights + spacing
         int totalHeight = 0;
         for (Element child : children) {
-            totalHeight += child.preferredHeight();
+            Size childSize = child.preferredSize(availableWidth, -1, context);
+            totalHeight += childSize.heightOr(1);
         }
-        return totalHeight + totalSpacing;
-    }
+        totalHeight += totalSpacing;
 
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (children.isEmpty() || availableWidth <= 0) {
-            return 0;
-        }
-
-        // Calculate effective spacing
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-        int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
-
-        // Sum heights of all children (Column is vertical, so all children get full width)
-        int totalHeight = 0;
-        for (Element child : children) {
-            totalHeight += child.preferredHeight(availableWidth, context);
+        // If a length constraint is set, use it for height (Column uses constraint for height in vertical parent)
+        if (layoutConstraint instanceof Constraint.Length) {
+            totalHeight = Math.max(totalHeight, ((Constraint.Length) layoutConstraint).value());
         }
 
-        return totalHeight + totalSpacing;
+        return Size.of(maxWidth, totalHeight);
     }
 
     @Override
@@ -223,12 +205,14 @@ public final class Column extends ContainerElement<Column> {
                 // First try text element special case
                 c = calculateDefaultConstraint(child);
                 if (c == null) {
-                    int preferred = child.preferredHeight();
-                    c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+                    Size size = child.preferredSize(-1, -1, context);
+                    int preferred = size.height();
+                    c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
                 }
             } else if (c instanceof Constraint.Fit) {
-                int preferred = child.preferredHeight();
-                c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+                Size size = child.preferredSize(-1, -1, context);
+                int preferred = size.height();
+                c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
             }
             constraints.add(c);
 

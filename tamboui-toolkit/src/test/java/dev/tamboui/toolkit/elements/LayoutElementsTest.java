@@ -357,11 +357,11 @@ class LayoutElementsTest {
             );
             // At width 20, each child gets 10 chars (20/2)
             // "12345678901234567890" = 20 chars at width 10 = 2 lines
-            assertThat(r.preferredHeight(20, null)).isEqualTo(2);
+            assertThat(r.preferredSize(20, -1, null).heightOr(0)).isEqualTo(2);
 
             // At width 10, each child gets 5 chars (10/2)
             // "12345678901234567890" = 20 chars at width 5 = 4 lines
-            assertThat(r.preferredHeight(10, null)).isEqualTo(4);
+            assertThat(r.preferredSize(10, -1, null).heightOr(0)).isEqualTo(4);
         }
 
         @Test
@@ -372,7 +372,7 @@ class LayoutElementsTest {
                 text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
             ).spacing(2);
             // Width 22: 2 spacing + 20 content = 10 per child, each wraps to 2 lines
-            assertThat(r.preferredHeight(22, null)).isEqualTo(2);
+            assertThat(r.preferredSize(22, -1, null).heightOr(0)).isEqualTo(2);
         }
 
         @Test
@@ -383,10 +383,10 @@ class LayoutElementsTest {
                 text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
             );
             // At width 20, first child = 1, second child = 1 (no wrapping)
-            assertThat(c.preferredHeight(20, null)).isEqualTo(2);
+            assertThat(c.preferredSize(20, -1, null).heightOr(0)).isEqualTo(2);
 
             // At width 10, first child = 1, second child = 2 (wraps)
-            assertThat(c.preferredHeight(10, null)).isEqualTo(3);
+            assertThat(c.preferredSize(10, -1, null).heightOr(0)).isEqualTo(3);
         }
 
         @Test
@@ -398,7 +398,7 @@ class LayoutElementsTest {
                 text("C")
             ).spacing(1);
             // 3 children + 2 spacing = 5
-            assertThat(c.preferredHeight(20, null)).isEqualTo(5);
+            assertThat(c.preferredSize(20, -1, null).heightOr(0)).isEqualTo(5);
         }
 
         @Test
@@ -406,7 +406,7 @@ class LayoutElementsTest {
         void panelIncludesBorders() {
             Panel p = panel(text("Content"));
             // 2 for borders + 1 for content
-            assertThat(p.preferredHeight(20, null)).isEqualTo(3);
+            assertThat(p.preferredSize(20, -1, null).heightOr(0)).isEqualTo(3);
         }
 
         @Test
@@ -414,7 +414,7 @@ class LayoutElementsTest {
         void panelIncludesPadding() {
             Panel p = panel(text("Content")).padding(1);
             // 2 for borders + 2 for padding + 1 for content
-            assertThat(p.preferredHeight(20, null)).isEqualTo(5);
+            assertThat(p.preferredSize(20, -1, null).heightOr(0)).isEqualTo(5);
         }
 
         @Test
@@ -424,10 +424,10 @@ class LayoutElementsTest {
                 text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER)
             );
             // At width 22: 2 borders, content width = 20, text fits in 1 line
-            assertThat(p.preferredHeight(22, null)).isEqualTo(3);
+            assertThat(p.preferredSize(22, -1, null).heightOr(0)).isEqualTo(3);
 
             // At width 12: 2 borders, content width = 10, text wraps to 2 lines
-            assertThat(p.preferredHeight(12, null)).isEqualTo(4);
+            assertThat(p.preferredSize(12, -1, null).heightOr(0)).isEqualTo(4);
         }
 
         @Test
@@ -442,15 +442,15 @@ class LayoutElementsTest {
             );
             // At width 20: header = 1, row max = 1 (20 chars / 2 = 10 per child, wraps to 2)
             // Actually: 20 chars at width 10 = 2 lines
-            assertThat(c.preferredHeight(20, null)).isEqualTo(3); // 1 + 2
+            assertThat(c.preferredSize(20, -1, null).heightOr(0)).isEqualTo(3); // 1 + 2
         }
 
         @Test
         @DisplayName("Empty containers return sensible defaults")
         void emptyContainers() {
-            assertThat(row().preferredHeight(20, null)).isEqualTo(1);
-            assertThat(column().preferredHeight(20, null)).isEqualTo(0);
-            assertThat(panel().preferredHeight(20, null)).isEqualTo(2); // Just borders
+            assertThat(row().preferredSize(20, -1, null).heightOr(0)).isEqualTo(1);
+            assertThat(column().preferredSize(20, -1, null).heightOr(0)).isEqualTo(0);
+            assertThat(panel().preferredSize(20, -1, null).heightOr(0)).isEqualTo(2); // Just borders
         }
     }
 

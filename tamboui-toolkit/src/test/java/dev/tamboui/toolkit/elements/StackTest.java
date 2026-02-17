@@ -49,7 +49,7 @@ class StackTest {
     void preferredWidth() {
         StackElement s = stack(text("Hi"), text("Hello"), text("Hey"));
         // "Hello" is the widest at 5
-        assertThat(s.preferredWidth()).isEqualTo(5);
+        assertThat(s.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -57,7 +57,7 @@ class StackTest {
     void preferredWidthWithMargin() {
         StackElement s = stack(text("Hello")).margin(new Margin(0, 2, 0, 3));
         // 5 + 2 + 3 = 10
-        assertThat(s.preferredWidth()).isEqualTo(10);
+        assertThat(s.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -90,7 +90,7 @@ class StackTest {
     @DisplayName("stack created from collection")
     void stackFromCollection() {
         StackElement s = stack(Arrays.asList(text("A"), text("BB")));
-        assertThat(s.preferredWidth()).isEqualTo(2);
+        assertThat(s.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(2);
     }
 
     @Test
@@ -179,14 +179,14 @@ class StackTest {
     void preferredHeight() {
         StackElement s = stack(text("A"), text("B"), text("C"));
         // All height 1
-        assertThat(s.preferredHeight()).isEqualTo(1);
+        assertThat(s.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 
     @Test
     @DisplayName("preferredHeight returns 0 for empty stack")
     void preferredHeightEmpty() {
         StackElement s = stack();
-        assertThat(s.preferredHeight()).isEqualTo(0);
+        assertThat(s.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -194,6 +194,6 @@ class StackTest {
     void preferredHeightWithMargin() {
         StackElement s = stack(text("A")).margin(new Margin(2, 0, 3, 0));
         // 1 + 2 + 3 = 6
-        assertThat(s.preferredHeight()).isEqualTo(6);
+        assertThat(s.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(6);
     }
 }

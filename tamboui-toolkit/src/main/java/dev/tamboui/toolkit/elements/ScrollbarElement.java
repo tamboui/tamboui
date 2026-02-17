@@ -9,6 +9,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
@@ -291,25 +292,23 @@ public final class ScrollbarElement extends StyledElement<ScrollbarElement> {
     }
 
     @Override
-    public int preferredWidth() {
-        // Scrollbar is 1 cell wide for vertical orientation
-        // For horizontal, use viewport length (visible area) capped at a reasonable size
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+        int width;
+        int height;
         if (orientation.isVertical()) {
-            return 1;
+            // Scrollbar is 1 cell wide for vertical orientation
+            width = 1;
+            // For vertical, use viewport length (visible area) capped at a reasonable size
+            height = state != null ? state.viewportContentLength() : 10;
+            height = Math.min(height, 100); // Cap at reasonable max
+        } else {
+            // For horizontal, use viewport length (visible area) capped at a reasonable size
+            width = state != null ? state.viewportContentLength() : 10;
+            width = Math.min(width, 100); // Cap at reasonable max
+            // Scrollbar is 1 cell tall for horizontal orientation
+            height = 1;
         }
-        int width = state != null ? state.viewportContentLength() : 10;
-        return Math.min(width, 100); // Cap at reasonable max
-    }
-
-    @Override
-    public int preferredHeight() {
-        // Scrollbar is 1 cell tall for horizontal orientation
-        // For vertical, use viewport length (visible area) capped at a reasonable size
-        if (!orientation.isVertical()) {
-            return 1;
-        }
-        int height = state != null ? state.viewportContentLength() : 10;
-        return Math.min(height, 100); // Cap at reasonable max
+        return Size.of(width, height);
     }
 
     @Override

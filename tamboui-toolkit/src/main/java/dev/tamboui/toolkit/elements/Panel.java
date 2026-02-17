@@ -30,6 +30,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderSet;
 import dev.tamboui.widgets.block.BorderType;
@@ -399,128 +400,74 @@ public final class Panel extends ContainerElement<Panel> {
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
-        int childrenWidth = 0;
+        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
 
+        // Calculate width
+        int childrenWidth = 0;
         if (!children.isEmpty()) {
             if (effectiveDirection == Direction.HORIZONTAL) {
                 // Horizontal: sum widths of all children
                 for (Element child : children) {
-                    childrenWidth += child.preferredWidth();
+                    Size childSize = child.preferredSize(availableWidth, availableHeight, context);
+                    childrenWidth += childSize.widthOr(0);
                 }
-
                 // Add spacing between children (n-1 spacings)
-                int effectiveSpacing = this.spacing != null ? this.spacing : 0;
                 if (children.size() > 1) {
                     childrenWidth += effectiveSpacing * (children.size() - 1);
                 }
             } else {
                 // Vertical: max width of all children
                 for (Element child : children) {
-                    childrenWidth = Math.max(childrenWidth, child.preferredWidth());
+                    Size childSize = child.preferredSize(availableWidth, availableHeight, context);
+                    childrenWidth = Math.max(childrenWidth, childSize.widthOr(0));
                 }
             }
         }
 
         int width = childrenWidth;
-
-        // Add padding width if present
         if (padding != null) {
             width += padding.horizontalTotal();
         }
-
-        // Panel always has borders (2 cells) unless borderType is NONE
-        // Since we can't know CSS borderType here, assume borders are present
-        width += 2;
-
-        // Add margin width if present
+        width += 2; // borders
         if (margin != null) {
             width += margin.left() + margin.right();
         }
 
-        return width;
-    }
-
-    @Override
-    public int preferredHeight() {
-        // Border overhead: 2 rows for top and bottom
-        int height = 2;
-
-        // Padding overhead
+        // Calculate height
+        int height = 2; // borders
         if (padding != null) {
             height += padding.verticalTotal();
         }
 
-        if (children.isEmpty()) {
-            return height;
-        }
+        if (!children.isEmpty()) {
+            // Content width for child height calculation
+            int paddingHorizontal = padding != null ? padding.horizontalTotal() : 0;
+            int contentWidth = availableWidth > 0 ? Math.max(1, availableWidth - 2 - paddingHorizontal) : -1;
 
-        Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-
-        if (effectiveDirection == Direction.VERTICAL) {
-            int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
-            for (Element child : children) {
-                height += child.preferredHeight();
+            if (effectiveDirection == Direction.VERTICAL) {
+                int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
+                for (Element child : children) {
+                    Size childSize = child.preferredSize(contentWidth, -1, context);
+                    height += childSize.heightOr(1);
+                }
+                height += totalSpacing;
+            } else {
+                int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
+                int childWidth = contentWidth > 0
+                        ? Math.max(1, (contentWidth - totalSpacing) / children.size())
+                        : -1;
+                int maxChildHeight = 1;
+                for (Element child : children) {
+                    Size childSize = child.preferredSize(childWidth, -1, context);
+                    maxChildHeight = Math.max(maxChildHeight, childSize.heightOr(1));
+                }
+                height += maxChildHeight;
             }
-            height += totalSpacing;
-        } else {
-            int maxChildHeight = 1;
-            for (Element child : children) {
-                maxChildHeight = Math.max(maxChildHeight, child.preferredHeight());
-            }
-            height += maxChildHeight;
         }
 
-        return height;
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (availableWidth <= 0) {
-            return 2; // Just borders
-        }
-
-        // Border overhead: 2 rows for top and bottom
-        int height = 2;
-
-        // Padding overhead
-        if (padding != null) {
-            height += padding.verticalTotal();
-        }
-
-        // Content width after borders and padding
-        int paddingHorizontal = padding != null ? padding.horizontalTotal() : 0;
-        int contentWidth = Math.max(1, availableWidth - 2 - paddingHorizontal);
-
-        if (children.isEmpty()) {
-            return height;
-        }
-
-        // Determine layout direction (default vertical)
-        Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-
-        if (effectiveDirection == Direction.VERTICAL) {
-            // Sum of children heights + spacing
-            int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
-            for (Element child : children) {
-                height += child.preferredHeight(contentWidth, context);
-            }
-            height += totalSpacing;
-        } else {
-            // Horizontal: max height of children with equal width distribution
-            int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
-            int childWidth = Math.max(1, (contentWidth - totalSpacing) / children.size());
-            int maxChildHeight = 1;
-            for (Element child : children) {
-                maxChildHeight = Math.max(maxChildHeight, child.preferredHeight(childWidth, context));
-            }
-            height += maxChildHeight;
-        }
-
-        return height;
+        return Size.of(width, height);
     }
 
     /**
@@ -540,15 +487,15 @@ public final class Panel extends ContainerElement<Panel> {
         // Use a large estimate for available width since we don't have actual dimensions yet
         int estimatedWidth = 1000;
 
-        // Children height: sum of child heights using preferredHeight
+        // Children height: sum of child heights using preferredSize
         for (Element child : children) {
             Constraint c = child.constraint();
             if (c instanceof Constraint.Length) {
                 height += ((Constraint.Length) c).value();
             } else {
-                // Use preferredHeight for proper calculation
-                int preferred = child.preferredHeight(estimatedWidth, RenderContext.empty());
-                height += preferred > 0 ? preferred : 1;
+                // Use preferredSize for proper calculation
+                Size size = child.preferredSize(estimatedWidth, -1, RenderContext.empty());
+                height += size.heightOr(1);
             }
         }
 
@@ -671,8 +618,9 @@ public final class Panel extends ContainerElement<Panel> {
             }
             // Handle null constraint by querying preferred size
             if (c == null) {
-                int preferred = isHorizontal ? child.preferredWidth() : child.preferredHeight();
-                c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+                Size size = child.preferredSize(-1, -1, context);
+                int preferred = isHorizontal ? size.width() : size.height();
+                c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
             }
             constraints.add(c);
         }

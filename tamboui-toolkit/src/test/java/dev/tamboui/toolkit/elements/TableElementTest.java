@@ -189,8 +189,8 @@ class TableElementTest {
             .row("Bob", "25");
 
         // 1 header row + 2 data rows = 3
-        assertThat(element.preferredHeight()).isEqualTo(3);
-        assertThat(element.preferredHeight(80, RenderContext.empty())).isEqualTo(3);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
+        assertThat(element.preferredSize(80, -1, RenderContext.empty()).heightOr(0)).isEqualTo(3);
     }
 
     @Test

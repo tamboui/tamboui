@@ -408,7 +408,7 @@ class FormElementTest {
                 .field("name", "Name")
                 .labelWidth(15);
 
-        assertThat(form.preferredWidth()).isGreaterThanOrEqualTo(15);
+        assertThat(form.preferredSize(-1, -1, null).widthOr(0)).isGreaterThanOrEqualTo(15);
     }
 
     @Test
@@ -424,7 +424,7 @@ class FormElementTest {
                 .field("email", "Email");
 
         // At minimum, 1 row per field
-        assertThat(form.preferredHeight()).isGreaterThanOrEqualTo(2);
+        assertThat(form.preferredSize(-1, -1, null).heightOr(0)).isGreaterThanOrEqualTo(2);
     }
 
     @Test
@@ -437,6 +437,6 @@ class FormElementTest {
         FormElement plainForm = form(state).field("name", "Name");
         FormElement borderedForm = form(state).field("name", "Name").rounded();
 
-        assertThat(borderedForm.preferredHeight()).isGreaterThan(plainForm.preferredHeight());
+        assertThat(borderedForm.preferredSize(-1, -1, null).heightOr(0)).isGreaterThan(plainForm.preferredSize(-1, -1, null).heightOr(0));
     }
 }

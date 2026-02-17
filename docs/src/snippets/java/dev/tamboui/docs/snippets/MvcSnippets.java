@@ -11,6 +11,7 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widgets.Clear;
 import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.RenderContext;
 
 import java.util.ArrayList;
@@ -290,11 +291,7 @@ public class MvcSnippets {
             this.controller = controller;
         }
 
-        @Override
-        public int preferredWidth() { return 0; }
 
-        @Override
-        public int preferredHeight() { return 0; }
 
         @Override
         public void render(Frame frame, Rect area, RenderContext context) {
@@ -336,6 +333,11 @@ public class MvcSnippets {
             }
             // ... other handling
             return EventResult.UNHANDLED;
+        }
+
+        @Override
+        public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+            return Size.UNKNOWN;
         }
 
         private Element header() { return text("Header"); }

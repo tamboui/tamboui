@@ -29,7 +29,7 @@ class ColumnTest {
     @DisplayName("preferredWidth() returns 0 for empty column")
     void preferredWidth_emptyColumn() {
         Column column = column();
-        assertThat(column.preferredWidth()).isEqualTo(0);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(0);
     }
 
     @Test
@@ -37,7 +37,7 @@ class ColumnTest {
     void preferredWidth_singleChild() {
         Column column = column(text("Hello"));
         // "Hello" = 5 characters
-        assertThat(column.preferredWidth()).isEqualTo(5);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -49,7 +49,7 @@ class ColumnTest {
             text("CC")          // 2
         );
         // Max of 1, 3, 2 = 3
-        assertThat(column.preferredWidth()).isEqualTo(3);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -61,7 +61,7 @@ class ColumnTest {
             text("CCC")         // 3
         );
         // All 3, so max = 3
-        assertThat(column.preferredWidth()).isEqualTo(3);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -73,7 +73,7 @@ class ColumnTest {
         ).spacing(5);
         // Spacing doesn't affect column width, only height
         // Max of 1, 3 = 3
-        assertThat(column.preferredWidth()).isEqualTo(3);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -83,7 +83,7 @@ class ColumnTest {
             text("Hello")       // 5
         ).margin(new Margin(1, 2, 1, 3)); // top, right, bottom, left
         // 5 + 2 (right) + 3 (left) = 10
-        assertThat(column.preferredWidth()).isEqualTo(10);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -93,7 +93,7 @@ class ColumnTest {
             text("Test")        // 4
         ).margin(1);
         // 4 + 1 (left) + 1 (right) = 6
-        assertThat(column.preferredWidth()).isEqualTo(6);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -101,7 +101,7 @@ class ColumnTest {
     void preferredWidth_nested() {
         Column innerColumn = column(text("AB"), text("CDEFG"));  // Max of 2, 5 = 5
         Column outerColumn = column(text("XXX"), innerColumn);   // Max of 3, 5 = 5
-        assertThat(outerColumn.preferredWidth()).isEqualTo(5);
+        assertThat(outerColumn.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
     }
 
     @Test
@@ -112,7 +112,7 @@ class ColumnTest {
             tabs("App", "Logs").divider(" | ")         // 10
         );
         // Max of 5, 10 = 10
-        assertThat(column.preferredWidth()).isEqualTo(10);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -123,7 +123,7 @@ class ColumnTest {
             text("Done")                 // 4
         );
         // Max of 10, 4 = 10
-        assertThat(column.preferredWidth()).isEqualTo(10);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(10);
     }
 
     @Test
@@ -134,7 +134,7 @@ class ColumnTest {
             row(text("XXX"), text("YYY"))   // 3 + 3 = 6
         );
         // Max of 2, 6 = 6
-        assertThat(column.preferredWidth()).isEqualTo(6);
+        assertThat(column.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(6);
     }
 
     @Test
@@ -180,7 +180,7 @@ class ColumnTest {
         Column column = column(text("Hi"), text("Longer text")).addClass("mycol");
 
         // When queried
-        int width = column.preferredWidth();
+        int width = column.preferredSize(-1, -1, null).widthOr(0);
 
         // Then should return max width
         // Max of "Hi" (2) and "Longer text" (11) = 11
@@ -251,7 +251,7 @@ class ColumnTest {
     void preferredHeight_sumsChildren() {
         Column column = column(text("A"), text("B"), text("C"));
         // 3 text elements, each height 1
-        assertThat(column.preferredHeight()).isEqualTo(3);
+        assertThat(column.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
     }
 
     @Test
@@ -259,20 +259,20 @@ class ColumnTest {
     void preferredHeight_withSpacing() {
         Column column = column(text("A"), text("B"), text("C")).spacing(2);
         // 3 texts (height 1 each) + 2 gaps of 2 = 3 + 4 = 7
-        assertThat(column.preferredHeight()).isEqualTo(7);
+        assertThat(column.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(7);
     }
 
     @Test
     @DisplayName("preferredHeight() returns 0 for empty column")
     void preferredHeight_emptyColumn() {
         Column column = column();
-        assertThat(column.preferredHeight()).isEqualTo(0);
+        assertThat(column.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(0);
     }
 
     @Test
     @DisplayName("preferredHeight() with single child")
     void preferredHeight_singleChild() {
         Column column = column(text("A"));
-        assertThat(column.preferredHeight()).isEqualTo(1);
+        assertThat(column.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
 }

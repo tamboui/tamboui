@@ -16,6 +16,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ContainerElement;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
 
 /**
  * A scope element that can show/hide its content dynamically.
@@ -155,8 +156,9 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
         // Calculate height based on children
         int totalHeight = 0;
         for (Element child : children) {
-            int childHeight = child.preferredHeight();
-            if (childHeight > 0) {
+            Size size = child.preferredSize(-1, -1, null);
+            int childHeight = size.height();
+            if (childHeight >= 0) {
                 totalHeight += childHeight;
             } else {
                 // If any child has unknown height, use fill
@@ -167,43 +169,26 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
     }
 
     @Override
-    public int preferredWidth() {
+    public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (!visible || children.isEmpty()) {
-            return 0;
+            return Size.of(0, 0);
         }
-        // Vertical layout: max width of children
+
+        // Calculate width: max of children
         int maxWidth = 0;
         for (Element child : children) {
-            maxWidth = Math.max(maxWidth, child.preferredWidth());
+            Size size = child.preferredSize(availableWidth, availableHeight, context);
+            maxWidth = Math.max(maxWidth, size.widthOr(0));
         }
-        return maxWidth;
-    }
 
-    @Override
-    public int preferredHeight() {
-        if (!visible || children.isEmpty()) {
-            return 0;
-        }
-        // Sum heights of all children
+        // Calculate height: sum of children
         int totalHeight = 0;
         for (Element child : children) {
-            totalHeight += child.preferredHeight();
-        }
-        return totalHeight;
-    }
-
-    @Override
-    public int preferredHeight(int availableWidth, RenderContext context) {
-        if (!visible || children.isEmpty() || availableWidth <= 0) {
-            return 0;
+            Size size = child.preferredSize(availableWidth, -1, context);
+            totalHeight += size.heightOr(1);
         }
 
-        // Sum heights of all children
-        int totalHeight = 0;
-        for (Element child : children) {
-            totalHeight += child.preferredHeight(availableWidth, context);
-        }
-        return totalHeight;
+        return Size.of(maxWidth, totalHeight);
     }
 
     @Override
@@ -230,12 +215,14 @@ public final class InlineScopeElement extends ContainerElement<InlineScopeElemen
                     c = ((TextElement) child).calculateHeightConstraint();
                 }
                 if (c == null) {
-                    int preferred = child.preferredHeight();
-                    c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+                    Size size = child.preferredSize(-1, -1, context);
+                    int preferred = size.height();
+                    c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
                 }
             } else if (c instanceof Constraint.Fit) {
-                int preferred = child.preferredHeight();
-                c = preferred > 0 ? Constraint.length(preferred) : Constraint.fill();
+                Size size = child.preferredSize(-1, -1, context);
+                int preferred = size.height();
+                c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
             }
             constraints.add(c);
         }

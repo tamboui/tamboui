@@ -262,13 +262,13 @@ class ListElementTest {
             TextElement wrappingText = text("12345678901234567890").overflow(Overflow.WRAP_CHARACTER);
 
             // At width 10, should be 2 lines
-            assertThat(wrappingText.preferredHeight(10, null)).isEqualTo(2);
+            assertThat(wrappingText.preferredSize(10, -1, null).heightOr(0)).isEqualTo(2);
 
             // At width 20, should be 1 line
-            assertThat(wrappingText.preferredHeight(20, null)).isEqualTo(1);
+            assertThat(wrappingText.preferredSize(20, -1, null).heightOr(0)).isEqualTo(1);
 
             // At width 5, should be 4 lines
-            assertThat(wrappingText.preferredHeight(5, null)).isEqualTo(4);
+            assertThat(wrappingText.preferredSize(5, -1, null).heightOr(0)).isEqualTo(4);
         }
 
         @Test
