@@ -70,6 +70,7 @@ public abstract class MergeServiceFilesTask extends DefaultTask {
             Set<String> implementations = entry.getValue();
 
             Path serviceFile = servicesDir.resolve(serviceName);
+            Files.createDirectories(serviceFile.getParent());
             StringBuilder content = new StringBuilder();
             for (String impl : implementations) {
                 content.append(impl).append("\n");
@@ -86,7 +87,7 @@ public abstract class MergeServiceFilesTask extends DefaultTask {
                 String name = entry.getName();
                 if (name.startsWith(SERVICES_PREFIX) && !entry.isDirectory()) {
                     String serviceName = name.substring(SERVICES_PREFIX.length());
-                    if (!serviceName.isEmpty() && !serviceName.contains("/")) {
+                    if (!serviceName.isEmpty()) {
                         Set<String> implementations = services.computeIfAbsent(serviceName, k -> new LinkedHashSet<>());
                         try (BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(jar.getInputStream(entry), StandardCharsets.UTF_8))) {
@@ -112,9 +113,9 @@ public abstract class MergeServiceFilesTask extends DefaultTask {
     private void collectServicesFromDirectory(File dir, Map<String, Set<String>> services) throws IOException {
         Path servicesPath = dir.toPath().resolve("META-INF/services");
         if (Files.isDirectory(servicesPath)) {
-            try (var stream = Files.list(servicesPath)) {
+            try (var stream = Files.walk(servicesPath)) {
                 stream.filter(Files::isRegularFile).forEach(serviceFile -> {
-                    String serviceName = serviceFile.getFileName().toString();
+                    String serviceName = servicesPath.relativize(serviceFile).toString();
                     Set<String> implementations = services.computeIfAbsent(serviceName, k -> new LinkedHashSet<>());
                     try {
                         for (String line : Files.readAllLines(serviceFile, StandardCharsets.UTF_8)) {

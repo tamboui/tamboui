@@ -16,6 +16,13 @@ dependencies {
     implementation(libs.asciidoctor.plugin)
     implementation(libs.git.publish.plugin)
     implementation(libs.spotless.gradle.plugin)
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 java {

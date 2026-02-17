@@ -104,6 +104,7 @@ val generateDemoManifest = tasks.register<GenerateDemoManifestTask>("generateDem
 
 val mergeServiceFiles = tasks.register<MergeServiceFilesTask>("mergeServiceFiles") {
     classpath.from(configurations.named("runtimeClasspath"))
+    classpath.from(aggregatedDemosClasspath)
     outputDirectory = layout.buildDirectory.dir("generated/services")
 }
 
