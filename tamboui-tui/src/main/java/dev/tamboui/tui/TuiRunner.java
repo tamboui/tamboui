@@ -574,6 +574,21 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
+     * Dispatches an event into the event queue.
+     * <p>
+     * Primarily for testing: allows tests to inject key, mouse, or resize events
+     * without going through the backend. The event is processed on the next
+     * iteration of the event loop. Has no effect if the runner is not running.
+     *
+     * @param event the event to dispatch
+     */
+    public void dispatch(Event event) {
+        if (running.get()) {
+            eventQueue.offer(event);
+        }
+    }
+
+    /**
      * Returns whether the current thread is the render thread.
      *
      * @return true if called from the render thread
