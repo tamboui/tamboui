@@ -19,6 +19,7 @@
 :annotations-module: tamboui-annotations
 :processor-module: tamboui-processor
 :css-module: tamboui-css
+:bom-module: tamboui-bom
 
 // Maven coordinates
 :maven-group: dev.tamboui

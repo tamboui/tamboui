@@ -33,18 +33,23 @@ Add the snapshot repository and dependencies to your `pom.xml`:
 </repository>
 
 <dependencies>
+    <dependencies>
+        <groupId>{maven-group}</groupId>
+        <artifactId>{bom-module}</artifactId>
+        <version>{project-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+    </dependencies>
     <!-- For Toolkit DSL (recommended) -->
     <dependency>
         <groupId>{maven-group}</groupId>
         <artifactId>{toolkit-module}</artifactId>
-        <version>{project-version}</version>
     </dependency>
 
     <!-- JLine backend (required) -->
     <dependency>
         <groupId>{maven-group}</groupId>
         <artifactId>{jline-module}</artifactId>
-        <version>{project-version}</version>
     </dependency>
 </dependencies>
 ----
@@ -63,11 +68,12 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("{maven-group}:{bom-module}:{project-version}"))
     // For Toolkit DSL (recommended)
-    implementation("{maven-group}:{toolkit-module}:{project-version}")
+    implementation("{maven-group}:{toolkit-module}")
 
     // JLine backend (required)
-    implementation("{maven-group}:{jline-module}:{project-version}")
+    implementation("{maven-group}:{jline-module}")
 }
 ----
 
