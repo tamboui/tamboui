@@ -10,6 +10,6 @@
  * arbitrary widgets as node content.
  *
  * @see dev.tamboui.widgets.tree.TreeWidget
- * @see dev.tamboui.widgets.tree.SizedWidget
+ * @see dev.tamboui.widgets.common.SizedWidget
  */
 package dev.tamboui.widgets.tree;

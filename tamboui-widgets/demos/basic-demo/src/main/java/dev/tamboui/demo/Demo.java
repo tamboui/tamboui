@@ -322,8 +322,8 @@ public class Demo {
     }
 
     private void renderList(Frame frame, Rect area) {
-        List<ListItem> listItems = items.stream()
-            .map(ListItem::from)
+        var listItems = items.stream()
+            .map(s -> ListItem.from(s).toSizedWidget())
             .toList();
 
         boolean isFocused = focused == FocusedWidget.LIST;

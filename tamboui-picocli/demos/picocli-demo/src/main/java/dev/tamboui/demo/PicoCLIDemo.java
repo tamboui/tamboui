@@ -212,8 +212,8 @@ public class PicoCLIDemo extends TuiCommand {
     }
 
     private void renderList(Frame frame, Rect area) {
-        List<ListItem> listItems = items.stream()
-                .map(ListItem::from)
+        var listItems = items.stream()
+                .map(s -> ListItem.from(s).toSizedWidget())
                 .toList();
 
         ListWidget list = ListWidget.builder()

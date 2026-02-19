@@ -14,6 +14,10 @@ public final class ListState {
     private Integer selected;
     private int offset;
 
+    // Sticky scroll state
+    private boolean userScrolledAway;
+    private int lastDataSize;
+
     /**
      * Creates a new list state with no selection.
      */
@@ -54,6 +58,7 @@ public final class ListState {
      */
     public void selectFirst() {
         this.selected = 0;
+        this.offset = 0;
     }
 
     /**
@@ -105,6 +110,40 @@ public final class ListState {
     }
 
     /**
+     * Adjusts the scroll offset by a delta.
+     *
+     * @param delta the amount to scroll (positive = down, negative = up)
+     */
+    public void scrollBy(int delta) {
+        this.offset = Math.max(0, this.offset + delta);
+    }
+
+    /**
+     * Returns whether the user has scrolled away from the bottom (for sticky scroll).
+     *
+     * @return true if the user has scrolled away
+     */
+    public boolean isUserScrolledAway() {
+        return userScrolledAway;
+    }
+
+    /**
+     * Marks that the user has scrolled away from the bottom.
+     */
+    public void markUserScrolledAway() {
+        this.userScrolledAway = true;
+    }
+
+    /**
+     * Resumes auto-scrolling to the bottom (for sticky scroll).
+     * <p>
+     * The scroll offset will be set to the maximum during the next render.
+     */
+    public void resumeAutoScroll() {
+        this.userScrolledAway = false;
+    }
+
+    /**
      * Scrolls the list to ensure the selected item is visible.
      *
      * @param visibleHeight the visible height in the display area
@@ -131,10 +170,81 @@ public final class ListState {
     }
 
     /**
-     * Scrolls the list to show the last items without changing selection.
+     * Scrolls the list to ensure the selected item is visible,
+     * using pre-computed item heights.
+     *
+     * @param visibleHeight the visible height in the display area
+     * @param itemHeights array of item heights
+     */
+    public void scrollToSelected(int visibleHeight, int[] itemHeights) {
+        if (selected == null || itemHeights.length == 0) {
+            return;
+        }
+
+        int sel = Math.min(selected, itemHeights.length - 1);
+
+        int selectedTop = 0;
+        for (int i = 0; i < sel; i++) {
+            selectedTop += itemHeights[i];
+        }
+        int selectedBottom = selectedTop + itemHeights[sel];
+
+        if (selectedTop < offset) {
+            offset = selectedTop;
+        } else if (selectedBottom > offset + visibleHeight) {
+            offset = selectedBottom - visibleHeight;
+        }
+
+        offset = Math.max(0, offset);
+    }
+
+    /**
+     * Applies sticky scroll logic.
      * <p>
-     * This is useful for chat messages, logs, or other content where you want
-     * to always show the most recent items without needing to select them.
+     * Auto-scrolls to the end when new items are added, but pauses
+     * when the user has scrolled away. Resumes when the user scrolls
+     * back to the bottom.
+     *
+     * @param totalItems the total number of items
+     * @param totalHeight the total content height in rows
+     * @param visibleHeight the visible viewport height
+     */
+    public void applyStickyScroll(int totalItems, int totalHeight, int visibleHeight) {
+        int maxScroll = Math.max(0, totalHeight - visibleHeight);
+
+        boolean newItemsAdded = totalItems > lastDataSize;
+        lastDataSize = totalItems;
+
+        // Clamp
+        offset = Math.min(offset, maxScroll);
+        offset = Math.max(0, offset);
+
+        // Check if at bottom
+        boolean atBottom = maxScroll > 0 && offset >= maxScroll;
+
+        if (atBottom) {
+            userScrolledAway = false;
+        } else if (newItemsAdded && !userScrolledAway) {
+            offset = maxScroll;
+        }
+
+        if (!userScrolledAway) {
+            offset = maxScroll;
+        }
+    }
+
+    /**
+     * Applies scroll-to-end mode (unconditional pin to bottom).
+     *
+     * @param totalHeight the total content height in rows
+     * @param visibleHeight the visible viewport height
+     */
+    public void applyScrollToEnd(int totalHeight, int visibleHeight) {
+        offset = Math.max(0, totalHeight - visibleHeight);
+    }
+
+    /**
+     * Scrolls the list to show the last items without changing selection.
      *
      * @param visibleHeight the visible height in the display area
      * @param items the list of items
@@ -145,13 +255,11 @@ public final class ListState {
             return;
         }
 
-        // Calculate total content height
         int totalHeight = 0;
         for (ListItem item : items) {
             totalHeight += item.height();
         }
 
-        // Set offset to show the last items
         if (totalHeight > visibleHeight) {
             offset = totalHeight - visibleHeight;
         } else {

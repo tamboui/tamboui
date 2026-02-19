@@ -19,12 +19,12 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
-import dev.tamboui.toolkit.elements.RichTextAreaElement;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.tabs.TabsState;
 
@@ -104,7 +104,7 @@ public class RichTextDemo implements Element {
         // Create preview element once (state persists across renders)
         previewElement = new MarkupTextAreaElement()
                 .wrapWord()
-                .scrollbar(RichTextAreaElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .rounded()
                 .focusable()
                 .focusedBorderColor(Color.CYAN)

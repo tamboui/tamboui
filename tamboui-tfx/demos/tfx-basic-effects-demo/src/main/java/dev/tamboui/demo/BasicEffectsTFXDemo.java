@@ -46,6 +46,7 @@ import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
+import dev.tamboui.widgets.list.ScrollMode;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
@@ -399,28 +400,28 @@ public class BasicEffectsTFXDemo {
     
     private void renderEffectList(Frame frame, Rect area) {
         // Build list items - map item indices to demo indices
-        List<ListItem> items = new ArrayList<>();
+        List<ListItem> listItems = new ArrayList<>();
         itemToDemoIndex = new ArrayList<>(); // Maps item index to demo index
         String currentCategory = null;
-        
+
         for (int i = 0; i < demos.size(); i++) {
             EffectDemo demo = demos.get(i);
-            
+
             // Add category header if category changed
             if (currentCategory == null || !currentCategory.equals(demo.category)) {
                 if (currentCategory != null) {
-                    items.add(ListItem.from("")); // Spacer
+                    listItems.add(ListItem.from("")); // Spacer
                     itemToDemoIndex.add(-1); // Spacer doesn't map to a demo
                 }
                 currentCategory = demo.category;
-                items.add(ListItem.from(
+                listItems.add(ListItem.from(
                     Text.from(Line.from(Span.raw("── " + demo.category + " ──").dim()))
                 ));
                 itemToDemoIndex.add(-1); // Header doesn't map to a demo
             }
-            
+
             // Add effect item
-            items.add(ListItem.from(demo.name));
+            listItems.add(ListItem.from(demo.name));
             itemToDemoIndex.add(i); // This item maps to demo index i
         }
         
@@ -441,11 +442,13 @@ public class BasicEffectsTFXDemo {
             }
         }
         
-        // Update scroll to keep selected visible
-        listState.scrollToSelected(area.height(), items);
-        
+        var items = listItems.stream()
+            .map(ListItem::toSizedWidget)
+            .toList();
+
         ListWidget list = ListWidget.builder()
             .items(items)
+            .scrollMode(ScrollMode.AUTO_SCROLL)
             .highlightStyle(Style.EMPTY.fg(Color.YELLOW).bold())
             .highlightSymbol("▶ ")
             .block(Block.builder()

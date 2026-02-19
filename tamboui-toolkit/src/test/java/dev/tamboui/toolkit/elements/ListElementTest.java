@@ -19,6 +19,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.*;
@@ -398,7 +399,7 @@ class ListElementTest {
             Frame frame = Frame.forTesting(buffer);
 
             list("Item 1", "Item 2")
-                .scrollbar(ListElement.ScrollBarPolicy.NONE)
+                .scrollbar(ScrollBarPolicy.NONE)
                 .displayOnly()
                 .render(frame, area, RenderContext.empty());
 
@@ -417,7 +418,7 @@ class ListElementTest {
 
             // 5 items in 3-row viewport should show scrollbar
             list("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .displayOnly()
                 .render(frame, area, RenderContext.empty());
 
@@ -435,7 +436,7 @@ class ListElementTest {
 
             // 2 items in 10-row viewport should not need scrollbar
             list("Item 1", "Item 2")
-                .scrollbar(ListElement.ScrollBarPolicy.AS_NEEDED)
+                .scrollbar(ScrollBarPolicy.AS_NEEDED)
                 .displayOnly()
                 .render(frame, area, RenderContext.empty());
 

@@ -41,6 +41,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.common.SizedWidget;
 import dev.tamboui.widgets.input.TextInput;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.list.ListItem;
@@ -701,7 +702,7 @@ public class DemoLauncher {
         }
 
         // Convert demos to list items
-        List<ListItem> items = new ArrayList<>();
+        List<SizedWidget> items = new ArrayList<>();
         for (DemoEntry demo : demos) {
             // Format: "Module: Display Name - Description"
             String description = demo.description() != null && !demo.description().isEmpty()
@@ -713,7 +714,7 @@ public class DemoLauncher {
                 itemText += " [blue]" + String.join(", ", demo.tags()) + "[/blue]";
             }*/
             Text markup = MarkupParser.parse(itemText);
-            items.add(ListItem.from(markup));
+            items.add(ListItem.from(markup).toSizedWidget());
         }
 
         ListWidget list = ListWidget.builder()

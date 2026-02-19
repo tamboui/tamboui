@@ -23,6 +23,7 @@ import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.common.SizedWidget;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;

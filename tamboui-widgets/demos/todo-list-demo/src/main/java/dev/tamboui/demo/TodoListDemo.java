@@ -238,7 +238,9 @@ public class TodoListDemo {
     }
 
     private void renderList(Frame frame, Rect area) {
-        List<ListItem> items = buildListItems();
+        var items = buildListItems().stream()
+            .map(ListItem::toSizedWidget)
+            .toList();
 
         Block block = Block.builder()
             .borders(Borders.TOP_ONLY)

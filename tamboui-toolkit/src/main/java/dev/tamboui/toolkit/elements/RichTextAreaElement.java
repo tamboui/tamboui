@@ -27,6 +27,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
@@ -75,18 +76,6 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  * @see RichTextState for scroll state management
  */
 public final class RichTextAreaElement extends StyledElement<RichTextAreaElement> {
-
-    /**
-     * Policy for displaying the scrollbar.
-     */
-    public enum ScrollBarPolicy {
-        /** Never show the scrollbar. */
-        NONE,
-        /** Always show the scrollbar. */
-        ALWAYS,
-        /** Show the scrollbar only when content exceeds the viewport. */
-        AS_NEEDED
-    }
 
     private static final Style DEFAULT_LINE_NUMBER_STYLE = Style.EMPTY.dim();
 

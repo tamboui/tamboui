@@ -29,7 +29,6 @@ import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.tui.event.TickEvent;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widget.Widget;
-import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
@@ -172,7 +171,7 @@ public class CoreConceptsSnippets {
 
         // Render sidebar and main area
         ListWidget sidebar = ListWidget.builder()
-            .items(ListItem.from("Item 1"), ListItem.from("Item 2"), ListItem.from("Item 3"))
+            .items("Item 1", "Item 2", "Item 3")
             .build();
         sidebar.render(columns.get(0), frame.buffer(), new ListState());
 

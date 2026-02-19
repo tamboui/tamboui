@@ -38,8 +38,9 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
+import dev.tamboui.widgets.common.SizedWidget;
 import dev.tamboui.widgets.tree.GuideStyle;
-import dev.tamboui.widgets.tree.SizedWidget;
 import dev.tamboui.widgets.tree.TreeNode;
 import dev.tamboui.widgets.tree.TreeState;
 import dev.tamboui.widgets.tree.TreeWidget;
@@ -94,18 +95,6 @@ import dev.tamboui.widgets.tree.TreeWidget;
  */
 public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
 
-    /**
-     * Policy for displaying the scrollbar.
-     */
-    public enum ScrollBarPolicy {
-        /** Never show the scrollbar. */
-        NONE,
-        /** Always show the scrollbar. */
-        ALWAYS,
-        /** Show the scrollbar only when content exceeds the viewport. */
-        AS_NEEDED
-    }
-
     // ═══════════════════════════════════════════════════════════════
     // CSS Property Definitions
     // ═══════════════════════════════════════════════════════════════
@@ -126,19 +115,6 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
         return Optional.empty();
     };
 
-    private static final PropertyConverter<ScrollBarPolicy> SCROLLBAR_POLICY_CONVERTER = value -> {
-        if (value == null || value.trim().isEmpty()) {
-            return Optional.empty();
-        }
-        String normalized = value.trim().toLowerCase();
-        for (ScrollBarPolicy policy : ScrollBarPolicy.values()) {
-            if (policy.name().toLowerCase().replace('_', '-').equals(normalized)) {
-                return Optional.of(policy);
-            }
-        }
-        return Optional.empty();
-    };
-
     /**
      * CSS property for guide style. Values: "unicode", "ascii", "none".
      */
@@ -151,7 +127,7 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
      * CSS property for scrollbar policy. Values: "none", "always", "as-needed".
      */
     public static final PropertyDefinition<ScrollBarPolicy> SCROLLBAR_POLICY =
-            PropertyDefinition.builder("scrollbar-policy", SCROLLBAR_POLICY_CONVERTER)
+            PropertyDefinition.builder("scrollbar-policy", ScrollBarPolicy.CONVERTER)
                     .defaultValue(ScrollBarPolicy.NONE)
                     .build();
 

@@ -12,10 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.PropertyRegistry;
+import dev.tamboui.style.StringConverter;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.ChildPosition;
@@ -28,13 +32,16 @@ import dev.tamboui.tui.error.TuiException;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
+import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
-import dev.tamboui.widgets.scrollbar.Scrollbar;
-import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
-import dev.tamboui.widgets.scrollbar.ScrollbarState;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
+import dev.tamboui.widgets.common.SizedWidget;
+import dev.tamboui.widgets.list.ListState;
+import dev.tamboui.widgets.list.ListWidget;
+import dev.tamboui.widgets.list.ScrollMode;
 
 /**
  * A scrollable container that displays a list of selectable items.
@@ -73,26 +80,43 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  */
 public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
-    /**
-     * Policy for displaying the scrollbar.
-     */
-    public enum ScrollBarPolicy {
-        /** Never show the scrollbar. */
-        NONE,
-        /** Always show the scrollbar. */
-        ALWAYS,
-        /** Show the scrollbar only when content exceeds the viewport. */
-        AS_NEEDED
-    }
+    // ═══════════════════════════════════════════════════════════════
+    // CSS Property Definitions
+    // ═══════════════════════════════════════════════════════════════
 
     private static final Style DEFAULT_HIGHLIGHT_STYLE = Style.EMPTY.reversed();
     private static final String DEFAULT_HIGHLIGHT_SYMBOL = "> ";
 
+    /**
+     * CSS property for scrollbar policy. Values: "none", "always", "as-needed".
+     */
+    public static final PropertyDefinition<ScrollBarPolicy> SCROLLBAR_POLICY =
+            PropertyDefinition.builder("scrollbar-policy", ScrollBarPolicy.CONVERTER)
+                    .defaultValue(ScrollBarPolicy.NONE)
+                    .build();
+
+    /**
+     * CSS property for highlight symbol shown before selected item.
+     */
+    public static final PropertyDefinition<String> HIGHLIGHT_SYMBOL =
+            PropertyDefinition.builder("highlight-symbol", StringConverter.INSTANCE)
+                    .defaultValue(DEFAULT_HIGHLIGHT_SYMBOL)
+                    .build();
+
+    static {
+        PropertyRegistry.registerAll(
+                SCROLLBAR_POLICY,
+                HIGHLIGHT_SYMBOL
+        );
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Configuration
+    // ═══════════════════════════════════════════════════════════════
+
     private final List<StyledElement<?>> items = new ArrayList<>();
     private List<T> data;
     private Function<T, StyledElement<?>> itemRenderer;
-    private int selectedIndex = 0;
-    private int scrollOffset = 0;
     private Style highlightStyle;  // null means "use CSS or default"
     private String highlightSymbol;  // null means "use CSS or default"
     private String title;
@@ -101,11 +125,12 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     private boolean autoScroll;
     private boolean autoScrollToEnd;
     private boolean stickyScroll;
-    private boolean userScrolledAway;
-    private int lastDataSize;
     private ScrollBarPolicy scrollBarPolicy = ScrollBarPolicy.NONE;
     private Color scrollbarThumbColor;
     private Color scrollbarTrackColor;
+
+    // State delegation
+    private final ListState listState = new ListState();
 
     // Cached values from last render for event handling
     private int lastItemCount;
@@ -145,6 +170,10 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     public ListElement(StyledElement<?>... items) {
         this.items.addAll(Arrays.asList(items));
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Fluent API
+    // ═══════════════════════════════════════════════════════════════
 
     /**
      * Sets the list items from strings.
@@ -215,7 +244,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
      * @return this element
      */
     public ListElement<T> selected(int index) {
-        this.selectedIndex = Math.max(0, index);
+        listState.select(Math.max(0, index));
         return this;
     }
 
@@ -225,7 +254,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
      * @return the selected index
      */
     public int selected() {
-        return selectedIndex;
+        Integer sel = listState.selected();
+        return sel != null ? sel : 0;
     }
 
     /**
@@ -477,15 +507,15 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         return this;
     }
 
+    // ═══════════════════════════════════════════════════════════════
     // Navigation methods
+    // ═══════════════════════════════════════════════════════════════
 
     /**
      * Selects the previous item.
      */
     public void selectPrevious() {
-        if (selectedIndex > 0) {
-            selectedIndex--;
-        }
+        listState.selectPrevious();
     }
 
     /**
@@ -494,17 +524,14 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
      * @param itemCount the total number of items
      */
     public void selectNext(int itemCount) {
-        if (selectedIndex < itemCount - 1) {
-            selectedIndex++;
-        }
+        listState.selectNext(itemCount);
     }
 
     /**
      * Selects the first item.
      */
     public void selectFirst() {
-        selectedIndex = 0;
-        scrollOffset = 0;
+        listState.selectFirst();
     }
 
     /**
@@ -513,12 +540,15 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
      * @param itemCount the total number of items
      */
     public void selectLast(int itemCount) {
-        selectedIndex = Math.max(0, itemCount - 1);
+        listState.selectLast(itemCount);
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Size calculation
+    // ═══════════════════════════════════════════════════════════════
 
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
-        // Calculate max width from items
         int maxWidth = 0;
         List<StyledElement<?>> effectiveItems;
         if (data != null && itemRenderer != null) {
@@ -535,13 +565,11 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             maxWidth = Math.max(maxWidth, itemSize.widthOr(0));
         }
 
-        // Add highlight symbol width and border width if present
         String effectiveSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
         int symbolWidth = effectiveSymbol.length();
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
         int width = maxWidth + symbolWidth + borderWidth;
 
-        // Return number of items + border height if present
         int itemCount;
         if (data != null) {
             itemCount = data.size();
@@ -562,6 +590,10 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         }
         return Collections.unmodifiableMap(attrs);
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Rendering — delegates to ListWidget
+    // ═══════════════════════════════════════════════════════════════
 
     @Override
     protected void renderContent(Frame frame, Rect area, RenderContext context) {
@@ -584,14 +616,148 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         this.lastItemCount = totalItems;
 
         if (totalItems == 0) {
+            if (title != null || borderType != null) {
+                renderBorder(frame, area, context);
+            }
             return;
         }
 
-        // Clamp selection to valid range
-        selectedIndex = Math.max(0, Math.min(selectedIndex, totalItems - 1));
+        // Sync selection into ListState
+        if (listState.selected() == null) {
+            listState.select(0);
+        }
 
-        // Render border/block if needed
-        Rect listArea = area;
+        // Render border
+        Rect listArea = renderBorder(frame, area, context);
+        if (listArea.isEmpty()) {
+            return;
+        }
+
+        this.lastViewportHeight = listArea.height();
+
+        // Resolve CSS properties
+        CssStyleResolver cssResolver = context.resolveStyle(this).orElse(CssStyleResolver.empty());
+
+        // Build and render ListWidget
+        ListWidget widget = buildListWidget(effectiveItems, frame, listArea, context, cssResolver);
+        frame.renderStatefulWidget(widget, listArea, listState);
+    }
+
+    private ListWidget buildListWidget(List<StyledElement<?>> effectiveItems,
+                                        Frame frame, Rect listArea,
+                                        RenderContext context, CssStyleResolver cssResolver) {
+        ListWidget.Builder builder = ListWidget.builder();
+
+        // Convert StyledElements to SizedWidgets
+        List<SizedWidget> sizedItems = new ArrayList<>(effectiveItems.size());
+        for (StyledElement<?> element : effectiveItems) {
+            sizedItems.add(adaptItemElement(element, frame, listArea, context));
+        }
+        builder.items(sizedItems);
+
+        // Configure highlight
+        configureHighlight(builder, context, cssResolver);
+
+        // Configure scroll mode
+        builder.scrollMode(resolveScrollMode());
+
+        // Configure scrollbar
+        configureScrollbar(builder, context, cssResolver);
+
+        // Configure item style resolver for zebra striping
+        builder.itemStyleResolver((index, total) ->
+                context.childStyle("item", ChildPosition.of(index, total)));
+
+        return builder.build();
+    }
+
+    private void configureHighlight(ListWidget.Builder builder,
+                                    RenderContext context, CssStyleResolver cssResolver) {
+        // Resolve highlight symbol: explicit > CSS > default
+        String effectiveHighlightSymbol = cssResolver.resolve(HIGHLIGHT_SYMBOL, this.highlightSymbol);
+        if (effectiveHighlightSymbol == null) {
+            effectiveHighlightSymbol = DEFAULT_HIGHLIGHT_SYMBOL;
+        }
+        builder.highlightSymbol(effectiveHighlightSymbol);
+
+        // Resolve highlight style: explicit > CSS > default
+        Style effectiveHighlightStyle = resolveEffectiveStyle(
+                context, "item", PseudoClassState.ofSelected(),
+                highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
+        builder.highlightStyle(effectiveHighlightStyle);
+    }
+
+    private ScrollMode resolveScrollMode() {
+        if (stickyScroll) {
+            return ScrollMode.STICKY_SCROLL;
+        } else if (autoScrollToEnd) {
+            return ScrollMode.SCROLL_TO_END;
+        } else if (autoScroll) {
+            return ScrollMode.AUTO_SCROLL;
+        }
+        return ScrollMode.NONE;
+    }
+
+    private void configureScrollbar(ListWidget.Builder builder,
+                                    RenderContext context, CssStyleResolver cssResolver) {
+        ScrollBarPolicy effectivePolicy = cssResolver.resolve(SCROLLBAR_POLICY, this.scrollBarPolicy);
+        builder.scrollBarPolicy(effectivePolicy);
+
+        // Resolve scrollbar styles: explicit > CSS > default
+        Style explicitThumbStyle = scrollbarThumbColor != null ? Style.EMPTY.fg(scrollbarThumbColor) : null;
+        Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle, Style.EMPTY);
+        if (!thumbStyle.equals(Style.EMPTY)) {
+            builder.scrollbarThumbStyle(thumbStyle);
+        }
+
+        Style explicitTrackStyle = scrollbarTrackColor != null ? Style.EMPTY.fg(scrollbarTrackColor) : null;
+        Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle, Style.EMPTY);
+        if (!trackStyle.equals(Style.EMPTY)) {
+            builder.scrollbarTrackStyle(trackStyle);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // StyledElement → SizedWidget adaptation
+    // ═══════════════════════════════════════════════════════════════
+
+    private SizedWidget adaptItemElement(StyledElement<?> element,
+                                          Frame frame,
+                                          Rect listArea,
+                                          RenderContext context) {
+        int availableWidth = listArea.width();
+        Size size = element.preferredSize(availableWidth, -1, context);
+        int preferredWidth = size.widthOr(0);
+        int preferredHeight = size.heightOr(0);
+
+        // Check for explicit length constraint
+        Constraint c = element.constraint();
+        if (c instanceof Constraint.Length) {
+            preferredHeight = ((Constraint.Length) c).value();
+        }
+
+        Widget adapted = createElementAdapter(element, frame, context);
+
+        if (preferredWidth > 0 && preferredHeight > 0) {
+            return SizedWidget.of(adapted, preferredWidth, preferredHeight);
+        } else if (preferredHeight > 0) {
+            return SizedWidget.ofHeight(adapted, preferredHeight);
+        } else if (preferredWidth > 0) {
+            return SizedWidget.ofWidth(adapted, preferredWidth);
+        }
+        return SizedWidget.of(adapted);
+    }
+
+    private Widget createElementAdapter(StyledElement<?> element, Frame frame, RenderContext context) {
+        return (rect, buffer) -> {
+            if (!rect.isEmpty()) {
+                element.constraint(Constraint.fill());
+                context.renderChild(element, frame, rect);
+            }
+        };
+    }
+
+    private Rect renderBorder(Frame frame, Rect area, RenderContext context) {
         if (title != null || borderType != null) {
             Block.Builder blockBuilder = Block.builder()
                     .borders(Borders.ALL)
@@ -607,232 +773,13 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             }
             Block block = blockBuilder.build();
             block.render(area, frame.buffer());
-            listArea = block.inner(area);
+            return block.inner(area);
         }
-
-        if (listArea.isEmpty()) {
-            return;
-        }
-
-        int visibleHeight = listArea.height();
-        this.lastViewportHeight = visibleHeight;
-
-        // Resolve highlight style: explicit > CSS > default
-        Style effectiveHighlightStyle = resolveEffectiveStyle(
-            context, "item", PseudoClassState.ofSelected(),
-            highlightStyle, DEFAULT_HIGHLIGHT_STYLE);
-
-        // Resolve highlight symbol
-        String effectiveHighlightSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
-        int symbolWidth = effectiveHighlightSymbol.length();
-
-        // Determine if we should reserve space for scrollbar
-        // For AS_NEEDED, we use a heuristic: reserve space if items exceed viewport height
-        boolean reserveScrollbarSpace = scrollBarPolicy == ScrollBarPolicy.ALWAYS
-                || (scrollBarPolicy == ScrollBarPolicy.AS_NEEDED && totalItems > visibleHeight);
-
-        // Calculate content area (reserve space for symbol and possibly scrollbar)
-        // This must be done before calculating item heights since wrapping depends on width
-        int contentX = listArea.left() + symbolWidth;
-        int contentWidth = listArea.width() - symbolWidth;
-        if (reserveScrollbarSpace) {
-            contentWidth -= 1; // Reserve space for scrollbar
-        }
-
-        if (contentWidth <= 0) {
-            return;
-        }
-
-        // Calculate item heights using content width for proper text wrapping
-        int[] itemHeights = new int[totalItems];
-        for (int i = 0; i < totalItems; i++) {
-            itemHeights[i] = itemHeightOf(effectiveItems.get(i), contentWidth, context);
-        }
-
-        // Calculate total content height for scroll calculations
-        int totalHeight = 0;
-        for (int h : itemHeights) {
-            totalHeight += h;
-        }
-        int maxScroll = Math.max(0, totalHeight - visibleHeight);
-
-        // Final determination of whether to show scrollbar
-        boolean showScrollbar = scrollBarPolicy == ScrollBarPolicy.ALWAYS
-                || (scrollBarPolicy == ScrollBarPolicy.AS_NEEDED && totalHeight > visibleHeight);
-
-        // Auto-scroll logic
-        if (stickyScroll) {
-            // Sticky scroll: auto-scroll to end unless user has scrolled away
-            boolean newItemsAdded = totalItems > lastDataSize;
-            lastDataSize = totalItems;
-
-            // Clamp scrollOffset to valid range
-            scrollOffset = Math.min(scrollOffset, maxScroll);
-            scrollOffset = Math.max(0, scrollOffset);
-
-            // Check if at bottom - must be at or very near maxScroll, and maxScroll must be positive
-            boolean atBottom = maxScroll > 0 && scrollOffset >= maxScroll;
-
-            // Reset userScrolledAway if at bottom
-            if (atBottom) {
-                userScrolledAway = false;
-            } else if (newItemsAdded && !userScrolledAway) {
-                // New items added and we were auto-scrolling, stay at bottom
-                scrollOffset = maxScroll;
-            }
-
-            // Auto-scroll to end if user hasn't scrolled away
-            if (!userScrolledAway) {
-                scrollOffset = maxScroll;
-            }
-        } else if (autoScrollToEnd) {
-            // Scroll to show last items (always, overriding user scroll)
-            scrollOffset = maxScroll;
-        } else if (autoScroll) {
-            // Scroll to keep selected item visible
-            scrollToSelected(visibleHeight, itemHeights);
-        }
-
-        // Render visible items
-        int y = listArea.top();
-        int currentOffset = 0;
-
-        for (int i = 0; i < totalItems && y < listArea.bottom(); i++) {
-            int itemHeight = itemHeights[i];
-
-            // Skip items before the visible area
-            if (currentOffset + itemHeight <= scrollOffset) {
-                currentOffset += itemHeight;
-                continue;
-            }
-
-            // Calculate visible portion of this item
-            int startLine = Math.max(0, scrollOffset - currentOffset);
-            int visibleItemHeight = Math.min(itemHeight - startLine, listArea.bottom() - y);
-
-            boolean isSelected = (i == selectedIndex);
-
-            // Get CSS positional style for this item
-            ChildPosition pos = ChildPosition.of(i, totalItems);
-            Style posStyle = context.childStyle("item", pos);
-
-            // Determine the row background style
-            Style rowStyle = context.currentStyle();
-            if (!posStyle.equals(context.currentStyle())) {
-                rowStyle = rowStyle.patch(posStyle);
-            }
-            if (isSelected) {
-                rowStyle = rowStyle.patch(effectiveHighlightStyle);
-            }
-
-            // Draw highlight symbol for selected item
-            if (isSelected && symbolWidth > 0) {
-                frame.buffer().setString(listArea.left(), y, effectiveHighlightSymbol, effectiveHighlightStyle);
-            }
-
-            // Render the item element
-            Rect itemArea = new Rect(contentX, y, contentWidth, visibleItemHeight);
-            StyledElement<?> item = effectiveItems.get(i);
-            context.renderChild(item, frame, itemArea);
-
-            // Apply row background AFTER child renders
-            // This ensures zebra/selection styling takes precedence over child's CSS background
-            Color rowBg = posStyle.bg().orElse(null);
-            if (isSelected && effectiveHighlightStyle.bg().isPresent()) {
-                rowBg = effectiveHighlightStyle.bg().get();
-            }
-            if (rowBg != null) {
-                Style bgOnly = Style.EMPTY.bg(rowBg);
-                for (int row = 0; row < visibleItemHeight && y + row < listArea.bottom(); row++) {
-                    Rect rowArea = new Rect(listArea.left(), y + row, listArea.width() - (showScrollbar ? 1 : 0), 1);
-                    frame.buffer().setStyle(rowArea, bgOnly);
-                }
-            }
-
-            y += visibleItemHeight;
-            currentOffset += itemHeight;
-        }
-
-        // Render scrollbar if enabled
-        if (showScrollbar && totalItems > 0) {
-            Rect scrollbarArea = new Rect(
-                listArea.right() - 1,
-                listArea.top(),
-                1,
-                listArea.height()
-            );
-
-            ScrollbarState scrollbarState = new ScrollbarState()
-                .contentLength(totalHeight)
-                .viewportContentLength(visibleHeight)
-                .position(scrollOffset);
-
-            // Resolve scrollbar styles: explicit > CSS > default
-            Style explicitThumbStyle = scrollbarThumbColor != null ? Style.EMPTY.fg(scrollbarThumbColor) : null;
-            Style explicitTrackStyle = scrollbarTrackColor != null ? Style.EMPTY.fg(scrollbarTrackColor) : null;
-            Style thumbStyle = resolveEffectiveStyle(context, "scrollbar-thumb", explicitThumbStyle, Style.EMPTY);
-            Style trackStyle = resolveEffectiveStyle(context, "scrollbar-track", explicitTrackStyle, Style.EMPTY);
-
-            Scrollbar.Builder scrollbarBuilder = Scrollbar.builder()
-                .orientation(ScrollbarOrientation.VERTICAL_RIGHT);
-            if (!thumbStyle.equals(Style.EMPTY)) {
-                scrollbarBuilder.thumbStyle(thumbStyle);
-            }
-            if (!trackStyle.equals(Style.EMPTY)) {
-                scrollbarBuilder.trackStyle(trackStyle);
-            }
-
-            frame.renderStatefulWidget(scrollbarBuilder.build(), scrollbarArea, scrollbarState);
-        }
-    }
-
-    /**
-     * Returns the height of an item (in rows) given the available content width.
-     * <p>
-     * Uses {@link dev.tamboui.toolkit.element.Element#preferredHeight(int, RenderContext)} to allow
-     * elements like text to calculate wrapped height based on available width and CSS properties.
-     *
-     * @param item the item element
-     * @param contentWidth the available width for content
-     * @param context the render context for CSS resolution
-     * @return the height in rows
-     */
-    private int itemHeightOf(StyledElement<?> item, int contentWidth, RenderContext context) {
-        // First check for explicit length constraint
-        Constraint c = item.constraint();
-        if (c instanceof Constraint.Length) {
-            return ((Constraint.Length) c).value();
-        }
-        // Use width-aware preferred height with context for CSS property resolution
-        Size size = item.preferredSize(contentWidth, -1, context);
-        int preferred = size.height();
-        return preferred >= 0 ? preferred : 1;
-    }
-
-    /**
-     * Scrolls to keep the selected item visible.
-     */
-    private void scrollToSelected(int visibleHeight, int[] itemHeights) {
-        // Calculate the top position of the selected item
-        int selectedTop = 0;
-        for (int i = 0; i < selectedIndex && i < itemHeights.length; i++) {
-            selectedTop += itemHeights[i];
-        }
-        int selectedHeight = selectedIndex < itemHeights.length ? itemHeights[selectedIndex] : 1;
-        int selectedBottom = selectedTop + selectedHeight;
-
-        // Adjust scroll offset to keep selected item visible
-        if (selectedTop < scrollOffset) {
-            scrollOffset = selectedTop;
-        } else if (selectedBottom > scrollOffset + visibleHeight) {
-            scrollOffset = selectedBottom - visibleHeight;
-        }
-
-        scrollOffset = Math.max(0, scrollOffset);
+        return area;
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // Event handling for automatic navigation
+    // Event handling
     // ═══════════════════════════════════════════════════════════════
 
     @Override
@@ -848,8 +795,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         if (event.matches(Actions.MOVE_UP)) {
             if (stickyScroll) {
-                scrollOffset = Math.max(0, scrollOffset - 1);
-                userScrolledAway = true; // Scrolling up means user is scrolling away
+                listState.scrollBy(-1);
+                listState.markUserScrolledAway();
             } else {
                 selectPrevious();
             }
@@ -858,8 +805,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         if (event.matches(Actions.MOVE_DOWN)) {
             if (stickyScroll) {
-                scrollOffset += 1;
-                userScrolledAway = true; // Will be reset in render if at bottom
+                listState.scrollBy(1);
+                listState.markUserScrolledAway();
             } else {
                 selectNext(lastItemCount);
             }
@@ -869,8 +816,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         if (event.matches(Actions.PAGE_UP)) {
             int steps = Math.max(1, lastViewportHeight - 1);
             if (stickyScroll) {
-                scrollOffset = Math.max(0, scrollOffset - steps);
-                userScrolledAway = true; // Scrolling up means user is scrolling away
+                listState.scrollBy(-steps);
+                listState.markUserScrolledAway();
             } else {
                 for (int i = 0; i < steps; i++) {
                     selectPrevious();
@@ -882,8 +829,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         if (event.matches(Actions.PAGE_DOWN)) {
             int steps = Math.max(1, lastViewportHeight - 1);
             if (stickyScroll) {
-                scrollOffset += steps;
-                userScrolledAway = true; // Will be reset in render if at bottom
+                listState.scrollBy(steps);
+                listState.markUserScrolledAway();
             } else {
                 for (int i = 0; i < steps; i++) {
                     selectNext(lastItemCount);
@@ -894,8 +841,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         if (event.matches(Actions.HOME)) {
             if (stickyScroll) {
-                scrollOffset = 0;
-                userScrolledAway = true; // At top, not bottom
+                listState.setOffset(0);
+                listState.markUserScrolledAway();
             } else {
                 selectFirst();
             }
@@ -904,8 +851,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         if (event.matches(Actions.END)) {
             if (stickyScroll) {
-                userScrolledAway = false; // Going to end, resume auto-scroll
-                // scrollOffset will be set to max in render
+                // Going to end resumes auto-scroll; offset set by widget during render
+                listState.resumeAutoScroll();
             } else {
                 selectLast(lastItemCount);
             }
@@ -925,9 +872,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         if (lastItemCount > 0) {
             if (event.kind() == MouseEventKind.SCROLL_UP) {
                 if (stickyScroll) {
-                    // Direct scroll for sticky mode - scrolling up always means user is scrolling away
-                    scrollOffset = Math.max(0, scrollOffset - 3);
-                    userScrolledAway = true;
+                    listState.scrollBy(-3);
+                    listState.markUserScrolledAway();
                 } else {
                     for (int i = 0; i < 3; i++) {
                         selectPrevious();
@@ -937,10 +883,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             }
             if (event.kind() == MouseEventKind.SCROLL_DOWN) {
                 if (stickyScroll) {
-                    // Direct scroll for sticky mode
-                    scrollOffset += 3;
-                    // Will be reset in render if at bottom
-                    userScrolledAway = true;
+                    listState.scrollBy(3);
+                    listState.markUserScrolledAway();
                 } else {
                     for (int i = 0; i < 3; i++) {
                         selectNext(lastItemCount);

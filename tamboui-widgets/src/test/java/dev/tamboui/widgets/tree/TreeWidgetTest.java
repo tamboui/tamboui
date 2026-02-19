@@ -15,6 +15,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
+import dev.tamboui.widgets.common.SizedWidget;
 import dev.tamboui.widgets.paragraph.Paragraph;
 
 import static org.assertj.core.api.Assertions.assertThat;

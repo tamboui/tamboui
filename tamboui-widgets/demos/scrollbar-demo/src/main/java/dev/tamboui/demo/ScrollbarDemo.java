@@ -307,8 +307,8 @@ public class ScrollbarDemo {
             1, innerArea.height());
 
         // Create list items
-        List<ListItem> listItems = items.stream()
-            .map(item -> ListItem.from(Text.from(item)))
+        var listItems = items.stream()
+            .map(item -> ListItem.from(Text.from(item)).toSizedWidget())
             .toList();
 
         ListWidget list = ListWidget.builder()

@@ -27,7 +27,6 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
-import dev.tamboui.widgets.list.ListDirection;
 import dev.tamboui.widgets.list.ListItem;
 import dev.tamboui.widgets.list.ListState;
 import dev.tamboui.widgets.list.ListWidget;
@@ -271,12 +270,8 @@ public class ListDemo {
      * Render a basic list with selection.
      */
     private void renderBasicList(Frame frame, Rect area) {
-        List<ListItem> items = getItems().stream()
-            .map(ListItem::from)
-            .toList();
-
         ListWidget list = ListWidget.builder()
-            .items(items)
+            .items("Item 1", "Item 2", "Item 3", "Item 4")
             .style(Style.EMPTY.fg(Color.WHITE))
             .highlightStyle(Style.EMPTY.reversed())
             .highlightSymbol("> ")
@@ -289,15 +284,31 @@ public class ListDemo {
      * Render a list with multiline items and custom styling.
      */
     private void renderMultilineList(Frame frame, Rect area) {
-        List<ListItem> items = getMultilineItems();
-
         ListWidget list = ListWidget.builder()
-            .items(items)
+            .items(
+                ListItem.from(Text.from(
+                    Line.from("[Remy]: I'm building one now."),
+                    Line.from("It even supports multiline text!")
+                )),
+                ListItem.from(Line.from("[Gusteau]: With enough passion, yes.")),
+                ListItem.from(Line.from("[Remy]: But can anyone build a TUI in Java?")),
+                ListItem.from(Line.from("[Gusteau]: With enough passion, yes!")),
+                ListItem.from(Line.from(
+                    Span.raw("[System]: ").bold().fg(Color.CYAN),
+                    Span.raw("List widget supports ").fg(Color.WHITE),
+                    Span.raw("styled text").bold().fg(Color.YELLOW),
+                    Span.raw(" in items!").fg(Color.WHITE)
+                )),
+                ListItem.from(Line.from(
+                    Span.raw("[Info]: ").bold().fg(Color.GREEN),
+                    Span.raw("You can use ").fg(Color.WHITE),
+                    Span.raw("multiple spans").italic().fg(Color.MAGENTA),
+                    Span.raw(" per line.").fg(Color.WHITE)
+                ))
+            )
             .style(Style.EMPTY.fg(Color.WHITE))
             .highlightStyle(Style.EMPTY.fg(Color.YELLOW).italic())
             .highlightSymbol(Line.from("> ").fg(Color.RED))
-            .direction(ListDirection.BOTTOM_TO_TOP)
-            .repeatHighlightSymbol(false)
             .build();
 
         frame.renderStatefulWidget(list, area, multilineListState);

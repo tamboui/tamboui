@@ -2,7 +2,7 @@
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.widgets.tree;
+package dev.tamboui.widgets.common;
 
 import java.util.Objects;
 

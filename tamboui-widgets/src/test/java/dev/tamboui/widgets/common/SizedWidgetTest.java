@@ -2,7 +2,7 @@
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.widgets.tree;
+package dev.tamboui.widgets.common;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

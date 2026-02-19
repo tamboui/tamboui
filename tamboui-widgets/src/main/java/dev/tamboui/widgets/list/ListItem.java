@@ -7,6 +7,8 @@ package dev.tamboui.widgets.list;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Text;
+import dev.tamboui.widgets.common.SizedWidget;
+import dev.tamboui.widgets.paragraph.Paragraph;
 
 /**
  * An item in a list widget.
@@ -92,6 +94,22 @@ public final class ListItem {
      */
     public Style style() {
         return style;
+    }
+
+    /**
+     * Converts this list item to a {@link SizedWidget} for use with the new
+     * {@link ListWidget} builder.
+     * <p>
+     * The widget renders the item's {@link Text} content using a {@link Paragraph},
+     * with the item's style applied as background.
+     *
+     * @return a SizedWidget wrapping this item's content
+     */
+    public SizedWidget toSizedWidget() {
+        Paragraph paragraph = style.equals(Style.EMPTY)
+                ? Paragraph.from(content)
+                : Paragraph.builder().text(content).style(style).build();
+        return SizedWidget.ofHeight(paragraph, content.height());
     }
 
     @Override

@@ -269,10 +269,9 @@ public class CssNoToolkitDemo {
 
         CssStyleResolver listResolver = resolveStyle("ListElement", "nav-list", Set.of(), isFocused);
 
-        List<ListItem> items = new ArrayList<>();
-        for (String item : listItems) {
-            items.add(ListItem.from(item));
-        }
+        var items = listItems.stream()
+            .map(item -> ListItem.from(item).toSizedWidget())
+            .toList();
 
         ListWidget list = ListWidget.builder()
             .items(items)

@@ -146,20 +146,17 @@ public class WidgetsSnippets {
 
     void listWidget() {
         // tag::list-widget[]
-        // Create items
-        List<ListItem> items = List.of(
-            ListItem.from("First item"),
-            ListItem.from("Second item"),
-            ListItem.from("Styled item").style(Style.EMPTY.bold())
-        );
-
         // Create state
         ListState state = new ListState();
         state.select(0);  // Select first item
 
         // Build and render
         ListWidget list = ListWidget.builder()
-            .items(items)
+            .items(
+                ListItem.from("First item"),
+                ListItem.from("Second item"),
+                ListItem.from("Styled item").style(Style.EMPTY.bold())
+            )
             .highlightStyle(Style.EMPTY.reversed())
             .highlightSymbol(">> ")
             .block(Block.builder()

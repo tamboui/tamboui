@@ -30,6 +30,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.common.ScrollBarPolicy;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
@@ -77,18 +78,6 @@ import dev.tamboui.widgets.scrollbar.ScrollbarState;
  * @see RichTextAreaElement for pre-styled Text rendering
  */
 public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaElement> {
-
-    /**
-     * Policy for displaying the scrollbar.
-     */
-    public enum ScrollBarPolicy {
-        /** Never show the scrollbar. */
-        NONE,
-        /** Always show the scrollbar. */
-        ALWAYS,
-        /** Show the scrollbar only when content exceeds the viewport. */
-        AS_NEEDED
-    }
 
     private static final Style DEFAULT_LINE_NUMBER_STYLE = Style.EMPTY.dim();
 
@@ -352,34 +341,6 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
      */
     public MarkupTextAreaElement scrollbar(ScrollBarPolicy policy) {
         this.scrollBarPolicy = policy != null ? policy : ScrollBarPolicy.NONE;
-        return this;
-    }
-
-    /**
-     * Sets the scrollbar policy using RichTextAreaElement's policy type.
-     *
-     * @param policy the scrollbar display policy
-     * @return this element for chaining
-     */
-    public MarkupTextAreaElement scrollbar(RichTextAreaElement.ScrollBarPolicy policy) {
-        if (policy == null) {
-            this.scrollBarPolicy = ScrollBarPolicy.NONE;
-            return this;
-        }
-        switch (policy) {
-            case NONE:
-                this.scrollBarPolicy = ScrollBarPolicy.NONE;
-                break;
-            case ALWAYS:
-                this.scrollBarPolicy = ScrollBarPolicy.ALWAYS;
-                break;
-            case AS_NEEDED:
-                this.scrollBarPolicy = ScrollBarPolicy.AS_NEEDED;
-                break;
-            default:
-                this.scrollBarPolicy = ScrollBarPolicy.NONE;
-                break;
-        }
         return this;
     }
 
