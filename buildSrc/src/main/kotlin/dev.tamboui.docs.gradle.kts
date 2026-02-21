@@ -110,6 +110,11 @@ tasks.asciidoctor {
         from(javadoc.map { it.destinationDir }) {
             into("api")
         }
+        // Copy versions.json to docs root when present (for version selector dropdown)
+        from(project.layout.projectDirectory) {
+            include("versions.json")
+            into(".")
+        }
     }
 
     attributes(
@@ -145,19 +150,64 @@ tasks.asciidoctor {
 // Git publish configuration for publishing documentation to tamboui.dev
 // For SNAPSHOT versions (main branch): publish to docs/main
 // For release versions (tags): publish to docs/<version>
+// The generated docs include a version dropdown that reads docs/versions.json when available.
+// Format: JSON object mapping display name -> path segment (relative to docs/). Example:
+//   { "main": "main", "0.1.0": "0.1.0", "latest": "0.1.0", "0.2.0-snapshot": "main" }
+// URL for a version is <origin>/docs/<pathSegment>/<page> (pathSegment must not contain '/').
 val targetFolder = providers.provider {
     val version = project.version.toString()
     if (version.endsWith("-SNAPSHOT")) "docs/main" else "docs/$version"
 }
 
+val currentVersionSegment = providers.provider {
+    targetFolder.get().removePrefix("docs/")
+}
+
+// Generate docs/versions.json from folder names on gh-pages (clones repo to list docs/* then writes JSON)
+val generateVersionsJson = tasks.register<DefaultTask>("generateVersionsJson") {
+    val cloneDir = layout.buildDirectory.dir("docs-gh-pages-clone")
+    val outputFile = layout.buildDirectory.file("versions.json")
+    outputs.file(outputFile)
+    inputs.property("targetFolder", targetFolder)
+    inputs.property("currentSegment", currentVersionSegment)
+
+    doLast {
+        val repo = cloneDir.get().asFile
+        if (!repo.isDirectory || !repo.resolve(".git").isDirectory) {
+            repo.mkdirs()
+            val proc = ProcessBuilder(
+                "git", "clone", "--depth", "1",
+                "--branch", "gh-pages",
+                "https://github.com/tamboui/tamboui.dev.git",
+                repo.absolutePath
+            ).directory(repo.parentFile).redirectErrorStream(true).start()
+            val ok = proc.waitFor() == 0
+            if (!ok) throw GradleException("git clone failed with exit code ${proc.exitValue()}")
+        }
+        val docsDir = repo.resolve("docs")
+        val segments = mutableSetOf<String>()
+        if (docsDir.isDirectory) {
+            docsDir.listFiles()?.filter { f -> f.isDirectory }?.forEach { f -> segments.add(f.name) }
+        }
+        segments.add(currentVersionSegment.get())
+        val sorted = segments.sortedWith(compareBy<String> { if (it == "main") "" else it })
+        val map = sorted.associateWith { seg -> seg }
+        val json = map.entries.joinToString(", ") { e -> """ "${e.key}": "${e.value}" """ }
+        outputFile.get().asFile.writeText("{$json}\n")
+    }
+}
+
 gitPublish {
-    repoUri.set("git@github.com:tamboui/tamboui.dev.git")
+    repoUri.set("https://github.com/tamboui/tamboui.dev.git")
     branch.set("gh-pages")
     sign.set(false)
 
     contents {
         from(tasks.asciidoctor) {
             into(targetFolder)
+        }
+        from(generateVersionsJson) {
+            into("docs")
         }
     }
 
