@@ -26,6 +26,7 @@ public final class FocusManager {
     }
 
     private String focusedId;
+    private boolean focusExplicitlyCleared;
     private final List<String> focusOrder = new ArrayList<>();
     private final Map<String, Rect> focusableAreas = new LinkedHashMap<>();
 
@@ -55,13 +56,32 @@ public final class FocusManager {
      */
     public void setFocus(String elementId) {
         this.focusedId = elementId;
+        if (elementId != null) {
+            this.focusExplicitlyCleared = false;
+        }
     }
 
     /**
      * Clears the current focus.
+     * <p>
+     * After calling this method, auto-focus will not re-focus the first
+     * element until focus is explicitly set again (e.g., via Tab, click,
+     * or {@link #setFocus(String)}).
      */
     public void clearFocus() {
         this.focusedId = null;
+        this.focusExplicitlyCleared = true;
+    }
+
+    /**
+     * Returns whether focus was explicitly cleared (e.g., via Escape).
+     * <p>
+     * When true, auto-focus logic should not re-focus the first element.
+     *
+     * @return true if focus was explicitly cleared
+     */
+    public boolean isFocusExplicitlyCleared() {
+        return focusExplicitlyCleared;
     }
 
     /**
@@ -83,7 +103,8 @@ public final class FocusManager {
             focusableAreas.put(elementId, area);
 
             // Auto-focus first focusable element if nothing is focused
-            if (isFirst && focusedId == null) {
+            // (but not if focus was explicitly cleared, e.g. via Escape)
+            if (isFirst && focusedId == null && !focusExplicitlyCleared) {
                 focusedId = elementId;
             }
         }
@@ -107,6 +128,8 @@ public final class FocusManager {
         if (focusOrder.isEmpty()) {
             return false;
         }
+
+        focusExplicitlyCleared = false;
 
         if (focusedId == null) {
             focusedId = focusOrder.get(0);
@@ -137,6 +160,8 @@ public final class FocusManager {
         if (focusOrder.isEmpty()) {
             return false;
         }
+
+        focusExplicitlyCleared = false;
 
         if (focusedId == null) {
             focusedId = focusOrder.get(focusOrder.size() - 1);
@@ -169,6 +194,7 @@ public final class FocusManager {
         for (Map.Entry<String, Rect> entry : focusableAreas.entrySet()) {
             if (entry.getValue().contains(x, y)) {
                 focusedId = entry.getKey();
+                focusExplicitlyCleared = false;
                 return true;
             }
         }
