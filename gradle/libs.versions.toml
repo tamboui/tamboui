@@ -1,5 +1,5 @@
 [versions]
-jline = "3.25.1"
+jline = "3.30.6"
 aesh-terminal = "3.1"
 junit = "5.14.1"
 assertj = "3.27.6"
