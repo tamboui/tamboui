@@ -163,26 +163,21 @@ val currentVersionSegment = providers.provider {
     targetFolder.get().removePrefix("docs/")
 }
 
-// Generate docs/versions.json from folder names on gh-pages (clones repo to list docs/* then writes JSON)
+// Generate docs/versions.json from folder names on gh-pages (reads plugin's clone at build/gitPublish)
 val generateVersionsJson = tasks.register<DefaultTask>("generateVersionsJson") {
-    val cloneDir = layout.buildDirectory.dir("docs-gh-pages-clone")
+    val repoDir = layout.buildDirectory.dir("gitPublish")
     val outputFile = layout.buildDirectory.file("versions.json")
     outputs.file(outputFile)
     inputs.property("targetFolder", targetFolder)
     inputs.property("currentSegment", currentVersionSegment)
+    dependsOn(tasks.named("gitPublishReset"))
 
     doLast {
-        val repo = cloneDir.get().asFile
+        val repo = repoDir.get().asFile
         if (!repo.isDirectory || !repo.resolve(".git").isDirectory) {
-            repo.mkdirs()
-            val proc = ProcessBuilder(
-                "git", "clone", "--depth", "1",
-                "--branch", "gh-pages",
-                "https://github.com/tamboui/tamboui.dev.git",
-                repo.absolutePath
-            ).directory(repo.parentFile).redirectErrorStream(true).start()
-            val ok = proc.waitFor() == 0
-            if (!ok) throw GradleException("git clone failed with exit code ${proc.exitValue()}")
+            throw GradleException(
+                "Git clone not found at ${repo}. Run :docs:gitPublishCopy or :docs:gitPublishReset first (requires network)."
+            )
         }
         val docsDir = repo.resolve("docs")
         val segments = mutableSetOf<String>()
