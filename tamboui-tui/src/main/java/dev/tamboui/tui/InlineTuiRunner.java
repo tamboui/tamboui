@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -327,6 +328,16 @@ public final class InlineTuiRunner implements AutoCloseable {
      */
     public int height() {
         return viewport.height();
+    }
+
+    /**
+     * Sets the terminal window title.
+     *
+     * @param title the window title to set
+     * @throws IOException if the operation fails
+     */
+    public void setWindowTitle(String title) throws IOException {
+        backend.setWindowTitle(title);
     }
 
     /**

@@ -290,6 +290,18 @@ public interface Backend extends AutoCloseable {
     }
 
     /**
+     * Sets the terminal window title.
+     * <p>
+     * Uses the OSC 2 escape sequence ({@code ESC]2;title BEL}).
+     *
+     * @param title the window title to set
+     * @throws IOException if the operation fails
+     */
+    default void setWindowTitle(String title) throws IOException {
+        writeRaw(AnsiStringBuilder.windowTitle(title));
+    }
+
+    /**
      * Moves the cursor to the beginning of the current line (carriage return).
      *
      * @throws IOException if the operation fails
