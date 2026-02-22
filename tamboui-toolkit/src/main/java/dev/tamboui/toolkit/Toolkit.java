@@ -57,6 +57,7 @@ import dev.tamboui.widgets.form.FormState;
 import dev.tamboui.widgets.form.SelectFieldState;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.select.SelectState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
 import dev.tamboui.widgets.tree.TreeNode;
@@ -1017,6 +1018,20 @@ public final class Toolkit {
      * @return a new form field element
      */
     public static FormFieldElement formField(String label, SelectFieldState state) {
+        return new FormFieldElement(label, state);
+    }
+
+    /**
+     * Creates a form field with a label and a {@link SelectState} reference.
+     * <p>
+     * Unlike the {@link SelectFieldState} overload, this keeps a direct reference
+     * to the original state, enabling true two-way binding.
+     *
+     * @param label the field label
+     * @param state the select state (direct reference)
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, SelectState state) {
         return new FormFieldElement(label, state);
     }
 
