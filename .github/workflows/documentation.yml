@@ -11,7 +11,7 @@ jobs:
   publish_documentation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
           ssh-key: "${{ secrets.DOCS_SSH_PRIVATE_KEY }}"

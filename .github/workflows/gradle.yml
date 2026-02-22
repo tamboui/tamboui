@@ -18,7 +18,7 @@ jobs:
     name: Static Code Format Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/shared-build-setup
       - name: check formatting and comment on PR if failed
         id: check-formatting
@@ -27,7 +27,7 @@ jobs:
     name: Verify JBang Demos
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/shared-build-setup
       - name: Update jbang-catalog.json to include new demos
         run: |
@@ -44,7 +44,7 @@ jobs:
     name: Full Gradle Build (excluding distributions)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/shared-build-setup
 
       - name: Execute Gradle
