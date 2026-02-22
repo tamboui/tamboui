@@ -17,7 +17,7 @@ dependencies {
     implementation(libs.git.publish.plugin)
     implementation(libs.spotless.gradle.plugin)
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
