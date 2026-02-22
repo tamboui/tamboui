@@ -1,5 +1,5 @@
 [versions]
-jline = "3.25.1"
+jline = "3.30.6"
 aesh-terminal = "3.1"
 junit = "5.14.1"
 assertj = "3.27.6"
@@ -9,13 +9,13 @@ nexus = "2.0.0"
 oshi = "6.9.3"
 animal-sniffer = "2.0.0"
 sniffer18-signature = "1.0"
-compile-testing = "0.21.0"
+compile-testing = "0.23.0"
 gradle-tooling-api = "9.2.1"
 asciidoctor = "4.0.5"
 git-publish = "3.0.1"
 spotless = "8.2.1"
 apache-sshd = "2.17.1"
-netty = "4.1.81.Final"
+netty = "4.2.10.Final"
 
 [libraries]
 jline = { module = "org.jline:jline", version.ref = "jline" }

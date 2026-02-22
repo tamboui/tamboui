@@ -1,6 +1,6 @@
 // Shared attributes for TamboUI documentation
 :project-name: TamboUI
-:project-version: 1.0.0-SNAPSHOT
+:project-version: 0.1.0-SNAPSHOT
 :github-repo: tamboui/tamboui
 :github-url: https://github.com/{github-repo}
 
@@ -14,7 +14,7 @@
 :widgets-module: tamboui-widgets
 :tui-module: tamboui-tui
 :toolkit-module: tamboui-toolkit
-:jline-module: tamboui-jline
+:jline-module: tamboui-jline3-backend
 :picocli-module: tamboui-picocli
 :annotations-module: tamboui-annotations
 :processor-module: tamboui-processor
