@@ -46,7 +46,7 @@ Add the snapshot repository and dependencies to your `pom.xml`:
         <artifactId>{toolkit-module}</artifactId>
     </dependency>
 
-    <!-- JLine backend (required) -->
+    <!-- JLine backend (one backend is required) -->
     <dependency>
         <groupId>{maven-group}</groupId>
         <artifactId>{jline-module}</artifactId>
@@ -84,9 +84,8 @@ For quick experimentation, use JBang with inline dependencies:
 [source,java,subs="+attributes"]
 ----
 ///usr/bin/env jbang "$0" "$@" ; exit $?
-//DEPS {maven-group}:{toolkit-module}:LATEST
-//DEPS {maven-group}:{jline-module}:LATEST
-//REPOS https://central.sonatype.com/repository/maven-snapshots/
+//DEPS {maven-group}:{toolkit-module}:{project-version}
+//DEPS {maven-group}:{jline-module}:{project-version}
 
 // Your code here...
 ----
