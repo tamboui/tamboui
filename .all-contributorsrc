@@ -47,6 +47,16 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "lukasz-kapica",
+      "name": "Łukasz Kapica",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4257505?v=4",
+      "profile": "https://github.com/lukasz-kapica",
+      "contributions": [
+        "doc",
+        "infra"
+      ]
     }
   ]
 }
