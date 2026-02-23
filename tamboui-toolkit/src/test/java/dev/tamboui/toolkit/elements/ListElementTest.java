@@ -18,7 +18,11 @@ import dev.tamboui.style.Overflow;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.element.Size;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -486,5 +490,123 @@ class ListElementTest {
         list("A", "B").title("Items").render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Nested
+    @DisplayName("Focused border color")
+    class FocusedBorderColorTests {
+
+        @Test
+        @DisplayName("focusedBorderColor renders when element is focused")
+        void focusedBorderColor_rendersWhenFocused() {
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.focusManager().setFocus("myList");
+
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            list("Item 1", "Item 2")
+                .id("myList")
+                .focusedBorderColor(Color.CYAN)
+                .render(frame, area, context);
+
+            // Border should be rendered in CYAN when focused
+            assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+        }
+
+        @Test
+        @DisplayName("borderColor renders when element is not focused")
+        void borderColor_rendersWhenUnfocused() {
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            list("Item 1", "Item 2")
+                .id("myList")
+                .borderColor(Color.DARK_GRAY)
+                .focusedBorderColor(Color.CYAN)
+                .render(frame, area, RenderContext.empty());
+
+            // Border should be rendered in DARK_GRAY when not focused
+            assertThat(buffer.get(0, 0).style().fg()).contains(Color.DARK_GRAY);
+        }
+
+        @Test
+        @DisplayName("focusedBorderColor triggers border without title or borderType")
+        void focusedBorderColor_triggersBorderWithoutTitleOrBorderType() {
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.focusManager().setFocus("myList");
+
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            list("Item 1", "Item 2")
+                .id("myList")
+                .focusedBorderColor(Color.GREEN)
+                .render(frame, area, context);
+
+            // Border symbols should be present even without title or borderType
+            String topLeft = buffer.get(0, 0).symbol();
+            assertThat(topLeft).isIn("┌", "╭", "┏", "╔");
+        }
+
+        @Test
+        @DisplayName("preferredSize includes border when focusedBorderColor is set")
+        void preferredSize_includesBorderWhenFocusedBorderColorSet() {
+            ListElement<?> withFocusedBorder = list("A", "B")
+                .focusedBorderColor(Color.CYAN);
+
+            ListElement<?> withoutBorder = list("A", "B");
+
+            Size sizeWith = withFocusedBorder.preferredSize(40, 10, null);
+            Size sizeWithout = withoutBorder.preferredSize(40, 10, null);
+
+            // focusedBorderColor triggers hasBorder, adding +2 width and +2 height
+            assertThat(sizeWith.widthOr(0)).isEqualTo(sizeWithout.widthOr(0) + 2);
+            assertThat(sizeWith.heightOr(0)).isEqualTo(sizeWithout.heightOr(0) + 2);
+        }
+    }
+
+    @Nested
+    @DisplayName("Unfocused key handling")
+    class UnfocusedKeyHandlingTests {
+
+        @Test
+        @DisplayName("Key events are unhandled when element is not focused")
+        void keyEvent_unhandledWhenUnfocused() {
+            ListElement<?> element = list("Item 1", "Item 2", "Item 3");
+
+            // Render once so lastItemCount is set
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+            element.render(frame, area, RenderContext.empty());
+
+            // UP and DOWN should be UNHANDLED when not focused
+            assertThat(element.handleKeyEvent(KeyEvent.ofKey(KeyCode.UP), false))
+                .isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), false))
+                .isEqualTo(EventResult.UNHANDLED);
+        }
+
+        @Test
+        @DisplayName("Key events are handled when element is focused")
+        void keyEvent_handledWhenFocused() {
+            ListElement<?> element = list("Item 1", "Item 2", "Item 3");
+
+            // Render once so lastItemCount is set
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+            element.render(frame, area, RenderContext.empty());
+
+            // UP and DOWN should be HANDLED when focused
+            assertThat(element.handleKeyEvent(KeyEvent.ofKey(KeyCode.UP), true))
+                .isEqualTo(EventResult.HANDLED);
+            assertThat(element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true))
+                .isEqualTo(EventResult.HANDLED);
+        }
     }
 }
