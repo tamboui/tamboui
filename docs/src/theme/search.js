@@ -1,0 +1,100 @@
+(function () {
+  'use strict';
+
+  function byId(id) { return document.getElementById(id); }
+
+  function ensureSearchUI() {
+    var header = byId('header');
+    if (!header) return null;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'doc-search';
+    wrap.innerHTML = '' +
+      '<input id="doc-search-input" type="search" placeholder="Search docs..." aria-label="Search docs" />' +
+      '<div id="doc-search-results" class="doc-search-results" hidden></div>';
+
+    var nav = header.querySelector('.top-nav');
+    if (nav && nav.parentNode) nav.parentNode.insertBefore(wrap, nav.nextSibling);
+    else header.appendChild(wrap);
+
+    return {
+      input: byId('doc-search-input'),
+      results: byId('doc-search-results')
+    };
+  }
+
+  function snippet(text, q) {
+    var idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if (idx < 0) return text.slice(0, 180);
+    var start = Math.max(0, idx - 70);
+    var end = Math.min(text.length, idx + 110);
+    return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+  }
+
+  function renderResults(container, docs, query, hits) {
+    if (!query.trim()) {
+      container.hidden = true;
+      container.innerHTML = '';
+      return;
+    }
+    if (!hits.length) {
+      container.hidden = false;
+      container.innerHTML = '<div class="doc-search-empty">No results for "' + query.replace(/</g, '&lt;') + '"</div>';
+      return;
+    }
+
+    var html = hits.slice(0, 12).map(function (hit) {
+      var d = docs[hit.ref];
+      if (!d) return '';
+      return '<a class="doc-search-item" href="' + d.url + '">' +
+        '<div class="title">' + d.title + '</div>' +
+        '<div class="snippet">' + snippet(d.body || '', query).replace(/</g, '&lt;') + '</div>' +
+      '</a>';
+    }).join('');
+
+    container.hidden = false;
+    container.innerHTML = html;
+  }
+
+  function init() {
+    if (typeof lunr === 'undefined') return;
+    var ui = ensureSearchUI();
+    if (!ui) return;
+
+    fetch('search-index.json')
+      .then(function (r) { return r.json(); })
+      .then(function (entries) {
+        var docs = {};
+        entries.forEach(function (d, i) {
+          docs[String(i)] = d;
+        });
+
+        var idx = lunr(function () {
+          this.ref('id');
+          this.field('title', { boost: 10 });
+          this.field('body');
+          entries.forEach(function (d, i) {
+            this.add({ id: String(i), title: d.title || '', body: d.body || '' });
+          }, this);
+        });
+
+        ui.input.addEventListener('input', function () {
+          var q = ui.input.value.trim();
+          if (!q) return renderResults(ui.results, docs, q, []);
+          var hits = idx.search(q + '*');
+          renderResults(ui.results, docs, q, hits);
+        });
+
+        document.addEventListener('click', function (e) {
+          if (!ui.results.contains(e.target) && e.target !== ui.input) {
+            ui.results.hidden = true;
+          }
+        });
+      })
+      .catch(function () {
+        // fail quietly; docs still usable without search
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
