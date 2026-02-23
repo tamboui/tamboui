@@ -495,6 +495,7 @@ isBackTab(event)   // Shift+Tab
       <td align="center" valign="top" width="14.28%"><a href="https://xam.dk"><img src="https://avatars.githubusercontent.com/u/54129?v=4?s=100" width="100px;" alt="Max Rydahl Andersen"/><br /><sub><b>Max Rydahl Andersen</b></sub></a><br /><a href="#infra-maxandersen" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#test-maxandersen" title="Tests">⚠️</a> <a href="#code-maxandersen" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/davsclaus"><img src="https://avatars.githubusercontent.com/u/477100?v=4?s=100" width="100px;" alt="Claus Ibsen"/><br /><sub><b>Claus Ibsen</b></sub></a><br /><a href="#code-davsclaus" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://andresalmiray.com/"><img src="https://avatars.githubusercontent.com/u/13969?v=4?s=100" width="100px;" alt="Andres Almiray"/><br /><sub><b>Andres Almiray</b></sub></a><br /><a href="#infra-aalmiray" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lukasz-kapica"><img src="https://avatars.githubusercontent.com/u/4257505?v=4?s=100" width="100px;" alt="Łukasz Kapica"/><br /><sub><b>Łukasz Kapica</b></sub></a><br /><a href="#doc-lukasz-kapica" title="Documentation">📖</a> <a href="#infra-lukasz-kapica" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     </tr>
   </tbody>
 </table>
