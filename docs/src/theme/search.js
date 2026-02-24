@@ -13,12 +13,18 @@
       '<input id="doc-search-input" type="search" placeholder="Search docs..." aria-label="Search docs" />' +
       '<div id="doc-search-results" class="doc-search-results" hidden></div>';
 
-    // Place search as first element after main title in header
-    var title = header.querySelector('h1');
-    if (title && title.parentNode) {
-      title.insertAdjacentElement('afterend', wrap);
+    // Place search as first item in top navigation row (before Home/Getting Started/...)
+    var nav = header.querySelector('.top-nav');
+    if (nav) {
+      nav.insertBefore(wrap, nav.firstChild);
     } else {
-      header.insertBefore(wrap, header.firstChild);
+      // fallback: after title
+      var title = header.querySelector('h1');
+      if (title && title.parentNode) {
+        title.insertAdjacentElement('afterend', wrap);
+      } else {
+        header.insertBefore(wrap, header.firstChild);
+      }
     }
 
     return {

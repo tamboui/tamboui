@@ -983,12 +983,12 @@ body.toc2.toc-left .prev-next-nav {
 }
 
 /* --- Docs Search (Lunr) --- */
-#header .doc-search {
+.top-nav .doc-search {
   position: relative;
-  margin: 0 0 0 0.8rem;
-  flex: 0 1 320px;
-  min-width: 220px;
-  max-width: 380px;
+  margin: 0 0.55rem 0 0;
+  flex: 0 1 260px;
+  min-width: 190px;
+  max-width: 320px;
 }
 
 #doc-search-input {
