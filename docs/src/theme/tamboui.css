@@ -983,14 +983,17 @@ body.toc2.toc-left .prev-next-nav {
 }
 
 /* --- Docs Search (Lunr) --- */
-.doc-search {
+#header .doc-search {
   position: relative;
-  margin: 0.75rem 0 0.25rem;
+  margin: 0 0 0 0.8rem;
+  flex: 0 1 320px;
+  min-width: 220px;
+  max-width: 380px;
 }
 
 #doc-search-input {
-  width: min(560px, 100%);
-  padding: 0.55rem 0.7rem;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
   border-radius: 8px;
   border: 1px solid var(--color-border, #444);
   background: var(--color-panel, #111);

@@ -13,9 +13,13 @@
       '<input id="doc-search-input" type="search" placeholder="Search docs..." aria-label="Search docs" />' +
       '<div id="doc-search-results" class="doc-search-results" hidden></div>';
 
-    var nav = header.querySelector('.top-nav');
-    if (nav && nav.parentNode) nav.parentNode.insertBefore(wrap, nav.nextSibling);
-    else header.appendChild(wrap);
+    // Place search as first element after main title in header
+    var title = header.querySelector('h1');
+    if (title && title.parentNode) {
+      title.insertAdjacentElement('afterend', wrap);
+    } else {
+      header.insertBefore(wrap, header.firstChild);
+    }
 
     return {
       input: byId('doc-search-input'),
