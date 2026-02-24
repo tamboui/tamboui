@@ -983,7 +983,7 @@ body.toc2.toc-left .prev-next-nav {
 }
 
 /* --- Docs Search (Lunr) --- */
-.top-nav .doc-search {
+#header .doc-search {
   position: relative;
   margin: 0 0.55rem 0 0;
   flex: 0 1 260px;

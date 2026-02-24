@@ -13,10 +13,10 @@
       '<input id="doc-search-input" type="search" placeholder="Search docs..." aria-label="Search docs" />' +
       '<div id="doc-search-results" class="doc-search-results" hidden></div>';
 
-    // Place search as first item in top navigation row (before Home/Getting Started/...)
+    // Keep search outside the scrolling nav container so the dropdown is not clipped.
     var nav = header.querySelector('.top-nav');
     if (nav) {
-      nav.insertBefore(wrap, nav.firstChild);
+      header.insertBefore(wrap, nav);
     } else {
       // fallback: after title
       var title = header.querySelector('h1');
