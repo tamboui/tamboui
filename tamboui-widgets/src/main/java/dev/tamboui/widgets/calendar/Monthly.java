@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Objects;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
@@ -49,6 +50,7 @@ public final class Monthly implements Widget {
     private final Style defaultStyle;
     private final Block block;
     private final DayOfWeek firstDayOfWeek;
+    private final Locale locale;
 
     private Monthly(Builder builder) {
         this.displayDate = builder.displayDate;
@@ -59,6 +61,7 @@ public final class Monthly implements Widget {
         this.defaultStyle = builder.defaultStyle;
         this.block = builder.block;
         this.firstDayOfWeek = builder.firstDayOfWeek;
+        this.locale = builder.locale;
     }
 
     /**
@@ -70,6 +73,20 @@ public final class Monthly implements Widget {
      */
     public static Monthly of(LocalDate displayDate, DateStyler dateStyler) {
         return new Builder(displayDate, dateStyler).build();
+    }
+
+    /**
+     * Creates a calendar for the month containing the given date using custom locale.
+     *
+     * @param displayDate the date determining which month to display
+     * @param dateStyler  the styler for individual dates
+     * @param locale the locale to be used
+     * @return a new Monthly calendar
+     */
+    public static Monthly of(LocalDate displayDate, DateStyler dateStyler, Locale locale) {
+        return new Builder(displayDate, dateStyler)
+                .locale(locale)
+                .build();
     }
 
     /**
@@ -162,7 +179,8 @@ public final class Monthly implements Widget {
             .surroundingStyle(surroundingStyle)
             .defaultStyle(defaultStyle)
             .block(block)
-            .firstDayOfWeek(firstDayOfWeek);
+            .firstDayOfWeek(firstDayOfWeek)
+            .locale(locale);
     }
 
     @Override
@@ -204,7 +222,7 @@ public final class Monthly implements Widget {
         }
 
         YearMonth yearMonth = YearMonth.from(displayDate);
-        String monthName = yearMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault());
+        String monthName = yearMonth.getMonth().getDisplayName(TextStyle.FULL, locale);
         String header = monthName + " " + yearMonth.getYear();
 
         // Center the header
@@ -324,6 +342,7 @@ public final class Monthly implements Widget {
         private Style defaultStyle;
         private Block block;
         private DayOfWeek firstDayOfWeek = DayOfWeek.MONDAY;
+        private Locale locale = Locale.getDefault();
 
         private Builder(LocalDate displayDate, DateStyler dateStyler) {
             this.displayDate = displayDate != null ? displayDate : LocalDate.now();
@@ -393,6 +412,18 @@ public final class Monthly implements Widget {
          */
         public Builder firstDayOfWeek(DayOfWeek dayOfWeek) {
             this.firstDayOfWeek = dayOfWeek != null ? dayOfWeek : DayOfWeek.MONDAY;
+            return this;
+        }
+
+        /**
+         * Sets the locale.
+         *
+         * @param locale the locale to be used
+         * @return this builder
+         */
+        public Builder locale(Locale locale) {
+            Objects.requireNonNull(locale);
+            this.locale = locale;
             return this;
         }
 
