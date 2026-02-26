@@ -232,7 +232,7 @@ public final class Monthly implements Widget {
         }
 
         YearMonth yearMonth = YearMonth.from(displayDate);
-        String monthName = yearMonth.getMonth().getDisplayName(TextStyle.FULL, locale);
+        String monthName = capitalize(yearMonth.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, locale));
         String header = monthName + " " + yearMonth.getYear();
 
         // Center the header
@@ -338,6 +338,20 @@ public final class Monthly implements Widget {
 
             y++;
         }
+    }
+
+    /**
+     * Capitalizes the first letter of the given string.
+     *
+     * @param str the string to capitalize
+     * @return the string with the first letter converted to uppercase,
+     *         or the original string if it is {@code null} or empty
+     */
+    private static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 
     /**
