@@ -101,6 +101,7 @@ public final class Monthly implements Widget {
     /**
      * Creates a calendar for the current month with custom locale and no special styling.
      *
+     * @param locale the locale to be used
      * @return a new Monthly calendar for the current month
      */
     public static Monthly ofCurrentMonth(Locale locale) {
