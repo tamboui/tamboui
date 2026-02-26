@@ -8,7 +8,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Locale;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
