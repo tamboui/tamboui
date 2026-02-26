@@ -6,6 +6,7 @@ package dev.tamboui.widgets.calendar;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
@@ -82,6 +83,21 @@ class MonthlyTest {
         String content = extractBufferContent(buffer, 0, 0, 25, 1);
         assertThat(content).contains("June");
         assertThat(content).contains("2025");
+    }
+
+    @Test
+    void ofCurrentMonthWithLocale_renderWithMonthHeader() {
+        Monthly calendar = Monthly.ofCurrentMonth(Locale.US)
+                .showMonthHeader(Style.EMPTY.bold());
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
+        calendar.render(new Rect(0, 0, 25, 10), buffer);
+
+        String currentMonth = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL_STANDALONE, Locale.US);
+
+        // Find the currentMonth in the buffer
+        String content = extractBufferContent(buffer, 0, 0, 25, 1);
+        assertThat(content).contains(currentMonth);
     }
 
     @Test

@@ -99,6 +99,15 @@ public final class Monthly implements Widget {
     }
 
     /**
+     * Creates a calendar for the current month with custom locale and no special styling.
+     *
+     * @return a new Monthly calendar for the current month
+     */
+    public static Monthly ofCurrentMonth(Locale locale) {
+        return of(LocalDate.now(), date -> Style.EMPTY, locale);
+    }
+
+    /**
      * Creates a builder for a calendar displaying the given month.
      *
      * @param displayDate the date determining which month to display
