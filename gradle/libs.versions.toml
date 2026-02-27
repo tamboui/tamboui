@@ -1,7 +1,7 @@
 [versions]
 jline = "3.30.6"
 aesh-terminal = "3.2"
-junit = "5.14.3"
+junit = "6.0.3"
 assertj = "3.27.6"
 native-build-tools = "0.11.4"
 picocli = "4.7.7"
