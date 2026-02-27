@@ -205,14 +205,32 @@ public final class Column extends ContainerElement<Column> {
                 // First try text element special case
                 c = calculateDefaultConstraint(child);
                 if (c == null) {
-                    Size size = child.preferredSize(-1, -1, context);
+                    Size size = child.preferredSize(effectiveArea.width(), -1, context);
                     int preferred = size.height();
                     c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
                 }
             } else if (c instanceof Constraint.Fit) {
-                Size size = child.preferredSize(-1, -1, context);
+                Size size = child.preferredSize(effectiveArea.width(), -1, context);
                 int preferred = size.height();
                 c = preferred >= 0 ? Constraint.length(preferred) : Constraint.fill();
+            } else if (c instanceof Constraint.Min) {
+                // For elements whose preferred height depends on the available width
+                // (e.g., WRAP_CHARACTER / WRAP_WORD text), the Constraint.Min returned by
+                // constraint() is based on the raw newline count and may be far too small.
+                // Recalculate using the actual column width to get the true wrapped height
+                // and raise the floor so fill spacers cannot crowd the element below what it needs.
+                // Constraint.min is used instead of Constraint.length so that the element can
+                // still grow if no fill competitors are present (e.g., single wrapping text with
+                // no spacers gets all remaining space, allowing all wrapped lines to render).
+                int minHeight = ((Constraint.Min) c).value();
+                Size size = child.preferredSize(effectiveArea.width(), -1, context);
+                int preferredHeight = size.height();
+                if (preferredHeight > minHeight) {
+                    // Cap at available height to prevent REQUIRED constraint conflicts
+                    // when the column is too small to satisfy the floor (which would
+                    // throw UnsatisfiableConstraintException from the Cassowary solver).
+                    c = Constraint.min(Math.min(preferredHeight, effectiveArea.height()));
+                }
             }
             constraints.add(c);
 

@@ -5,6 +5,7 @@
 package dev.tamboui.toolkit.elements;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
@@ -12,6 +13,8 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.layout.cassowary.UnsatisfiableConstraintException;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
@@ -19,6 +22,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for Column.
@@ -274,5 +278,99 @@ class ColumnTest {
     void preferredHeight_singleChild() {
         Column column = column(text("A"));
         assertThat(column.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
+    }
+
+    @Nested
+    @DisplayName("Wrapping text height allocation")
+    class WrappingTextHeightAllocationTests {
+
+        @Test
+        @DisplayName("WRAP_CHARACTER text gets correct row allocation when competing with spacers")
+        void wrapCharacter_getsCorrectRowAllocation_withSpacers() {
+            // "AAAAAABBBBBBCCCCCC" (18 chars) at width 6 requires 3 rows under WRAP_CHARACTER.
+            Rect area = new Rect(0, 0, 6, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            column(
+                spacer(),
+                text("AAAAAABBBBBBCCCCCC").overflow(Overflow.WRAP_CHARACTER),
+                spacer()
+            ).render(frame, area, RenderContext.empty());
+
+            assertThat(buffer).hasContent(
+                "      ",
+                "AAAAAA",
+                "BBBBBB",
+                "CCCCCC",
+                "      "
+            );
+        }
+
+        @Test
+        @DisplayName("WRAP_WORD text gets correct row allocation when competing with spacers")
+        void wrapWord_getsCorrectRowAllocation_withSpacers() {
+            // "Hello World" (11 chars) at width 6 wraps to 2 lines at word boundaries:
+            //   "Hello " → word "Hello" (5 chars), cell 6 left empty
+            //   "World " → word "World" (5 chars), cell 6 left empty
+            // ceil(11/6) = 2, so calculateWrappedHeight agrees with the word-wrap result.
+            Rect area = new Rect(0, 0, 6, 4);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            column(
+                spacer(),
+                text("Hello World").overflow(Overflow.WRAP_WORD),
+                spacer()
+            ).render(frame, area, RenderContext.empty());
+
+            assertThat(buffer).hasContent(
+                "      ",
+                "Hello ",
+                "World ",
+                "      "
+            );
+        }
+
+        @Test
+        @DisplayName("Two WRAP_CHARACTER texts whose combined minimum exceeds available height")
+        void twoWrapTexts_combinedMinExceedsAvailableHeight() {
+            // Each text needs 2 rows at width 6 (12 chars each), so the combined minimum
+            // is 4 rows, but only 3 rows are available.
+            // The per-element cap (Math.min(preferredHeight, available)) gives each text
+            // Constraint.min(2), which is individually valid but jointly infeasible:
+            //   size[0] >= 2  AND  size[1] >= 2  AND  size[0] + size[1] <= 3
+            // The Cassowary solver therefore throws UnsatisfiableConstraintException.
+            Rect area = new Rect(0, 0, 6, 3);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            assertThatThrownBy(() ->
+                column(
+                    text("AAAAAABBBBBB").overflow(Overflow.WRAP_CHARACTER),
+                    text("CCCCCCDDDDDD").overflow(Overflow.WRAP_CHARACTER)
+                ).render(frame, area, RenderContext.empty())
+            ).isInstanceOf(UnsatisfiableConstraintException.class);
+        }
+
+        @Test
+        @DisplayName("WRAP_CHARACTER does not throw when column is too small to fit wrapped text")
+        void wrapCharacter_doesNotThrow_whenColumnTooSmall() {
+            // "AAAAAABBBBBBCCCCCC" requires 3 rows at width 6, but only 1 row is available.
+            // The raised Constraint.min floor must be capped at the available height (1) to
+            // avoid conflicting REQUIRED constraints in the Cassowary solver.
+            Rect area = new Rect(0, 0, 6, 1);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            // Should not throw UnsatisfiableConstraintException
+            column(
+                text("AAAAAABBBBBBCCCCCC").overflow(Overflow.WRAP_CHARACTER)
+            ).render(frame, area, RenderContext.empty());
+
+            assertThat(buffer).hasContent(
+                "AAAAAA"
+            );
+        }
     }
 }
