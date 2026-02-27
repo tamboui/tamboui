@@ -86,6 +86,20 @@ class MonthlyTest {
     }
 
     @Test
+    void withCustomLocale_renderWithMonthHeader() {
+        LocalDate date = LocalDate.of(2025, 6, 15);
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY, new Locale("pl"))
+                .showMonthHeader(Style.EMPTY.bold());
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
+        calendar.render(new Rect(0, 0, 25, 10), buffer);
+
+        // Find "Czerwiec" in the buffer
+        String content = extractBufferContent(buffer, 0, 0, 25, 1);
+        assertThat(content).contains("Czerwiec");
+    }
+
+    @Test
     void ofCurrentMonthWithLocale_renderWithMonthHeader() {
         Monthly calendar = Monthly.ofCurrentMonth(Locale.US)
                 .showMonthHeader(Style.EMPTY.bold());
