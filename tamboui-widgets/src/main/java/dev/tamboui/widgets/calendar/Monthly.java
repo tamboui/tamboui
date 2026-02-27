@@ -347,11 +347,12 @@ public final class Monthly implements Widget {
      * @return the string with the first letter converted to uppercase,
      *         or the original string if it is {@code null} or empty
      */
-    private static String capitalize(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    private static String capitalize(String s, Locale locale) {
+if (s == null || s.isEmpty()) return s;
+int firstCp = s.codePointAt(0);
+int firstLen = Character.charCount(firstCp);
+String first = new String(Character.toChars(firstCp)).toUpperCase(locale);
+return first + s.substring(firstLen);
     }
 
     /**
