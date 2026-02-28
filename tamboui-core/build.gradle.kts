@@ -13,4 +13,6 @@ tasks.named<org.gradle.jvm.tasks.Jar>("jar") {
 
 dependencies {
     testFixturesApi(libs.assertj.core)
+
+    compileOnly(libs.jfr.polyfill)
 }

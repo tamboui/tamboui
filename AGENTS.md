@@ -176,6 +176,36 @@ CharWidth.truncateWithEllipsis(s, w, pos) // Truncate with "..."
 
 See `Paragraph.java` for correct CharWidth usage in text rendering.
 
+## JFR (Java Flight Recorder) Support
+
+TamboUI can emit JFR events for diagnostics/performance analysis.
+
+### Packaging
+
+- **Core JFR events**: `dev.tamboui.jfr` (e.g. `TerminalDrawEvent`)
+- **Toolkit JFR events**: `dev.tamboui.toolkit.jfr`
+
+### Naming
+
+- Use `@Name("dev.tamboui.<area>.<thing>")`
+- Keep names short and consistent; **do not include `Event`** in the `@Name`.
+
+### Runtime overhead
+
+- Always guard emission with `enabled()` checks to keep overhead minimal when not recording:
+  - Callers should do `if (X.enabled()) { X.commit(...); }`
+  - The `enabled()` method must be on the event class so callers can avoid any allocations.
+
+### Helper method convention
+
+- Prefer static helpers on the event class over separate tracer interfaces.
+- If a helper just creates + populates + calls `Event.commit()`, name it **`commit(...)`** to match JDK convention.
+
+### Java 8 compatibility
+
+- Library modules target **Java 8**, so referencing `jdk.jfr.*` requires the build to supply it.
+- When adding JFR events to a module, add `compileOnly(libs.jfr.polyfill)` to that module’s Gradle dependencies.
+
 ## Exception Handling Strategy
 
 TamboUI uses a consistent exception hierarchy for framework errors.

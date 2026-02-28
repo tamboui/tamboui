@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.CellUpdate;
 import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.jfr.TerminalDrawEvent;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
 
@@ -107,62 +108,74 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
      * @throws RuntimeIOException if drawing fails
      */
     public CompletedFrame draw(Consumer<Frame> renderer) {
+        TerminalDrawEvent trace = null;
+        if (TerminalDrawEvent.EVENT.isEnabled()) {
+            trace = new TerminalDrawEvent();
+            trace.begin();
+        }
         try {
-            // Handle resize if needed
-            Size size = backend.size();
-            Rect area = Rect.of(size.width(), size.height());
+            try {
+                // Handle resize if needed
+                Size size = backend.size();
+                Rect area = Rect.of(size.width(), size.height());
 
-            if (!area.equals(currentBuffer.area())) {
-                resize(area);
-            }
-
-            // Clear current buffer for new frame
-            currentBuffer.clear();
-
-            // Create frame and render
-            Frame frame = new Frame(currentBuffer, rawOutput);
-            renderer.accept(frame);
-
-            // Calculate diff and draw
-            List<CellUpdate> updates = previousBuffer.diff(currentBuffer);
-            if (!updates.isEmpty()) {
-                backend.draw(updates);
-            }
-
-            // Handle cursor
-            if (frame.isCursorVisible()) {
-                frame.cursorPosition().ifPresent(pos -> {
-                    try {
-                        backend.setCursorPosition(pos);
-                        if (hiddenCursor) {
-                            backend.showCursor();
-                            hiddenCursor = false;
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeIOException(
-                                String.format("Failed to set cursor position to %s: %s", pos, e.getMessage()), e);
-                    }
-                });
-            } else if (!hiddenCursor) {
-                try {
-                    backend.hideCursor();
-                    hiddenCursor = true;
-                } catch (IOException e) {
-                    throw new RuntimeIOException("Failed to hide cursor: " + e.getMessage(), e);
+                if (!area.equals(currentBuffer.area())) {
+                    resize(area);
                 }
+
+                // Clear current buffer for new frame
+                currentBuffer.clear();
+
+                // Create frame and render
+                Frame frame = new Frame(currentBuffer, rawOutput);
+                renderer.accept(frame);
+
+                // Calculate diff and draw
+                List<CellUpdate> updates = previousBuffer.diff(currentBuffer);
+                if (!updates.isEmpty()) {
+                    backend.draw(updates);
+                }
+
+                // Handle cursor
+                if (frame.isCursorVisible()) {
+                    frame.cursorPosition().ifPresent(pos -> {
+                        try {
+                            backend.setCursorPosition(pos);
+                            if (hiddenCursor) {
+                                backend.showCursor();
+                                hiddenCursor = false;
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeIOException(
+                                    String.format("Failed to set cursor position to %s: %s", pos, e.getMessage()), e);
+                        }
+                    });
+                } else if (!hiddenCursor) {
+                    try {
+                        backend.hideCursor();
+                        hiddenCursor = true;
+                    } catch (IOException e) {
+                        throw new RuntimeIOException("Failed to hide cursor: " + e.getMessage(), e);
+                    }
+                }
+
+                // Flush output
+                backend.flush();
+
+                // Swap buffers
+                Buffer temp = previousBuffer;
+                previousBuffer = currentBuffer;
+                currentBuffer = temp;
+
+                return new CompletedFrame(previousBuffer, area);
+            } catch (IOException e) {
+                throw new RuntimeIOException("Failed to draw frame: " + e.getMessage(), e);
             }
-
-            // Flush output
-            backend.flush();
-
-            // Swap buffers
-            Buffer temp = previousBuffer;
-            previousBuffer = currentBuffer;
-            currentBuffer = temp;
-
-            return new CompletedFrame(previousBuffer, area);
-        } catch (IOException e) {
-            throw new RuntimeIOException("Failed to draw frame: " + e.getMessage(), e);
+        } finally {
+            if (trace != null) {
+                trace.end();
+                trace.commit();
+            }
         }
     }
 

@@ -98,6 +98,24 @@ NOTE: If you are using JBang 0.136 or higher you can use the shortcut `// REPOS 
 - Java 8 or later, Java 17+ highly recommended
 - Gradle 9.x
 
+## JFR tracing
+
+TamboUI can emit JFR events for diagnostics and performance analysis when a recording is active.
+
+```bash
+jcmd <pid> JFR.start name=tamboui settings=profile duration=60s filename=tamboui.jfr
+```
+
+Event names:
+
+- `dev.tamboui.terminal.draw` (duration of `Terminal.draw()`)
+- `dev.tamboui.toolkit.route` (duration of toolkit event routing)
+- `dev.tamboui.toolkit.candidate`
+- `dev.tamboui.toolkit.focus.change`
+- `dev.tamboui.toolkit.focus.navigation`
+- `dev.tamboui.toolkit.drag.state`
+- `dev.tamboui.toolkit.global.handler`
+
 ## Quick Start
 
 ### Using TuiRunner (Recommended)
