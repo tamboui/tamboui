@@ -67,6 +67,9 @@
     "image-demo": {
       "script-ref": "tamboui-image/demos/image-demo/src/main/java/dev/tamboui/demo/ImageDemo.java"
     },
+    "video-demo": {
+      "script-ref": "tamboui-image/demos/video-demo/src/main/java/dev/tamboui/demo/VideoDemo.java"
+    },
     "picocli-demo": {
       "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     },
