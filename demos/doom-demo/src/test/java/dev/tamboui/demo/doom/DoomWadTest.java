@@ -1,0 +1,275 @@
+/*
+ * Copyright TamboUI Contributors
+ * SPDX-License-Identifier: MIT
+ */
+package dev.tamboui.demo.doom;
+
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class DoomWadTest {
+
+    @Test
+    void loadsMapFromWad() throws Exception {
+        byte[] wad = buildSimpleWad();
+        Path temp = Files.createTempFile("doom-demo", ".wad");
+        temp.toFile().deleteOnExit();
+        Files.write(temp, wad);
+
+        DoomDemo.WadFile wadFile = DoomDemo.WadFile.open(temp);
+        DoomDemo.WadMap map = wadFile.loadMap("MAP01");
+        DoomDemo.MapData grid = DoomDemo.WadRasterizer.rasterize(map, 64, "test.wad");
+
+        assertNotNull(grid);
+        assertEquals(5, grid.map().length);
+        assertEquals(5, grid.map()[0].length);
+        assertEquals('#', grid.map()[0][0]);
+        assertEquals('.', grid.map()[2][2]);
+        assertEquals(2.5, grid.startX(), 0.01);
+        assertEquals(2.5, grid.startY(), 0.01);
+        assertEquals("FLOOR1", grid.floorTextureName());
+        assertEquals("CEIL1", grid.ceilingTextureName());
+    }
+
+    @Test
+    void loadsTextureFromWad() throws Exception {
+        byte[] wad = buildSimpleWad();
+        Path temp = Files.createTempFile("doom-demo-texture", ".wad");
+        temp.toFile().deleteOnExit();
+        Files.write(temp, wad);
+
+        DoomDemo.WadFile wadFile = DoomDemo.WadFile.open(temp);
+        DoomDemo.WadTextureSet textures = wadFile.textureSet();
+        DoomDemo.WadTexture texture = textures.texture("TESTTX");
+
+        assertNotNull(texture);
+        assertEquals(2, texture.width());
+        assertEquals(2, texture.height());
+        assertEquals(0xFFFF0000, texture.sample(0, 0));
+        assertEquals(0xFF00FF00, texture.sample(1, 0));
+        assertEquals(0xFF00FF00, texture.sample(0, 1));
+        assertEquals(0xFFFF0000, texture.sample(1, 1));
+
+        DoomDemo.WadTexture flat = textures.flat("FLOOR1");
+        assertNotNull(flat);
+        assertEquals(64, flat.width());
+        assertEquals(64, flat.height());
+        assertEquals(0xFF00FF00, flat.sample(0, 0));
+    }
+
+    private static byte[] buildSimpleWad() throws IOException {
+        List<LumpData> lumps = new ArrayList<>();
+        lumps.add(new LumpData("MAP01", new byte[0]));
+
+        byte[] things = new byte[10];
+        writeShortLE(things, 0, (short) 64);  // x
+        writeShortLE(things, 2, (short) 64);  // y
+        writeShortLE(things, 4, (short) 0);   // angle
+        writeShortLE(things, 6, (short) 1);   // type (player 1)
+        writeShortLE(things, 8, (short) 0);   // options
+        lumps.add(new LumpData("THINGS", things));
+
+        byte[] linedefs = new byte[56];
+        int offset = 0;
+        offset = writeLine(linedefs, offset, 0, 1, 0);
+        offset = writeLine(linedefs, offset, 1, 2, 0);
+        offset = writeLine(linedefs, offset, 2, 3, 0);
+        writeLine(linedefs, offset, 3, 0, 0);
+        lumps.add(new LumpData("LINEDEFS", linedefs));
+
+        lumps.add(new LumpData("SIDEDEFS", buildSideDefs()));
+
+        byte[] vertexes = new byte[16];
+        writeShortLE(vertexes, 0, (short) 0);
+        writeShortLE(vertexes, 2, (short) 0);
+        writeShortLE(vertexes, 4, (short) 128);
+        writeShortLE(vertexes, 6, (short) 0);
+        writeShortLE(vertexes, 8, (short) 128);
+        writeShortLE(vertexes, 10, (short) 128);
+        writeShortLE(vertexes, 12, (short) 0);
+        writeShortLE(vertexes, 14, (short) 128);
+        lumps.add(new LumpData("VERTEXES", vertexes));
+
+        lumps.add(new LumpData("SECTORS", buildSectors()));
+
+        lumps.add(new LumpData("PLAYPAL", buildPalette()));
+        lumps.add(new LumpData("PNAMES", buildPatchNames()));
+        lumps.add(new LumpData("TEXTURE1", buildTextureLump()));
+        lumps.add(new LumpData("PATCH1", buildPatchLump()));
+        lumps.add(new LumpData("FLOOR1", buildFlat((byte) 2)));
+        lumps.add(new LumpData("CEIL1", buildFlat((byte) 1)));
+
+        return buildWad(lumps);
+    }
+
+    private static byte[] buildPalette() {
+        byte[] palette = new byte[256 * 3];
+        palette[3] = (byte) 255;
+        palette[6 + 1] = (byte) 255;
+        return palette;
+    }
+
+    private static byte[] buildSideDefs() throws IOException {
+        byte[] bytes = new byte[30];
+        writeName(bytes, 4, "-");
+        writeName(bytes, 12, "-");
+        writeName(bytes, 20, "TESTTX");
+        writeShortLE(bytes, 28, (short) 0);
+        return bytes;
+    }
+
+    private static byte[] buildSectors() throws IOException {
+        byte[] bytes = new byte[26];
+        writeName(bytes, 4, "FLOOR1");
+        writeName(bytes, 12, "CEIL1");
+        return bytes;
+    }
+
+    private static byte[] buildPatchNames() throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        writeIntLE(out, 1);
+        writeName(out, "PATCH1");
+        return out.toByteArray();
+    }
+
+    private static byte[] buildTextureLump() throws IOException {
+        byte[] bytes = new byte[40];
+        writeIntLE(bytes, 0, 1);
+        writeIntLE(bytes, 4, 8);
+        writeName(bytes, 8, "TESTTX");
+        writeIntLE(bytes, 16, 0);
+        writeShortLE(bytes, 20, (short) 2);
+        writeShortLE(bytes, 22, (short) 2);
+        writeIntLE(bytes, 24, 0);
+        writeShortLE(bytes, 28, (short) 1);
+        int patchOffset = 30;
+        writeShortLE(bytes, patchOffset, (short) 0);
+        writeShortLE(bytes, patchOffset + 2, (short) 0);
+        writeShortLE(bytes, patchOffset + 4, (short) 0);
+        writeShortLE(bytes, patchOffset + 6, (short) 0);
+        writeShortLE(bytes, patchOffset + 8, (short) 0);
+        return bytes;
+    }
+
+    private static byte[] buildPatchLump() {
+        byte[] bytes = new byte[30];
+        writeShortLE(bytes, 0, (short) 2);
+        writeShortLE(bytes, 2, (short) 2);
+        writeShortLE(bytes, 4, (short) 0);
+        writeShortLE(bytes, 6, (short) 0);
+        writeIntLE(bytes, 8, 16);
+        writeIntLE(bytes, 12, 23);
+        bytes[16] = 0;
+        bytes[17] = 2;
+        bytes[18] = 0;
+        bytes[19] = 1;
+        bytes[20] = 2;
+        bytes[21] = 0;
+        bytes[22] = (byte) 0xFF;
+        bytes[23] = 0;
+        bytes[24] = 2;
+        bytes[25] = 0;
+        bytes[26] = 2;
+        bytes[27] = 1;
+        bytes[28] = 0;
+        bytes[29] = (byte) 0xFF;
+        return bytes;
+    }
+
+    private static byte[] buildFlat(byte index) {
+        byte[] bytes = new byte[64 * 64];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = index;
+        }
+        return bytes;
+    }
+
+    private static int writeLine(byte[] buffer, int offset, int v1, int v2, int flags) {
+        writeShortLE(buffer, offset, (short) v1);
+        writeShortLE(buffer, offset + 2, (short) v2);
+        writeShortLE(buffer, offset + 4, (short) flags);
+        writeShortLE(buffer, offset + 6, (short) 0);
+        writeShortLE(buffer, offset + 8, (short) 0);
+        writeShortLE(buffer, offset + 10, (short) 0);
+        writeShortLE(buffer, offset + 12, (short) -1);
+        return offset + 14;
+    }
+
+    private static byte[] buildWad(List<LumpData> lumps) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] header = new byte[12];
+        out.write(header);
+
+        List<DirectoryEntry> entries = new ArrayList<>();
+        int offset = 12;
+        for (LumpData lump : lumps) {
+            entries.add(new DirectoryEntry(lump.name, offset, lump.data.length));
+            out.write(lump.data);
+            offset += lump.data.length;
+        }
+
+        int directoryOffset = offset;
+        for (DirectoryEntry entry : entries) {
+            writeIntLE(out, entry.offset);
+            writeIntLE(out, entry.size);
+            writeName(out, entry.name);
+        }
+
+        byte[] data = out.toByteArray();
+        System.arraycopy("PWAD".getBytes(StandardCharsets.US_ASCII), 0, data, 0, 4);
+        writeIntLE(data, 4, entries.size());
+        writeIntLE(data, 8, directoryOffset);
+        return data;
+    }
+
+    private static void writeName(ByteArrayOutputStream out, String name) throws IOException {
+        byte[] bytes = new byte[8];
+        byte[] nameBytes = name.getBytes(StandardCharsets.US_ASCII);
+        int count = Math.min(nameBytes.length, 8);
+        System.arraycopy(nameBytes, 0, bytes, 0, count);
+        out.write(bytes);
+    }
+
+    private static void writeName(byte[] buffer, int offset, String name) throws IOException {
+        byte[] bytes = new byte[8];
+        byte[] nameBytes = name.getBytes(StandardCharsets.US_ASCII);
+        int count = Math.min(nameBytes.length, 8);
+        System.arraycopy(nameBytes, 0, bytes, 0, count);
+        System.arraycopy(bytes, 0, buffer, offset, bytes.length);
+    }
+
+    private static void writeIntLE(ByteArrayOutputStream out, int value) throws IOException {
+        out.write(value & 0xFF);
+        out.write((value >> 8) & 0xFF);
+        out.write((value >> 16) & 0xFF);
+        out.write((value >> 24) & 0xFF);
+    }
+
+    private static void writeIntLE(byte[] buffer, int offset, int value) {
+        buffer[offset] = (byte) (value & 0xFF);
+        buffer[offset + 1] = (byte) ((value >> 8) & 0xFF);
+        buffer[offset + 2] = (byte) ((value >> 16) & 0xFF);
+        buffer[offset + 3] = (byte) ((value >> 24) & 0xFF);
+    }
+
+    private static void writeShortLE(byte[] buffer, int offset, short value) {
+        buffer[offset] = (byte) (value & 0xFF);
+        buffer[offset + 1] = (byte) ((value >> 8) & 0xFF);
+    }
+
+    private record LumpData(String name, byte[] data) {
+    }
+
+    private record DirectoryEntry(String name, int offset, int size) {
+    }
+}
