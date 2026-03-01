@@ -10,6 +10,7 @@ import jdk.jfr.Event;
 import jdk.jfr.EventType;
 import jdk.jfr.Label;
 import jdk.jfr.Name;
+import jdk.jfr.Threshold;
 
 /**
  * JFR event measuring time spent in {@code Terminal.draw()}.
