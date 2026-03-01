@@ -49,3 +49,11 @@ jobs:
 
       - name: Execute Gradle
         run: ./gradlew build -x spotlessCheck -x distTar -x distZip
+  native-compile:
+    name: Build Native Executables
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/shared-build-setup
+      - name: Execute Gradle
+        run: ./gradlew demos:filemanager-demo:nativeCompile
