@@ -173,7 +173,6 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
             }
         } finally {
             if (trace != null) {
-                trace.end();
                 trace.commit();
             }
         }

@@ -20,6 +20,7 @@ import jdk.jfr.Name;
 @Label("Terminal Draw")
 @Description("Time spent in Terminal.draw()")
 @Category({ "TamboUI", "Terminal" })
+@Threshold("1 ms")
 public final class TerminalDrawEvent extends Event {
     /**
      * The {@link EventType} for {@link TerminalDrawEvent}.
