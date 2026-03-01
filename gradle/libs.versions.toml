@@ -1,6 +1,6 @@
 [versions]
 jline = "3.25.1"
-aesh-terminal = "3.2"
+aesh-terminal = "3.3"
 junit = "5.14.3"
 assertj = "3.27.6"
 native-build-tools = "0.11.4"
