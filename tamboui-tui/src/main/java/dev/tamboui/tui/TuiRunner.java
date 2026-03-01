@@ -616,6 +616,16 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
+     * Sets the terminal window title.
+     *
+     * @param title the window title to set
+     * @throws IOException if the operation fails
+     */
+    public void setWindowTitle(String title) throws IOException {
+        backend.setWindowTitle(title);
+    }
+
+    /**
      * Returns the shared scheduler for scheduling tasks.
      * <p>
      * This scheduler runs on a dedicated daemon thread. Tasks scheduled here
