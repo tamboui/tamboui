@@ -49,6 +49,15 @@ jobs:
 
       - name: Execute Gradle
         run: ./gradlew build -x spotlessCheck -x distTar -x distZip
+      - name: Upload JUnit XML + HTML test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-test-results
+          if-no-files-found: warn
+          path: |
+            **/build/test-results/test/*.xml
+            **/build/reports/tests/test/**
   native-compile:
     name: Build Native Executables
     runs-on: ubuntu-latest
@@ -57,3 +66,4 @@ jobs:
       - uses: ./.github/actions/shared-build-setup
       - name: Execute Gradle
         run: ./gradlew demos:filemanager-demo:nativeCompile
+  
