@@ -374,7 +374,7 @@ public final class Monthly implements Widget {
      */
     private static String[] getWeekdayAbbrev(Locale locale) {
       return Arrays.stream(DayOfWeek.values())
-              .map(dayOfWeek -> dayOfWeek.getDisplayName(TextStyle.FULL_STANDALONE, locale))
+              .map(dayOfWeek -> dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, locale))
               .map(dayOfWeek -> capitalize(dayOfWeek, locale))
               .map(Monthly::firstTwoChars)
               .toArray(String[]::new);
