@@ -10,6 +10,7 @@ module dev.tamboui.toolkit {
     requires transitive dev.tamboui.tui;
     requires transitive dev.tamboui.css;
     requires java.logging;
+    requires jdk.jfr;
 
     exports dev.tamboui.toolkit;
     exports dev.tamboui.toolkit.app;
