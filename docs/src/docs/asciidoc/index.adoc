@@ -102,6 +102,11 @@ These work at any API level:
 * link:bindings.html[Bindings and Actions] - Input handling and @OnAction
 * link:mvc-architecture.html[Application Structure] - MVC patterns
 
+== Testing & Debugging
+
+* link:pilot-testing.html[Pilot Testing] - Programmatic testing with Pilot
+* link:tracing.html[Tracing] - Profiling and introspecting with Java Flight Recorder
+
 == Advanced
 
 * link:developer-guide.html[Developer Guide] - Creating custom widgets

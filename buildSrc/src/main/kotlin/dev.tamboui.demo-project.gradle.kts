@@ -43,7 +43,8 @@ graalvmNative {
                 "--allow-incomplete-classpath",
                 "-H:+ReportExceptionStackTraces",
                 "--enable-native-access=ALL-UNNAMED",
-                "-H:+SharedArenaSupport"
+                "-H:+SharedArenaSupport",
+                "--enable-monitoring=jfr"
             )
 
             // JLine requires access to terminal

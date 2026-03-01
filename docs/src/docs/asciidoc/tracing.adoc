@@ -1,0 +1,81 @@
+= Tracing and Introspection
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+
+include::_attributes.adoc[]
+
+When running you TamboUI application you cannot as easily use `println()` or `log()` to print to the console. Instead, you can use Java Flight Recorder (JFR) to trace the application and see what is happening.
+
+{project-name} emits Java Flight Recorder (JFR) events so you can profile rendering, inspect event routing, and debug focus and input handling without changing your application code. This guide explains which events are available, how to record them, and how to use the recordings.
+
+== Why use JFR with TamboUI?
+
+* **Low overhead** — Events are only allocated and written when a JFR recording is active and the event type is enabled. When not recording, the cost is a single `enabled()` check per site.
+* **No code changes** — Start your app with JFR and enable TamboUI event types; no recompile or debug flags.
+* **Standard tooling** — Use JDK Mission Control (JMC), `jfr` CLI, or any JFR consumer to view timelines, histograms, and logs.
+
+Use JFR when you want to:
+
+* See how long each frame spends in `Terminal.draw()` (rendering + diff + backend).
+* Trace which element received an input event and why (focus, routing, handlers).
+* Inspect focus changes, Tab/Shift+Tab navigation, and drag state.
+* Correlate UI behavior with other JFR data (GC, locks, CPU).
+
+== Enabling JFR recording
+
+Start your application with the JVM flags that enable Flight Recorder. 
+
+Simplest is using `jbang`'s `--jfr' flag:
+
+[source,bash]
+----
+jbang --jfr my-tamboui-app.jar
+----
+
+This will record to a file called `my-tamboui-app.jfr` in the current directory.
+
+You can add flags to the JVM to control the recording, i.e. to record for 60 seconds to a file: 
+
+[source,bash]
+----
+jbang --jfr=duration=60s my-tamboui-app.jar 
+----
+
+Same using `java` directly:
+
+[source,bash]
+----
+java -XX:StartFlightRecording=filename=recording.jfr,duration=60s -jar my-tamboui-app.jar
+----
+
+TamboUI events are under the category **TamboUI** (with subcategories **Terminal** and **Toolkit > Events**). In JDK Mission Control you can enable/disable event types when starting a recording or in a template.
+
+== Overhead and best practices
+
+* Events are only emitted when a recording is active and the event type is enabled. The library always checks `enabled()` before allocating or committing, so overhead when not recording is minimal.
+* For long or production-like runs, use a bounded recording (e.g. `duration=60s`) or enable only the TamboUI category to limit file size and cost.
+* To debug focus or routing, enable the Toolkit events; to profile frame time only, enable `dev.tamboui.terminal.draw` (and optionally standard JFR profile events).
+
+== Summary: event reference
+
+[cols="2,1,4",options="header"]
+|===
+| Event (JFR name) | Type | Use for
+| `dev.tamboui.terminal.draw` | Duration | Frame render time
+| `dev.tamboui.toolkit.route` | Duration | Per-input routing time and result
+| `dev.tamboui.toolkit.focus.change` | Instant | Focus transitions (from/to/reason)
+| `dev.tamboui.toolkit.focus.navigation` | Instant | Tab/Shift+Tab success and targets
+| `dev.tamboui.toolkit.candidate` | Instant | Which elements were considered and why
+| `dev.tamboui.toolkit.global.handler` | Instant | Global handler order and result
+| `dev.tamboui.toolkit.drag.state` | Instant | Drag start/drag/end/cancel and coordinates
+|===
+
+
+[NOTE]
+====
+JFR event support in TamboUI is **new and actively evolving**. We welcome feedback and suggestions for additional instrumentation points—please open an issue or discussion if you have ideas for new events that could improve profiling or diagnostics!
+====
+

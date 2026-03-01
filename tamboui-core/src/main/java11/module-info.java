@@ -21,5 +21,7 @@ module dev.tamboui.core {
     exports dev.tamboui.widget;
     exports dev.tamboui.error;
 
+    requires jdk.jfr;
+    
     uses dev.tamboui.terminal.BackendProvider;
 }
