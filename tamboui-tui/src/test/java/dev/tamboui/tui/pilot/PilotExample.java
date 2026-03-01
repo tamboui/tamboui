@@ -4,6 +4,8 @@
  */
 package dev.tamboui.tui.pilot;
 
+import java.time.Duration;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.tui.EventHandler;
@@ -20,6 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Methods can be run as tests or used as documentation.
  */
 class PilotExample {
+
+    /** Wait for counter to reach expected value (avoids CI race where event is processed after fixed pause). */
+    private static void awaitCounter(int[] counter, int expected) throws InterruptedException {
+        Duration timeout = Duration.ofSeconds(2);
+        long deadline = System.nanoTime() + timeout.toNanos();
+        while (counter[0] != expected && System.nanoTime() < deadline) {
+            Thread.sleep(10);
+        }
+    }
 
     /**
      * Example: testing a simple counter application.
@@ -57,15 +68,15 @@ class PilotExample {
             Pilot pilot = test.pilot();
 
             pilot.press('+');
-            pilot.pause();
+            awaitCounter(counter, 1);
             assertEquals(1, counter[0]);
 
             pilot.press('+');
-            pilot.pause();
+            awaitCounter(counter, 2);
             assertEquals(2, counter[0]);
 
             pilot.press('-');
-            pilot.pause();
+            awaitCounter(counter, 1);
             assertEquals(1, counter[0]);
 
             pilot.press('q');
