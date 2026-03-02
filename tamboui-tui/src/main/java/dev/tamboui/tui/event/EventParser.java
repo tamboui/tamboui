@@ -66,22 +66,18 @@ public final class EventParser {
         }
 
         // Control characters
-        if (c < 32) {
+        if (c < 32 || c == 127) {
             return parseControlChar(c, bindings);
         }
 
+        boolean isPrintable = Character.isDefined(c) && !Character.isISOControl(c);
+
         // Regular printable character
-        if (c < 127) {
+        if (isPrintable) {
             return KeyEvent.ofChar((char) c, bindings);
         }
 
-        // DEL key
-        if (c == 127) {
-            return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings);
-        }
-
-        // Extended ASCII / UTF-8 - treat as character
-        return KeyEvent.ofChar((char) c, bindings);
+        return KeyEvent.ofKey(KeyCode.UNKNOWN);
     }
 
     private static Event parseControlChar(int c, Bindings bindings) {
@@ -95,6 +91,8 @@ public final class EventParser {
                 return KeyEvent.ofKey(KeyCode.ENTER, bindings);        // Enter (LF or CR)
             case 27:
                 return KeyEvent.ofKey(KeyCode.ESCAPE, bindings);           // Escape (standalone)
+            case 127:
+                return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings);     // DEL key
             default:
                 if (c >= 1 && c <= 26) {
                     char letter = (char) ('a' + c - 1);
