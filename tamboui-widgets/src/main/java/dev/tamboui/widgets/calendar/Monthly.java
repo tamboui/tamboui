@@ -8,6 +8,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -38,7 +39,6 @@ import dev.tamboui.widgets.block.Block;
  */
 public final class Monthly implements Widget {
 
-    private static final String[] WEEKDAY_ABBREV = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"};
     private static final int CELL_WIDTH = 3;  // Width per day cell (2 digits + space)
     private static final int CALENDAR_WIDTH = CELL_WIDTH * 7 - 1;  // 7 days, minus trailing space
 
@@ -247,13 +247,15 @@ public final class Monthly implements Widget {
             return y;
         }
 
+        String[] weekdayAbbrev = getWeekdayAbbrev(locale);
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 7; i++) {
             int dayIndex = (firstDayOfWeek.getValue() - 1 + i) % 7;
             if (i > 0) {
                 sb.append(" ");
             }
-            sb.append(WEEKDAY_ABBREV[dayIndex]);
+            sb.append(weekdayAbbrev[dayIndex]);
         }
 
         int x = area.x() + Math.max(0, (area.width() - sb.length()) / 2);
@@ -354,6 +356,62 @@ public final class Monthly implements Widget {
         int firstLen = Character.charCount(firstCp);
         String first = new String(Character.toChars(firstCp)).toUpperCase(locale);
         return first + s.substring(firstLen);
+    }
+
+    /**
+     * Returns an array of two-character weekday abbreviations for the given locale.
+     * <p>
+     * Each abbreviation is derived from the full standalone display name of the day,
+     * capitalized according to the locale rules, and then truncated (or left-padded)
+     * to exactly two Unicode characters.
+     * <p>
+     * The returned array contains seven elements, one for each day of the week,
+     * ordered from Monday to Sunday as defined by {@link DayOfWeek#values()}.
+     *
+     * @param locale the locale to use for day-of-week display names
+     * @return a seven-element array of two-character weekday abbreviations
+     * @see DayOfWeek#getDisplayName(TextStyle, Locale)
+     */
+    private static String[] getWeekdayAbbrev(Locale locale) {
+      return Arrays.stream(DayOfWeek.values())
+              .map(dayOfWeek -> dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, locale))
+              .map(dayOfWeek -> capitalize(dayOfWeek, locale))
+              .map(Monthly::firstTwoChars)
+              .toArray(String[]::new);
+    }
+
+    /**
+     * Returns the first two Unicode code points of the given string.
+     * <p>
+     * If the string contains fewer than two code points, it is left-padded
+     * with spaces to ensure the result always represents exactly two characters.
+     * A {@code null} input is treated as an empty string.
+     *
+     * <pre>{@code
+     * firstTwoChars("Hello")  → "He"
+     * firstTwoChars("A")      → " A"
+     * firstTwoChars("")       → "  "
+     * firstTwoChars(null)     → "  "
+     * firstTwoChars("🎉🎄!") → "🎉🎄"
+     * }</pre>
+     *
+     * @param input the input string, may be {@code null}
+     * @return a string representing exactly two Unicode code points,
+     *         left-padded with spaces if necessary
+     */
+    private static String firstTwoChars(String input) {
+        if (input == null) {
+            return "  ";
+        }
+        int codePointCount = input.codePointCount(0, input.length());
+        if (codePointCount >= 2) {
+            int endIndex = input.offsetByCodePoints(0, 2);
+            return input.substring(0, endIndex);
+        } else if (codePointCount == 1) {
+            return " " + input;
+        } else {
+            return "  ";
+        }
     }
 
     /**

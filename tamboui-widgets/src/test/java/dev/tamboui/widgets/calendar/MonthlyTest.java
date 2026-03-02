@@ -117,7 +117,7 @@ class MonthlyTest {
     @Test
     void renderWithWeekdaysHeader() {
         LocalDate date = LocalDate.of(2025, 6, 15);
-        Monthly calendar = Monthly.of(date, d -> Style.EMPTY)
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY, Locale.US)
             .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN));
 
         Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
@@ -126,6 +126,20 @@ class MonthlyTest {
         // Find weekday abbreviations in the buffer
         String content = extractBufferContent(buffer, 0, 0, 25, 1);
         assertThat(content).contains("Mo");
+    }
+
+    @Test
+    void withCustomLocale_renderWithWeekdaysHeader() {
+        LocalDate date = LocalDate.of(2025, 6, 15);
+        Monthly calendar = Monthly.of(date, d -> Style.EMPTY, new Locale("pl", "PL"))
+                .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN));
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 25, 10));
+        calendar.render(new Rect(0, 0, 25, 10), buffer);
+
+        // Find weekday abbreviations in the buffer
+        String content = extractBufferContent(buffer, 0, 0, 25, 1);
+        assertThat(content).contains("Po");
     }
 
     @Test
@@ -236,11 +250,11 @@ class MonthlyTest {
     void firstDayOfWeekChangesDayOrder() {
         LocalDate date = LocalDate.of(2025, 6, 15);
 
-        Monthly mondayFirst = Monthly.of(date, d -> Style.EMPTY)
+        Monthly mondayFirst = Monthly.of(date, d -> Style.EMPTY, Locale.US)
             .showWeekdaysHeader(Style.EMPTY)
             .firstDayOfWeek(DayOfWeek.MONDAY);
 
-        Monthly sundayFirst = Monthly.of(date, d -> Style.EMPTY)
+        Monthly sundayFirst = Monthly.of(date, d -> Style.EMPTY, Locale.US)
             .showWeekdaysHeader(Style.EMPTY)
             .firstDayOfWeek(DayOfWeek.SUNDAY);
 
