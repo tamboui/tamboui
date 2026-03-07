@@ -10,6 +10,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.EventType;
+import jdk.jfr.FlightRecorder;
 import jdk.jfr.Label;
 import jdk.jfr.Name;
 
@@ -21,7 +22,7 @@ import jdk.jfr.Name;
 @Description("Global event handler invocation")
 @Category({ "TamboUI", "Toolkit", "Events" })
 public final class GlobalHandlerEvent extends Event {
-    private static final EventType EVENT = EventType.getEventType(GlobalHandlerEvent.class);
+    private static EventType EVENT;
 
     @Label("Route ID")
     long routeId;
@@ -39,6 +40,10 @@ public final class GlobalHandlerEvent extends Event {
      * @return true if enabled
      */
     public static boolean enabled() {
+        if (!FlightRecorder.isAvailable()) { return false; }
+        if (EVENT == null) {
+            EVENT = EventType.getEventType(GlobalHandlerEvent.class);
+        }
         return EVENT.isEnabled();
     }
 

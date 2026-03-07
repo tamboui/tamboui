@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/shared-build-setup
+        with:
+          debug_enabled: ${{ inputs.debug_enabled }}
       - name: check formatting and comment on PR if failed
         id: check-formatting
         run: ./gradlew spotlessCheck
@@ -58,12 +60,46 @@ jobs:
           path: |
             **/build/test-results/test/*.xml
             **/build/reports/tests/test/**
+            
   native-compile:
-    name: Build Native Executables
-    runs-on: ubuntu-latest
+    name: Native Compile + Run (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/shared-build-setup
-      - name: Execute Gradle
+      - name: Build native executable
         run: ./gradlew demos:filemanager-demo:nativeCompile
+      # - name: Run demo, send q after 2s (Unix) fails as no pty.
+      #   if: runner.os != 'Windows'
+      #   shell: bash
+      #   env:
+      #     BIN: ./demos/filemanager-demo/build/native/nativeCompile/filemanager-demo
+      #   run: |
+      #     test -x "$BIN"
+      #     (
+      #       sleep 2
+      #       printf 'q'
+      #     ) | "$BIN"
+      - name: Run demo, send q after 2s (Windows)
+        ## mainly to verify jfr does not break native compilation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          BIN: .\demos\filemanager-demo\build\native\nativeCompile\filemanager-demo.exe
+        run: |
+          if (!(Test-Path $env:BIN)) {
+            throw "Native binary not found: $env:BIN"
+          }
+          $job = Start-Job -ScriptBlock {
+            Start-Sleep -Seconds 2
+            "q"
+          }
+          Receive-Job -Wait -AutoRemoveJob $job | & $env:BIN
+          if ($LASTEXITCODE -ne 0) {
+            throw "Demo exited with code $LASTEXITCODE"
+          }
   

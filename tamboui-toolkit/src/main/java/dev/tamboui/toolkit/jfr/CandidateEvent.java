@@ -8,6 +8,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.EventType;
+import jdk.jfr.FlightRecorder;
 import jdk.jfr.Label;
 import jdk.jfr.Name;
 
@@ -19,7 +20,7 @@ import jdk.jfr.Name;
 @Description("Candidate element considered during event routing")
 @Category({ "TamboUI", "Toolkit", "Events" })
 public final class CandidateEvent extends Event {
-    private static final EventType EVENT = EventType.getEventType(CandidateEvent.class);
+    private static EventType EVENT;
 
     @Label("Route ID")
     long routeId;
@@ -43,6 +44,10 @@ public final class CandidateEvent extends Event {
      * @return true if enabled
      */
     public static boolean enabled() {
+        if (!FlightRecorder.isAvailable()) { return false; }
+        if (EVENT == null) {
+            EVENT = EventType.getEventType(CandidateEvent.class);
+        }
         return EVENT.isEnabled();
     }
 

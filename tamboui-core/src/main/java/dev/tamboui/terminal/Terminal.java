@@ -109,7 +109,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
      */
     public CompletedFrame draw(Consumer<Frame> renderer) {
         TerminalDrawEvent trace = null;
-        if (TerminalDrawEvent.EVENT.isEnabled()) {
+        if (TerminalDrawEvent.enabled()) {
             trace = new TerminalDrawEvent();
             trace.begin();
         }

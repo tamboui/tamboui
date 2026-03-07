@@ -8,6 +8,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.EventType;
+import jdk.jfr.FlightRecorder;
 import jdk.jfr.Label;
 import jdk.jfr.Name;
 import jdk.jfr.Threshold;
@@ -23,10 +24,20 @@ import jdk.jfr.Threshold;
 @Category({ "TamboUI", "Terminal" })
 @Threshold("1 ms")
 public final class TerminalDrawEvent extends Event {
+    private static EventType EVENT;
+
     /**
-     * The {@link EventType} for {@link TerminalDrawEvent}.
+     * Returns whether this event type is enabled.
+     *
+     * @return true if enabled
      */
-    public static final EventType EVENT = EventType.getEventType(TerminalDrawEvent.class);
+    public static boolean enabled() {
+        if (!FlightRecorder.isAvailable()) { return false; }
+        if (EVENT == null) {
+            EVENT = EventType.getEventType(TerminalDrawEvent.class);
+        }
+        return EVENT.isEnabled();
+    }
 
     /**
      * Creates a new draw event instance.

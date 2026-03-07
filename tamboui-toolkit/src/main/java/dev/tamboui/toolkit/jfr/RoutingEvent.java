@@ -10,6 +10,7 @@ import jdk.jfr.Category;
 import jdk.jfr.Description;
 import jdk.jfr.Event;
 import jdk.jfr.EventType;
+import jdk.jfr.FlightRecorder;
 import jdk.jfr.Label;
 import jdk.jfr.Name;
 
@@ -23,7 +24,20 @@ import jdk.jfr.Name;
 @Description("Duration of toolkit event routing")
 @Category({ "TamboUI", "Toolkit", "Events" })
 public final class RoutingEvent extends Event {
-    private static final EventType EVENT = EventType.getEventType(RoutingEvent.class);
+    private static EventType EVENT;
+
+    /**
+     * Returns whether this event type is enabled.
+     *
+     * @return true if enabled
+     */
+    public static boolean enabled() {
+        if (!FlightRecorder.isAvailable()) { return false; }
+        if (EVENT == null) {
+            EVENT = EventType.getEventType(RoutingEvent.class);
+        }
+        return EVENT.isEnabled();
+    }
 
     @Label("Route ID")
     long routeId;
@@ -40,14 +54,7 @@ public final class RoutingEvent extends Event {
     private RoutingEvent() {
     }
 
-    /**
-     * Returns whether this event type is enabled.
-     *
-     * @return true if enabled
-     */
-    public static boolean enabled() {
-        return EVENT.isEnabled();
-    }
+    
 
     /**
      * Starts a new routing duration event.
@@ -76,4 +83,6 @@ public final class RoutingEvent extends Event {
     public void setResult(EventResult result) {
         this.result = result != null ? result.name() : null;
     }
+
+   
 }

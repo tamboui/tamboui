@@ -10,6 +10,11 @@ inputs:
     description: The Java version to use for building
     required: false
     default: '25'
+  debug_enabled:
+    description: 'Run the build with upterm debugging enabled (https://github.com/owenthereal/action-upterm)'
+    required: false
+    type: boolean
+    default: false
 outputs:
   github-short-sha:
     description: The short github.sha
