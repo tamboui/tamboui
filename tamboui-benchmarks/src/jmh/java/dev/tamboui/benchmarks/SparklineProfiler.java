@@ -218,7 +218,7 @@ public class SparklineProfiler {
                 .data(data).max(100).style(Style.EMPTY.fg(color)).barSet(barSet).direction(dir)
                 .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
                         .borderStyle(Style.EMPTY.fg(color))
-                        .title(Title.from(Line.from(Span.raw(String.format(" %s: %d%% ", name, current))
+                        .title(Title.from(Line.from(Span.raw(" " + name + ": " + current + "% ")
                                 .style(Style.EMPTY.fg(color))))).build())
                 .build(), area);
     }
@@ -229,8 +229,8 @@ public class SparklineProfiler {
                         Span.raw(" Frame: ").dim(),
                         Span.raw(String.valueOf(frameCount)).bold().cyan(),
                         Span.raw("   "),
-                        Span.raw(String.format("%.0f FPS", currentFps)).bold().green(),
-                        Span.raw(String.format("  %.1f us/frame", currentUsPerFrame)).dim())))
+                        Span.raw((long) currentFps + " FPS").bold().green(),
+                        Span.raw("  " + (long) (currentUsPerFrame * 10) / 10.0 + " us/frame").dim())))
                 .block(Block.builder().borders(Borders.ALL).borderType(BorderType.ROUNDED)
                         .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY)).build())
                 .build(), area);

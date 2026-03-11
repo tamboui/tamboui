@@ -163,7 +163,7 @@ public class SparklineDemoBenchmark {
     private void renderSparkline(Frame frame, Rect area, String name, long[] data,
                                   Color color, Sparkline.BarSet barSet, Sparkline.RenderDirection dir) {
         long current = data[DATA_SIZE - 1];
-        String label = String.format(" %s: %d%% ", name, current);
+        String label = " " + name + ": " + current + "% ";
         Sparkline sparkline = Sparkline.builder()
                 .data(data)
                 .max(100)
