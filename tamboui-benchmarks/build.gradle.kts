@@ -9,6 +9,7 @@ dependencies {
     jmh(project(":tamboui-core"))
     jmh(project(":tamboui-widgets"))
     jmh(project(":tamboui-jline3-backend"))
+    jmh(project(":tamboui-panama-backend"))
 }
 
 jmh {
