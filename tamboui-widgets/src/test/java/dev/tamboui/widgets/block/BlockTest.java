@@ -937,13 +937,14 @@ class BlockTest {
 
         // Now simulate what the Terminal does: diff the two buffers
         // The diff should detect that position (0,1) changed from "│" to "*"
-        java.util.List<dev.tamboui.buffer.CellUpdate> updates = buffer1.diff(buffer2);
+        dev.tamboui.buffer.DiffResult diff = new dev.tamboui.buffer.DiffResult();
+        buffer1.diff(buffer2, diff);
 
         // Should have exactly 1 update at position (0,1)
-        assertThat(updates).hasSize(1);
-        assertThat(updates.get(0).x()).isEqualTo(0);
-        assertThat(updates.get(0).y()).isEqualTo(1);
-        assertThat(updates.get(0).cell().symbol()).isEqualTo("*");
+        assertThat(diff.size()).isEqualTo(1);
+        assertThat(diff.getX(0)).isEqualTo(0);
+        assertThat(diff.getY(0)).isEqualTo(1);
+        assertThat(diff.getCell(0).symbol()).isEqualTo("*");
     }
 
     @Test
@@ -1009,12 +1010,13 @@ class BlockTest {
         assertThat(buffer2).isEqualTo(expectedAfter);
 
         // Diff should show changes for top border (minus corners), left/right sides, bottom border
-        java.util.List<dev.tamboui.buffer.CellUpdate> updates = buffer1.diff(buffer2);
+        dev.tamboui.buffer.DiffResult diff = new dev.tamboui.buffer.DiffResult();
+        buffer1.diff(buffer2, diff);
 
         // Top row: positions 1,2,3 change from " " to "─"
         // Middle row: positions 0 and 4 change from " " to "│"
         // Bottom row: positions 1,2,3 change from " " to "─"
-        assertThat(updates).hasSize(8);
+        assertThat(diff.size()).isEqualTo(8);
     }
 
 }

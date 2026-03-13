@@ -8,14 +8,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Cell;
-import dev.tamboui.buffer.CellUpdate;
+import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.layout.Size;
 import dev.tamboui.style.Style;
 
@@ -25,15 +23,15 @@ class PanamaBackendHyperlinkTest {
 
     @Test
     @DisplayName("draw emits OSC8 start and end around linked cell")
-    @SuppressWarnings("deprecation")
     void hyperlinkStartAndEndAroundCell() throws IOException {
         FakeTerminal terminal = new FakeTerminal();
         PanamaBackend backend = new PanamaBackend(terminal);
 
         Style style = Style.EMPTY.hyperlink("https://example.com");
-        List<CellUpdate> updates = List.of(new CellUpdate(0, 0, new Cell("A", style)));
+        DiffResult diff = new DiffResult();
+        diff.add(0, 0, new Cell("A", style));
 
-        backend.draw(updates);
+        backend.draw(diff);
         backend.flush();
 
         String output = terminal.output();
@@ -52,18 +50,16 @@ class PanamaBackendHyperlinkTest {
 
     @Test
     @DisplayName("draw ends hyperlink before next non-linked cell")
-    @SuppressWarnings("deprecation")
     void hyperlinkEndsBeforePlainCell() throws IOException {
         FakeTerminal terminal = new FakeTerminal();
         PanamaBackend backend = new PanamaBackend(terminal);
 
         Style linkStyle = Style.EMPTY.hyperlink("https://example.com", "link-1");
-        List<CellUpdate> updates = Arrays.asList(
-            new CellUpdate(0, 0, new Cell("A", linkStyle)),
-            new CellUpdate(1, 0, new Cell("B", Style.EMPTY))
-        );
+        DiffResult diff = new DiffResult();
+        diff.add(0, 0, new Cell("A", linkStyle));
+        diff.add(1, 0, new Cell("B", Style.EMPTY));
 
-        backend.draw(updates);
+        backend.draw(diff);
         backend.flush();
 
         String output = terminal.output();
