@@ -78,12 +78,16 @@ public final class StyleEngine {
 
     private String activeStylesheetName;
 
+    // Theme variable storage (global scope)
+    private Map<String, String> themeVariables;
+
     private StyleEngine() {
         this.namedStylesheets = new LinkedHashMap<>();
         this.inlineStylesheets = new ArrayList<>();
         this.cascadeResolver = new CascadeResolver();
         this.listeners = new CopyOnWriteArrayList<>();
         this.activeStylesheetName = null;
+        this.themeVariables = new HashMap<>();
     }
 
     /**
@@ -370,12 +374,15 @@ public final class StyleEngine {
     private Map<String, String> collectVariables() {
         Map<String, String> variables = new LinkedHashMap<>();
 
-        // Collect from inline stylesheets
+        // 1. Theme variables (lowest priority)
+        variables.putAll(themeVariables);
+
+        // 2. Collect from inline stylesheets (overrides theme)
         for (Stylesheet stylesheet : inlineStylesheets) {
             variables.putAll(stylesheet.variables());
         }
 
-        // Collect from active named stylesheet (overrides inline)
+        // 3. Collect from active named stylesheet (overrides inline)
         if (activeStylesheetName != null) {
             StylesheetEntry entry = namedStylesheets.get(activeStylesheetName);
             if (entry != null) {
@@ -384,6 +391,36 @@ public final class StyleEngine {
         }
 
         return variables;
+    }
+
+    /**
+     * Sets theme variables for TCSS $variable resolution.
+     * Called by ThemeEngine.injectVariables().
+     * <p>
+     * These variables are available globally in all TCSS files without declaration.
+     */
+    public void setThemeVariables(Map<String, String> variables) {
+        this.themeVariables = new HashMap<>(variables);
+        // Trigger re-resolution if stylesheets are already loaded
+        notifyListeners();
+    }
+
+    /**
+     * Resolves a TCSS variable reference ($varname).
+     * <p>
+     * Resolution order:
+     * <ol>
+     *   <li>User-defined variables in current TCSS file ($varname: value;)</li>
+     *   <li>Theme-injected variables ($primary, $error, etc.)</li>
+     *   <li>Return null if not found (parser will error)</li>
+     * </ol>
+     *
+     * @param varName variable name (without $ prefix)
+     * @return resolved value, or null if not found
+     */
+    public String resolveVariable(String varName) {
+        Map<String, String> allVariables = collectVariables();
+        return allVariables.get(varName);
     }
 
     private String readClasspathResource(String resource) throws IOException {
