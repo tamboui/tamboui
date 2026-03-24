@@ -20,6 +20,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
@@ -349,6 +350,118 @@ class TextAreaElementTest {
 
             assertThat(result).isEqualTo(EventResult.HANDLED);
             assertThat(element.getState().text()).isEqualTo("    ");
+        }
+
+        @Test
+        @DisplayName("Ctrl+P moves cursor up with emacs bindings")
+        void emacsCtrlP() {
+            TextAreaElement element = textArea().text("Line1\nLine2");
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'p', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorRow()).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("Ctrl+N moves cursor down with emacs bindings")
+        void emacsCtrlN() {
+            TextAreaElement element = textArea().text("Line1\nLine2");
+            element.getState().moveCursorToStart();
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'n', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorRow()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("Ctrl+B moves cursor left with emacs bindings")
+        void emacsCtrlB() {
+            TextAreaElement element = textArea().text("Hello");
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'b', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("Ctrl+F moves cursor right with emacs bindings")
+        void emacsCtrlF() {
+            TextAreaElement element = textArea().text("Hello");
+            element.getState().moveCursorToStart();
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'f', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("Ctrl+A moves cursor to line start with emacs bindings")
+        void emacsCtrlA() {
+            TextAreaElement element = textArea().text("Hello");
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'a', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("Ctrl+E moves cursor to line end with emacs bindings")
+        void emacsCtrlE() {
+            TextAreaElement element = textArea().text("Hello");
+            element.getState().moveCursorToStart();
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'e', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(5);
+        }
+
+        @Test
+        @DisplayName("Ctrl+H deletes backward with emacs bindings")
+        void emacsCtrlH() {
+            TextAreaElement element = textArea().text("Hello");
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'h', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().text()).isEqualTo("Hell");
+        }
+
+        @Test
+        @DisplayName("Ctrl+D deletes forward with emacs bindings")
+        void emacsCtrlD() {
+            TextAreaElement element = textArea().text("Hello");
+            element.getState().moveCursorToStart();
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'd', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().text()).isEqualTo("ello");
+        }
+
+        @Test
+        @DisplayName("Unbound Ctrl combo returns UNHANDLED")
+        void unboundCtrlCombo() {
+            TextAreaElement element = textArea().text("Hello");
+            KeyEvent event = new KeyEvent(KeyCode.CHAR, KeyModifiers.CTRL, 'z', BindingSets.emacs());
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().text()).isEqualTo("Hello");
         }
     }
 
