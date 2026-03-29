@@ -142,6 +142,12 @@ public final class EventParser {
             return parseMouseSGR(backend, bindings);
         }
 
+        // Check for mouse event (X10 format: ESC [ M Cb Cx Cy)
+        // JLine3 on Windows generates this format via trackMouse()
+        if (c == 'M') {
+            return parseMouseX10(backend, bindings);
+        }
+
         // Arrow keys and simple sequences
         switch (c) {
             case 'A':
@@ -402,6 +408,72 @@ public final class EventParser {
         if (isRelease) {
             kind = MouseEventKind.RELEASE;
         } else if (isDrag) {
+            kind = MouseEventKind.DRAG;
+        } else if (mouseButton == MouseButton.NONE) {
+            kind = MouseEventKind.MOVE;
+        } else {
+            kind = MouseEventKind.PRESS;
+        }
+
+        return new MouseEvent(kind, mouseButton, x, y, mods, bindings);
+    }
+
+    /**
+     * Parses X10 mouse format: ESC [ M Cb Cx Cy
+     * where Cb = button + 32, Cx = x + 33 (1-based + 32), Cy = y + 33 (1-based + 32)
+     */
+    private static Event parseMouseX10(Backend backend, Bindings bindings) throws IOException {
+        int cb = backend.read(PEEK_TIMEOUT);
+        int cx = backend.read(PEEK_TIMEOUT);
+        int cy = backend.read(PEEK_TIMEOUT);
+
+        if (cb == -2 || cb == -1 || cx == -2 || cx == -1 || cy == -2 || cy == -1) {
+            return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+        }
+
+        int buttonCode = cb - 32;
+        int x = cx - 33;  // Convert to 0-indexed
+        int y = cy - 33;
+
+        // Parse modifiers from button code
+        boolean shift = (buttonCode & 4) != 0;
+        boolean alt = (buttonCode & 8) != 0;
+        boolean ctrl = (buttonCode & 16) != 0;
+        KeyModifiers mods = KeyModifiers.of(ctrl, alt, shift);
+
+        // Clear modifier bits to get actual button
+        int button = buttonCode & ~(4 | 8 | 16);
+
+        // Scroll wheel
+        if (button >= 64 && button <= 65) {
+            MouseEventKind kind = (button == 64) ? MouseEventKind.SCROLL_UP : MouseEventKind.SCROLL_DOWN;
+            return new MouseEvent(kind, MouseButton.NONE, x, y, mods, bindings);
+        }
+
+        boolean isDrag = (button & 32) != 0;
+        button = button & ~32;
+
+        MouseButton mouseButton;
+        switch (button) {
+            case 0:
+                mouseButton = MouseButton.LEFT;
+                break;
+            case 1:
+                mouseButton = MouseButton.MIDDLE;
+                break;
+            case 2:
+                mouseButton = MouseButton.RIGHT;
+                break;
+            case 3:
+                // X10 format: button 3 means release (no specific button info)
+                return new MouseEvent(MouseEventKind.RELEASE, MouseButton.LEFT, x, y, mods, bindings);
+            default:
+                mouseButton = MouseButton.NONE;
+                break;
+        }
+
+        MouseEventKind kind;
+        if (isDrag) {
             kind = MouseEventKind.DRAG;
         } else if (mouseButton == MouseButton.NONE) {
             kind = MouseEventKind.MOVE;

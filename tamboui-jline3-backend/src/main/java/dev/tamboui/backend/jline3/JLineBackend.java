@@ -137,7 +137,15 @@ public class JLineBackend extends AbstractBackend {
 
     @Override
     public void enableMouseCapture() throws IOException {
-        // Enable mouse tracking modes
+        // Use JLine3's native mouse tracking API first.
+        // On Windows, this sets the correct console mode (ENABLE_MOUSE_INPUT)
+        // via Win32 API, enabling mouse events in CMD/PowerShell.
+        // JLine3 then translates native mouse events into escape sequences
+        // that flow through the NonBlockingReader for EventParser to parse.
+        terminal.trackMouse(Terminal.MouseTracking.Any);
+
+        // Also send ANSI escape sequences for terminals that support them
+        // (e.g. Windows Terminal, xterm, etc.)
         writer.print(CSI + "?1000h");  // Normal tracking
         writer.print(CSI + "?1002h");  // Button event tracking
         writer.print(CSI + "?1015h");  // urxvt style
@@ -148,6 +156,9 @@ public class JLineBackend extends AbstractBackend {
 
     @Override
     public void disableMouseCapture() throws IOException {
+        // Disable JLine3 native mouse tracking
+        terminal.trackMouse(Terminal.MouseTracking.Off);
+
         writer.print(CSI + "?1006l");
         writer.print(CSI + "?1015l");
         writer.print(CSI + "?1002l");
