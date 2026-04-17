@@ -224,12 +224,14 @@ public final class Theme {
         // TODO: Add success/warning shades when widgets need them
 
         // 5. Generate text colors
-        Color contrastText = effectiveBg.getContrastText();
-        colors.put("text", getOrVariable("text", contrastText));
+        // Use the theme's foreground color as the base text color rather than
+        // a pure black/white contrast.  Themes like Nord (#eceff4) and
+        // Catppuccin (#cdd6f4) intentionally use softer foreground tones.
+        colors.put("text", getOrVariable("text", effectiveFg));
         colors.put("text-muted", getOrVariable("text-muted",
-            contrastText.blend(effectiveBg, 0.4f)));
+            effectiveFg.blend(effectiveBg, 0.4f)));
         colors.put("text-disabled", getOrVariable("text-disabled",
-            contrastText.blend(effectiveBg, 0.62f)));
+            effectiveFg.blend(effectiveBg, 0.62f)));
         colors.put("text-on-primary", getOrVariable("text-on-primary",
             primary.getContrastText()));
 
@@ -243,7 +245,7 @@ public final class Theme {
         colors.put("selection-bg", getOrVariable("selection-bg",
             primary.blend(effectiveBg, 0.7f)));
         colors.put("hover-bg", getOrVariable("hover-bg",
-            contrastText.blend(effectiveBg, 0.96f)));
+            effectiveFg.blend(effectiveBg, 0.96f)));
 
         // TODO: scrollbar colors when ScrollBar widget implemented
         // TODO: link colors when Link widget implemented
