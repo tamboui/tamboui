@@ -95,6 +95,7 @@ These work at any API level:
 * link:layouts.html[Layouts Reference] - Columns, Grid, Dock, Stack, Flow
 * link:markup.html[Markup Text] - BBCode-style text formatting
 * link:styling.html[CSS Styling] - External stylesheets and theming
+* link:themes.html[Themes] - Semantic color palettes with auto-generated shades
 
 == Toolkit DSL
 

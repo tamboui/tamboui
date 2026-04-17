@@ -44,6 +44,8 @@ public final class ThemeEngine {
 
     /**
      * Creates a ThemeEngine with the auto-terminal theme.
+     *
+     * @throws IllegalStateException if the auto-terminal theme is not found
      */
     public ThemeEngine() {
         this(ThemeRegistry.get("auto-terminal")
@@ -52,6 +54,8 @@ public final class ThemeEngine {
 
     /**
      * Creates a ThemeEngine with the specified theme.
+     *
+     * @param theme the initial theme to use
      */
     public ThemeEngine(Theme theme) {
         setTheme(theme);
@@ -59,6 +63,8 @@ public final class ThemeEngine {
 
     /**
      * Sets the active theme and regenerates colors.
+     *
+     * @param theme the theme to set as active
      */
     public void setTheme(Theme theme) {
         this.currentTheme = theme;
@@ -68,6 +74,9 @@ public final class ThemeEngine {
 
     /**
      * Sets the active theme by name.
+     *
+     * @param themeName the name of the theme to look up and set
+     * @throws IllegalArgumentException if no theme with the given name is registered
      */
     public void setTheme(String themeName) {
         Theme theme = ThemeRegistry.get(themeName)
@@ -77,6 +86,8 @@ public final class ThemeEngine {
 
     /**
      * Gets the current theme.
+     *
+     * @return the current theme
      */
     public Theme getTheme() {
         return currentTheme;
@@ -84,6 +95,8 @@ public final class ThemeEngine {
 
     /**
      * Gets the generated color system.
+     *
+     * @return the color system generated from the current theme
      */
     public ColorSystem getColorSystem() {
         return colorSystem;
@@ -92,6 +105,8 @@ public final class ThemeEngine {
     /**
      * Gets the theme property resolver.
      * Use this as fallback when no CSS is available.
+     *
+     * @return the theme-based property resolver
      */
     public StylePropertyResolver getResolver() {
         return themeResolver;
@@ -111,6 +126,8 @@ public final class ThemeEngine {
      * </ul>
      * <p>
      * Call this once at application startup.
+     *
+     * @param styleEngine the style engine to inject theme variables into
      */
     public void injectVariables(StyleEngine styleEngine) {
         Map<String, String> cssVariables = new HashMap<>();
@@ -137,6 +154,9 @@ public final class ThemeEngine {
      * </ol>
      * <p>
      * Call this per-element during rendering.
+     *
+     * @param cssResolver the CSS style resolver to compose with the theme resolver
+     * @return a composed resolver that checks CSS rules first, then falls back to the theme
      */
     public StylePropertyResolver composeWithCss(CssStyleResolver cssResolver) {
         // TODO: Implement proper composition in Task 11
