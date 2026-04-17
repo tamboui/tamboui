@@ -29,7 +29,6 @@ import dev.tamboui.toolkit.elements.ListElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.widgets.input.TextAreaState;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -69,9 +68,6 @@ public class CssDemo implements Element {
         "Notifications"
     );
     private final ListElement<?> navList;
-    private final TextAreaState overflowState = new TextAreaState(
-        "The text-overflow CSS property controls how this long line behaves: "
-        + "the dark theme wraps it at word boundaries while the light theme clips it at the pane edge.");
 
     private CssDemo() {
         styleEngine = StyleEngine.create();
@@ -178,22 +174,12 @@ public class CssDemo implements Element {
                 buildThemeList()
             )).id("about-panel").focusable().title("About").rounded(), Constraint.length(30))
 
-            // Footer: a text area whose overflow mode comes from the theme's
-            // text-overflow property (dark = wrap-word, light = clip) - toggling
-            // the theme with [t] re-wraps this text with zero code involved.
-            .bottom(column(
-                textArea(overflowState)
-                    .id("overflow-area")
-                    .title("text-overflow from CSS (watch me on [t])")
-                    .showCursor(false)
-                    .rounded()
-                    .length(4),
-                panel(() -> row(
-                    text("CSS $variables ").addClass("primary"),
-                    text("+ ThemeEngine ").addClass("secondary"),
-                    text("= Semantic Styling").addClass("success")
-                )).rounded().length(3)
-            ).length(7))
+            // Footer
+            .bottom(panel(() -> row(
+                text("CSS $variables ").addClass("primary"),
+                text("+ ThemeEngine ").addClass("secondary"),
+                text("= Semantic Styling").addClass("success")
+            )).rounded())
         .render(frame, area, context);
     }
 
