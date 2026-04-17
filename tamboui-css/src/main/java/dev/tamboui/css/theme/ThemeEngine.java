@@ -10,6 +10,7 @@ import java.util.Map;
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.theme.ColorSystem;
 import dev.tamboui.theme.Theme;
@@ -159,9 +160,17 @@ public final class ThemeEngine {
      * @return a composed resolver that checks CSS rules first, then falls back to the theme
      */
     public StylePropertyResolver composeWithCss(CssStyleResolver cssResolver) {
-        // TODO: Implement proper composition in Task 11
-        // For now, just return the theme resolver
-        return themeResolver;
+        StylePropertyResolver fallback = themeResolver;
+        return new StylePropertyResolver() {
+            @Override
+            public <T> java.util.Optional<T> get(PropertyDefinition<T> property) {
+                java.util.Optional<T> cssValue = cssResolver.get(property);
+                if (cssValue.isPresent()) {
+                    return cssValue;
+                }
+                return fallback.get(property);
+            }
+        };
     }
 
     private String toCssValue(Color color) {
