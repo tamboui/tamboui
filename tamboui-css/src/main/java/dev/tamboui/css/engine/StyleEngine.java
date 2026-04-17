@@ -398,6 +398,8 @@ public final class StyleEngine {
      * Called by ThemeEngine.injectVariables().
      * <p>
      * These variables are available globally in all TCSS files without declaration.
+     *
+     * @param variables map of variable names to values
      */
     public void setThemeVariables(Map<String, String> variables) {
         this.themeVariables = new HashMap<>(variables);
