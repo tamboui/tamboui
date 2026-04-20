@@ -15,6 +15,10 @@ inputs:
     required: false
     type: boolean
     default: false
+  github-token:
+    description: 'GitHub token used by setup-graalvm to raise API rate limits'
+    required: false
+    default: ''
 outputs:
   github-short-sha:
     description: The short github.sha
@@ -32,7 +36,7 @@ runs:
       with:
         distribution: 'graalvm-community'
         java-version: '${{ inputs.java-version }}'
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github-token }}
     - uses: gradle/actions/wrapper-validation@v5
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5

@@ -16,6 +16,8 @@ jobs:
           fetch-depth: 1
           ssh-key: "${{ secrets.DOCS_SSH_PRIVATE_KEY }}"
       - uses: ./.github/actions/shared-build-setup
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup git for SSH push
         env:
           GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"

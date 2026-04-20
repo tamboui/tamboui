@@ -28,6 +28,8 @@ jobs:
           git commit -a -m "[release] Releasing version ${{ github.event.inputs.version }}"
           git push origin main
       - uses: ./.github/actions/shared-build-setup
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Execute Gradle build
         if: env.CENTRAL_USERNAME
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository

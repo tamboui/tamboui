@@ -22,6 +22,7 @@ jobs:
       - uses: ./.github/actions/shared-build-setup
         with:
           debug_enabled: ${{ inputs.debug_enabled }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: check formatting and comment on PR if failed
         id: check-formatting
         run: ./gradlew spotlessCheck
@@ -31,6 +32,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/shared-build-setup
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update jbang-catalog.json to include new demos
         run: |
           ./gradlew publishToMavenLocal
@@ -48,6 +51,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/shared-build-setup
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Execute Gradle
         run: ./gradlew build -x spotlessCheck -x distTar -x distZip
@@ -71,6 +76,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/shared-build-setup
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build native executable
         run: ./gradlew demos:filemanager-demo:nativeCompile
       # - name: Run demo, send q after 2s (Unix) fails as no pty.
