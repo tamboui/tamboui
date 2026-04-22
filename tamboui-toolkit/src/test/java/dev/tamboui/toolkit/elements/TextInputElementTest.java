@@ -13,6 +13,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,5 +78,39 @@ class TextInputElementTest {
         textInput().placeholder("Enter...").rounded().render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.YELLOW);
+    }
+
+    @Test
+    @DisplayName("handles key events")
+    void handlesKeyEvents() {
+        String unicodeChars = "AĄÄÉÅŞÞ";
+
+        TextInputElement input = textInput();
+        for (char ch : unicodeChars.toCharArray()) {
+            input.handleKeyEvent(KeyEvent.ofChar(ch), true);
+        }
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+
+        Rect area = new Rect(0, 0, 20, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        input.renderContent(frame, area, context);
+
+        String content = extractBufferContent(buffer, 0, 0, 10, 1);
+
+        assertThat(content).contains(unicodeChars);
+    }
+
+    private String extractBufferContent(Buffer buffer, int startX, int startY, int width, int height) {
+        StringBuilder sb = new StringBuilder();
+        for (int y = startY; y < startY + height; y++) {
+            for (int x = startX; x < startX + width; x++) {
+                sb.append(buffer.get(x, y).symbol());
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }

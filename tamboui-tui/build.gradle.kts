@@ -14,4 +14,5 @@ dependencies {
     testImplementation(testFixtures(projects.tambouiToolkit))
     testFixturesImplementation(projects.tambouiCore)
     testFixturesImplementation(testFixtures(projects.tambouiCore))
+    testImplementation("org.mockito:mockito-core:5.11.0")
 }

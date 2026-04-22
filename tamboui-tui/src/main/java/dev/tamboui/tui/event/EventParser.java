@@ -66,21 +66,15 @@ public final class EventParser {
         }
 
         // Control characters
-        if (c < 32) {
+        if (c < 32 || c == 127) {
             return parseControlChar(c, bindings);
         }
 
+//        if (!isPrintable(c)) {
+//            return KeyEvent.ofKey(KeyCode.UNKNOWN);
+//        }
+
         // Regular printable character
-        if (c < 127) {
-            return KeyEvent.ofChar((char) c, bindings);
-        }
-
-        // DEL key
-        if (c == 127) {
-            return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings);
-        }
-
-        // Extended ASCII / UTF-8 - treat as character
         return KeyEvent.ofChar((char) c, bindings);
     }
 
@@ -95,6 +89,8 @@ public final class EventParser {
                 return KeyEvent.ofKey(KeyCode.ENTER, bindings);        // Enter (LF or CR)
             case 27:
                 return KeyEvent.ofKey(KeyCode.ESCAPE, bindings);           // Escape (standalone)
+            case 127:
+                return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings);     // DEL key
             default:
                 if (c >= 1 && c <= 26) {
                     char letter = (char) ('a' + c - 1);
@@ -410,5 +406,15 @@ public final class EventParser {
         }
 
         return new MouseEvent(kind, mouseButton, x, y, mods, bindings);
+    }
+
+    private static boolean isPrintable(int c) {
+        int type = Character.getType(c);
+        return Character.isDefined(c)
+                && !Character.isISOControl(c)
+                && type != Character.FORMAT          // Cf – Word Joiner, ZWJ, ZWNJ, itp.
+                && type != Character.SURROGATE        // Cs
+                && type != Character.PRIVATE_USE      // Co
+                && type != Character.UNASSIGNED;      // Cn
     }
 }
