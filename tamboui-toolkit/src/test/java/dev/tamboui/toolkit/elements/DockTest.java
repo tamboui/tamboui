@@ -17,6 +17,7 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
@@ -29,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for DockElement.
  */
-class DockTest {
+class DockTest extends AbstractElementTest {
 
     @Test
     @DisplayName("renders all 5 regions")

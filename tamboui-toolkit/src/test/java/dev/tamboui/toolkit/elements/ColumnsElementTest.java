@@ -4,12 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
@@ -19,16 +13,23 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.columns.ColumnOrder;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import java.util.Arrays;
+
+import static dev.tamboui.toolkit.Toolkit.columns;
+import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for ColumnsElement.
  */
-class ColumnsElementTest {
+class ColumnsElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("preferredWidth() returns 0 for empty columns")

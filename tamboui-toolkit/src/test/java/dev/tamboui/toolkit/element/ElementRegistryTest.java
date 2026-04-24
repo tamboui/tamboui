@@ -4,28 +4,19 @@
  */
 package dev.tamboui.toolkit.element;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.toolkit.AbstractElementTest;
+import org.junit.jupiter.api.*;
+
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for ElementRegistry CSS selector support.
  */
-class ElementRegistryTest {
+class ElementRegistryTest extends AbstractElementTest {
 
     private ElementRegistry registry;
     private Rect area1;

@@ -4,9 +4,8 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.AbstractElementTest;
+import org.junit.jupiter.api.*;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.cascade.CssStyleResolver;
@@ -27,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for TextElement.
  */
-class TextElementTest {
+class TextElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("TextElement fluent API chains correctly")

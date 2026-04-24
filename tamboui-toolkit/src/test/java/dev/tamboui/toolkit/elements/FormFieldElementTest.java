@@ -4,28 +4,23 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
-import dev.tamboui.widgets.form.BooleanFieldState;
-import dev.tamboui.widgets.form.FieldType;
-import dev.tamboui.widgets.form.FormState;
-import dev.tamboui.widgets.form.SelectFieldState;
-import dev.tamboui.widgets.form.ValidationResult;
-import dev.tamboui.widgets.form.Validators;
+import dev.tamboui.widgets.form.*;
 import dev.tamboui.widgets.input.TextInputState;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.formField;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for FormFieldElement.
  */
-class FormFieldElementTest {
+class FormFieldElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("formField renders label and input")

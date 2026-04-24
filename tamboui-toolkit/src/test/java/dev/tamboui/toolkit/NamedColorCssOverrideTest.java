@@ -12,6 +12,7 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.elements.TextElement;
 
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * When code uses {@code .red()} or {@code .fg(Color.RED)}, a CSS class "red" is added.
  * Theme stylesheets should be able to override the color via {@code .red { color: #FF5555; }}.
  */
-class NamedColorCssOverrideTest {
+class NamedColorCssOverrideTest extends AbstractElementTest {
 
     private static final Rect AREA = new Rect(0, 0, 10, 1);
 

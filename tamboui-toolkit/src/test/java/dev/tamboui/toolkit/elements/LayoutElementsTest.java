@@ -4,9 +4,8 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.AbstractElementTest;
+import org.junit.jupiter.api.*;
 
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
@@ -25,7 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Tests for layout elements (Panel, Row, Column, Spacer).
  */
-class LayoutElementsTest {
+class LayoutElementsTest extends AbstractElementTest {
 
     @Nested
     @DisplayName("Panel tests")

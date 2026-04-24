@@ -7,4 +7,5 @@ description = "TFX effects integration with TamboUI Toolkit DSL"
 dependencies {
     api(projects.tambouiTfxTui)
     api(projects.tambouiToolkit)
+    testImplementation(testFixtures(projects.tambouiToolkit))
 }

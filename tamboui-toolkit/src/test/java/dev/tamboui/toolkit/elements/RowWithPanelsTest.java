@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for Row/Column preferredSize respecting length constraints.
  */
-class RowWithPanelsTest {
+class RowWithPanelsTest extends AbstractElementTest {
 
     @Test
     @DisplayName("Row preferredSize should respect length constraint")

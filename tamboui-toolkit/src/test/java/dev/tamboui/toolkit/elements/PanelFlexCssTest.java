@@ -14,6 +14,7 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests that Panel consumes CSS flex layout properties.
  */
-class PanelFlexCssTest {
+class PanelFlexCssTest extends AbstractElementTest {
 
     private StyleEngine styleEngine;
     private DefaultRenderContext context;

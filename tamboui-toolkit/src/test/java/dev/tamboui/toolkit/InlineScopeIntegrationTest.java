@@ -15,6 +15,7 @@ import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.TestBackend;
 import dev.tamboui.terminal.TestBackend.OpType;
+import dev.tamboui.toolkit.AbstractElementTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for InlineDisplay dynamic resizing behavior
  * when scopes collapse/expand.
  */
-class InlineScopeIntegrationTest {
+class InlineScopeIntegrationTest extends AbstractElementTest {
 
     private TestBackend backend;
 

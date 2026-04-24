@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests CSS property resolution for SpinnerElement.
  */
-class SpinnerElementCssTest {
+class SpinnerElementCssTest extends AbstractElementTest {
 
     private DefaultRenderContext context;
     private StyleEngine styleEngine;

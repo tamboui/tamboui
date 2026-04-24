@@ -15,6 +15,8 @@ dependencies {
     testFixturesImplementation(testFixtures(projects.tambouiTui))
     testFixturesImplementation(projects.tambouiCore)
     testFixturesImplementation(testFixtures(projects.tambouiCore))
+    testFixturesImplementation(platform(libs.junit.bom))
+    testFixturesImplementation(libs.junit.jupiter)
     testFixturesImplementation(libs.assertj.core)
 
     compileOnly(libs.jfr.polyfill)

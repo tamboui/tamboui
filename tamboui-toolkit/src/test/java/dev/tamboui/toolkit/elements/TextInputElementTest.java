@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for TextInputElement.
  */
-class TextInputElementTest {
+class TextInputElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("styleAttributes exposes title")

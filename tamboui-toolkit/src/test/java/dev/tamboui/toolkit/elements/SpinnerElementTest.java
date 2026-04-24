@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Tests for {@link SpinnerElement}.
  */
-class SpinnerElementTest {
+class SpinnerElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("SpinnerElement fluent API chains correctly")

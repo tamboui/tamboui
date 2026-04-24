@@ -4,13 +4,6 @@
  */
 package dev.tamboui.toolkit.element;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.StyledAreaInfo;
@@ -19,13 +12,17 @@ import dev.tamboui.style.Tags;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
+import dev.tamboui.toolkit.AbstractElementTest;
+import org.junit.jupiter.api.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.*;
 
 /**
  * Tests for fault-tolerant rendering in DefaultRenderContext.
  */
-class FaultTolerantRenderingTest {
+class FaultTolerantRenderingTest extends AbstractElementTest {
 
     private DefaultRenderContext context;
     private Frame frame;

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for WaveTextElement.
  */
-class WaveTextElementTest {
+class WaveTextElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("WaveTextElement fluent API chains correctly")

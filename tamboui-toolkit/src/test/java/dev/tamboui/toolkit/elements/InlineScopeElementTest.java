@@ -4,19 +4,19 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InlineScopeElementTest {
+class InlineScopeElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("preferredHeight returns 0 when hidden")

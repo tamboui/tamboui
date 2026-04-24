@@ -4,6 +4,7 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import dev.tamboui.toolkit.AbstractElementTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Tests for TableElement.
  */
-class TableElementTest {
+class TableElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("TableElement fluent API chains correctly")

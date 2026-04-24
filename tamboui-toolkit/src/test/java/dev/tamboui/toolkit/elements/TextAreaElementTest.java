@@ -4,12 +4,6 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Constraint;
@@ -20,18 +14,22 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.widgets.input.TextAreaState;
+import org.junit.jupiter.api.*;
 
-import static dev.tamboui.toolkit.Toolkit.*;
-import static org.assertj.core.api.Assertions.*;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static dev.tamboui.toolkit.Toolkit.textArea;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for TextAreaElement.
  */
-class TextAreaElementTest {
+class TextAreaElementTest extends AbstractElementTest {
 
     @Nested
     @DisplayName("Construction")
@@ -354,7 +352,7 @@ class TextAreaElementTest {
 
     @Nested
     @DisplayName("Text Change Listener")
-    class TextChangeListenerTest {
+    class TextChangeListenerTest extends AbstractElementTest {
 
         @Test
         @DisplayName("Listener is called on text change")

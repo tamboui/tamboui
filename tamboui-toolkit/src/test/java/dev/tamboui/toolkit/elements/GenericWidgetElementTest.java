@@ -4,9 +4,8 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import dev.tamboui.toolkit.AbstractElementTest;
+import org.junit.jupiter.api.*;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
@@ -24,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Tests for GenericWidgetElement.
  */
-class GenericWidgetElementTest {
+class GenericWidgetElementTest extends AbstractElementTest {
 
     @Nested
     @DisplayName("Factory methods")

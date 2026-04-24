@@ -17,6 +17,7 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.Panel;
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test that verifies CSS styles are actually applied during rendering.
  */
-class CssRenderingTest {
+class CssRenderingTest extends AbstractElementTest {
 
     // Path to the demo's theme resources (single source of truth)
     private static final Path THEMES_DIR = Paths.get("../tamboui-css/demos/css-demo/src/main/resources/themes-css");

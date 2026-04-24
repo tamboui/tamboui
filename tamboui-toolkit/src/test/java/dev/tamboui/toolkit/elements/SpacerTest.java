@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.toolkit.AbstractElementTest;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for Spacer.
  */
-class SpacerTest {
+class SpacerTest extends AbstractElementTest {
 
     @Test
     @DisplayName("preferredWidth() returns 0 for fill spacer")

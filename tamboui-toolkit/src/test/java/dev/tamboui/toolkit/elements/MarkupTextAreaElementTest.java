@@ -4,33 +4,28 @@
  */
 package dev.tamboui.toolkit.elements;
 
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
-import dev.tamboui.style.Color;
-import dev.tamboui.style.Modifier;
-import dev.tamboui.style.RichTextState;
-import dev.tamboui.style.Style;
-import dev.tamboui.style.StyledAreaInfo;
-import dev.tamboui.style.StyledAreaRegistry;
+import dev.tamboui.style.*;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
-import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.Toolkit.markupTextArea;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for MarkupTextAreaElement.
  */
-class MarkupTextAreaElementTest {
+class MarkupTextAreaElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("MarkupTextAreaElement fluent API chains correctly")

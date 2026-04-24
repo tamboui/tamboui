@@ -12,6 +12,7 @@ import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for LineGaugeElement.
  */
-class LineGaugeElementTest {
+class LineGaugeElementTest extends AbstractElementTest {
 
     @Test
     @DisplayName("styleAttributes exposes label")
