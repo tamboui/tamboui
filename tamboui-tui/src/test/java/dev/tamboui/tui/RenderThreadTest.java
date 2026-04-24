@@ -35,14 +35,14 @@ class RenderThreadTest {
     @Test
     @DisplayName("isRenderThread returns true when called from the render thread")
     void isRenderThread_returnsTrue_whenCalledFromRenderThread() {
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
         assertThat(RenderThread.isRenderThread()).isTrue();
     }
 
     @Test
     @DisplayName("isRenderThread returns false when called from a different thread")
     void isRenderThread_returnsFalse_whenCalledFromDifferentThread() throws Exception {
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
 
         AtomicBoolean isRenderThread = new AtomicBoolean(true);
         CountDownLatch latch = new CountDownLatch(1);
@@ -58,18 +58,17 @@ class RenderThreadTest {
     }
 
     @Test
-    @DisplayName("checkRenderThread succeeds when no render thread is set (allows testing)")
-    void checkRenderThread_succeeds_whenNoRenderThreadSet() {
+    @DisplayName("checkRenderThread throws when current thread is not marked as render thread")
+    void checkRenderThread_throws_whenNotMarked() {
         RenderThread.clearRenderThread();
 
-        // Should not throw - allows unit tests to run without special setup
-        assertThatCode(RenderThread::checkRenderThread).doesNotThrowAnyException();
+        assertThatThrownBy(RenderThread::checkRenderThread).isInstanceOf(TuiException.class);
     }
 
     @Test
     @DisplayName("checkRenderThread throws with informative message when called from wrong thread")
     void checkRenderThread_throwsInformativeException_whenCalledFromWrongThread() throws Exception {
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
 
         AtomicReference<Throwable> caught = new AtomicReference<>();
         CountDownLatch latch = new CountDownLatch(1);
@@ -94,7 +93,7 @@ class RenderThreadTest {
     @Test
     @DisplayName("checkRenderThread succeeds when on render thread")
     void checkRenderThread_succeeds_whenOnRenderThread() {
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
 
         // Should not throw
         assertThatCode(RenderThread::checkRenderThread).doesNotThrowAnyException();
@@ -103,7 +102,7 @@ class RenderThreadTest {
     @Test
     @DisplayName("clearRenderThread resets the render thread reference")
     void clearRenderThread_resetsReference() {
-        RenderThread.setRenderThread(Thread.currentThread());
+        RenderThread.markAsRenderThread();
         assertThat(RenderThread.isRenderThread()).isTrue();
 
         RenderThread.clearRenderThread();

@@ -4,18 +4,18 @@
  */
 package dev.tamboui.tui;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import dev.tamboui.tui.error.TuiException;
 
 /**
  * Utility class for render thread management.
  * <p>
  * TamboUI uses a dedicated render thread model similar to JavaFX. All rendering operations
- * must happen on the render thread. This class provides methods to check if the current
- * thread is the render thread and to assert that code is running on the render thread.
+ * must happen on a render thread. This class provides methods to check if the current
+ * thread is a render thread and to assert that code is running on one.
  * <p>
- * The render thread is set when {@link TuiRunner#run} starts and cleared when it exits.
+ * Multiple concurrent render threads are supported (e.g. for concurrent virtual TUIs).
+ * Each thread marks itself via {@link #markAsRenderThread()} when {@link TuiRunner#run}
+ * starts and unmarks itself when it exits.
  * <p>
  * <b>Usage:</b>
  * <pre>{@code
@@ -34,57 +34,49 @@ import dev.tamboui.tui.error.TuiException;
  */
 public final class RenderThread {
 
-    private static final AtomicReference<Thread> renderThread = new AtomicReference<>();
+    private static final ThreadLocal<Boolean> isRenderThread = new ThreadLocal<>();
 
     private RenderThread() {
         // Utility class
     }
 
     /**
-     * Returns whether the current thread is the render thread.
+     * Returns whether the current thread is a render thread.
      *
-     * @return true if called from the render thread, false otherwise
+     * @return true if called from a render thread, false otherwise
      */
     public static boolean isRenderThread() {
-        return Thread.currentThread() == renderThread.get();
+        return Boolean.TRUE.equals(isRenderThread.get());
     }
 
     /**
-     * Asserts that the current thread is the render thread.
+     * Asserts that the current thread is a render thread.
      * <p>
      * This should be called at the start of any method that must only be
-     * executed on the render thread.
-     * <p>
-     * The check only enforces when a render thread has been set (i.e., when
-     * TuiRunner.run() is active). If no render thread has been set, the check
-     * passes silently, allowing unit tests to run without special setup.
+     * executed on a render thread.
      *
-     * @throws IllegalStateException if a render thread has been set and this is not it
+     * @throws TuiException if this thread has not been marked as a render thread
      */
     public static void checkRenderThread() {
-        Thread ui = renderThread.get();
-        // Only enforce if render thread has been set
-        if (ui != null && Thread.currentThread() != ui) {
+        if (!Boolean.TRUE.equals(isRenderThread.get())) {
             Thread current = Thread.currentThread();
             throw new TuiException(
                 "Must be called on render thread. Current: " + current.getName() +
-                " (id=" + current.getId() + "), render thread: " + ui.getName());
+                " (id=" + current.getId() + ")");
         }
     }
 
     /**
-     * Sets the render thread. Package-private for use by TuiRunner.
-     *
-     * @param thread the thread to set as the render thread
+     * Marks the current thread as a render thread. Package-private for use by TuiRunner.
      */
-    static void setRenderThread(Thread thread) {
-        renderThread.set(thread);
+    static void markAsRenderThread() {
+        isRenderThread.set(Boolean.TRUE);
     }
 
     /**
-     * Clears the render thread reference. Package-private for use by TuiRunner.
+     * Clears the render thread mark from the current thread. Package-private for use by TuiRunner.
      */
     static void clearRenderThread() {
-        renderThread.set(null);
+        isRenderThread.remove();
     }
 }
