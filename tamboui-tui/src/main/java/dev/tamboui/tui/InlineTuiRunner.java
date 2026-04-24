@@ -4,17 +4,6 @@
  */
 package dev.tamboui.tui;
 
-import dev.tamboui.inline.InlineDisplay;
-import dev.tamboui.layout.Size;
-import dev.tamboui.terminal.Backend;
-import dev.tamboui.terminal.BackendFactory;
-import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.Text;
-import dev.tamboui.tui.event.Event;
-import dev.tamboui.tui.event.ResizeEvent;
-import dev.tamboui.tui.event.TickEvent;
-import dev.tamboui.tui.event.UiRunnable;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,6 +17,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import dev.tamboui.inline.InlineDisplay;
+import dev.tamboui.layout.Size;
+import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.BackendFactory;
+import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Text;
+import dev.tamboui.tui.event.Event;
+import dev.tamboui.tui.event.ResizeEvent;
+import dev.tamboui.tui.event.TickEvent;
+import dev.tamboui.tui.event.UiRunnable;
 
 /**
  * Event loop for inline displays.

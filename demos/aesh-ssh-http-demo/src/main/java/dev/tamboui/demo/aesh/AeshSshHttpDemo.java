@@ -11,6 +11,12 @@
  */
 package dev.tamboui.demo.aesh;
 
+import java.util.concurrent.TimeUnit;
+
+import org.aesh.terminal.Connection;
+import org.aesh.terminal.http.netty.NettyWebsocketTtyBootstrap;
+import org.aesh.terminal.ssh.netty.NettySshTtyBootstrap;
+
 import dev.tamboui.backend.aesh.AeshBackend;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitApp;
@@ -21,11 +27,6 @@ import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.widgets.input.TextAreaState;
-import org.aesh.terminal.Connection;
-import org.aesh.terminal.http.netty.NettyWebsocketTtyBootstrap;
-import org.aesh.terminal.ssh.netty.NettySshTtyBootstrap;
-
-import java.util.concurrent.TimeUnit;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
