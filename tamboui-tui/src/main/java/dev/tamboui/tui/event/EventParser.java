@@ -21,7 +21,8 @@ public final class EventParser {
     private static final int ESC = 27;
     private static final int PEEK_TIMEOUT = 50;
 
-    private EventParser() {}
+    private EventParser() {
+    }
 
     /**
      * Reads and parses the next event from the backend using the default bindings.
@@ -87,14 +88,16 @@ public final class EventParser {
     private static Event parseControlChar(int c, Bindings bindings) {
         switch (c) {
             case 3:
-                return KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings);  // Ctrl+C
+                return KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings); // Ctrl+C
+            case 8:
+                return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings); // Backspace (BS on Windows)
             case 9:
-                return KeyEvent.ofKey(KeyCode.TAB, bindings);               // Tab
+                return KeyEvent.ofKey(KeyCode.TAB, bindings); // Tab
             case 10:
             case 13:
-                return KeyEvent.ofKey(KeyCode.ENTER, bindings);        // Enter (LF or CR)
+                return KeyEvent.ofKey(KeyCode.ENTER, bindings); // Enter (LF or CR)
             case 27:
-                return KeyEvent.ofKey(KeyCode.ESCAPE, bindings);           // Escape (standalone)
+                return KeyEvent.ofKey(KeyCode.ESCAPE, bindings); // Escape (standalone)
             default:
                 if (c >= 1 && c <= 26) {
                     char letter = (char) ('a' + c - 1);
