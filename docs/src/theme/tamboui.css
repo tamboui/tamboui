@@ -44,6 +44,7 @@
     /* Layout */
     --sl-nav-height: 3.5rem;
     --sl-sidebar-width: 18rem;
+    --sl-header-actions-width: 14rem;
     --sl-content-width: 50rem;
     --sl-nav-pad-x: 1rem;
     --sl-content-pad-x: 2rem;
@@ -187,6 +188,7 @@ body {
     gap: 0.25rem;
     position: absolute;
     left: var(--sl-sidebar-width);
+    right: var(--sl-header-actions-width);
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -215,6 +217,57 @@ body {
 .top-nav a.current {
     color: var(--sl-color-text-accent);
     background: var(--sl-color-accent-low);
+}
+
+/* ===== Header right-side actions (version selector + theme toggle) ===== */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== Version selector (multi-version docs) ===== */
+.version-selector-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-shrink: 0;
+}
+
+.version-selector-label {
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-5);
+    white-space: nowrap;
+}
+
+.version-selector {
+    font-size: 0.875rem;
+    font-family: var(--sl-font-system);
+    color: var(--sl-color-text);
+    background: var(--sl-color-bg);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.375rem;
+    padding: 0.25rem 1.75rem 0.25rem 0.5rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='currentColor' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.35rem center;
+    min-width: 4rem;
+}
+
+.version-selector:hover {
+    border-color: var(--sl-color-accent);
+}
+
+.version-selector:focus {
+    outline: none;
+    border-color: var(--sl-color-accent);
+    box-shadow: 0 0 0 2px var(--sl-color-accent-low);
 }
 
 /* Mobile: hamburger menu for top nav */
@@ -778,6 +831,8 @@ blockquote, .quoteblock {
 
 /* ===== Theme Toggle ===== */
 .theme-toggle {
+    position: relative;
+    z-index: 1;
     background: transparent;
     border: 1px solid var(--sl-color-hairline);
     border-radius: 0.5rem;
