@@ -69,14 +69,14 @@ public final class RenderThread {
     /**
      * Marks the current thread as a render thread. Package-private for use by TuiRunner.
      */
-    public static void markAsRenderThread() {
+    static void markAsRenderThread() {
         isRenderThread.set(Boolean.TRUE);
     }
 
     /**
      * Clears the render thread mark from the current thread. Package-private for use by TuiRunner.
      */
-    public static void clearRenderThread() {
+    static void clearRenderThread() {
         isRenderThread.remove();
     }
 }

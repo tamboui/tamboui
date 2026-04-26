@@ -7,18 +7,18 @@ package dev.tamboui.toolkit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import dev.tamboui.tui.RenderThread;
+import dev.tamboui.tui.RenderThreadTestHelper;
 
 public abstract class AbstractElementTest {
 
     @BeforeEach
     void setUpRenderThread() {
-        RenderThread.markAsRenderThread();
+        RenderThreadTestHelper.markAsRenderThread();
     }
 
     @AfterEach
     void tearDownRenderThread() {
-        RenderThread.clearRenderThread();
+        RenderThreadTestHelper.clearRenderThread();
     }
 
 }
