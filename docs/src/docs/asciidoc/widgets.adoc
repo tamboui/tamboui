@@ -110,6 +110,10 @@ include::_attributes.adoc[]
 |<<clear,Clear>>
 |Stateless
 |Clears an area (for widget layering)
+
+|<<markdownview,MarkdownView>>
+|Stateless
+|Renders CommonMark + GFM markdown (separate `tamboui-markdown` module)
 |===
 
 == Container Widgets
@@ -672,6 +676,29 @@ Clears an area by filling it with a style. Useful for widget layering:
 ----
 include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=clear-style]
 ----
+
+== Markdown
+
+[[markdownview]]
+=== MarkdownView
+
+Renders CommonMark + GFM markdown to a buffer. Lives in its own
+`tamboui-markdown` module so consumers who do not need markdown rendering do
+not pay for the CommonMark dependency. The renderer is tolerant of partial
+input: a small sanitizer trims trailing unmatched inline markers before each
+parse, so a stream of markdown (for example produced by an LLM) can be
+displayed safely on every frame.
+
+[source,java]
+----
+MarkdownView view = MarkdownView.builder()
+    .source("# Hello\n\nThis is **markdown**.")
+    .build();
+view.render(area, buffer);
+----
+
+See link:markdown.html[Markdown Reference] for the full element coverage,
+streaming behaviour, and customization hooks.
 
 [[toolkit-dsl]]
 == Using Widgets with Toolkit DSL

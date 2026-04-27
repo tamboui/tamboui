@@ -67,6 +67,9 @@
     "image-demo": {
       "script-ref": "tamboui-image/demos/image-demo/src/main/java/dev/tamboui/demo/ImageDemo.java"
     },
+    "markdown-demo": {
+      "script-ref": "tamboui-markdown/demos/markdown-demo/src/main/java/dev/tamboui/demo/MarkdownDemo.java"
+    },
     "picocli-demo": {
       "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     },
@@ -114,6 +117,9 @@
     },
     "tree-demo": {
       "script-ref": "tamboui-toolkit/demos/tree-demo/src/main/java/dev/tamboui/demo/tree/TreeDemo.java"
+    },
+    "markdown-toolkit-demo": {
+      "script-ref": "tamboui-toolkit-markdown/demos/markdown-toolkit-demo/src/main/java/dev/tamboui/demo/MarkdownToolkitDemo.java"
     },
     "helloworld-demo": {
       "script-ref": "tamboui-tui/demos/helloworld-demo/src/main/java/dev/tamboui/demo/HelloWorldDemo.java"

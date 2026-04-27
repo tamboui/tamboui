@@ -69,6 +69,12 @@ Feedback, issues, and contributions are welcome!
 |`tamboui-image`
 |Image rendering with Kitty, iTerm, Sixel, and braille protocols
 
+|`tamboui-markdown`
+|Markdown rendering
+
+|`tamboui-toolkit-markdown`
+|Toolkit DSL element wrapping the markdown renderer
+
 |`tamboui-picocli`
 |Optional PicoCLI integration for CLI argument parsing
 |===
@@ -92,6 +98,7 @@ Feedback, issues, and contributions are welcome!
 These work at any API level:
 
 * link:widgets.html[Widgets Reference] - Block, Paragraph, List, Table, Chart, etc.
+* link:markdown.html[Markdown Reference] - Render CommonMark + GFM with the optional `tamboui-markdown` module
 * link:layouts.html[Layouts Reference] - Columns, Grid, Dock, Stack, Flow
 * link:markup.html[Markup Text] - BBCode-style text formatting
 * link:styling.html[CSS Styling] - External stylesheets and theming
