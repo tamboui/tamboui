@@ -159,6 +159,9 @@ public final class EventParser {
                 return KeyEvent.ofKey(KeyCode.HOME, bindings);
             case 'F':
                 return KeyEvent.ofKey(KeyCode.END, bindings);
+            case 'Z':
+                // Shift+Tab (backtab) - ESC[Z
+                return KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.SHIFT, bindings);
             default:
                 return parseExtendedCSI(c, backend, bindings);
         }
