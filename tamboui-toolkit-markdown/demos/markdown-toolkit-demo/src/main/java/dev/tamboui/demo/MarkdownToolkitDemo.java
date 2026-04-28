@@ -2,6 +2,7 @@
 //DEPS dev.tamboui:tamboui-toolkit-markdown:LATEST
 //DEPS dev.tamboui:tamboui-css:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
+//FILES sample.md=../../../../resources/sample.md
 
 /*
  * Copyright TamboUI Contributors

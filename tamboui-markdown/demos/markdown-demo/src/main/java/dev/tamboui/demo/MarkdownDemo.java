@@ -1,6 +1,7 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-markdown:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
+//FILES sample.md=../../../../resources/sample.md
 
 /*
  * Copyright TamboUI Contributors
