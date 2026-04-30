@@ -351,12 +351,12 @@ public final class TuiRunner implements AutoCloseable {
             }
 
             // Scroll handling
-            if (keyEvent.code() == KeyCode.UP || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'k') {
+            if (keyEvent.code() == KeyCode.UP || keyEvent.isChar('k')) {
                 if (errorScroll > 0) {
                     errorScroll--;
                     renderErrorDisplay();
                 }
-            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'j') {
+            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.isChar('j')) {
                 errorScroll++;
                 renderErrorDisplay();
             } else if (keyEvent.code() == KeyCode.PAGE_UP) {

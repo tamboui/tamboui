@@ -354,19 +354,19 @@ public class CodingAssistantDemo {
         }
 
         // Ctrl+D for demo
-        if (event.code() == KeyCode.CHAR && event.character() == 'd' && event.hasCtrl()) {
+        if (event.isChar('d') && event.hasCtrl()) {
             runDemo();
             return EventResult.HANDLED;
         }
 
         // Ctrl+H for help
-        if (event.code() == KeyCode.CHAR && event.character() == 'h' && event.hasCtrl()) {
+        if (event.isChar('h') && event.hasCtrl()) {
             showHelp();
             return EventResult.HANDLED;
         }
 
         // Ctrl+L to clear
-        if (event.code() == KeyCode.CHAR && event.character() == 'l' && event.hasCtrl()) {
+        if (event.isChar('l') && event.hasCtrl()) {
             lines.clear();
             activeToolCalls.clear();
             activeThinkingText = null;

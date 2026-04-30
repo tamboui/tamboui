@@ -42,7 +42,7 @@ public final class KeyEvent implements Event {
 
     private final KeyCode code;
     private final KeyModifiers modifiers;
-    private final char character;
+    private final int character;
     private final Bindings bindings;
 
     /**
@@ -52,7 +52,7 @@ public final class KeyEvent implements Event {
      * @param modifiers modifier state
      * @param character the character when {@code code} is {@link KeyCode#CHAR}, otherwise ignored
      */
-    public KeyEvent(KeyCode code, KeyModifiers modifiers, char character) {
+    public KeyEvent(KeyCode code, KeyModifiers modifiers, int character) {
         this(code, modifiers, character, BindingSets.defaults());
     }
 
@@ -61,10 +61,10 @@ public final class KeyEvent implements Event {
      *
      * @param code the key code ({@link KeyCode#CHAR} for printable characters)
      * @param modifiers modifier state
-     * @param character the character when {@code code} is {@link KeyCode#CHAR}, otherwise ignored
+     * @param character the Unicode code point when {@code code} is {@link KeyCode#CHAR}, otherwise ignored
      * @param bindings the bindings for semantic action matching
      */
-    public KeyEvent(KeyCode code, KeyModifiers modifiers, char character, Bindings bindings) {
+    public KeyEvent(KeyCode code, KeyModifiers modifiers, int character, Bindings bindings) {
         this.code = code;
         this.modifiers = modifiers;
         this.character = character;
@@ -78,41 +78,57 @@ public final class KeyEvent implements Event {
      * @return key event representing the character with no modifiers
      */
     public static KeyEvent ofChar(char c) {
-        return new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, c);
+        return ofChar((int) c);
+    }
+
+    public static KeyEvent ofChar(int codePoint) {
+        return new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, codePoint);
     }
 
     /**
      * Creates a key event for a printable character with modifiers and the default bindings.
      *
-     * @param c         the character
+     * @param codePoint the Unicode code point
      * @param modifiers modifier state
      * @return key event representing the character
      */
     public static KeyEvent ofChar(char c, KeyModifiers modifiers) {
-        return new KeyEvent(KeyCode.CHAR, modifiers, c);
+        return ofChar((int) c, modifiers);
+    }
+
+    public static KeyEvent ofChar(int codePoint, KeyModifiers modifiers) {
+        return new KeyEvent(KeyCode.CHAR, modifiers, codePoint);
     }
 
     /**
      * Creates a key event for a printable character with specific bindings.
      *
-     * @param c        the character
-     * @param bindings the bindings for semantic action matching
+     * @param codePoint the Unicode code point
+     * @param bindings  the bindings for semantic action matching
      * @return key event representing the character with no modifiers
      */
     public static KeyEvent ofChar(char c, Bindings bindings) {
-        return new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, c, bindings);
+        return ofChar((int) c, bindings);
+    }
+
+    public static KeyEvent ofChar(int codePoint, Bindings bindings) {
+        return new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, codePoint, bindings);
     }
 
     /**
      * Creates a key event for a printable character with modifiers and specific bindings.
      *
-     * @param c         the character
+     * @param codePoint the Unicode code point
      * @param modifiers modifier state
      * @param bindings  the bindings for semantic action matching
      * @return key event representing the character
      */
     public static KeyEvent ofChar(char c, KeyModifiers modifiers, Bindings bindings) {
-        return new KeyEvent(KeyCode.CHAR, modifiers, c, bindings);
+        return ofChar((int) c, modifiers, bindings);
+    }
+
+    public static KeyEvent ofChar(int codePoint, KeyModifiers modifiers, Bindings bindings) {
+        return new KeyEvent(KeyCode.CHAR, modifiers, codePoint, bindings);
     }
 
     /**
@@ -166,7 +182,11 @@ public final class KeyEvent implements Event {
      * @return true if matches
      */
     public boolean isChar(char c) {
-        return code == KeyCode.CHAR && character == c;
+        return isChar((int) c);
+    }
+
+    public boolean isChar(int codePoint) {
+        return code == KeyCode.CHAR && character == codePoint;
     }
 
     /**
@@ -176,7 +196,11 @@ public final class KeyEvent implements Event {
      * @return true if matches ignoring case
      */
     public boolean isCharIgnoreCase(char c) {
-        return code == KeyCode.CHAR && Character.toLowerCase(character) == Character.toLowerCase(c);
+        return isCharIgnoreCase((int) c);
+    }
+
+    public boolean isCharIgnoreCase(int codePoint) {
+        return code == KeyCode.CHAR && Character.toLowerCase(character) == Character.toLowerCase(codePoint);
     }
 
     /**
@@ -244,11 +268,45 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns the character for {@link KeyCode#CHAR} events, or {@code '\0'} otherwise.
+     * Returns the character for {@link KeyCode#CHAR} events as a {@code char}, or {@code '\0'}
+     * otherwise. For BMP code points (U+0000–U+FFFF) this is the exact character. For
+     * supplementary code points (emoji, rare scripts) this returns {@code '�'} (replacement
+     * character); use {@link #string()} or {@link #codePoint()} in those cases.
      *
-     * @return the character value
+     * @return the character, or {@code '\0'} for non-{@link KeyCode#CHAR} events
+     * @deprecated Prefer {@link #string()} for text insertion/concatenation or {@link #isChar}
+     *             for comparisons. {@code character()} cannot represent supplementary code points.
      */
+    @Deprecated
     public char character() {
+        if (code != KeyCode.CHAR) {
+            return '\0';
+        }
+        return character <= Character.MAX_VALUE ? (char) character : '�';
+    }
+
+    /**
+     * Returns the character for {@link KeyCode#CHAR} events as a {@link String}, or an empty
+     * string otherwise. Correctly handles the full Unicode range including supplementary
+     * characters (emoji, etc.).
+     *
+     * <p>Use this for text insertion, display, and string concatenation.
+     * Use {@link #codePoint()} for numeric range checks.
+     *
+     * @return a one- or two-{@code char} {@code String} representing the Unicode character,
+     *         or {@code ""} for non-{@link KeyCode#CHAR} events
+     */
+    public String string() {
+        return code == KeyCode.CHAR ? new String(Character.toChars(character)) : "";
+    }
+
+    /**
+     * Returns the Unicode code point for {@link KeyCode#CHAR} events, or {@code 0} otherwise.
+     * Use this when you need the numeric value for range checks or comparisons.
+     *
+     * @return the Unicode code point
+     */
+    public int codePoint() {
         return character;
     }
 
@@ -444,12 +502,12 @@ public final class KeyEvent implements Event {
     public int hashCode() {
         int result = code != null ? code.hashCode() : 0;
         result = 31 * result + modifiers.hashCode();
-        result = 31 * result + Character.hashCode(character);
+        result = 31 * result + character;
         return result;
     }
 
     @Override
     public String toString() {
-        return String.format("KeyEvent[code=%s, modifiers=%s, character=%s]", code, modifiers, character);
+        return String.format("KeyEvent[code=%s, modifiers=%s, character=%s]", code, modifiers, new String(Character.toChars(character)));
     }
 }

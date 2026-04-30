@@ -29,6 +29,35 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("readEvent passes through a non-ASCII BMP code point (é = U+00E9)")
+    void readEventPassesThroughBmpCodePoint() throws IOException {
+        // Backend already decoded UTF-8; EventParser receives the code point directly
+        QueueBackend backend = new QueueBackend(0x00E9);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(keyEvent.codePoint()).isEqualTo(0x00E9);
+        assertThat(keyEvent.string()).isEqualTo("é");
+    }
+
+    @Test
+    @DisplayName("readEvent passes through a supplementary code point (😀 = U+1F600)")
+    void readEventPassesThroughSupplementaryCodePoint() throws IOException {
+        QueueBackend backend = new QueueBackend(0x1F600);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(keyEvent.codePoint()).isEqualTo(0x1F600);
+        assertThat(keyEvent.string()).isEqualTo("😀");
+    }
+
+    @Test
     @DisplayName("readEvent recognizes ESC[Z as Shift+Tab")
     void readEventRecognizesShiftTab() throws IOException {
         // ESC[Z is the standard escape sequence for Shift+Tab (backtab)

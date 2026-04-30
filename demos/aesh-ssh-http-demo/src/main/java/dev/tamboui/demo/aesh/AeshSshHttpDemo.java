@@ -24,6 +24,7 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.widgets.input.TextAreaState;
@@ -233,8 +234,8 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
         private EventResult handleKey(KeyEvent event) {
             // Log the event
             String eventStr = String.format("KeyEvent: code=%s, char='%s', modifiers=%s",
-                event.code(), 
-                event.character() != 0 ? event.character() : ' ',
+                event.code(),
+                event.string(),
                 event.modifiers());
             appendToLog(eventStr);
             
