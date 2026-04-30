@@ -28,6 +28,21 @@ class EventParserTest {
         assertThat(keyEvent.modifiers()).isEqualTo(KeyModifiers.NONE);
     }
 
+    @Test
+    @DisplayName("readEvent recognizes ESC[Z as Shift+Tab")
+    void readEventRecognizesShiftTab() throws IOException {
+        // ESC[Z is the standard escape sequence for Shift+Tab (backtab)
+        QueueBackend backend = new QueueBackend(27, '[', 'Z');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.TAB);
+        assertThat(keyEvent.modifiers()).isEqualTo(KeyModifiers.SHIFT);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
     private static final class QueueBackend extends TestBackend {
 
         private final int[] input;
