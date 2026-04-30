@@ -7,6 +7,9 @@ package dev.tamboui.terminal;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 import dev.tamboui.buffer.Buffer;
@@ -34,6 +37,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     private Buffer previousBuffer;
     private boolean hiddenCursor;
     private boolean previousFrameHadRawOutput;
+    private List<Rect> previousRawOutputAreas = Collections.emptyList();
 
     /**
      * Creates a new terminal instance with the given backend.
@@ -138,9 +142,20 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 Frame frame = new Frame(currentBuffer, rawOutput);
                 renderer.accept(frame);
 
-                // Clean up Kitty graphics layer when images are no longer rendered
+                // Clean up images when raw-output widgets are no longer rendered.
+                // Kitty: delete-all removes the separate graphics layer.
+                // iTerm2/Sixel: overwrite previous image areas with spaces.
                 if (previousFrameHadRawOutput && !frame.hadRawOutput()) {
                     rawOutput.write(KITTY_DELETE_ALL);
+                    for (Rect imageArea : previousRawOutputAreas) {
+                        for (int y = imageArea.y(); y < imageArea.y() + imageArea.height(); y++) {
+                            String move = String.format("\033[%d;%dH", y + 1, imageArea.x() + 1);
+                            rawOutput.write(move.getBytes(StandardCharsets.US_ASCII));
+                            byte[] spaces = new byte[imageArea.width()];
+                            Arrays.fill(spaces, (byte) ' ');
+                            rawOutput.write(spaces);
+                        }
+                    }
                 }
 
                 // Calculate diff and draw (zero-allocation DoD variant)
@@ -182,6 +197,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 currentBuffer = temp;
 
                 previousFrameHadRawOutput = frame.hadRawOutput();
+                previousRawOutputAreas = frame.rawOutputAreas();
 
                 return new CompletedFrame(previousBuffer, area);
             } catch (IOException e) {
@@ -207,6 +223,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
             if (previousFrameHadRawOutput) {
                 rawOutput.write(KITTY_DELETE_ALL);
                 previousFrameHadRawOutput = false;
+                previousRawOutputAreas = Collections.emptyList();
             }
             backend.clear();
         } catch (IOException e) {
