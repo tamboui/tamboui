@@ -30,6 +30,7 @@ public final class Frame {
     private Position cursorPosition;
     private boolean cursorVisible;
     private final Deque<String> contextKeyStack = new ArrayDeque<>();
+    private boolean hadRawOutput;
 
     Frame(Buffer buffer, OutputStream rawOutput) {
         this.buffer = buffer;
@@ -98,6 +99,7 @@ public final class Frame {
     public void renderWidget(Widget widget, Rect area) {
         if (widget instanceof RawOutputCapable) {
             ((RawOutputCapable) widget).render(area, buffer, rawOutput);
+            hadRawOutput = true;
         } else {
             widget.render(area, buffer);
         }
@@ -218,6 +220,13 @@ public final class Frame {
         if (!contextKeyStack.isEmpty()) {
             contextKeyStack.pop();
         }
+    }
+
+    /**
+     * Returns whether any {@link RawOutputCapable} widget was rendered in this frame.
+     */
+    boolean hadRawOutput() {
+        return hadRawOutput;
     }
 
     /**

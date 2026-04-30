@@ -6,6 +6,7 @@ package dev.tamboui.terminal;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 import dev.tamboui.buffer.Buffer;
@@ -23,12 +24,16 @@ import dev.tamboui.layout.Size;
  */
 public final class Terminal<B extends Backend> implements AutoCloseable {
 
+    private static final byte[] KITTY_DELETE_ALL =
+            "\033_Ga=d,d=a\033\\".getBytes(StandardCharsets.US_ASCII);
+
     private final B backend;
     private final OutputStream rawOutput;
     private final DiffResult diffResult;
     private Buffer currentBuffer;
     private Buffer previousBuffer;
     private boolean hiddenCursor;
+    private boolean previousFrameHadRawOutput;
 
     /**
      * Creates a new terminal instance with the given backend.
@@ -133,6 +138,11 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 Frame frame = new Frame(currentBuffer, rawOutput);
                 renderer.accept(frame);
 
+                // Clean up Kitty graphics layer when images are no longer rendered
+                if (previousFrameHadRawOutput && !frame.hadRawOutput()) {
+                    rawOutput.write(KITTY_DELETE_ALL);
+                }
+
                 // Calculate diff and draw (zero-allocation DoD variant)
                 previousBuffer.diff(currentBuffer, diffResult);
                 if (!diffResult.isEmpty()) {
@@ -171,6 +181,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 previousBuffer = currentBuffer;
                 currentBuffer = temp;
 
+                previousFrameHadRawOutput = frame.hadRawOutput();
+
                 return new CompletedFrame(previousBuffer, area);
             } catch (IOException e) {
                 throw new RuntimeIOException("Failed to draw frame: " + e.getMessage(), e);
@@ -192,6 +204,10 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
         currentBuffer = Buffer.empty(area);
         previousBuffer = Buffer.empty(area);
         try {
+            if (previousFrameHadRawOutput) {
+                rawOutput.write(KITTY_DELETE_ALL);
+                previousFrameHadRawOutput = false;
+            }
             backend.clear();
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to clear terminal during resize: " + e.getMessage(), e);
