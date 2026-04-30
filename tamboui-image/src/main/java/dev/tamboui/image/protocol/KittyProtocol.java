@@ -52,17 +52,32 @@ public final class KittyProtocol implements ImageProtocol {
             return;
         }
 
-        // Move cursor to position
-        String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
+        // Compute the actual cell dimensions from the (already scaled) image pixel size.
+        // The image was pre-scaled by Image.scaleImage() to fit within the pixel grid
+        // (area.width() * widthMultiplier × area.height() * heightMultiplier) while
+        // preserving aspect ratio. We must tell the terminal to display the image over
+        // exactly the number of cells the scaled image occupies — not the full area —
+        // otherwise the terminal stretches the image to fill, distorting the aspect ratio.
+        Resolution res = resolution();
+        int imageCols = Math.max(1, (image.width() + res.widthMultiplier() - 1) / res.widthMultiplier());
+        int imageRows = Math.max(1, (image.height() + res.heightMultiplier() - 1) / res.heightMultiplier());
+        imageCols = Math.min(imageCols, area.width());
+        imageRows = Math.min(imageRows, area.height());
+
+        // Center image within the area
+        int offsetX = (area.width() - imageCols) / 2;
+        int offsetY = (area.height() - imageRows) / 2;
+
+        // Move cursor to centered position
+        String cursorMove = String.format("\033[%d;%dH", area.y() + offsetY + 1, area.x() + offsetX + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
         // Encode image as PNG and then base64
-        // The image should already be scaled by Image.scaleImage() based on the scaling mode
         byte[] pngData = image.toPng();
         String base64Data = Base64.getEncoder().encodeToString(pngData);
 
-        // Send image using chunked transmission
-        sendChunked(rawOutput, base64Data, area.width(), area.height());
+        // Send image using chunked transmission with correct cell dimensions
+        sendChunked(rawOutput, base64Data, imageCols, imageRows);
 
         rawOutput.flush();
     }

@@ -64,8 +64,22 @@ public final class ITermProtocol implements ImageProtocol {
             return;
         }
 
-        // Move cursor to position
-        String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
+        // Compute the actual cell dimensions from the (already scaled) image pixel size.
+        // Same logic as KittyProtocol: the image was pre-scaled to fit within the pixel
+        // grid while preserving aspect ratio, so we must use the actual image cell size
+        // to avoid the terminal stretching the image to fill the full area.
+        Resolution res = resolution();
+        int imageCols = Math.max(1, (image.width() + res.widthMultiplier() - 1) / res.widthMultiplier());
+        int imageRows = Math.max(1, (image.height() + res.heightMultiplier() - 1) / res.heightMultiplier());
+        imageCols = Math.min(imageCols, area.width());
+        imageRows = Math.min(imageRows, area.height());
+
+        // Center image within the area
+        int offsetX = (area.width() - imageCols) / 2;
+        int offsetY = (area.height() - imageRows) / 2;
+
+        // Move cursor to centered position
+        String cursorMove = String.format("\033[%d;%dH", area.y() + offsetY + 1, area.x() + offsetX + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
         // Encode image as PNG
@@ -78,11 +92,11 @@ public final class ITermProtocol implements ImageProtocol {
 
         // Arguments:
         // inline=1: display inline (not as download)
-        // width=N: display width in cells
-        // height=N: display height in cells
-        // preserveAspectRatio=0: do not apply additional scaling (Image.scaleImage() handles it)
+        // width=N: display width in cells (computed from actual image size)
+        // height=N: display height in cells (computed from actual image size)
+        // preserveAspectRatio=0: no additional scaling needed since dimensions already match
         cmd.append(String.format("inline=1;width=%d;height=%d;preserveAspectRatio=0:",
-            area.width(), area.height()));
+            imageCols, imageRows));
 
         // Append base64 data
         cmd.append(base64Data);
