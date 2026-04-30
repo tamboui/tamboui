@@ -114,7 +114,7 @@ public final class KittyProtocol implements ImageProtocol {
                 // c=cols: display width in cells
                 // r=rows: display height in cells
                 // m=0/1: more chunks follow
-                cmd.append(String.format("a=T,f=100,t=d,c=%d,r=%d,m=%d;", cols, rows, more ? 1 : 0));
+                cmd.append(String.format("a=T,f=100,t=d,q=2,c=%d,r=%d,m=%d;", cols, rows, more ? 1 : 0));
                 first = false;
             } else {
                 // Subsequent chunks only need the 'm' flag
@@ -140,7 +140,7 @@ public final class KittyProtocol implements ImageProtocol {
         // f=100: format = PNG
         // t=d: transmission = direct
         // c=cols, r=rows: display size in cells
-        String cmd = String.format("%sa=T,f=100,t=d,c=%d,r=%d;%s%s",
+        String cmd = String.format("%sa=T,f=100,t=d,q=2,c=%d,r=%d;%s%s",
             APC, cols, rows, base64Data, ST);
         out.write(cmd.getBytes(StandardCharsets.US_ASCII));
     }

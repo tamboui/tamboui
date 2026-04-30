@@ -133,18 +133,71 @@ public final class Image implements Widget, RawOutputCapable {
             return;
         }
 
-        // Scale image based on scaling mode and protocol resolution
+        if (protocol.requiresRawOutput()) {
+            // Native protocols (Kitty, iTerm2): send original full-resolution image
+            // and let the terminal handle pixel scaling via c=/r= or width=/height=.
+            // This avoids double scaling (app downscale then terminal upscale) which
+            // causes blurry rendering.
+            Rect displayArea = computeNativeDisplayArea(data, imageArea);
+            try {
+                protocol.render(data, displayArea, buffer, rawOutput);
+            } catch (IOException e) {
+                throw new RuntimeIOException("Failed to render image using protocol " + protocol.name(), e);
+            }
+        } else {
+            // Character-based protocols (half-block, braille): pre-scale to pixel grid
+            ImageProtocol.Resolution res = protocol.resolution();
+            int gridWidth = imageArea.width() * res.widthMultiplier();
+            int gridHeight = imageArea.height() * res.heightMultiplier();
+            ImageData scaledData = scaleImage(data, gridWidth, gridHeight);
+            try {
+                protocol.render(scaledData, imageArea, buffer, rawOutput);
+            } catch (IOException e) {
+                throw new RuntimeIOException("Failed to render image using protocol " + protocol.name(), e);
+            }
+        }
+    }
+
+    /**
+     * Computes the display area in cells for native protocols that handle their own
+     * pixel scaling (Kitty, iTerm2). Uses the protocol's resolution ratio for
+     * cell aspect ratio calculations.
+     */
+    private Rect computeNativeDisplayArea(ImageData source, Rect area) {
         ImageProtocol.Resolution res = protocol.resolution();
-        int gridWidth = imageArea.width() * res.widthMultiplier();
-        int gridHeight = imageArea.height() * res.heightMultiplier();
+        double cellPxW = res.widthMultiplier();
+        double cellPxH = res.heightMultiplier();
 
-        ImageData scaledData = scaleImage(data, gridWidth, gridHeight);
+        switch (scaling) {
+            case FIT: {
+                double imgAspect = (double) source.width() / source.height();
+                double areaPxW = area.width() * cellPxW;
+                double areaPxH = area.height() * cellPxH;
+                double areaAspect = areaPxW / areaPxH;
 
-        // Render using the selected protocol
-        try {
-            protocol.render(scaledData, imageArea, buffer, rawOutput);
-        } catch (IOException e) {
-            throw new RuntimeIOException("Failed to render image using protocol " + protocol.name(), e);
+                int displayCols, displayRows;
+                if (imgAspect > areaAspect) {
+                    displayCols = area.width();
+                    displayRows = Math.max(1, (int) Math.round(displayCols * cellPxW / (imgAspect * cellPxH)));
+                } else {
+                    displayRows = area.height();
+                    displayCols = Math.max(1, (int) Math.round(displayRows * cellPxH * imgAspect / cellPxW));
+                }
+                return new Rect(area.x(), area.y(),
+                    Math.min(displayCols, area.width()),
+                    Math.min(displayRows, area.height()));
+            }
+            case FILL:
+            case STRETCH:
+                return area;
+            case NONE:
+            default: {
+                int naturalCols = Math.max(1, (int) Math.ceil(source.width() / cellPxW));
+                int naturalRows = Math.max(1, (int) Math.ceil(source.height() / cellPxH));
+                return new Rect(area.x(), area.y(),
+                    Math.min(naturalCols, area.width()),
+                    Math.min(naturalRows, area.height()));
+            }
         }
     }
 
