@@ -12,6 +12,7 @@ import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.toolkit.event.MouseEventHandler;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.tui.event.PasteEvent;
 
 /**
  * Base interface for all DSL elements.
@@ -106,6 +107,17 @@ public interface Element {
      * @return HANDLED if the event was handled, UNHANDLED otherwise
      */
     default EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        return EventResult.UNHANDLED;
+    }
+
+    /**
+     * Handles a paste event on this element.
+     * Override to receive bracketed paste content when this element is focused.
+     *
+     * @param event the paste event
+     * @return HANDLED if the event was handled, UNHANDLED otherwise
+     */
+    default EventResult handlePasteEvent(PasteEvent event) {
         return EventResult.UNHANDLED;
     }
 

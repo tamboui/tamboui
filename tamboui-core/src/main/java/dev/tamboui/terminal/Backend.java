@@ -128,6 +128,28 @@ public interface Backend extends AutoCloseable {
     }
 
     /**
+     * Enables bracketed paste mode ({@code ESC[?2004h}).
+     * <p>
+     * When active, pasted text is wrapped with {@code ESC[200~} / {@code ESC[201~}
+     * markers so the event parser can deliver the full paste as a single
+     * {@link dev.tamboui.tui.event.PasteEvent} instead of individual key events.
+     *
+     * @throws IOException if writing to the terminal fails
+     */
+    default void enableBracketedPaste() throws IOException {
+        writeRaw("\033[?2004h");
+    }
+
+    /**
+     * Disables bracketed paste mode ({@code ESC[?2004l}).
+     *
+     * @throws IOException if writing to the terminal fails
+     */
+    default void disableBracketedPaste() throws IOException {
+        writeRaw("\033[?2004l");
+    }
+
+    /**
      * Scrolls the screen up by the given number of lines.
      *
      * @param lines the number of lines to scroll up

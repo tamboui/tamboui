@@ -198,6 +198,9 @@ public final class TuiRunner implements AutoCloseable {
             if (config.mouseCapture()) {
                 backend.enableMouseCapture();
             }
+            if (config.bracketedPaste()) {
+                backend.enableBracketedPaste();
+            }
 
             Terminal<Backend> terminal = new Terminal<>(backend);
             return new TuiRunner(backend, terminal, config);
@@ -738,6 +741,9 @@ public final class TuiRunner implements AutoCloseable {
 
         // Restore terminal state
         try {
+            if (config.bracketedPaste()) {
+                backend.disableBracketedPaste();
+            }
             if (config.mouseCapture()) {
                 backend.disableMouseCapture();
             }

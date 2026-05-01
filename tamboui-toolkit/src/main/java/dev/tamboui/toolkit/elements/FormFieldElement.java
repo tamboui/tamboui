@@ -17,6 +17,7 @@ import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -583,6 +584,20 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     @Override
     public boolean isFocusable() {
         return focusable;
+    }
+
+    @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        if (fieldType == FieldType.TEXT || fieldType == FieldType.TEXT_AREA) {
+            if (textState != null) {
+                textState.insert(event.text());
+                if (!validators.isEmpty()) {
+                    validateField();
+                }
+                return EventResult.HANDLED;
+            }
+        }
+        return EventResult.UNHANDLED;
     }
 
     @Override

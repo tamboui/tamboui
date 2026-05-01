@@ -37,6 +37,7 @@ public final class TuiConfig {
     private final boolean alternateScreen;
     private final boolean hideCursor;
     private final boolean mouseCapture;
+    private final boolean bracketedPaste;
     private final Duration pollTimeout;
     private final Duration tickRate;
     private final Duration resizeGracePeriod;
@@ -58,6 +59,7 @@ public final class TuiConfig {
      * @param alternateScreen whether to use the alternate screen buffer
      * @param hideCursor whether to hide the cursor
      * @param mouseCapture whether to capture mouse events
+     * @param bracketedPaste whether to enable bracketed paste mode
      * @param pollTimeout timeout for polling events
      * @param tickRate interval between tick events, or null to disable
      * @param resizeGracePeriod grace period for resize events, or null to disable
@@ -75,6 +77,7 @@ public final class TuiConfig {
             boolean alternateScreen,
             boolean hideCursor,
             boolean mouseCapture,
+            boolean bracketedPaste,
             Duration pollTimeout,
             Duration tickRate,
             Duration resizeGracePeriod,
@@ -91,6 +94,7 @@ public final class TuiConfig {
         this.alternateScreen = alternateScreen;
         this.hideCursor = hideCursor;
         this.mouseCapture = mouseCapture;
+        this.bracketedPaste = bracketedPaste;
         this.pollTimeout = pollTimeout;
         this.tickRate = tickRate;
         this.resizeGracePeriod = resizeGracePeriod;
@@ -120,6 +124,7 @@ public final class TuiConfig {
                 true,                        // alternateScreen
                 true,                        // hideCursor
                 false,                       // mouseCapture
+                false,                       // bracketedPaste
                 Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
                 Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
                 Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD),  // resizeGracePeriod
@@ -196,6 +201,19 @@ public final class TuiConfig {
      */
     public boolean mouseCapture() {
         return mouseCapture;
+    }
+
+    /**
+     * Returns whether bracketed paste mode is enabled.
+     * <p>
+     * When enabled, pasted text containing control characters such as Tab is
+     * delivered as a single {@link dev.tamboui.tui.event.PasteEvent} rather than
+     * individual key events. Disabled by default.
+     *
+     * @return true if bracketed paste mode is enabled
+     */
+    public boolean bracketedPaste() {
+        return bracketedPaste;
     }
 
     /**
@@ -327,6 +345,7 @@ public final class TuiConfig {
                 && alternateScreen == that.alternateScreen
                 && hideCursor == that.hideCursor
                 && mouseCapture == that.mouseCapture
+                && bracketedPaste == that.bracketedPaste
                 && pollTimeout.equals(that.pollTimeout)
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
                 && (resizeGracePeriod != null ? resizeGracePeriod.equals(that.resizeGracePeriod) : that.resizeGracePeriod == null)
@@ -341,6 +360,7 @@ public final class TuiConfig {
         result = 31 * result + Boolean.hashCode(alternateScreen);
         result = 31 * result + Boolean.hashCode(hideCursor);
         result = 31 * result + Boolean.hashCode(mouseCapture);
+        result = 31 * result + Boolean.hashCode(bracketedPaste);
         result = 31 * result + pollTimeout.hashCode();
         result = 31 * result + (tickRate != null ? tickRate.hashCode() : 0);
         result = 31 * result + (resizeGracePeriod != null ? resizeGracePeriod.hashCode() : 0);
@@ -375,6 +395,7 @@ public final class TuiConfig {
         private boolean alternateScreen = true;
         private boolean hideCursor = true;
         private boolean mouseCapture = false;
+        private boolean bracketedPaste = false;
         private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private Duration tickRate = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private Duration resizeGracePeriod = Duration.ofMillis(DEFAULT_RESIZE_GRACE_PERIOD);
@@ -455,6 +476,21 @@ public final class TuiConfig {
          */
         public Builder mouseCapture(boolean mouseCapture) {
             this.mouseCapture = mouseCapture;
+            return this;
+        }
+
+        /**
+         * Sets whether to enable bracketed paste mode.
+         * <p>
+         * When enabled, pasted text containing control characters such as Tab is
+         * delivered as a single {@link dev.tamboui.tui.event.PasteEvent} rather than
+         * individual key events.
+         *
+         * @param bracketedPaste true to enable bracketed paste mode
+         * @return this builder
+         */
+        public Builder bracketedPaste(boolean bracketedPaste) {
+            this.bracketedPaste = bracketedPaste;
             return this;
         }
 
@@ -615,6 +651,7 @@ public final class TuiConfig {
                     alternateScreen,
                     hideCursor,
                     mouseCapture,
+                    bracketedPaste,
                     pollTimeout,
                     tickRate,
                     resizeGracePeriod,

@@ -58,6 +58,37 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("bracketed paste emits PasteEvent with full content")
+    void bracketedPasteEmitsPasteEvent() throws IOException {
+        // ESC[200~ hello ESC[201~
+        QueueBackend backend = new QueueBackend(
+            27, '[', '2', '0', '0', '~',  // ESC[200~
+            'h', 'e', 'l', 'l', 'o',      // content
+            27, '[', '2', '0', '1', '~'   // ESC[201~
+        );
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(PasteEvent.class);
+        assertThat(((PasteEvent) event).text()).isEqualTo("hello");
+    }
+
+    @Test
+    @DisplayName("bracketed paste preserves supplementary Unicode (😀 = U+1F600)")
+    void bracketedPastePreservesUnicode() throws IOException {
+        QueueBackend backend = new QueueBackend(
+            27, '[', '2', '0', '0', '~',
+            0x1F600,
+            27, '[', '2', '0', '1', '~'
+        );
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(PasteEvent.class);
+        assertThat(((PasteEvent) event).text()).isEqualTo("😀");
+    }
+
+    @Test
     @DisplayName("readEvent recognizes ESC[Z as Shift+Tab")
     void readEventRecognizesShiftTab() throws IOException {
         // ESC[Z is the standard escape sequence for Shift+Tab (backtab)

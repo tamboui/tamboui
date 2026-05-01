@@ -41,15 +41,17 @@ public final class InlineTuiConfig {
     private final Duration tickRate;
     private final Duration pollTimeout;
     private final boolean clearOnClose;
+    private final boolean bracketedPaste;
     private final Bindings bindings;
     private final ScheduledExecutorService scheduler;
 
     private InlineTuiConfig(int height, Duration tickRate, Duration pollTimeout,
-                            boolean clearOnClose, Bindings bindings, ScheduledExecutorService scheduler) {
+                            boolean clearOnClose, boolean bracketedPaste, Bindings bindings, ScheduledExecutorService scheduler) {
         this.height = height;
         this.tickRate = tickRate;
         this.pollTimeout = pollTimeout;
         this.clearOnClose = clearOnClose;
+        this.bracketedPaste = bracketedPaste;
         this.bindings = bindings;
         this.scheduler = scheduler;
     }
@@ -73,6 +75,7 @@ public final class InlineTuiConfig {
                 height,
                 Duration.ofMillis(DEFAULT_TICK_RATE),
                 Duration.ofMillis(DEFAULT_POLL_TIMEOUT),
+                false,
                 false,
                 BindingSets.defaults(),
                 null
@@ -135,6 +138,15 @@ public final class InlineTuiConfig {
     }
 
     /**
+     * Returns whether bracketed paste mode is enabled.
+     *
+     * @return true if bracketed paste mode is enabled
+     */
+    public boolean bracketedPaste() {
+        return bracketedPaste;
+    }
+
+    /**
      * Returns the key bindings for semantic action matching.
      *
      * @return the bindings
@@ -170,6 +182,7 @@ public final class InlineTuiConfig {
         private Duration tickRate = Duration.ofMillis(DEFAULT_TICK_RATE);
         private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private boolean clearOnClose = false;
+        private boolean bracketedPaste = false;
         private Bindings bindings = BindingSets.defaults();
         private ScheduledExecutorService scheduler;
 
@@ -237,6 +250,17 @@ public final class InlineTuiConfig {
         }
 
         /**
+         * Sets whether to enable bracketed paste mode.
+         *
+         * @param bracketedPaste true to enable bracketed paste mode
+         * @return this builder
+         */
+        public Builder bracketedPaste(boolean bracketedPaste) {
+            this.bracketedPaste = bracketedPaste;
+            return this;
+        }
+
+        /**
          * Sets the key bindings for semantic action matching.
          *
          * @param bindings the bindings to use
@@ -270,7 +294,7 @@ public final class InlineTuiConfig {
          * @return a new InlineTuiConfig
          */
         public InlineTuiConfig build() {
-            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bindings, scheduler);
+            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bracketedPaste, bindings, scheduler);
         }
     }
 }

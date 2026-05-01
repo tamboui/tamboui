@@ -17,6 +17,7 @@ import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -297,6 +298,15 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      * Note: The {@code focused} parameter is informational only.
      * If the event reached this element, it should be processed.
      */
+    @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        state.insert(event.text());
+        if (changeListener != null) {
+            changeListener.onTextChange(state.text());
+        }
+        return EventResult.HANDLED;
+    }
+
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Text input requires focus - only handle events when focused

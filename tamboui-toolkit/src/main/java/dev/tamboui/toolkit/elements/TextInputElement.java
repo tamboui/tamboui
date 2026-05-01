@@ -17,6 +17,7 @@ import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -307,6 +308,12 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
      * @param focused whether this element is currently focused
      * @return HANDLED if the event was processed, UNHANDLED otherwise
      */
+    @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        state.insert(event.text());
+        return EventResult.HANDLED;
+    }
+
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (!focused) {
