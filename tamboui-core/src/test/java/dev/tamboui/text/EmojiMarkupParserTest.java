@@ -81,6 +81,13 @@ class EmojiMarkupParserTest {
     }
 
     @Test
+    @DisplayName("unknown emoji codes with dollar signs do not throw")
+    void unknownEmojiCodesWithDollarSign() {
+        assertThat(replaceEmoji(":unknown$1: text")).isEqualTo(":unknown$1: text");
+        assertThat(replaceEmoji("before :no$match: after")).isEqualTo("before :no$match: after");
+    }
+
+    @Test
     @DisplayName("MarkupParser.parse can disable emoji replacement")
     void markupParserCanDisableEmoji() {
         Text text = MarkupParser.parse(":warning: Alert!", null, false);

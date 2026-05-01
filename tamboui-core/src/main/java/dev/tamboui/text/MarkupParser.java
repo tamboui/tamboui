@@ -621,7 +621,7 @@ public final class MarkupParser {
                 matcher.appendReplacement(result, Matcher.quoteReplacement(emoji));
             } else {
                 // Unknown emoji code - leave it as-is
-                matcher.appendReplacement(result, matcher.group(0));
+                matcher.appendReplacement(result, Matcher.quoteReplacement(matcher.group(0)));
             }
         }
         matcher.appendTail(result);
