@@ -19,6 +19,11 @@ public final class PasteEvent implements Event {
 
     private final String text;
 
+    /**
+     * Creates a paste event with the given text.
+     *
+     * @param text the pasted text content
+     */
     public PasteEvent(String text) {
         this.text = text;
     }
