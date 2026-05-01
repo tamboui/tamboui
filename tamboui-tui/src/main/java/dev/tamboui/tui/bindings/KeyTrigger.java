@@ -90,30 +90,72 @@ public final class KeyTrigger implements InputTrigger {
         return ch((int) c);
     }
 
+    /**
+     * Creates a trigger for a Unicode code point (case-sensitive).
+     *
+     * @param codePoint the code point to match
+     * @return a trigger that matches the exact code point
+     */
     public static KeyTrigger ch(int codePoint) {
         return new KeyTrigger(KeyCode.CHAR, codePoint, false, false, false, false);
     }
 
+    /**
+     * Creates a trigger for a character (case-insensitive).
+     *
+     * @param c the character to match
+     * @return a trigger that matches the character regardless of case
+     */
     public static KeyTrigger chIgnoreCase(char c) {
         return chIgnoreCase((int) c);
     }
 
+    /**
+     * Creates a trigger for a Unicode code point (case-insensitive).
+     *
+     * @param codePoint the code point to match
+     * @return a trigger that matches the code point regardless of case
+     */
     public static KeyTrigger chIgnoreCase(int codePoint) {
         return new KeyTrigger(KeyCode.CHAR, codePoint, false, false, false, true);
     }
 
+    /**
+     * Creates a trigger for a Ctrl+key combination.
+     *
+     * @param c the character pressed with Ctrl
+     * @return a trigger that matches Ctrl + the given character
+     */
     public static KeyTrigger ctrl(char c) {
         return ctrl((int) c);
     }
 
+    /**
+     * Creates a trigger for a Ctrl+key combination.
+     *
+     * @param codePoint the code point of the key pressed with Ctrl
+     * @return a trigger that matches Ctrl + the given code point
+     */
     public static KeyTrigger ctrl(int codePoint) {
         return new KeyTrigger(KeyCode.CHAR, codePoint, true, false, false, false);
     }
 
+    /**
+     * Creates a trigger for an Alt+key combination.
+     *
+     * @param c the character pressed with Alt
+     * @return a trigger that matches Alt + the given character
+     */
     public static KeyTrigger alt(char c) {
         return alt((int) c);
     }
 
+    /**
+     * Creates a trigger for an Alt+key combination.
+     *
+     * @param codePoint the code point of the key pressed with Alt
+     * @return a trigger that matches Alt + the given code point
+     */
     public static KeyTrigger alt(int codePoint) {
         return new KeyTrigger(KeyCode.CHAR, codePoint, false, true, false, false);
     }

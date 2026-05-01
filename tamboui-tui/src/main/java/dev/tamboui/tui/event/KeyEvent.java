@@ -81,8 +81,25 @@ public final class KeyEvent implements Event {
         return ofChar((int) c);
     }
 
+    /**
+     * Creates a key event for a printable character with no modifiers and the default bindings.
+     *
+     * @param codePoint the Unicode code point
+     * @return key event representing the character with no modifiers
+     */
     public static KeyEvent ofChar(int codePoint) {
         return new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, codePoint);
+    }
+
+    /**
+     * Creates a key event for a printable character with modifiers and the default bindings.
+     *
+     * @param c         the character
+     * @param modifiers modifier state
+     * @return key event representing the character
+     */
+    public static KeyEvent ofChar(char c, KeyModifiers modifiers) {
+        return ofChar((int) c, modifiers);
     }
 
     /**
@@ -92,12 +109,19 @@ public final class KeyEvent implements Event {
      * @param modifiers modifier state
      * @return key event representing the character
      */
-    public static KeyEvent ofChar(char c, KeyModifiers modifiers) {
-        return ofChar((int) c, modifiers);
-    }
-
     public static KeyEvent ofChar(int codePoint, KeyModifiers modifiers) {
         return new KeyEvent(KeyCode.CHAR, modifiers, codePoint);
+    }
+
+    /**
+     * Creates a key event for a printable character with specific bindings.
+     *
+     * @param c        the character
+     * @param bindings the bindings for semantic action matching
+     * @return key event representing the character with no modifiers
+     */
+    public static KeyEvent ofChar(char c, Bindings bindings) {
+        return ofChar((int) c, bindings);
     }
 
     /**
@@ -107,12 +131,20 @@ public final class KeyEvent implements Event {
      * @param bindings  the bindings for semantic action matching
      * @return key event representing the character with no modifiers
      */
-    public static KeyEvent ofChar(char c, Bindings bindings) {
-        return ofChar((int) c, bindings);
-    }
-
     public static KeyEvent ofChar(int codePoint, Bindings bindings) {
         return new KeyEvent(KeyCode.CHAR, KeyModifiers.NONE, codePoint, bindings);
+    }
+
+    /**
+     * Creates a key event for a printable character with modifiers and specific bindings.
+     *
+     * @param c         the character
+     * @param modifiers modifier state
+     * @param bindings  the bindings for semantic action matching
+     * @return key event representing the character
+     */
+    public static KeyEvent ofChar(char c, KeyModifiers modifiers, Bindings bindings) {
+        return ofChar((int) c, modifiers, bindings);
     }
 
     /**
@@ -123,10 +155,6 @@ public final class KeyEvent implements Event {
      * @param bindings  the bindings for semantic action matching
      * @return key event representing the character
      */
-    public static KeyEvent ofChar(char c, KeyModifiers modifiers, Bindings bindings) {
-        return ofChar((int) c, modifiers, bindings);
-    }
-
     public static KeyEvent ofChar(int codePoint, KeyModifiers modifiers, Bindings bindings) {
         return new KeyEvent(KeyCode.CHAR, modifiers, codePoint, bindings);
     }
@@ -185,6 +213,12 @@ public final class KeyEvent implements Event {
         return isChar((int) c);
     }
 
+    /**
+     * Returns true if this is a character event matching the given code point.
+     *
+     * @param codePoint code point to compare
+     * @return true if matches
+     */
     public boolean isChar(int codePoint) {
         return code == KeyCode.CHAR && character == codePoint;
     }
@@ -199,6 +233,12 @@ public final class KeyEvent implements Event {
         return isCharIgnoreCase((int) c);
     }
 
+    /**
+     * Returns true if this is a character event matching the given code point (case-insensitive).
+     *
+     * @param codePoint code point to compare (case-insensitive)
+     * @return true if matches ignoring case
+     */
     public boolean isCharIgnoreCase(int codePoint) {
         return code == KeyCode.CHAR && Character.toLowerCase(character) == Character.toLowerCase(codePoint);
     }
