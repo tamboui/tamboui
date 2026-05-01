@@ -297,6 +297,12 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         return this;
     }
 
+    @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        state.insert(event.text());
+        return EventResult.HANDLED;
+    }
+
     /**
      * Handles a key event for text input.
      * <p>
@@ -304,16 +310,10 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
      * Enter triggers the onSubmit callback if set.
      * Only processes events when focused.
      *
-     * @param event the key event
+     * @param event   the key event
      * @param focused whether this element is currently focused
      * @return HANDLED if the event was processed, UNHANDLED otherwise
      */
-    @Override
-    public EventResult handlePasteEvent(PasteEvent event) {
-        state.insert(event.text());
-        return EventResult.HANDLED;
-    }
-
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (!focused) {

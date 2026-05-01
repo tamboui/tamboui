@@ -132,7 +132,7 @@ public interface Backend extends AutoCloseable {
      * <p>
      * When active, pasted text is wrapped with {@code ESC[200~} / {@code ESC[201~}
      * markers so the event parser can deliver the full paste as a single
-     * {@link dev.tamboui.tui.event.PasteEvent} instead of individual key events.
+     * {@code PasteEvent} instead of individual key events.
      *
      * @throws IOException if writing to the terminal fails
      */
