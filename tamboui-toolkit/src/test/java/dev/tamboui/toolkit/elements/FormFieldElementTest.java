@@ -113,6 +113,46 @@ class FormFieldElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("formField checkbox with inputBeforeLabel=true renders checkbox before label")
+    void formFieldWithInputBeforeLabelShowsInputFirst() {
+        BooleanFieldState state = new BooleanFieldState(true);
+        FormFieldElement field = formField("Subscribe", state).labelWidth(9).inputBeforeLabel();
+
+        Rect area = new Rect(0, 0, 13, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        field.render(frame, area, RenderContext.empty());
+
+        // Should render properly
+        String result = "";
+        for (int x = 0; x < buffer.width(); x++) {
+            result += buffer.get(x, 0).symbol();
+        }
+        assertThat(result).isEqualTo("[x] Subscribe");
+    }
+
+    @Test
+    @DisplayName("formField checkbox with inputBeforeLabel=false renders checkbox after label")
+    void formFieldWithInputBeforeLabelShowsInputLast() {
+        BooleanFieldState state = new BooleanFieldState(true);
+        FormFieldElement field = formField("Subscribe", state).labelWidth(9).inputBeforeLabel(false);
+
+        Rect area = new Rect(0, 0, 13, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        field.render(frame, area, RenderContext.empty());
+
+        // Should render properly
+        String result = "";
+        for (int x = 0; x < buffer.width(); x++) {
+            result += buffer.get(x, 0).symbol();
+        }
+        assertThat(result).isEqualTo("Subscribe [x]");
+    }
+
+    @Test
     @DisplayName("formField with SelectFieldState renders select")
     void formFieldWithSelectRendersSelect() {
         SelectFieldState state = new SelectFieldState("USA", "UK", "Germany");
