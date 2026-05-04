@@ -27,8 +27,6 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
     private Style innerElementFocusedStyle;
     private EventHandler onPress;
 
-    private boolean isFocused = false;
-
     /** Creates a button with the specified inner element. */
     public ButtonElement(StyledElement<?> innerElement) {
         this.innerElement = innerElement;
@@ -75,17 +73,6 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
         return this;
     }
 
-    /**
-     * Return if the button was focused <i>on the last render cycle</i>.
-     * This lags behind by one cycle and should not be relied upon for proactive focus checks;
-     * its intention is to provide information for rendering things such as help text only.
-     *
-     * @return true if the button was focused, false otherwise
-     */
-    public boolean isFocused() {
-        return this.isFocused;
-    }
-
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         return this.innerElement.preferredSize(availableWidth, availableHeight, context);
@@ -97,8 +84,8 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
         Style effectiveStyle = context.currentStyle();
 
         // if focused, toggle style
-        this.isFocused = elementId != null && context.isFocused(elementId);
-        if (this.isFocused) {
+        boolean isFocused = elementId != null && context.isFocused(elementId);
+        if (isFocused) {
             if (effectiveStyle.effectiveModifiers().contains(Modifier.REVERSED)) {
                 effectiveStyle.notReversed();
             } else {
