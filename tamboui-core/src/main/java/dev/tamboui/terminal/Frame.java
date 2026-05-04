@@ -123,6 +123,13 @@ public final class Frame {
      */
     public <S> void renderStatefulWidget(StatefulWidget<S> widget, Rect area, S state) {
         widget.render(area, buffer, state);
+        if (widget instanceof RawOutputCapable) {
+            hadRawOutput = true;
+            if (rawOutputAreas == null) {
+                rawOutputAreas = new ArrayList<>();
+            }
+            rawOutputAreas.add(area);
+        }
     }
 
     /**
