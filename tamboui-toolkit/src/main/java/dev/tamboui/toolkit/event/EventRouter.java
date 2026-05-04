@@ -53,7 +53,7 @@ public final class EventRouter implements AutoCloseable {
     private final AtomicLong routeIdCounter = new AtomicLong();
     private final List<Element> elements = new ArrayList<>();
     private final IdentityHashMap<Element, Rect> elementAreas = new IdentityHashMap<>();
-    private final List<GlobalEventHandler> globalHandlers = new ArrayList<>();
+    private final List<EventHandler> globalHandlers = new ArrayList<>();
 
     // Drag state
     private Element draggingElement;
@@ -78,7 +78,7 @@ public final class EventRouter implements AutoCloseable {
      *
      * @param handler the handler to add
      */
-    public void addGlobalHandler(GlobalEventHandler handler) {
+    public void addGlobalHandler(EventHandler handler) {
         globalHandlers.add(handler);
     }
 
@@ -101,7 +101,7 @@ public final class EventRouter implements AutoCloseable {
      *
      * @param handler the handler to remove
      */
-    public void removeGlobalHandler(GlobalEventHandler handler) {
+    public void removeGlobalHandler(EventHandler handler) {
         globalHandlers.remove(handler);
     }
 
