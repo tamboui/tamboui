@@ -102,6 +102,15 @@ public final class ScrollableElement extends ContainerElement<ScrollableElement>
     }
 
     /**
+     * Return the internal {@link ScrollbarState}.
+     *
+     * @return the scrollbar state
+     */
+    public ScrollbarState getState() {
+        return this.state;
+    }
+
+    /**
      * Element of height 1 that will be displayed at the top of the area if there are
      * results above the current view.
      * @param scrollUpIndicator the indicator to use
