@@ -73,6 +73,11 @@ public final class KittyProtocol implements ImageProtocol {
     }
 
     @Override
+    public boolean handlesOwnScaling() {
+        return true;
+    }
+
+    @Override
     public Resolution resolution() {
         // Kitty renders at pixel level, report typical cell pixel ratio
         return new Resolution(8, 16);
