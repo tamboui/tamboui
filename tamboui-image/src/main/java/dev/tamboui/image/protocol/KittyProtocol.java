@@ -111,6 +111,7 @@ public final class KittyProtocol implements ImageProtocol {
                 // a=T: action = transmit and display
                 // f=100: format = PNG
                 // t=d: transmission = direct (embedded in escape code)
+                // q=2: quiet mode — suppress terminal OK/error responses on stdin
                 // c=cols: display width in cells
                 // r=rows: display height in cells
                 // m=0/1: more chunks follow
