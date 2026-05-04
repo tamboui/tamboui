@@ -7,6 +7,8 @@ package dev.tamboui.toolkit.elements;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -18,6 +20,7 @@ import dev.tamboui.toolkit.Toolkit;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.tree.GuideStyle;
 import dev.tamboui.widgets.tree.TreeNode;
+import dev.tamboui.widgets.tree.TreeWidget;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -794,5 +797,28 @@ class TreeElementTest extends AbstractElementTest {
         assertThat(buffer).hasContent(
                 "Fixed               "
         );
+    }
+
+    @Test
+    @DisplayName("lastFlatEntries works as expected")
+    void testLastFlatEntries() {
+        TreeNode<Void> root = TreeNode.<Void>of("Root")
+                .add(TreeNode.<Void>of("Child").leaf())
+                .expanded();
+
+        Rect area = new Rect(0, 0, 40, 10);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        TreeElement<Void> tree = tree(root);
+        tree.render(frame, area, RenderContext.empty());
+
+        List<TreeWidget.FlatEntry<TreeNode<Void>>> entries = tree.lastFlatEntries();
+        assertThat(entries).hasSize(2);
+        assertThat(entries.get(0).node().label()).isEqualTo("Root");
+        assertThat(entries.get(0).depth()).isZero();
+        assertThat(entries.get(1).node().label()).isEqualTo("Child");
+        assertThat(entries.get(1).depth()).isEqualTo(1);
+        assertThat(entries.get(1).parent()).isSameAs(root);
     }
 }
