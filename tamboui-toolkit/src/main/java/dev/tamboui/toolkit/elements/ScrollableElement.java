@@ -30,7 +30,7 @@ import java.util.List;
  *
  * Note that each child counts as one scrollable unit; children will not be split across page boundaries.
  */
-public final class Scrollable extends ContainerElement<Scrollable> {
+public final class ScrollableElement extends ContainerElement<ScrollableElement> {
 
     private final Scrollbar scrollbar;
     private final ScrollbarState state;
@@ -38,7 +38,7 @@ public final class Scrollable extends ContainerElement<Scrollable> {
     private Element scrollDownIndicator = null;
 
     /** Creates an empty scrollable container. */
-    public Scrollable() {
+    public ScrollableElement() {
         this(new Element[0]);
     }
 
@@ -47,7 +47,7 @@ public final class Scrollable extends ContainerElement<Scrollable> {
      *
      * @param children the child elements
      */
-    public Scrollable(Element... children) {
+    public ScrollableElement(Element... children) {
         this.scrollbar = Scrollbar.builder().orientation(ScrollbarOrientation.VERTICAL_RIGHT).build();
         this.state = new ScrollbarState();
         this.children.addAll(Arrays.asList(children));
@@ -61,7 +61,7 @@ public final class Scrollable extends ContainerElement<Scrollable> {
      * @param scrollbar the scrollbar element
      * @param children the child elements
      */
-    public Scrollable(Scrollbar scrollbar, Element... children) {
+    public ScrollableElement(Scrollbar scrollbar, Element... children) {
         this.scrollbar = scrollbar;
         this.state = new ScrollbarState();
         this.children.addAll(Arrays.asList(children));
@@ -107,7 +107,7 @@ public final class Scrollable extends ContainerElement<Scrollable> {
      * @param scrollUpIndicator the indicator to use
      * @return this, for fluent operations
      */
-    public Scrollable scrollUpIndicator(Element scrollUpIndicator) {
+    public ScrollableElement scrollUpIndicator(Element scrollUpIndicator) {
         this.scrollUpIndicator = scrollUpIndicator;
         return this;
     }
@@ -118,7 +118,7 @@ public final class Scrollable extends ContainerElement<Scrollable> {
      * @param scrollDownIndicator the indicator to use
      * @return this, for fluent operations
      */
-    public Scrollable scrollDownIndicator(Element scrollDownIndicator) {
+    public ScrollableElement scrollDownIndicator(Element scrollDownIndicator) {
         this.scrollDownIndicator = scrollDownIndicator;
         return this;
     }
