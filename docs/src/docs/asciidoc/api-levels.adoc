@@ -402,6 +402,15 @@ ListElement provides methods for navigation:
 include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=list-element-navigation]
 ----
 
+=== Scrolling
+
+For a convenient vertical scrolling container that works out of the box with keyboard and mouse controls, use `scrollable()`:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=scrollable-usage]
+----
+
 === Event Handling
 
 Attach handlers to elements:
