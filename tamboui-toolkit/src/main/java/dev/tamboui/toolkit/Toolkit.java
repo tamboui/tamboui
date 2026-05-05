@@ -15,6 +15,7 @@ import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.BarChartElement;
+import dev.tamboui.toolkit.elements.ButtonElement;
 import dev.tamboui.toolkit.elements.CalendarElement;
 import dev.tamboui.toolkit.elements.CanvasElement;
 import dev.tamboui.toolkit.elements.ChartElement;
@@ -949,6 +950,18 @@ public final class Toolkit {
      */
     public static TextAreaElement textArea() {
         return new TextAreaElement();
+    }
+
+    // ==================== Button ====================
+
+    /**
+     * Creates a button with the given inner element.
+     *
+     * @param innerElement the inner element of the button
+     * @return a new button element
+     */
+    public static ButtonElement button(StyledElement<?> innerElement) {
+        return new ButtonElement(innerElement);
     }
 
     // ==================== Form Field ====================
