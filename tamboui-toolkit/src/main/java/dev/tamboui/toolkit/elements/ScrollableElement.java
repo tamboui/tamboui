@@ -4,6 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Constraint;
@@ -21,9 +25,6 @@ import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A container element with a scrollbar that allows a vertical list that overflows its bounds.
