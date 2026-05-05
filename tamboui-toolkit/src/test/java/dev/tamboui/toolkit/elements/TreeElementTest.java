@@ -4,10 +4,10 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
