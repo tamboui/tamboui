@@ -27,7 +27,11 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
     private Style innerElementFocusedStyle;
     private EventHandler onPress;
 
-    /** Creates a button with the specified inner element. */
+    /**
+     * Creates a button with the specified inner element.
+     *
+     * @param innerElement the inner element to be wrapped by the button
+     */
     public ButtonElement(StyledElement<?> innerElement) {
         this.innerElement = innerElement;
         this.innerElementStyle = innerElement.getStyle();
