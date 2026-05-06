@@ -27,6 +27,7 @@ public class JLineBackend extends AbstractBackend {
 
     private static final String ESC = "\033";
     private static final String CSI = ESC + "[";
+    private static final boolean IS_WINDOWS = System.getProperty("os.name", "").toLowerCase().contains("win");
 
     private final Terminal terminal;
     private final PrintWriter writer;
@@ -137,7 +138,17 @@ public class JLineBackend extends AbstractBackend {
 
     @Override
     public void enableMouseCapture() throws IOException {
-        // Enable mouse tracking modes
+        // On Windows, use JLine3's native mouse tracking API.
+        // This sets the correct console mode (ENABLE_MOUSE_INPUT) via Win32 API,
+        // enabling mouse events in CMD/PowerShell. JLine3 then translates native
+        // mouse events into X10 escape sequences for EventParser to parse.
+        // Only enable on Windows to avoid duplicate events on Unix terminals.
+        if (IS_WINDOWS) {
+            terminal.trackMouse(Terminal.MouseTracking.Any);
+        }
+
+        // Send ANSI escape sequences for terminals that support them
+        // (e.g. Windows Terminal, xterm, etc.)
         writer.print(CSI + "?1000h");  // Normal tracking
         writer.print(CSI + "?1002h");  // Button event tracking
         writer.print(CSI + "?1015h");  // urxvt style
@@ -148,6 +159,11 @@ public class JLineBackend extends AbstractBackend {
 
     @Override
     public void disableMouseCapture() throws IOException {
+        // Disable JLine3 native mouse tracking (Windows only)
+        if (IS_WINDOWS) {
+            terminal.trackMouse(Terminal.MouseTracking.Off);
+        }
+
         writer.print(CSI + "?1006l");
         writer.print(CSI + "?1015l");
         writer.print(CSI + "?1002l");
