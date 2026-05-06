@@ -527,7 +527,7 @@ public class WidgetsSnippets {
 
         // Handle key events
         if (event.code() == KeyCode.CHAR) {
-            state.insert(event.character());
+            state.insert(event.string());
         } else if (event.code() == KeyCode.BACKSPACE) {
             state.deleteBackward();
         } else if (event.code() == KeyCode.DELETE) {
@@ -565,7 +565,7 @@ public class WidgetsSnippets {
 
         // Handle key events
         if (event.code() == KeyCode.CHAR) {
-            state.insert(event.character());
+            state.insert(event.string());
         } else if (event.code() == KeyCode.ENTER) {
             state.insert('\n');
         } else if (event.code() == KeyCode.BACKSPACE) {
@@ -598,7 +598,7 @@ public class WidgetsSnippets {
         checkbox.render(area, buffer, state);
 
         // Handle input
-        if (event.code() == KeyCode.ENTER || (event.code() == KeyCode.CHAR && event.character() == ' ')) {
+        if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
             state.toggle();
         }
         // end::checkbox[]
@@ -631,7 +631,7 @@ public class WidgetsSnippets {
         toggle.render(area, buffer, state);
 
         // Handle input
-        if (event.code() == KeyCode.ENTER || (event.code() == KeyCode.CHAR && event.character() == ' ')) {
+        if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
             state.toggle();
         }
         // end::toggle[]

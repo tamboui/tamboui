@@ -792,7 +792,7 @@ public class ApiLevelsSnippets {
             runner.run(
                 // Event handler
                 (event, r) -> {
-                    if (event instanceof KeyEvent key && key.character() == 'q') {
+                    if (event instanceof KeyEvent key && key.isChar('q')) {
                         r.quit();
                         return true;
                     }
@@ -943,10 +943,10 @@ public class ApiLevelsSnippets {
             )
             .focusable()
             .onKeyEvent(event -> {
-                if (event.character() == 'y' || event.character() == 'Y') {
+                if (event.isCharIgnoreCase('y')) {
                     startNextPhase();
                     return EventResult.HANDLED;
-                } else if (event.character() == 'n') {
+                } else if (event.isChar('n')) {
                     quit();
                     return EventResult.HANDLED;
                 }

@@ -260,38 +260,38 @@ public final class RFlexDemo {
             return false;
         }
 
-        if (k.isRight() || (k.code() == KeyCode.CHAR && k.character() == 'l')) {
+        if (k.isRight() || k.isChar('l')) {
             selectedTab = SelectedTab.fromIndex(selectedTab.ordinal() + 1);
             return true;
         }
-        if (k.isLeft() || (k.code() == KeyCode.CHAR && k.character() == 'h')) {
+        if (k.isLeft() || k.isChar('h')) {
             selectedTab = SelectedTab.fromIndex(selectedTab.ordinal() - 1);
             return true;
         }
 
-        if (k.isDown() || (k.code() == KeyCode.CHAR && k.character() == 'j')) {
+        if (k.isDown() || k.isChar('j')) {
             scrollOffset = Math.min(maxScrollOffset(), scrollOffset + 1);
             return true;
         }
-        if (k.isUp() || (k.code() == KeyCode.CHAR && k.character() == 'k')) {
+        if (k.isUp() || k.isChar('k')) {
             scrollOffset = Math.max(0, scrollOffset - 1);
             return true;
         }
 
-        if (k.code() == KeyCode.HOME || (k.code() == KeyCode.CHAR && k.character() == 'g')) {
+        if (k.code() == KeyCode.HOME || k.isChar('g')) {
             scrollOffset = 0;
             return true;
         }
-        if (k.code() == KeyCode.END || (k.code() == KeyCode.CHAR && k.character() == 'G')) {
+        if (k.code() == KeyCode.END || k.isChar('G')) {
             scrollOffset = maxScrollOffset();
             return true;
         }
 
-        if (k.code() == KeyCode.CHAR && k.character() == '+') {
+        if (k.isChar('+')) {
             spacing = Math.min(10, spacing + 1);
             return true;
         }
-        if (k.code() == KeyCode.CHAR && k.character() == '-') {
+        if (k.isChar('-')) {
             spacing = Math.max(0, spacing - 1);
             return true;
         }

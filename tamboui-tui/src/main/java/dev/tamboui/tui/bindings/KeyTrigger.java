@@ -41,13 +41,13 @@ import dev.tamboui.tui.event.KeyModifiers;
 public final class KeyTrigger implements InputTrigger {
 
     private final KeyCode keyCode;
-    private final Character character;
+    private final Integer character;
     private final boolean ctrl;
     private final boolean alt;
     private final boolean shift;
     private final boolean ignoreCase;
 
-    private KeyTrigger(KeyCode keyCode, Character character,
+    private KeyTrigger(KeyCode keyCode, Integer character,
                        boolean ctrl, boolean alt, boolean shift, boolean ignoreCase) {
         this.keyCode = keyCode;
         this.character = character;
@@ -87,37 +87,77 @@ public final class KeyTrigger implements InputTrigger {
      * @return a trigger that matches the exact character
      */
     public static KeyTrigger ch(char c) {
-        return new KeyTrigger(KeyCode.CHAR, c, false, false, false, false);
+        return ch((int) c);
+    }
+
+    /**
+     * Creates a trigger for a Unicode code point (case-sensitive).
+     *
+     * @param codePoint the code point to match
+     * @return a trigger that matches the exact code point
+     */
+    public static KeyTrigger ch(int codePoint) {
+        return new KeyTrigger(KeyCode.CHAR, codePoint, false, false, false, false);
     }
 
     /**
      * Creates a trigger for a character (case-insensitive).
      *
-     * @param c the character to match (case-insensitive)
+     * @param c the character to match
      * @return a trigger that matches the character regardless of case
      */
     public static KeyTrigger chIgnoreCase(char c) {
-        return new KeyTrigger(KeyCode.CHAR, c, false, false, false, true);
+        return chIgnoreCase((int) c);
     }
 
     /**
-     * Creates a trigger for Ctrl+character.
+     * Creates a trigger for a Unicode code point (case-insensitive).
      *
-     * @param c the character
-     * @return a trigger that matches Ctrl+c
+     * @param codePoint the code point to match
+     * @return a trigger that matches the code point regardless of case
+     */
+    public static KeyTrigger chIgnoreCase(int codePoint) {
+        return new KeyTrigger(KeyCode.CHAR, codePoint, false, false, false, true);
+    }
+
+    /**
+     * Creates a trigger for a Ctrl+key combination.
+     *
+     * @param c the character pressed with Ctrl
+     * @return a trigger that matches Ctrl + the given character
      */
     public static KeyTrigger ctrl(char c) {
-        return new KeyTrigger(KeyCode.CHAR, c, true, false, false, false);
+        return ctrl((int) c);
     }
 
     /**
-     * Creates a trigger for Alt+character.
+     * Creates a trigger for a Ctrl+key combination.
      *
-     * @param c the character
-     * @return a trigger that matches Alt+c
+     * @param codePoint the code point of the key pressed with Ctrl
+     * @return a trigger that matches Ctrl + the given code point
+     */
+    public static KeyTrigger ctrl(int codePoint) {
+        return new KeyTrigger(KeyCode.CHAR, codePoint, true, false, false, false);
+    }
+
+    /**
+     * Creates a trigger for an Alt+key combination.
+     *
+     * @param c the character pressed with Alt
+     * @return a trigger that matches Alt + the given character
      */
     public static KeyTrigger alt(char c) {
-        return new KeyTrigger(KeyCode.CHAR, c, false, true, false, false);
+        return alt((int) c);
+    }
+
+    /**
+     * Creates a trigger for an Alt+key combination.
+     *
+     * @param codePoint the code point of the key pressed with Alt
+     * @return a trigger that matches Alt + the given code point
+     */
+    public static KeyTrigger alt(int codePoint) {
+        return new KeyTrigger(KeyCode.CHAR, codePoint, false, true, false, false);
     }
 
     @Override
@@ -160,11 +200,11 @@ public final class KeyTrigger implements InputTrigger {
 
         // Check character for CHAR events
         if (keyCode == KeyCode.CHAR && character != null) {
-            char eventChar = event.character();
+            int eventCodePoint = event.codePoint();
             if (ignoreCase) {
-                return Character.toLowerCase(eventChar) == Character.toLowerCase(character);
+                return Character.toLowerCase(eventCodePoint) == Character.toLowerCase(character);
             }
-            return eventChar == character;
+            return eventCodePoint == character;
         }
 
         return true;
@@ -183,10 +223,10 @@ public final class KeyTrigger implements InputTrigger {
             sb.append("Shift+");
         }
         if (character != null) {
-            if (character == ' ') {
+            if (character == (int) ' ') {
                 sb.append("Space");
             } else {
-                sb.append(character);
+                sb.appendCodePoint(character);
             }
         } else {
             sb.append(formatKeyCode(keyCode));

@@ -649,7 +649,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         }
 
         // Toggle on space or enter
-        if (event.isConfirm() || event.character() == ' ') {
+        if (event.isConfirm() || event.isChar(' ')) {
             booleanState.toggle();
             return EventResult.HANDLED;
         }
