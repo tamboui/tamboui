@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import dev.tamboui.markdown.MarkdownView;
@@ -105,8 +106,9 @@ public final class MarkdownDemo {
                 }
                 if (streaming && streamLength < fullSource.length()) {
                     long now = System.nanoTime();
-                    if (now - lastTick > 25_000_000L) {
-                        streamLength = Math.min(fullSource.length(), streamLength + 1);
+                    if (now - lastTick > 10_000_000L) {
+                        int step = ThreadLocalRandom.current().nextInt(1, 26);
+                        streamLength = Math.min(fullSource.length(), streamLength + step);
                         lastTick = now;
                     }
                 }
