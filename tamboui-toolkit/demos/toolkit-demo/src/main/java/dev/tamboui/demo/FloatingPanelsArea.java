@@ -145,14 +145,12 @@ final class FloatingPanelsArea implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (event.code() == KeyCode.CHAR && event.hasAlt()) {
-            switch (event.character()) {
-                case '1': createPanel(new ClockPanel()); return EventResult.HANDLED;
-                case '2': createPanel(new CounterPanel()); return EventResult.HANDLED;
-                case '3': createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED;
-                case '4': createPanel(new QuotePanel()); return EventResult.HANDLED;
-                case '5': createPanel(new ProgressPanel()); return EventResult.HANDLED;
-                case '6': createPanel(new TodoPanel()); return EventResult.HANDLED;
-            }
+            if (event.isChar('1')) { createPanel(new ClockPanel()); return EventResult.HANDLED; }
+            if (event.isChar('2')) { createPanel(new CounterPanel()); return EventResult.HANDLED; }
+            if (event.isChar('3')) { createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED; }
+            if (event.isChar('4')) { createPanel(new QuotePanel()); return EventResult.HANDLED; }
+            if (event.isChar('5')) { createPanel(new ProgressPanel()); return EventResult.HANDLED; }
+            if (event.isChar('6')) { createPanel(new TodoPanel()); return EventResult.HANDLED; }
         }
         return EventResult.UNHANDLED;
     }

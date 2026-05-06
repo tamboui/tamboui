@@ -155,6 +155,9 @@ public final class InlineTuiRunner implements AutoCloseable {
         try {
             // Enable raw mode for key events
             backend.enableRawMode();
+            if (config.bracketedPaste()) {
+                backend.enableBracketedPaste();
+            }
 
             // Create inline display using shared backend (no alternate screen)
             display = InlineDisplay.withBackend(config.height(), backend);
@@ -458,6 +461,13 @@ public final class InlineTuiRunner implements AutoCloseable {
         try {
             viewport.release();
         } catch (Exception ignored) {
+        }
+
+        if (config.bracketedPaste()) {
+            try {
+                backend.disableBracketedPaste();
+            } catch (Exception ignored) {
+            }
         }
 
         try {

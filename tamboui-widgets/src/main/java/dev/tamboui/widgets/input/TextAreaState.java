@@ -7,6 +7,8 @@ package dev.tamboui.widgets.input;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.tamboui.text.CharWidth;
+
 /**
  * State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
  */
@@ -152,11 +154,13 @@ public final class TextAreaState {
         lines.add(cursorRow, new StringBuilder(afterCursor));
     }
 
-    /** Deletes the character before the cursor. */
+    /** Deletes the grapheme cluster before the cursor. */
     public void deleteBackward() {
         if (cursorCol > 0) {
-            lines.get(cursorRow).deleteCharAt(cursorCol - 1);
-            cursorCol--;
+            StringBuilder line = lines.get(cursorRow);
+            int start = GraphemeClusters.clusterStart(line, cursorCol);
+            line.delete(start, cursorCol);
+            cursorCol = start;
         } else if (cursorRow > 0) {
             // Merge with previous line
             StringBuilder prevLine = lines.get(cursorRow - 1);
@@ -167,11 +171,12 @@ public final class TextAreaState {
         }
     }
 
-    /** Deletes the character after the cursor. */
+    /** Deletes the grapheme cluster after the cursor. */
     public void deleteForward() {
         StringBuilder currentLine = lines.get(cursorRow);
         if (cursorCol < currentLine.length()) {
-            currentLine.deleteCharAt(cursorCol);
+            int end = GraphemeClusters.clusterEnd(currentLine, cursorCol);
+            currentLine.delete(cursorCol, end);
         } else if (cursorRow < lines.size() - 1) {
             // Merge with next line
             currentLine.append(lines.get(cursorRow + 1));
@@ -181,21 +186,21 @@ public final class TextAreaState {
 
     // --- Cursor Movement ---
 
-    /** Moves the cursor one position to the left. */
+    /** Moves the cursor one grapheme cluster to the left. */
     public void moveCursorLeft() {
         if (cursorCol > 0) {
-            cursorCol--;
+            cursorCol = GraphemeClusters.clusterStart(lines.get(cursorRow), cursorCol);
         } else if (cursorRow > 0) {
             cursorRow--;
             cursorCol = lines.get(cursorRow).length();
         }
     }
 
-    /** Moves the cursor one position to the right. */
+    /** Moves the cursor one grapheme cluster to the right. */
     public void moveCursorRight() {
         StringBuilder currentLine = lines.get(cursorRow);
         if (cursorCol < currentLine.length()) {
-            cursorCol++;
+            cursorCol = GraphemeClusters.clusterEnd(currentLine, cursorCol);
         } else if (cursorRow < lines.size() - 1) {
             cursorRow++;
             cursorCol = 0;
@@ -256,12 +261,29 @@ public final class TextAreaState {
             scrollRow = cursorRow - visibleRows + 1;
         }
 
-        // Horizontal scrolling
-        if (cursorCol < scrollCol) {
+        // Horizontal scrolling (display-width aware: cursorCol is a char offset)
+        String line = getLine(cursorRow);
+        if (cursorCol <= scrollCol) {
             scrollCol = cursorCol;
-        } else if (cursorCol >= scrollCol + visibleCols) {
-            scrollCol = cursorCol - visibleCols + 1;
+        } else {
+            int from = Math.min(scrollCol, line.length());
+            int to = Math.min(cursorCol, line.length());
+            int displayWidth = CharWidth.of(line.substring(from, to));
+            if (displayWidth >= visibleCols) {
+                scrollCol = findScrollColForCursor(line, cursorCol, visibleCols);
+            }
         }
+    }
+
+    private static int findScrollColForCursor(String line, int cursorCol, int visibleCols) {
+        int end = Math.min(cursorCol, line.length());
+        for (int col = end - 1; col >= 0; col--) {
+            int width = CharWidth.of(line.substring(col, end));
+            if (width >= visibleCols) {
+                return col + 1;
+            }
+        }
+        return 0;
     }
 
     /**

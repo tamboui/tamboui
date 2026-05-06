@@ -17,6 +17,7 @@ import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -586,6 +587,20 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     }
 
     @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        if (fieldType == FieldType.TEXT || fieldType == FieldType.TEXT_AREA) {
+            if (textState != null) {
+                textState.insert(event.text());
+                if (!validators.isEmpty()) {
+                    validateField();
+                }
+                return EventResult.HANDLED;
+            }
+        }
+        return EventResult.UNHANDLED;
+    }
+
+    @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (!focused) {
             return EventResult.UNHANDLED;
@@ -649,7 +664,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         }
 
         // Toggle on space or enter
-        if (event.isConfirm() || event.character() == ' ') {
+        if (event.isConfirm() || event.isChar(' ')) {
             booleanState.toggle();
             return EventResult.HANDLED;
         }

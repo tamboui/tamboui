@@ -16,6 +16,7 @@ import dev.tamboui.tui.EventHandler;
  *   <li>{@link MouseEvent} - Mouse input</li>
  *   <li>{@link ResizeEvent} - Terminal window resize</li>
  *   <li>{@link TickEvent} - Animation timer tick</li>
+ *   <li>{@link PasteEvent} - Bracketed paste content</li>
  * </ul>
  *
  * @see EventHandler

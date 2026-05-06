@@ -28,6 +28,7 @@ import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
+import dev.tamboui.tui.event.PasteEvent;
 /**
  * Routes events to elements based on focus and position.
  * <p>
@@ -184,6 +185,8 @@ public final class EventRouter implements AutoCloseable {
             EventResult result;
             if (event instanceof KeyEvent) {
                 result = routeKeyEvent(routeId, (KeyEvent) event);
+            } else if (event instanceof PasteEvent) {
+                result = routePasteEvent((PasteEvent) event);
             } else if (event instanceof MouseEvent) {
                 // For non-key events, call global handlers first
                 result = routeGlobalHandlers(routeId, event);
@@ -215,6 +218,21 @@ public final class EventRouter implements AutoCloseable {
             }
             if (result.isHandled()) {
                 return result;
+            }
+        }
+        return EventResult.UNHANDLED;
+    }
+
+    private EventResult routePasteEvent(PasteEvent event) {
+        String focusedId = focusManager.focusedId();
+        if (focusedId != null) {
+            for (Element element : elements) {
+                if (focusedId.equals(element.id())) {
+                    EventResult result = element.handlePasteEvent(event);
+                    if (result.isHandled()) {
+                        return result;
+                    }
+                }
             }
         }
         return EventResult.UNHANDLED;

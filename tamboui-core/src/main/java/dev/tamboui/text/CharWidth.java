@@ -306,7 +306,7 @@ public final class CharWidth {
                 // Skip width contribution (it joins with previous)
                 i += charCount;
                 // Check if next character is also ZWJ to continue sequence
-                if (i < s.length() && s.codePointAt(i) != 0x200D) {
+                if (i >= s.length() || s.codePointAt(i) != 0x200D) {
                     inZwjSequence = false;
                     // After exiting ZWJ sequence, this is a safe break point
                     lastSafeBreak = i;

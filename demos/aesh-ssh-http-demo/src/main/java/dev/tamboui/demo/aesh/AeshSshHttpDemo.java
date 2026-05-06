@@ -233,8 +233,8 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
         private EventResult handleKey(KeyEvent event) {
             // Log the event
             String eventStr = String.format("KeyEvent: code=%s, char='%s', modifiers=%s",
-                event.code(), 
-                event.character() != 0 ? event.character() : ' ',
+                event.code(),
+                event.string(),
                 event.modifiers());
             appendToLog(eventStr);
             

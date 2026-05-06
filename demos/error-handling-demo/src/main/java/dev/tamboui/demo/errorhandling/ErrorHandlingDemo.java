@@ -104,7 +104,7 @@ public class ErrorHandlingDemo {
     }
 
     private static EventResult handleKeyEvent(KeyEvent event) {
-        char c = event.character();
+        int c = event.codePoint();
 
         if (c == 'e' || c == 'E') {
             faultyPanelEnabled = !faultyPanelEnabled;

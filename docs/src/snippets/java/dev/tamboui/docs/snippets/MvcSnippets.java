@@ -393,7 +393,7 @@ public class MvcSnippets {
 
             public void startEditing() { editing = true; }
             public void cancelEditing() { editing = false; input.setLength(0); }
-            public void typeChar(char c) { input.append(c); }
+            public void typeChar(String s) { input.append(s); }
             public void backspace() {
                 if (input.length() > 0) input.setLength(input.length() - 1);
             }
@@ -475,8 +475,8 @@ public class MvcSnippets {
             if (ctrl.isEditing()) {
                 if (event.isCancel()) { ctrl.cancelEditing(); return EventResult.HANDLED; }
                 if (event.isSelect()) { ctrl.submit(); return EventResult.HANDLED; }
-                if (event.code() == KeyCode.CHAR && event.character() >= 32) {
-                    ctrl.typeChar(event.character());
+                if (event.code() == KeyCode.CHAR && event.codePoint() >= 32) {
+                    ctrl.typeChar(event.string());
                     return EventResult.HANDLED;
                 }
                 if (event.code() == KeyCode.BACKSPACE) {

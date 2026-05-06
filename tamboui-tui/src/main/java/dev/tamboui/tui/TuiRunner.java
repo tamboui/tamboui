@@ -198,6 +198,9 @@ public final class TuiRunner implements AutoCloseable {
             if (config.mouseCapture()) {
                 backend.enableMouseCapture();
             }
+            if (config.bracketedPaste()) {
+                backend.enableBracketedPaste();
+            }
 
             Terminal<Backend> terminal = new Terminal<>(backend);
             return new TuiRunner(backend, terminal, config);
@@ -351,12 +354,12 @@ public final class TuiRunner implements AutoCloseable {
             }
 
             // Scroll handling
-            if (keyEvent.code() == KeyCode.UP || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'k') {
+            if (keyEvent.code() == KeyCode.UP || keyEvent.isChar('k')) {
                 if (errorScroll > 0) {
                     errorScroll--;
                     renderErrorDisplay();
                 }
-            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.code() == KeyCode.CHAR && keyEvent.character() == 'j') {
+            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.isChar('j')) {
                 errorScroll++;
                 renderErrorDisplay();
             } else if (keyEvent.code() == KeyCode.PAGE_UP) {
@@ -738,6 +741,9 @@ public final class TuiRunner implements AutoCloseable {
 
         // Restore terminal state
         try {
+            if (config.bracketedPaste()) {
+                backend.disableBracketedPaste();
+            }
             if (config.mouseCapture()) {
                 backend.disableMouseCapture();
             }

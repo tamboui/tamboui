@@ -71,18 +71,13 @@ public final class EventParser {
             return parseControlChar(c, bindings);
         }
 
-        // Regular printable character
-        if (c < 127) {
-            return KeyEvent.ofChar((char) c, bindings);
-        }
-
         // DEL key
         if (c == 127) {
             return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings);
         }
 
-        // Extended ASCII / UTF-8 - treat as character
-        return KeyEvent.ofChar((char) c, bindings);
+        // Any printable character (ASCII or full Unicode code point from backend)
+        return KeyEvent.ofChar(c, bindings);
     }
 
     private static Event parseControlChar(int c, Bindings bindings) {
@@ -127,8 +122,8 @@ public final class EventParser {
 
         // Alt+key
         backend.read(PEEK_TIMEOUT); // consume the character
-        if (next >= 32 && next < 127) {
-            return KeyEvent.ofChar((char) next, KeyModifiers.ALT, bindings);
+        if (next >= 32 && next != 127) {
+            return KeyEvent.ofChar(next, KeyModifiers.ALT, bindings);
         }
 
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
@@ -178,14 +173,19 @@ public final class EventParser {
                 sb.append((char) c);
             } else {
                 // End of sequence
-                return parseCSIWithParams(sb.toString(), c, bindings);
+                return parseCSIWithParams(sb.toString(), c, backend, bindings);
             }
         }
 
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
     }
 
-    private static Event parseCSIWithParams(String params, int terminator, Bindings bindings) {
+    private static Event parseCSIWithParams(String params, int terminator, Backend backend, Bindings bindings) throws IOException {
+        // Bracketed paste start: ESC[200~
+        if (terminator == '~' && "200".equals(params)) {
+            return readPasteContent(backend, bindings);
+        }
+
         // Parse sequences like "1~" (Home), "4~" (End), "5~" (PgUp), etc.
         if (terminator == '~') {
             return parseVT(params, bindings);
@@ -197,6 +197,31 @@ public final class EventParser {
         }
 
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+    }
+
+    private static Event readPasteContent(Backend backend, Bindings bindings) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        while (true) {
+            int c = backend.read(PEEK_TIMEOUT);
+            if (c < 0) break;
+            if (c != ESC) {
+                sb.appendCodePoint(c);
+                continue;
+            }
+            // ESC seen — peek-before-consume to match [201~
+            if (backend.peek(PEEK_TIMEOUT) != '[')  { sb.appendCodePoint(ESC); continue; }
+            backend.read(PEEK_TIMEOUT); // consume '['
+            if (backend.peek(PEEK_TIMEOUT) != '2')  { sb.appendCodePoint(ESC); sb.appendCodePoint('['); continue; }
+            backend.read(PEEK_TIMEOUT);
+            if (backend.peek(PEEK_TIMEOUT) != '0')  { sb.appendCodePoint(ESC); sb.appendCodePoint('['); sb.appendCodePoint('2'); continue; }
+            backend.read(PEEK_TIMEOUT);
+            if (backend.peek(PEEK_TIMEOUT) != '1')  { sb.appendCodePoint(ESC); sb.appendCodePoint('['); sb.appendCodePoint('2'); sb.appendCodePoint('0'); continue; }
+            backend.read(PEEK_TIMEOUT);
+            if (backend.peek(PEEK_TIMEOUT) != '~')  { sb.appendCodePoint(ESC); sb.appendCodePoint('['); sb.appendCodePoint('2'); sb.appendCodePoint('0'); sb.appendCodePoint('1'); continue; }
+            backend.read(PEEK_TIMEOUT); // consume '~'
+            break; // ESC[201~ matched — end of paste
+        }
+        return new PasteEvent(sb.toString());
     }
 
     private static Event parseVT(String params, Bindings bindings) {
