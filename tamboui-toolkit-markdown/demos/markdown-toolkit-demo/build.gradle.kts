@@ -5,8 +5,8 @@ plugins {
 description = "Toolkit DSL demo for the markdown renderer with CSS-based styling"
 
 demo {
+    module = "Markdown"
     tags = setOf("toolkit", "markdown", "css", "styling")
-    internal = true
 }
 
 dependencies {

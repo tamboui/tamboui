@@ -6,7 +6,6 @@ description = "Demo showcasing the markdown renderer, including simulated LLM st
 
 demo {
     tags = setOf("markdown", "text", "streaming")
-    internal = true
 }
 
 dependencies {

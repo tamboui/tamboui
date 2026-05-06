@@ -667,8 +667,8 @@ The widget displays:
 * Full stack trace (scrollable)
 * Footer with instructions
 
-[[clear]]
-=== Clear
+[[clear-style]]
+=== Clear (Styled)
 
 Clears an area by filling it with a style. Useful for widget layering:
 
