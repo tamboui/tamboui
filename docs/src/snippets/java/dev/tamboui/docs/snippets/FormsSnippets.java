@@ -90,13 +90,16 @@ public class FormsSnippets {
 
     void booleanFields() {
         // tag::boolean-fields[]
-        BooleanFieldState subscribeState = new BooleanFieldState(false);
+        BooleanFieldState state = new BooleanFieldState(false);
 
-        // Checkbox style: [x] or [ ]
-        formField("Subscribe", subscribeState);
+        // Checkbox style: “Subscribe [x]” or “Subscribe [ ]”
+        formField("Subscribe", state);
 
-        // Toggle style: [ON] or [OFF]
-        formField("Dark Mode", subscribeState, FieldType.TOGGLE);
+        // Toggle style: “● Yes / ○ No”
+        formField("Dark Mode", state, FieldType.TOGGLE);
+
+        // Display the checkbox before the label “[x] Overdrive”
+        formField("Overdrive", state).inputBeforeLabel(true);
         // end::boolean-fields[]
     }
 

@@ -86,6 +86,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     // Layout
     private int labelWidth = DEFAULT_LABEL_WIDTH;
     private int spacing = DEFAULT_SPACING;
+    private boolean inputBeforeLabel = false;
 
     // Styling
     private Style labelStyle;
@@ -275,6 +276,30 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
      */
     public FormFieldElement spacing(int spacing) {
         this.spacing = Math.max(0, spacing);
+        return this;
+    }
+
+    /**
+     * Sets if the input should be displayed before the label.
+     *
+     * For example, a checkbox with {@code inputBeforeLabel=false} (default) will render
+     * as "Label [x]" whereas {@code inputBeforeLabel=true} will render "[x] Label"
+     *
+     * @param inputBeforeLabel true if the input should be before the label, false otherwise
+     * @return this element for chaining
+     */
+    public FormFieldElement inputBeforeLabel(boolean inputBeforeLabel) {
+        this.inputBeforeLabel = inputBeforeLabel;
+        return this;
+    }
+
+    /**
+     * Sets the input to be displayed before the label ("[x] Label")
+     *
+     * @return this element for chaining
+     */
+    public FormFieldElement inputBeforeLabel() {
+        inputBeforeLabel(true);
         return this;
     }
 
@@ -715,9 +740,18 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         Style effectiveErrorStyle = resolveEffectiveStyle(context, "error", errorStyle, DEFAULT_ERROR_STYLE);
 
         // Calculate layout
-        int effectiveLabelWidth = Math.min(labelWidth, area.width() - 1);
-        int inputX = area.x() + effectiveLabelWidth + spacing;
-        int inputWidth = area.width() - effectiveLabelWidth - spacing;
+        int inputX, labelX, effectiveLabelWidth, inputWidth;
+        if (inputBeforeLabel) {
+            inputWidth = area.width() - labelWidth - spacing;
+            effectiveLabelWidth = Math.min(labelWidth, area.width() - 1);
+            inputX = area.x();
+            labelX = area.x() + inputWidth + spacing;
+        } else {
+            effectiveLabelWidth = Math.min(labelWidth, area.width() - 1);
+            inputWidth = area.width() - effectiveLabelWidth - spacing;
+            labelX = area.x();
+            inputX = area.x() + effectiveLabelWidth + spacing;
+        }
 
         // Determine if we need error row
         boolean hasError = !lastValidation().isValid();
@@ -725,7 +759,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         int totalHeight = showInlineErrors && hasError ? inputHeight + 1 : inputHeight;
 
         // Render label
-        Rect labelArea = new Rect(area.x(), area.y(), effectiveLabelWidth, inputHeight);
+        Rect labelArea = new Rect(labelX, area.y(), effectiveLabelWidth, inputHeight);
         renderLabel(frame, labelArea, effectiveLabelStyle);
 
         // Render input
