@@ -25,7 +25,7 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
     private StyledElement<?> innerElement;
     private Style innerElementStyle;
     private Style innerElementFocusedStyle;
-    private EventHandler onPress;
+    private EventHandler onPress = null;
 
     /**
      * Creates a button with the specified inner element.
@@ -48,7 +48,7 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
     private void registerHandlers() {
         this.keyHandler =
             (KeyEvent event) -> {
-                if (event.isConfirm()) {
+                if (event.isConfirm() && this.onPress != null) {
                     return this.onPress.handle(event);
                 }
                 return EventResult.UNHANDLED;
@@ -91,9 +91,9 @@ public final class ButtonElement extends StyledElement<ButtonElement> {
         boolean isFocused = elementId != null && context.isFocused(elementId);
         if (isFocused) {
             if (effectiveStyle.effectiveModifiers().contains(Modifier.REVERSED)) {
-                effectiveStyle.notReversed();
+                effectiveStyle = effectiveStyle.notReversed();
             } else {
-                effectiveStyle.reversed();
+                effectiveStyle = effectiveStyle.reversed();
             }
 
             this.innerElement.style(innerElementFocusedStyle);
