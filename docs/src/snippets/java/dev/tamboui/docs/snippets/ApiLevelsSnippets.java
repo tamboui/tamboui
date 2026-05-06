@@ -588,6 +588,14 @@ public class ApiLevelsSnippets {
         // end::list-element-navigation[]
     }
 
+    void scrollableUsage() {
+        // tag::scrollable-usage[]
+        scrollable(children)
+            .scrollUpIndicator(text("[scroll up to see more...]").dim())
+            .scrollDownIndicator(text("[scroll down to see more...]").dim());
+        // end::scrollable-usage[]
+    }
+
     void eventHandling() {
         // tag::event-handling[]
         panel("Interactive")

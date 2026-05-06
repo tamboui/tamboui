@@ -37,6 +37,7 @@ import dev.tamboui.toolkit.elements.Panel;
 import dev.tamboui.toolkit.elements.RichTextAreaElement;
 import dev.tamboui.toolkit.elements.RichTextElement;
 import dev.tamboui.toolkit.elements.Row;
+import dev.tamboui.toolkit.elements.ScrollableElement;
 import dev.tamboui.toolkit.elements.ScrollbarElement;
 import dev.tamboui.toolkit.elements.Spacer;
 import dev.tamboui.toolkit.elements.SparklineElement;
@@ -354,6 +355,36 @@ public final class Toolkit {
      */
     public static Column column() {
         return new Column();
+    }
+
+    /**
+     * Creates a scrollable with a scrollbar and children.
+     *
+     * @param scrollbar the scrollbar to use
+     * @param children the child elements
+     * @return a new scrollable
+     */
+    public static ScrollableElement scrollable(ScrollbarElement scrollbar, Element... children) {
+        return new ScrollableElement(scrollbar).add(children);
+    }
+
+    /**
+     * Creates a scrollable with a set of children.
+     *
+     * @param children the child elements
+     * @return a new scrollable
+     */
+    public static ScrollableElement scrollable(Element... children) {
+        return new ScrollableElement(children);
+    }
+
+    /**
+     * Creates an empty scrollable.
+     *
+     * @return a new empty scrollable
+     */
+    public static ScrollableElement scrollable() {
+        return new ScrollableElement();
     }
 
     // ==================== Columns ====================
