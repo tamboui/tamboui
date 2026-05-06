@@ -349,6 +349,22 @@ class TextAreaElementTest extends AbstractElementTest {
             assertThat(result).isEqualTo(EventResult.HANDLED);
             assertThat(element.getState().text()).isEqualTo("    ");
         }
+
+        @Test
+        @DisplayName("onSubmit callback is invoked on Enter")
+        void onSubmitCallback() {
+            AtomicReference<String> capturedText = new AtomicReference<>();
+            TextAreaElement element = textArea()
+                .text("Hello")
+                .onSubmit(capturedText::set);
+
+            KeyEvent enterEvent = new KeyEvent(KeyCode.ENTER, KeyModifiers.NONE, '\0');
+            element.handleKeyEvent(enterEvent, true);
+
+            assertThat(capturedText.get()).isEqualTo("Hello");
+            // Text should have newline added
+            assertThat(element.getState().text()).isEqualTo("Hello\n");
+        }
     }
 
     @Nested

@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -16,6 +17,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
@@ -23,6 +25,8 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.input.TextArea;
 import dev.tamboui.widgets.input.TextAreaState;
+
+import static dev.tamboui.toolkit.Toolkit.handleTextAreaKey;
 
 /**
  * A DSL wrapper for the TextArea widget.
@@ -72,6 +76,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     private boolean showLineNumbers = false;
     private Style lineNumberStyle;
     private TextChangeListener changeListener;
+    private Consumer<String> onSubmit;
 
     /** Creates a new text area element with a default state. */
     public TextAreaElement() {
@@ -252,6 +257,20 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return this;
     }
 
+    /**
+     * Sets a callback for when the user submits text with Enter.
+     * <p>
+     * The callback is invoked before the newline is inserted. If you want to
+     * prevent newline insertion, do not call the normal Enter key handling.
+     *
+     * @param handler the callback invoked with the current text, or null to disable
+     * @return this builder
+     */
+    public TextAreaElement onSubmit(Consumer<String> handler) {
+        this.onSubmit = handler;
+        return this;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Calculate max line width from content
@@ -304,62 +323,22 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         if (!focused) {
             return EventResult.UNHANDLED;
         }
+
+        if (event.matches(Actions.CONFIRM)) {
+            // Call submit callback if provided (before inserting newline)
+            if (onSubmit != null && !event.hasShift()) {
+                onSubmit.accept(state.text());
+            }
+            // Always insert newline on Enter (unless handled by callback)
+            state.insert('\n');
+            return EventResult.HANDLED;
+        }
+
         boolean handled = handleTextAreaKey(state, event);
         if (handled && changeListener != null) {
             changeListener.onTextChange(state.text());
         }
         return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
-    }
-
-    /**
-     * Handles common key events for text area input.
-     */
-    private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event) {
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case UP:
-                state.moveCursorUp();
-                return true;
-            case DOWN:
-                state.moveCursorDown();
-                return true;
-            case HOME:
-                state.moveCursorToLineStart();
-                return true;
-            case END:
-                state.moveCursorToLineEnd();
-                return true;
-            case ENTER:
-                state.insert('\n');
-                return true;
-            case TAB:
-                state.insert("    "); // 4 spaces for tab
-                return true;
-            case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
-                    return false;
-                }
-                char c = event.character();
-                if (c >= 32 && c < 127) {
-                    state.insert(c);
-                    return true;
-                }
-                return false;
-            default:
-                return false;
-        }
     }
 
     @Override
