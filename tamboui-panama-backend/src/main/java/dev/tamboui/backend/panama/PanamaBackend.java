@@ -167,6 +167,16 @@ public class PanamaBackend extends AbstractBackend {
     }
 
     @Override
+    public void beginSynchronizedUpdate() throws IOException {
+        outputBuffer.appendAscii(MODE_2026_BSU);
+    }
+
+    @Override
+    public void endSynchronizedUpdate() throws IOException {
+        outputBuffer.appendAscii(MODE_2026_ESU);
+    }
+
+    @Override
     public void scrollUp(int lines) throws IOException {
         outputBuffer.csi().appendInt(lines).append((byte) 'S');
         flush();

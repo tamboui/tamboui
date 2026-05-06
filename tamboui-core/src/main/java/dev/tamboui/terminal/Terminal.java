@@ -149,36 +149,46 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
                 // Calculate diff and draw (zero-allocation DoD variant)
                 previousBuffer.diff(currentBuffer, diffResult);
-                if (!diffResult.isEmpty()) {
-                    backend.draw(diffResult);
-                }
-                diffResult.clear();  // Clear after use to release Cell refs for GC
 
-                // Handle cursor
-                if (frame.isCursorVisible()) {
-                    frame.cursorPosition().ifPresent(pos -> {
-                        try {
-                            backend.setCursorPosition(pos);
-                            if (hiddenCursor) {
-                                backend.showCursor();
-                                hiddenCursor = false;
-                            }
-                        } catch (IOException e) {
-                            throw new RuntimeIOException(
-                                    String.format("Failed to set cursor position to %s: %s", pos, e.getMessage()), e);
-                        }
-                    });
-                } else if (!hiddenCursor) {
-                    try {
-                        backend.hideCursor();
-                        hiddenCursor = true;
-                    } catch (IOException e) {
-                        throw new RuntimeIOException("Failed to hide cursor: " + e.getMessage(), e);
+                // Wrap rendering in synchronized update (Mode 2026) to prevent tearing.
+                // BSU, draw data, and ESU are all written to the output buffer and
+                // flushed together in a single syscall for atomic rendering.
+                backend.beginSynchronizedUpdate();
+                try {
+                    if (!diffResult.isEmpty()) {
+                        backend.draw(diffResult);
                     }
-                }
 
-                // Flush output
-                backend.flush();
+                    // Handle cursor
+                    if (frame.isCursorVisible()) {
+                        frame.cursorPosition().ifPresent(pos -> {
+                            try {
+                                backend.setCursorPosition(pos);
+                                if (hiddenCursor) {
+                                    backend.showCursor();
+                                    hiddenCursor = false;
+                                }
+                            } catch (IOException e) {
+                                throw new RuntimeIOException(
+                                        String.format("Failed to set cursor position to %s: %s", pos, e.getMessage()),
+                                        e);
+                            }
+                        });
+                    } else if (!hiddenCursor) {
+                        try {
+                            backend.hideCursor();
+                            hiddenCursor = true;
+                        } catch (IOException e) {
+                            throw new RuntimeIOException("Failed to hide cursor: " + e.getMessage(), e);
+                        }
+                    }
+                } finally {
+                    diffResult.clear();  // Release Cell refs for GC even on error
+                    // Write ESU before flushing so BSU + draw + ESU are sent atomically.
+                    // Done in finally to avoid leaving the terminal in a stuck buffering state.
+                    backend.endSynchronizedUpdate();
+                    backend.flush();
+                }
 
                 // Swap buffers
                 Buffer temp = previousBuffer;

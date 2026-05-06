@@ -17,6 +17,11 @@ import dev.tamboui.layout.Size;
  */
 public interface Backend extends AutoCloseable {
 
+    /** Mode 2026 Begin Synchronized Update escape sequence. */
+    String MODE_2026_BSU = "\033[?2026h";
+    /** Mode 2026 End Synchronized Update escape sequence. */
+    String MODE_2026_ESU = "\033[?2026l";
+
     /**
      * Draws the given cell updates to the terminal using a Data-Oriented Design approach.
      * <p>
@@ -125,6 +130,34 @@ public interface Backend extends AutoCloseable {
      */
     default void disableMouseCapture() throws IOException {
         // Optional: not all backends support mouse
+    }
+
+    /**
+     * Begins a synchronized update (Mode 2026 BSU).
+     * <p>
+     * When supported, the terminal buffers all subsequent output until
+     * {@link #endSynchronizedUpdate()} is called, then renders everything
+     * in a single frame. This prevents screen tearing during redraws.
+     * <p>
+     * Terminals that do not support Mode 2026 safely ignore the escape sequence.
+     *
+     * @throws IOException if the operation fails
+     */
+    default void beginSynchronizedUpdate() throws IOException {
+        // Optional: not all backends support synchronized output
+    }
+
+    /**
+     * Ends a synchronized update (Mode 2026 ESU).
+     * <p>
+     * Writes the ESU sequence to the output buffer. The caller is responsible
+     * for flushing, since not all terminals support Mode 2026 and the flush
+     * must happen unconditionally.
+     *
+     * @throws IOException if the operation fails
+     */
+    default void endSynchronizedUpdate() throws IOException {
+        // Optional: not all backends support synchronized output
     }
 
     /**
