@@ -42,19 +42,21 @@ TamboUI is a Java library for building modern terminal user interfaces, inspired
 
 ## Module Structure
 
-| Module                | Purpose |
-|-----------------------|---------|
+| Module                | Purpose                                                                                             |
+|-----------------------|-----------------------------------------------------------------------------------------------------|
 | `tamboui-core`        | Core types: Buffer, Cell, Rect, Style, Layout, Text, Widget/StatefulWidget interfaces, InlineDisplay |
-| `tamboui-widgets`     | All widget implementations (Block, Paragraph, List, Table, Chart, Canvas, etc.) |
-| `tamboui-jline`       | JLine 3 terminal backend implementation |
-| `tamboui-tui`         | High-level TUI framework: TuiRunner, event handling, bindings, action handlers |
-| `tamboui-toolkit`     | Fluent DSL for declarative UI with retained-mode elements, focus management, event routing |
-| `tamboui-css`         | CSS-based styling with TCSS format, selectors, cascade resolution, theme switching |
-| `tamboui-annotations` | Annotation definitions (`@OnAction`) for action handling |
-| `tamboui-processor`   | Annotation processor for compile-time action handler generation (avoids reflection) |
-| `tamboui-image`       | Image rendering with multiple protocols (Kitty, iTerm, Sixel, HalfBlock, Braille) |
-| `tamboui-picocli`     | PicoCLI integration for CLI argument parsing |
-| `**/demos/*`          | Demo applications showcasing features |
+| `tamboui-widgets`     | All widget implementations (Block, Paragraph, List, Table, Chart, Canvas, etc.)                     |
+| `tamboui-jline`       | JLine 3 terminal backend implementation                                                             |
+| `tamboui-tui`         | High-level TUI framework: TuiRunner, event handling, bindings, action handlers                      |
+| `tamboui-toolkit`     | Fluent DSL for declarative UI with retained-mode elements, focus management, event routing          |
+| `tamboui-css`         | CSS-based styling with TCSS format, selectors, cascade resolution, theme switching                  |
+| `tamboui-annotations` | Annotation definitions (`@OnAction`) for action handling                                            |
+| `tamboui-processor`   | Annotation processor for compile-time action handler generation (avoids reflection)                 |
+| `tamboui-image`       | Image rendering with multiple protocols (Kitty, iTerm, Sixel, HalfBlock, Braille)                   |
+| `tamboui-markdown`    | Markdown renderer (CommonMark + GFM; opt-in CommonMark dep; Java 11) |
+| `tamboui-toolkit-markdown` | Toolkit DSL element wrapping `MarkdownView` (Java 11) |
+| `tamboui-picocli`     | PicoCLI integration for CLI argument parsing                                                        |
+| `**/demos/*`          | Demo applications showcasing features                                                               |
 
 ## Architecture
 

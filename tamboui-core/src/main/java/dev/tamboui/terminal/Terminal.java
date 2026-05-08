@@ -6,6 +6,11 @@ package dev.tamboui.terminal;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 import dev.tamboui.buffer.Buffer;
@@ -23,12 +28,19 @@ import dev.tamboui.layout.Size;
  */
 public final class Terminal<B extends Backend> implements AutoCloseable {
 
+    // Kitty graphics protocol: delete all images from the graphics layer.
+    // Non-Kitty terminals safely ignore this APC sequence.
+    private static final byte[] KITTY_DELETE_ALL =
+            "\033_Ga=d,d=a\033\\".getBytes(StandardCharsets.US_ASCII);
+
     private final B backend;
     private final OutputStream rawOutput;
     private final DiffResult diffResult;
     private Buffer currentBuffer;
     private Buffer previousBuffer;
     private boolean hiddenCursor;
+    private boolean previousFrameHadRawOutput;
+    private List<Rect> previousRawOutputAreas = Collections.emptyList();
 
     /**
      * Creates a new terminal instance with the given backend.
@@ -133,6 +145,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 Frame frame = new Frame(currentBuffer, rawOutput);
                 renderer.accept(frame);
 
+                cleanupRawOutput(frame.rawOutputAreas());
+
                 // Calculate diff and draw (zero-allocation DoD variant)
                 previousBuffer.diff(currentBuffer, diffResult);
                 if (!diffResult.isEmpty()) {
@@ -171,6 +185,9 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 previousBuffer = currentBuffer;
                 currentBuffer = temp;
 
+                previousFrameHadRawOutput = frame.hadRawOutput();
+                previousRawOutputAreas = frame.rawOutputAreas();
+
                 return new CompletedFrame(previousBuffer, area);
             } catch (IOException e) {
                 throw new RuntimeIOException("Failed to draw frame: " + e.getMessage(), e);
@@ -192,9 +209,66 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
         currentBuffer = Buffer.empty(area);
         previousBuffer = Buffer.empty(area);
         try {
+            cleanupRawOutput(Collections.emptyList());
+            previousFrameHadRawOutput = false;
+            previousRawOutputAreas = Collections.emptyList();
             backend.clear();
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to clear terminal during resize: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Cleans up raw output artifacts from previous frames.
+     * <p>
+     * When raw-output widgets (Kitty/iTerm2/Sixel) are removed or moved between
+     * frames, their artifacts must be explicitly cleared:
+     * <ul>
+     *   <li>Kitty: images live on a separate graphics layer, so a delete-all
+     *       command is sent when all images are removed.</li>
+     *   <li>iTerm2/Sixel: images occupy terminal cells, so stale areas are
+     *       overwritten with spaces.</li>
+     * </ul>
+     *
+     * @param currentAreas the raw output areas rendered in the current frame
+     *                     (empty list when no images are present)
+     * @throws IOException if writing cleanup sequences fails
+     */
+    private void cleanupRawOutput(List<Rect> currentAreas) throws IOException {
+        if (!previousFrameHadRawOutput) {
+            return;
+        }
+
+        List<Rect> staleAreas;
+        if (currentAreas.isEmpty()) {
+            rawOutput.write(KITTY_DELETE_ALL);
+            staleAreas = previousRawOutputAreas;
+        } else {
+            staleAreas = new ArrayList<>();
+            for (Rect prev : previousRawOutputAreas) {
+                if (!currentAreas.contains(prev)) {
+                    staleAreas.add(prev);
+                }
+            }
+        }
+
+        if (!staleAreas.isEmpty()) {
+            int maxWidth = 0;
+            for (Rect area : staleAreas) {
+                if (area.width() > maxWidth) {
+                    maxWidth = area.width();
+                }
+            }
+            byte[] spaces = new byte[maxWidth];
+            Arrays.fill(spaces, (byte) ' ');
+
+            for (Rect imageArea : staleAreas) {
+                for (int y = imageArea.y(); y < imageArea.y() + imageArea.height(); y++) {
+                    String move = String.format("\033[%d;%dH", y + 1, imageArea.x() + 1);
+                    rawOutput.write(move.getBytes(StandardCharsets.US_ASCII));
+                    rawOutput.write(spaces, 0, imageArea.width());
+                }
+            }
         }
     }
 
@@ -205,6 +279,9 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
      */
     public void clear() {
         try {
+            cleanupRawOutput(Collections.emptyList());
+            previousFrameHadRawOutput = false;
+            previousRawOutputAreas = Collections.emptyList();
             backend.clear();
             Rect area = currentBuffer.area();
             currentBuffer = Buffer.empty(area);
@@ -259,6 +336,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     @Override
     public void close() {
         try {
+            cleanupRawOutput(Collections.emptyList());
             if (hiddenCursor) {
                 backend.showCursor();
             }

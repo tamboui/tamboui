@@ -45,6 +45,20 @@ public interface ImageProtocol {
     boolean requiresRawOutput();
 
     /**
+     * Returns true if this protocol handles its own pixel scaling via cell dimensions
+     * (e.g. Kitty's c=/r= or iTerm2's width=/height=).
+     * <p>
+     * Protocols that return true receive the original full-resolution image and a
+     * display area computed in cells. Protocols that return false (Sixel, character-based)
+     * receive a pre-scaled image.
+     *
+     * @return true if the protocol handles scaling internally
+     */
+    default boolean handlesOwnScaling() {
+        return false;
+    }
+
+    /**
      * Returns the resolution multiplier for this protocol.
      * <p>
      * This indicates how many "virtual pixels" each terminal cell can represent:

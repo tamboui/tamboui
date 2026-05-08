@@ -6,7 +6,10 @@ package dev.tamboui.terminal;
 
 import java.io.OutputStream;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.List;
 import java.util.Optional;
 
 import dev.tamboui.buffer.Buffer;
@@ -30,6 +33,8 @@ public final class Frame {
     private Position cursorPosition;
     private boolean cursorVisible;
     private final Deque<String> contextKeyStack = new ArrayDeque<>();
+    private boolean hadRawOutput;
+    private List<Rect> rawOutputAreas;
 
     Frame(Buffer buffer, OutputStream rawOutput) {
         this.buffer = buffer;
@@ -98,6 +103,11 @@ public final class Frame {
     public void renderWidget(Widget widget, Rect area) {
         if (widget instanceof RawOutputCapable) {
             ((RawOutputCapable) widget).render(area, buffer, rawOutput);
+            hadRawOutput = true;
+            if (rawOutputAreas == null) {
+                rawOutputAreas = new ArrayList<>();
+            }
+            rawOutputAreas.add(area);
         } else {
             widget.render(area, buffer);
         }
@@ -113,6 +123,13 @@ public final class Frame {
      */
     public <S> void renderStatefulWidget(StatefulWidget<S> widget, Rect area, S state) {
         widget.render(area, buffer, state);
+        if (widget instanceof RawOutputCapable) {
+            hadRawOutput = true;
+            if (rawOutputAreas == null) {
+                rawOutputAreas = new ArrayList<>();
+            }
+            rawOutputAreas.add(area);
+        }
     }
 
     /**
@@ -218,6 +235,20 @@ public final class Frame {
         if (!contextKeyStack.isEmpty()) {
             contextKeyStack.pop();
         }
+    }
+
+    /**
+     * Returns whether any {@link RawOutputCapable} widget was rendered in this frame.
+     */
+    boolean hadRawOutput() {
+        return hadRawOutput;
+    }
+
+    /**
+     * Returns the areas where {@link RawOutputCapable} widgets rendered in this frame.
+     */
+    List<Rect> rawOutputAreas() {
+        return rawOutputAreas != null ? rawOutputAreas : Collections.emptyList();
     }
 
     /**

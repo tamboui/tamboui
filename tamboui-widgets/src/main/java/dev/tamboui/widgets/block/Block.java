@@ -203,6 +203,43 @@ public final class Block implements Widget {
     }
 
     /**
+     * Returns the number of rows this block reserves for chrome (top and
+     * bottom borders, top and bottom titles, and vertical padding). The
+     * inner content area of any rendered block is {@code area.height()}
+     * minus this value (clamped at 0).
+     *
+     * @return rows of vertical chrome
+     */
+    public int verticalChrome() {
+        int chrome = 0;
+        if (borders.contains(Borders.TOP) || title != null) {
+            chrome += 1;
+        }
+        if (borders.contains(Borders.BOTTOM) || titleBottom != null) {
+            chrome += 1;
+        }
+        return chrome + padding.verticalTotal();
+    }
+
+    /**
+     * Returns the number of columns this block reserves for chrome (left
+     * and right borders plus horizontal padding). The inner content area
+     * is {@code area.width()} minus this value (clamped at 0).
+     *
+     * @return columns of horizontal chrome
+     */
+    public int horizontalChrome() {
+        int chrome = 0;
+        if (borders.contains(Borders.LEFT)) {
+            chrome += 1;
+        }
+        if (borders.contains(Borders.RIGHT)) {
+            chrome += 1;
+        }
+        return chrome + padding.horizontalTotal();
+    }
+
+    /**
      * Returns the inner area after accounting for borders, titles, and padding.
      *
      * @param area the outer area

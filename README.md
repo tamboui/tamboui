@@ -515,6 +515,7 @@ isBackTab(event)   // Shift+Tab
       <td align="center" valign="top" width="14.28%"><a href="https://andresalmiray.com/"><img src="https://avatars.githubusercontent.com/u/13969?v=4?s=100" width="100px;" alt="Andres Almiray"/><br /><sub><b>Andres Almiray</b></sub></a><br /><a href="#infra-aalmiray" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/lukasz-kapica"><img src="https://avatars.githubusercontent.com/u/4257505?v=4?s=100" width="100px;" alt="Łukasz Kapica"/><br /><sub><b>Łukasz Kapica</b></sub></a><br /><a href="#doc-lukasz-kapica" title="Documentation">📖</a> <a href="#infra-lukasz-kapica" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/franz1981"><img src="https://avatars.githubusercontent.com/u/13125299?v=4?s=100" width="100px;" alt="Francesco Nigro"/><br /><sub><b>Francesco Nigro</b></sub></a><br /><a href="#code-franz1981" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://ncovercash.dev/"><img src="https://avatars.githubusercontent.com/u/8005215?v=4?s=100" width="100px;" alt="Noah Overcash"/><br /><sub><b>Noah Overcash</b></sub></a><br /><a href="#code-ncovercash" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

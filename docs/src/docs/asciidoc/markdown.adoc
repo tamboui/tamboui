@@ -1,0 +1,217 @@
+= Markdown Reference
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+
+include::_attributes.adoc[]
+
+The `tamboui-markdown` module renders CommonMark + GFM (tables, task lists,
+strikethrough) to a TamboUI `Buffer`.
+
+[source,kotlin]
+----
+dependencies {
+    implementation("dev.tamboui:tamboui-markdown:LATEST")
+
+    // Toolkit DSL integration (optional)
+    implementation("dev.tamboui:tamboui-toolkit-markdown:LATEST")
+}
+----
+
+Requires Java 11.
+
+== Toolkit DSL
+
+The `tamboui-toolkit-markdown` module provides `MarkdownElement`, a
+`StyledElement` that wraps `MarkdownView` so markdown content participates
+in the toolkit's styling and layout system.
+
+[source,java]
+----
+import static dev.tamboui.toolkit.Toolkit.*;
+import static dev.tamboui.toolkit.markdown.MarkdownElement.markdown;
+
+panel("README",
+    markdown(readme).overflow(Overflow.WRAP_WORD).fill()
+).rounded();
+----
+
+CSS rules attached to the `MarkdownElement` selector flow through to the
+underlying widget, so the same `heading-1-color`, `link-color`,
+`blockquote-prefix` and so on documented below apply.
+
+== Quick start
+
+[source,java]
+----
+import dev.tamboui.markdown.MarkdownView;
+import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.block.Title;
+
+MarkdownView view = MarkdownView.builder()
+    .source("# Hello\n\nThis is **markdown**.")
+    .block(Block.builder()
+        .borders(Borders.ALL)
+        .title(Title.from(" README "))
+        .build())
+    .scroll(0)
+    .build();
+
+view.render(area, buffer);
+----
+
+== Supported elements
+
+|===
+|Element |Notes
+
+|Headings (1-6)
+|Bold styling, level-scaled colors. H1 underlined with `═`, H2 with `─`.
+
+|Paragraphs
+|Width-aware word wrap. Soft line breaks become a single space; hard line
+breaks (two trailing spaces) start a new line.
+
+|Bullet, ordered and task lists
+|Bullet `•`, ordered `N.`, task `[x]` / `[ ]`. Sub-lists indent by their
+parent marker width.
+
+|Block quotes
+|Single `│ ` bar with the configured blockquote style (default: dim).
+
+|Fenced and indented code blocks
+|Wrapped in a rounded `Block`. The info string is used as the block title.
+Long lines are clipped to the inner width.
+
+|GFM tables
+|Delegated to `Table` with equal-percentage column widths. Header rows are
+bolded.
+
+|Thematic breaks
+|A row of `─` glyphs styled with `MarkdownStyles.horizontalRule()`.
+
+|Inline emphasis, strong, strikethrough, code
+|Composed via `Style.patch` so explicit styles win.
+
+|Links
+|Underlined and colored. The link target is also attached to each span as an
+OSC-8 hyperlink, so terminals like iTerm2 and Kitty render them clickable.
+
+|Images
+|Rendered as a styled `[image: alt](url)` text span. There is no coupling to
+`tamboui-image` — image rendering in a markdown view would mean an image
+protocol decision per markdown, which is out of scope.
+
+|HTML blocks and inline HTML
+|Rendered as escaped text in a dim style. The HTML source stays visible but
+is clearly not interpreted.
+|===
+
+== Streaming
+
+`MarkdownView` is safe to re-bind on every frame, including when the source
+is being typed token-by-token by an LLM. Before every parse the source goes
+through `PartialMarkdownSanitizer`, which trims trailing unmatched inline
+markers. Well-formed markdown is returned byte-identical, so the same code
+path serves both static and streaming consumers.
+
+The sanitizer rules:
+
+* A trailing run of `*`, `_`, `~`, or single/double `` ` `` whose **left
+  boundary** is start-of-string, whitespace, or an opening bracket is treated
+  as an unmatched opener and dropped. A trailing run after non-whitespace is
+  a closer (e.g. the `**` at the end of `**bold**`) and is left alone.
+* A trailing run of three or more backticks is left alone — that is a code
+  fence delimiter, not inline code.
+* A dangling link `[label](` with no closing `)` is rewritten to plain
+  `[label]`.
+* A trailing partial ATX header line (`##` with no content) is dropped.
+* An open code fence is left alone — CommonMark already treats EOF as fence
+  close.
+
+== Customizing styles
+
+Styles resolve in this order: **explicit `MarkdownStyles` value > CSS resolver > built-in default.**
+
+=== Programmatic overrides
+
+`MarkdownStyles` controls the styles applied to each element. Override any
+subset and keep the rest at their defaults:
+
+[source,java]
+----
+import dev.tamboui.markdown.MarkdownStyles;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+MarkdownStyles styles = MarkdownStyles.builder()
+    .heading(1, Style.EMPTY.bold().fg(Color.MAGENTA))
+    .link(Style.EMPTY.fg(Color.GREEN).underlined())
+    .build();
+
+MarkdownView view = MarkdownView.builder()
+    .source(source)
+    .styles(styles)
+    .build();
+----
+
+=== CSS resolver
+
+Pass a `StylePropertyResolver` (the same single-resolver pattern Block and
+the other widgets use) to fill any slot the user did not set
+programmatically. Each markdown sub-element exposes three flat properties:
+
+* `{element}-color` — foreground color (named, hex, rgb, or indexed)
+* `{element}-background` — background color
+* `{element}-text-style` — space-separated modifiers (`bold`, `italic`,
+  `underlined`, `dim`, `reversed`, `crossed-out` / `strikethrough`,
+  `hidden`, `slow-blink`, `rapid-blink`)
+
+Plus a few string properties (mirroring the `Checkbox` widget convention):
+
+* `blockquote-prefix` — a glyph drawn at the start of each quoted line; a
+  single space is always appended after it.
+* `task-checked-symbol` / `task-unchecked-symbol` — glyphs drawn for GFM
+  task-list items; defaults are `[x]` and `[ ]`, again followed by a single
+  space.
+* `text-overflow` — the standard `text-overflow` property, same as
+  `Paragraph`. Supported values: `wrap-word` (default), `wrap-character` /
+  `wrap`, `clip`, `ellipsis`, `ellipsis-start`, `ellipsis-middle`. Applies
+  to prose: paragraphs, headings, list items, blockquote contents.
+  Code-block lines always clip (their structure is meaningful and ellipsis
+  would mislead) and table cells are sized by the `Table` widget.
+
+Element names: `heading-1` … `heading-6`, `strong`, `emphasis`,
+`strikethrough`, `inline-code`, `code-block`, `link`, `blockquote`,
+`list-marker`, `html`, `horizontal-rule`, `task-checked`, `task-unchecked`.
+
+[source,java]
+----
+MarkdownView view = MarkdownView.builder()
+    .source(source)
+    .styleResolver(myCssEngine.resolver())
+    .build();
+----
+
+A TCSS rule for the markdown widget looks like:
+
+[source]
+----
+MarkdownView {
+    text-overflow: ellipsis;
+    heading-1-color: magenta;
+    heading-1-text-style: bold;
+    link-color: green;
+    link-text-style: underlined;
+    blockquote-color: yellow;
+    blockquote-background: black;
+    blockquote-prefix: ">";
+    task-checked-color: green;
+    task-checked-symbol: "✓";
+    task-unchecked-color: gray;
+    task-unchecked-symbol: "·";
+}
+----

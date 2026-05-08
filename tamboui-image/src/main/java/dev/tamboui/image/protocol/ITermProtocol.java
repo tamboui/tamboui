@@ -100,6 +100,11 @@ public final class ITermProtocol implements ImageProtocol {
     }
 
     @Override
+    public boolean handlesOwnScaling() {
+        return true;
+    }
+
+    @Override
     public Resolution resolution() {
         // iTerm2 renders at pixel level, report typical cell pixel ratio
         return new Resolution(8, 16);

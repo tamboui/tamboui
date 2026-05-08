@@ -505,6 +505,15 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
         }
     }
 
+    /**
+     * Returns the last rendered flat entries (for external state access).
+     *
+     * @return the flattened entries from the last render
+     */
+    public List<TreeWidget.FlatEntry<TreeNode<T>>> lastFlatEntries() {
+        return lastFlatEntries;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         if (roots.isEmpty()) {
