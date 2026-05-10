@@ -120,7 +120,7 @@ final class TodoPanel extends PanelContent {
         if (selectedIndex == -1) {
             if (event.code() == KeyCode.CHAR) {
                 if (inputBuffer.length() < 25) {
-                    inputBuffer.insert(cursorPosition, event.character());
+                    inputBuffer.insert(cursorPosition, event.string());
                     cursorPosition++;
                 }
                 return EventResult.HANDLED;

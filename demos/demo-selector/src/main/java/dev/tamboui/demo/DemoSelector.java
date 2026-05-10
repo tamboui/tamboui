@@ -309,9 +309,9 @@ public class DemoSelector extends ToolkitApp {
 
         // Type to filter
         if (event.code() == KeyCode.CHAR && !event.hasCtrl() && !event.hasAlt()) {
-            var c = event.character();
+            int c = event.codePoint();
             if (Character.isLetterOrDigit(c) || c == '-' || c == '_') {
-                filter += c;
+                filter += event.string();
                 rebuildDisplayList();
                 demoList.selected(findFirstSelectable());
                 return EventResult.HANDLED;

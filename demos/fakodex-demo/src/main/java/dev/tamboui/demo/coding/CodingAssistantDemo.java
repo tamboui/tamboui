@@ -24,7 +24,6 @@ import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.spinner.SpinnerState;
@@ -354,19 +353,19 @@ public class CodingAssistantDemo {
         }
 
         // Ctrl+D for demo
-        if (event.code() == KeyCode.CHAR && event.character() == 'd' && event.hasCtrl()) {
+        if (event.isChar('d') && event.hasCtrl()) {
             runDemo();
             return EventResult.HANDLED;
         }
 
         // Ctrl+H for help
-        if (event.code() == KeyCode.CHAR && event.character() == 'h' && event.hasCtrl()) {
+        if (event.isChar('h') && event.hasCtrl()) {
             showHelp();
             return EventResult.HANDLED;
         }
 
         // Ctrl+L to clear
-        if (event.code() == KeyCode.CHAR && event.character() == 'l' && event.hasCtrl()) {
+        if (event.isChar('l') && event.hasCtrl()) {
             lines.clear();
             activeToolCalls.clear();
             activeThinkingText = null;

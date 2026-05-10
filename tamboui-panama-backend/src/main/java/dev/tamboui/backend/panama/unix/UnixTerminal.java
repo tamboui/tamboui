@@ -285,21 +285,21 @@ public final class UnixTerminal implements PlatformTerminal {
         // Check for pending resize events (set by signal handler)
         checkResizePending();
 
-        // Return peeked character if available
+        // Return peeked code point if available
         if (peekedChar != -2) {
             var c = peekedChar;
             peekedChar = -2;
             return c;
         }
 
-        return readInternal(timeoutMs);
+        return readCodePoint(timeoutMs);
     }
 
     /**
      * Peeks at the next character without consuming it.
      *
      * @param timeoutMs timeout in milliseconds
-     * @return the character peeked, -1 for EOF, or -2 for timeout
+     * @return the Unicode code point peeked, -1 for EOF, or -2 for timeout
      * @throws IOException if reading fails
      */
     public int peek(int timeoutMs) throws IOException {
@@ -307,8 +307,48 @@ public final class UnixTerminal implements PlatformTerminal {
             return peekedChar;
         }
 
-        peekedChar = readInternal(timeoutMs);
+        peekedChar = readCodePoint(timeoutMs);
         return peekedChar;
+    }
+
+    /**
+     * Reads the next byte and, if it is the start of a multi-byte UTF-8 sequence,
+     * reads the continuation bytes and returns the decoded Unicode code point.
+     * For non-UTF-8 charsets the raw byte value is returned as-is.
+     */
+    private int readCodePoint(int timeoutMs) throws IOException {
+        int first = readInternal(timeoutMs);
+        if (first < 0x80 || first < 0) {
+            // ASCII, EOF (-1), or timeout (-2) — return as-is
+            return first;
+        }
+
+        // Determine sequence length from the leading byte
+        int seqLen;
+        if (first < 0xC0) {
+            // Lone continuation byte — not valid UTF-8; return as-is
+            return first;
+        } else if (first < 0xE0) {
+            seqLen = 2;
+        } else if (first < 0xF0) {
+            seqLen = 3;
+        } else if (first < 0xF8) {
+            seqLen = 4;
+        } else {
+            return first;
+        }
+
+        // Read continuation bytes (they must arrive quickly after the leader)
+        int codePoint = first & (0x3F >> (seqLen - 2));
+        for (int i = 1; i < seqLen; i++) {
+            int b = readInternal(50);
+            if (b < 0 || (b & 0xC0) != 0x80) {
+                // Incomplete or invalid sequence — return the leader byte
+                return first;
+            }
+            codePoint = (codePoint << 6) | (b & 0x3F);
+        }
+        return codePoint;
     }
 
     /**

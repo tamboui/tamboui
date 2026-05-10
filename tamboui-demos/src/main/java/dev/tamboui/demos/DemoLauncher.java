@@ -761,9 +761,9 @@ public class DemoLauncher {
                 if (event.modifiers().ctrl() || event.modifiers().alt()) {
                     return false;
                 }
-                char c = event.character();
-                if (c >= 32 && c < 127) {
-                    state.insert(c);
+                int c = event.codePoint();
+                if (c >= 32 && c != 127) {
+                    state.insert(event.string());
                     return true;
                 }
                 return false;

@@ -34,6 +34,7 @@ public final class WindowsTerminal implements PlatformTerminal {
     private final int savedOutputMode;
     private boolean rawModeEnabled;
     private volatile Runnable resizeHandler;
+    private int pendingSurrogate;
 
     /**
      * Creates a new Windows terminal instance.
@@ -171,7 +172,20 @@ public final class WindowsTerminal implements PlatformTerminal {
             if (keyDown != 0) {
                 var ch = (short) Kernel32.IR_CHAR.get(inputRecord, 0L);
                 if (ch != 0) {
-                    return ch & 0xFFFF;
+                    int c = ch & 0xFFFF;
+                    if (Character.isHighSurrogate((char) c)) {
+                        // Windows sends supplementary characters as two KEY_EVENTs with surrogates;
+                        // read the low surrogate immediately with a short wait.
+                        pendingSurrogate = c;
+                        return read(50);
+                    }
+                    if (Character.isLowSurrogate((char) c) && pendingSurrogate != 0) {
+                        int codePoint = Character.toCodePoint((char) pendingSurrogate, (char) c);
+                        pendingSurrogate = 0;
+                        return codePoint;
+                    }
+                    pendingSurrogate = 0;
+                    return c;
                 }
             }
         } else if (eventType == Kernel32.WINDOW_BUFFER_SIZE_EVENT) {

@@ -252,7 +252,16 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
 
         // Check if cursor is visible
         int relativeRow = cursorRow - scrollRow;
-        int relativeCol = cursorCol - scrollCol;
+        // Convert char-offset cursor column to display column relative to scroll
+        int relativeCol;
+        if (cursorCol < scrollCol) {
+            relativeCol = -1; // cursor is left of the viewport
+        } else {
+            String cursorLine = state.getLine(cursorRow);
+            int from = Math.min(scrollCol, cursorLine.length());
+            int to = Math.min(cursorCol, cursorLine.length());
+            relativeCol = CharWidth.of(cursorLine.substring(from, to));
+        }
 
         if (relativeRow >= 0 && relativeRow < textArea.height() &&
             relativeCol >= 0 && relativeCol < textArea.width()) {

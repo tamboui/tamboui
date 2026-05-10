@@ -75,32 +75,34 @@ public final class TextInputState {
         cursorPosition += s.length();
     }
 
-    /** Deletes the character before the cursor. */
+    /** Deletes the grapheme cluster before the cursor. */
     public void deleteBackward() {
         if (cursorPosition > 0) {
-            text.deleteCharAt(cursorPosition - 1);
-            cursorPosition--;
+            int start = GraphemeClusters.clusterStart(text, cursorPosition);
+            text.delete(start, cursorPosition);
+            cursorPosition = start;
         }
     }
 
-    /** Deletes the character after the cursor. */
+    /** Deletes the grapheme cluster after the cursor. */
     public void deleteForward() {
         if (cursorPosition < text.length()) {
-            text.deleteCharAt(cursorPosition);
+            int end = GraphemeClusters.clusterEnd(text, cursorPosition);
+            text.delete(cursorPosition, end);
         }
     }
 
-    /** Moves the cursor one position to the left. */
+    /** Moves the cursor one grapheme cluster to the left. */
     public void moveCursorLeft() {
         if (cursorPosition > 0) {
-            cursorPosition--;
+            cursorPosition = GraphemeClusters.clusterStart(text, cursorPosition);
         }
     }
 
-    /** Moves the cursor one position to the right. */
+    /** Moves the cursor one grapheme cluster to the right. */
     public void moveCursorRight() {
         if (cursorPosition < text.length()) {
-            cursorPosition++;
+            cursorPosition = GraphemeClusters.clusterEnd(text, cursorPosition);
         }
     }
 
@@ -129,4 +131,5 @@ public final class TextInputState {
         text = new StringBuilder(newText);
         cursorPosition = Math.min(cursorPosition, text.length());
     }
+
 }

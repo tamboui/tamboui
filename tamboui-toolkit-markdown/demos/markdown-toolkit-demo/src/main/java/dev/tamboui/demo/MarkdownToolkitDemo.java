@@ -140,19 +140,16 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
             scroll = Math.max(0, scroll - 1);
             return EventResult.HANDLED;
         }
-        switch (key.character()) {
-            case 't':
-            case 'T':
-                themeIndex = (themeIndex + 1) % THEMES.length;
-                applyTheme();
-                return EventResult.HANDLED;
-            case 'q':
-            case 'Q':
-                quit();
-                return EventResult.HANDLED;
-            default:
-                return EventResult.UNHANDLED;
+        if (key.isCharIgnoreCase('t')) {
+            themeIndex = (themeIndex + 1) % THEMES.length;
+            applyTheme();
+            return EventResult.HANDLED;
         }
+        if (key.isCharIgnoreCase('q')) {
+            quit();
+            return EventResult.HANDLED;
+        }
+        return EventResult.UNHANDLED;
     }
 
     private void applyTheme() {

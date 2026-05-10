@@ -201,7 +201,7 @@ public class InlineToolkitDemo extends InlineApp {
     }
 
     private EventResult handlePromptKey(KeyEvent keyEvent) {
-        char c = keyEvent.character();
+        int c = keyEvent.codePoint();
         if (c == 'y' || c == 'Y' || keyEvent.isConfirm()) {
             println(text(""));
             println(text("--- Building Native Modules ---").bold());
@@ -221,7 +221,7 @@ public class InlineToolkitDemo extends InlineApp {
     }
 
     private EventResult handleDetailsKey(KeyEvent keyEvent) {
-        if (keyEvent.character() == 'd' || keyEvent.character() == 'D') {
+        if (keyEvent.isCharIgnoreCase('d')) {
             showDetails = !showDetails;
             return EventResult.HANDLED;
         }

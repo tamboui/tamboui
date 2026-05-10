@@ -212,7 +212,7 @@ public final class RecordingBackend implements Backend {
     public int read(int timeoutMs) throws IOException {
         // If we have interactions, play them back
         if (!interactionPlayer.isFinished()) {
-            int b = interactionPlayer.nextByte(Math.min(timeoutMs, 100));
+            int b = interactionPlayer.nextCodePoint(Math.min(timeoutMs, 100));
             // Capture frame during read to ensure we get frames during Sleep commands
             // Only capture if draw() has been called (TUI demos), not for inline demos
             // which use System.out and AnsiTerminalCapture instead
@@ -258,7 +258,7 @@ public final class RecordingBackend implements Backend {
     @Override
     public int peek(int timeoutMs) throws IOException {
         // Peek at pending bytes from interaction player
-        return interactionPlayer.peekByte();
+        return interactionPlayer.peekCodePoint();
     }
 
     @Override

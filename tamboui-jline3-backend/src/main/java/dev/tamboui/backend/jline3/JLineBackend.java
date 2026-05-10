@@ -241,14 +241,39 @@ public class JLineBackend extends AbstractBackend {
         terminal.handle(Signal.WINCH, signal -> handler.run());
     }
 
+    // Cached code point from a previous peek(); -2 means empty.
+    private int peekedCodePoint = -2;
+
     @Override
     public int read(int timeoutMs) throws IOException {
-        return reader.read(timeoutMs);
+        if (peekedCodePoint != -2) {
+            int v = peekedCodePoint;
+            peekedCodePoint = -2;
+            return v;
+        }
+        return readCodePoint(timeoutMs);
     }
 
     @Override
     public int peek(int timeoutMs) throws IOException {
-        return reader.peek(timeoutMs);
+        if (peekedCodePoint == -2) {
+            peekedCodePoint = readCodePoint(timeoutMs);
+        }
+        return peekedCodePoint;
+    }
+
+    private int readCodePoint(int timeoutMs) throws IOException {
+        int c = reader.read(timeoutMs);
+        if (c < 0 || !Character.isHighSurrogate((char) c)) {
+            return c;
+        }
+        // Surrogate pair: read the low surrogate with a short timeout
+        int low = reader.read(50);
+        if (low >= 0 && Character.isLowSurrogate((char) low)) {
+            return Character.toCodePoint((char) c, (char) low);
+        }
+        // Unpaired high surrogate — return as-is
+        return c;
     }
 
     @Override

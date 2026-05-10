@@ -71,18 +71,13 @@ public final class EventParser {
             return parseControlChar(c, bindings);
         }
 
-        // Regular printable character
-        if (c < 127) {
-            return KeyEvent.ofChar((char) c, bindings);
-        }
-
         // DEL key
         if (c == 127) {
             return KeyEvent.ofKey(KeyCode.BACKSPACE, bindings);
         }
 
-        // Extended ASCII / UTF-8 - treat as character
-        return KeyEvent.ofChar((char) c, bindings);
+        // Any printable character (ASCII or full Unicode code point from backend)
+        return KeyEvent.ofChar(c, bindings);
     }
 
     private static Event parseControlChar(int c, Bindings bindings) {
@@ -127,8 +122,8 @@ public final class EventParser {
 
         // Alt+key
         backend.read(PEEK_TIMEOUT); // consume the character
-        if (next >= 32 && next < 127) {
-            return KeyEvent.ofChar((char) next, KeyModifiers.ALT, bindings);
+        if (next >= 32 && next != 127) {
+            return KeyEvent.ofChar(next, KeyModifiers.ALT, bindings);
         }
 
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);

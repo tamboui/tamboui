@@ -7,6 +7,8 @@ package dev.tamboui.widgets.input;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.tamboui.text.CharWidth;
+
 /**
  * State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
  */
@@ -152,11 +154,13 @@ public final class TextAreaState {
         lines.add(cursorRow, new StringBuilder(afterCursor));
     }
 
-    /** Deletes the character before the cursor. */
+    /** Deletes the grapheme cluster before the cursor. */
     public void deleteBackward() {
         if (cursorCol > 0) {
-            lines.get(cursorRow).deleteCharAt(cursorCol - 1);
-            cursorCol--;
+            StringBuilder line = lines.get(cursorRow);
+            int start = GraphemeClusters.clusterStart(line, cursorCol);
+            line.delete(start, cursorCol);
+            cursorCol = start;
         } else if (cursorRow > 0) {
             // Merge with previous line
             StringBuilder prevLine = lines.get(cursorRow - 1);
@@ -167,11 +171,12 @@ public final class TextAreaState {
         }
     }
 
-    /** Deletes the character after the cursor. */
+    /** Deletes the grapheme cluster after the cursor. */
     public void deleteForward() {
         StringBuilder currentLine = lines.get(cursorRow);
         if (cursorCol < currentLine.length()) {
-            currentLine.deleteCharAt(cursorCol);
+            int end = GraphemeClusters.clusterEnd(currentLine, cursorCol);
+            currentLine.delete(cursorCol, end);
         } else if (cursorRow < lines.size() - 1) {
             // Merge with next line
             currentLine.append(lines.get(cursorRow + 1));
@@ -181,21 +186,21 @@ public final class TextAreaState {
 
     // --- Cursor Movement ---
 
-    /** Moves the cursor one position to the left. */
+    /** Moves the cursor one grapheme cluster to the left. */
     public void moveCursorLeft() {
         if (cursorCol > 0) {
-            cursorCol--;
+            cursorCol = GraphemeClusters.clusterStart(lines.get(cursorRow), cursorCol);
         } else if (cursorRow > 0) {
             cursorRow--;
             cursorCol = lines.get(cursorRow).length();
         }
     }
 
-    /** Moves the cursor one position to the right. */
+    /** Moves the cursor one grapheme cluster to the right. */
     public void moveCursorRight() {
         StringBuilder currentLine = lines.get(cursorRow);
         if (cursorCol < currentLine.length()) {
-            cursorCol++;
+            cursorCol = GraphemeClusters.clusterEnd(currentLine, cursorCol);
         } else if (cursorRow < lines.size() - 1) {
             cursorRow++;
             cursorCol = 0;
@@ -256,12 +261,75 @@ public final class TextAreaState {
             scrollRow = cursorRow - visibleRows + 1;
         }
 
-        // Horizontal scrolling
-        if (cursorCol < scrollCol) {
+        // Horizontal scrolling (display-width aware: cursorCol is a char offset)
+        String line = getLine(cursorRow);
+        if (cursorCol <= scrollCol) {
             scrollCol = cursorCol;
-        } else if (cursorCol >= scrollCol + visibleCols) {
-            scrollCol = cursorCol - visibleCols + 1;
+        } else {
+            int from = Math.min(scrollCol, line.length());
+            int to = Math.min(cursorCol, line.length());
+            int displayWidth = CharWidth.of(line.substring(from, to));
+            if (displayWidth >= visibleCols) {
+                scrollCol = findScrollColForCursor(line, cursorCol, visibleCols);
+            }
         }
+    }
+
+    private static int findScrollColForCursor(String line, int cursorCol, int visibleCols) {
+        int end = Math.min(cursorCol, line.length());
+        // prefixWidth[i] = display width of line.substring(0, i), respecting ZWJ
+        // sequences and Regional Indicator pairs the same way CharWidth.of(String) does.
+        // For a multi-char cluster, the width is recorded on the offset past the cluster;
+        // intermediate offsets carry the running width as it stood before the cluster.
+        int[] prefixWidth = new int[end + 1];
+        int width = 0;
+        int i = 0;
+        while (i < end) {
+            int cp = line.codePointAt(i);
+            int charCount = Character.charCount(cp);
+            int clusterChars;
+            int clusterWidth;
+
+            if (cp == 0x200D) {
+                // ZWJ + following code point: contributes 0 (the joiner and the joined glyph).
+                clusterChars = charCount;
+                if (i + charCount < end) {
+                    clusterChars += Character.charCount(line.codePointAt(i + charCount));
+                }
+                clusterWidth = 0;
+            } else if (cp >= 0x1F1E6 && cp <= 0x1F1FF
+                && i + charCount < end
+                && isRegionalIndicator(line.codePointAt(i + charCount))) {
+                int nextCp = line.codePointAt(i + charCount);
+                clusterChars = charCount + Character.charCount(nextCp);
+                clusterWidth = 2;
+            } else {
+                clusterChars = charCount;
+                clusterWidth = CharWidth.of(cp);
+            }
+
+            int newWidth = width + clusterWidth;
+            // Carry the previous running width across intermediate offsets, then jump
+            // to the new running width at the offset past the cluster.
+            for (int j = 1; j < clusterChars; j++) {
+                prefixWidth[i + j] = width;
+            }
+            prefixWidth[i + clusterChars] = newWidth;
+            width = newWidth;
+            i += clusterChars;
+        }
+
+        int totalWidth = prefixWidth[end];
+        for (int col = end - 1; col >= 0; col--) {
+            if (totalWidth - prefixWidth[col] >= visibleCols) {
+                return col + 1;
+            }
+        }
+        return 0;
+    }
+
+    private static boolean isRegionalIndicator(int cp) {
+        return cp >= 0x1F1E6 && cp <= 0x1F1FF;
     }
 
     /**

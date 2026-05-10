@@ -384,11 +384,11 @@ final class InteractionPlayer {
     }
 
     /**
-     * Peeks at the next byte without consuming it.
+     * Peeks at the next code point without consuming it.
      *
-     * @return the next byte, or -1 if no byte available
+     * @return the next code point, or -1 if none available
      */
-    int peekByte() {
+    int peekCodePoint() {
         if (!pendingBytes.isEmpty()) {
             return pendingBytes.peek();
         }
@@ -396,13 +396,13 @@ final class InteractionPlayer {
     }
 
     /**
-     * Gets the next byte to return from read(), or -2 for timeout.
+     * Gets the next code point to return from read(), or -2 for timeout.
      * This method handles wait commands by sleeping.
      *
      * @param maxWaitMs maximum time to wait
-     * @return the next byte, or -2 for timeout, or 'q' if finished
+     * @return the next code point, or -2 for timeout, or 'q' if finished
      */
-    int nextByte(int maxWaitMs) {
+    int nextCodePoint(int maxWaitMs) {
         // Return pending bytes first
         if (!pendingBytes.isEmpty()) {
             return pendingBytes.poll();

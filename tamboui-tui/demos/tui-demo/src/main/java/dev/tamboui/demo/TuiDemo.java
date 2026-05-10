@@ -141,7 +141,7 @@ public class TuiDemo {
 
         // Character input
         if (k.code() == KeyCode.CHAR) {
-            logEvent("Key: '" + k.character() + "'");
+            logEvent("Key: '" + k.string() + "'");
             return true;
         }
 
