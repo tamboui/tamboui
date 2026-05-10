@@ -157,6 +157,16 @@ public class JLineBackend extends AbstractBackend {
     }
 
     @Override
+    public void beginSynchronizedUpdate() throws IOException {
+        writer.print(MODE_2026_BSU);
+    }
+
+    @Override
+    public void endSynchronizedUpdate() throws IOException {
+        writer.print(MODE_2026_ESU);
+    }
+
+    @Override
     public void scrollUp(int lines) throws IOException {
         writer.print(CSI + lines + "S");
         writer.flush();

@@ -121,7 +121,7 @@ public class AeshBackend extends AbstractBackend {
     @Override
     public Position getCursorPosition() throws IOException {
         try {
-            Point point = connection.getCursorPosition();
+            Point point = connection.terminal().getCursorPosition();
             if (point != null) {
                 return new Position(point.x(), point.y());
             }
@@ -187,6 +187,16 @@ public class AeshBackend extends AbstractBackend {
         outputBuffer.append(CSI).append("?1000l");
         flush();
         mouseEnabled = false;
+    }
+
+    @Override
+    public void beginSynchronizedUpdate() throws IOException {
+        outputBuffer.append(MODE_2026_BSU);
+    }
+
+    @Override
+    public void endSynchronizedUpdate() throws IOException {
+        outputBuffer.append(MODE_2026_ESU);
     }
 
     @Override
