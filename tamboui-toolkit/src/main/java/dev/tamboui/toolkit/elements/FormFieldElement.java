@@ -81,6 +81,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     private TextInputState textState;
     private BooleanFieldState booleanState;
     private SelectFieldState selectState;
+    private SelectState selectStateRef;
     private FieldType fieldType = FieldType.TEXT;
 
     // Layout
@@ -165,6 +166,22 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     public FormFieldElement(String label, SelectFieldState state) {
         this.label = label != null ? label : "";
         this.selectState = state;
+        this.fieldType = FieldType.SELECT;
+        this.focusable = true;
+    }
+
+    /**
+     * Creates a new form field with the given label and a {@link SelectState} reference.
+     * <p>
+     * Unlike the {@link SelectFieldState} constructor, this keeps a direct reference
+     * to the original {@link SelectState}, enabling true two-way binding.
+     *
+     * @param label the field label
+     * @param state the select state (direct reference, not copied)
+     */
+    public FormFieldElement(String label, SelectState state) {
+        this.label = label != null ? label : "";
+        this.selectStateRef = state;
         this.fieldType = FieldType.SELECT;
         this.focusable = true;
     }
@@ -683,6 +700,19 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     }
 
     private EventResult handleSelectFieldKey(KeyEvent event) {
+        // Prefer selectStateRef (direct reference for two-way binding)
+        if (selectStateRef != null) {
+            if (event.isUp() || event.isLeft()) {
+                selectStateRef.selectPrevious();
+                return EventResult.HANDLED;
+            }
+            if (event.isDown() || event.isRight()) {
+                selectStateRef.selectNext();
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        }
+
         if (selectState == null) {
             return EventResult.UNHANDLED;
         }
@@ -894,7 +924,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     }
 
     private void renderSelect(Frame frame, Rect area, RenderContext context, boolean focused) {
-        if (selectState == null) {
+        if (selectStateRef == null && selectState == null) {
             return;
         }
 
@@ -911,8 +941,11 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
         Select select = builder.build();
 
-        // Create state from SelectFieldState and render
-        SelectState state = new SelectState(selectState.options(), selectState.selectedIndex());
+        // Use selectStateRef directly if available (two-way binding),
+        // otherwise create from SelectFieldState
+        SelectState state = selectStateRef != null
+                ? selectStateRef
+                : new SelectState(selectState.options(), selectState.selectedIndex());
         int y = borderType != null ? area.y() + 1 : area.y();
         Rect selectArea = new Rect(area.x(), y, area.width(), 1);
 
