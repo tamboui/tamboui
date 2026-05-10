@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 
 /**
@@ -27,6 +28,7 @@ import dev.tamboui.widgets.input.TextInputState;
  * FormState form = FormState.builder()
  *     .textField("fullName", "Ada Lovelace")
  *     .textField("email", "ada@analytical.io")
+ *     .textAreaField("description", "Very long text")
  *     .booleanField("newsletter", true)
  *     .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
  *     .build();
@@ -49,6 +51,7 @@ import dev.tamboui.widgets.input.TextInputState;
 public final class FormState {
 
     private final Map<String, TextInputState> textFields;
+    private final Map<String, TextAreaState> textAreaFields;
     private final Map<String, BooleanFieldState> booleanFields;
     private final Map<String, SelectFieldState> selectFields;
     private final Set<String> maskedFields;
@@ -56,6 +59,7 @@ public final class FormState {
 
     private FormState(Builder builder) {
         this.textFields = new LinkedHashMap<>(builder.textFields);
+        this.textAreaFields = new LinkedHashMap<>(builder.textAreaFields);
         this.booleanFields = new LinkedHashMap<>(builder.booleanFields);
         this.selectFields = new LinkedHashMap<>(builder.selectFields);
         this.maskedFields = new HashSet<>(builder.maskedFields);
@@ -88,6 +92,21 @@ public final class FormState {
     }
 
     /**
+     * Returns the TextAreaState for the given field name.
+     *
+     * @param name the field name
+     * @return the text area input state
+     * @throws IllegalArgumentException if no text field with that name exists
+     */
+    public TextAreaState textAreaField(String name) {
+        TextAreaState state = textAreaFields.get(name);
+        if (state == null) {
+            throw new IllegalArgumentException("No text area field named: " + name);
+        }
+        return state;
+    }
+
+    /**
      * Returns the current text value for the given field name.
      *
      * @param name the field name
@@ -96,6 +115,17 @@ public final class FormState {
      */
     public String textValue(String name) {
         return textField(name).text();
+    }
+
+    /**
+     * Returns the current text value for the given field name.
+     *
+     * @param name the field name
+     * @return the text value
+     * @throws IllegalArgumentException if no text area field with that name exists
+     */
+    public String textAreaValue(String name) {
+        return textAreaField(name).text();
     }
 
     /**
@@ -110,6 +140,17 @@ public final class FormState {
     }
 
     /**
+     * Sets the text value for the given field name.
+     *
+     * @param name the field name
+     * @param value the new value
+     * @throws IllegalArgumentException if no text area field with that name exists
+     */
+    public void setTextAreaValue(String name, String value) {
+        textAreaField(name).setText(value);
+    }
+
+    /**
      * Returns all text field values as a map.
      *
      * @return an unmodifiable map of field names to values
@@ -117,6 +158,9 @@ public final class FormState {
     public Map<String, String> textValues() {
         Map<String, String> values = new LinkedHashMap<>();
         for (Map.Entry<String, TextInputState> entry : textFields.entrySet()) {
+            values.put(entry.getKey(), entry.getValue().text());
+        }
+        for (Map.Entry<String, TextAreaState> entry : textAreaFields.entrySet()) {
             values.put(entry.getKey(), entry.getValue().text());
         }
         return Collections.unmodifiableMap(values);
@@ -299,6 +343,7 @@ public final class FormState {
      */
     public static final class Builder {
 
+        private final Map<String, TextAreaState> textAreaFields = new LinkedHashMap<>();
         private final Map<String, TextInputState> textFields = new LinkedHashMap<>();
         private final Map<String, BooleanFieldState> booleanFields = new LinkedHashMap<>();
         private final Map<String, SelectFieldState> selectFields = new LinkedHashMap<>();
@@ -328,6 +373,31 @@ public final class FormState {
          */
         public Builder textField(String name) {
             return textField(name, "");
+        }
+
+
+
+        /**
+         * Adds a text area field with the given initial value.
+         *
+         * @param name the field name
+         * @param initialValue the initial value
+         * @return this builder for chaining
+         */
+        public Builder textAreaField(String name, String initialValue) {
+            Objects.requireNonNull(name, "Field name must not be null");
+            textAreaFields.put(name, new TextAreaState(initialValue != null ? initialValue : ""));
+            return this;
+        }
+
+        /**
+         * Adds a text area field with an empty initial value.
+         *
+         * @param name the field name
+         * @return this builder for chaining
+         */
+        public Builder textAreaField(String name) {
+            return textAreaField(name, "");
         }
 
         /**

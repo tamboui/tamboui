@@ -49,6 +49,7 @@ import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
+import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
@@ -975,6 +976,28 @@ public final class Toolkit {
     }
 
     /**
+     * Creates a form field with a label and text area input state.
+     * <p>
+     * Form fields combine a label and input into a single element with
+     * consistent layout and styling.
+     * <pre>{@code
+     * formField("Full name", nameState)
+     *     .labelWidth(14)
+     *     .rounded()
+     *     .borderColor(Color.DARK_GRAY)
+     *     .focusedBorderColor(Color.CYAN)
+     * }</pre>
+     *
+     * @param label the field label
+     * @param state the text area state
+     * @param height the text area height
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, TextAreaState state, int height) {
+        return new FormFieldElement(label, state, height);
+    }
+
+    /**
      * Creates a form field with a label and new text input state.
      *
      * @param label the field label
@@ -1305,4 +1328,119 @@ public final class Toolkit {
         }
     }
 
+    /**
+     * Handles common key events for text area input with semantic action support.
+     * <p>
+     * Supports:
+     * - Navigation: MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
+     * - Line navigation: HOME, END, PAGE_UP, PAGE_DOWN
+     * - Editing: BACKSPACE, DELETE, CONFIRM (Enter)
+     * - Tab insertion (configurable width)
+     * - Unicode character input (not ASCII-only)
+     * - Shift+navigation for potential future selection support
+     *
+     * @param state the text area state to modify
+     * @param event the key event to handle
+     * @return true if the event was handled, false otherwise
+     */
+    public static boolean handleTextAreaKey(TextAreaState state, KeyEvent event) {
+        // Handle navigation actions (semantic, respect keybindings)
+        if (event.matches(Actions.MOVE_UP)) {
+            if (event.hasShift()) {
+                // Shift+Up could be used for selection in future
+                state.moveCursorUp();
+            } else {
+                state.moveCursorUp();
+            }
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_DOWN)) {
+            if (event.hasShift()) {
+                state.moveCursorDown();
+            } else {
+                state.moveCursorDown();
+            }
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_LEFT)) {
+            state.moveCursorLeft();
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_RIGHT)) {
+            state.moveCursorRight();
+            return true;
+        }
+
+        if (event.matches(Actions.HOME)) {
+            state.moveCursorToLineStart();
+            return true;
+        }
+
+        if (event.matches(Actions.END)) {
+            state.moveCursorToLineEnd();
+            return true;
+        }
+
+        if (event.matches(Actions.PAGE_UP)) {
+            // Page up: move up by viewport height (estimated as 10 lines)
+            for (int i = 0; i < 10; i++) {
+                state.moveCursorUp();
+            }
+            return true;
+        }
+
+        if (event.matches(Actions.PAGE_DOWN)) {
+            // Page down: move down by viewport height (estimated as 10 lines)
+            for (int i = 0; i < 10; i++) {
+                state.moveCursorDown();
+            }
+            return true;
+        }
+
+        // Handle editing actions
+        if (event.isKey(dev.tamboui.tui.event.KeyCode.BACKSPACE)) {
+            state.deleteBackward();
+            return true;
+        }
+
+        if (event.isKey(dev.tamboui.tui.event.KeyCode.DELETE)) {
+            state.deleteForward();
+            return true;
+        }
+
+        if (event.matches(Actions.CONFIRM) && event.hasShift()) {
+            // Always insert newline on Enter (unless handled by callback)
+            state.insert('\n');
+            return true;
+        }
+
+        // Handle Tab with configurable width
+        if (event.isKey(dev.tamboui.tui.event.KeyCode.TAB)) {
+            state.insert("    "); // 4 spaces for tab
+            return true;
+        }
+
+        // Handle character input with full Unicode support
+        if (event.code() == dev.tamboui.tui.event.KeyCode.CHAR) {
+            // Skip control characters and characters with Ctrl/Alt modifiers
+            // Ctrl+X, Alt+X are for custom actions, not text input
+            if (event.hasCtrl() || event.hasAlt()) {
+                return false;
+            }
+
+            char c = event.character();
+            // Accept all printable characters (not ISO control characters or DEL)
+            // This includes emoji, CJK, accents, etc.
+            if (!Character.isISOControl(c) && c != '\u007F') {
+                state.insert(c);
+                return true;
+            }
+            return false;
+        }
+
+        return false;
+    }
 }

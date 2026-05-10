@@ -28,6 +28,8 @@ import dev.tamboui.widgets.form.FormState;
 import dev.tamboui.widgets.form.SelectFieldState;
 import dev.tamboui.widgets.form.ValidationResult;
 import dev.tamboui.widgets.form.Validator;
+import dev.tamboui.widgets.input.TextArea;
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInput;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.select.Select;
@@ -35,6 +37,7 @@ import dev.tamboui.widgets.select.SelectState;
 import dev.tamboui.widgets.toggle.Toggle;
 import dev.tamboui.widgets.toggle.ToggleState;
 
+import static dev.tamboui.toolkit.Toolkit.handleTextAreaKey;
 import static dev.tamboui.toolkit.Toolkit.handleTextInputKey;
 
 /**
@@ -79,6 +82,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     // Core state
     private String label;
     private TextInputState textState;
+    private TextAreaState textAreaState;
     private BooleanFieldState booleanState;
     private SelectFieldState selectState;
     private FieldType fieldType = FieldType.TEXT;
@@ -101,6 +105,9 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     private String uncheckedSymbol;
     private Color checkedColor;
     private Color uncheckedColor;
+
+    // TextArea styling
+    private int areaHeight;
 
     // Password/masked input
     private Character maskChar;
@@ -134,6 +141,21 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     }
 
     /**
+     * Creates a new form field with the given label and text area state.
+     *
+     * @param label the field label
+     * @param state the text area state
+     * @param maxHeight the height of the text area in rows
+     */
+    public FormFieldElement(String label, TextAreaState state, int maxHeight) {
+        this.label = label != null ? label : "";
+        this.textAreaState = state != null ? state : new TextAreaState();
+        this.areaHeight = maxHeight;
+        this.fieldType = FieldType.TEXT_AREA;
+        this.focusable = true;
+    }
+
+    /**
      * Creates a new form field with the given label and a new text input state.
      *
      * @param label the field label
@@ -147,7 +169,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
      *
      * @param label the field label
      * @param state the boolean field state
-     * @param type the field type (CHECKBOX or TOGGLE)
+     * @param type  the field type (CHECKBOX or TOGGLE)
      */
     public FormFieldElement(String label, BooleanFieldState state, FieldType type) {
         this.label = label != null ? label : "";
@@ -574,8 +596,8 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         // Add 1 row if showing inline errors
         int baseHeight = borderType != null ? 3 : 1;
         int height = showInlineErrors && !lastValidation().isValid() ? baseHeight + 1 : baseHeight;
-
-        return Size.of(width, height);
+        int totalHeight = height + areaHeight;
+        return Size.of(width, Math.max(availableHeight, totalHeight));
     }
 
     // ==================== Event Handling ====================
@@ -594,8 +616,9 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         // Handle based on field type
         switch (fieldType) {
             case TEXT:
-            case TEXT_AREA:
                 return handleTextFieldKey(event);
+            case TEXT_AREA:
+                return handleTextAreaFieldKey(event);
 
             case CHECKBOX:
             case TOGGLE:
@@ -634,6 +657,47 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         }
 
         boolean handled = handleTextInputKey(textState, event);
+        if (handled) {
+            // Re-validate on change if we have validators
+            if (!validators.isEmpty()) {
+                validateField();
+            }
+        }
+        return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
+    }
+
+    private EventResult handleTextAreaFieldKey(KeyEvent event) {
+        if (textAreaState == null) {
+            return EventResult.UNHANDLED;
+        }
+
+        // Handle Ctrl + Enter key - add line
+        if (event.isConfirm()) {
+            textAreaState.setText(textAreaState.text() + System.lineSeparator());
+            textAreaState.moveCursorToEnd();
+            return EventResult.HANDLED;
+        }
+
+        // Handle Ctrl + Enter key - call onSubmit and validate
+        if (event.hasCtrl() && event.isConfirm()) {
+            validateField();
+            if (onSubmit != null) {
+                onSubmit.run();
+            }
+            return EventResult.HANDLED;
+        }
+
+        // Arrow navigation for text fields
+        if (arrowNavigation) {
+            if (event.isUp() && textAreaState.cursorRow() == 0 )  {
+                return EventResult.FOCUS_PREVIOUS;
+            }
+            if (event.isDown() && textAreaState.cursorRow() == textAreaState.lineCount()) {
+                return EventResult.FOCUS_NEXT;
+            }
+        }
+
+        boolean handled = handleTextAreaKey(textAreaState, event);
         if (handled) {
             // Re-validate on change if we have validators
             if (!validators.isEmpty()) {
@@ -762,8 +826,12 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
         switch (fieldType) {
             case TEXT:
-            case TEXT_AREA:
                 renderTextInput(frame, area, context, focused, hasError);
+                break;
+
+
+            case TEXT_AREA:
+                renderTextArea(frame, area, context, focused, hasError);
                 break;
 
             case CHECKBOX:
@@ -781,7 +849,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     }
 
     private void renderTextInput(Frame frame, Rect area, RenderContext context,
-                                  boolean focused, boolean hasError) {
+                                 boolean focused, boolean hasError) {
         if (textState == null) {
             return;
         }
@@ -823,6 +891,49 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
             widget.renderWithCursor(area, frame.buffer(), textState, frame);
         } else {
             frame.renderStatefulWidget(widget, area, textState);
+        }
+    }
+
+    private void renderTextArea(Frame frame, Rect area, RenderContext context,
+                                boolean focused, boolean hasError) {
+        if (textAreaState == null) {
+            return;
+        }
+
+        // Determine effective border color
+        Color effectiveBorderColor = borderColor;
+        if (hasError && errorBorderColor != null) {
+            effectiveBorderColor = errorBorderColor;
+        } else if (focused && focusedBorderColor != null) {
+            effectiveBorderColor = focusedBorderColor;
+        }
+
+        Rect inputArea = new Rect(area.x(), area.y(), area.width(), area.height() + areaHeight);
+
+        TextArea.Builder builder = TextArea.builder()
+                .style(context.currentStyle())
+                .placeholder(placeholder);
+
+        if (borderType != null || effectiveBorderColor != null) {
+            Block.Builder blockBuilder = Block.builder()
+                    .borders(Borders.ALL)
+                    .styleResolver(styleResolver(context));
+            if (borderType != null) {
+                blockBuilder.borderType(borderType);
+            }
+            if (effectiveBorderColor != null) {
+                blockBuilder.borderColor(effectiveBorderColor);
+            }
+            builder.block(blockBuilder.build());
+        }
+
+        TextArea widget = builder.build();
+
+        // Show cursor when focused
+        if (focused) {
+            widget.renderWithCursor(inputArea, frame.buffer(), textAreaState, frame);
+        } else {
+            frame.renderStatefulWidget(widget, inputArea, textAreaState);
         }
     }
 

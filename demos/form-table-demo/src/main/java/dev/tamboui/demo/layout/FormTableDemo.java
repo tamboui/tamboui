@@ -37,11 +37,16 @@ public final class FormTableDemo {
     private static final AtomicInteger TAB_INDEX = new AtomicInteger(0);
     private static final TableState TABLE_STATE = new TableState();
 
+    private static String BIO = "Augusta Ada King, Countess of Lovelace (née Byron; 10 December 1815 – 27 November 1852), also known as Ada Lovelace, was an English mathematician and writer chiefly known for work on Charles Babbage's proposed mechanical general-purpose computer, the analytical engine. She was the first to recognise the machine had applications beyond pure calculation. Lovelace is often considered the first computer programmer."+
+            System.lineSeparator() +
+            "Lovelace was the only legitimate child of poet Lord Byron and reformer Anne Isabella Milbanke.[2] Lord Byron separated from his wife a month after Ada was born, and died when she was eight. Although often ill in childhood, Lovelace pursued her studies assiduously. She married William King in 1835. King was a Baron, and was created Viscount Ockham and 1st Earl of Lovelace in 1838. The name Lovelace was chosen because Ada was descended from the extinct Baron Lovelaces.[3] The title given to her husband thus made Ada the Countess of Lovelace.";
+
     // Centralized form state for all fields
     private static final FormState FORM = FormState.builder()
             // Profile fields (text)
             .textField("fullName", "Ada Lovelace")
             .textField("email", "ada@analytical.io")
+            .textAreaField("bio", BIO)
             // Preferences fields (boolean + select)
             .selectField("theme", Arrays.asList("Nord", "Dracula", "Solarized", "Monokai"), 0)
             .booleanField("notifications", true)
@@ -55,6 +60,7 @@ public final class FormTableDemo {
     private static final FormState VALIDATION_FORM = FormState.builder()
             .textField("username", "")
             .textField("email", "")
+            .textField("bio", "")
             .maskedField("password", "")  // masked field for password
             .textField("age", "")
             .textField("phone", "")
@@ -177,12 +183,15 @@ public final class FormTableDemo {
                         formField("Email", FORM.textField("email"))
                                 .id("email").labelWidth(LABEL_WIDTH).rounded()
                                 .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                .arrowNavigation(true),
+                        formField("Bio", FORM.textAreaField("bio"), 4)
+                                .id("bio").labelWidth(LABEL_WIDTH).rounded()
+                                .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
                                 .arrowNavigation(true)
                 ))
                 .rounded()
                 .borderColor(Color.CYAN)
                 .fit(),
-
                 row(
                         panel("Preferences (Select + Toggle)", column(
                                 formField("Theme", FORM.selectField("theme"))
@@ -242,6 +251,15 @@ public final class FormTableDemo {
                                         .errorBorderColor(Color.RED)
                                         .placeholder("min 8 characters")
                                         .validate(Validators.required("Password is required"), Validators.minLength(8))
+                                        .showInlineErrors(true)
+                                        .arrowNavigation(true),
+                                formField("Bio", VALIDATION_FORM.textField("bio"))
+                                        .formState(VALIDATION_FORM, "bio")
+                                        .id("val-bio").labelWidth(LABEL_WIDTH).rounded()
+                                        .borderColor(Color.DARK_GRAY).focusedBorderColor(Color.CYAN)
+                                        .errorBorderColor(Color.RED)
+                                        .placeholder("min 8 characters")
+                                        .validate(Validators.required("Bio is required"), Validators.minLength(8))
                                         .showInlineErrors(true)
                                         .arrowNavigation(true)
                         ))
