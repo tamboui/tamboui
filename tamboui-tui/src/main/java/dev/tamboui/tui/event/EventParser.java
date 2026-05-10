@@ -19,7 +19,13 @@ import dev.tamboui.tui.bindings.Bindings;
 public final class EventParser {
 
     private static final int ESC = 27;
-    private static final int PEEK_TIMEOUT = 50;
+    /**
+     * Timeout (ms) when waiting for the next byte(s) after ESC to detect escape sequences.
+     * We use read() not peek() so we actually block; on Windows peek() is often
+     * non-functional and returns timeout immediately, which splits ESC [ A into
+     * Escape + '[' + 'A' and shows A/B for arrow up/down.
+     */
+    private static final int ESC_CONTINUATION_MS = 150;
 
     private EventParser() {
     }
@@ -108,7 +114,9 @@ public final class EventParser {
     }
 
     private static Event parseEscapeSequence(Backend backend, Bindings bindings) throws IOException {
-        int next = backend.peek(PEEK_TIMEOUT);
+        // Use read() not peek(): on Windows peek() often doesn't wait, so we get
+        // ESC then timeout then '[' and 'A' as separate keys. Block for the next byte.
+        int next = backend.read(ESC_CONTINUATION_MS);
 
         if (next == -2 || next == -1) {
             // Standalone ESC key
@@ -116,17 +124,14 @@ public final class EventParser {
         }
 
         if (next == '[') {
-            backend.read(PEEK_TIMEOUT); // consume '['
             return parseCSI(backend, bindings);
         }
 
         if (next == 'O') {
-            backend.read(PEEK_TIMEOUT); // consume 'O'
             return parseSS3(backend, bindings);
         }
 
-        // Alt+key
-        backend.read(PEEK_TIMEOUT); // consume the character
+        // Alt+key (already consumed by read above)
         if (next >= 32 && next < 127) {
             return KeyEvent.ofChar((char) next, KeyModifiers.ALT, bindings);
         }
@@ -135,7 +140,7 @@ public final class EventParser {
     }
 
     private static Event parseCSI(Backend backend, Bindings bindings) throws IOException {
-        int c = backend.read(PEEK_TIMEOUT);
+        int c = backend.read(ESC_CONTINUATION_MS);
         if (c == -2 || c == -1) {
             return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
         }
@@ -173,7 +178,7 @@ public final class EventParser {
         sb.append((char) first);
 
         int c;
-        while ((c = backend.read(PEEK_TIMEOUT)) != -2 && c != -1) {
+        while ((c = backend.read(ESC_CONTINUATION_MS)) != -2 && c != -1) {
             if (c >= '0' && c <= '9' || c == ';') {
                 sb.append((char) c);
             } else {
@@ -302,7 +307,7 @@ public final class EventParser {
     }
 
     private static Event parseSS3(Backend backend, Bindings bindings) throws IOException {
-        int c = backend.read(PEEK_TIMEOUT);
+        int c = backend.read(ESC_CONTINUATION_MS);
         if (c == -2 || c == -1) {
             return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
         }
@@ -341,7 +346,7 @@ public final class EventParser {
 
         StringBuilder sb = new StringBuilder();
         int c;
-        while ((c = backend.read(PEEK_TIMEOUT)) != -2 && c != -1) {
+        while ((c = backend.read(ESC_CONTINUATION_MS)) != -2 && c != -1) {
             if (c == 'M' || c == 'm') {
                 return parseMouseParams(sb.toString(), c == 'm', bindings);
             }
