@@ -109,6 +109,9 @@
     "richtext-demo": {
       "script-ref": "tamboui-toolkit/demos/richtext-demo/src/main/java/dev/tamboui/demo/RichTextDemo.java"
     },
+    "scrollable-demo": {
+      "script-ref": "tamboui-toolkit/demos/scrollable-demo/src/main/java/dev/tamboui/demo/ScrollableDemo.java"
+    },
     "textarea-demo": {
       "script-ref": "tamboui-toolkit/demos/textarea-demo/src/main/java/dev/tamboui/demo/TextAreaDemo.java"
     },
