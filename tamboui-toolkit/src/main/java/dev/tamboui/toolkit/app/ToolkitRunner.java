@@ -160,9 +160,10 @@ public final class ToolkitRunner implements AutoCloseable {
                 }
 
                 // Auto-focus first focusable element if nothing is focused or focus is stale
+                // (but not if focus was explicitly cleared, e.g. via Escape)
                 String currentFocus = focusManager.focusedId();
                 List<String> focusOrder = focusManager.focusOrder();
-                if (!focusOrder.isEmpty()) {
+                if (!focusOrder.isEmpty() && !focusManager.isFocusExplicitlyCleared()) {
                     if (currentFocus == null || !focusOrder.contains(currentFocus)) {
                         focusManager.setFocus(focusOrder.get(0));
                     }
