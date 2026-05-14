@@ -4,6 +4,8 @@
  */
 package dev.tamboui.widgets.spinner;
 
+import dev.tamboui.widgets.braille.BraillePatterns;
+
 /**
  * Built-in spinner frame sets for the {@link Spinner} widget.
  * <p>
@@ -74,10 +76,61 @@ public enum SpinnerStyle {
     /** Growing dots spinner using braille. */
     GROWING_DOTS(SpinnerFrameSet.of("\u2800", "\u2840", "\u28c0", "\u28e0", "\u28f0", "\u28f8", "\u28fc", "\u28fe", "\u28ff")),
 
-    /** Bouncing ball spinner. */
-    BOUNCING_BALL(SpinnerFrameSet.of("\u2801", "\u2802", "\u2804", "\u2840", "\u2880", "\u2820", "\u2810", "\u2808"));
+/** Bouncing ball spinner. */
+BOUNCING_BALL(SpinnerFrameSet.of("\u2801", "\u2802", "\u2804", "\u2840", "\u2880", "\u2820", "\u2810", "\u2808")),
 
-    private final SpinnerFrameSet frameSet;
+/** Braille wave animation (8 frames). */
+BRAILLE_WAVE(SpinnerFrameSet.of(BraillePatterns.brailleWave())),
+
+/** DNA double helix pattern (12 frames). */
+DNA(SpinnerFrameSet.of(BraillePatterns.dna())),
+
+/** Scanning line animation (10 frames). */
+SCAN(SpinnerFrameSet.of(BraillePatterns.scan())),
+
+/** Falling dots with offsets (12 frames). */
+RAIN(SpinnerFrameSet.of(BraillePatterns.rain())),
+
+/** Vertical scan with fade (6 frames). */
+SCANLINE(SpinnerFrameSet.of(BraillePatterns.scanLine())),
+
+/** Expanding/contracting circle (5 frames). */
+PULSE(SpinnerFrameSet.of(BraillePatterns.pulse())),
+
+/** Snake path animation (16 frames). */
+SNAKE(SpinnerFrameSet.of(BraillePatterns.snake())),
+
+/** Sparkle patterns (6 frames). */
+SPARKLE(SpinnerFrameSet.of(BraillePatterns.sparkle())),
+
+/** Diagonal cascade (12 frames). */
+CASCADE(SpinnerFrameSet.of(BraillePatterns.cascade())),
+
+/** Column fill animation (26 frames). */
+COLUMNS(SpinnerFrameSet.of(BraillePatterns.columns())),
+
+/** Orbiting dot (8 frames). */
+ORBIT(SpinnerFrameSet.of(BraillePatterns.orbit())),
+
+/** Breathing/pulsing dots (18 frames). */
+BREATHE(SpinnerFrameSet.of(BraillePatterns.breathe())),
+
+/** Wave across rows (16 frames). */
+WAVE_ROWS(SpinnerFrameSet.of(BraillePatterns.waveRows())),
+
+/** Checkerboard toggle (4 frames). */
+CHECKERBOARD(SpinnerFrameSet.of(BraillePatterns.checkerboard())),
+
+/** Double helix wave (16 frames). */
+HELIX(SpinnerFrameSet.of(BraillePatterns.helix())),
+
+/** Fill sweep animation (11 frames). */
+FILL_SWEEP(SpinnerFrameSet.of(BraillePatterns.fillSweep())),
+
+/** Diagonal fill/unfill (16 frames). */
+DIAG_SWIPE(SpinnerFrameSet.of(BraillePatterns.diagonalSwipe()));
+
+private final SpinnerFrameSet frameSet;
 
     SpinnerStyle(SpinnerFrameSet frameSet) {
         this.frameSet = frameSet;

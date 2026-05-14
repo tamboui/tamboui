@@ -20,6 +20,7 @@ import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
+import dev.tamboui.widgets.braille.BraillePatterns;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -73,6 +74,13 @@ public class SpinnerDemo {
     private final SpinnerState growingDotsState = new SpinnerState();
     private final SpinnerState bouncingBallState = new SpinnerState();
     private final SpinnerState customState = new SpinnerState();
+    private final SpinnerState brailleScanState = new SpinnerState();
+    private final SpinnerState brailleBreatheState = new SpinnerState();
+    private final SpinnerState brailleDnaState = new SpinnerState();
+    private final SpinnerState brailleRainState = new SpinnerState();
+    private final SpinnerState brailleOrbitState = new SpinnerState();
+    private final SpinnerState brailleWaveRowsState = new SpinnerState();
+    private final SpinnerState brailleHelixState = new SpinnerState();
 
     // Custom frame set example
     private static final SpinnerFrameSet CUSTOM_FRAMES = SpinnerFrameSet.of(
@@ -139,6 +147,13 @@ public class SpinnerDemo {
         growingDotsState.advance();
         bouncingBallState.advance();
         customState.advance();
+        brailleScanState.advance();
+        brailleBreatheState.advance();
+        brailleDnaState.advance();
+        brailleRainState.advance();
+        brailleOrbitState.advance();
+        brailleWaveRowsState.advance();
+        brailleHelixState.advance();
     }
 
     private void ui(Frame frame) {
@@ -233,7 +248,14 @@ public class SpinnerDemo {
                 Constraint.length(3),  // SQUARE_CORNERS
                 Constraint.length(3),  // GROWING_DOTS
                 Constraint.length(3),  // BOUNCING_BALL
-                Constraint.length(3)   // Custom FrameSet
+                Constraint.length(3),  // Custom FrameSet
+                Constraint.length(3),  // BRAILLE scan
+                Constraint.length(3),  // BRAILLE breathe
+                Constraint.length(3),  // BRAILLE DNA
+                Constraint.length(3),  // BRAILLE rain
+                Constraint.length(3),  // BRAILLE orbit
+                Constraint.length(3),  // BRAILLE waveRows
+                Constraint.length(3)   // BRAILLE helix
             )
             .split(cols.get(1));
 
@@ -268,6 +290,41 @@ public class SpinnerDemo {
         renderSpinnerRow(frame, rightRows.get(7), "Custom FrameSet",
             Spinner.builder().frameSet(CUSTOM_FRAMES).style(Style.EMPTY.fg(MAGENTA)).build(),
             customState);
+
+        renderSpinnerRow(frame, rightRows.get(8), "BRAILLE scan",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.scan()))
+                .style(Style.EMPTY.fg(CYAN)).build(),
+            brailleScanState);
+
+        renderSpinnerRow(frame, rightRows.get(9), "BRAILLE breathe",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.breathe()))
+                .style(Style.EMPTY.fg(GREEN)).build(),
+            brailleBreatheState);
+
+        renderSpinnerRow(frame, rightRows.get(10), "BRAILLE dna",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.dna()))
+                .style(Style.EMPTY.fg(YELLOW)).build(),
+            brailleDnaState);
+
+        renderSpinnerRow(frame, rightRows.get(11), "BRAILLE rain",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.rain()))
+                .style(Style.EMPTY.fg(MAGENTA)).build(),
+            brailleRainState);
+
+        renderSpinnerRow(frame, rightRows.get(12), "BRAILLE orbit",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.orbit()))
+                .style(Style.EMPTY.fg(BLUE)).build(),
+            brailleOrbitState);
+
+        renderSpinnerRow(frame, rightRows.get(13), "BRAILLE waveRows",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.waveRows()))
+                .style(Style.EMPTY.fg(RED)).build(),
+            brailleWaveRowsState);
+
+        renderSpinnerRow(frame, rightRows.get(14), "BRAILLE helix",
+            Spinner.builder().frameSet(BraillePatterns.of(BraillePatterns.helix()))
+                .style(Style.EMPTY.fg(ORANGE)).build(),
+            brailleHelixState);
     }
 
     private void renderSpinnerRow(Frame frame, Rect area, String label, Spinner spinner, SpinnerState state) {

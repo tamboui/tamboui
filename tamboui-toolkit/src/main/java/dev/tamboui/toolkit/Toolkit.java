@@ -1227,11 +1227,31 @@ public final class Toolkit {
      * @param label the label text
      * @return a new spinner element
      */
-    public static SpinnerElement spinner(SpinnerStyle style, String label) {
-        return new SpinnerElement(style, label);
-    }
+public static SpinnerElement spinner(SpinnerStyle style, String label) {
+    return new SpinnerElement(style, label);
+}
 
-    // ==================== Generic Widget ====================
+// ==================== Animated Grid ====================
+
+/**
+ * Creates an animated grid element with custom frames.
+ * <p>
+ * This is useful for creating custom grid-based animations using Braille characters.
+ *
+ * <pre>{@code
+ * spinner("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧").cyan()
+ * }</pre>
+ *
+ * @param frames the animation frames
+ * @return a new spinner element with the custom frames
+ */
+public static SpinnerElement spinner(String... frames) {
+    SpinnerElement element = new SpinnerElement();
+    element.frames(frames);
+    return element;
+}
+
+// ==================== Generic Widget ====================
 
     /**
      * Wraps any low-level {@link Widget} as a {@link GenericWidgetElement}.
