@@ -7,10 +7,12 @@ package dev.tamboui.toolkit.elements;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import dev.tamboui.layout.Rect;
@@ -95,6 +97,9 @@ public final class FormElement extends StyledElement<FormElement> {
     private Color focusedBorderColor;
     private Color errorBorderColor;
     private boolean showInlineErrors = false;
+
+    // List of FieldTypes to render input before label
+    private final Set<FieldType> inputBeforeLabelTypes = new HashSet<>();
 
     // Group styling
     private Style groupTitleStyle;
@@ -328,6 +333,20 @@ public final class FormElement extends StyledElement<FormElement> {
      */
     public FormElement groupTitleStyle(Style style) {
         this.groupTitleStyle = style;
+        return this;
+    }
+
+    /**
+     * Sets the field types that should render their input before label.
+     * 
+     * @see FormFieldElement#inputBeforeLabel(boolean)
+     *
+     * @param types the field types
+     * @return this element for chaining
+     */
+    public FormElement inputBeforeLabelTypes(FieldType... types) {
+        this.inputBeforeLabelTypes.clear();
+        Collections.addAll(this.inputBeforeLabelTypes, types);
         return this;
     }
 
@@ -642,6 +661,10 @@ public final class FormElement extends StyledElement<FormElement> {
         }
         if (showInlineErrors) {
             field.showInlineErrors(true);
+        }
+
+        if (inputBeforeLabelTypes.contains(config.type)) {
+            field.inputBeforeLabel(true);
         }
 
         // Apply validators
