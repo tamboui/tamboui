@@ -1,6 +1,6 @@
 // Shared attributes for TamboUI documentation
 :project-name: TamboUI
-:project-version: 0.1.0-SNAPSHOT
+// :project-version: set by Gradle
 :github-repo: tamboui/tamboui
 :github-url: https://github.com/{github-repo}
 
