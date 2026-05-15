@@ -98,8 +98,8 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
     private void startSshServer() {
         try {
             NettySshTtyBootstrap bootstrap = new NettySshTtyBootstrap();
-            bootstrap.setPort(SSH_PORT);
-            bootstrap.setHost("localhost");
+            bootstrap.port(SSH_PORT);
+            bootstrap.host("localhost");
             bootstrap.start(this).get(10, TimeUnit.SECONDS);
             System.out.println("SSH server started on port " + SSH_PORT);
         } catch (Exception e) {

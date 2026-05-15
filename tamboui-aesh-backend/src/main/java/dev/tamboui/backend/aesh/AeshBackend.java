@@ -12,7 +12,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.aesh.terminal.Connection;
-import org.aesh.terminal.tty.Point;
 import org.aesh.terminal.tty.TerminalConnection;
 
 import dev.tamboui.layout.Position;
@@ -120,14 +119,8 @@ public class AeshBackend extends AbstractBackend {
 
     @Override
     public Position getCursorPosition() throws IOException {
-        try {
-            Point point = connection.getCursorPosition();
-            if (point != null) {
-                return new Position(point.x(), point.y());
-            }
-        } catch (Exception e) {
-            // Fall through to return origin
-        }
+        // Connection no longer provides getCursorPosition() as of aesh 3.7.
+        // Return origin as fallback, consistent with the JLine backend.
         return Position.ORIGIN;
     }
 
