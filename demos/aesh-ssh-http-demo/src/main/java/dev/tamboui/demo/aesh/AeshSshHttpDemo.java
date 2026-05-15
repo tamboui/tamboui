@@ -1,7 +1,7 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-aesh-backend:LATEST
-//DEPS org.aesh:terminal-ssh:3.1
-//DEPS org.aesh:terminal-http:3.1
+//DEPS org.aesh:terminal-ssh:3.7
+//DEPS org.aesh:terminal-http:3.7
 //DEPS org.apache.sshd:sshd-core:2.14.0
 //DEPS org.apache.sshd:sshd-netty:2.14.0
 //DEPS io.netty:netty-all:4.1.81.Final
