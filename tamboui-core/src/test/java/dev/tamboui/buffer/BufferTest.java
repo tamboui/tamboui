@@ -64,6 +64,27 @@ class BufferTest {
     }
 
     @Test
+    @DisplayName("Buffer setString replaces C0 control characters with space")
+    void setStringControlCharsReplacedWithSpace() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        // Tab (\t) is the most common culprit: terminals jump to the next tab stop
+        // rather than advancing one column, breaking cursor-adjacency tracking.
+        buffer.setString(0, 0, "a\tb", Style.EMPTY);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("a");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo(" "); // \t replaced with space
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("b");
+
+        // Other C0 control chars and DEL are also replaced with space
+        Buffer buffer2 = Buffer.empty(new Rect(0, 0, 10, 1));
+        buffer2.setString(0, 0, "\r\n\u0001\u007f", Style.EMPTY);
+        assertThat(buffer2.get(0, 0).symbol()).isEqualTo(" "); // \r replaced
+        assertThat(buffer2.get(1, 0).symbol()).isEqualTo(" "); // \n replaced
+        assertThat(buffer2.get(2, 0).symbol()).isEqualTo(" "); // NUL+1 replaced
+        assertThat(buffer2.get(3, 0).symbol()).isEqualTo(" "); // DEL replaced
+    }
+
+    @Test
     @DisplayName("Buffer setString with style")
     void setStringWithStyle() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));

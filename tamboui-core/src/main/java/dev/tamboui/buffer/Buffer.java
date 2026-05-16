@@ -290,7 +290,13 @@ public final class Buffer {
             }
             appendToLast = false;
 
-            String symbol = codePoint < 128 ? ASCII_STRINGS[codePoint] : new String(Character.toChars(codePoint));
+            // C0 control chars (U+0000–U+001F) and DEL (U+007F) are not displayable glyphs.
+            // Writing them to the terminal moves the cursor unpredictably (e.g. \t jumps to
+            // the next tab stop, \r resets to column 0), which breaks the cursor-adjacency
+            // optimisation in AbstractBackend and corrupts all subsequent cells in the row.
+            String symbol = (codePoint < 0x20 || codePoint == 0x7F)
+                    ? " "
+                    : codePoint < 128 ? ASCII_STRINGS[codePoint] : new String(Character.toChars(codePoint));
 
             if (charWidth == 2 && col + 1 >= area.right()) {
                 // Wide char at rightmost column: no room for continuation, replace with space
