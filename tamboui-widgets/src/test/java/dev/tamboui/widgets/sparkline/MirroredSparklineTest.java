@@ -4,6 +4,8 @@
  */
 package dev.tamboui.widgets.sparkline;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,14 +15,15 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.Block;
 
-import static org.assertj.core.api.Assertions.*;
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class MirroredSparklineTest {
 
     @Test
     @DisplayName("Centre row renders separator")
     void centreRowRendersSeparator() {
-        // 3-row area: top, centre, bottom
+        // 3-row area: top series, centre separator, bottom series
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(8)
                 .bottomData(8)
@@ -31,11 +34,11 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        assertThat(buffer.get(0, 1).symbol()).isEqualTo("─");
+        assertThat(buffer).hasSymbolAt(0, 1, "─");
     }
 
     @Test
-    @DisplayName("Top series renders above centre")
+    @DisplayName("Top series renders above centre, bottom empty when zero")
     void topSeriesRendersAboveCentre() {
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(8)
@@ -47,14 +50,12 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        // row 0 is above centre (row 1) — full bar for value == max
-        assertThat(buffer.get(0, 0).symbol()).isEqualTo("█");
-        // row 2 (below centre) — no bottom data
-        assertThat(buffer.get(0, 2).symbol()).isEqualTo(" ");
+        // row 0 = top full bar, row 1 = centre separator, row 2 = bottom empty
+        assertThat(buffer).hasContent("█", "─", " ");
     }
 
     @Test
-    @DisplayName("Bottom series renders below centre")
+    @DisplayName("Bottom series renders below centre, top empty when zero")
     void bottomSeriesRendersBelowCentre() {
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(0)
@@ -66,23 +67,18 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        // row 0 (above centre) — no top data
-        assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
-        // row 2 (below centre) — full bar
-        assertThat(buffer.get(0, 2).symbol()).isEqualTo("█");
+        // row 0 = top empty, row 1 = centre separator, row 2 = bottom full bar
+        assertThat(buffer).hasContent(" ", "─", "█");
     }
 
     @Test
     @DisplayName("Top and bottom styles applied to correct rows")
     void stylesAppliedToCorrectRows() {
-        Style topStyle = Style.EMPTY.fg(Color.GREEN);
-        Style bottomStyle = Style.EMPTY.fg(Color.BLUE);
-
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(8)
                 .bottomData(8)
-                .topStyle(topStyle)
-                .bottomStyle(bottomStyle)
+                .topStyle(Style.EMPTY.fg(Color.GREEN))
+                .bottomStyle(Style.EMPTY.fg(Color.BLUE))
                 .showYAxis(false)
                 .build();
         Rect area = new Rect(0, 0, 1, 3);
@@ -90,8 +86,8 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
-        assertThat(buffer.get(0, 2).style().fg()).contains(Color.BLUE);
+        assertThat(buffer).hasForegroundAt(0, 0, Color.GREEN);
+        assertThat(buffer).hasForegroundAt(0, 2, Color.BLUE);
     }
 
     @Test
@@ -103,27 +99,18 @@ class MirroredSparklineTest {
                 .max(8)
                 .showYAxis(true)
                 .build();
-        // Wide enough for label (4 chars) + at least 1 data column
+        // 6 wide: 4 label cols + 2 data cols; 3 rows
         Rect area = new Rect(0, 0, 6, 3);
         Buffer buffer = Buffer.empty(area);
 
         chart.render(area, buffer);
 
-        // Row 0: max label "   8" at x=0..3
-        String topLabel = ""
-                + buffer.get(0, 0).symbol()
-                + buffer.get(1, 0).symbol()
-                + buffer.get(2, 0).symbol()
-                + buffer.get(3, 0).symbol();
-        assertThat(topLabel).isEqualTo("   8");
-
-        // Centre row: "   0"
-        String centreLabel = ""
-                + buffer.get(0, 1).symbol()
-                + buffer.get(1, 1).symbol()
-                + buffer.get(2, 1).symbol()
-                + buffer.get(3, 1).symbol();
-        assertThat(centreLabel).isEqualTo("   0");
+        // Row 0: max label "   8" then bar; row 1: "   0" then separator; row 2: "   8" then bar
+        assertThat(buffer).hasContent(
+                "   8█ ",
+                "   0─ ",
+                "   8█ "
+        );
     }
 
     @Test
@@ -135,15 +122,13 @@ class MirroredSparklineTest {
                 .max(8)
                 .showYAxis(false)
                 .build();
-        Rect area = new Rect(0, 0, 6, 3);
+        Rect area = new Rect(0, 0, 1, 3);
         Buffer buffer = Buffer.empty(area);
 
         chart.render(area, buffer);
 
-        // x=0 should be the bar column, not a label — expect a bar symbol
-        assertThat(buffer.get(0, 0).symbol()).isNotEqualTo(" "); // has a bar
-        // and no "8" label at position 3
-        assertThat(buffer.get(3, 0).symbol()).isNotEqualTo("8");
+        // x=0 is the bar column — should have a bar symbol, not a label character
+        assertThat(buffer).hasContent("█", "─", "█");
     }
 
     @Test
@@ -162,13 +147,12 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        // x-axis is at y=3; "-7s" starts at col 0
-        assertThat(buffer.get(0, 3).symbol()).isEqualTo("-");
-        assertThat(buffer.get(1, 3).symbol()).isEqualTo("7");
-        assertThat(buffer.get(2, 3).symbol()).isEqualTo("s");
-        // "now" right-aligned ending at last tick (col 7): n=5, o=6, w=7
-        assertThat(buffer.get(5, 3).symbol()).isEqualTo("n");
-        assertThat(buffer.get(7, 3).symbol()).isEqualTo("w");
+        // x-axis at y=3: "-7s" at col 0, "now" right-aligned ending at col 7
+        assertThat(buffer).hasSymbolAt(0, 3, "-");
+        assertThat(buffer).hasSymbolAt(1, 3, "7");
+        assertThat(buffer).hasSymbolAt(2, 3, "s");
+        assertThat(buffer).hasSymbolAt(5, 3, "n");
+        assertThat(buffer).hasSymbolAt(7, 3, "w");
     }
 
     @Test
@@ -185,10 +169,11 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        assertThat(buffer.get(0, 0).symbol()).isEqualTo("┌");
-        assertThat(buffer.get(4, 0).symbol()).isEqualTo("┐");
-        assertThat(buffer.get(0, 4).symbol()).isEqualTo("└");
-        assertThat(buffer.get(4, 4).symbol()).isEqualTo("┘");
+        assertThat(buffer)
+                .hasSymbolAt(0, 0, "┌")
+                .hasSymbolAt(4, 0, "┐")
+                .hasSymbolAt(0, 4, "└")
+                .hasSymbolAt(4, 4, "┘");
     }
 
     @Test
@@ -206,7 +191,7 @@ class MirroredSparklineTest {
     }
 
     @Test
-    @DisplayName("Explicit max scales both series")
+    @DisplayName("Explicit max scales both series to full bars")
     void explicitMaxScalesBothSeries() {
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(100)
@@ -219,12 +204,11 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        assertThat(buffer.get(0, 0).symbol()).isEqualTo("█"); // top full
-        assertThat(buffer.get(0, 2).symbol()).isEqualTo("█"); // bottom full
+        assertThat(buffer).hasContent("█", "─", "█");
     }
 
     @Test
-    @DisplayName("autoMax clears explicit max")
+    @DisplayName("autoMax clears explicit max and rescales from data")
     void autoMaxClearsExplicitMax() {
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(50)
@@ -239,15 +223,14 @@ class MirroredSparklineTest {
         chart.render(area, buffer);
 
         // bottom = 100 = max → full bar
-        assertThat(buffer.get(0, 2).symbol()).isEqualTo("█");
+        assertThat(buffer).hasSymbolAt(0, 2, "█");
     }
 
     @Test
     @DisplayName("topData from List accepted")
     void topDataFromList() {
-        java.util.List<Long> data = java.util.Arrays.asList(8L);
         MirroredSparkline chart = MirroredSparkline.builder()
-                .topData(data)
+                .topData(Arrays.asList(8L))
                 .bottomData(new long[0])
                 .showYAxis(false)
                 .build();
@@ -256,16 +239,15 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        assertThat(buffer.get(0, 0).symbol()).isEqualTo("█");
+        assertThat(buffer).hasSymbolAt(0, 0, "█");
     }
 
     @Test
     @DisplayName("bottomData from List accepted")
     void bottomDataFromList() {
-        java.util.List<Long> data = java.util.Arrays.asList(8L);
         MirroredSparkline chart = MirroredSparkline.builder()
                 .topData(new long[0])
-                .bottomData(data)
+                .bottomData(Arrays.asList(8L))
                 .showYAxis(false)
                 .build();
         Rect area = new Rect(0, 0, 1, 3);
@@ -273,6 +255,6 @@ class MirroredSparklineTest {
 
         chart.render(area, buffer);
 
-        assertThat(buffer.get(0, 2).symbol()).isEqualTo("█");
+        assertThat(buffer).hasSymbolAt(0, 2, "█");
     }
 }

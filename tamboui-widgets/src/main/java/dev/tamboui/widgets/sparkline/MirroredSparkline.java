@@ -9,6 +9,7 @@ import java.util.List;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 
@@ -210,31 +211,22 @@ public final class MirroredSparkline implements Widget {
         // --- X-axis label row ---
         if (hasXAxis) {
             int xAxisY = inner.y() + chartBodyRows;
-            char[] xChars = new char[chartW];
-            for (int i = 0; i < chartW; i++) {
-                xChars[i] = ' ';
-            }
-            // Distribute labels evenly across the tick range
+            // Distribute labels evenly across the tick range, writing directly to the buffer.
+            // Buffer cells not written remain as empty space (Buffer.empty initialises all to ' ').
             for (int li = 0; li < xLabels.length; li++) {
                 String lbl = xLabels[li];
+                int lblWidth = CharWidth.of(lbl);
                 double fraction = xLabels.length > 1 ? (double) li / (xLabels.length - 1) : 0;
                 int col = (int) Math.round(fraction * (ticks - 1));
                 // Right-align the last label so it doesn't run past the right edge
                 int start = li == xLabels.length - 1
-                        ? Math.max(0, col - lbl.length() + 1)
+                        ? Math.max(0, col - lblWidth + 1)
                         : col;
-                for (int k = 0; k < lbl.length() && start + k < chartW; k++) {
-                    xChars[start + k] = lbl.charAt(k);
+                if (start < chartW) {
+                    String truncated = CharWidth.substringByWidth(lbl, chartW - start);
+                    buffer.setString(inner.x() + yLabelW + start, xAxisY, truncated, DIM);
                 }
             }
-            if (showYAxis) {
-                StringBuilder spaces = new StringBuilder(yLabelW);
-                for (int i = 0; i < yLabelW; i++) {
-                    spaces.append(' ');
-                }
-                buffer.setString(inner.x(), xAxisY, spaces.toString(), DIM);
-            }
-            buffer.setString(inner.x() + yLabelW, xAxisY, new String(xChars), DIM);
         }
     }
 
