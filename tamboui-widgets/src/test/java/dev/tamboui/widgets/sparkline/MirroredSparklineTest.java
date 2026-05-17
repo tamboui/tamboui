@@ -131,6 +131,154 @@ class MirroredSparklineTest {
         assertThat(buffer).hasContent("█", "─", "█");
     }
 
+    // -------------------------------------------------------------------------
+    // Basic rendering — no axes (parallel to SparklineTest)
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("Renders basic top and bottom data with sub-pixel symbols")
+    void rendersBasicTopAndBottomData() {
+        // 0 → " ", 4/8 = 0.5 → "▄", 8/8 = 1.0 → "█"
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0, 4, 8)
+                .bottomData(0, 4, 8)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 3, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasContent(" ▄█", "───", " ▄█");
+    }
+
+    @Test
+    @DisplayName("Renders with explicit max value producing partial bars")
+    void rendersWithMaxValue() {
+        // 50/100 = 0.5 → "▄", 100/100 = 1.0 → "█"
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(50, 100)
+                .bottomData(50, 100)
+                .max(100)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 2, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasContent("▄█", "──", "▄█");
+    }
+
+    @Test
+    @DisplayName("Auto-scales to max across both datasets")
+    void autoScalesToDataMax() {
+        // max = 100; 25/100 → "▂", 50/100 → "▄", 100/100 → "█"
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(25, 50, 100)
+                .bottomData(25, 50, 100)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 3, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasContent("▂▄█", "───", "▂▄█");
+    }
+
+    @Test
+    @DisplayName("Truncates data to fit area width showing most recent ticks")
+    void truncatesDataToFitArea() {
+        // 8 data points, 3-wide area → shows last 3: [6, 7, 8] of max 8
+        // 6/8 → "▆", 7/8 → "▇", 8/8 → "█"
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(1, 2, 3, 4, 5, 6, 7, 8)
+                .bottomData(1, 2, 3, 4, 5, 6, 7, 8)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 3, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasContent("▆▇█", "───", "▆▇█");
+    }
+
+    @Test
+    @DisplayName("THREE_LEVELS bar set uses coarser symbols")
+    void withThreeLevelsBarSet() {
+        // With THREE_LEVELS, 6/8=0.75 → "█" (not "▆" as in NINE_LEVELS)
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0, 6, 8)
+                .bottomData(0, 6, 8)
+                .barSet(Sparkline.BarSet.THREE_LEVELS)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 3, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasContent(" ██", "───", " ██");
+    }
+
+    @Test
+    @DisplayName("Handles empty top and bottom data without throwing")
+    void handlesAllEmptyData() {
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(new long[0])
+                .bottomData(new long[0])
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 3, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // No ticks → nothing written; buffer stays empty
+        assertThat(buffer).hasContent("   ", "   ", "   ");
+    }
+
+    @Test
+    @DisplayName("Handles all-zero data without division by zero")
+    void handlesAllZeroData() {
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0, 0, 0)
+                .bottomData(0, 0, 0)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 3, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // effectiveMax = 1 (floor), all barPx = 0 → empty bars; centre separator written
+        assertThat(buffer).hasContent("   ", "───", "   ");
+    }
+
+    @Test
+    @DisplayName("Renders fewer data points than area width")
+    void fewerDataPointsThanWidth() {
+        // 2 data points in a 5-wide area: bars at col 0-1, empty at col 2-4
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(4, 8)
+                .bottomData(4, 8)
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 5, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // 4/8 → "▄", 8/8 → "█"; columns 2-4 remain empty
+        assertThat(buffer).hasContent("▄█   ", "──   ", "▄█   ");
+    }
+
+    // -------------------------------------------------------------------------
+    // X-axis labels
+    // -------------------------------------------------------------------------
+
     @Test
     @DisplayName("X-axis labels rendered below chart body")
     void xAxisLabelsRendered() {
