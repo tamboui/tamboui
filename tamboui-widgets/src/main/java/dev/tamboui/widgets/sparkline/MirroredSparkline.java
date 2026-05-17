@@ -8,7 +8,11 @@ import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
@@ -78,6 +82,24 @@ import dev.tamboui.widgets.block.Block;
  */
 public final class MirroredSparkline implements Widget {
 
+    /**
+     * CSS property for the top series bar colour ({@code top-color}).
+     * <p>
+     * Resolved by {@link Builder#styleResolver(StylePropertyResolver)}; a programmatic
+     * value set via {@link Builder#topForeground(Color)} takes precedence.
+     */
+    public static final PropertyDefinition<Color> TOP_COLOR =
+            PropertyDefinition.of("top-color", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the bottom series bar colour ({@code bottom-color}).
+     * <p>
+     * Resolved by {@link Builder#styleResolver(StylePropertyResolver)}; a programmatic
+     * value set via {@link Builder#bottomForeground(Color)} takes precedence.
+     */
+    public static final PropertyDefinition<Color> BOTTOM_COLOR =
+            PropertyDefinition.of("bottom-color", ColorConverter.INSTANCE);
+
     private static final int Y_LABEL_WIDTH = 4;
     private static final Style DIM = Style.EMPTY.dim();
     private static final String CENTRE_SEPARATOR = "─";
@@ -96,14 +118,20 @@ public final class MirroredSparkline implements Widget {
     private MirroredSparkline(Builder builder) {
         this.topData = builder.topData;
         this.bottomData = builder.bottomData;
-        this.topStyle = builder.topStyle;
-        this.bottomStyle = builder.bottomStyle;
         this.max = builder.max;
         this.block = builder.block;
         this.barSet = builder.barSet;
         this.direction = builder.direction;
         this.showYAxis = builder.showYAxis;
         this.xLabels = builder.xLabels;
+
+        Color resolvedTopFg = builder.resolveTopColor();
+        Style baseTopStyle = builder.topStyle;
+        this.topStyle = resolvedTopFg != null ? baseTopStyle.fg(resolvedTopFg) : baseTopStyle;
+
+        Color resolvedBottomFg = builder.resolveBottomColor();
+        Style baseBottomStyle = builder.bottomStyle;
+        this.bottomStyle = resolvedBottomFg != null ? baseBottomStyle.fg(resolvedBottomFg) : baseBottomStyle;
     }
 
     /**
@@ -288,6 +316,9 @@ public final class MirroredSparkline implements Widget {
         private Sparkline.RenderDirection direction = Sparkline.RenderDirection.LEFT_TO_RIGHT;
         private boolean showYAxis = true;
         private String[] xLabels;
+        private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+        private Color topForeground;
+        private Color bottomForeground;
 
         private Builder() {
         }
@@ -440,6 +471,49 @@ public final class MirroredSparkline implements Widget {
         public Builder xLabels(String... labels) {
             this.xLabels = labels != null ? labels.clone() : null;
             return this;
+        }
+
+        /**
+         * Sets the CSS property resolver used to read {@code top-color} and {@code bottom-color} properties.
+         * Programmatic values set via {@link #topForeground(Color)} and {@link #bottomForeground(Color)} take
+         * precedence over CSS values.
+         *
+         * @param resolver the resolver
+         * @return this builder
+         */
+        public Builder styleResolver(StylePropertyResolver resolver) {
+            this.styleResolver = resolver != null ? resolver : StylePropertyResolver.empty();
+            return this;
+        }
+
+        /**
+         * Sets the foreground colour for the top series bars, overriding any CSS {@code top-color} property.
+         *
+         * @param color the colour
+         * @return this builder
+         */
+        public Builder topForeground(Color color) {
+            this.topForeground = color;
+            return this;
+        }
+
+        /**
+         * Sets the foreground colour for the bottom series bars, overriding any CSS {@code bottom-color} property.
+         *
+         * @param color the colour
+         * @return this builder
+         */
+        public Builder bottomForeground(Color color) {
+            this.bottomForeground = color;
+            return this;
+        }
+
+        private Color resolveTopColor() {
+            return styleResolver.resolve(TOP_COLOR, topForeground);
+        }
+
+        private Color resolveBottomColor() {
+            return styleResolver.resolve(BOTTOM_COLOR, bottomForeground);
         }
 
         /**

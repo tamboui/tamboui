@@ -13,6 +13,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
@@ -459,6 +460,104 @@ class MirroredSparklineTest {
         assertThat(buffer).hasSymbolAt(1, 0, " "); // top empty at right
         assertThat(buffer).hasSymbolAt(0, 2, "█"); // bottom full at left
         assertThat(buffer).hasSymbolAt(1, 2, " "); // bottom empty at right
+    }
+
+    // -------------------------------------------------------------------------
+    // CSS property resolution
+    // -------------------------------------------------------------------------
+
+    @Test
+    @DisplayName("CSS top-color applied to top series bars")
+    void cssTopColorApplied() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.of("top-color", Color.GREEN);
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(8)
+                .bottomData(0)
+                .showYAxis(false)
+                .styleResolver(resolver)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 0, Color.GREEN);
+    }
+
+    @Test
+    @DisplayName("CSS bottom-color applied to bottom series bars")
+    void cssBottomColorApplied() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.of("bottom-color", Color.BLUE);
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0)
+                .bottomData(8)
+                .showYAxis(false)
+                .styleResolver(resolver)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 2, Color.BLUE);
+    }
+
+    @Test
+    @DisplayName("Programmatic topForeground overrides CSS top-color")
+    void programmaticTopForegroundOverridesCss() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.of("top-color", Color.GREEN);
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(8)
+                .bottomData(0)
+                .showYAxis(false)
+                .styleResolver(resolver)
+                .topForeground(Color.RED)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 0, Color.RED);
+    }
+
+    @Test
+    @DisplayName("Programmatic bottomForeground overrides CSS bottom-color")
+    void programmaticBottomForegroundOverridesCss() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.of("bottom-color", Color.BLUE);
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0)
+                .bottomData(8)
+                .showYAxis(false)
+                .styleResolver(resolver)
+                .bottomForeground(Color.MAGENTA)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 2, Color.MAGENTA);
+    }
+
+    @Test
+    @DisplayName("topStyle fg takes lowest precedence below topForeground and CSS")
+    void topStyleFgLowerPrecedenceThanCss() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.of("top-color", Color.GREEN);
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(8)
+                .bottomData(0)
+                .topStyle(Style.EMPTY.fg(Color.YELLOW))
+                .showYAxis(false)
+                .styleResolver(resolver)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // CSS top-color (GREEN) wins over topStyle fg (YELLOW)
+        assertThat(buffer).hasForegroundAt(0, 0, Color.GREEN);
     }
 
     @Test
