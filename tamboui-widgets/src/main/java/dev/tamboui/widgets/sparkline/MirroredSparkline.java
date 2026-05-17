@@ -89,6 +89,7 @@ public final class MirroredSparkline implements Widget {
     private final Long max;
     private final Block block;
     private final Sparkline.BarSet barSet;
+    private final Sparkline.RenderDirection direction;
     private final boolean showYAxis;
     private final String[] xLabels;
 
@@ -100,6 +101,7 @@ public final class MirroredSparkline implements Widget {
         this.max = builder.max;
         this.block = builder.block;
         this.barSet = builder.barSet;
+        this.direction = builder.direction;
         this.showYAxis = builder.showYAxis;
         this.xLabels = builder.xLabels;
     }
@@ -111,6 +113,28 @@ public final class MirroredSparkline implements Widget {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * Creates a mirrored sparkline with the given top and bottom data using default settings.
+     *
+     * @param topData    the top series data (bars grow upward from centre)
+     * @param bottomData the bottom series data (bars grow downward from centre)
+     * @return a new MirroredSparkline
+     */
+    public static MirroredSparkline from(long[] topData, long[] bottomData) {
+        return builder().topData(topData).bottomData(bottomData).build();
+    }
+
+    /**
+     * Creates a mirrored sparkline with the given top and bottom data using default settings.
+     *
+     * @param topData    the top series data (bars grow upward from centre)
+     * @param bottomData the bottom series data (bars grow downward from centre)
+     * @return a new MirroredSparkline
+     */
+    public static MirroredSparkline from(List<Long> topData, List<Long> bottomData) {
+        return builder().topData(topData).bottomData(bottomData).build();
     }
 
     @Override
@@ -165,7 +189,9 @@ public final class MirroredSparkline implements Widget {
             }
 
             for (int t = 0; t < ticks; t++) {
-                int x = inner.x() + yLabelW + t;
+                int x = direction == Sparkline.RenderDirection.RIGHT_TO_LEFT
+                        ? inner.x() + yLabelW + (ticks - 1 - t)
+                        : inner.x() + yLabelW + t;
                 int dataIdx = dataLen - ticks + t;
                 long topVal = dataIdx >= 0 && dataIdx < topData.length ? topData[dataIdx] : 0;
                 long botVal = dataIdx >= 0 && dataIdx < bottomData.length ? bottomData[dataIdx] : 0;
@@ -213,13 +239,17 @@ public final class MirroredSparkline implements Widget {
             int xAxisY = inner.y() + chartBodyRows;
             // Distribute labels evenly across the tick range, writing directly to the buffer.
             // Buffer cells not written remain as empty space (Buffer.empty initialises all to ' ').
+            boolean rtl = direction == Sparkline.RenderDirection.RIGHT_TO_LEFT;
             for (int li = 0; li < xLabels.length; li++) {
                 String lbl = xLabels[li];
                 int lblWidth = CharWidth.of(lbl);
-                double fraction = xLabels.length > 1 ? (double) li / (xLabels.length - 1) : 0;
+                double rawFraction = xLabels.length > 1 ? (double) li / (xLabels.length - 1) : 0;
+                // Mirror label positions for RIGHT_TO_LEFT so the first label lands on the right
+                double fraction = rtl ? 1.0 - rawFraction : rawFraction;
                 int col = (int) Math.round(fraction * (ticks - 1));
-                // Right-align the last label so it doesn't run past the right edge
-                int start = li == xLabels.length - 1
+                // Right-align whichever label lands at the rightmost column
+                boolean atRightEdge = rtl ? li == 0 : li == xLabels.length - 1;
+                int start = atRightEdge
                         ? Math.max(0, col - lblWidth + 1)
                         : col;
                 if (start < chartW) {
@@ -255,6 +285,7 @@ public final class MirroredSparkline implements Widget {
         private Long max;
         private Block block;
         private Sparkline.BarSet barSet = Sparkline.BarSet.NINE_LEVELS;
+        private Sparkline.RenderDirection direction = Sparkline.RenderDirection.LEFT_TO_RIGHT;
         private boolean showYAxis = true;
         private String[] xLabels;
 
@@ -368,6 +399,20 @@ public final class MirroredSparkline implements Widget {
          */
         public Builder barSet(Sparkline.BarSet barSet) {
             this.barSet = barSet != null ? barSet : Sparkline.BarSet.NINE_LEVELS;
+            return this;
+        }
+
+        /**
+         * Sets the render direction. In {@link Sparkline.RenderDirection#LEFT_TO_RIGHT} (default) the oldest
+         * data point appears at the left and the newest at the right. In
+         * {@link Sparkline.RenderDirection#RIGHT_TO_LEFT} the newest data point appears at the left, matching
+         * a right-to-left scrolling display.
+         *
+         * @param direction the render direction
+         * @return this builder
+         */
+        public Builder direction(Sparkline.RenderDirection direction) {
+            this.direction = direction != null ? direction : Sparkline.RenderDirection.LEFT_TO_RIGHT;
             return this;
         }
 

@@ -257,4 +257,82 @@ class MirroredSparklineTest {
 
         assertThat(buffer).hasSymbolAt(0, 2, "█");
     }
+
+    @Test
+    @DisplayName("from(long[], long[]) factory builds with defaults")
+    void fromArrayFactory() {
+        // Default includes showYAxis=true (4-char label) so area must be wide enough
+        MirroredSparkline chart = MirroredSparkline.from(new long[]{8}, new long[]{8});
+        Rect area = new Rect(0, 0, 6, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // Bar appears at col 4 (after the 4-char Y-axis label)
+        assertThat(buffer).hasSymbolAt(4, 0, "█");
+        assertThat(buffer).hasSymbolAt(4, 1, "─");
+        assertThat(buffer).hasSymbolAt(4, 2, "█");
+    }
+
+    @Test
+    @DisplayName("from(List, List) factory builds with defaults")
+    void fromListFactory() {
+        // Default includes showYAxis=true (4-char label) so area must be wide enough
+        MirroredSparkline chart = MirroredSparkline.from(Arrays.asList(8L), Arrays.asList(8L));
+        Rect area = new Rect(0, 0, 6, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasSymbolAt(4, 0, "█");
+        assertThat(buffer).hasSymbolAt(4, 1, "─");
+        assertThat(buffer).hasSymbolAt(4, 2, "█");
+    }
+
+    @Test
+    @DisplayName("RIGHT_TO_LEFT renders newest data at left column")
+    void rightToLeftNewestDataAtLeft() {
+        // data: [0, 8] — newest value is 8 (last element)
+        // LEFT_TO_RIGHT:  col 0 = 0 (empty), col 1 = 8 (full)
+        // RIGHT_TO_LEFT:  col 0 = 8 (full),  col 1 = 0 (empty)
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0, 8)
+                .bottomData(0, 8)
+                .showYAxis(false)
+                .direction(Sparkline.RenderDirection.RIGHT_TO_LEFT)
+                .build();
+        Rect area = new Rect(0, 0, 2, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // Newest (8) at left, oldest (0) at right
+        assertThat(buffer).hasSymbolAt(0, 0, "█"); // top full at left
+        assertThat(buffer).hasSymbolAt(1, 0, " "); // top empty at right
+        assertThat(buffer).hasSymbolAt(0, 2, "█"); // bottom full at left
+        assertThat(buffer).hasSymbolAt(1, 2, " "); // bottom empty at right
+    }
+
+    @Test
+    @DisplayName("RIGHT_TO_LEFT x-axis labels are mirrored")
+    void rightToLeftXAxisLabels() {
+        // 8 ticks; "-7s" should land on the right, "now" on the left
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(0, 0, 0, 0, 0, 0, 0, 0)
+                .bottomData(0, 0, 0, 0, 0, 0, 0, 0)
+                .showYAxis(false)
+                .xLabels("-7s", "now")
+                .direction(Sparkline.RenderDirection.RIGHT_TO_LEFT)
+                .build();
+        Rect area = new Rect(0, 0, 8, 4);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // "now" at col 0 (left), "-7s" right-aligned ending at col 7 (right)
+        assertThat(buffer).hasSymbolAt(0, 3, "n");
+        assertThat(buffer).hasSymbolAt(2, 3, "w");
+        assertThat(buffer).hasSymbolAt(5, 3, "-");
+        assertThat(buffer).hasSymbolAt(7, 3, "s");
+    }
 }
