@@ -376,6 +376,38 @@ class MirroredSparklineTest {
     }
 
     @Test
+    @DisplayName("topData from int array accepted")
+    void topDataFromIntArray() {
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(new int[]{8})
+                .bottomData(new long[0])
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasSymbolAt(0, 0, "█");
+    }
+
+    @Test
+    @DisplayName("bottomData from int array accepted")
+    void bottomDataFromIntArray() {
+        MirroredSparkline chart = MirroredSparkline.builder()
+                .topData(new long[0])
+                .bottomData(new int[]{8})
+                .showYAxis(false)
+                .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasSymbolAt(0, 2, "█");
+    }
+
+    @Test
     @DisplayName("topData from List accepted")
     void topDataFromList() {
         MirroredSparkline chart = MirroredSparkline.builder()

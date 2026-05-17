@@ -335,6 +335,24 @@ public final class MirroredSparkline implements Widget {
         }
 
         /**
+         * Sets the top series data from an int array (bars grow upward from centre).
+         *
+         * @param data the data values
+         * @return this builder
+         */
+        public Builder topData(int... data) {
+            if (data == null) {
+                this.topData = new long[0];
+            } else {
+                this.topData = new long[data.length];
+                for (int i = 0; i < data.length; i++) {
+                    this.topData[i] = data[i];
+                }
+            }
+            return this;
+        }
+
+        /**
          * Sets the top series data from a list (bars grow upward from centre).
          *
          * @param data the data values
@@ -353,6 +371,24 @@ public final class MirroredSparkline implements Widget {
          */
         public Builder bottomData(long... data) {
             this.bottomData = data != null ? data.clone() : new long[0];
+            return this;
+        }
+
+        /**
+         * Sets the bottom series data from an int array (bars grow downward from centre).
+         *
+         * @param data the data values
+         * @return this builder
+         */
+        public Builder bottomData(int... data) {
+            if (data == null) {
+                this.bottomData = new long[0];
+            } else {
+                this.bottomData = new long[data.length];
+                for (int i = 0; i < data.length; i++) {
+                    this.bottomData[i] = data[i];
+                }
+            }
             return this;
         }
 
