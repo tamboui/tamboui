@@ -73,6 +73,9 @@
     "picocli-demo": {
       "script-ref": "tamboui-picocli/demos/picocli-demo/src/main/java/dev/tamboui/demo/PicoCLIDemo.java"
     },
+    "ratty-demo": {
+      "script-ref": "tamboui-ratty/demos/ratty-demo/src/main/java/dev/tamboui/demos/ratty/RattyDemo.java"
+    },
     "tfx-basic-effects-demo": {
       "script-ref": "tamboui-tfx/demos/tfx-basic-effects-demo/src/main/java/dev/tamboui/demo/BasicEffectsTFXDemo.java"
     },
