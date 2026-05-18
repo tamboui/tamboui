@@ -169,6 +169,9 @@
     "scrollbar-demo": {
       "script-ref": "tamboui-widgets/demos/scrollbar-demo/src/main/java/dev/tamboui/demo/ScrollbarDemo.java"
     },
+    "mirrored-sparkline-demo": {
+      "script-ref": "tamboui-widgets/demos/mirrored-sparkline-demo/src/main/java/dev/tamboui/demo/MirroredSparklineDemo.java"
+    },
     "sparkline-demo": {
       "script-ref": "tamboui-widgets/demos/sparkline-demo/src/main/java/dev/tamboui/demo/SparklineDemo.java"
     },
