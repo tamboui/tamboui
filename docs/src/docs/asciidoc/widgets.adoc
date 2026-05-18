@@ -47,6 +47,10 @@ include::_attributes.adoc[]
 |Stateless
 |Mini line chart for data series
 
+|<<mirroredsparkline,MirroredSparkline>>
+|Stateless
+|Dual-series mirrored chart growing from a shared centre axis
+
 |<<barchart,BarChart>>
 |Stateless
 |Vertical bar chart
@@ -357,6 +361,16 @@ A mini chart showing data trends:
 [source,java]
 ----
 include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=sparkline]
+----
+
+[[mirroredsparkline]]
+=== MirroredSparkline
+
+A dual-series chart where bars grow upward (top series) and downward (bottom series) from a shared centre axis — useful for displaying paired metrics such as network in/out or disk read/write rates:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=mirrored-sparkline]
 ----
 
 === BarChart

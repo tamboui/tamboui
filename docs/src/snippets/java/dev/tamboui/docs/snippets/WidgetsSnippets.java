@@ -49,6 +49,7 @@ import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.select.Select;
 import dev.tamboui.widgets.select.SelectState;
+import dev.tamboui.widgets.sparkline.MirroredSparkline;
 import dev.tamboui.widgets.sparkline.Sparkline;
 import dev.tamboui.widgets.spinner.Spinner;
 import dev.tamboui.widgets.spinner.SpinnerFrameSet;
@@ -340,6 +341,28 @@ public class WidgetsSnippets {
 
         sparkline.render(area, buffer);
         // end::sparkline[]
+    }
+
+    void mirroredSparklineWidget() {
+        // tag::mirrored-sparkline[]
+        long[] inRates  = {0, 2, 5, 8, 12, 9, 6, 3};
+        long[] outRates = {0, 1, 3, 6,  9, 7, 4, 2};
+
+        MirroredSparkline chart = MirroredSparkline.builder()
+            .topData(inRates)
+            .bottomData(outRates)
+            .topStyle(Style.EMPTY.fg(Color.GREEN))
+            .bottomStyle(Style.EMPTY.fg(Color.BLUE))
+            .xLabels("-60s", "-45s", "-30s", "-15s", "now")
+            .block(Block.builder()
+                .title("In / Out  msg/s")
+                .borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED)
+                .build())
+            .build();
+
+        chart.render(area, buffer);
+        // end::mirrored-sparkline[]
     }
 
     void barChartWidget() {
