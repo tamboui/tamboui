@@ -293,7 +293,27 @@ public class JLineBackend extends AbstractBackend {
         disableRawMode();
 
         writer.flush();
-        terminal.close();
+
+        // Close terminal with a timeout to work around a macOS deadlock:
+        // JLine's internal reader thread blocks in native FileInputStream.read0()
+        // on stdin, and FileDescriptor.close0() blocks until that read completes.
+        // On macOS, close() never unblocks a concurrent read() on the same FD.
+        // All terminal state is already restored above, so skipping close on
+        // timeout is safe — JVM exit handles FD cleanup.
+        Thread closeThread = new Thread(() -> {
+            try {
+                terminal.close();
+            } catch (IOException e) {
+                // best effort
+            }
+        }, "jline-terminal-close");
+        closeThread.setDaemon(true);
+        closeThread.start();
+        try {
+            closeThread.join(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**

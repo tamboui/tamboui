@@ -74,6 +74,7 @@ public final class TerminalInputReader implements Runnable {
     public void stop(long timeoutMs) {
         Thread t = thread;
         if (t != null && t.isAlive()) {
+            t.interrupt();
             try {
                 t.join(timeoutMs);
             } catch (InterruptedException e) {
