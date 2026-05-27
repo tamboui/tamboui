@@ -438,13 +438,14 @@ public class RattyDrawDemo {
         // Fill with light grid dots, then highlight drawn points.
         Style gridStyle = Style.EMPTY.fg(Color.DARK_GRAY);
         Style drawStyle = Style.EMPTY.fg(Color.LIGHT_RED);
+        Cell gridCell = new Cell("·", gridStyle);
+        Cell drawCell = new Cell("█", drawStyle);
         for (int y = 0; y < inner.height(); y++) {
             for (int x = 0; x < inner.width(); x++) {
-                Cell cell = frame.buffer().get(inner.x() + x, inner.y() + y);
                 if (points.contains(packPoint(x, y))) {
-                    cell.symbol("█").style(drawStyle);
+                    frame.buffer().set(inner.x() + x, inner.y() + y, drawCell);
                 } else {
-                    cell.symbol("·").style(gridStyle);
+                    frame.buffer().set(inner.x() + x, inner.y() + y, gridCell);
                 }
             }
         }
@@ -454,11 +455,7 @@ public class RattyDrawDemo {
             String text = "Draw here!";
             int startX = inner.x() + Math.max(0, (inner.width() - text.length()) / 2);
             int row = inner.y() + inner.height() / 2;
-            for (int i = 0; i < text.length() && (startX + i) < inner.x() + inner.width(); i++) {
-                frame.buffer().get(startX + i, row)
-                    .symbol(String.valueOf(text.charAt(i)))
-                    .style(Style.EMPTY.fg(Color.GRAY));
-            }
+            frame.buffer().setString(startX, row, text, Style.EMPTY.fg(Color.GRAY));
         }
     }
 
@@ -477,10 +474,10 @@ public class RattyDrawDemo {
 
         // Clear the inner so the terminal-rendered 3D object isn't fighting
         // with leftover text cells.
-        Style clearStyle = Style.EMPTY;
+        Cell blank = new Cell(" ", Style.EMPTY);
         for (int y = 0; y < inner.height(); y++) {
             for (int x = 0; x < inner.width(); x++) {
-                frame.buffer().get(inner.x() + x, inner.y() + y).symbol(" ").style(clearStyle);
+                frame.buffer().set(inner.x() + x, inner.y() + y, blank);
             }
         }
 
@@ -490,11 +487,7 @@ public class RattyDrawDemo {
                 String text = "Draw on the left canvas";
                 int startX = inner.x() + Math.max(0, (inner.width() - text.length()) / 2);
                 int row = inner.y() + inner.height() / 2;
-                for (int i = 0; i < text.length() && (startX + i) < inner.x() + inner.width(); i++) {
-                    frame.buffer().get(startX + i, row)
-                        .symbol(String.valueOf(text.charAt(i)))
-                        .style(Style.EMPTY.fg(Color.GRAY));
-                }
+                frame.buffer().setString(startX, row, text, Style.EMPTY.fg(Color.GRAY));
             }
             return;
         }
