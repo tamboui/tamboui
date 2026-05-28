@@ -4,16 +4,15 @@
  */
 package dev.tamboui.backend.panama.windows;
 
+import dev.tamboui.backend.panama.PlatformTerminal;
+import dev.tamboui.error.RuntimeIOException;
+import dev.tamboui.layout.Size;
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
-import dev.tamboui.backend.panama.PlatformTerminal;
-import dev.tamboui.error.RuntimeIOException;
-import dev.tamboui.layout.Size;
 
 /**
  * Windows terminal operations using Panama FFI.
@@ -35,6 +34,8 @@ public final class WindowsTerminal implements PlatformTerminal {
     private boolean rawModeEnabled;
     private volatile Runnable resizeHandler;
     private int pendingSurrogate;
+
+    private int peekedChar = Integer.MIN_VALUE; // empty until peek() fills it
 
     /**
      * Creates a new Windows terminal instance.
@@ -139,6 +140,26 @@ public final class WindowsTerminal implements PlatformTerminal {
 
     @Override
     public int read(int timeoutMs) throws IOException {
+        if (peekedChar != Integer.MIN_VALUE) {
+            int c = peekedChar;
+            peekedChar = Integer.MIN_VALUE;
+            return c;
+        }
+        return readFromConsole(timeoutMs);
+    }
+
+    @Override
+    public int peek(int timeoutMs) throws IOException {
+        if (peekedChar == Integer.MIN_VALUE) {
+            int c = readFromConsole(timeoutMs);
+            if (c != -2) {
+                peekedChar = c;
+            }
+        }
+        return peekedChar == Integer.MIN_VALUE ? -2 : peekedChar;
+    }
+
+    private int readFromConsole(int timeoutMs) throws IOException {
         if (Kernel32.getNumberOfConsoleInputEvents(inputHandle, intBuffer) == 0) {
             throw new RuntimeIOException("Failed to get number of console input events");
         }
@@ -177,7 +198,7 @@ public final class WindowsTerminal implements PlatformTerminal {
                         // Windows sends supplementary characters as two KEY_EVENTs with surrogates;
                         // read the low surrogate immediately with a short wait.
                         pendingSurrogate = c;
-                        return read(50);
+                        return readFromConsole(50);
                     }
                     if (Character.isLowSurrogate((char) c) && pendingSurrogate != 0) {
                         int codePoint = Character.toCodePoint((char) pendingSurrogate, (char) c);
@@ -196,14 +217,6 @@ public final class WindowsTerminal implements PlatformTerminal {
         }
 
         return -2; // No relevant data
-    }
-
-    @Override
-    public int peek(int timeoutMs) throws IOException {
-        if (Kernel32.getNumberOfConsoleInputEvents(inputHandle, intBuffer) == 0) {
-            throw new RuntimeIOException("Failed to get number of console input events");
-        }
-        return intBuffer.get(ValueLayout.JAVA_INT, 0) > 0 ? 0 : -2;
     }
 
     @Override
