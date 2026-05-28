@@ -168,6 +168,93 @@ class EventParserTest {
         assertThat(keyEvent.hasAlt()).isTrue();
     }
 
+    // -- Arrow key CSI sequences (ESC [ A/B/C/D) --
+
+    @Test
+    @DisplayName("ESC[A is parsed as UP arrow")
+    void arrowUpParsedFromCsiSequence() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', 'A');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UP);
+    }
+
+    @Test
+    @DisplayName("ESC[B is parsed as DOWN arrow")
+    void arrowDownParsedFromCsiSequence() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', 'B');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.DOWN);
+    }
+
+    @Test
+    @DisplayName("ESC[C is parsed as RIGHT arrow")
+    void arrowRightParsedFromCsiSequence() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', 'C');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.RIGHT);
+    }
+
+    @Test
+    @DisplayName("ESC[D is parsed as LEFT arrow")
+    void arrowLeftParsedFromCsiSequence() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', 'D');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.LEFT);
+    }
+
+    @Test
+    @DisplayName("consecutive arrow keys are each parsed independently")
+    void consecutiveArrowKeysEachParsedIndependently() throws IOException {
+        // ESC[A ESC[B — two separate UP and DOWN events
+        QueueBackend backend = new QueueBackend(27, '[', 'A', 27, '[', 'B');
+
+        Event first  = EventParser.readEvent(backend, 0);
+        Event second = EventParser.readEvent(backend, 0);
+
+        assertThat(((KeyEvent) first).code()).isEqualTo(KeyCode.UP);
+        assertThat(((KeyEvent) second).code()).isEqualTo(KeyCode.DOWN);
+    }
+
+    @Test
+    @DisplayName("arrow keys become UNKNOWN when peek() returns 0 instead of the actual char")
+    void arrowKeyBecomesUnknownWhenPeekReturnsFlagInsteadOfChar() throws IOException {
+        // Simulates the broken WindowsTerminal.peek() that returned 0 (flag) rather
+        // than the next character. ESC [A should be UP, but with wrong peek it is UNKNOWN.
+        BrokenPeekBackend backend = new BrokenPeekBackend(27, '[', 'A');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code())
+            .as("peek() returning 0 instead of '[' prevents CSI detection")
+            .isEqualTo(KeyCode.UNKNOWN);
+    }
+
+    @Test
+    @DisplayName("arrow keys are correctly parsed when peek() returns the actual char")
+    void arrowKeyCorrectlyParsedWhenPeekReturnsActualChar() throws IOException {
+        // The correct implementation: peek() returns the real next character value.
+        // This is the contract required by EventParser and fulfilled by the fix.
+        QueueBackend backend = new QueueBackend(27, '[', 'A');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UP);
+    }
+
     private static final class QueueBackend extends TestBackend {
 
         private final int[] input;
@@ -194,6 +281,38 @@ class EventParserTest {
                 return -2;
             }
             return input[index];
+        }
+    }
+
+    /**
+     * Reproduces the broken WindowsTerminal.peek() behaviour: returns 0 when input is
+     * available instead of the actual next character value. Used to document and lock in
+     * the regression so it is immediately obvious if peek() is ever broken this way again.
+     */
+    private static final class BrokenPeekBackend extends TestBackend {
+
+        private final int[] input;
+        private int index;
+
+        private BrokenPeekBackend(int... input) {
+            super(80, 24);
+            this.input = input;
+            this.index = 0;
+        }
+
+        @Override
+        public int read(int timeoutMs) {
+            if (index >= input.length) {
+                return -2;
+            }
+            return input[index++];
+        }
+
+        @Override
+        public int peek(int timeoutMs) {
+            // Intentionally broken: returns 0 (events available) instead of the actual char.
+            // This is exactly what WindowsTerminal.peek() did before the fix.
+            return index < input.length ? 0 : -2;
         }
     }
 }
