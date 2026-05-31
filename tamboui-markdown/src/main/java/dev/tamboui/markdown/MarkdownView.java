@@ -261,12 +261,11 @@ public final class MarkdownView implements Widget {
                 continue;
             }
             if (chunk instanceof WidgetChunk) {
-                // Block-bordered widgets (code blocks, tables) need their full
-                // geometry to render correctly — a partial slice paints only
-                // the top border with no closure. Skip when we can't fit it
-                // whole; the user scrolls to align with its top.
-                if (chunkSkip == 0 && visibleHeight == chunkHeight) {
-                    Rect target = new Rect(contentArea.left(), y, contentArea.width(), chunkHeight);
+                // Render block-bordered widgets (code blocks, tables) when
+                // their top is visible. Paragraph and Block clip naturally
+                // when the available height is less than the full chunk.
+                if (chunkSkip == 0) {
+                    Rect target = new Rect(contentArea.left(), y, contentArea.width(), visibleHeight);
                     chunk.render(target, buffer);
                 }
             } else if (chunk instanceof LinesChunk) {
