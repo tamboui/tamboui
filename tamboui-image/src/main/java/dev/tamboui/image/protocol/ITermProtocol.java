@@ -37,6 +37,7 @@ public final class ITermProtocol implements ImageProtocol {
     private static final String ST = "\033\\";  // Alternative terminator
 
     private final boolean useStTerminator;
+    private final NativeImageCache cache = new NativeImageCache();
 
     /**
      * Creates an iTerm2 protocol instance using BEL terminator.
@@ -64,13 +65,23 @@ public final class ITermProtocol implements ImageProtocol {
             return;
         }
 
+        // Skip re-transmission when the same image is already shown at the same position.
+        // This is essential for iTerm2: it decodes and retains every inline image it receives,
+        // so re-sending the picture on every frame of the render loop would grow the terminal
+        // process memory without bound. The image stays on screen because the diff-based
+        // renderer leaves the image cells untouched between frames. A change in screen
+        // generation (clear/resize) forces a redraw.
+        if (!cache.needsEmit(image, area, NativeImageCache.generationOf(rawOutput))) {
+            return;
+        }
+
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
-        // Encode image as PNG
-        byte[] pngData = image.toPng();
-        String base64Data = Base64.getEncoder().encodeToString(pngData);
+        // Encode image as PNG then base64. The payload depends only on the pixels, so it is
+        // cached per image to avoid re-encoding on every frame of the render loop.
+        String base64Data = cache.payload(image, () -> encodeBase64(image));
 
         // Build the iTerm2 escape sequence
         StringBuilder cmd = new StringBuilder();
@@ -92,6 +103,18 @@ public final class ITermProtocol implements ImageProtocol {
 
         rawOutput.write(cmd.toString().getBytes(StandardCharsets.US_ASCII));
         rawOutput.flush();
+    }
+
+    /**
+     * Encodes the image as base64-encoded PNG, wrapping the checked IO exception so it
+     * can be used from a cache supplier.
+     */
+    private static String encodeBase64(ImageData image) {
+        try {
+            return Base64.getEncoder().encodeToString(image.toPng());
+        } catch (IOException e) {
+            throw new RuntimeIOException("Failed to encode image as PNG for iTerm2 protocol", e);
+        }
     }
 
     @Override

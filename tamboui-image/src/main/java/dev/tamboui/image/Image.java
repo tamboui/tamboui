@@ -34,6 +34,19 @@ import dev.tamboui.widgets.block.Block;
  * frame.renderWidget(image, area);
  * }</pre>
  *
+ * <h2>Render loop &amp; memory behaviour</h2>
+ * For the native protocols (Kitty, iTerm2, Sixel) the image is transmitted to the terminal as
+ * raw output. To keep a render loop cheap and, crucially, to avoid growing the terminal's memory
+ * on every frame (iTerm2 in particular retains every inline image it receives), an unchanged
+ * image at an unchanged position is transmitted only <em>once</em> and then left on screen — the
+ * diff-based renderer does not disturb its cells between frames. Transmission is repeated only
+ * when the image content or its display position changes.
+ * <p>
+ * This redraw suppression is driven by the {@link dev.tamboui.widget.RawOutputContext screen
+ * generation} of the raw output stream, so a {@link dev.tamboui.terminal.Terminal#clear()} or a
+ * resize transparently forces the image to be redrawn on the next frame. Application code does
+ * not need to do anything special for images to survive a screen clear.
+ *
  * @see ImageData
  * @see ImageScaling
  * @see dev.tamboui.image.capability.TerminalImageCapabilities

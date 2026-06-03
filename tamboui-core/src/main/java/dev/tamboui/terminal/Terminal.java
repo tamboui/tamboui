@@ -19,6 +19,8 @@ import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.jfr.TerminalDrawEvent;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
+import dev.tamboui.widget.RawOutputCapable;
+import dev.tamboui.widget.RawOutputContext;
 
 /**
  * The main terminal abstraction. Manages the rendering lifecycle and
@@ -30,11 +32,14 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     // Kitty graphics protocol: delete all images from the graphics layer.
     // Non-Kitty terminals safely ignore this APC sequence.
+    // d=A (uppercase) deletes all images AND frees their stored data. The lowercase d=a
+    // only removes placements while leaving the image bytes in terminal memory, which would
+    // leak terminal-side memory whenever images are dismissed.
     private static final byte[] KITTY_DELETE_ALL =
-            "\033_Ga=d,d=a\033\\".getBytes(StandardCharsets.US_ASCII);
+            "\033_Ga=d,d=A\033\\".getBytes(StandardCharsets.US_ASCII);
 
     private final B backend;
-    private final OutputStream rawOutput;
+    private final RawOutput rawOutput;
     private final DiffResult diffResult;
     private Buffer currentBuffer;
     private Buffer previousBuffer;
@@ -66,29 +71,58 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
         }
     }
 
-    private static OutputStream createRawOutputStream(Backend backend) {
-        return new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                backend.writeRaw(new byte[]{(byte) b});
-            }
+    private static RawOutput createRawOutputStream(Backend backend) {
+        return new RawOutput(backend);
+    }
 
-            @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                if (off == 0 && len == b.length) {
-                    backend.writeRaw(b);
-                } else {
-                    byte[] slice = new byte[len];
-                    System.arraycopy(b, off, slice, 0, len);
-                    backend.writeRaw(slice);
-                }
-            }
+    /**
+     * The raw output stream handed to {@link RawOutputCapable} widgets.
+     * <p>
+     * Beyond writing bytes to the backend, it exposes a {@link RawOutputContext#generation()
+     * generation} counter that the terminal increments whenever the screen is cleared
+     * (via {@link #clear()} or a resize). Raw-output widgets such as the native image
+     * protocols use it to know when their cached "already transmitted" state is stale and
+     * must be redrawn.
+     */
+    private static final class RawOutput extends OutputStream implements RawOutputContext {
 
-            @Override
-            public void flush() throws IOException {
-                backend.flush();
+        private final Backend backend;
+        private long generation;
+
+        RawOutput(Backend backend) {
+            this.backend = backend;
+        }
+
+        /** Increments the screen generation, signalling that the screen was cleared. */
+        void bumpGeneration() {
+            generation++;
+        }
+
+        @Override
+        public long generation() {
+            return generation;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            backend.writeRaw(new byte[]{(byte) b});
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            if (off == 0 && len == b.length) {
+                backend.writeRaw(b);
+            } else {
+                byte[] slice = new byte[len];
+                System.arraycopy(b, off, slice, 0, len);
+                backend.writeRaw(slice);
             }
-        };
+        }
+
+        @Override
+        public void flush() throws IOException {
+            backend.flush();
+        }
     }
 
     /**
@@ -213,6 +247,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
             previousFrameHadRawOutput = false;
             previousRawOutputAreas = Collections.emptyList();
             backend.clear();
+            // The screen was wiped: invalidate raw-output widgets' cached "already drawn" state.
+            rawOutput.bumpGeneration();
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to clear terminal during resize: " + e.getMessage(), e);
         }
@@ -274,6 +310,12 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
     /**
      * Clears the terminal and resets the buffers.
+     * <p>
+     * Any images drawn by native protocols (Kitty, iTerm2, Sixel) are removed from the screen
+     * as part of the clear, and the screen {@link RawOutputContext#generation() generation} is
+     * advanced so those widgets retransmit their image on the next {@link #draw(Consumer) draw}
+     * instead of assuming it is still visible. Callers therefore do not need to take any special
+     * action to make images survive a {@code clear()} — the following frame redraws them.
      *
      * @throws RuntimeIOException if clearing fails
      */
@@ -283,6 +325,8 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
             previousFrameHadRawOutput = false;
             previousRawOutputAreas = Collections.emptyList();
             backend.clear();
+            // The screen was wiped: invalidate raw-output widgets' cached "already drawn" state.
+            rawOutput.bumpGeneration();
             Rect area = currentBuffer.area();
             currentBuffer = Buffer.empty(area);
             previousBuffer = Buffer.empty(area);

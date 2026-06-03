@@ -45,6 +45,7 @@ public final class SixelProtocol implements ImageProtocol {
     private static final int SIXEL_OFFSET = 63;
 
     private final int maxColors;
+    private final NativeImageCache cache = new NativeImageCache();
 
     /**
      * Creates a Sixel protocol with default settings (256 colors).
@@ -72,13 +73,31 @@ public final class SixelProtocol implements ImageProtocol {
             return;
         }
 
+        // Skip re-transmission when the same image is already shown at the same position.
+        // Besides saving the (expensive) re-encoding and re-write each frame, this avoids
+        // repainting Sixel pixels the terminal already shows. The image stays on screen
+        // because the diff-based renderer leaves the image cells untouched between frames.
+        // A change in screen generation (clear/resize) forces a redraw.
+        if (!cache.needsEmit(image, area, NativeImageCache.generationOf(rawOutput))) {
+            return;
+        }
+
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
-        // Generate and write Sixel data
-        // The image should already be scaled by Image.scaleImage() based on the scaling mode
-        byte[] sixelData = encodeSixel(image);
+        // Generate and write Sixel data.
+        // The image should already be scaled by Image.scaleImage() based on the scaling mode.
+        // Sixel encoding is expensive (it scans every pixel against every palette entry), so
+        // the encoded bytes are cached per image to avoid recomputing them on every frame of
+        // the render loop.
+        byte[] sixelData = cache.payload(image, () -> {
+            try {
+                return encodeSixel(image);
+            } catch (IOException e) {
+                throw new RuntimeIOException("Failed to encode Sixel data", e);
+            }
+        });
         rawOutput.write(sixelData);
         rawOutput.flush();
     }
