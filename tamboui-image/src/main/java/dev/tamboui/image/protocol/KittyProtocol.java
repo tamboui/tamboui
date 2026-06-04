@@ -66,7 +66,8 @@ public final class KittyProtocol implements ImageProtocol {
         // shrinking image (e.g. FILL -> FIT) does not leave the larger one behind on the graphics
         // layer. d=I frees the image data too.
         for (Rect staleArea : stale) {
-            String delete = String.format("\033_Ga=d,d=I,i=%d\033\\", cache.imageId(staleArea));
+            // q=2 suppresses the terminal's OK/error reply; without it the reply is read as input.
+            String delete = String.format("\033_Ga=d,d=I,i=%d,q=2\033\\", cache.imageId(staleArea));
             rawOutput.write(delete.getBytes(StandardCharsets.US_ASCII));
         }
 

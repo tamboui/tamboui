@@ -35,8 +35,10 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     // d=A (uppercase) deletes all images AND frees their stored data. The lowercase d=a
     // only removes placements while leaving the image bytes in terminal memory, which would
     // leak terminal-side memory whenever images are dismissed.
+    // q=2 suppresses the terminal's OK/error reply; without it the reply is read back as input
+    // (e.g. stray digits landing in the focused field).
     private static final byte[] KITTY_DELETE_ALL =
-            "\033_Ga=d,d=A\033\\".getBytes(StandardCharsets.US_ASCII);
+            "\033_Ga=d,d=A,q=2\033\\".getBytes(StandardCharsets.US_ASCII);
 
     private final B backend;
     private final RawOutput rawOutput;

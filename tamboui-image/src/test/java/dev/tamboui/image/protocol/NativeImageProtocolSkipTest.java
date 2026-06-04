@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -157,6 +158,30 @@ class NativeImageProtocolSkipTest {
     }
 
     @Test
+    void kitty_delete_commands_set_quiet_mode() throws IOException {
+        // Without q=2 the terminal replies (e.g. ESC_Gi=1;OK ESC\) to graphics commands, and the
+        // app reads that reply as input (stray digits in the focused field). Every Kitty command,
+        // including the stale-image delete, must suppress the reply.
+        KittyProtocol protocol = new KittyProtocol();
+        ImageData image = solidImage(0xFFFF0000);
+        GenerationOutput out = new GenerationOutput();
+
+        render(protocol, image, AREA_1, out);
+        out.reset();
+        // Overlapping area -> deletes the previous image, then transmits the new one.
+        render(protocol, image, AREA_2, out);
+
+        boolean sawDelete = false;
+        for (String command : out.text().split("\033_G")) {
+            if (command.startsWith("a=d")) {
+                sawDelete = true;
+                assertThat(command).as("Kitty delete command must set q=2").contains("q=2");
+            }
+        }
+        assertThat(sawDelete).as("a stale-image delete should have been emitted").isTrue();
+    }
+
+    @Test
     void plain_stream_without_context_still_skips_frame_to_frame() throws IOException {
         // A stream that does not expose a generation (e.g. a test or third-party stream) must
         // still benefit from frame-to-frame skipping; it simply cannot signal a screen clear.
@@ -210,6 +235,10 @@ class NativeImageProtocolSkipTest {
 
         int size() {
             return bytes.size();
+        }
+
+        String text() {
+            return new String(bytes.toByteArray(), StandardCharsets.US_ASCII);
         }
 
         void reset() {
