@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
@@ -71,9 +72,13 @@ public final class ITermProtocol implements ImageProtocol {
         // process memory without bound. The image stays on screen because the diff-based
         // renderer leaves the image cells untouched between frames. A change in screen
         // generation (clear/resize) forces a redraw.
-        if (!cache.needsEmit(image, area, NativeImageCache.generationOf(rawOutput))) {
+        List<Rect> stale = cache.staleAreasToClear(image, area, NativeImageCache.generationOf(rawOutput));
+        if (stale == null) {
             return;
         }
+        // Wipe any previously shown image whose footprint this one does not fully cover, so a
+        // shrinking image (e.g. FILL -> FIT) does not leave the larger one behind.
+        NativeImageCache.clearAreas(stale, rawOutput);
 
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);

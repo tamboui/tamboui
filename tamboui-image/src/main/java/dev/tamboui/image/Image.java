@@ -53,6 +53,13 @@ import dev.tamboui.widgets.block.Block;
  */
 public final class Image implements Widget, RawOutputCapable {
 
+    /**
+     * Supersampling factor applied when capping the transmitted resolution for self-scaling
+     * protocols, giving headroom so high-DPI terminals (whose cells hold more pixels than the
+     * nominal ratio) still receive enough detail to render crisply.
+     */
+    private static final int DISPLAY_SUPERSAMPLE = 2;
+
     private final ImageData data;
     private final ImageScaling scaling;
     private final Block block;
@@ -147,12 +154,16 @@ public final class Image implements Widget, RawOutputCapable {
         }
 
         if (protocol.handlesOwnScaling()) {
-            // Kitty, iTerm2: send original full-resolution image and let the terminal
-            // handle pixel scaling via c=/r= or width=/height=. This avoids double
-            // scaling (app downscale then terminal upscale) which causes blurry rendering.
+            // Kitty, iTerm2: let the terminal handle pixel scaling via c=/r= or width=/height=
+            // to avoid double scaling (app downscale then terminal upscale) which blurs the
+            // result. We do NOT send the raw original though: a multi-megapixel source displayed
+            // in a small cell box would push megabytes to the terminal on every change, freezing
+            // the UI. Instead cap the transmitted resolution to the display size (with headroom
+            // for high-DPI cells), which the terminal still downsamples crisply.
             Rect displayArea = computeNativeDisplayArea(data, imageArea);
+            ImageData transmit = capToDisplayResolution(data, displayArea);
             try {
-                protocol.render(data, displayArea, buffer, rawOutput);
+                protocol.render(transmit, displayArea, buffer, rawOutput);
             } catch (IOException e) {
                 throw new RuntimeIOException("Failed to render image using protocol " + protocol.name(), e);
             }
@@ -215,6 +226,26 @@ public final class Image implements Widget, RawOutputCapable {
                 return new Rect(area.x() + noneOffX, area.y() + noneOffY, noneW, noneH);
             }
         }
+    }
+
+    /**
+     * Caps the resolution of an image sent to a self-scaling protocol (Kitty, iTerm2) to roughly
+     * the on-screen display size, so a huge source is not transmitted in full on every change.
+     * <p>
+     * The target is the display footprint in cells multiplied by the protocol's per-cell pixel
+     * ratio and a supersampling factor that leaves headroom for high-DPI terminals, where real
+     * cells are larger than the nominal ratio. Images already at or below that size are returned
+     * unchanged (never upscaled), so small images keep their crispness.
+     */
+    private ImageData capToDisplayResolution(ImageData source, Rect displayArea) {
+        ImageProtocol.Resolution res = protocol.resolution();
+        int maxWidth = Math.max(1, displayArea.width() * res.widthMultiplier() * DISPLAY_SUPERSAMPLE);
+        int maxHeight = Math.max(1, displayArea.height() * res.heightMultiplier() * DISPLAY_SUPERSAMPLE);
+        if (source.width() <= maxWidth && source.height() <= maxHeight) {
+            return source;
+        }
+        int[] dims = source.scaledDimensionsToFit(maxWidth, maxHeight);
+        return source.resize(dims[0], dims[1]);
     }
 
     /**

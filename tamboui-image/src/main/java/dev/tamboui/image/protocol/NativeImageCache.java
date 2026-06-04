@@ -4,8 +4,14 @@
  */
 package dev.tamboui.image.protocol;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
@@ -120,40 +126,73 @@ final class NativeImageCache {
     }
 
     /**
-     * Returns whether the given image must be (re)transmitted to the terminal, recording it
-     * as the image now shown at {@code area}.
+     * Decides whether the given image must be (re)transmitted and, if so, returns the previously
+     * shown footprints that this emission must clear from the screen first.
      * <p>
-     * Returns {@code false} when the exact same image (by identity) is already shown at the
-     * same position, so an unchanged image is sent only once instead of on every frame.
-     * Returns {@code true} on the first render, on a content change, or on a position change.
-     * <p>
-     * Whenever {@code generation} differs from the previously observed value the entire
-     * shown-state is discarded, so every image is retransmitted after the screen has been
-     * cleared by {@code Terminal.clear()} or a resize.
+     * Returns {@code null} when the same image is already shown at the same footprint (skip).
+     * Otherwise records the new footprint and returns the list (possibly empty) of stale
+     * footprints whose pixels overlap the new one. Those must be wiped before drawing so that a
+     * shrinking footprint (e.g. FILL -> FIT) does not leave the larger previous image behind and
+     * repeated emissions at different positions do not stack up on screen.
      *
      * @param image      the image about to be rendered
-     * @param area       the display area in cells
+     * @param area       the display footprint in cells
      * @param generation the current screen generation (see {@code RawOutputContext})
-     * @return {@code true} if the image must be transmitted, {@code false} if it can be skipped
+     * @return the footprints to clear before emitting, or {@code null} to skip emission
      */
-    boolean needsEmit(ImageData image, Rect area, long generation) {
+    List<Rect> staleAreasToClear(ImageData image, Rect area, long generation) {
         synchronized (lock) {
             if (generation != lastGeneration) {
-                // Screen was cleared since we last drew: nothing we transmitted is on screen.
+                // Screen was already wiped (Terminal.clear()/resize()): nothing for us to clear,
+                // and nothing of ours is still on screen.
                 lastGeneration = generation;
                 shownByPosition.clear();
             }
             if (shownByPosition.get(area) == image) {
-                return false;
+                return null;
             }
-            // This emission paints `area`, visually overwriting any previously shown image whose
-            // footprint overlaps it. Drop those stale records: their pixels are no longer what we
-            // recorded, so returning to one of them later (e.g. the FIT -> FILL -> FIT scaling
-            // dance, where FILL's larger footprint covers FIT's) must be detected as a change and
-            // redrawn rather than wrongly skipped.
-            shownByPosition.entrySet().removeIf(entry -> !entry.getKey().intersection(area).isEmpty());
+            // Collect previously shown footprints that overlap this one (excluding the identical
+            // footprint, which this emission overwrites in place). They must be cleared so the old
+            // image does not remain visible around or behind the new one.
+            List<Rect> stale = new ArrayList<>();
+            Iterator<Map.Entry<Rect, ImageData>> it = shownByPosition.entrySet().iterator();
+            while (it.hasNext()) {
+                Rect shownArea = it.next().getKey();
+                if (!shownArea.equals(area) && !shownArea.intersection(area).isEmpty()) {
+                    stale.add(shownArea);
+                    it.remove();
+                }
+            }
             shownByPosition.put(area, image);
-            return true;
+            return stale;
+        }
+    }
+
+    /**
+     * Overwrites the given cell areas with spaces, removing any cell-based image (iTerm2, Sixel)
+     * previously drawn there. Kitty images live on a separate graphics layer and are removed by
+     * deleting their image id instead.
+     *
+     * @param areas the areas to clear
+     * @param out   the raw output stream
+     * @throws IOException if writing fails
+     */
+    static void clearAreas(List<Rect> areas, OutputStream out) throws IOException {
+        if (areas.isEmpty()) {
+            return;
+        }
+        int maxWidth = 0;
+        for (Rect area : areas) {
+            maxWidth = Math.max(maxWidth, area.width());
+        }
+        byte[] spaces = new byte[maxWidth];
+        Arrays.fill(spaces, (byte) ' ');
+        for (Rect area : areas) {
+            for (int y = area.y(); y < area.y() + area.height(); y++) {
+                String move = String.format("\033[%d;%dH", y + 1, area.x() + 1);
+                out.write(move.getBytes(StandardCharsets.US_ASCII));
+                out.write(spaces, 0, area.width());
+            }
         }
     }
 

@@ -122,22 +122,12 @@ public class ImageDemo {
 
             var terminal = new Terminal<>(backend);
 
-            // Event-driven loop: draw once, then redraw only when the input actually changed
-            // something or the terminal was resized. Redrawing on every poll wastes work
-            // (e.g. the character-based protocols re-sample the image into the buffer each
-            // frame) and makes the demo feel laggy without changing what is on screen.
-            terminal.draw(this::ui);
-            var lastSize = backend.size();
+            // Event loop
             while (running) {
-                var c = backend.read(100);
-                boolean changed = handleInput(c);
+                terminal.draw(this::ui);
 
-                var size = backend.size();
-                boolean resized = size.width() != lastSize.width() || size.height() != lastSize.height();
-                if (changed || resized) {
-                    terminal.draw(this::ui);
-                    lastSize = size;
-                }
+                var c = backend.read(100);
+                handleInput(c);
             }
         }
     }
@@ -149,17 +139,8 @@ public class ImageDemo {
         return capabilities.supports(currentProtocol.protocolType());
     }
 
-    /**
-     * Handles a single input event.
-     *
-     * @param c the character read, or a negative sentinel on timeout/EOF
-     * @return {@code true} if the change warrants a redraw
-     */
-    private boolean handleInput(int c) {
+    private void handleInput(int c) {
         var previousProtocol = currentProtocol;
-        var previousScaling = currentScaling;
-        var previousForce = forceProtocol;
-        var wasRunning = running;
 
         switch (c) {
             case 'q':
@@ -210,11 +191,6 @@ public class ImageDemo {
         if (previousProtocol != currentProtocol) {
             forceProtocol = false;
         }
-
-        return currentProtocol != previousProtocol
-            || currentScaling != previousScaling
-            || forceProtocol != previousForce
-            || running != wasRunning;
     }
 
     private void ui(Frame frame) {

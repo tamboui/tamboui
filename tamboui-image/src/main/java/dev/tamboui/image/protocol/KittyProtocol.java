@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
@@ -57,8 +58,16 @@ public final class KittyProtocol implements ImageProtocol {
         // Skip re-transmission when the same image is already shown at the same position.
         // The image persists on the terminal's graphics layer, so there is nothing to redraw.
         // A change in screen generation (clear/resize) forces a redraw.
-        if (!cache.needsEmit(image, area, NativeImageCache.generationOf(rawOutput))) {
+        List<Rect> stale = cache.staleAreasToClear(image, area, NativeImageCache.generationOf(rawOutput));
+        if (stale == null) {
             return;
+        }
+        // Delete any previously shown image whose footprint this one does not fully cover, so a
+        // shrinking image (e.g. FILL -> FIT) does not leave the larger one behind on the graphics
+        // layer. d=I frees the image data too.
+        for (Rect staleArea : stale) {
+            String delete = String.format("\033_Ga=d,d=I,i=%d\033\\", cache.imageId(staleArea));
+            rawOutput.write(delete.getBytes(StandardCharsets.US_ASCII));
         }
 
         // Move cursor to position

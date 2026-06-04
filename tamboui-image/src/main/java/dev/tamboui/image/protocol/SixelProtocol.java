@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dev.tamboui.buffer.Buffer;
@@ -78,9 +79,12 @@ public final class SixelProtocol implements ImageProtocol {
         // repainting Sixel pixels the terminal already shows. The image stays on screen
         // because the diff-based renderer leaves the image cells untouched between frames.
         // A change in screen generation (clear/resize) forces a redraw.
-        if (!cache.needsEmit(image, area, NativeImageCache.generationOf(rawOutput))) {
+        List<Rect> stale = cache.staleAreasToClear(image, area, NativeImageCache.generationOf(rawOutput));
+        if (stale == null) {
             return;
         }
+        // Wipe any previously shown image whose footprint this one does not fully cover.
+        NativeImageCache.clearAreas(stale, rawOutput);
 
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
