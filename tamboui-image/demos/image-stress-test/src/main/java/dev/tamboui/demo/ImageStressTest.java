@@ -12,15 +12,14 @@ package dev.tamboui.demo;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 import dev.tamboui.image.Image;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
-import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
+import dev.tamboui.image.protocol.ImageProtocol;
 import dev.tamboui.image.protocol.KittyProtocol;
 import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.layout.Constraint;
@@ -70,7 +69,7 @@ import dev.tamboui.widgets.paragraph.Paragraph;
  */
 public class ImageStressTest {
 
-    private enum Mode { SAME, CHANGING }
+    private enum Mode { SAME, CHANGING, HIDDEN }
 
     private boolean running = true;
     private Mode mode = Mode.SAME;
@@ -84,34 +83,17 @@ public class ImageStressTest {
     /**
      * Entry point.
      *
-     * @param args optional startup overrides (any order): {@code kitty}/{@code iterm2}/
-     *             {@code sixel}/{@code auto} to pick the protocol, {@code changing} to start in
-     *             changing-image mode, {@code fit}/{@code fill}/{@code stretch} for the scaling.
-     *             With no args the behaviour is unchanged (auto protocol, SAME mode, FIT).
+     * @param args CLI arguments (unused)
      * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        new ImageStressTest(args).run();
+        new ImageStressTest().run();
     }
 
-    private ImageStressTest(String[] args) {
+    private ImageStressTest() {
         // Generate a 1024×768 test image — large enough to be meaningful for the leak
         this.staticImage = generateGradientImage(1024, 768);
-        ImageProtocol selected = TerminalImageCapabilities.detect().bestProtocol();
-        for (String arg : args) {
-            switch (arg.toLowerCase(Locale.ROOT)) {
-                case "kitty": selected = new KittyProtocol(); break;
-                case "iterm2": case "iterm": selected = new ITermProtocol(); break;
-                case "sixel": selected = new SixelProtocol(); break;
-                case "auto": selected = TerminalImageCapabilities.detect().bestProtocol(); break;
-                case "changing": this.mode = Mode.CHANGING; break;
-                case "fit": this.scaling = ImageScaling.FIT; break;
-                case "fill": this.scaling = ImageScaling.FILL; break;
-                case "stretch": this.scaling = ImageScaling.STRETCH; break;
-                default: break;
-            }
-        }
-        this.protocol = selected;
+        this.protocol = TerminalImageCapabilities.detect().bestProtocol();
     }
 
     private void run() throws Exception {
@@ -140,7 +122,11 @@ public class ImageStressTest {
                 running = false;
                 break;
             case 'c': case 'C':
-                mode = (mode == Mode.SAME) ? Mode.CHANGING : Mode.SAME;
+                switch (mode) {
+                    case SAME: mode = Mode.CHANGING; break;
+                    case CHANGING: mode = Mode.HIDDEN; break;
+                    case HIDDEN: mode = Mode.SAME; break;
+                }
                 break;
             case 'f':
                 scaling = ImageScaling.FIT;
@@ -194,9 +180,9 @@ public class ImageStressTest {
         var lines = Text.from(
             Line.from(
                 Span.raw("  Mode: ").dim(),
-                mode == Mode.SAME
-                    ? Span.raw("SAME IMAGE (skip expected)").green().bold()
-                    : Span.raw("CHANGING IMAGE (re-transmit every frame)").red().bold()
+                mode == Mode.SAME ? Span.raw("SAME IMAGE (skip expected)").green().bold()
+                    : mode == Mode.CHANGING ? Span.raw("CHANGING IMAGE (re-transmit every frame)").red().bold()
+                    : Span.raw("HIDDEN (no image rendered)").yellow().bold()
             ),
             Line.from(
                 Span.raw("  Protocol: ").dim(),
@@ -236,6 +222,23 @@ public class ImageStressTest {
     }
 
     private void renderImage(Frame frame, Rect area) {
+        if (mode == Mode.HIDDEN) {
+            // Render just the block with a label — no image widget, so the terminal's
+            // raw-output cleanup should remove any previously shown image.
+            var placeholder = Paragraph.builder()
+                .text(Text.from(Line.empty(), Line.from(Span.raw("Image hidden — press c to cycle back").dim())))
+                .centered()
+                .block(Block.builder()
+                    .borders(Borders.ALL)
+                    .borderType(BorderType.ROUNDED)
+                    .borderStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+                    .title(Title.from(Line.from(Span.raw(" hidden ").dim())))
+                    .build())
+                .build();
+            frame.renderWidget(placeholder, area);
+            return;
+        }
+
         var imageData = (mode == Mode.CHANGING)
             ? generateRandomImage(256, 256)
             : staticImage;
@@ -260,7 +263,7 @@ public class ImageStressTest {
     private void renderHelp(Frame frame, Rect area) {
         var help = Paragraph.builder()
             .text(Text.from(Line.from(
-                Span.raw(" c").bold().yellow(), Span.raw(" toggle mode  ").dim(),
+                Span.raw(" c").bold().yellow(), Span.raw(" cycle mode  ").dim(),
                 Span.raw("1").bold().yellow(), Span.raw(" Kitty  ").dim(),
                 Span.raw("2").bold().yellow(), Span.raw(" iTerm2  ").dim(),
                 Span.raw("3").bold().yellow(), Span.raw(" Sixel  ").dim(),

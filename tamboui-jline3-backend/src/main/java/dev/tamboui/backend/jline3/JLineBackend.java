@@ -6,6 +6,7 @@ package dev.tamboui.backend.jline3;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
@@ -22,6 +23,15 @@ import dev.tamboui.terminal.Mode2027Support;
 
 /**
  * JLine 3 based backend for terminal operations.
+ * <p>
+ * Two construction modes are supported:
+ * <ul>
+ *   <li>{@link #JLineBackend()} — creates and owns a system terminal;
+ *       {@link #close()} will close it.</li>
+ *   <li>{@link #JLineBackend(Terminal)} — uses an externally provided terminal
+ *       (e.g., from a JLine shell); the caller retains ownership and {@link #close()}
+ *       will <em>not</em> close the terminal.</li>
+ * </ul>
  */
 public class JLineBackend extends AbstractBackend {
 
@@ -29,6 +39,7 @@ public class JLineBackend extends AbstractBackend {
     private static final String CSI = ESC + "[";
 
     private final Terminal terminal;
+    private final boolean ownTerminal;
     private final PrintWriter writer;
     private final NonBlockingReader reader;
     private Attributes savedAttributes;
@@ -38,14 +49,31 @@ public class JLineBackend extends AbstractBackend {
 
     /**
      * Creates a new JLine 3 backend using the system terminal.
+     * <p>
+     * The backend owns the terminal and will close it when {@link #close()} is called.
      *
      * @throws IOException if the terminal cannot be opened
      */
     public JLineBackend() throws IOException {
-        this.terminal = TerminalBuilder.builder()
-            .system(true)
-            .jansi(true)
-            .build();
+        this(TerminalBuilder.builder().system(true).jansi(true).build(), true);
+    }
+
+    /**
+     * Creates a new JLine 3 backend using an existing terminal.
+     * <p>
+     * The caller retains ownership of the terminal; it will not be closed
+     * when this backend is closed. This is useful when embedding TamboUI
+     * inside a host application that already owns the terminal (e.g., a JLine shell).
+     *
+     * @param terminal the JLine terminal to use
+     */
+    public JLineBackend(Terminal terminal) {
+        this(terminal, false);
+    }
+
+    private JLineBackend(Terminal terminal, boolean ownTerminal) {
+        this.terminal = Objects.requireNonNull(terminal, "terminal cannot be null");
+        this.ownTerminal = ownTerminal;
         this.writer = terminal.writer();
         this.reader = terminal.reader();
         this.inAlternateScreen = false;
@@ -276,6 +304,14 @@ public class JLineBackend extends AbstractBackend {
         return c;
     }
 
+    /**
+     * Closes this backend, resetting terminal state (mouse capture, alternate screen,
+     * cursor visibility, raw mode).
+     * <p>
+     * If this backend owns the terminal (created via {@link #JLineBackend()}), the
+     * terminal is closed. If an external terminal was provided via
+     * {@link #JLineBackend(Terminal)}, it is left open for the caller to manage.
+     */
     @Override
     public void close() throws IOException {
         // Reset state
@@ -293,7 +329,9 @@ public class JLineBackend extends AbstractBackend {
         disableRawMode();
 
         writer.flush();
-        terminal.close();
+        if (ownTerminal) {
+            terminal.close();
+        }
     }
 
     /**

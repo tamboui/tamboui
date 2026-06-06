@@ -218,6 +218,74 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("partially renders a fenced code block when viewport is shorter than the block")
+    void rendersPartialCodeBlock() {
+        // 3-line code block = 5 rows total (top border + 3 lines + bottom border).
+        // Give only 3 rows — Block renders: top border, 1 content line, bottom border.
+        MarkdownView view = MarkdownView.builder()
+            .source("```\nline1\nline2\nline3\n```")
+            .build();
+        Buffer buffer = renderInto(view, 20, 3);
+
+        // Top border visible
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("╭");
+        // First code line visible
+        assertThat(buffer.get(1, 1).symbol()).isEqualTo("l");
+        assertThat(buffer.get(5, 1).symbol()).isEqualTo("1");
+        // Bottom border (Block closes within available height)
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("╰");
+    }
+
+    @Test
+    @DisplayName("renders a code block preceded by text when only partial code block fits")
+    void rendersPartialCodeBlockAfterText() {
+        // Paragraph takes 1 row, spacer 1 row, code block needs 3 rows (border + 1 line + border).
+        // Give 4 rows total — paragraph(1) + spacer(1) + partial code block(2 of 3).
+        MarkdownView view = MarkdownView.builder()
+            .source("hello\n\n```\ncode\n```")
+            .build();
+        Buffer buffer = renderInto(view, 20, 4);
+
+        // First row: paragraph
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("h");
+        // Row 3 (index 2): top border of code block
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("╭");
+        // Row 4 (index 3): bottom border (only 2 rows for a 3-row code block)
+        assertThat(buffer.get(0, 3).symbol()).isEqualTo("╰");
+    }
+
+    @Test
+    @DisplayName("renders bottom of a code block when top is scrolled off-screen")
+    void rendersCodeBlockScrolledFromTop() {
+        // 1-line code block = 3 rows (top border + content + bottom border).
+        // Scroll by 1 so the top border is off-screen — should show content + bottom border.
+        MarkdownView view = MarkdownView.builder()
+            .source("```\ncode\n```")
+            .scroll(1)
+            .build();
+        Buffer buffer = renderInto(view, 20, 3);
+
+        // Row 0: code content (top border scrolled away)
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("c");
+        // Row 1: bottom border
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("╰");
+    }
+
+    @Test
+    @DisplayName("renders only bottom border when code block is mostly scrolled off")
+    void rendersCodeBlockBottomBorderOnly() {
+        // 1-line code block = 3 rows. Scroll by 2 — only bottom border remains visible.
+        MarkdownView view = MarkdownView.builder()
+            .source("```\ncode\n```")
+            .scroll(2)
+            .build();
+        Buffer buffer = renderInto(view, 20, 3);
+
+        // Row 0: bottom border only
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("╰");
+    }
+
+    @Test
     @DisplayName("computeHeight returns 0 for non-positive widths")
     void computeHeightZero() {
         MarkdownView view = MarkdownView.builder().source("# Title").build();

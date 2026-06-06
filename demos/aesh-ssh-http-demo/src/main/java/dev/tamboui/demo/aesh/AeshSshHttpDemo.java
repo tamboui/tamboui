@@ -1,7 +1,7 @@
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-aesh-backend:LATEST
-//DEPS org.aesh:terminal-ssh:3.1
-//DEPS org.aesh:terminal-http:3.1
+//DEPS org.aesh:terminal-ssh:3.12
+//DEPS org.aesh:terminal-http:3.12
 //DEPS org.apache.sshd:sshd-core:2.14.0
 //DEPS org.apache.sshd:sshd-netty:2.14.0
 //DEPS io.netty:netty-all:4.1.81.Final
@@ -98,8 +98,8 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
     private void startSshServer() {
         try {
             NettySshTtyBootstrap bootstrap = new NettySshTtyBootstrap();
-            bootstrap.setPort(SSH_PORT);
-            bootstrap.setHost("localhost");
+            bootstrap.port(SSH_PORT);
+            bootstrap.host("localhost");
             bootstrap.start(this).get(10, TimeUnit.SECONDS);
             System.out.println("SSH server started on port " + SSH_PORT);
         } catch (Exception e) {
