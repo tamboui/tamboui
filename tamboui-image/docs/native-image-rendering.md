@@ -112,3 +112,10 @@ always present, so auto-detect picks Kitty for Ghostty even without the terminfo
   input). Auto-detection picks a supported protocol, so this only happens on a manual override.
 - Switching *away* from Kitty to a non-Kitty protocol can leave the last Kitty image on the graphics
   layer until the next screen clear — a framework-level protocol-switch cleanup gap.
+- Cell-based protocols (iTerm2, Sixel) can show a hole where cell text was. If one frame draws text
+  inside the image's area (e.g. a "hidden" placeholder) and the next frame shows the image at the
+  same spot, the cell diff that clears the old text is written *after* the image was emitted during
+  the same draw, punching it out. Re-transmitting every frame used to mask this (the next frame
+  redrew over the hole); with skip suppression an unchanged frame is not re-sent, so it persists.
+  Kitty is unaffected — its graphics live on a separate layer that cell writes don't touch. A proper
+  fix is framework-level: defer raw output until after the cell diff so graphics composite on top.
