@@ -272,8 +272,8 @@ final class InteractionPlayer {
                 break;
 
             default:
-                // Check for Ctrl+key patterns
-                if (command.startsWith("ctrl+")) {
+                // Check for modifier+key patterns (Ctrl+x, Shift+x)
+                if (command.startsWith("ctrl+") || command.startsWith("shift+")) {
                     addRepeatedKey(command, repeatCount, repeatDelayMs, interactions);
                 }
                 break;
@@ -462,11 +462,13 @@ final class InteractionPlayer {
         // Check for modifier prefixes
         boolean ctrl = false;
         boolean shift = false;
+        String keyName = keySpec;
 
         while (lower.contains("+")) {
             int plusIdx = lower.indexOf('+');
             String prefix = lower.substring(0, plusIdx);
             lower = lower.substring(plusIdx + 1);
+            keyName = keyName.substring(keyName.indexOf('+') + 1);
 
             switch (prefix) {
                 case "ctrl":
@@ -554,9 +556,9 @@ final class InteractionPlayer {
                 pendingBytes.add((int) '~');
                 break;
             default:
-                // Single character - use original keySpec to preserve case
-                if (keySpec.length() == 1) {
-                    char c = keySpec.charAt(0);
+                // Single character - use keyName (with modifiers stripped) to preserve case
+                if (keyName.length() == 1) {
+                    char c = keyName.charAt(0);
                     if (ctrl && Character.isLetter(c)) {
                         // Ctrl+letter = letter - 'a' + 1
                         pendingBytes.add(Character.toLowerCase(c) - 'a' + 1);
