@@ -22,6 +22,22 @@ cd tamboui
 ./gradlew build
 ```
 
+### mise (optional, recommended)
+
+If you have [mise](https://mise.jdx.dev) installed, it will automatically set up the correct Java and JBang versions and give you shorthand tasks for common operations:
+
+```bash
+mise install        # install Java + JBang
+mise tasks          # list available tasks
+mise run build      # compile + format, no tests
+mise run test       # run all tests
+mise run check      # full build + tests + javadoc
+mise run format     # apply Spotless formatting
+mise run demo <name>  # run a demo
+```
+
+Run `mise tasks` for the full list.
+
 ## IDE's 
 
 Intellij, Visual Code Studio and Cursor is known to work with TamboUI project.
@@ -45,6 +61,16 @@ You need to set both `java.jdt.ls.java.home` and `gradle.java.home` for it to wo
 ```
 
 ## Build and test
+
+Using mise (if installed):
+
+- Build: `mise run build`
+- Test: `mise run test`
+- Full check: `mise run check`
+- Javadoc: `mise run javadoc`
+- Format: `mise run format`
+
+Or directly with Gradle:
 
 - Build: `./gradlew -q build`
 - Test: `./gradlew -q test`

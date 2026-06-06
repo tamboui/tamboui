@@ -1,0 +1,69 @@
+[tools]
+java = "latest"
+jbang = "latest"
+
+# ── Build ──────────────────────────────────────────────────────────────────────
+
+[tasks.build]
+description = "Build without tests or javadoc"
+run = "./gradlew -q spotlessApply assemble -x test -x javadoc"
+
+[tasks.test]
+description = "Run all tests"
+run = "./gradlew -q test"
+
+[tasks.check]
+description = "Full build: compile + test + javadoc"
+run = "./gradlew -q build javadoc"
+
+# ── Code Quality ───────────────────────────────────────────────────────────────
+
+[tasks.format]
+description = "Apply code formatting (Spotless)"
+run = "./gradlew -q spotlessApply"
+
+[tasks.format-check]
+description = "Check code formatting without applying"
+run = "./gradlew -q spotlessCheck"
+
+# ── Documentation ──────────────────────────────────────────────────────────────
+
+[tasks.javadoc]
+description = "Generate javadoc (checks for warnings)"
+run = "./gradlew -q javadoc"
+
+[tasks.docs]
+description = "Build Asciidoc documentation"
+run = "./gradlew -q :docs:asciidoctor"
+
+# ── Publishing ─────────────────────────────────────────────────────────────────
+
+[tasks.publish-local]
+description = "Publish to local Maven repository"
+run = "./gradlew -q publishToMavenLocal"
+
+[tasks.publish-build]
+description = "Publish to build/ directory for inspection"
+run = "./gradlew -q publishAllPublicationsToBuildRepository"
+
+# ── Demos ──────────────────────────────────────────────────────────────────────
+
+[tasks.demo]
+description = "Run a demo (pass demo name as argument)"
+run = "./run-demo.sh {{arg(name=\"demo\", required=true)}}"
+
+[tasks.demo-native]
+description = "Run a demo as native image"
+run = "./run-demo.sh {{arg(name=\"demo\", required=true)}} --native"
+
+# ── JBang ──────────────────────────────────────────────────────────────────────
+
+[tasks.update-jbang]
+description = "Update the JBang demo catalog"
+run = "./gradlew -q updateJBangCatalog"
+
+# ── Housekeeping ───────────────────────────────────────────────────────────────
+
+[tasks.clean]
+description = "Delete all build directories"
+run = "./gradlew -q clean"
