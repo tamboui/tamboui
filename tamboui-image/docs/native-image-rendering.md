@@ -106,6 +106,9 @@ always present, so auto-detect picks Kitty for Ghostty even without the terminfo
 ## Known limitations (out of scope here)
 
 - The first PNG encode of a given image is synchronous and one-time (cached afterwards).
-- Forcing a protocol a terminal does not support (e.g. the iTerm2 protocol in Ghostty) renders
-  nothing, and switching *away* from Kitty to a non-Kitty protocol can leave the last Kitty image on
-  the graphics layer until the next screen clear — a framework-level protocol-switch cleanup gap.
+- Forcing a protocol a terminal does not support renders poorly. Ghostty does not appear to handle
+  the iTerm2 inline-image protocol (it implements Kitty), and iTerm2 does not appear to fully
+  implement the Kitty graphics protocol (forcing Kitty there can render an artifact and disrupt
+  input). Auto-detection picks a supported protocol, so this only happens on a manual override.
+- Switching *away* from Kitty to a non-Kitty protocol can leave the last Kitty image on the graphics
+  layer until the next screen clear — a framework-level protocol-switch cleanup gap.
