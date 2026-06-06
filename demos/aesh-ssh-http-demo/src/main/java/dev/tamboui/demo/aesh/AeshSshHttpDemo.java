@@ -4,7 +4,7 @@
 //DEPS org.aesh:terminal-http:3.12
 //DEPS org.apache.sshd:sshd-core:2.14.0
 //DEPS org.apache.sshd:sshd-netty:2.14.0
-//DEPS io.netty:netty-all:4.1.81.Final
+//DEPS io.netty:netty-all:4.2.15.Final
 /*
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
