@@ -1,7 +1,7 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 //DEPS dev.tamboui:tamboui-toolkit:LATEST
 //DEPS dev.tamboui:tamboui-jline3-backend:LATEST
-//DEPS com.github.oshi:oshi-core:6.9.2
+//DEPS com.github.oshi:oshi-core:6.12.0
 //SOURCES SystemMetrics.java SystemMonitor.java
 
 /*

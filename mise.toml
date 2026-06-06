@@ -62,6 +62,10 @@ run = "./run-demo.sh {{arg(name=\"demo\", required=true)}} --native"
 description = "Update the JBang demo catalog"
 run = "./gradlew -q updateJBangCatalog"
 
+[tasks.verify-jbang]
+description = "Verify the JBang demo catalog"
+run = "./gradlew -q updateJBangCatalog --verify-builds"
+
 # ── Housekeeping ───────────────────────────────────────────────────────────────
 
 [tasks.clean]
