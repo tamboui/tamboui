@@ -7,7 +7,6 @@ package dev.tamboui.image.protocol;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
@@ -67,7 +66,7 @@ public final class KittyProtocol implements ImageProtocol {
         // layer. d=I frees the image data too.
         for (Rect staleArea : stale) {
             // q=2 suppresses the terminal's OK/error reply; without it the reply is read as input.
-            String delete = String.format("\033_Ga=d,d=I,i=%d,q=2\033\\", cache.imageId(staleArea));
+            String delete = String.format("\033_Ga=d,d=I,i=%d,q=2\033\\", NativeImageCache.imageId(staleArea));
             rawOutput.write(delete.getBytes(StandardCharsets.US_ASCII));
         }
 
@@ -79,30 +78,18 @@ public final class KittyProtocol implements ImageProtocol {
         // The image should already be scaled by Image.scaleImage() based on the scaling mode.
         // The base64 payload depends only on the pixels, so it is cached per image to avoid
         // re-encoding on every frame of the render loop.
-        String base64Data = cache.payload(image, () -> encodeBase64(image));
+        String base64Data = cache.payload(image, () -> NativeImageCache.encodeBase64(image));
 
         // Use a stable image id (and matching placement id) derived from the display
         // position. Reusing the id makes the terminal REPLACE the stored image instead of
         // accumulating a fresh copy on every frame, which would otherwise grow the terminal
         // process memory without bound across the render loop.
-        int imageId = cache.imageId(area);
+        int imageId = NativeImageCache.imageId(area);
 
         // Send image using chunked transmission
         sendChunked(rawOutput, base64Data, imageId, area.width(), area.height());
 
         rawOutput.flush();
-    }
-
-    /**
-     * Encodes the image as base64-encoded PNG, wrapping the checked IO exception so it
-     * can be used from a cache supplier.
-     */
-    private static String encodeBase64(ImageData image) {
-        try {
-            return Base64.getEncoder().encodeToString(image.toPng());
-        } catch (IOException e) {
-            throw new RuntimeIOException("Failed to encode image as PNG for Kitty protocol", e);
-        }
     }
 
     @Override

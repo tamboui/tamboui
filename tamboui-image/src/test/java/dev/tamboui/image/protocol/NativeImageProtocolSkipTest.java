@@ -157,6 +157,51 @@ class NativeImageProtocolSkipTest {
             .isGreaterThan(0);
     }
 
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("nativeProtocols")
+    void non_overlapping_move_and_return_retransmits(
+            String name, Supplier<ImageProtocol> factory) throws IOException {
+        ImageProtocol protocol = factory.get();
+        ImageData image = solidImage(0xFFFF0000);
+        GenerationOutput out = new GenerationOutput();
+
+        Rect far = new Rect(40, 20, 5, 3); // disjoint from AREA_1
+
+        render(protocol, image, AREA_1, out);
+        // Move to a non-overlapping position: the framework's cleanupRawOutput() wipes AREA_1.
+        render(protocol, image, far, out);
+        out.reset();
+
+        // Returning to AREA_1 must retransmit — it was vacated and wiped, not still on screen.
+        // Regression guard for stale shown-state suppressing a redraw after a non-overlapping move.
+        render(protocol, image, AREA_1, out);
+        assertThat(out.size())
+            .as("returning to a vacated non-overlapping position must retransmit")
+            .isGreaterThan(0);
+    }
+
+    @Test
+    void kitty_image_id_is_stable_across_protocol_instances() throws IOException {
+        // Switching protocols at runtime creates a fresh instance. It must reuse the image id for
+        // a given position so its transmission REPLACES the image already on screen, rather than
+        // leaving the old one orphaned on the graphics layer (which looked "stuck" until a resize).
+        ImageData image = solidImage(0xFFFF0000);
+
+        GenerationOutput first = new GenerationOutput();
+        render(new KittyProtocol(), image, AREA_1, first);
+        GenerationOutput second = new GenerationOutput();
+        render(new KittyProtocol(), image, AREA_1, second);
+
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("i=(\\d+)");
+        java.util.regex.Matcher m1 = p.matcher(first.text());
+        java.util.regex.Matcher m2 = p.matcher(second.text());
+        assertThat(m1.find()).isTrue();
+        assertThat(m2.find()).isTrue();
+        assertThat(m1.group(1))
+            .as("a fresh protocol instance must reuse the image id for the same area")
+            .isEqualTo(m2.group(1));
+    }
+
     @Test
     void kitty_delete_commands_set_quiet_mode() throws IOException {
         // Without q=2 the terminal replies (e.g. ESC_Gi=1;OK ESC\) to graphics commands, and the

@@ -7,7 +7,6 @@ package dev.tamboui.image.protocol;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
@@ -86,7 +85,7 @@ public final class ITermProtocol implements ImageProtocol {
 
         // Encode image as PNG then base64. The payload depends only on the pixels, so it is
         // cached per image to avoid re-encoding on every frame of the render loop.
-        String base64Data = cache.payload(image, () -> encodeBase64(image));
+        String base64Data = cache.payload(image, () -> NativeImageCache.encodeBase64(image));
 
         // Build the iTerm2 escape sequence
         StringBuilder cmd = new StringBuilder();
@@ -108,18 +107,6 @@ public final class ITermProtocol implements ImageProtocol {
 
         rawOutput.write(cmd.toString().getBytes(StandardCharsets.US_ASCII));
         rawOutput.flush();
-    }
-
-    /**
-     * Encodes the image as base64-encoded PNG, wrapping the checked IO exception so it
-     * can be used from a cache supplier.
-     */
-    private static String encodeBase64(ImageData image) {
-        try {
-            return Base64.getEncoder().encodeToString(image.toPng());
-        } catch (IOException e) {
-            throw new RuntimeIOException("Failed to encode image as PNG for iTerm2 protocol", e);
-        }
     }
 
     @Override

@@ -9,13 +9,13 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
 
+import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.widget.RawOutputContext;
@@ -39,24 +39,29 @@ import dev.tamboui.widget.RawOutputContext;
  * Ids are keyed by <em>display position</em> rather than by image content. Re-rendering
  * at the same spot — whether the same picture every frame or a new picture each time the
  * content changes (e.g. flipping PDF pages) — reuses the same id, so the terminal
- * <em>replaces</em> the stored image instead of piling up copies. This bounds terminal
- * memory to O(number of distinct image positions on screen) regardless of how many frames
- * are drawn or how many images are shown over time.
+ * <em>replaces</em> the stored image instead of piling up copies.
  *
  * <h2>Redraw suppression</h2>
  * Even with a stable id, re-sending the payload on every frame is itself a leak source for
  * the cell-based protocols: iTerm2 decodes and retains every inline image it receives, so a
  * render loop that re-transmits the same picture every frame grows the terminal process
- * without bound. {@link #needsEmit(ImageData, Rect)} returns {@code false} when the same
- * image is already shown at the same position, so an unchanged image is transmitted exactly
- * once. The picture stays on screen because the diff-based renderer leaves the image cells
- * untouched between frames, and the frame still records the area as occupied so it is not
- * treated as stale and cleared.
+ * without bound. {@link #staleAreasToClear(ImageData, Rect, long)} returns {@code null} when
+ * the same image is already shown at the same position, so an unchanged image is transmitted
+ * exactly once. The picture stays on screen because the diff-based renderer leaves the image
+ * cells untouched between frames, and the frame still records the area as occupied so it is
+ * not treated as stale and cleared.
  * <p>
- * Re-emission is triggered whenever the image content or the display position changes (e.g.
- * a new PDF page, or a resize that re-lays-out the area). The one case not auto-detected is
- * an explicit {@code Terminal.clear()} that wipes the screen without changing the image or
- * its position; callers that clear the screen manually should expect to redraw their images.
+ * A protocol instance renders a single image at a time, so only the <em>last</em> emitted
+ * {@code (area, image)} pair is tracked. Anything that differs from it — new content, a moved
+ * or resized footprint, or a return to a position that was vacated in between — is treated as
+ * a change and retransmitted; the previous footprint, if different, is reported for clearing.
+ * Tracking only the last pair (rather than a map of every position ever shown) avoids a stale
+ * entry wrongly suppressing a redraw after {@code Terminal.cleanupRawOutput()} has already
+ * wiped a vacated area from the screen.
+ * <p>
+ * The one case not auto-detected is an explicit {@code Terminal.clear()} that wipes the screen
+ * without changing the image or its position; the screen {@code generation} (see
+ * {@link RawOutputContext}) covers {@code clear()}/resize, after which everything is redrawn.
  *
  * <h2>Payload cache</h2>
  * Encoded payloads are keyed by the source {@link ImageData} and held weakly, so once an
@@ -68,47 +73,34 @@ final class NativeImageCache {
 
     private final Object lock = new Object();
 
-    /**
-     * Stable terminal image id per display position. Keyed by the full display
-     * {@link Rect} so distinct positions get distinct ids while a stable position
-     * keeps a stable id across frames.
-     */
-    private final Map<Rect, Integer> idsByPosition = new HashMap<>();
-
-    /**
-     * The image currently shown at each display position. Only the latest image per
-     * position is retained (a put replaces the previous one), so this holds at most one
-     * strong {@link ImageData} reference per on-screen image — superseded images (e.g. old
-     * PDF pages) become eligible for garbage collection.
-     */
-    private final Map<Rect, ImageData> shownByPosition = new HashMap<>();
-
     /** Encoded payload (base64 string / Sixel bytes) per source image, weakly held. */
     private final Map<ImageData, Object> payloads = new WeakHashMap<>();
 
-    private int nextId = 1;
+    /** Footprint of the image last emitted, or {@code null} if nothing is currently shown. */
+    private Rect lastArea;
 
-    /** The screen generation observed at the last {@link #needsEmit} call. */
+    /** Image last emitted at {@link #lastArea} (identity-compared), or {@code null}. */
+    private ImageData lastImage;
+
+    /** The screen generation observed at the last {@link #staleAreasToClear} call. */
     private long lastGeneration;
 
     /**
-     * Returns a stable, positive terminal image id for the given display area.
+     * Returns a stable, positive terminal image id for the given display area, derived
+     * deterministically from the area's geometry.
      * <p>
-     * The same area always yields the same id, so repeated renders replace the
-     * terminal-side image rather than accumulating new copies.
+     * Because the id depends only on the position (not on per-instance counter state), the same
+     * area always yields the same id — even across different protocol instances. A new instance
+     * (e.g. created when an app switches protocols at runtime) therefore reuses the id of the
+     * image already on screen and <em>replaces</em> it, rather than leaving the old image
+     * orphaned on the terminal's graphics layer.
      *
      * @param area the display area in cells
-     * @return a stable image id
+     * @return a stable, positive image id
      */
-    int imageId(Rect area) {
-        synchronized (lock) {
-            Integer id = idsByPosition.get(area);
-            if (id == null) {
-                id = nextId++;
-                idsByPosition.put(area, id);
-            }
-            return id;
-        }
+    static int imageId(Rect area) {
+        int id = area.hashCode() & 0x7FFFFFFF;
+        return id == 0 ? 1 : id;
     }
 
     /**
@@ -127,13 +119,12 @@ final class NativeImageCache {
 
     /**
      * Decides whether the given image must be (re)transmitted and, if so, returns the previously
-     * shown footprints that this emission must clear from the screen first.
+     * shown footprint that this emission must clear from the screen first.
      * <p>
      * Returns {@code null} when the same image is already shown at the same footprint (skip).
-     * Otherwise records the new footprint and returns the list (possibly empty) of stale
-     * footprints whose pixels overlap the new one. Those must be wiped before drawing so that a
-     * shrinking footprint (e.g. FILL -> FIT) does not leave the larger previous image behind and
-     * repeated emissions at different positions do not stack up on screen.
+     * Otherwise records the new footprint as the current one and returns the list (empty, or the
+     * single previous footprint when it moved) to wipe before drawing, so a moved or shrinking
+     * image does not leave the previous one behind on screen.
      *
      * @param image      the image about to be rendered
      * @param area       the display footprint in cells
@@ -146,24 +137,20 @@ final class NativeImageCache {
                 // Screen was already wiped (Terminal.clear()/resize()): nothing for us to clear,
                 // and nothing of ours is still on screen.
                 lastGeneration = generation;
-                shownByPosition.clear();
+                lastArea = null;
+                lastImage = null;
             }
-            if (shownByPosition.get(area) == image) {
+            if (area.equals(lastArea) && image == lastImage) {
                 return null;
             }
-            // Collect previously shown footprints that overlap this one (excluding the identical
-            // footprint, which this emission overwrites in place). They must be cleared so the old
-            // image does not remain visible around or behind the new one.
             List<Rect> stale = new ArrayList<>();
-            Iterator<Map.Entry<Rect, ImageData>> it = shownByPosition.entrySet().iterator();
-            while (it.hasNext()) {
-                Rect shownArea = it.next().getKey();
-                if (!shownArea.equals(area) && !shownArea.intersection(area).isEmpty()) {
-                    stale.add(shownArea);
-                    it.remove();
-                }
+            if (lastArea != null && !lastArea.equals(area)) {
+                // The previously shown image moved or resized; clear its old footprint so it does
+                // not remain visible around or behind the new one.
+                stale.add(lastArea);
             }
-            shownByPosition.put(area, image);
+            lastArea = area;
+            lastImage = image;
             return stale;
         }
     }
@@ -193,6 +180,21 @@ final class NativeImageCache {
                 out.write(move.getBytes(StandardCharsets.US_ASCII));
                 out.write(spaces, 0, area.width());
             }
+        }
+    }
+
+    /**
+     * Encodes an image as a base64-encoded PNG, wrapping the checked IO exception so it can be
+     * used from a cache supplier. Shared by the Kitty and iTerm2 protocols.
+     *
+     * @param image the image to encode
+     * @return the base64-encoded PNG
+     */
+    static String encodeBase64(ImageData image) {
+        try {
+            return Base64.getEncoder().encodeToString(image.toPng());
+        } catch (IOException e) {
+            throw new RuntimeIOException("Failed to encode image as PNG", e);
         }
     }
 
