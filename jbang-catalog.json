@@ -166,6 +166,9 @@
     "list-demo": {
       "script-ref": "tamboui-widgets/demos/list-demo/src/main/java/dev/tamboui/demo/ListDemo.java"
     },
+    "mirrored-sparkline-demo": {
+      "script-ref": "tamboui-widgets/demos/mirrored-sparkline-demo/src/main/java/dev/tamboui/demo/MirroredSparklineDemo.java"
+    },
     "paragraph-demo": {
       "script-ref": "tamboui-widgets/demos/paragraph-demo/src/main/java/dev/tamboui/demo/ParagraphDemo.java"
     },
