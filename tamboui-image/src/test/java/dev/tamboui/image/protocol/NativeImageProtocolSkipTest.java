@@ -227,6 +227,26 @@ class NativeImageProtocolSkipTest {
     }
 
     @Test
+    void sixel_clears_slot_on_content_change_at_same_area() throws IOException {
+        // A Sixel image only fills a sub-region of its cell slot (FIT letterboxes; FILL/STRETCH
+        // differ), and the slot is unchanged when only the content/scaling changes. The slot must
+        // be wiped before drawing, or a smaller new image leaves the previous, larger one around
+        // it (stacking). Sixel data never contains 0x20, so a run of spaces proves the slot clear.
+        SixelProtocol protocol = new SixelProtocol();
+        ImageData first = solidImage(0xFFFF0000);
+        ImageData second = solidImage(0xFF00FF00);
+        GenerationOutput out = new GenerationOutput();
+
+        render(protocol, first, AREA_1, out);
+        out.reset();
+        render(protocol, second, AREA_1, out);
+
+        assertThat(out.text())
+            .as("Sixel must wipe the slot before drawing a changed image at the same position")
+            .contains("   ");
+    }
+
+    @Test
     void plain_stream_without_context_still_skips_frame_to_frame() throws IOException {
         // A stream that does not expose a generation (e.g. a test or third-party stream) must
         // still benefit from frame-to-frame skipping; it simply cannot signal a screen clear.

@@ -52,6 +52,12 @@ When the footprint changes, `staleAreasToClear()` returns the old footprint. Cel
 *Why:* otherwise a shrinking image (FILL → FIT) or a moved image leaves the previous, larger copy
 visible around/behind the new one — the "stacked images" artifact.
 
+Sixel is a special case: it receives the whole cell slot (not the exact display footprint like
+Kitty/iTerm2), and the pre-scaled image only fills a sub-region of it (FIT letterboxes; FILL/STRETCH
+differ), while the slot does not change when only the scaling changes. So Sixel additionally clears
+its whole slot before drawing — otherwise a smaller image leaves the previous, larger one around it
+even at the same position.
+
 ### 5. Cap the transmitted resolution for self-scaling protocols
 For Kitty/iTerm2, `Image` does not send the full-resolution source; it caps it to the on-screen
 display size × a supersampling factor (headroom for high-DPI cells), never upscaling.
@@ -119,3 +125,9 @@ always present, so auto-detect picks Kitty for Ghostty even without the terminfo
   redrew over the hole); with skip suppression an unchanged frame is not re-sent, so it persists.
   Kitty is unaffected — its graphics live on a separate layer that cell writes don't touch. A proper
   fix is framework-level: defer raw output until after the cell diff so graphics composite on top.
+- Sixel cannot update smoothly when the image changes every frame. Unlike Kitty (replace by id) and
+  iTerm2 (replace the inline image in place), Sixel has no in-place replacement, so each new image
+  means clear-slot → re-encode → re-send → terminal re-decode. That flickers under rapid change.
+  This is inherent to Sixel; ordinary use (occasional changes, e.g. flipping a page) is unaffected.
+  Terminal-side Sixel behaviour also varies — WezTerm, for instance, grows memory on repeated Sixel
+  images where iTerm2 stays flat.

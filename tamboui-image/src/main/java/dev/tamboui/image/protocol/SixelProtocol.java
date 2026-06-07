@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,15 @@ public final class SixelProtocol implements ImageProtocol {
         if (stale == null) {
             return;
         }
-        // Wipe any previously shown image whose footprint this one does not fully cover.
-        NativeImageCache.clearAreas(stale, rawOutput);
+        // Clear the slot before drawing. Unlike Kitty/iTerm2 (which receive the exact display
+        // footprint), Sixel receives the whole cell slot but the pre-scaled image only fills a
+        // sub-region of it (FIT letterboxes; FILL/STRETCH differ), and the slot does not change
+        // when only the scaling changes. Without clearing the slot, a smaller new image leaves the
+        // previous, larger one visible around it (stacking). Also clear any old slots a moved
+        // image left behind (stale).
+        List<Rect> toClear = new ArrayList<>(stale);
+        toClear.add(area);
+        NativeImageCache.clearAreas(toClear, rawOutput);
 
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
