@@ -4,6 +4,8 @@
  */
 package dev.tamboui.style;
 
+import dev.tamboui.color.ColorManipulation;
+
 /**
  * Terminal colors supporting ANSI 16, 256-color indexed, and RGB true color modes.
  */
@@ -500,6 +502,66 @@ public interface Color {
      */
     default Rgb toRgb() {
         return new Rgb(255, 255, 255);
+    }
+
+    /**
+     * Lightens this color by increasing its lightness in HSL space.
+     *
+     * @param amount amount to increase lightness (0.0 to 1.0)
+     * @return lightened color
+     */
+    default Color lighten(float amount) {
+        return ColorManipulation.lighten(this, amount);
+    }
+
+    /**
+     * Darkens this color by decreasing its lightness in HSL space.
+     *
+     * @param amount amount to decrease lightness (0.0 to 1.0)
+     * @return darkened color
+     */
+    default Color darken(float amount) {
+        return ColorManipulation.darken(this, amount);
+    }
+
+    /**
+     * Blends this color with another using linear RGB interpolation.
+     *
+     * @param other the color to blend with
+     * @param ratio blend ratio (0.0 = all this, 1.0 = all other)
+     * @return blended color
+     */
+    default Color blend(Color other, float ratio) {
+        return ColorManipulation.blend(this, other, ratio);
+    }
+
+    /**
+     * Returns a contrasting text color (black or white) for this background.
+     *
+     * @return white for dark backgrounds, black for light backgrounds
+     */
+    default Color getContrastText() {
+        return ColorManipulation.getContrastText(this);
+    }
+
+    /**
+     * Inverts this color by flipping RGB components.
+     *
+     * @return inverted color
+     */
+    default Color inverse() {
+        return ColorManipulation.inverse(this);
+    }
+
+    /**
+     * Applies alpha/transparency to this color.
+     * Note: Reserved for future RGBA support, currently returns unchanged.
+     *
+     * @param alpha alpha value (0.0 to 1.0)
+     * @return the color (unchanged until RGBA support added)
+     */
+    default Color withAlpha(float alpha) {
+        return ColorManipulation.withAlpha(this, alpha);
     }
 
     /**
