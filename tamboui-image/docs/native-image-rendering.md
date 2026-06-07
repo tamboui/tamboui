@@ -129,5 +129,4 @@ always present, so auto-detect picks Kitty for Ghostty even without the terminfo
   iTerm2 (replace the inline image in place), Sixel has no in-place replacement, so each new image
   means clear-slot → re-encode → re-send → terminal re-decode. That flickers under rapid change.
   This is inherent to Sixel; ordinary use (occasional changes, e.g. flipping a page) is unaffected.
-  Terminal-side Sixel behaviour also varies — WezTerm, for instance, grows memory on repeated Sixel
-  images where iTerm2 stays flat.
+  Terminal-side Sixel handling also varies between emulators.
