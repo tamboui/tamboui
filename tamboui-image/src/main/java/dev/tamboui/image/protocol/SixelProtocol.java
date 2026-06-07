@@ -94,8 +94,18 @@ public final class SixelProtocol implements ImageProtocol {
         toClear.add(area);
         NativeImageCache.clearAreas(toClear, rawOutput);
 
-        // Move cursor to position
-        String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
+        // Center the image within the slot, like Kitty/iTerm2 do via their display area. The
+        // pre-scaled image usually covers only part of the slot (FIT letterboxes); drawing it at
+        // the slot corner would put it top-left instead of centered. Centering is cell-granular
+        // (the cursor addresses whole cells), matching the cell-level centering of the others.
+        Resolution res = resolution();
+        int imageCellsW = (image.width() + res.widthMultiplier() - 1) / res.widthMultiplier();
+        int imageCellsH = (image.height() + res.heightMultiplier() - 1) / res.heightMultiplier();
+        int offsetX = Math.max(0, (area.width() - imageCellsW) / 2);
+        int offsetY = Math.max(0, (area.height() - imageCellsH) / 2);
+
+        // Move cursor to the centered position
+        String cursorMove = String.format("\033[%d;%dH", area.y() + offsetY + 1, area.x() + offsetX + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
         // Generate and write Sixel data.

@@ -227,6 +227,21 @@ class NativeImageProtocolSkipTest {
     }
 
     @Test
+    void sixel_centers_image_in_slot() throws IOException {
+        // A 10x10 image is 2x1 cells (res 8x16). Centered in the 5x3 AREA_1 that is offset (1,1),
+        // so the draw cursor must move to row 2, col 2 — not the slot corner (1,1).
+        SixelProtocol protocol = new SixelProtocol();
+        ImageData image = solidImage(0xFFFF0000);
+        GenerationOutput out = new GenerationOutput();
+
+        render(protocol, image, AREA_1, out);
+
+        assertThat(out.text())
+            .as("Sixel image should be centered in its slot like Kitty/iTerm2")
+            .contains("\033[2;2H");
+    }
+
+    @Test
     void sixel_clears_slot_on_content_change_at_same_area() throws IOException {
         // A Sixel image only fills a sub-region of its cell slot (FIT letterboxes; FILL/STRETCH
         // differ), and the slot is unchanged when only the content/scaling changes. The slot must
