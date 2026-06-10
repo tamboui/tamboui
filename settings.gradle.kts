@@ -27,7 +27,7 @@ val modules = listOf(
 include(*modules.toTypedArray())
 
 fun includeDemosFrom(demosDir: File, projectPathPrefix: String) {
-    demosDir.listFiles()?.filter { it.isDirectory }?.forEach { demo ->
+    demosDir.listFiles()?.filter { it.isDirectory && !it.name.startsWith(".settings") }?.forEach { demo ->
         val projectPath = "$projectPathPrefix${demo.name}"
         include(projectPath)
         project(":$projectPath").projectDir = demo
