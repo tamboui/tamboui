@@ -301,6 +301,18 @@ public final class EventParser {
             case 'F':
                 code = KeyCode.END;
                 break;
+            case 'P':
+                code = KeyCode.F1;
+                break;
+            case 'Q':
+                code = KeyCode.F2;
+                break;
+            case 'R':
+                code = KeyCode.F3;
+                break;
+            case 'S':
+                code = KeyCode.F4;
+                break;
             default:
                 code = KeyCode.UNKNOWN;
                 break;
