@@ -17,6 +17,10 @@ dependencies {
     implementation(libs.spotless.gradle.plugin)
     implementation(libs.test.logger.gradle.plugin)
 
+    // junit-jupiter / junit-platform-launcher are declared without a version in
+    // the catalog; their versions come from the junit BOM. Without this platform
+    // the version is empty ("Could not find org.junit.jupiter:junit-jupiter:").
+    testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
