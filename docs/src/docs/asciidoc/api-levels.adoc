@@ -377,6 +377,13 @@ Panels support border styling:
 include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=panel-border-styling]
 ----
 
+Titles can be aligned within the border. An explicit alignment overrides the CSS `text-align` property; when neither is set the title is left-aligned:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=panel-title-alignment]
+----
+
 === Sizing
 
 Control how elements fill space:

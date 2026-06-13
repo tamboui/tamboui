@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Margin;
 import dev.tamboui.layout.Padding;
@@ -69,6 +70,65 @@ class PanelTest extends AbstractElementTest {
         panel("Test").render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    // ============ title alignment tests ============
+
+    @Test
+    @DisplayName("Title is left-aligned by default")
+    void titleAlignment_defaultsToLeft() {
+        Buffer buffer = renderPanel(panel("Hi"), new Rect(0, 0, 20, 3));
+        // startX = left border + 1 = 1
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("titleCenter() centers the title in the top border")
+    void titleCenter_centersTitle() {
+        Buffer buffer = renderPanel(panel("Hi").titleCenter(), new Rect(0, 0, 20, 3));
+        // availableWidth = 20 - 2 = 18, startX = 1, x = 1 + (18 - 2) / 2 = 9
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(10, 0).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("titleRight() right-aligns the title in the top border")
+    void titleRight_rightAlignsTitle() {
+        Buffer buffer = renderPanel(panel("Hi").titleRight(), new Rect(0, 0, 20, 3));
+        // x = startX + availableWidth - titleWidth = 1 + 18 - 2 = 17
+        assertThat(buffer.get(17, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(18, 0).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("bottomTitleAlignment() aligns the bottom title")
+    void bottomTitleAlignment_centersBottomTitle() {
+        Buffer buffer = renderPanel(
+            panel().bottomTitle("Hi").bottomTitleAlignment(Alignment.CENTER),
+            new Rect(0, 0, 20, 3));
+        // bottom border row = height - 1 = 2; centered x = 9
+        assertThat(buffer.get(9, 2).symbol()).isEqualTo("H");
+        assertThat(buffer.get(10, 2).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("CSS text-align centers the title")
+    void titleAlignment_fromCssTextAlign() {
+        Buffer buffer = renderPanelStyled(panel("Hi"), new Rect(0, 0, 20, 3),
+            "Panel { text-align: center; }");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(10, 0).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("Explicit title alignment overrides CSS text-align")
+    void titleAlignment_explicitOverridesCss() {
+        Buffer buffer = renderPanelStyled(panel("Hi").titleRight(), new Rect(0, 0, 20, 3),
+            "Panel { text-align: center; }");
+        // explicit right wins over CSS center
+        assertThat(buffer.get(17, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(18, 0).symbol()).isEqualTo("i");
     }
 
     // ============ preferredWidth tests ============
@@ -187,5 +247,26 @@ class PanelTest extends AbstractElementTest {
 
         assertThat(vertical.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(3); // max(1,1) + 2 borders
         assertThat(horizontal.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(4); // 1+1 + 2 borders
+    }
+
+    private static Buffer renderPanel(Panel panel, Rect area) {
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        panel.render(frame, area, DefaultRenderContext.createEmpty());
+        return buffer;
+    }
+
+    private static Buffer renderPanelStyled(Panel panel, Rect area, String css) {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", css);
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        panel.render(frame, area, context);
+        return buffer;
     }
 }

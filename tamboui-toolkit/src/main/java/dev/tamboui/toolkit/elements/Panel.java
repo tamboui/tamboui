@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.cascade.CssStyleResolver;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Direction;
 import dev.tamboui.layout.Flex;
@@ -49,6 +50,7 @@ import dev.tamboui.widgets.block.Title;
  *   <li>{@code flex} - Flex positioning mode: "start", "center", "end", "space-between", "space-around", "space-evenly"</li>
  *   <li>{@code margin} - Margin around the panel: single value or CSS-style shorthand</li>
  *   <li>{@code spacing} - Gap between children in cells</li>
+ *   <li>{@code text-align} - Title alignment: "left", "center", or "right"</li>
  * </ul>
  * <p>
  * Programmatic values override CSS values when both are set.
@@ -58,6 +60,8 @@ public final class Panel extends ContainerElement<Panel> {
     private Line title;
     private Line bottomTitle;
     private Overflow titleOverflow = Overflow.CLIP;
+    private Alignment titleAlignment;
+    private Alignment bottomTitleAlignment;
     private BorderType borderType;
     private Color borderColor;
     private Color focusedBorderColor;
@@ -174,6 +178,64 @@ public final class Panel extends ContainerElement<Panel> {
      */
     public Panel titleEllipsisStart() {
         this.titleOverflow = Overflow.ELLIPSIS_START;
+        return this;
+    }
+
+    /**
+     * Sets the title alignment within the top border.
+     * <p>
+     * Overrides the CSS {@code text-align} property. When neither is set, the
+     * title is left-aligned.
+     *
+     * @param alignment the title alignment
+     * @return this panel for chaining
+     */
+    public Panel titleAlignment(Alignment alignment) {
+        this.titleAlignment = alignment;
+        return this;
+    }
+
+    /**
+     * Left-aligns the title (the default).
+     *
+     * @return this panel for chaining
+     */
+    public Panel titleLeft() {
+        this.titleAlignment = Alignment.LEFT;
+        return this;
+    }
+
+    /**
+     * Center-aligns the title within the top border.
+     *
+     * @return this panel for chaining
+     */
+    public Panel titleCenter() {
+        this.titleAlignment = Alignment.CENTER;
+        return this;
+    }
+
+    /**
+     * Right-aligns the title within the top border.
+     *
+     * @return this panel for chaining
+     */
+    public Panel titleRight() {
+        this.titleAlignment = Alignment.RIGHT;
+        return this;
+    }
+
+    /**
+     * Sets the bottom title alignment within the bottom border.
+     * <p>
+     * Overrides the CSS {@code text-align} property. When neither is set, the
+     * bottom title is left-aligned.
+     *
+     * @param alignment the bottom title alignment
+     * @return this panel for chaining
+     */
+    public Panel bottomTitleAlignment(Alignment alignment) {
+        this.bottomTitleAlignment = alignment;
         return this;
     }
 
@@ -566,11 +628,14 @@ public final class Panel extends ContainerElement<Panel> {
         }
 
         if (title != null) {
-            blockBuilder.title(Title.from(title).overflow(titleOverflow));
+            blockBuilder.title(Title.from(title)
+                    .alignment(resolveTitleAlignment(titleAlignment, cssResolver))
+                    .overflow(titleOverflow));
         }
 
         if (bottomTitle != null) {
-            blockBuilder.titleBottom(Title.from(bottomTitle));
+            blockBuilder.titleBottom(Title.from(bottomTitle)
+                    .alignment(resolveTitleAlignment(bottomTitleAlignment, cssResolver)));
         }
 
         Block block = blockBuilder.build();
@@ -646,6 +711,25 @@ public final class Panel extends ContainerElement<Panel> {
             Rect childArea = areas.get(i);
             context.renderChild(child, frame, childArea);
         }
+    }
+
+    /**
+     * Resolves the effective title alignment using the priority: explicit
+     * value set on this panel, then the CSS {@code text-align} property, then
+     * {@link Alignment#LEFT}.
+     *
+     * @param explicit the explicitly set alignment, or {@code null}
+     * @param cssResolver the CSS resolver for this element, or {@code null}
+     * @return the effective alignment, never {@code null}
+     */
+    private Alignment resolveTitleAlignment(Alignment explicit, CssStyleResolver cssResolver) {
+        if (explicit != null) {
+            return explicit;
+        }
+        if (cssResolver != null) {
+            return cssResolver.alignment().orElse(Alignment.LEFT);
+        }
+        return Alignment.LEFT;
     }
 
     /**

@@ -6,6 +6,7 @@ import dev.tamboui.backend.jline3.JLineBackend;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.inline.InlineDisplay;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Flex;
 import dev.tamboui.layout.Layout;
@@ -541,6 +542,17 @@ public class ApiLevelsSnippets {
             .borderColor(Color.CYAN)
             .focusedBorderColor(Color.YELLOW);
         // end::panel-border-styling[]
+    }
+
+    void panelTitleAlignment() {
+        // tag::panel-title-alignment[]
+        panel("Centered", text("content"))
+            .titleCenter();          // also titleLeft(), titleRight(), titleAlignment(...)
+
+        panel("Status", text("content"))
+            .bottomTitle("v1.0")
+            .bottomTitleAlignment(Alignment.RIGHT);
+        // end::panel-title-alignment[]
     }
 
     void sizingOptions() {
