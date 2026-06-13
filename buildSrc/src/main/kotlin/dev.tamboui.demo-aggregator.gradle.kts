@@ -7,6 +7,19 @@ plugins {
     id("dev.tamboui.publishing")
 }
 
+// During an IntelliJ Gradle sync, java-library modules (e.g. tamboui-core) are
+// bumped to `options.release = 11` (see dev.tamboui.java-library) so the IDE can
+// resolve their module-info. That raises their org.gradle.jvm.version variant
+// attribute to 11, which then fails to resolve against this aggregator's Java 8
+// baseline ("looking for a library compatible with JVM runtime version 8, but
+// project :tamboui-core is only compatible with ... 11 or newer"). Mirror the
+// sync-only bump here so the dependency resolves. CLI/CI builds are unaffected.
+if (providers.systemProperty("idea.sync.active").isPresent) {
+    tasks.withType<JavaCompile>().configureEach {
+        options.release = 11
+    }
+}
+
 val aggregatedDemos by configurations.creating {
     isCanBeResolved = false
     isCanBeConsumed = false
