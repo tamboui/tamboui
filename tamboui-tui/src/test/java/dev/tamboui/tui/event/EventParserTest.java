@@ -103,6 +103,71 @@ class EventParserTest {
         assertThat(keyEvent.hasShift()).isTrue();
     }
 
+    @Test
+    @DisplayName("SS3 F4 (ESC O S) is parsed as F4")
+    void ss3F4ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 'O', 'S');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F4);
+        assertThat(keyEvent.hasShift()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Shift+F1 (ESC[1;2P) is parsed as F1 with Shift")
+    void shiftF1ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', ';', '2', 'P');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F1);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Shift+F4 (ESC[1;2S) is parsed as F4 with Shift")
+    void shiftF4ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', ';', '2', 'S');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F4);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Ctrl+F2 (ESC[1;5Q) is parsed as F2 with Ctrl")
+    void ctrlF2ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', ';', '5', 'Q');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F2);
+        assertThat(keyEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Alt+F3 (ESC[1;3R) is parsed as F3 with Alt")
+    void altF3ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', ';', '3', 'R');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F3);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
     private static final class QueueBackend extends TestBackend {
 
         private final int[] input;
