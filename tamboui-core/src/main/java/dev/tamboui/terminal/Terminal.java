@@ -4,6 +4,7 @@
  */
 package dev.tamboui.terminal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -91,6 +92,13 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
         private final Backend backend;
         private long generation;
 
+        // While buffering, widget writes are collected here instead of sent immediately, so the
+        // frame's raw output (native images) can be flushed AFTER the cell diff. Cell-based image
+        // protocols (iTerm2, Sixel) otherwise get holes punched by the diff that clears the
+        // previous frame's text from the image's cells during the same draw.
+        private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        private boolean buffering;
+
         RawOutput(Backend backend) {
             this.backend = backend;
         }
@@ -105,14 +113,38 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
             return generation;
         }
 
+        /** Begins collecting writes instead of sending them. */
+        void startBuffering() {
+            buffering = true;
+        }
+
+        /** Stops collecting; subsequent writes are sent directly again. */
+        void stopBuffering() {
+            buffering = false;
+        }
+
+        /** Sends any collected bytes to the backend (called after the cell diff). */
+        void drainBuffer() throws IOException {
+            if (buffer.size() > 0) {
+                backend.writeRaw(buffer.toByteArray());
+                buffer.reset();
+            }
+        }
+
         @Override
         public void write(int b) throws IOException {
-            backend.writeRaw(new byte[]{(byte) b});
+            if (buffering) {
+                buffer.write(b);
+            } else {
+                backend.writeRaw(new byte[]{(byte) b});
+            }
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            if (off == 0 && len == b.length) {
+            if (buffering) {
+                buffer.write(b, off, len);
+            } else if (off == 0 && len == b.length) {
                 backend.writeRaw(b);
             } else {
                 byte[] slice = new byte[len];
@@ -123,7 +155,11 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
         @Override
         public void flush() throws IOException {
-            backend.flush();
+            // While buffering, a widget's flush() must not push its raw output to the terminal yet;
+            // the buffer is drained and flushed by the terminal after the cell diff.
+            if (!buffering) {
+                backend.flush();
+            }
         }
     }
 
@@ -177,10 +213,22 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                 // Clear current buffer for new frame
                 currentBuffer.clear();
 
-                // Create frame and render
+                // Create frame and render. Buffer the raw output (native images) widgets emit, so it
+                // is flushed AFTER the cell diff below. Otherwise the diff that clears the previous
+                // frame's text from a cell-based image's cells (iTerm2, Sixel) would punch a hole in
+                // the image emitted during this same draw. Kitty is unaffected (separate graphics
+                // layer), but deferring is harmless for it.
                 Frame frame = new Frame(currentBuffer, rawOutput);
-                renderer.accept(frame);
+                rawOutput.startBuffering();
+                try {
+                    renderer.accept(frame);
+                } finally {
+                    rawOutput.stopBuffering();
+                }
 
+                // Clear stale raw-output areas directly, before the diff: these wipe vacated image
+                // regions (spaces / Kitty delete-all) and must not overwrite the new cell content
+                // the diff is about to draw there.
                 cleanupRawOutput(frame.rawOutputAreas());
 
                 // Calculate diff and draw (zero-allocation DoD variant)
@@ -189,6 +237,9 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                     backend.draw(diffResult);
                 }
                 diffResult.clear();  // Clear after use to release Cell refs for GC
+
+                // Flush the buffered raw output (native images) on top of the freshly drawn cells.
+                rawOutput.drainBuffer();
 
                 // Handle cursor
                 if (frame.isCursorVisible()) {
