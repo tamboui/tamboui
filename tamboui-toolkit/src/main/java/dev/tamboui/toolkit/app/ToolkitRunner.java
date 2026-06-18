@@ -25,7 +25,6 @@ import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.bindings.ActionHandler;
-import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
@@ -458,7 +457,6 @@ public final class ToolkitRunner implements AutoCloseable {
      */
     public static final class Builder {
         private TuiConfig config = TuiConfig.defaults();
-        private Bindings bindings = BindingSets.defaults();
         private StyleEngine styleEngine;
         private Object app;
         private boolean autoBindingRegistration;
@@ -485,10 +483,6 @@ public final class ToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the TUI configuration.
-         * <p>
-         * Use this to configure terminal settings (raw mode, alternate screen,
-         * tick rate, mouse capture, etc.). Key bindings set via
-         * {@link #bindings(Bindings)} take precedence over bindings in the config.
          *
          * @param config the configuration
          * @return this builder
@@ -500,15 +494,12 @@ public final class ToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the bindings to use for action matching.
-         * <p>
-         * These bindings take precedence over any bindings in the
-         * {@link TuiConfig} set via {@link #config(TuiConfig)}.
          *
          * @param bindings the bindings
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
-            this.bindings = bindings;
+            this.config = config.toBuilder().bindings(bindings).build();
             return this;
         }
 
@@ -631,14 +622,8 @@ public final class ToolkitRunner implements AutoCloseable {
          * @throws Exception if terminal initialization fails
          */
         public ToolkitRunner build() throws Exception {
-            // Ensure bindings are propagated to TuiConfig so the TerminalInputReader
-            // stamps KeyEvents with the correct bindings. Without this, custom
-            // bindings (e.g., unbinding focusNext from Tab) would only affect the
-            // render context but not the input reader, causing the EventRouter to
-            // intercept keys that the user intended to handle in their elements.
-            TuiConfig effectiveConfig = config.withBindings(bindings);
-            TuiRunner tuiRunner = TuiRunner.create(effectiveConfig);
-            ToolkitRunner runner = new ToolkitRunner(tuiRunner, bindings, faultTolerant, errorOutput, toolkitPostRenderProcessors);
+            TuiRunner tuiRunner = TuiRunner.create(config);
+            ToolkitRunner runner = new ToolkitRunner(tuiRunner, config.bindings(), faultTolerant, errorOutput, toolkitPostRenderProcessors);
 
             if (styleEngine != null) {
                 runner.styleEngine(styleEngine);
@@ -646,7 +631,7 @@ public final class ToolkitRunner implements AutoCloseable {
 
             // Register global action handlers from annotated app object
             if (autoBindingRegistration && app != null) {
-                ActionHandler globalHandler = new ActionHandler(bindings)
+                ActionHandler globalHandler = new ActionHandler(config.bindings())
                         .registerAnnotated(app);
                 runner.eventRouter().addGlobalHandler(globalHandler);
             }

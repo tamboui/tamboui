@@ -25,7 +25,6 @@ import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.InlineTuiConfig;
 import dev.tamboui.tui.InlineTuiRunner;
-import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
@@ -340,7 +339,6 @@ public final class InlineToolkitRunner implements AutoCloseable {
      */
     public static final class Builder {
         private InlineTuiConfig config;
-        private Bindings bindings = BindingSets.defaults();
         private StyleEngine styleEngine;
 
         private Builder(int height) {
@@ -349,10 +347,6 @@ public final class InlineToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the inline TUI configuration.
-         * <p>
-         * Use this to configure terminal settings (tick rate, poll timeout,
-         * clear-on-close, etc.). Key bindings set via {@link #bindings(Bindings)}
-         * take precedence over bindings in the config.
          *
          * @param config the configuration
          * @return this builder
@@ -364,15 +358,12 @@ public final class InlineToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the key bindings.
-         * <p>
-         * These bindings take precedence over any bindings in the
-         * {@link InlineTuiConfig} set via {@link #config(InlineTuiConfig)}.
          *
          * @param bindings the bindings to use
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
-            this.bindings = bindings;
+            this.config = config.toBuilder().bindings(bindings).build();
             return this;
         }
 
@@ -437,11 +428,7 @@ public final class InlineToolkitRunner implements AutoCloseable {
          * @throws Exception if terminal initialization fails
          */
         public InlineToolkitRunner build() throws Exception {
-            // Ensure bindings are propagated to InlineTuiConfig so the
-            // TerminalInputReader stamps KeyEvents with the correct bindings.
-            // This mirrors ToolkitRunner.Builder.build() for consistency.
-            InlineTuiConfig effectiveConfig = config.withBindings(bindings);
-            InlineToolkitRunner runner = InlineToolkitRunner.create(effectiveConfig);
+            InlineToolkitRunner runner = InlineToolkitRunner.create(config);
 
             if (styleEngine != null) {
                 runner.styleEngine(styleEngine);
