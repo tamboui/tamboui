@@ -11,8 +11,13 @@ import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.bindings.BindingSets;
+import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.error.RenderErrorHandlers;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -187,5 +192,66 @@ class TuiConfigTest {
                 .build();
 
         assertThat(config.errorOutput()).isSameAs(System.err);
+    }
+
+    @Test
+    @DisplayName("withBindings returns new config with different bindings")
+    void withBindingsReturnsNewConfigWithDifferentBindings() {
+        TuiConfig original = TuiConfig.defaults();
+        Bindings custom = BindingSets.standard()
+                .toBuilder()
+                .unbind(Actions.FOCUS_NEXT)
+                .build();
+
+        TuiConfig derived = original.withBindings(custom);
+
+        // Bindings should be different
+        assertThat(derived.bindings()).isSameAs(custom);
+        assertThat(derived.bindings()).isNotSameAs(original.bindings());
+
+        // Everything else should be preserved
+        assertThat(derived.rawMode()).isEqualTo(original.rawMode());
+        assertThat(derived.alternateScreen()).isEqualTo(original.alternateScreen());
+        assertThat(derived.hideCursor()).isEqualTo(original.hideCursor());
+        assertThat(derived.mouseCapture()).isEqualTo(original.mouseCapture());
+        assertThat(derived.pollTimeout()).isEqualTo(original.pollTimeout());
+        assertThat(derived.tickRate()).isEqualTo(original.tickRate());
+        assertThat(derived.shutdownHook()).isEqualTo(original.shutdownHook());
+    }
+
+    @Test
+    @DisplayName("withBindings with null falls back to defaults")
+    void withBindingsNullFallsBackToDefaults() {
+        Bindings custom = BindingSets.standard()
+                .toBuilder()
+                .unbind(Actions.FOCUS_NEXT)
+                .build();
+        TuiConfig config = TuiConfig.builder().bindings(custom).build();
+
+        TuiConfig derived = config.withBindings(null);
+
+        // Should use default bindings
+        KeyEvent tab = KeyEvent.ofKey(KeyCode.TAB, derived.bindings());
+        assertThat(tab.isFocusNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("withBindings preserves custom config settings")
+    void withBindingsPreservesCustomSettings() {
+        TuiConfig original = TuiConfig.builder()
+                .mouseCapture(true)
+                .pollTimeout(Duration.ofMillis(50))
+                .noTick()
+                .shutdownHook(false)
+                .build();
+
+        Bindings custom = BindingSets.vim();
+        TuiConfig derived = original.withBindings(custom);
+
+        assertThat(derived.bindings()).isSameAs(custom);
+        assertThat(derived.mouseCapture()).isTrue();
+        assertThat(derived.pollTimeout()).isEqualTo(Duration.ofMillis(50));
+        assertThat(derived.ticksEnabled()).isFalse();
+        assertThat(derived.shutdownHook()).isFalse();
     }
 }

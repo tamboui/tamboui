@@ -25,7 +25,6 @@ import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.InlineTuiConfig;
 import dev.tamboui.tui.InlineTuiRunner;
-import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
@@ -70,12 +69,13 @@ public final class InlineToolkitRunner implements AutoCloseable {
     private final DefaultRenderContext renderContext;
     private volatile Duration lastElapsed = Duration.ZERO;
 
-    private InlineToolkitRunner(InlineTuiRunner tuiRunner) {
+    private InlineToolkitRunner(InlineTuiRunner tuiRunner, Bindings bindings) {
         this.tuiRunner = tuiRunner;
         this.focusManager = new FocusManager();
         this.elementRegistry = new ElementRegistry();
         this.eventRouter = new EventRouter(focusManager, elementRegistry);
         this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
+        this.renderContext.setBindings(bindings);
     }
 
     /**
@@ -108,7 +108,7 @@ public final class InlineToolkitRunner implements AutoCloseable {
      */
     public static InlineToolkitRunner create(InlineTuiConfig config) throws Exception {
         InlineTuiRunner tuiRunner = InlineTuiRunner.create(config);
-        return new InlineToolkitRunner(tuiRunner);
+        return new InlineToolkitRunner(tuiRunner, config.bindings());
     }
 
     /**
@@ -338,62 +338,36 @@ public final class InlineToolkitRunner implements AutoCloseable {
      * Builder for {@link InlineToolkitRunner} instances.
      */
     public static final class Builder {
-        private final int height;
-        private Duration tickRate = Duration.ofMillis(InlineTuiConfig.DEFAULT_TICK_RATE);
-        private Duration pollTimeout = Duration.ofMillis(InlineTuiConfig.DEFAULT_POLL_TIMEOUT);
-        private boolean clearOnClose = false;
-        private Bindings bindings = BindingSets.defaults();
+        private InlineTuiConfig config;
+        private Bindings bindings;
         private StyleEngine styleEngine;
 
         private Builder(int height) {
-            this.height = height;
+            this.config = InlineTuiConfig.defaults(height);
         }
 
         /**
-         * Sets the tick interval for animations.
+         * Sets the inline TUI configuration.
+         * <p>
+         * Use this to configure terminal settings (tick rate, poll timeout,
+         * clear-on-close, etc.). If {@link #bindings(Bindings)} is also
+         * called, those bindings take precedence over bindings in the
+         * config. Otherwise the config's bindings are used.
          *
-         * @param tickRate the tick interval
+         * @param config the configuration
          * @return this builder
          */
-        public Builder tickRate(Duration tickRate) {
-            this.tickRate = tickRate;
-            return this;
-        }
-
-        /**
-         * Disables tick events.
-         *
-         * @return this builder
-         */
-        public Builder noTick() {
-            this.tickRate = null;
-            return this;
-        }
-
-        /**
-         * Sets the poll timeout.
-         *
-         * @param pollTimeout the poll timeout
-         * @return this builder
-         */
-        public Builder pollTimeout(Duration pollTimeout) {
-            this.pollTimeout = pollTimeout;
-            return this;
-        }
-
-        /**
-         * Configures whether to clear the display when closed.
-         *
-         * @param clearOnClose true to clear on close
-         * @return this builder
-         */
-        public Builder clearOnClose(boolean clearOnClose) {
-            this.clearOnClose = clearOnClose;
+        public Builder config(InlineTuiConfig config) {
+            this.config = config;
             return this;
         }
 
         /**
          * Sets the key bindings.
+         * <p>
+         * When set, these bindings take precedence over any bindings in the
+         * {@link InlineTuiConfig} set via {@link #config(InlineTuiConfig)}.
+         * When not called, the config's bindings are used as-is.
          *
          * @param bindings the bindings to use
          * @return this builder
@@ -415,26 +389,67 @@ public final class InlineToolkitRunner implements AutoCloseable {
         }
 
         /**
+         * Sets the tick interval for animations.
+         *
+         * @param tickRate the tick interval
+         * @return this builder
+         */
+        public Builder tickRate(Duration tickRate) {
+            this.config = config.toBuilder().tickRate(tickRate).build();
+            return this;
+        }
+
+        /**
+         * Disables tick events.
+         *
+         * @return this builder
+         */
+        public Builder noTick() {
+            this.config = config.toBuilder().noTick().build();
+            return this;
+        }
+
+        /**
+         * Sets the poll timeout.
+         *
+         * @param pollTimeout the poll timeout
+         * @return this builder
+         */
+        public Builder pollTimeout(Duration pollTimeout) {
+            this.config = config.toBuilder().pollTimeout(pollTimeout).build();
+            return this;
+        }
+
+        /**
+         * Configures whether to clear the display when closed.
+         *
+         * @param clearOnClose true to clear on close
+         * @return this builder
+         */
+        public Builder clearOnClose(boolean clearOnClose) {
+            this.config = config.toBuilder().clearOnClose(clearOnClose).build();
+            return this;
+        }
+
+        /**
          * Builds and returns a configured InlineToolkitRunner.
          *
          * @return a new InlineToolkitRunner
          * @throws Exception if terminal initialization fails
          */
         public InlineToolkitRunner build() throws Exception {
-            InlineTuiConfig config = InlineTuiConfig.builder(height)
-                    .tickRate(tickRate)
-                    .pollTimeout(pollTimeout)
-                    .clearOnClose(clearOnClose)
-                    .bindings(bindings)
-                    .build();
-
-            InlineToolkitRunner runner = InlineToolkitRunner.create(config);
+            // Ensure bindings are propagated to InlineTuiConfig so the
+            // TerminalInputReader stamps KeyEvents with the correct bindings.
+            // This mirrors ToolkitRunner.Builder.build() for consistency.
+            // If bindings were explicitly set, they take precedence over
+            // bindings in the config. Otherwise use the config's bindings.
+            InlineTuiConfig effectiveConfig = bindings != null
+                    ? config.withBindings(bindings) : config;
+            InlineToolkitRunner runner = InlineToolkitRunner.create(effectiveConfig);
 
             if (styleEngine != null) {
                 runner.styleEngine(styleEngine);
             }
-
-            runner.renderContext.setBindings(bindings);
 
             return runner;
         }

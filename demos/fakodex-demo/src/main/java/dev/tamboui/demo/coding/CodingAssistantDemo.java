@@ -22,7 +22,6 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.input.TextInputState;
@@ -198,16 +197,12 @@ public class CodingAssistantDemo {
      */
     public void run() throws Exception {
         var styleEngine = createStyleEngine();
-        var config = TuiConfig.builder()
-                .mouseCapture(true)
-                .tickRate(Duration.ofMillis(TICK_RATE_MS))
-                .build();
-
         // Add welcome message
         addWelcomeMessage();
 
         try (var runner = ToolkitRunner.builder()
-                .config(config)
+                .mouseCapture(true)
+                .tickRate(Duration.ofMillis(TICK_RATE_MS))
                 .styleEngine(styleEngine)
                 .build()) {
             this.runner = runner;

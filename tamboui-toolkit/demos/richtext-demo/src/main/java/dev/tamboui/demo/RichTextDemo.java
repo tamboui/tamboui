@@ -19,7 +19,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.MarkupTextAreaElement;
-import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.KeyTrigger;
@@ -135,13 +134,9 @@ public class RichTextDemo implements Element {
                 .bind(KeyTrigger.key(KeyCode.F2), "selectCssTab")
                 .build();
 
-        var config = TuiConfig.builder()
+        try (var runner = ToolkitRunner.builder()
                 .mouseCapture(true)
                 .noTick()
-                .build();
-
-        try (var runner = ToolkitRunner.builder()
-                .config(config)
                 .bindings(bindings)
                 .build()) {
 
