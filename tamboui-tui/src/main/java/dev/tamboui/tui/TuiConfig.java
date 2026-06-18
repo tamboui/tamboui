@@ -267,27 +267,6 @@ public final class TuiConfig {
     }
 
     /**
-     * Returns a new TuiConfig identical to this one but with different bindings.
-     * <p>
-     * This is useful when the bindings need to be changed after a config has
-     * been created (e.g., when a higher-level builder overrides bindings).
-     *
-     * @param newBindings the bindings to use in the new config
-     * @return a new TuiConfig with the specified bindings
-     */
-    public TuiConfig withBindings(Bindings newBindings) {
-        if (newBindings == null) {
-            newBindings = BindingSets.defaults();
-        }
-        return new TuiConfig(
-                rawMode, alternateScreen, hideCursor, mouseCapture, bracketedPaste,
-                pollTimeout, tickRate, resizeGracePeriod, shutdownHook,
-                newBindings, errorHandler, errorOutput, fpsOverlayEnabled,
-                postRenderProcessors, backend, scheduler
-        );
-    }
-
-    /**
      * Returns the error handler for render errors.
      *
      * @return the error handler

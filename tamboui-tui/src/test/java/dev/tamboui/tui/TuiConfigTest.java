@@ -16,8 +16,6 @@ import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.error.RenderErrorHandlers;
-import dev.tamboui.tui.event.KeyCode;
-import dev.tamboui.tui.event.KeyEvent;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -195,15 +193,15 @@ class TuiConfigTest {
     }
 
     @Test
-    @DisplayName("withBindings returns new config with different bindings")
-    void withBindingsReturnsNewConfigWithDifferentBindings() {
+    @DisplayName("toBuilder creates copy with different bindings")
+    void toBuilderCreatesConfigWithDifferentBindings() {
         TuiConfig original = TuiConfig.defaults();
         Bindings custom = BindingSets.standard()
                 .toBuilder()
                 .unbind(Actions.FOCUS_NEXT)
                 .build();
 
-        TuiConfig derived = original.withBindings(custom);
+        TuiConfig derived = original.toBuilder().bindings(custom).build();
 
         // Bindings should be different
         assertThat(derived.bindings()).isSameAs(custom);
@@ -220,24 +218,8 @@ class TuiConfigTest {
     }
 
     @Test
-    @DisplayName("withBindings with null falls back to defaults")
-    void withBindingsNullFallsBackToDefaults() {
-        Bindings custom = BindingSets.standard()
-                .toBuilder()
-                .unbind(Actions.FOCUS_NEXT)
-                .build();
-        TuiConfig config = TuiConfig.builder().bindings(custom).build();
-
-        TuiConfig derived = config.withBindings(null);
-
-        // Should use default bindings
-        KeyEvent tab = KeyEvent.ofKey(KeyCode.TAB, derived.bindings());
-        assertThat(tab.isFocusNext()).isTrue();
-    }
-
-    @Test
-    @DisplayName("withBindings preserves custom config settings")
-    void withBindingsPreservesCustomSettings() {
+    @DisplayName("toBuilder preserves custom config settings")
+    void toBuilderPreservesCustomSettings() {
         TuiConfig original = TuiConfig.builder()
                 .mouseCapture(true)
                 .pollTimeout(Duration.ofMillis(50))
@@ -246,7 +228,7 @@ class TuiConfigTest {
                 .build();
 
         Bindings custom = BindingSets.vim();
-        TuiConfig derived = original.withBindings(custom);
+        TuiConfig derived = original.toBuilder().bindings(custom).build();
 
         assertThat(derived.bindings()).isSameAs(custom);
         assertThat(derived.mouseCapture()).isTrue();

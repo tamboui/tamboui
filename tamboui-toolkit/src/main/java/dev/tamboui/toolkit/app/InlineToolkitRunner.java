@@ -339,7 +339,6 @@ public final class InlineToolkitRunner implements AutoCloseable {
      */
     public static final class Builder {
         private InlineTuiConfig config;
-        private Bindings bindings;
         private StyleEngine styleEngine;
 
         private Builder(int height) {
@@ -350,9 +349,8 @@ public final class InlineToolkitRunner implements AutoCloseable {
          * Sets the inline TUI configuration.
          * <p>
          * Use this to configure terminal settings (tick rate, poll timeout,
-         * clear-on-close, etc.). If {@link #bindings(Bindings)} is also
-         * called, those bindings take precedence over bindings in the
-         * config. Otherwise the config's bindings are used.
+         * clear-on-close, etc.). All builder methods (including
+         * {@link #bindings(Bindings)}) use last-write-wins semantics.
          *
          * @param config the configuration
          * @return this builder
@@ -364,16 +362,12 @@ public final class InlineToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the key bindings.
-         * <p>
-         * When set, these bindings take precedence over any bindings in the
-         * {@link InlineTuiConfig} set via {@link #config(InlineTuiConfig)}.
-         * When not called, the config's bindings are used as-is.
          *
          * @param bindings the bindings to use
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
-            this.bindings = bindings;
+            this.config = config.toBuilder().bindings(bindings).build();
             return this;
         }
 
@@ -438,14 +432,7 @@ public final class InlineToolkitRunner implements AutoCloseable {
          * @throws Exception if terminal initialization fails
          */
         public InlineToolkitRunner build() throws Exception {
-            // Ensure bindings are propagated to InlineTuiConfig so the
-            // TerminalInputReader stamps KeyEvents with the correct bindings.
-            // This mirrors ToolkitRunner.Builder.build() for consistency.
-            // If bindings were explicitly set, they take precedence over
-            // bindings in the config. Otherwise use the config's bindings.
-            InlineTuiConfig effectiveConfig = bindings != null
-                    ? config.withBindings(bindings) : config;
-            InlineToolkitRunner runner = InlineToolkitRunner.create(effectiveConfig);
+            InlineToolkitRunner runner = InlineToolkitRunner.create(config);
 
             if (styleEngine != null) {
                 runner.styleEngine(styleEngine);
