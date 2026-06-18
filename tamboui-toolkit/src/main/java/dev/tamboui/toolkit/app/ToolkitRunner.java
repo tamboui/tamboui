@@ -82,6 +82,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private volatile Duration lastElapsed = Duration.ZERO;
 
     private ToolkitRunner(TuiRunner tuiRunner,
+                          Bindings bindings,
                           boolean faultTolerant,
                           PrintStream errorOutput,
                           List<ToolkitPostRenderProcessor> toolkitPostRenderProcessors) {
@@ -91,13 +92,14 @@ public final class ToolkitRunner implements AutoCloseable {
         this.styledAreaRegistry = StyledAreaRegistry.create();
         this.eventRouter = new EventRouter(focusManager, elementRegistry);
         this.renderContext = new DefaultRenderContext(focusManager, eventRouter);
+        this.renderContext.setBindings(bindings);
         this.renderContext.setFaultTolerant(faultTolerant);
         this.faultTolerant = faultTolerant;
         this.postRenderProcessors = toolkitPostRenderProcessors;
     }
 
-    private ToolkitRunner(TuiRunner tuiRunner) {
-        this(tuiRunner, false, NULL_OUTPUT, Collections.emptyList());
+    private ToolkitRunner(TuiRunner tuiRunner, Bindings bindings) {
+        this(tuiRunner, bindings, false, NULL_OUTPUT, Collections.emptyList());
     }
 
     /**
@@ -119,7 +121,7 @@ public final class ToolkitRunner implements AutoCloseable {
      */
     public static ToolkitRunner create(TuiConfig config) throws Exception {
         TuiRunner tuiRunner = TuiRunner.create(config);
-        return new ToolkitRunner(tuiRunner);
+        return new ToolkitRunner(tuiRunner, config.bindings());
     }
 
     /**
@@ -483,6 +485,10 @@ public final class ToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the TUI configuration.
+         * <p>
+         * Use this to configure terminal settings (raw mode, alternate screen,
+         * tick rate, mouse capture, etc.). Key bindings set via
+         * {@link #bindings(Bindings)} take precedence over bindings in the config.
          *
          * @param config the configuration
          * @return this builder
@@ -494,6 +500,9 @@ public final class ToolkitRunner implements AutoCloseable {
 
         /**
          * Sets the bindings to use for action matching.
+         * <p>
+         * These bindings take precedence over any bindings in the
+         * {@link TuiConfig} set via {@link #config(TuiConfig)}.
          *
          * @param bindings the bindings
          * @return this builder
@@ -511,6 +520,49 @@ public final class ToolkitRunner implements AutoCloseable {
          */
         public Builder styleEngine(StyleEngine styleEngine) {
             this.styleEngine = styleEngine;
+            return this;
+        }
+
+        /**
+         * Enables mouse capture.
+         *
+         * @param mouseCapture true to capture mouse events
+         * @return this builder
+         */
+        public Builder mouseCapture(boolean mouseCapture) {
+            this.config = config.toBuilder().mouseCapture(mouseCapture).build();
+            return this;
+        }
+
+        /**
+         * Sets the tick interval for animations.
+         *
+         * @param tickRate the tick interval
+         * @return this builder
+         */
+        public Builder tickRate(Duration tickRate) {
+            this.config = config.toBuilder().tickRate(tickRate).build();
+            return this;
+        }
+
+        /**
+         * Disables tick events.
+         *
+         * @return this builder
+         */
+        public Builder noTick() {
+            this.config = config.toBuilder().noTick().build();
+            return this;
+        }
+
+        /**
+         * Enables or disables bracketed paste mode.
+         *
+         * @param bracketedPaste true to enable bracketed paste
+         * @return this builder
+         */
+        public Builder bracketedPaste(boolean bracketedPaste) {
+            this.config = config.toBuilder().bracketedPaste(bracketedPaste).build();
             return this;
         }
 
@@ -586,10 +638,7 @@ public final class ToolkitRunner implements AutoCloseable {
             // intercept keys that the user intended to handle in their elements.
             TuiConfig effectiveConfig = config.withBindings(bindings);
             TuiRunner tuiRunner = TuiRunner.create(effectiveConfig);
-            ToolkitRunner runner = new ToolkitRunner(tuiRunner, faultTolerant, errorOutput, toolkitPostRenderProcessors);
-
-            // Set bindings on render context for Component auto-registration
-            runner.renderContext.setBindings(bindings);
+            ToolkitRunner runner = new ToolkitRunner(tuiRunner, bindings, faultTolerant, errorOutput, toolkitPostRenderProcessors);
 
             if (styleEngine != null) {
                 runner.styleEngine(styleEngine);

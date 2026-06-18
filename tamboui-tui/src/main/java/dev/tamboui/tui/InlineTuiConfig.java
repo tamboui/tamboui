@@ -156,6 +156,25 @@ public final class InlineTuiConfig {
     }
 
     /**
+     * Returns a new InlineTuiConfig identical to this one but with different bindings.
+     * <p>
+     * This is useful when the bindings need to be changed after a config has
+     * been created (e.g., when a higher-level builder overrides bindings).
+     *
+     * @param newBindings the bindings to use in the new config
+     * @return a new InlineTuiConfig with the specified bindings
+     */
+    public InlineTuiConfig withBindings(Bindings newBindings) {
+        if (newBindings == null) {
+            newBindings = BindingSets.defaults();
+        }
+        return new InlineTuiConfig(
+                height, tickRate, pollTimeout, clearOnClose, bracketedPaste,
+                newBindings, scheduler
+        );
+    }
+
+    /**
      * Returns the externally-managed scheduler, or null if the runner should create its own.
      * <p>
      * When an external scheduler is provided, the runner will NOT shut it down on close -
@@ -165,6 +184,24 @@ public final class InlineTuiConfig {
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    /**
+     * Returns a builder pre-populated with this config's values.
+     * <p>
+     * This is useful for creating a modified copy of an existing config.
+     *
+     * @return a new builder initialized with this config's values
+     */
+    public Builder toBuilder() {
+        Builder b = new Builder(height);
+        b.tickRate = tickRate;
+        b.pollTimeout = pollTimeout;
+        b.clearOnClose = clearOnClose;
+        b.bracketedPaste = bracketedPaste;
+        b.bindings = bindings;
+        b.scheduler = scheduler;
+        return b;
     }
 
     @Override

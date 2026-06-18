@@ -18,7 +18,6 @@ import dev.tamboui.tfx.toolkit.ToolkitEffects;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
@@ -66,12 +65,8 @@ public class TfxToolkitDemo {
     }
 
     private void run() throws Exception {
-        TuiConfig config = TuiConfig.builder()
-                .tickRate(Duration.ofMillis(16))
-                .build();
-
         try (ToolkitRunner r = ToolkitRunner.builder()
-                .config(config)
+                .tickRate(Duration.ofMillis(16))
                 .postRenderProcessor(effects.asPostRenderProcessor())
                 .build()) {
 

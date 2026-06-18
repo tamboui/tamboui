@@ -18,7 +18,6 @@ import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.elements.TreeElement;
-import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.widgets.tree.GuideStyle;
 import dev.tamboui.widgets.tree.TreeNode;
 
@@ -316,12 +315,8 @@ public class TreeDemo {
 
     private void run() throws Exception {
         var styleEngine = createStyleEngine();
-        var config = TuiConfig.builder()
-                .mouseCapture(true)
-                .build();
-
         try (var runner = ToolkitRunner.builder()
-                .config(config)
+                .mouseCapture(true)
                 .styleEngine(styleEngine)
                 .build()) {
             runner.run(this::render);

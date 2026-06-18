@@ -28,7 +28,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.bindings.BindingSets;
@@ -258,13 +257,9 @@ public class CustomComponentDemo implements Element {
                 .bind(KeyTrigger.ch('-'), "decrement")
                 .build();
 
-        var config = TuiConfig.builder()
-            .mouseCapture(true)
-            .noTick()
-            .build();
-
         try (var runner = ToolkitRunner.builder()
-                .config(config)
+                .mouseCapture(true)
+                .noTick()
                 .bindings(bindings)
                 .build()) {
 

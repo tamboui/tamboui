@@ -25,7 +25,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.toolkit.focus.FocusManager;
-import dev.tamboui.tui.TuiConfig;
 
 import static dev.tamboui.export.ExportRequest.export;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -63,12 +62,8 @@ public final class ToolkitExportDemo {
         Path outDir = args.length > 0 ? Paths.get(args[0]) : Files.createTempDirectory("tamboui-export-");
         ToolkitExportDemo app = new ToolkitExportDemo(outDir);
 
-        var config = TuiConfig.builder()
-            .tickRate(Duration.ofMillis(100))
-            .build();
-
         try (var r = ToolkitRunner.builder()
-            .config(config)
+            .tickRate(Duration.ofMillis(100))
             .app(app)
             .postRenderProcessor(app::captureFrame)
             .build()) {

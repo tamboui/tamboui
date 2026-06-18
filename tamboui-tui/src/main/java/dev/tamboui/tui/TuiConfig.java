@@ -353,6 +353,34 @@ public final class TuiConfig {
         return scheduler;
     }
 
+    /**
+     * Returns a builder pre-populated with this config's values.
+     * <p>
+     * This is useful for creating a modified copy of an existing config.
+     *
+     * @return a new builder initialized with this config's values
+     */
+    public Builder toBuilder() {
+        Builder b = new Builder();
+        b.rawMode = rawMode;
+        b.alternateScreen = alternateScreen;
+        b.hideCursor = hideCursor;
+        b.mouseCapture = mouseCapture;
+        b.bracketedPaste = bracketedPaste;
+        b.pollTimeout = pollTimeout;
+        b.tickRate = tickRate;
+        b.resizeGracePeriod = resizeGracePeriod;
+        b.shutdownHook = shutdownHook;
+        b.bindings = bindings;
+        b.errorHandler = errorHandler;
+        b.errorOutput = errorOutput;
+        b.fpsOverlayEnabled = fpsOverlayEnabled;
+        b.postRenderProcessors.addAll(postRenderProcessors);
+        b.backend = backend;
+        b.scheduler = scheduler;
+        return b;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

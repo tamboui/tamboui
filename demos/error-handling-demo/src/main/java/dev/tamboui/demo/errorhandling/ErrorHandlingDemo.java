@@ -16,7 +16,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -42,12 +41,8 @@ public class ErrorHandlingDemo {
      * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        TuiConfig config = TuiConfig.builder()
-                .tickRate(Duration.ofMillis(100))
-                .build();
-
         try (ToolkitRunner runner = ToolkitRunner.builder()
-                .config(config)
+                .tickRate(Duration.ofMillis(100))
                 .faultTolerant(true)
                 .build()) {
 
