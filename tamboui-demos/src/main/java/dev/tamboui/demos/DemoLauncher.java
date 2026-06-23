@@ -503,6 +503,7 @@ public class DemoLauncher {
 
             // Create and run the inline TUI runner for this iteration
             try (InlineTuiRunner runner = InlineTuiRunner.create(config)) {
+                runner.setWindowTitle("TamboUI Demo Launcher");
                 runner.run(
                         (event, r) -> {
                             if (event instanceof KeyEvent) {

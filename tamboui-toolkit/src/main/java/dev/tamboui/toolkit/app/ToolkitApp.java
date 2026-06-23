@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit.app;
 
+import java.io.IOException;
+
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.tui.TuiConfig;
 
@@ -114,6 +116,18 @@ public abstract class ToolkitApp {
      */
     protected ToolkitRunner runner() {
         return runner;
+    }
+
+    /**
+     * Sets the terminal window title.
+     *
+     * @param title the window title to set
+     * @throws IOException if the operation fails
+     */
+    protected void setWindowTitle(String title) throws IOException {
+        if (runner != null) {
+            runner.setWindowTitle(title);
+        }
     }
 
     /**
