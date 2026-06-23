@@ -58,6 +58,9 @@
     "stack-demo": {
       "script-ref": "tamboui-core/demos/stack-demo/src/main/java/dev/tamboui/demo/StackDemo.java"
     },
+    "theme-demo": {
+      "script-ref": "tamboui-core/demos/theme-demo/src/main/java/dev/tamboui/demo/ThemeDemo.java"
+    },
     "css-demo": {
       "script-ref": "tamboui-css/demos/css-demo/src/main/java/dev/tamboui/demo/CssDemo.java"
     },
