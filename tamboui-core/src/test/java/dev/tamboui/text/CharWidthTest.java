@@ -135,6 +135,30 @@ class CharWidthTest {
     }
 
     @Test
+    @DisplayName("Emoji presentation sequence (base + VS16) has width 2")
+    void emojiPresentationSequenceWidth() {
+        // Base glyphs that are 1-wide on their own but render as 2-wide emoji
+        // when followed by Variation Selector-16 (U+FE0F).
+        // U+2328 keyboard alone is 1-wide
+        assertThat(CharWidth.of(0x2328)).isEqualTo(1);
+        // ⌨️ = U+2328 + U+FE0F (keyboard)
+        assertThat(CharWidth.of("⌨️")).isEqualTo(2);
+        // ⏹️ = U+23F9 + U+FE0F (stop)
+        assertThat(CharWidth.of("⏹️")).isEqualTo(2);
+        // ⏺️ = U+23FA + U+FE0F (record)
+        assertThat(CharWidth.of("⏺️")).isEqualTo(2);
+        // Surrounding text keeps its own width: "A⌨️B" = 1 + 2 + 1 = 4
+        assertThat(CharWidth.of("A⌨️B")).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Already-wide emoji with VS16 stays width 2")
+    void alreadyWideEmojiWithVariationSelectorWidth() {
+        // 🖥️ = U+1F5A5 (already 2-wide) + U+FE0F must not become 4-wide
+        assertThat(CharWidth.of("🖥️")).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("Null and empty string have width 0")
     void nullAndEmptyWidth() {
         assertThat(CharWidth.of((String) null)).isEqualTo(0);
