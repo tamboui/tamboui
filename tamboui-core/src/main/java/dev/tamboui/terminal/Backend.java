@@ -119,6 +119,21 @@ public interface Backend extends AutoCloseable {
     }
 
     /**
+     * Enables mouse capture, optionally including bare motion (hover) events.
+     * <p>
+     * When {@code motion} is {@code true}, the backend additionally requests
+     * any-event tracking (DECSET 1003) so the terminal reports mouse motion with
+     * no button held, surfaced as {@code MouseEventKind.MOVE}.
+     * Backends that do not support motion tracking fall back to plain mouse capture.
+     *
+     * @param motion whether to also capture bare motion (hover) events
+     * @throws IOException if enabling mouse capture fails
+     */
+    default void enableMouseCapture(boolean motion) throws IOException {
+        enableMouseCapture();
+    }
+
+    /**
      * Disables mouse capture.
      *
      * @throws IOException if disabling mouse capture fails

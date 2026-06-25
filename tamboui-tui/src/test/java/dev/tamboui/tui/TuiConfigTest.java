@@ -89,6 +89,35 @@ class TuiConfigTest {
     }
 
     @Test
+    @DisplayName("mouseMotion defaults to false")
+    void mouseMotionDefaultsToFalse() {
+        assertThat(TuiConfig.defaults().mouseMotion()).isFalse();
+        assertThat(TuiConfig.builder().build().mouseMotion()).isFalse();
+    }
+
+    @Test
+    @DisplayName("builder enables mouseMotion independently of mouseCapture")
+    void builderEnablesMouseMotion() {
+        TuiConfig config = TuiConfig.builder()
+                .mouseCapture(true)
+                .mouseMotion(true)
+                .build();
+
+        assertThat(config.mouseCapture()).isTrue();
+        assertThat(config.mouseMotion()).isTrue();
+    }
+
+    @Test
+    @DisplayName("toBuilder preserves mouseMotion")
+    void toBuilderPreservesMouseMotion() {
+        TuiConfig original = TuiConfig.builder().mouseMotion(true).build();
+
+        TuiConfig derived = original.toBuilder().build();
+
+        assertThat(derived.mouseMotion()).isTrue();
+    }
+
+    @Test
     @DisplayName("ticksEnabled returns false when noTick() is used")
     void ticksEnabledFalseWhenNoTick() {
         TuiConfig config = TuiConfig.builder().noTick().build();

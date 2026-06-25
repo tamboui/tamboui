@@ -37,6 +37,7 @@ public final class TuiConfig {
     private final boolean alternateScreen;
     private final boolean hideCursor;
     private final boolean mouseCapture;
+    private final boolean mouseMotion;
     private final boolean bracketedPaste;
     private final Duration pollTimeout;
     private final Duration tickRate;
@@ -59,6 +60,7 @@ public final class TuiConfig {
      * @param alternateScreen whether to use the alternate screen buffer
      * @param hideCursor whether to hide the cursor
      * @param mouseCapture whether to capture mouse events
+     * @param mouseMotion whether to also capture bare mouse motion (hover) events
      * @param bracketedPaste whether to enable bracketed paste mode
      * @param pollTimeout timeout for polling events
      * @param tickRate interval between tick events, or null to disable
@@ -77,6 +79,7 @@ public final class TuiConfig {
             boolean alternateScreen,
             boolean hideCursor,
             boolean mouseCapture,
+            boolean mouseMotion,
             boolean bracketedPaste,
             Duration pollTimeout,
             Duration tickRate,
@@ -94,6 +97,7 @@ public final class TuiConfig {
         this.alternateScreen = alternateScreen;
         this.hideCursor = hideCursor;
         this.mouseCapture = mouseCapture;
+        this.mouseMotion = mouseMotion;
         this.bracketedPaste = bracketedPaste;
         this.pollTimeout = pollTimeout;
         this.tickRate = tickRate;
@@ -124,6 +128,7 @@ public final class TuiConfig {
                 true,                        // alternateScreen
                 true,                        // hideCursor
                 false,                       // mouseCapture
+                false,                       // mouseMotion
                 false,                       // bracketedPaste
                 Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
                 Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
@@ -201,6 +206,20 @@ public final class TuiConfig {
      */
     public boolean mouseCapture() {
         return mouseCapture;
+    }
+
+    /**
+     * Returns whether bare mouse motion (hover) capture is enabled.
+     * <p>
+     * When enabled together with {@link #mouseCapture()}, the backend requests
+     * any-event tracking so motion with no button held is delivered as
+     * {@code MouseEventKind.MOVE}. Disabled by default, since motion events fire
+     * for every terminal cell the cursor crosses.
+     *
+     * @return true if mouse motion capture is enabled
+     */
+    public boolean mouseMotion() {
+        return mouseMotion;
     }
 
     /**
@@ -345,6 +364,7 @@ public final class TuiConfig {
         b.alternateScreen = alternateScreen;
         b.hideCursor = hideCursor;
         b.mouseCapture = mouseCapture;
+        b.mouseMotion = mouseMotion;
         b.bracketedPaste = bracketedPaste;
         b.pollTimeout = pollTimeout;
         b.tickRate = tickRate;
@@ -373,6 +393,7 @@ public final class TuiConfig {
                 && alternateScreen == that.alternateScreen
                 && hideCursor == that.hideCursor
                 && mouseCapture == that.mouseCapture
+                && mouseMotion == that.mouseMotion
                 && bracketedPaste == that.bracketedPaste
                 && pollTimeout.equals(that.pollTimeout)
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
@@ -388,6 +409,7 @@ public final class TuiConfig {
         result = 31 * result + Boolean.hashCode(alternateScreen);
         result = 31 * result + Boolean.hashCode(hideCursor);
         result = 31 * result + Boolean.hashCode(mouseCapture);
+        result = 31 * result + Boolean.hashCode(mouseMotion);
         result = 31 * result + Boolean.hashCode(bracketedPaste);
         result = 31 * result + pollTimeout.hashCode();
         result = 31 * result + (tickRate != null ? tickRate.hashCode() : 0);
@@ -401,11 +423,12 @@ public final class TuiConfig {
     @Override
     public String toString() {
         return String.format(
-                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
+                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, mouseMotion=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
                 rawMode,
                 alternateScreen,
                 hideCursor,
                 mouseCapture,
+                mouseMotion,
                 pollTimeout,
                 tickRate,
                 resizeGracePeriod,
@@ -423,6 +446,7 @@ public final class TuiConfig {
         private boolean alternateScreen = true;
         private boolean hideCursor = true;
         private boolean mouseCapture = false;
+        private boolean mouseMotion = false;
         private boolean bracketedPaste = false;
         private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private Duration tickRate = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
@@ -504,6 +528,23 @@ public final class TuiConfig {
          */
         public Builder mouseCapture(boolean mouseCapture) {
             this.mouseCapture = mouseCapture;
+            return this;
+        }
+
+        /**
+         * Sets whether to capture bare mouse motion (hover) events.
+         * <p>
+         * Has effect only when {@link #mouseCapture(boolean)} is also enabled.
+         * When on, the backend requests any-event tracking so motion with no
+         * button held is delivered as {@code MouseEventKind.MOVE}. Disabled by
+         * default, since it generates an event for every terminal cell the cursor
+         * crosses.
+         *
+         * @param mouseMotion true to enable mouse motion (hover) capture
+         * @return this builder
+         */
+        public Builder mouseMotion(boolean mouseMotion) {
+            this.mouseMotion = mouseMotion;
             return this;
         }
 
@@ -679,6 +720,7 @@ public final class TuiConfig {
                     alternateScreen,
                     hideCursor,
                     mouseCapture,
+                    mouseMotion,
                     bracketedPaste,
                     pollTimeout,
                     tickRate,

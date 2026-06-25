@@ -196,7 +196,7 @@ public final class TuiRunner implements AutoCloseable {
                 backend.hideCursor();
             }
             if (config.mouseCapture()) {
-                backend.enableMouseCapture();
+                backend.enableMouseCapture(config.mouseMotion());
             }
             if (config.bracketedPaste()) {
                 backend.enableBracketedPaste();
