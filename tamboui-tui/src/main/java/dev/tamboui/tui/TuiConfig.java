@@ -50,6 +50,7 @@ public final class TuiConfig {
     private final List<PostRenderProcessor> postRenderProcessors;
     private final Backend backend;
     private final ScheduledExecutorService scheduler;
+    private final ClassLoader backendClassLoader;
 
     /**
      * Creates a new TUI configuration with the specified options.
@@ -89,9 +90,57 @@ public final class TuiConfig {
             RenderErrorHandler errorHandler,
             PrintStream errorOutput,
             boolean fpsOverlayEnabled,
-            List<PostRenderProcessor> postRenderProcessors, 
+            List<PostRenderProcessor> postRenderProcessors,
             Backend backend,
             ScheduledExecutorService scheduler
+    ) {
+        this(rawMode, alternateScreen, hideCursor, mouseCapture, bracketedPaste, pollTimeout, tickRate,
+                resizeGracePeriod, shutdownHook, bindings, errorHandler, errorOutput, fpsOverlayEnabled,
+                postRenderProcessors, backend, scheduler, null);
+    }
+
+    /**
+     * Creates a new TUI configuration with the specified options, including an explicit
+     * classloader for backend discovery.
+     * <p>
+     * Prefer using {@link #builder()} or {@link #defaults()} instead of this constructor.
+     *
+     * @param rawMode whether to enable raw terminal mode
+     * @param alternateScreen whether to use the alternate screen buffer
+     * @param hideCursor whether to hide the cursor
+     * @param mouseCapture whether to capture mouse events
+     * @param bracketedPaste whether to enable bracketed paste mode
+     * @param pollTimeout timeout for polling events
+     * @param tickRate interval between tick events, or null to disable
+     * @param resizeGracePeriod grace period for resize events, or null to disable
+     * @param shutdownHook whether to register a JVM shutdown hook
+     * @param bindings the key/mouse bindings for semantic actions
+     * @param errorHandler the handler for render errors
+     * @param errorOutput the output stream for error logging
+     * @param fpsOverlayEnabled whether to show the FPS overlay
+     * @param postRenderProcessors list of post-render processors
+     * @param backend the backend to use (optional)
+     * @param scheduler external scheduler to use, or null to create an internal one
+     * @param backendClassLoader classloader used exclusively for backend discovery, or null for the default
+     */
+    public TuiConfig(
+            boolean rawMode,
+            boolean alternateScreen,
+            boolean hideCursor,
+            boolean mouseCapture,
+            boolean bracketedPaste,
+            Duration pollTimeout,
+            Duration tickRate,
+            Duration resizeGracePeriod,
+            boolean shutdownHook,
+            Bindings bindings,
+            RenderErrorHandler errorHandler,
+            PrintStream errorOutput,
+            boolean fpsOverlayEnabled,
+            List<PostRenderProcessor> postRenderProcessors,
+            Backend backend,
+            ScheduledExecutorService scheduler,
+            ClassLoader backendClassLoader
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
@@ -112,6 +161,7 @@ public final class TuiConfig {
                 : Collections.emptyList();
         this.backend = backend;
         this.scheduler = scheduler;
+        this.backendClassLoader = backendClassLoader;
     }
 
     /**
@@ -340,6 +390,19 @@ public final class TuiConfig {
     }
 
     /**
+     * Returns the classloader used exclusively for backend discovery, or null for the default.
+     * <p>
+     * When null, a backend will be discovered using the default candidate classloaders (see
+     * {@link BackendFactory#create()}). When non-null, discovery uses only this classloader.
+     * Ignored when an explicit {@link #backend()} is set.
+     *
+     * @return the backend discovery classloader, or null
+     */
+    public ClassLoader backendClassLoader() {
+        return backendClassLoader;
+    }
+
+    /**
      * Returns the externally-managed scheduler, or null if the runner should create its own.
      * <p>
      * When an external scheduler is provided, the runner will NOT shut it down on close -
@@ -377,6 +440,7 @@ public final class TuiConfig {
         b.postRenderProcessors.addAll(postRenderProcessors);
         b.backend = backend;
         b.scheduler = scheduler;
+        b.backendClassLoader = backendClassLoader;
         return b;
     }
 
@@ -459,6 +523,7 @@ public final class TuiConfig {
         private final List<PostRenderProcessor> postRenderProcessors = new ArrayList<>();
         private Backend backend;
         private ScheduledExecutorService scheduler;
+        private ClassLoader backendClassLoader;
 
         private Builder() {
         }
@@ -473,6 +538,22 @@ public final class TuiConfig {
          */
         public Builder backend(Backend backend) {
             this.backend = backend;
+            return this;
+        }
+
+        /**
+         * Sets the classloader used exclusively for backend discovery.
+         * <p>
+         * When non-null, backend discovery uses only this classloader, which is useful for
+         * embedders (fat-jars, containers, app servers) where the thread-context classloader
+         * cannot see the bundled backend. Ignored when an explicit {@link #backend(Backend)}
+         * is set. Defaults to null (use the default candidate classloaders).
+         *
+         * @param backendClassLoader the classloader to use for discovery, or null for the default
+         * @return this builder
+         */
+        public Builder backendClassLoader(ClassLoader backendClassLoader) {
+            this.backendClassLoader = backendClassLoader;
             return this;
         }
 
@@ -732,7 +813,8 @@ public final class TuiConfig {
                     fpsOverlayEnabled,
                     postRenderProcessors,
                     backend,
-                    scheduler
+                    scheduler,
+                    backendClassLoader
             );
         }
     }

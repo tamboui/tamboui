@@ -247,6 +247,37 @@ class TuiConfigTest {
     }
 
     @Test
+    @DisplayName("backendClassLoader defaults to null")
+    void backendClassLoaderDefaultsToNull() {
+        assertThat(TuiConfig.defaults().backendClassLoader()).isNull();
+        assertThat(TuiConfig.builder().build().backendClassLoader()).isNull();
+    }
+
+    @Test
+    @DisplayName("builder sets backendClassLoader")
+    void builderSetsBackendClassLoader() {
+        ClassLoader loader = new java.net.URLClassLoader(new java.net.URL[0], getClass().getClassLoader());
+
+        TuiConfig config = TuiConfig.builder()
+                .backendClassLoader(loader)
+                .build();
+
+        assertThat(config.backendClassLoader()).isSameAs(loader);
+    }
+
+    @Test
+    @DisplayName("toBuilder preserves backendClassLoader")
+    void toBuilderPreservesBackendClassLoader() {
+        ClassLoader loader = new java.net.URLClassLoader(new java.net.URL[0], getClass().getClassLoader());
+        TuiConfig original = TuiConfig.builder().backendClassLoader(loader).build();
+
+        TuiConfig derived = original.toBuilder().mouseCapture(true).build();
+
+        assertThat(derived.backendClassLoader()).isSameAs(loader);
+        assertThat(derived.mouseCapture()).isTrue();
+    }
+
+    @Test
     @DisplayName("toBuilder preserves custom config settings")
     void toBuilderPreservesCustomSettings() {
         TuiConfig original = TuiConfig.builder()
