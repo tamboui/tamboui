@@ -329,4 +329,34 @@ class MarkdownViewTest {
             renderInto(view, 30, 6);
         }
     }
+
+    @Test
+    @DisplayName("scroll clamp prevents scrolling past content bottom")
+    void scrollClampPreventsBlankScreen() {
+        // Content renders to a few rows. A very large scroll value should show the
+        // last page of content, not a blank viewport.
+        String source = "line one\n\nline two\n\nline three";
+        int viewportHeight = 3;
+
+        // Render with a huge scroll — should show the bottom of the content
+        MarkdownView scrolled = MarkdownView.builder()
+            .source(source)
+            .scroll(Integer.MAX_VALUE)
+            .build();
+        Buffer scrolledBuf = renderInto(scrolled, 30, viewportHeight);
+
+        // At least one row in the viewport must contain non-space content
+        boolean hasContent = false;
+        for (int y = 0; y < viewportHeight && !hasContent; y++) {
+            for (int x = 0; x < 30; x++) {
+                if (!scrolledBuf.get(x, y).symbol().isBlank()) {
+                    hasContent = true;
+                    break;
+                }
+            }
+        }
+        assertThat(hasContent)
+            .as("viewport should show content, not blank space, when scroll is very large")
+            .isTrue();
+    }
 }

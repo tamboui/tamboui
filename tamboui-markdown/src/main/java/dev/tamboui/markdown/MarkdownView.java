@@ -240,7 +240,7 @@ public final class MarkdownView implements Widget {
             return;
         }
 
-        int skip = Math.max(0, Math.min(scroll, totalRows - 1));
+        int skip = Math.max(0, Math.min(scroll, Math.max(0, totalRows - contentArea.height())));
         int y = contentArea.top();
         int rowsRemaining = contentArea.height();
         int rowsSkipped = 0;
