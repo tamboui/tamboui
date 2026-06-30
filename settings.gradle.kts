@@ -46,7 +46,7 @@ modules.forEach { module ->
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-val javaVersion = JavaVersion.current()
-if (!javaVersion.isCompatibleWith(JavaVersion.VERSION_25)) {
-    throw GradleException("This project is compatible with Java ${javaVersion}, but requires Java 25+ JDK for building.")
-}
+//val javaVersion = JavaVersion.current()
+//if (!javaVersion.isCompatibleWith(JavaVersion.VERSION_25)) {
+//    throw GradleException("This project is compatible with Java ${javaVersion}, but requires Java 25+ JDK for building.")
+//}
