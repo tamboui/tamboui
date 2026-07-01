@@ -255,6 +255,55 @@ class EventParserTest {
         assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UP);
     }
 
+    // -- SGR mouse sequences (ESC [ < Cb ; Cx ; Cy M/m) --
+
+    @Test
+    @DisplayName("SGR button 35 with M is a hover MOVE with no button")
+    void sgrHoverParsedAsMove() throws IOException {
+        // Button 35 = no-button (3) + motion bit (32); terminator M.
+        // This is what a terminal sends for bare mouse motion under DECSET 1003.
+        QueueBackend backend = new QueueBackend(27, '[', '<', '3', '5', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.MOVE);
+        assertThat(mouse.button()).isEqualTo(MouseButton.NONE);
+        assertThat(mouse.x()).isEqualTo(9);  // 1-indexed column 10 -> 0-indexed 9
+        assertThat(mouse.y()).isEqualTo(4);  // 1-indexed row 5 -> 0-indexed 4
+    }
+
+    @Test
+    @DisplayName("SGR button 32 with M is a DRAG with the left button held")
+    void sgrLeftDragParsedAsDrag() throws IOException {
+        // Button 32 = left (0) + motion bit (32); terminator M.
+        // Regression guard: motion with a button held must stay DRAG, not MOVE.
+        QueueBackend backend = new QueueBackend(27, '[', '<', '3', '2', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.DRAG);
+        assertThat(mouse.button()).isEqualTo(MouseButton.LEFT);
+    }
+
+    @Test
+    @DisplayName("SGR button 0 with M is a left-button PRESS")
+    void sgrLeftPressParsedAsPress() throws IOException {
+        // Button 0 = left, no motion bit; terminator M. Regression guard for the
+        // non-motion branch after reordering MOVE/DRAG.
+        QueueBackend backend = new QueueBackend(27, '[', '<', '0', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.PRESS);
+        assertThat(mouse.button()).isEqualTo(MouseButton.LEFT);
+    }
+
     private static final class QueueBackend extends TestBackend {
 
         private final int[] input;

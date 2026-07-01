@@ -165,9 +165,17 @@ public class JLineBackend extends AbstractBackend {
 
     @Override
     public void enableMouseCapture() throws IOException {
+        enableMouseCapture(false);
+    }
+
+    @Override
+    public void enableMouseCapture(boolean motion) throws IOException {
         // Enable mouse tracking modes
         writer.print(CSI + "?1000h");  // Normal tracking
         writer.print(CSI + "?1002h");  // Button event tracking
+        if (motion) {
+            writer.print(CSI + "?1003h");  // Any-event tracking (motion without button held)
+        }
         writer.print(CSI + "?1015h");  // urxvt style
         writer.print(CSI + "?1006h");  // SGR extended mode
         writer.flush();
@@ -178,6 +186,9 @@ public class JLineBackend extends AbstractBackend {
     public void disableMouseCapture() throws IOException {
         writer.print(CSI + "?1006l");
         writer.print(CSI + "?1015l");
+        // Always clear any-event tracking; harmless if it was never enabled, and
+        // mandatory when it was, or the terminal keeps streaming motion after exit.
+        writer.print(CSI + "?1003l");
         writer.print(CSI + "?1002l");
         writer.print(CSI + "?1000l");
         writer.flush();

@@ -211,6 +211,7 @@ public final class CharWidth {
      *   <li>ZWJ sequences (e.g., 👨‍👦): width 2 for the combined glyph</li>
      *   <li>Regional Indicator pairs (flags, e.g., 🇫🇷): width 2</li>
      *   <li>Skin tone modifiers: zero-width (added to base emoji)</li>
+     *   <li>Emoji presentation sequences (1-wide base + VS16, e.g. ⌨️): width 2</li>
      * </ul>
      *
      * @param s the string to measure
@@ -247,6 +248,18 @@ public final class CharWidth {
                         i = nextIdx + Character.charCount(next);
                         continue;
                     }
+                }
+            }
+
+            // Emoji presentation sequence: a text-default glyph (1-wide on its own,
+            // e.g. U+2328 keyboard, U+23F9 stop, U+23FA record) followed by
+            // Variation Selector-16 (U+FE0F) is rendered as a 2-wide emoji.
+            if (cpWidth == 1) {
+                int vsIdx = i + charCount;
+                if (vsIdx < s.length() && s.codePointAt(vsIdx) == 0xFE0F) {
+                    width += 2;
+                    i = vsIdx + 1; // consume base glyph + VS16 (VS16 is in the BMP)
+                    continue;
                 }
             }
 

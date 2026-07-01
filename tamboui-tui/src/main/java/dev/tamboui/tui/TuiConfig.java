@@ -37,6 +37,7 @@ public final class TuiConfig {
     private final boolean alternateScreen;
     private final boolean hideCursor;
     private final boolean mouseCapture;
+    private final boolean mouseMotion;
     private final boolean bracketedPaste;
     private final Duration pollTimeout;
     private final Duration tickRate;
@@ -49,9 +50,58 @@ public final class TuiConfig {
     private final List<PostRenderProcessor> postRenderProcessors;
     private final Backend backend;
     private final ScheduledExecutorService scheduler;
+    private final ClassLoader backendClassLoader;
 
     /**
      * Creates a new TUI configuration with the specified options.
+     * <p>
+     * Prefer using {@link #builder()} or {@link #defaults()} instead of this constructor.
+     *
+     * @param rawMode whether to enable raw terminal mode
+     * @param alternateScreen whether to use the alternate screen buffer
+     * @param hideCursor whether to hide the cursor
+     * @param mouseCapture whether to capture mouse events
+     * @param mouseMotion whether to also capture bare mouse motion (hover) events
+     * @param bracketedPaste whether to enable bracketed paste mode
+     * @param pollTimeout timeout for polling events
+     * @param tickRate interval between tick events, or null to disable
+     * @param resizeGracePeriod grace period for resize events, or null to disable
+     * @param shutdownHook whether to register a JVM shutdown hook
+     * @param bindings the key/mouse bindings for semantic actions
+     * @param errorHandler the handler for render errors
+     * @param errorOutput the output stream for error logging
+     * @param fpsOverlayEnabled whether to show the FPS overlay
+     * @param postRenderProcessors list of post-render processors
+     * @param backend the backend to use (optional)
+     * @param scheduler external scheduler to use, or null to create an internal one
+     */
+    public TuiConfig(
+            boolean rawMode,
+            boolean alternateScreen,
+            boolean hideCursor,
+            boolean mouseCapture,
+            boolean mouseMotion,
+            boolean bracketedPaste,
+            Duration pollTimeout,
+            Duration tickRate,
+            Duration resizeGracePeriod,
+            boolean shutdownHook,
+            Bindings bindings,
+            RenderErrorHandler errorHandler,
+            PrintStream errorOutput,
+            boolean fpsOverlayEnabled,
+            List<PostRenderProcessor> postRenderProcessors,
+            Backend backend,
+            ScheduledExecutorService scheduler
+    ) {
+        this(rawMode, alternateScreen, hideCursor, mouseCapture, bracketedPaste, pollTimeout, tickRate,
+                resizeGracePeriod, shutdownHook, bindings, errorHandler, errorOutput, fpsOverlayEnabled,
+                postRenderProcessors, backend, scheduler, null);
+    }
+
+    /**
+     * Creates a new TUI configuration with the specified options, including an explicit
+     * classloader for backend discovery.
      * <p>
      * Prefer using {@link #builder()} or {@link #defaults()} instead of this constructor.
      *
@@ -71,6 +121,7 @@ public final class TuiConfig {
      * @param postRenderProcessors list of post-render processors
      * @param backend the backend to use (optional)
      * @param scheduler external scheduler to use, or null to create an internal one
+     * @param backendClassLoader classloader used exclusively for backend discovery, or null for the default
      */
     public TuiConfig(
             boolean rawMode,
@@ -86,14 +137,16 @@ public final class TuiConfig {
             RenderErrorHandler errorHandler,
             PrintStream errorOutput,
             boolean fpsOverlayEnabled,
-            List<PostRenderProcessor> postRenderProcessors, 
+            List<PostRenderProcessor> postRenderProcessors,
             Backend backend,
-            ScheduledExecutorService scheduler
+            ScheduledExecutorService scheduler,
+            ClassLoader backendClassLoader
     ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
         this.hideCursor = hideCursor;
         this.mouseCapture = mouseCapture;
+        this.mouseMotion = mouseMotion;
         this.bracketedPaste = bracketedPaste;
         this.pollTimeout = pollTimeout;
         this.tickRate = tickRate;
@@ -108,6 +161,7 @@ public final class TuiConfig {
                 : Collections.emptyList();
         this.backend = backend;
         this.scheduler = scheduler;
+        this.backendClassLoader = backendClassLoader;
     }
 
     /**
@@ -124,6 +178,7 @@ public final class TuiConfig {
                 true,                        // alternateScreen
                 true,                        // hideCursor
                 false,                       // mouseCapture
+                false,                       // mouseMotion
                 false,                       // bracketedPaste
                 Duration.ofMillis(DEFAULT_POLL_TIMEOUT),      // pollTimeout
                 Duration.ofMillis(DEFAULT_TICK_TIMEOUT),      // tickRate
@@ -201,6 +256,20 @@ public final class TuiConfig {
      */
     public boolean mouseCapture() {
         return mouseCapture;
+    }
+
+    /**
+     * Returns whether bare mouse motion (hover) capture is enabled.
+     * <p>
+     * When enabled together with {@link #mouseCapture()}, the backend requests
+     * any-event tracking so motion with no button held is delivered as
+     * {@code MouseEventKind.MOVE}. Disabled by default, since motion events fire
+     * for every terminal cell the cursor crosses.
+     *
+     * @return true if mouse motion capture is enabled
+     */
+    public boolean mouseMotion() {
+        return mouseMotion;
     }
 
     /**
@@ -321,6 +390,19 @@ public final class TuiConfig {
     }
 
     /**
+     * Returns the classloader used exclusively for backend discovery, or null for the default.
+     * <p>
+     * When null, a backend will be discovered using the default candidate classloaders (see
+     * {@link BackendFactory#create()}). When non-null, discovery uses only this classloader.
+     * Ignored when an explicit {@link #backend()} is set.
+     *
+     * @return the backend discovery classloader, or null
+     */
+    public ClassLoader backendClassLoader() {
+        return backendClassLoader;
+    }
+
+    /**
      * Returns the externally-managed scheduler, or null if the runner should create its own.
      * <p>
      * When an external scheduler is provided, the runner will NOT shut it down on close -
@@ -345,6 +427,7 @@ public final class TuiConfig {
         b.alternateScreen = alternateScreen;
         b.hideCursor = hideCursor;
         b.mouseCapture = mouseCapture;
+        b.mouseMotion = mouseMotion;
         b.bracketedPaste = bracketedPaste;
         b.pollTimeout = pollTimeout;
         b.tickRate = tickRate;
@@ -357,6 +440,7 @@ public final class TuiConfig {
         b.postRenderProcessors.addAll(postRenderProcessors);
         b.backend = backend;
         b.scheduler = scheduler;
+        b.backendClassLoader = backendClassLoader;
         return b;
     }
 
@@ -373,6 +457,7 @@ public final class TuiConfig {
                 && alternateScreen == that.alternateScreen
                 && hideCursor == that.hideCursor
                 && mouseCapture == that.mouseCapture
+                && mouseMotion == that.mouseMotion
                 && bracketedPaste == that.bracketedPaste
                 && pollTimeout.equals(that.pollTimeout)
                 && (tickRate != null ? tickRate.equals(that.tickRate) : that.tickRate == null)
@@ -388,6 +473,7 @@ public final class TuiConfig {
         result = 31 * result + Boolean.hashCode(alternateScreen);
         result = 31 * result + Boolean.hashCode(hideCursor);
         result = 31 * result + Boolean.hashCode(mouseCapture);
+        result = 31 * result + Boolean.hashCode(mouseMotion);
         result = 31 * result + Boolean.hashCode(bracketedPaste);
         result = 31 * result + pollTimeout.hashCode();
         result = 31 * result + (tickRate != null ? tickRate.hashCode() : 0);
@@ -401,11 +487,12 @@ public final class TuiConfig {
     @Override
     public String toString() {
         return String.format(
-                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
+                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, mouseMotion=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
                 rawMode,
                 alternateScreen,
                 hideCursor,
                 mouseCapture,
+                mouseMotion,
                 pollTimeout,
                 tickRate,
                 resizeGracePeriod,
@@ -423,6 +510,7 @@ public final class TuiConfig {
         private boolean alternateScreen = true;
         private boolean hideCursor = true;
         private boolean mouseCapture = false;
+        private boolean mouseMotion = false;
         private boolean bracketedPaste = false;
         private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
         private Duration tickRate = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
@@ -435,6 +523,7 @@ public final class TuiConfig {
         private final List<PostRenderProcessor> postRenderProcessors = new ArrayList<>();
         private Backend backend;
         private ScheduledExecutorService scheduler;
+        private ClassLoader backendClassLoader;
 
         private Builder() {
         }
@@ -449,6 +538,22 @@ public final class TuiConfig {
          */
         public Builder backend(Backend backend) {
             this.backend = backend;
+            return this;
+        }
+
+        /**
+         * Sets the classloader used exclusively for backend discovery.
+         * <p>
+         * When non-null, backend discovery uses only this classloader, which is useful for
+         * embedders (fat-jars, containers, app servers) where the thread-context classloader
+         * cannot see the bundled backend. Ignored when an explicit {@link #backend(Backend)}
+         * is set. Defaults to null (use the default candidate classloaders).
+         *
+         * @param backendClassLoader the classloader to use for discovery, or null for the default
+         * @return this builder
+         */
+        public Builder backendClassLoader(ClassLoader backendClassLoader) {
+            this.backendClassLoader = backendClassLoader;
             return this;
         }
 
@@ -504,6 +609,23 @@ public final class TuiConfig {
          */
         public Builder mouseCapture(boolean mouseCapture) {
             this.mouseCapture = mouseCapture;
+            return this;
+        }
+
+        /**
+         * Sets whether to capture bare mouse motion (hover) events.
+         * <p>
+         * Has effect only when {@link #mouseCapture(boolean)} is also enabled.
+         * When on, the backend requests any-event tracking so motion with no
+         * button held is delivered as {@code MouseEventKind.MOVE}. Disabled by
+         * default, since it generates an event for every terminal cell the cursor
+         * crosses.
+         *
+         * @param mouseMotion true to enable mouse motion (hover) capture
+         * @return this builder
+         */
+        public Builder mouseMotion(boolean mouseMotion) {
+            this.mouseMotion = mouseMotion;
             return this;
         }
 
@@ -679,6 +801,7 @@ public final class TuiConfig {
                     alternateScreen,
                     hideCursor,
                     mouseCapture,
+                    mouseMotion,
                     bracketedPaste,
                     pollTimeout,
                     tickRate,
@@ -690,7 +813,8 @@ public final class TuiConfig {
                     fpsOverlayEnabled,
                     postRenderProcessors,
                     backend,
-                    scheduler
+                    scheduler,
+                    backendClassLoader
             );
         }
     }

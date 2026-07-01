@@ -202,6 +202,8 @@ public final class Buffer {
      *   <li>ZWJ sequences: characters after ZWJ are appended to the preceding cell</li>
      *   <li>Regional Indicator pairs: combined into a single 2-wide cell</li>
      *   <li>Skin tone modifiers: appended to preceding cell (zero-width)</li>
+     *   <li>Emoji presentation sequences: a 1-wide base glyph followed by VS16 is
+     *       promoted to a 2-wide cell with a continuation</li>
      * </ul>
      *
      * @param x the x coordinate
@@ -232,6 +234,20 @@ public final class Buffer {
                     Cell baseCell = get(baseCol, y);
                     String combined = baseCell.symbol() + new String(Character.toChars(codePoint));
                     set(baseCol, y, baseCell.symbol(combined));
+
+                    // Variation Selector-16 forces emoji (2-wide) presentation. When the base
+                    // glyph was placed as 1-wide (a text-default symbol such as U+2328 keyboard,
+                    // U+23F9 stop or U+23FA record), promote it to occupy two cells so the
+                    // terminal's 2-wide rendering stays in sync with the buffer. Without this the
+                    // following cell is left untracked and stale glyphs remain on screen.
+                    // At the extreme right edge (base on the last column) the loop breaks before
+                    // VS16 is reached, so the glyph degrades to its 1-wide text presentation,
+                    // matching how wide characters truncate at the right edge.
+                    if (codePoint == 0xFE0F && baseCol == col - 1
+                            && col < area.right() && !get(col, y).isContinuation()) {
+                        set(col, y, Cell.CONTINUATION);
+                        col++;
+                    }
                 }
                 // Check if this is ZWJ - next char should join
                 if (codePoint == 0x200D) {

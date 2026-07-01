@@ -6,6 +6,8 @@ package dev.tamboui.tui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.Duration;
 
 import org.junit.jupiter.api.DisplayName;
@@ -86,6 +88,35 @@ class TuiConfigTest {
 
         assertThat(config.rawMode()).isTrue();
         assertThat(config.mouseCapture()).isTrue();
+    }
+
+    @Test
+    @DisplayName("mouseMotion defaults to false")
+    void mouseMotionDefaultsToFalse() {
+        assertThat(TuiConfig.defaults().mouseMotion()).isFalse();
+        assertThat(TuiConfig.builder().build().mouseMotion()).isFalse();
+    }
+
+    @Test
+    @DisplayName("builder enables mouseMotion independently of mouseCapture")
+    void builderEnablesMouseMotion() {
+        TuiConfig config = TuiConfig.builder()
+                .mouseCapture(true)
+                .mouseMotion(true)
+                .build();
+
+        assertThat(config.mouseCapture()).isTrue();
+        assertThat(config.mouseMotion()).isTrue();
+    }
+
+    @Test
+    @DisplayName("toBuilder preserves mouseMotion")
+    void toBuilderPreservesMouseMotion() {
+        TuiConfig original = TuiConfig.builder().mouseMotion(true).build();
+
+        TuiConfig derived = original.toBuilder().build();
+
+        assertThat(derived.mouseMotion()).isTrue();
     }
 
     @Test
@@ -215,6 +246,37 @@ class TuiConfigTest {
         assertThat(derived.pollTimeout()).isEqualTo(original.pollTimeout());
         assertThat(derived.tickRate()).isEqualTo(original.tickRate());
         assertThat(derived.shutdownHook()).isEqualTo(original.shutdownHook());
+    }
+
+    @Test
+    @DisplayName("backendClassLoader defaults to null")
+    void backendClassLoaderDefaultsToNull() {
+        assertThat(TuiConfig.defaults().backendClassLoader()).isNull();
+        assertThat(TuiConfig.builder().build().backendClassLoader()).isNull();
+    }
+
+    @Test
+    @DisplayName("builder sets backendClassLoader")
+    void builderSetsBackendClassLoader() {
+        ClassLoader loader = new URLClassLoader(new URL[0], getClass().getClassLoader());
+
+        TuiConfig config = TuiConfig.builder()
+                .backendClassLoader(loader)
+                .build();
+
+        assertThat(config.backendClassLoader()).isSameAs(loader);
+    }
+
+    @Test
+    @DisplayName("toBuilder preserves backendClassLoader")
+    void toBuilderPreservesBackendClassLoader() {
+        ClassLoader loader = new URLClassLoader(new URL[0], getClass().getClassLoader());
+        TuiConfig original = TuiConfig.builder().backendClassLoader(loader).build();
+
+        TuiConfig derived = original.toBuilder().mouseCapture(true).build();
+
+        assertThat(derived.backendClassLoader()).isSameAs(loader);
+        assertThat(derived.mouseCapture()).isTrue();
     }
 
     @Test
