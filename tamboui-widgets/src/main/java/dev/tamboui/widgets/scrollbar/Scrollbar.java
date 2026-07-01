@@ -336,26 +336,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         // Calculate thumb position and size
-        int contentLength = state.contentLength();
-        int viewportLength = state.viewportContentLength() > 0
-            ? state.viewportContentLength()
-            : trackLength;
-
-        // Thumb size proportional to viewport/content ratio
-        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
-        thumbSize = Math.min(thumbSize, trackLength);
-
-        // Thumb position
-        int scrollableRange = contentLength - viewportLength;
-        int thumbPosition;
-        if (scrollableRange <= 0) {
-            thumbPosition = 0;
-        } else {
-            double scrollFraction = (double) state.position() / scrollableRange;
-            scrollFraction = Math.max(0.0, Math.min(1.0, scrollFraction));
-            int thumbRange = trackLength - thumbSize;
-            thumbPosition = (int) Math.round(scrollFraction * thumbRange);
-        }
+        int[] thumb = computeThumbGeometry(trackLength, state);
+        int thumbSize = thumb[0];
+        int thumbPosition = thumb[1];
 
         // Get effective styles
         Style effectiveStyle = style != null ? style : Style.EMPTY;
@@ -423,6 +406,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         Rect trackArea = calculateTrackArea(area);
         if (trackArea.isEmpty()) {
+            if (action == ScrollbarAction.RELEASE && state.isDragging()) {
+                state.endDrag();
+                return true;
+            }
             return false;
         }
 
@@ -430,6 +417,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         int endOffset = endSymbol != null ? 1 : 0;
         int trackLength = (orientation.isVertical() ? trackArea.height() : trackArea.width()) - beginOffset - endOffset;
         if (trackLength <= 0) {
+            if (action == ScrollbarAction.RELEASE && state.isDragging()) {
+                state.endDrag();
+                return true;
+            }
             return false;
         }
 
@@ -491,23 +482,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
             return false;
         }
 
-        int contentLength = state.contentLength();
-        int viewportLength = state.viewportContentLength() > 0
-            ? state.viewportContentLength()
-            : trackLength;
-        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
-        thumbSize = Math.min(thumbSize, trackLength);
-
-        int scrollableRange = contentLength - viewportLength;
-        int thumbPosition;
-        if (scrollableRange <= 0) {
-            thumbPosition = 0;
-        } else {
-            double scrollFraction = (double) state.position() / scrollableRange;
-            scrollFraction = Math.max(0.0, Math.min(1.0, scrollFraction));
-            int thumbRange = trackLength - thumbSize;
-            thumbPosition = (int) Math.round(scrollFraction * thumbRange);
-        }
+        int[] thumb = computeThumbGeometry(trackLength, state);
+        int thumbSize = thumb[0];
+        int thumbPosition = thumb[1];
 
         if (relativePos >= thumbPosition && relativePos < thumbPosition + thumbSize) {
             state.startDrag(relativePos - thumbPosition);
@@ -522,14 +499,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
     }
 
     private boolean handleDrag(int mouseScrollPos, int trackStart, int trackLength, ScrollbarState state) {
-        int contentLength = state.contentLength();
-        int viewportLength = state.viewportContentLength() > 0
-            ? state.viewportContentLength()
-            : trackLength;
-        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
-        thumbSize = Math.min(thumbSize, trackLength);
+        int[] thumb = computeThumbGeometry(trackLength, state);
+        int thumbSize = thumb[0];
+        int scrollableRange = thumb[2];
 
-        int scrollableRange = contentLength - viewportLength;
         if (scrollableRange <= 0) {
             return true;
         }
@@ -601,6 +574,37 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         if (end != null) {
             buffer.setString(x + trackLength, y, end, endStyle);
         }
+    }
+
+    /**
+     * Computes the thumb size, position, and scrollable range for the given state and track.
+     * <p>
+     * This is the single source of truth used by both rendering and mouse hit-testing,
+     * ensuring that clicks always target the visually rendered thumb.
+     *
+     * @return an array of four ints: [thumbSize, thumbPosition, scrollableRange, viewportLength]
+     */
+    private int[] computeThumbGeometry(int trackLength, ScrollbarState state) {
+        int contentLength = state.contentLength();
+        int viewportLength = state.viewportContentLength() > 0
+            ? state.viewportContentLength()
+            : trackLength;
+
+        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
+        thumbSize = Math.min(thumbSize, trackLength);
+
+        int scrollableRange = contentLength - viewportLength;
+        int thumbPosition;
+        if (scrollableRange <= 0) {
+            thumbPosition = 0;
+        } else {
+            double scrollFraction = (double) state.position() / scrollableRange;
+            scrollFraction = Math.max(0.0, Math.min(1.0, scrollFraction));
+            int thumbRange = trackLength - thumbSize;
+            thumbPosition = (int) Math.round(scrollFraction * thumbRange);
+        }
+
+        return new int[] { thumbSize, thumbPosition, scrollableRange, viewportLength };
     }
 
     private Rect calculateTrackArea(Rect area) {

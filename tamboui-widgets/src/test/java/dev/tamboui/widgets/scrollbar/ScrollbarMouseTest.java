@@ -400,6 +400,10 @@ class ScrollbarMouseTest {
         @Test
         @DisplayName("Markers reduce effective track length for thumb calculation")
         void markersReduceTrackLength() {
+            // Drag to the same absolute y position with and without markers.
+            // With markers (trackLength=8, thumbRange=7): fraction = 4/7 ≈ 0.571
+            // Without markers (trackLength=10, thumbRange=9): fraction = 5/9 ≈ 0.556
+            // The different track lengths produce different scroll positions.
             Scrollbar withMarkers = Scrollbar.builder()
                 .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
                 .beginSymbol("↑")
@@ -412,18 +416,17 @@ class ScrollbarMouseTest {
             Rect area = new Rect(0, 0, 5, 10);
 
             state.startDrag(0);
-            withMarkers.handleMouseAction(4, 9, ScrollbarAction.DRAG, area, state);
+            withMarkers.handleMouseAction(4, 5, ScrollbarAction.DRAG, area, state);
             int posWithMarkers = state.position();
             state.endDrag();
 
             state.position(0);
             state.startDrag(0);
-            noMarkers.handleMouseAction(4, 9, ScrollbarAction.DRAG, area, state);
+            noMarkers.handleMouseAction(4, 5, ScrollbarAction.DRAG, area, state);
             int posWithout = state.position();
             state.endDrag();
 
-            assertThat(posWithMarkers).isEqualTo(90);
-            assertThat(posWithout).isEqualTo(90);
+            assertThat(posWithMarkers).isNotEqualTo(posWithout);
         }
     }
 
