@@ -5,6 +5,7 @@
 package dev.tamboui.widgets.sparkline;
 
 import java.util.List;
+import java.util.function.LongFunction;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
@@ -114,6 +115,7 @@ public final class DualSparkline implements Widget {
     private final Sparkline.BarSet reversedBarSet;
     private final Sparkline.RenderDirection direction;
     private final boolean showYAxis;
+    private final LongFunction<String> yAxisFormatter;
     private final String[] xLabels;
 
     private DualSparkline(Builder builder) {
@@ -125,6 +127,7 @@ public final class DualSparkline implements Widget {
         this.reversedBarSet = builder.barSet.reversed();
         this.direction = builder.direction;
         this.showYAxis = builder.showYAxis;
+        this.yAxisFormatter = builder.yAxisFormatter;
         this.xLabels = builder.xLabels;
 
         Color resolvedTopFg = builder.resolveTopColor();
@@ -232,7 +235,12 @@ public final class DualSparkline implements Widget {
             int y = inner.y() + r;
 
             if (showYAxis) {
-                String maxLabel = effectiveMax > 9999 ? "999+" : String.format("%4d", effectiveMax);
+                String maxLabel;
+                if (yAxisFormatter != null) {
+                    maxLabel = String.format("%4s", yAxisFormatter.apply(effectiveMax));
+                } else {
+                    maxLabel = effectiveMax > 9999 ? "999+" : String.format("%4d", effectiveMax);
+                }
                 String label;
                 if (r == 0) {
                     label = maxLabel;
@@ -355,6 +363,7 @@ public final class DualSparkline implements Widget {
         private Sparkline.BarSet barSet = Sparkline.BarSet.NINE_LEVELS;
         private Sparkline.RenderDirection direction = Sparkline.RenderDirection.LEFT_TO_RIGHT;
         private boolean showYAxis = false;
+        private LongFunction<String> yAxisFormatter;
         private String[] xLabels;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
         private Color topForeground;
@@ -532,6 +541,18 @@ public final class DualSparkline implements Widget {
          */
         public Builder showYAxis(boolean show) {
             this.showYAxis = show;
+            return this;
+        }
+
+        /**
+         * Sets a custom formatter for Y-axis labels. When set, used instead of the default integer format. The
+         * function receives the raw data value and should return a short label (up to 4 characters).
+         *
+         * @param formatter function mapping a data value to a label string
+         * @return this builder
+         */
+        public Builder yAxisFormatter(LongFunction<String> formatter) {
+            this.yAxisFormatter = formatter;
             return this;
         }
 
