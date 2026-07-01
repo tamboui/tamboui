@@ -135,6 +135,16 @@ public final class Actions {
      */
     public static final String SCROLL_DOWN = "scrollDown";
 
+    /**
+     * Scroll left (horizontal/tilt scroll wheel left).
+     */
+    public static final String SCROLL_LEFT = "scrollLeft";
+
+    /**
+     * Scroll right (horizontal/tilt scroll wheel right).
+     */
+    public static final String SCROLL_RIGHT = "scrollRight";
+
     // Debug / Development
     /**
      * Toggle the debug overlay.

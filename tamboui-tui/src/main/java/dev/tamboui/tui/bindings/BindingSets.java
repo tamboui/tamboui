@@ -205,6 +205,10 @@ public final class BindingSets {
         map.put("scroll_up", MouseEventKind.SCROLL_UP);
         map.put("scrolldown", MouseEventKind.SCROLL_DOWN);
         map.put("scroll_down", MouseEventKind.SCROLL_DOWN);
+        map.put("scrollleft", MouseEventKind.SCROLL_LEFT);
+        map.put("scroll_left", MouseEventKind.SCROLL_LEFT);
+        map.put("scrollright", MouseEventKind.SCROLL_RIGHT);
+        map.put("scroll_right", MouseEventKind.SCROLL_RIGHT);
         return map;
     }
 

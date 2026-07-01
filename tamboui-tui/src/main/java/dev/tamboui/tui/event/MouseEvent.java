@@ -175,6 +175,28 @@ public final class MouseEvent implements Event {
     }
 
     /**
+     * Creates a scroll left event (horizontal/tilt wheel).
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return mouse event
+     */
+    public static MouseEvent scrollLeft(int x, int y) {
+        return new MouseEvent(MouseEventKind.SCROLL_LEFT, MouseButton.NONE, x, y, KeyModifiers.NONE);
+    }
+
+    /**
+     * Creates a scroll right event (horizontal/tilt wheel).
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return mouse event
+     */
+    public static MouseEvent scrollRight(int x, int y) {
+        return new MouseEvent(MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, x, y, KeyModifiers.NONE);
+    }
+
+    /**
      * Returns true if this is a press event.
      *
      * @return true if this is a mouse press event
@@ -211,12 +233,13 @@ public final class MouseEvent implements Event {
     }
 
     /**
-     * Returns true if this is a scroll event.
+     * Returns true if this is a scroll event (vertical or horizontal).
      *
-     * @return true if this is a scroll-up or scroll-down event
+     * @return true if this is a scroll event
      */
     public boolean isScroll() {
-        return kind == MouseEventKind.SCROLL_UP || kind == MouseEventKind.SCROLL_DOWN;
+        return kind == MouseEventKind.SCROLL_UP || kind == MouseEventKind.SCROLL_DOWN
+                || kind == MouseEventKind.SCROLL_LEFT || kind == MouseEventKind.SCROLL_RIGHT;
     }
 
     /**

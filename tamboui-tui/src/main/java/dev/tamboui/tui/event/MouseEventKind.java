@@ -24,5 +24,11 @@ public enum MouseEventKind {
     SCROLL_UP,
 
     /** Scroll wheel was scrolled down. */
-    SCROLL_DOWN
+    SCROLL_DOWN,
+
+    /** Scroll wheel was scrolled left (horizontal/tilt wheel). */
+    SCROLL_LEFT,
+
+    /** Scroll wheel was scrolled right (horizontal/tilt wheel). */
+    SCROLL_RIGHT
 }

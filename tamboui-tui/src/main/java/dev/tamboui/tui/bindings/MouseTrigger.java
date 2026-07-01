@@ -160,6 +160,24 @@ public final class MouseTrigger implements InputTrigger {
     }
 
     /**
+     * Creates a trigger for scroll wheel left (horizontal/tilt wheel).
+     *
+     * @return a trigger that matches scroll left
+     */
+    public static MouseTrigger scrollLeft() {
+        return new MouseTrigger(MouseEventKind.SCROLL_LEFT, MouseButton.NONE, false, false, false);
+    }
+
+    /**
+     * Creates a trigger for scroll wheel right (horizontal/tilt wheel).
+     *
+     * @return a trigger that matches scroll right
+     */
+    public static MouseTrigger scrollRight() {
+        return new MouseTrigger(MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, false, false, false);
+    }
+
+    /**
      * Creates a trigger for a drag event.
      *
      * @param button the button held during drag

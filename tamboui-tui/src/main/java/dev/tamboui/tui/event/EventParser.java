@@ -416,9 +416,17 @@ public final class EventParser {
         int button = buttonCode & ~(4 | 8 | 16);
 
         // Determine event kind and button
-        if (button >= 64 && button <= 65) {
-            // Scroll wheel
-            MouseEventKind kind = (button == 64) ? MouseEventKind.SCROLL_UP : MouseEventKind.SCROLL_DOWN;
+        if (button >= 64 && button <= 67) {
+            MouseEventKind kind;
+            if (button == 65) {
+                kind = MouseEventKind.SCROLL_DOWN;
+            } else if (button == 66) {
+                kind = MouseEventKind.SCROLL_LEFT;
+            } else if (button == 67) {
+                kind = MouseEventKind.SCROLL_RIGHT;
+            } else {
+                kind = MouseEventKind.SCROLL_UP;
+            }
             return new MouseEvent(kind, MouseButton.NONE, x, y, mods, bindings);
         }
 
