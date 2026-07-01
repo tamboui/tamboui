@@ -7,6 +7,7 @@ package dev.tamboui.markdown;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Modifier;
@@ -258,12 +259,13 @@ class MarkdownViewTest {
     @DisplayName("renders bottom of a code block when top is scrolled off-screen")
     void rendersCodeBlockScrolledFromTop() {
         // 1-line code block = 3 rows (top border + content + bottom border).
+        // Viewport must be smaller than content so scrolling is possible.
         // Scroll by 1 so the top border is off-screen — should show content + bottom border.
         MarkdownView view = MarkdownView.builder()
             .source("```\ncode\n```")
             .scroll(1)
             .build();
-        Buffer buffer = renderInto(view, 20, 3);
+        Buffer buffer = renderInto(view, 20, 2);
 
         // Row 0: code content (top border scrolled away)
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("c");
@@ -274,12 +276,13 @@ class MarkdownViewTest {
     @Test
     @DisplayName("renders only bottom border when code block is mostly scrolled off")
     void rendersCodeBlockBottomBorderOnly() {
-        // 1-line code block = 3 rows. Scroll by 2 — only bottom border remains visible.
+        // 1-line code block = 3 rows. Viewport must be smaller than content.
+        // Scroll by 2 — only bottom border remains visible.
         MarkdownView view = MarkdownView.builder()
             .source("```\ncode\n```")
             .scroll(2)
             .build();
-        Buffer buffer = renderInto(view, 20, 3);
+        Buffer buffer = renderInto(view, 20, 1);
 
         // Row 0: bottom border only
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("╰");
@@ -328,5 +331,65 @@ class MarkdownViewTest {
             MarkdownView view = MarkdownView.builder().source(full.substring(0, len)).build();
             renderInto(view, 30, 6);
         }
+    }
+
+    @Test
+    @DisplayName("scroll clamp prevents scrolling past content bottom")
+    void scrollClampPreventsBlankScreen() {
+        // 5 content rows: "line one" / blank / "line two" / blank / "line three"
+        // Viewport height 3 → clamp = max(0, 5-3) = 2 → shows rows 2-4
+        String source = "line one\n\nline two\n\nline three";
+
+        MarkdownView scrolled = MarkdownView.builder()
+            .source(source)
+            .scroll(Integer.MAX_VALUE)
+            .build();
+        Buffer scrolledBuf = renderInto(scrolled, 30, 3);
+
+        // Row 0: "line two", Row 1: blank, Row 2: "line three"
+        BufferAssertions.assertThat(scrolledBuf)
+            .hasSymbolAt(0, 0, "l")
+            .hasSymbolAt(5, 0, "t")
+            .hasSymbolAt(7, 0, "o")
+            .hasSymbolAt(0, 2, "l")
+            .hasSymbolAt(5, 2, "t")
+            .hasSymbolAt(9, 2, "e");
+    }
+
+    @Test
+    @DisplayName("scroll clamp with content shorter than viewport stays at top")
+    void scrollClampContentShorterThanViewport() {
+        // 1 content row, 5-row viewport → clamp = max(0, 1-5) = 0
+        MarkdownView scrolled = MarkdownView.builder()
+            .source("hello")
+            .scroll(Integer.MAX_VALUE)
+            .build();
+        Buffer buf = renderInto(scrolled, 30, 5);
+
+        BufferAssertions.assertThat(buf)
+            .hasSymbolAt(0, 0, "h")
+            .hasSymbolAt(4, 0, "o");
+    }
+
+    @Test
+    @DisplayName("scroll clamp with content exactly fitting viewport stays at top")
+    void scrollClampContentExactlyFitsViewport() {
+        // 5 content rows, 5-row viewport → clamp = max(0, 5-5) = 0
+        String source = "line one\n\nline two\n\nline three";
+
+        MarkdownView scrolled = MarkdownView.builder()
+            .source(source)
+            .scroll(Integer.MAX_VALUE)
+            .build();
+        Buffer buf = renderInto(scrolled, 30, 5);
+
+        // All content visible from the top
+        BufferAssertions.assertThat(buf)
+            .hasSymbolAt(0, 0, "l")
+            .hasSymbolAt(5, 0, "o")
+            .hasSymbolAt(0, 2, "l")
+            .hasSymbolAt(5, 2, "t")
+            .hasSymbolAt(0, 4, "l")
+            .hasSymbolAt(5, 4, "t");
     }
 }
