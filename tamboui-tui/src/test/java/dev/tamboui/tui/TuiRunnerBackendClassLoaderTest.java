@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui;
 
+import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TuiRunnerBackendClassLoaderTest {
 
     private static ClassLoader newLoader() {
-        return new URLClassLoader(new java.net.URL[0], TuiRunnerBackendClassLoaderTest.class.getClassLoader());
+        return new URLClassLoader(new URL[0], TuiRunnerBackendClassLoaderTest.class.getClassLoader());
     }
 
     @Test

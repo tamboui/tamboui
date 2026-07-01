@@ -5,6 +5,7 @@
 package dev.tamboui.terminal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,7 +101,7 @@ public final class BackendFactory {
 
         // Load all available providers, capturing any that fail to instantiate so that a present
         // but broken backend is not mistaken for an absent one.
-        List<Throwable> loadFailures = new java.util.ArrayList<>();
+        List<Throwable> loadFailures = new ArrayList<>();
         List<BackendProvider> allProviders =
                 SafeServiceLoader.load(BackendProvider.class, classLoader, loadFailures::add);
 
@@ -130,7 +131,7 @@ public final class BackendFactory {
      */
     private static List<BackendProvider> resolveProviders(
             String providerSpec, List<BackendProvider> allProviders, List<Throwable> loadFailures) {
-        List<BackendProvider> resolved = new java.util.ArrayList<>();
+        List<BackendProvider> resolved = new ArrayList<>();
         for (String spec : providerSpec.split(",")) {
             String trimmedSpec = spec.trim();
             if (trimmedSpec.isEmpty()) {
@@ -144,6 +145,10 @@ public final class BackendFactory {
                     // providers when there are no usable ones at all; otherwise an unrelated
                     // failure would wrongly claim that "none could be initialized" even though a
                     // working provider was discovered (the requested name is simply absent).
+                    // Trade-off: if the requested provider itself is broken while a different one
+                    // works (e.g. jline broken, panama fine), allProviders is non-empty so this
+                    // reports "not found" rather than "broken". ServiceLoader does not tell us
+                    // which class failed, so we cannot distinguish those cases here.
                     .orElseThrow(() -> (!loadFailures.isEmpty() && allProviders.isEmpty())
                             ? brokenProvidersException(loadFailures)
                             : new BackendException(
@@ -196,7 +201,8 @@ public final class BackendFactory {
 
     /**
      * Builds the exception describing providers that were discovered on the classpath but failed
-     * to initialize, attaching the first failure as the cause.
+     * to initialize, attaching the first failure as the cause and any remaining failures as
+     * suppressed exceptions so their full stack traces are preserved for diagnostics.
      *
      * @param loadFailures the non-empty list of discovery/instantiation failures
      * @return a {@link BackendException} reporting the failures
@@ -205,11 +211,15 @@ public final class BackendFactory {
         String detail = loadFailures.stream()
                 .map(t -> "  " + t.getMessage())
                 .collect(Collectors.joining("\n"));
-        return new BackendException(
+        BackendException exception = new BackendException(
                 "Found " + loadFailures.size() + " BackendProvider(s) on the classpath but none "
                         + "could be initialized (see cause).\nFailures:\n" + detail,
                 loadFailures.get(0)
         );
+        for (int i = 1; i < loadFailures.size(); i++) {
+            exception.addSuppressed(loadFailures.get(i));
+        }
+        return exception;
     }
 
     /**

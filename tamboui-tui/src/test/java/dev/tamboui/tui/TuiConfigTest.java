@@ -6,6 +6,8 @@ package dev.tamboui.tui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.Duration;
 
 import org.junit.jupiter.api.DisplayName;
@@ -256,7 +258,7 @@ class TuiConfigTest {
     @Test
     @DisplayName("builder sets backendClassLoader")
     void builderSetsBackendClassLoader() {
-        ClassLoader loader = new java.net.URLClassLoader(new java.net.URL[0], getClass().getClassLoader());
+        ClassLoader loader = new URLClassLoader(new URL[0], getClass().getClassLoader());
 
         TuiConfig config = TuiConfig.builder()
                 .backendClassLoader(loader)
@@ -268,7 +270,7 @@ class TuiConfigTest {
     @Test
     @DisplayName("toBuilder preserves backendClassLoader")
     void toBuilderPreservesBackendClassLoader() {
-        ClassLoader loader = new java.net.URLClassLoader(new java.net.URL[0], getClass().getClassLoader());
+        ClassLoader loader = new URLClassLoader(new URL[0], getClass().getClassLoader());
         TuiConfig original = TuiConfig.builder().backendClassLoader(loader).build();
 
         TuiConfig derived = original.toBuilder().mouseCapture(true).build();
