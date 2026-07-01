@@ -17,6 +17,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.jfr.TerminalDrawEvent;
+import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
 
@@ -39,6 +40,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     private Buffer currentBuffer;
     private Buffer previousBuffer;
     private boolean hiddenCursor;
+    private Position previousCursorPosition;
     private boolean previousFrameHadRawOutput;
     private List<Rect> previousRawOutputAreas = Collections.emptyList();
 
@@ -149,24 +151,29 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
                 // Calculate diff and draw (zero-allocation DoD variant)
                 previousBuffer.diff(currentBuffer, diffResult);
+                boolean hadDiff = !diffResult.isEmpty();
 
                 // Wrap rendering in synchronized update (Mode 2026) to prevent tearing.
                 // BSU, draw data, cursor ops, and ESU are all written to the output
                 // buffer and flushed together in a single syscall for atomic rendering.
                 backend.beginSynchronizedUpdate();
                 try {
-                    if (!diffResult.isEmpty()) {
+                    if (hadDiff) {
                         backend.draw(diffResult);
                     }
 
-                    // Handle cursor
+                    // Handle cursor — skip redundant setCursorPosition when nothing
+                    // on screen changed, so the terminal's blink timer is not reset
                     if (frame.isCursorVisible()) {
                         frame.cursorPosition().ifPresent(pos -> {
                             try {
-                                backend.setCursorPosition(pos);
-                                if (hiddenCursor) {
-                                    backend.showCursor();
-                                    hiddenCursor = false;
+                                if (hiddenCursor || hadDiff || !pos.equals(previousCursorPosition)) {
+                                    backend.setCursorPosition(pos);
+                                    if (hiddenCursor) {
+                                        backend.showCursor();
+                                        hiddenCursor = false;
+                                    }
+                                    previousCursorPosition = pos;
                                 }
                             } catch (IOException e) {
                                 throw new RuntimeIOException(
@@ -178,6 +185,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                         try {
                             backend.hideCursor();
                             hiddenCursor = true;
+                            previousCursorPosition = null;
                         } catch (IOException e) {
                             throw new RuntimeIOException("Failed to hide cursor: " + e.getMessage(), e);
                         }
