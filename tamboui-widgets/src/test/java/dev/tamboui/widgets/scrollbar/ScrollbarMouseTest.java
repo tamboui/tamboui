@@ -95,17 +95,40 @@ class ScrollbarMouseTest {
         }
 
         @Test
-        @DisplayName("Page down clamps at end")
-        void pageDownClampsAtEnd() {
+        @DisplayName("Click on thumb at end starts drag instead of page down")
+        void clickOnThumbAtEndStartsDrag() {
             Scrollbar scrollbar = Scrollbar.vertical();
+            // At position >= scrollableRange (100-10=90), the thumb sits at the very
+            // bottom of the track, so a click there starts a drag rather than paging.
             ScrollbarState state = new ScrollbarState(100)
                 .viewportContentLength(10)
                 .position(95);
             Rect area = new Rect(0, 0, 5, 10);
 
-            scrollbar.handleMouseAction(4, 9, ScrollbarAction.PRESS, area, state);
+            boolean consumed = scrollbar.handleMouseAction(4, 9, ScrollbarAction.PRESS, area, state);
 
-            assertThat(state.position()).isEqualTo(99);
+            assertThat(consumed).isTrue();
+            assertThat(state.isDragging()).isTrue();
+            assertThat(state.position()).isEqualTo(95);
+        }
+
+        @Test
+        @DisplayName("Page down near end increases position within bounds")
+        void pageDownNearEnd() {
+            Scrollbar scrollbar = Scrollbar.vertical();
+            // Use a taller area (20 cells) so the thumb doesn't occupy the last cell.
+            // trackLength=20, thumbSize=ceil(10/100*20)=2, scrollableRange=90,
+            // thumbRange=18, position 85: fraction=85/90≈0.944, thumbPos=round(17.0)=17
+            // thumb at cells 17-18, click at y=19 is below the thumb → pageDown
+            ScrollbarState state = new ScrollbarState(100)
+                .viewportContentLength(10)
+                .position(85);
+            Rect area = new Rect(0, 0, 5, 20);
+
+            boolean consumed = scrollbar.handleMouseAction(4, 19, ScrollbarAction.PRESS, area, state);
+
+            assertThat(consumed).isTrue();
+            assertThat(state.position()).isEqualTo(95);
         }
     }
 
