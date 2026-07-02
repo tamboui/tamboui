@@ -336,9 +336,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         // Calculate thumb position and size
-        int[] thumb = computeThumbGeometry(trackLength, state);
-        int thumbSize = thumb[0];
-        int thumbPosition = thumb[1];
+        ThumbGeometry thumb = computeThumbGeometry(trackLength, state);
+        int thumbSize = thumb.size;
+        int thumbPosition = thumb.position;
 
         // Get effective styles
         Style effectiveStyle = style != null ? style : Style.EMPTY;
@@ -482,14 +482,12 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
             return false;
         }
 
-        int[] thumb = computeThumbGeometry(trackLength, state);
-        int thumbSize = thumb[0];
-        int thumbPosition = thumb[1];
+        ThumbGeometry thumb = computeThumbGeometry(trackLength, state);
 
-        if (relativePos >= thumbPosition && relativePos < thumbPosition + thumbSize) {
-            state.startDrag(relativePos - thumbPosition);
+        if (relativePos >= thumb.position && relativePos < thumb.position + thumb.size) {
+            state.startDrag(relativePos - thumb.position);
             return true;
-        } else if (relativePos < thumbPosition) {
+        } else if (relativePos < thumb.position) {
             state.pageUp();
             return true;
         } else {
@@ -499,15 +497,13 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
     }
 
     private boolean handleDrag(int mouseScrollPos, int trackStart, int trackLength, ScrollbarState state) {
-        int[] thumb = computeThumbGeometry(trackLength, state);
-        int thumbSize = thumb[0];
-        int scrollableRange = thumb[2];
+        ThumbGeometry thumb = computeThumbGeometry(trackLength, state);
 
-        if (scrollableRange <= 0) {
+        if (thumb.scrollableRange <= 0) {
             return true;
         }
 
-        int thumbRange = trackLength - thumbSize;
+        int thumbRange = trackLength - thumb.size;
         if (thumbRange <= 0) {
             return true;
         }
@@ -515,7 +511,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         int relativePos = mouseScrollPos - trackStart;
         double fraction = (double) (relativePos - state.dragOffset()) / thumbRange;
         fraction = Math.max(0.0, Math.min(1.0, fraction));
-        int newPosition = (int) Math.round(fraction * scrollableRange);
+        int newPosition = (int) Math.round(fraction * thumb.scrollableRange);
         state.position(newPosition);
         return true;
     }
@@ -577,14 +573,24 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
     }
 
     /**
-     * Computes the thumb size, position, and scrollable range for the given state and track.
+     * Computed thumb geometry for a given track length and scrollbar state.
      * <p>
      * This is the single source of truth used by both rendering and mouse hit-testing,
      * ensuring that clicks always target the visually rendered thumb.
-     *
-     * @return an array of four ints: [thumbSize, thumbPosition, scrollableRange, viewportLength]
      */
-    private int[] computeThumbGeometry(int trackLength, ScrollbarState state) {
+    private static final class ThumbGeometry {
+        final int size;
+        final int position;
+        final int scrollableRange;
+
+        ThumbGeometry(int size, int position, int scrollableRange) {
+            this.size = size;
+            this.position = position;
+            this.scrollableRange = scrollableRange;
+        }
+    }
+
+    private ThumbGeometry computeThumbGeometry(int trackLength, ScrollbarState state) {
         int contentLength = state.contentLength();
         int viewportLength = state.viewportContentLength() > 0
             ? state.viewportContentLength()
@@ -604,7 +610,7 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
             thumbPosition = (int) Math.round(scrollFraction * thumbRange);
         }
 
-        return new int[] { thumbSize, thumbPosition, scrollableRange, viewportLength };
+        return new ThumbGeometry(thumbSize, thumbPosition, scrollableRange);
     }
 
     private Rect calculateTrackArea(Rect area) {
