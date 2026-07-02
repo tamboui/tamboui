@@ -187,6 +187,8 @@ public class TuiDemo {
             case MOVE -> "Mouse move";
             case SCROLL_UP -> "Scroll up";
             case SCROLL_DOWN -> "Scroll down";
+            case SCROLL_LEFT -> "Scroll left";
+            case SCROLL_RIGHT -> "Scroll right";
         };
 
         logEvent(eventName + " at (" + m.x() + "," + m.y() + ")");
