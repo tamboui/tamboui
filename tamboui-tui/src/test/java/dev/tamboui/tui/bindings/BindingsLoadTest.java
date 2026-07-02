@@ -264,6 +264,19 @@ class BindingsLoadTest {
     }
 
     @Test
+    @DisplayName("Parse horizontal mouse scroll bindings")
+    void parseHorizontalMouseScrollBindings() throws IOException {
+        String props = "scrollLeft = Mouse.ScrollLeft\nscrollRight = Mouse.ScrollRight\n";
+        Bindings bindings = BindingSets.load(new ByteArrayInputStream(props.getBytes(StandardCharsets.UTF_8)));
+
+        MouseEvent scrollLeft = new MouseEvent(MouseEventKind.SCROLL_LEFT, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+        MouseEvent scrollRight = new MouseEvent(MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+
+        assertThat(scrollLeft.matches(Actions.SCROLL_LEFT)).isTrue();
+        assertThat(scrollRight.matches(Actions.SCROLL_RIGHT)).isTrue();
+    }
+
+    @Test
     @DisplayName("Parse Ctrl+mouse click binding")
     void parseCtrlMouseClickBinding() throws IOException {
         String props = "customClick = Ctrl+Mouse.Left.Press\n";

@@ -73,6 +73,44 @@ class MouseEventTest {
     }
 
     @Test
+    @DisplayName("scrollLeft creates scroll left event")
+    void scrollLeftCreatesScrollLeftEvent() {
+        MouseEvent event = MouseEvent.scrollLeft(3, 4);
+        assertThat(event.kind()).isEqualTo(MouseEventKind.SCROLL_LEFT);
+        assertThat(event.button()).isEqualTo(MouseButton.NONE);
+        assertThat(event.x()).isEqualTo(3);
+        assertThat(event.y()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("scrollRight creates scroll right event")
+    void scrollRightCreatesScrollRightEvent() {
+        MouseEvent event = MouseEvent.scrollRight(9, 10);
+        assertThat(event.kind()).isEqualTo(MouseEventKind.SCROLL_RIGHT);
+        assertThat(event.button()).isEqualTo(MouseButton.NONE);
+        assertThat(event.x()).isEqualTo(9);
+        assertThat(event.y()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("isScroll returns true for all scroll directions")
+    void isScrollReturnsTrueForAllScrollDirections() {
+        assertThat(MouseEvent.scrollUp(0, 0).isScroll()).isTrue();
+        assertThat(MouseEvent.scrollDown(0, 0).isScroll()).isTrue();
+        assertThat(MouseEvent.scrollLeft(0, 0).isScroll()).isTrue();
+        assertThat(MouseEvent.scrollRight(0, 0).isScroll()).isTrue();
+    }
+
+    @Test
+    @DisplayName("isScroll returns false for non-scroll events")
+    void isScrollReturnsFalseForNonScrollEvents() {
+        assertThat(MouseEvent.press(MouseButton.LEFT, 0, 0).isScroll()).isFalse();
+        assertThat(MouseEvent.release(MouseButton.LEFT, 0, 0).isScroll()).isFalse();
+        assertThat(MouseEvent.move(0, 0).isScroll()).isFalse();
+        assertThat(MouseEvent.drag(MouseButton.LEFT, 0, 0).isScroll()).isFalse();
+    }
+
+    @Test
     @DisplayName("all mouse buttons supported")
     void allButtonsSupported() {
         assertThat(MouseEvent.press(MouseButton.LEFT, 0, 0).button()).isEqualTo(MouseButton.LEFT);

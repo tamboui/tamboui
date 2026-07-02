@@ -360,6 +360,54 @@ class BindingsTest {
     }
 
     @Test
+    @DisplayName("Scroll left trigger matches scroll left event")
+    void scrollLeftTriggerMatchesScrollLeftEvent() {
+        MouseTrigger trigger = MouseTrigger.scrollLeft();
+        MouseEvent scrollLeft = new MouseEvent(
+            MouseEventKind.SCROLL_LEFT, MouseButton.NONE, 10, 20, KeyModifiers.NONE);
+
+        assertThat(trigger.matches(scrollLeft)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Scroll right trigger matches scroll right event")
+    void scrollRightTriggerMatchesScrollRightEvent() {
+        MouseTrigger trigger = MouseTrigger.scrollRight();
+        MouseEvent scrollRight = new MouseEvent(
+            MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, 10, 20, KeyModifiers.NONE);
+
+        assertThat(trigger.matches(scrollRight)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Scroll left and right actions match in standard bindings")
+    void scrollLeftAndRightActionsMatchInStandardBindings() {
+        Bindings bindings = BindingSets.standard();
+
+        MouseEvent scrollLeft = new MouseEvent(
+            MouseEventKind.SCROLL_LEFT, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+        MouseEvent scrollRight = new MouseEvent(
+            MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+
+        assertThat(scrollLeft.matches(Actions.SCROLL_LEFT)).isTrue();
+        assertThat(scrollRight.matches(Actions.SCROLL_RIGHT)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Horizontal scroll events match the generic scroll action")
+    void horizontalScrollMatchesGenericScrollAction() {
+        Bindings bindings = BindingSets.standard();
+
+        MouseEvent scrollLeft = new MouseEvent(
+            MouseEventKind.SCROLL_LEFT, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+        MouseEvent scrollRight = new MouseEvent(
+            MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+
+        assertThat(scrollLeft.matches(Actions.SCROLL)).isTrue();
+        assertThat(scrollRight.matches(Actions.SCROLL)).isTrue();
+    }
+
+    @Test
     @DisplayName("Drag trigger matches drag events")
     void dragTriggerMatchesDragEvents() {
         MouseTrigger trigger = MouseTrigger.drag(MouseButton.LEFT);
