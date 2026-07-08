@@ -53,7 +53,8 @@ import dev.tamboui.widgets.paragraph.Paragraph;
  */
 public final class GourmanGame {
 
-    /** Creates a game; call {@link #run()} to start it. */
+    /** Creates a game; call {@link #run()} for the standalone loop or drive it with
+     * {@link #tick()}, {@link #handleKey(KeyEvent)} and {@link #boardCanvas(boolean)} to embed. */
     public GourmanGame() {
     }
 
@@ -102,6 +103,12 @@ public final class GourmanGame {
     private static final int CELL_PIXELS = 2;
     private static final int PIXELS_X = Maze.COLUMNS * CELL_PIXELS;
     private static final int PIXELS_Y = Maze.ROWS * CELL_PIXELS;
+    /** Exact character width the borderless {@link #boardCanvas(boolean)} widget requires. */
+    public static final int BOARD_WIDTH = Maze.COLUMNS * CELL_PIXELS;
+    /** Exact character height the borderless {@link #boardCanvas(boolean)} widget requires. */
+    public static final int BOARD_HEIGHT = Maze.ROWS;
+    /** Extra characters, per axis, that the bordered board adds around the borderless size. */
+    public static final int BOARD_BORDER = 2;
     private static final int BOARD_PANEL_WIDTH = PIXELS_X + 2;
     private static final int BOARD_PANEL_HEIGHT = Maze.ROWS + 2;
     private static final int SIDE_PANEL_WIDTH = 24;
@@ -176,8 +183,8 @@ public final class GourmanGame {
 
     // --- Game state ---
 
-    /** Starts a fresh game. Package-visible so tests can drive the game without a terminal. */
-    void newGame() {
+    /** Starts a fresh game: full pellets, starting lives, level 1. */
+    public void newGame() {
         maze.resetPellets();
         score = 0;
         lives = STARTING_LIVES;
@@ -222,7 +229,13 @@ public final class GourmanGame {
         return (long) (baseMillis * speedFactor() * Duration.ofMillis(1).toNanos());
     }
 
-    private void tick() {
+    /**
+     * Advances the game clock to now: movement, gravity of the mode schedule, phase changes.
+     * Call regularly (every 30-100ms) — the game catches up on wall-clock time, so the exact
+     * cadence only affects animation smoothness, not game speed. Used by embedding hosts that
+     * drive the game from their own event loop instead of {@link #run()}.
+     */
+    public void tick() {
         if (paused || phase == Phase.GAME_OVER) {
             return;
         }
@@ -475,7 +488,9 @@ public final class GourmanGame {
 
     private boolean handleEvent(Event event, TuiRunner runner) {
         if (event instanceof KeyEvent key) {
-            handleKey(key, runner);
+            if (handleKey(key)) {
+                runner.quit();
+            }
             return true;
         }
         if (event instanceof TickEvent) {
@@ -485,14 +500,21 @@ public final class GourmanGame {
         return false;
     }
 
-    private void handleKey(KeyEvent key, TuiRunner runner) {
+    /**
+     * Handles one key press (movement, pause, restart). Returns {@code true} when the player
+     * asked to quit the game — the standalone runner exits on it; an embedding host typically
+     * hides its game panel instead.
+     *
+     * @param key the pressed key
+     * @return whether the player asked to quit
+     */
+    public boolean handleKey(KeyEvent key) {
         if (key.isQuit() || key.isCharIgnoreCase('q')) {
-            runner.quit();
-            return;
+            return true;
         }
         if (key.isCharIgnoreCase('r')) {
             newGame();
-            return;
+            return false;
         }
         if (key.isCharIgnoreCase('p')) {
             boolean wasPaused = paused;
@@ -500,7 +522,7 @@ public final class GourmanGame {
             if (paused != wasPaused) {
                 publish(paused ? new GameEvent.GamePaused() : new GameEvent.GameResumed());
             }
-            return;
+            return false;
         }
         if (key.isLeft() || key.isCharIgnoreCase('h')) {
             desiredDirection = Direction.LEFT;
@@ -510,6 +532,18 @@ public final class GourmanGame {
             desiredDirection = Direction.UP;
         } else if (key.isDown() || key.isCharIgnoreCase('j')) {
             desiredDirection = Direction.DOWN;
+        }
+        return false;
+    }
+
+    /**
+     * Pauses play if a round is in progress (no-op otherwise). Embedding hosts call this when
+     * they hide the game panel so ghosts don't hunt an unattended Gourman; the p key resumes.
+     */
+    public void pause() {
+        if (!paused && phase == Phase.PLAYING) {
+            paused = true;
+            publish(new GameEvent.GamePaused());
         }
     }
 
@@ -558,8 +592,16 @@ public final class GourmanGame {
         frame.renderWidget(Paragraph.builder().text(Text.from(message)).build(), area);
     }
 
-    /** The board widget; package-visible so tests can render it headlessly into a buffer. */
-    Canvas boardCanvas(boolean bordered) {
+    /**
+     * The board as a plain widget, for embedding the game inside another TamboUI application
+     * (and for headless render tests). The widget must be given exactly {@code 56x31} characters
+     * ({@code 58x33} when {@code bordered}) — the canvas maps a fixed pixel grid onto its area,
+     * so any other size distorts the maze.
+     *
+     * @param bordered whether to wrap the board in its rounded, titled border
+     * @return the board widget
+     */
+    public Canvas boardCanvas(boolean bordered) {
         Color borderColor = phase == Phase.GAME_OVER ? Color.RED : Color.CYAN;
         Canvas.Builder builder = Canvas.builder()
                 // Bounds span [0, N-1] for N pixels so integer coordinates map 1:1 onto grid
