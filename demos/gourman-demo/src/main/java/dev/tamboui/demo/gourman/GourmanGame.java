@@ -160,6 +160,16 @@ public final class GourmanGame {
         listeners.add(Objects.requireNonNull(listener, "listener"));
     }
 
+    /**
+     * Unsubscribes a previously added listener; a host that shuts down its event transport while
+     * the game keeps running detaches it here. Unknown listeners are ignored.
+     *
+     * @param listener the listener to unsubscribe
+     */
+    public void removeListener(GameListener listener) {
+        listeners.remove(listener);
+    }
+
     private void publish(GameEvent event) {
         for (GameListener listener : listeners) {
             try {
@@ -590,6 +600,71 @@ public final class GourmanGame {
                 + " characters; this window is " + area.width() + "x" + area.height() + ".")));
         message.add(Line.from(Span.raw(" Enlarge the window or reduce the font size (Cmd -).").dim()));
         frame.renderWidget(Paragraph.builder().text(Text.from(message)).build(), area);
+    }
+
+    /**
+     * Resumes a round paused with {@link #pause()} or the p key (no-op otherwise). Embedding
+     * hosts call this when they show the game panel again.
+     */
+    public void resume() {
+        if (paused) {
+            paused = false;
+            publish(new GameEvent.GameResumed());
+        }
+    }
+
+    /**
+     * The current score.
+     *
+     * @return the score
+     */
+    public int score() {
+        return score;
+    }
+
+    /**
+     * The current level, starting at 1.
+     *
+     * @return the level
+     */
+    public int level() {
+        return level;
+    }
+
+    /**
+     * Lives remaining.
+     *
+     * @return the number of lives
+     */
+    public int lives() {
+        return lives;
+    }
+
+    /**
+     * Pellets (of both kinds) left on the maze.
+     *
+     * @return the pellet count
+     */
+    public int pelletsRemaining() {
+        return maze.pelletCount();
+    }
+
+    /**
+     * Whether play is currently paused.
+     *
+     * @return whether the game is paused
+     */
+    public boolean paused() {
+        return paused;
+    }
+
+    /**
+     * Whether the last life has been lost (the r key or {@link #newGame()} starts over).
+     *
+     * @return whether the game is over
+     */
+    public boolean gameOver() {
+        return phase == Phase.GAME_OVER;
     }
 
     /**
