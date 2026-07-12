@@ -211,6 +211,20 @@ class DividerElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("rounded divider renders horizontal line characters")
+    void roundedDividerRendersHorizontalLineCharacters() {
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        divider(DividerStyle.ROUNDED).render(frame, area, RenderContext.empty());
+
+        for (int x = 0; x < 10; x++) {
+            assertThat(buffer.get(x, 0).symbol()).isEqualTo("─");
+        }
+    }
+
+    @Test
     @DisplayName("center text renders at the center with gap around")
     void centerTextRenders() {
         Rect area = new Rect(0, 0, 20, 1);
@@ -223,6 +237,19 @@ class DividerElementTest extends AbstractElementTest {
         assertThat(buffer.get(8, 0).symbol()).isEqualTo("M");
         assertThat(buffer.get(9, 0).symbol()).isEqualTo("i");
         assertThat(buffer.get(10, 0).symbol()).isEqualTo("d");
+    }
+
+    @Test
+    @DisplayName("overlong center text starts at the first column")
+    void overlongCenterTextStartsAtFirstColumn() {
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        divider().center("Long title").render(frame, area, RenderContext.empty());
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("L");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo(" ");
     }
 
     @Test
@@ -240,6 +267,21 @@ class DividerElementTest extends AbstractElementTest {
         assertThat(buffer.get(3, 0).symbol()).isEqualTo("t");
         // Position after text should be empty (gap)
         assertThat(buffer.get(4, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("left text uses terminal display width for CJK and emoji")
+    void leftTextUsesDisplayWidth() {
+        Rect area = new Rect(0, 0, 8, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        divider().left("你好🔥").render(frame, area, RenderContext.empty());
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("你");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("好");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo("🔥");
+        assertThat(buffer.get(6, 0).symbol()).isEqualTo(" ");
     }
 
     @Test

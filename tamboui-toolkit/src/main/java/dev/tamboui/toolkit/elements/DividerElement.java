@@ -200,10 +200,11 @@ public final class DividerElement extends StyledElement<DividerElement> {
     }
 
     /**
-     * Sets text spanning the full divider (replaces left text, center-aligned).
-     * Convenience method for {@code center(text)}.
+     * Sets the center text for the divider.
+     * <p>
+     * Equivalent to calling {@link #center(String)}.
      *
-     * @param text the text to display
+     * @param text the text to display at the center of the divider
      * @return this element
      */
     public DividerElement line(String text) {
@@ -405,8 +406,8 @@ public final class DividerElement extends StyledElement<DividerElement> {
 
         // Left text: flush left with 1 space padding on right
         if (leftText != null && !leftText.isEmpty()) {
-            int leftW = Math.min(leftText.length(), width);
-            buffer.setString(area.left(), textRow, leftText.substring(0, leftW), mergedLeftStyle);
+            int leftW = Math.min(CharWidth.of(leftText), width);
+            buffer.setString(area.left(), textRow, CharWidth.substringByWidth(leftText, leftW), mergedLeftStyle);
             // Clear the line char immediately after the text to create a gap
             int gapPos = area.left() + leftW;
             if (gapPos < area.right()) {
@@ -428,7 +429,7 @@ public final class DividerElement extends StyledElement<DividerElement> {
         // Center text: centered with 1 space padding on each side
         if (centerText != null && !centerText.isEmpty()) {
             int centerWidth = CharWidth.of(centerText);
-            int startPos = (width - centerWidth) / 2;
+            int startPos = Math.max(0, (width - centerWidth) / 2);
             // 1 space padding on each side (clamped)
             if (startPos > 0) {
                 buffer.set(area.left() + startPos - 1, textRow, Cell.EMPTY);

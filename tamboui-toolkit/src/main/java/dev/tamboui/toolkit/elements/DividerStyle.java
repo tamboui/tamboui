@@ -7,63 +7,49 @@ package dev.tamboui.toolkit.elements;
 /**
  * Visual line style for {@link DividerElement}.
  * <p>
- * Each style defines the characters used for the left end, middle fill,
- * and right end of the divider.
+ * Each style defines the character used to fill the divider.
  */
 public enum DividerStyle {
 
     /**
      * Single-line style: {@code ─}
      */
-    SINGLE("─", "─", "─"),
+    SINGLE("─"),
 
     /**
      * Double-line style: {@code ═}
      */
-    DOUBLE("═", "═", "═"),
+    DOUBLE("═"),
 
     /**
      * Bold/heavy style: {@code ━}
      */
-    BOLD("━", "━", "━"),
+    BOLD("━"),
 
     /**
      * Dotted style: {@code ·}
      */
-    DOTTED("·", "·", "·"),
+    DOTTED("·"),
 
     /**
      * Dashed style: {@code -}
      */
-    DASHED("-", "-", "-"),
+    DASHED("-"),
 
     /**
      * Heavy style: {@code █}
      */
-    HEAVY("█", "█", "█"),
+    HEAVY("█"),
 
     /**
-     * Rounded style: {@code ─} with round corners
+     * Rounded style: {@code ─}
      */
-    ROUNDED("╭", "─", "╮");
+    ROUNDED("─");
 
-    private final String left;
     private final String line;
-    private final String right;
 
-    DividerStyle(String left, String line, String right) {
-        this.left = left;
+    DividerStyle(String line) {
         this.line = line;
-        this.right = right;
-    }
-
-    /**
-     * Returns the left-end cap character.
-     *
-     * @return the left cap string
-     */
-    public String left() {
-        return left;
     }
 
     /**
@@ -75,12 +61,4 @@ public enum DividerStyle {
         return line;
     }
 
-    /**
-     * Returns the right-end cap character.
-     *
-     * @return the right cap string
-     */
-    public String right() {
-        return right;
-    }
 }
