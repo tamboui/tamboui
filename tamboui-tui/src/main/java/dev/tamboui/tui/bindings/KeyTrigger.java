@@ -8,6 +8,7 @@ import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
+import dev.tamboui.widgets.toast.ToastShortcutTrigger;
 
 /**
  * An {@link InputTrigger} that matches {@link KeyEvent}s.
@@ -38,7 +39,7 @@ import dev.tamboui.tui.event.KeyModifiers;
  * KeyTrigger.key(KeyCode.TAB, false, false, true)
  * }</pre>
  */
-public final class KeyTrigger implements InputTrigger {
+public final class KeyTrigger implements InputTrigger, ToastShortcutTrigger {
 
     private final KeyCode keyCode;
     private final Integer character;
