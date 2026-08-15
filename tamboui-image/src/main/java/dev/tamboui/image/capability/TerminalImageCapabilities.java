@@ -213,6 +213,12 @@ public final class TerminalImageCapabilities {
             supported.add(TerminalImageProtocol.KITTY);
         }
 
+        // Check for Ghostty (supports Kitty protocol). TERM is only "xterm-ghostty" when the
+        // bundled terminfo is installed; the env var is always present, so it is the reliable hint.
+        if (getEnv("GHOSTTY_RESOURCES_DIR") != null) {
+            supported.add(TerminalImageProtocol.KITTY);
+        }
+
         // Check for iTerm2
         if (getEnv("ITERM_SESSION_ID") != null) {
             supported.add(TerminalImageProtocol.ITERM2);
@@ -239,6 +245,9 @@ public final class TerminalImageCapabilities {
                 supported.add(TerminalImageProtocol.ITERM2);
             }
             if (termProgram.equalsIgnoreCase("WezTerm")) {
+                supported.add(TerminalImageProtocol.KITTY);
+            }
+            if (termProgram.equalsIgnoreCase("ghostty")) {
                 supported.add(TerminalImageProtocol.KITTY);
             }
         }
