@@ -173,6 +173,31 @@ public final class FormElement extends StyledElement<FormElement> {
     }
 
     /**
+     * Adds a text area field with a given maximum height to the form.
+     *
+     * @param fieldName the field name in FormState
+     * @param label the display label
+     * @param maxHeight the field maximum height
+     * @return this element for chaining
+     */
+    public FormElement textAreaField(String fieldName, String label, int maxHeight) {
+        return textAreaField(fieldName, label, maxHeight, (Validator[]) null);
+    }
+
+    /**
+     * Adds a text area field with a given maximum height and validators to the form.
+     *
+     * @param fieldName the field name in FormState
+     * @param label the display label
+     * @param maxHeight the field maximum height
+     * @param validators the validators to apply
+     * @return this element for chaining
+     */
+    public FormElement textAreaField(String fieldName, String label, int maxHeight, Validator... validators) {
+        return field(fieldName, label, FieldType.TEXT_AREA, maxHeight, validators);
+    }
+
+    /**
      * Adds a field with a specific type and validators to the form.
      *
      * @param fieldName the field name in FormState
@@ -182,7 +207,21 @@ public final class FormElement extends StyledElement<FormElement> {
      * @return this element for chaining
      */
     public FormElement field(String fieldName, String label, FieldType type, Validator... validators) {
-        FieldConfig config = new FieldConfig(fieldName, label, type != null ? type : FieldType.TEXT, currentGroup);
+        return field(fieldName, label, type, 1, validators);
+    }
+
+    /**
+     * Adds a field with a specific type and validators to the form.
+     *
+     * @param fieldName the field name in FormState
+     * @param label the display label
+     * @param type the field type
+     * @param maxHeight the field maximum height
+     * @param validators the validators to apply
+     * @return this element for chaining
+     */
+    public FormElement field(String fieldName, String label, FieldType type, int maxHeight, Validator... validators) {
+        FieldConfig config = new FieldConfig(fieldName, label, type != null ? type : FieldType.TEXT, currentGroup, maxHeight);
         if (validators != null) {
             config.validators.addAll(Arrays.asList(validators));
         }
@@ -199,7 +238,7 @@ public final class FormElement extends StyledElement<FormElement> {
      * @return this element for chaining
      */
     public FormElement field(String fieldName, String label, String placeholder) {
-        FieldConfig config = new FieldConfig(fieldName, label, FieldType.TEXT, currentGroup);
+        FieldConfig config = new FieldConfig(fieldName, label, FieldType.TEXT, currentGroup, 1);
         config.placeholder = placeholder;
         fields.add(config);
         return this;
@@ -626,6 +665,17 @@ public final class FormElement extends StyledElement<FormElement> {
                         formState.selectField(config.fieldName));
                 break;
 
+            case TEXT_AREA:
+                field = new FormFieldElement(config.label, formState.textAreaField(config.fieldName), config.maxHeight);
+                if (config.placeholder != null) {
+                    field.placeholder(config.placeholder);
+                }
+                // Auto-apply masking for password fields
+                if (formState.isMaskedField(config.fieldName)) {
+                    field.masked();
+                }
+                break;
+
             default:
                 field = new FormFieldElement(config.label,
                         formState.textField(config.fieldName));
@@ -692,14 +742,16 @@ public final class FormElement extends StyledElement<FormElement> {
         final String label;
         final FieldType type;
         final String group;
+        final int maxHeight;
         final List<Validator> validators = new ArrayList<>();
         String placeholder;
 
-        FieldConfig(String fieldName, String label, FieldType type, String group) {
+        FieldConfig(String fieldName, String label, FieldType type, String group, int maxHeight) {
             this.fieldName = fieldName;
             this.label = label;
             this.type = type;
             this.group = group;
+            this.maxHeight = maxHeight;
         }
     }
 
@@ -742,6 +794,9 @@ public final class FormElement extends StyledElement<FormElement> {
                 return 1;
             }
             int fieldHeight = borderType != null ? 3 : 1;
+            if (fieldConfig.type == FieldType.TEXT_AREA) {
+                fieldHeight += fieldConfig.maxHeight - 1;
+            }
             return showInlineErrors ? fieldHeight + 1 : fieldHeight;
         }
     }

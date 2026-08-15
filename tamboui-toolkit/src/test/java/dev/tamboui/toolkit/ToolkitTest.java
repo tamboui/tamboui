@@ -327,6 +327,42 @@ class ToolkitTest extends AbstractElementTest {
     }
 
     @Nested
+    @DisplayName("TextArea factory methods")
+    class TextAreaFactoryTests {
+
+        @Test
+        @DisplayName("textArea() creates TextAreaElement with new state")
+        void emptyTextArea() {
+            dev.tamboui.toolkit.elements.TextAreaElement element = textArea();
+            assertThat(element).isInstanceOf(dev.tamboui.toolkit.elements.TextAreaElement.class);
+        }
+
+        @Test
+        @DisplayName("textArea(TextAreaState) creates TextAreaElement with state")
+        void textAreaWithState() {
+            dev.tamboui.widgets.input.TextAreaState state = new dev.tamboui.widgets.input.TextAreaState();
+            dev.tamboui.toolkit.elements.TextAreaElement element = textArea(state);
+            assertThat(element).isInstanceOf(dev.tamboui.toolkit.elements.TextAreaElement.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("TextArea Key Handling Tests")
+    class TextAreaKeyHandlingTests {
+
+        @Test
+        @DisplayName("handleTextAreaKey inserts newline on Enter")
+        void handleTextAreaKeyInsertsNewlineOnEnter() {
+            dev.tamboui.widgets.input.TextAreaState state = new dev.tamboui.widgets.input.TextAreaState();
+            state.setText("Line 1");
+            dev.tamboui.tui.event.KeyEvent enterKey = dev.tamboui.tui.event.KeyEvent.ofKey(dev.tamboui.tui.event.KeyCode.ENTER);
+            boolean handled = Toolkit.handleTextAreaKey(state, enterKey);
+            assertThat(handled).isTrue();
+            assertThat(state.text()).isEqualTo("Line 1\n");
+        }
+    }
+
+    @Nested
     @DisplayName("TextInput factory methods")
     class TextInputFactoryTests {
 

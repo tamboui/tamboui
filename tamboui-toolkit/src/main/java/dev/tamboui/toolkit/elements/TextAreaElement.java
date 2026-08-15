@@ -7,6 +7,7 @@ package dev.tamboui.toolkit.elements;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -16,6 +17,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.block.Block;
@@ -73,6 +75,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     private boolean showLineNumbers = false;
     private Style lineNumberStyle;
     private TextChangeListener changeListener;
+    private Consumer<String> onSubmit;
 
     /** Creates a new text area element with a default state. */
     public TextAreaElement() {
@@ -253,6 +256,20 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         return this;
     }
 
+    /**
+     * Sets a callback for when the user submits text with Enter.
+     * <p>
+     * The callback is invoked before the newline is inserted. If you want to
+     * prevent newline insertion, do not call the normal Enter key handling.
+     *
+     * @param handler the callback invoked with the current text, or null to disable
+     * @return this builder
+     */
+    public TextAreaElement onSubmit(Consumer<String> handler) {
+        this.onSubmit = handler;
+        return this;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Calculate max line width from content
@@ -314,6 +331,17 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         if (!focused) {
             return EventResult.UNHANDLED;
         }
+
+        if (event.matches(Actions.CONFIRM)) {
+            // Call submit callback if provided (before inserting newline)
+            if (onSubmit != null && !event.hasShift()) {
+                onSubmit.accept(state.text());
+            }
+            // Always insert newline on Enter (unless handled by callback)
+            state.insert('\n');
+            return EventResult.HANDLED;
+        }
+
         boolean handled = handleTextAreaKey(state, event);
         if (handled && changeListener != null) {
             changeListener.onTextChange(state.text());

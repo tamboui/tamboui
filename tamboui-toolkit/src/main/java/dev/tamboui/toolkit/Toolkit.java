@@ -51,6 +51,8 @@ import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
+import dev.tamboui.tui.bindings.Actions;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
@@ -1029,6 +1031,28 @@ public final class Toolkit {
     }
 
     /**
+     * Creates a form field with a label and text area input state.
+     * <p>
+     * Form fields combine a label and input into a single element with
+     * consistent layout and styling.
+     * <pre>{@code
+     * formField("Full name", nameState)
+     *     .labelWidth(14)
+     *     .rounded()
+     *     .borderColor(Color.DARK_GRAY)
+     *     .focusedBorderColor(Color.CYAN)
+     * }</pre>
+     *
+     * @param label the field label
+     * @param state the text area state
+     * @param height the text area height
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, TextAreaState state, int height) {
+        return new FormFieldElement(label, state, height);
+    }
+
+    /**
      * Creates a form field with a label and new text input state.
      *
      * @param label the field label
@@ -1379,4 +1403,94 @@ public static SpinnerElement spinner(String... frames) {
         }
     }
 
+    /**
+     * Handles common key events for text area input with semantic action support.
+     * <p>
+     * Supports:
+     * - Navigation: MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
+     * - Line navigation: HOME, END, PAGE_UP, PAGE_DOWN
+     * - Editing: BACKSPACE, DELETE, CONFIRM (Enter)
+     * - Tab insertion (configurable width)
+     * - Unicode character input (not ASCII-only)
+     * - Shift+navigation for potential future selection support
+     *
+     * @param state the text area state to modify
+     * @param event the key event to handle
+     * @return true if the event was handled, false otherwise
+     */
+    public static boolean handleTextAreaKey(TextAreaState state, KeyEvent event) {
+        // Handle navigation actions (semantic, respect keybindings)
+        if (event.matches(Actions.MOVE_UP)) {
+            state.moveCursorUp();
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_DOWN)) {
+            state.moveCursorDown();
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_LEFT)) {
+            state.moveCursorLeft();
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_RIGHT)) {
+            state.moveCursorRight();
+            return true;
+        }
+
+        if (event.matches(Actions.HOME)) {
+            state.moveCursorToLineStart();
+            return true;
+        }
+
+        if (event.matches(Actions.END)) {
+            state.moveCursorToLineEnd();
+            return true;
+        }
+
+        // Handle editing actions
+        if (event.isKey(KeyCode.BACKSPACE)) {
+            state.deleteBackward();
+            return true;
+        }
+
+        if (event.isKey(KeyCode.DELETE)) {
+            state.deleteForward();
+            return true;
+        }
+
+        if (event.matches(Actions.CONFIRM)) {
+            // Insert newline on Enter
+            state.insert('\n');
+            return true;
+        }
+
+        // Handle Tab with configurable width
+        if (event.isKey(KeyCode.TAB)) {
+            state.insert("    "); // 4 spaces for tab
+            return true;
+        }
+
+        // Handle character input with full Unicode support
+        if (event.code() == KeyCode.CHAR) {
+            // Skip control characters and characters with Ctrl/Alt modifiers
+            // Ctrl+X, Alt+X are for custom actions, not text input
+            if (event.hasCtrl() || event.hasAlt()) {
+                return false;
+            }
+
+            int c = event.codePoint();
+            // Accept all printable characters (not ISO control characters or DEL)
+            // This includes emoji, CJK, accents, etc.
+            if (!Character.isISOControl(c) && c != 0x7F) {
+                state.insert(event.string());
+                return true;
+            }
+            return false;
+        }
+
+        return false;
+    }
 }

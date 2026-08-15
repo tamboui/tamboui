@@ -228,7 +228,51 @@ class FormStateTest {
         assertThat(values).containsEntry("role", "Admin");
     }
 
+    // ==================== Text Area Fields ====================
+
+    @Test
+    @DisplayName("textAreaField() returns TextAreaState")
+    void textAreaFieldReturnsState() {
+        FormState form = FormState.builder()
+                .textAreaField("bio", "My bio")
+                .build();
+
+        assertThat(form.textAreaField("bio")).isNotNull();
+        assertThat(form.textAreaField("bio").text()).isEqualTo("My bio");
+    }
+
+    @Test
+    @DisplayName("textAreaValue() returns current value")
+    void textAreaValueReturnsValue() {
+        FormState form = FormState.builder()
+                .textAreaField("bio", "My bio")
+                .build();
+
+        assertThat(form.textAreaValue("bio")).isEqualTo("My bio");
+    }
+
+    @Test
+    @DisplayName("setTextAreaValue() updates value")
+    void setTextAreaValueUpdates() {
+        FormState form = FormState.builder()
+                .textAreaField("bio", "My bio")
+                .build();
+
+        form.setTextAreaValue("bio", "New bio");
+        assertThat(form.textAreaValue("bio")).isEqualTo("New bio");
+    }
+
     // ==================== Builder ====================
+
+    @Test
+    @DisplayName("builder rejects duplicate field names")
+    void builderRejectsDuplicateFieldNames() {
+        assertThatThrownBy(() -> FormState.builder()
+                .textField("myField", "A")
+                .textAreaField("myField", "B")
+        ).isInstanceOf(IllegalArgumentException.class)
+         .hasMessageContaining("myField");
+    }
 
     @Test
     @DisplayName("builder creates form with all field types")

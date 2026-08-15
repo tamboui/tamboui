@@ -12,7 +12,11 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.form.*;
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.toolkit.Toolkit.formField;
@@ -195,6 +199,42 @@ class FormFieldElementTest extends AbstractElementTest {
         // With border: 3 rows
         field.rounded();
         assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("formField with TextAreaState preferredHeight returns correct height")
+    void formFieldWithTextAreaStatePreferredHeight() {
+        FormFieldElement field = formField("Bio", new TextAreaState("Line 1"), 5);
+
+        // Without border: baseHeight = 1, totalHeight = 1 + 5 - 1 = 5
+        assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(5);
+
+        // With border: baseHeight = 3, totalHeight = 3 + 5 - 1 = 7
+        field.rounded();
+        assertThat(field.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(7);
+    }
+
+    @Test
+    @DisplayName("formField with TextAreaState arrow navigation boundary")
+    void formFieldWithTextAreaStateArrowNavigation() {
+        TextAreaState state = new TextAreaState("Line 1\nLine 2");
+        FormFieldElement field = formField("Bio", state, 5).arrowNavigation(true);
+
+        // Arrow up at top boundary
+        state.moveCursorUp(); // Move to top line
+        state.moveCursorToLineStart();
+        EventResult upResult = field.handleKeyEvent(KeyEvent.ofKey(KeyCode.UP), true);
+        assertThat(upResult).isEqualTo(EventResult.FOCUS_PREVIOUS);
+
+        // Arrow down at bottom boundary
+        state.moveCursorDown(); // Move back to bottom line
+        EventResult downResult = field.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+        assertThat(downResult).isEqualTo(EventResult.FOCUS_NEXT);
+
+        // Arrow down NOT at bottom boundary
+        state.moveCursorUp();
+        EventResult middleDownResult = field.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+        assertThat(middleDownResult).isEqualTo(EventResult.HANDLED);
     }
 
     @Test
