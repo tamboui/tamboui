@@ -10,6 +10,10 @@ inputs:
     description: The Java version to use for building
     required: false
     default: '25'
+  github-token:
+    description: 'GitHub token for API rate limiting (e.g. GraalVM download)'
+    required: false
+    default: ${{ github.token }}
   debug_enabled:
     description: 'Run the build with upterm debugging enabled (https://github.com/owenthereal/action-upterm)'
     required: false

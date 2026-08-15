@@ -1,0 +1,90 @@
+/* Theme-aware stylesheet.
+ *
+ * All $variables are injected by ThemeEngine from the active theme's
+ * ColorSystem.  Switching themes re-injects the variables — one
+ * stylesheet, many looks.
+ */
+
+/* ===== Base ===== */
+* {
+    color: $text;
+}
+
+Row, Column {
+    background: $background;
+}
+
+/* ===== Panels ===== */
+Panel {
+    background: $surface;
+    border-color: $border;
+    border-type: rounded;
+}
+
+Panel:focus {
+    border-color: $border-focus;
+    border-type: double;
+    text-style: bold;
+}
+
+/* ===== List ===== */
+ListElement {
+    background: $surface;
+    border-color: $border;
+}
+
+ListElement:focus {
+    border-color: $border-focus;
+}
+
+ListElement-item {
+    color: $text;
+}
+
+ListElement-item:selected {
+    background: $selection-bg;
+    color: $primary;
+    text-style: bold;
+}
+
+/* ===== Header / Status ===== */
+.header {
+    color: $primary;
+    text-style: bold;
+    text-align: center;
+}
+
+.status {
+    background: $background;
+    color: $text;
+    border-color: $border-muted;
+}
+
+/* ===== Semantic text classes ===== */
+.primary       { color: $primary;   text-style: bold; }
+.secondary     { color: $secondary; }
+.warning       { color: $warning;   text-style: bold; }
+.error         { color: $error;     text-style: bold; }
+.success       { color: $success; }
+.info          { color: $info; }
+.accent        { color: $accent; }
+
+/* ===== Derived color classes ===== */
+.muted         { color: $text-muted; }
+.disabled      { color: $text-disabled; }
+.primary-light { color: $primary-light; }
+.primary-dark  { color: $primary-dark; }
+.primary-muted { color: $primary-muted; }
+.error-light   { color: $error-light; }
+.error-dark    { color: $error-dark; }
+
+/* ===== Dim helper ===== */
+.dim {
+    color: $text-muted;
+}
+
+/* ===== Theme indicator ===== */
+#theme-indicator {
+    color: $primary;
+    text-style: bold;
+}
