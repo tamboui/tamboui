@@ -8,7 +8,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dev.tamboui.buffer.Buffer;
@@ -45,6 +47,7 @@ public final class SixelProtocol implements ImageProtocol {
     private static final int SIXEL_OFFSET = 63;
 
     private final int maxColors;
+    private final NativeImageCache cache = new NativeImageCache();
 
     /**
      * Creates a Sixel protocol with default settings (256 colors).
@@ -72,13 +75,51 @@ public final class SixelProtocol implements ImageProtocol {
             return;
         }
 
-        // Move cursor to position
-        String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
+        // Skip re-transmission when the same image is already shown at the same position.
+        // Besides saving the (expensive) re-encoding and re-write each frame, this avoids
+        // repainting Sixel pixels the terminal already shows. The image stays on screen
+        // because the diff-based renderer leaves the image cells untouched between frames.
+        // A change in screen generation (clear/resize) forces a redraw.
+        List<Rect> stale = cache.staleAreasToClear(image, area, NativeImageCache.generationOf(rawOutput));
+        if (stale == null) {
+            return;
+        }
+        // Clear the slot before drawing. Unlike Kitty/iTerm2 (which receive the exact display
+        // footprint), Sixel receives the whole cell slot but the pre-scaled image only fills a
+        // sub-region of it (FIT letterboxes; FILL/STRETCH differ), and the slot does not change
+        // when only the scaling changes. Without clearing the slot, a smaller new image leaves the
+        // previous, larger one visible around it (stacking). Also clear any old slots a moved
+        // image left behind (stale).
+        List<Rect> toClear = new ArrayList<>(stale);
+        toClear.add(area);
+        NativeImageCache.clearAreas(toClear, rawOutput);
+
+        // Center the image within the slot, like Kitty/iTerm2 do via their display area. The
+        // pre-scaled image usually covers only part of the slot (FIT letterboxes); drawing it at
+        // the slot corner would put it top-left instead of centered. Centering is cell-granular
+        // (the cursor addresses whole cells), matching the cell-level centering of the others.
+        Resolution res = resolution();
+        int imageCellsW = (image.width() + res.widthMultiplier() - 1) / res.widthMultiplier();
+        int imageCellsH = (image.height() + res.heightMultiplier() - 1) / res.heightMultiplier();
+        int offsetX = Math.max(0, (area.width() - imageCellsW) / 2);
+        int offsetY = Math.max(0, (area.height() - imageCellsH) / 2);
+
+        // Move cursor to the centered position
+        String cursorMove = String.format("\033[%d;%dH", area.y() + offsetY + 1, area.x() + offsetX + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
-        // Generate and write Sixel data
-        // The image should already be scaled by Image.scaleImage() based on the scaling mode
-        byte[] sixelData = encodeSixel(image);
+        // Generate and write Sixel data.
+        // The image should already be scaled by Image.scaleImage() based on the scaling mode.
+        // Sixel encoding is expensive (it scans every pixel against every palette entry), so
+        // the encoded bytes are cached per image to avoid recomputing them on every frame of
+        // the render loop.
+        byte[] sixelData = cache.payload(image, () -> {
+            try {
+                return encodeSixel(image);
+            } catch (IOException e) {
+                throw new RuntimeIOException("Failed to encode Sixel data", e);
+            }
+        });
         rawOutput.write(sixelData);
         rawOutput.flush();
     }
