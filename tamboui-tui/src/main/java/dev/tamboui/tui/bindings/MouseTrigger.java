@@ -15,7 +15,7 @@ import dev.tamboui.tui.event.MouseEventKind;
  * <p>
  * Mouse triggers can match combinations of:
  * <ul>
- *   <li>Event kind (PRESS, RELEASE, SCROLL_UP, SCROLL_DOWN, etc.)</li>
+ *   <li>Event kind (PRESS, RELEASE, SCROLL_UP, SCROLL_DOWN, SCROLL_LEFT, SCROLL_RIGHT, etc.)</li>
  *   <li>Button (LEFT, RIGHT, MIDDLE)</li>
  *   <li>Keyboard modifiers (Ctrl, Alt, Shift held during mouse action)</li>
  * </ul>
@@ -157,6 +157,24 @@ public final class MouseTrigger implements InputTrigger {
      */
     public static MouseTrigger scrollDown() {
         return new MouseTrigger(MouseEventKind.SCROLL_DOWN, MouseButton.NONE, false, false, false);
+    }
+
+    /**
+     * Creates a trigger for scroll wheel left (horizontal tilt wheel or trackpad gesture).
+     *
+     * @return a trigger that matches scroll left
+     */
+    public static MouseTrigger scrollLeft() {
+        return new MouseTrigger(MouseEventKind.SCROLL_LEFT, MouseButton.NONE, false, false, false);
+    }
+
+    /**
+     * Creates a trigger for scroll wheel right (horizontal tilt wheel or trackpad gesture).
+     *
+     * @return a trigger that matches scroll right
+     */
+    public static MouseTrigger scrollRight() {
+        return new MouseTrigger(MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, false, false, false);
     }
 
     /**

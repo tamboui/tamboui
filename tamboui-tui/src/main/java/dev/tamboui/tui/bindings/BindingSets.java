@@ -205,6 +205,10 @@ public final class BindingSets {
         map.put("scroll_up", MouseEventKind.SCROLL_UP);
         map.put("scrolldown", MouseEventKind.SCROLL_DOWN);
         map.put("scroll_down", MouseEventKind.SCROLL_DOWN);
+        map.put("scrollleft", MouseEventKind.SCROLL_LEFT);
+        map.put("scroll_left", MouseEventKind.SCROLL_LEFT);
+        map.put("scrollright", MouseEventKind.SCROLL_RIGHT);
+        map.put("scroll_right", MouseEventKind.SCROLL_RIGHT);
         return map;
     }
 
@@ -237,7 +241,7 @@ public final class BindingSets {
      * <ul>
      *   <li>Format: [Modifiers+]Mouse.Button.Kind</li>
      *   <li>Buttons: Left, Right, Middle</li>
-     *   <li>Kinds: Press, Release, Drag, ScrollUp, ScrollDown</li>
+     *   <li>Kinds: Press, Release, Drag, ScrollUp, ScrollDown, ScrollLeft, ScrollRight</li>
      *   <li>Example: Ctrl+Mouse.Left.Press</li>
      * </ul>
      *

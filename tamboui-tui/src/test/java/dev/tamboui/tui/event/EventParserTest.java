@@ -255,6 +255,87 @@ class EventParserTest {
         assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UP);
     }
 
+    // -- SGR mouse scroll events --
+
+    @Test
+    @DisplayName("SGR mouse button code 64 parsed as SCROLL_UP")
+    void sgrScrollUpParsed() throws IOException {
+        // ESC [ < 64 ; 10 ; 5 M
+        QueueBackend backend = new QueueBackend(
+            27, '[', '<', '6', '4', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.SCROLL_UP);
+        assertThat(mouse.x()).isEqualTo(9);
+        assertThat(mouse.y()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("SGR mouse button code 65 parsed as SCROLL_DOWN")
+    void sgrScrollDownParsed() throws IOException {
+        // ESC [ < 65 ; 10 ; 5 M
+        QueueBackend backend = new QueueBackend(
+            27, '[', '<', '6', '5', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.SCROLL_DOWN);
+        assertThat(mouse.x()).isEqualTo(9);
+        assertThat(mouse.y()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("SGR mouse button code 66 parsed as SCROLL_LEFT")
+    void sgrScrollLeftParsed() throws IOException {
+        // ESC [ < 66 ; 10 ; 5 M
+        QueueBackend backend = new QueueBackend(
+            27, '[', '<', '6', '6', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.SCROLL_LEFT);
+        assertThat(mouse.x()).isEqualTo(9);
+        assertThat(mouse.y()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("SGR mouse button code 67 parsed as SCROLL_RIGHT")
+    void sgrScrollRightParsed() throws IOException {
+        // ESC [ < 67 ; 10 ; 5 M
+        QueueBackend backend = new QueueBackend(
+            27, '[', '<', '6', '7', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.SCROLL_RIGHT);
+        assertThat(mouse.x()).isEqualTo(9);
+        assertThat(mouse.y()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("SGR horizontal scroll with Shift modifier")
+    void sgrHorizontalScrollWithShiftModifier() throws IOException {
+        // ESC [ < 70 ; 10 ; 5 M (66 + 4 = 70, Shift+ScrollLeft)
+        QueueBackend backend = new QueueBackend(
+            27, '[', '<', '7', '0', ';', '1', '0', ';', '5', 'M');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(MouseEvent.class);
+        MouseEvent mouse = (MouseEvent) event;
+        assertThat(mouse.kind()).isEqualTo(MouseEventKind.SCROLL_LEFT);
+        assertThat(mouse.modifiers().shift()).isTrue();
+    }
+
     private static final class QueueBackend extends TestBackend {
 
         private final int[] input;
