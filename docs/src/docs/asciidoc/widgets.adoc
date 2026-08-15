@@ -724,6 +724,34 @@ The Toolkit DSL provides fluent factories for all widgets:
 include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=toolkit-dsl]
 ----
 
+=== Divider
+
+`divider()` creates a one-row horizontal separator for Toolkit layouts.
+Use `divider(String)` or `left(String)`, `center(String)`, and `right(String)` to place text over the line.
+`line(String)` is an alias for `center(String)`.
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=divider]
+----
+
+Available styles are `SINGLE` (`─`), `DOUBLE` (`═`), `BOLD` (`━`), `DOTTED` (`·`), `DASHED` (`-`), and `HEAVY` (`█`).
+`ROUNDED` also renders as `─`; horizontal dividers do not use corner end caps.
+
+Text is measured and truncated by terminal display width, so CJK characters and emoji align correctly.
+When center text is wider than the available area, it is rendered from the first column and clipped to the divider width.
+
+Use `lineStyle()`, `leftStyle()`, `centerStyle()`, and `rightStyle()` (or their `*Color()` variants) to style individual portions.
+The following CSS child selectors provide the same separation:
+
+[source,css]
+----
+DividerElement-line { color: gray; }
+DividerElement-left { color: red; }
+DividerElement-center { color: cyan; text-style: bold; }
+DividerElement-right { color: green; }
+----
+
 For layout DSL examples (columns, grid, dock, stack, flow), see link:layouts.html[Layouts Reference].
 
 See link:api-levels.html[API Levels] for more details on the Toolkit DSL.
