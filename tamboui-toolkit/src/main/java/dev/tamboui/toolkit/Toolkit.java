@@ -51,6 +51,7 @@ import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
+import dev.tamboui.tui.bindings.Actions;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
@@ -1364,9 +1365,9 @@ public static SpinnerElement spinner(String... frames) {
                 state.moveCursorToEnd();
                 return true;
             case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
+                // Check for modifier keys in the active binding set
                 if (event.modifiers().ctrl() || event.modifiers().alt()) {
-                    return false;
+                    return handleTextInputAction(state, event);
                 }
                 int c = event.codePoint();
                 if (c >= 32 && c != 127) {
@@ -1377,6 +1378,40 @@ public static SpinnerElement spinner(String... frames) {
             default:
                 return false;
         }
+    }
+
+    private static boolean handleTextInputAction(TextInputState state, KeyEvent event) {
+        if (event.matches(Actions.MOVE_LEFT)) {
+            state.moveCursorLeft();
+            return true;
+        }
+
+        if (event.matches(Actions.MOVE_RIGHT)) {
+            state.moveCursorRight();
+            return true;
+        }
+
+        if (event.matches(Actions.HOME)) {
+            state.moveCursorToStart();
+            return true;
+        }
+
+        if (event.matches(Actions.END)) {
+            state.moveCursorToEnd();
+            return true;
+        }
+
+        if (event.matches(Actions.DELETE_BACKWARD)) {
+            state.deleteBackward();
+            return true;
+        }
+
+        if (event.matches(Actions.DELETE_FORWARD)) {
+            state.deleteForward();
+            return true;
+        }
+
+        return false;
     }
 
 }
