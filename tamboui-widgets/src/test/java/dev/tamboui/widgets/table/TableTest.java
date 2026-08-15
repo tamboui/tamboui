@@ -12,11 +12,13 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.TestStylePropertyResolver;
+import dev.tamboui.text.Text;
 import dev.tamboui.widgets.block.Block;
 
 import static org.assertj.core.api.Assertions.*;
@@ -298,5 +300,137 @@ class TableTest {
 
         // Second row "Bob" starts at y=1 and should have blue background
         BufferAssertions.assertThat(buffer).at(0, 1).hasBackground(Color.BLUE);
+    }
+
+    @Test
+    @DisplayName("Cell alignment LEFT places content at column start")
+    void cellAlignmentLeft() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from(Cell.from("Hi").alignment(Alignment.LEFT))))
+            .widths(Constraint.length(10))
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("i");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Cell alignment CENTER centers content within column")
+    void cellAlignmentCenter() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from(Cell.from("Hi").alignment(Alignment.CENTER))))
+            .widths(Constraint.length(10))
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        // (10 - 2) / 2 = 4
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("i");
+        assertThat(buffer.get(6, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Cell alignment RIGHT places content at column end")
+    void cellAlignmentRight() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from(Cell.from("Hi").alignment(Alignment.RIGHT))))
+            .widths(Constraint.length(10))
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        assertThat(buffer.get(7, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(8, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("Cell alignment RIGHT applies to second column with column spacing")
+    void cellAlignmentRightInSecondColumn() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from(
+                Cell.from("A"),
+                Cell.from("42").alignment(Alignment.RIGHT)
+            )))
+            .widths(Constraint.length(3), Constraint.length(5))
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 9, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        // First column left-aligned at x=0
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
+        // Second column starts at x=4 (3 + 1 spacing), width 5; "42" right-aligned at x=7,8
+        assertThat(buffer.get(6, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(7, 0).symbol()).isEqualTo("4");
+        assertThat(buffer.get(8, 0).symbol()).isEqualTo("2");
+    }
+
+    @Test
+    @DisplayName("Cell alignment applies per-line for multi-line cells")
+    void cellAlignmentMultiLine() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from(Cell.from(Text.from("Hi\nThere"))
+                    .alignment(Alignment.RIGHT))
+                .height(2)
+            ))
+            .widths(Constraint.length(10))
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 2);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        // "Hi" right-aligned on row 0
+        assertThat(buffer.get(8, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("i");
+        // "There" right-aligned on row 1
+        assertThat(buffer.get(5, 1).symbol()).isEqualTo("T");
+        assertThat(buffer.get(9, 1).symbol()).isEqualTo("e");
+    }
+
+    @Test
+    @DisplayName("Cell content wider than column is clipped from left edge regardless of alignment")
+    void cellAlignmentClipsOverflowFromLeft() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from(
+                Cell.from("HelloWorld").alignment(Alignment.RIGHT)
+            )))
+            .widths(Constraint.length(5))
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        // Overflow: clipped from left edge, first 5 chars rendered
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo("o");
     }
 }

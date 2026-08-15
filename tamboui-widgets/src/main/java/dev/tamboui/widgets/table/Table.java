@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -283,6 +284,7 @@ public final class Table implements StatefulWidget<TableState> {
                 Cell cell = cells.get(col);
                 Style cellStyle = rowStyle.patch(cell.style());
                 Text content = cell.content();
+                Alignment alignment = cell.alignment();
 
                 // Render each line of the cell
                 List<Line> lines = content.lines();
@@ -293,8 +295,29 @@ public final class Table implements StatefulWidget<TableState> {
                         break;
                     }
 
+                    // Apply horizontal alignment within the column when content fits.
+                    // If the line is wider than the column it is clipped from the left edge.
+                    int lineWidth = line.width();
+                    int alignmentOffset;
+                    if (lineWidth >= colWidth) {
+                        alignmentOffset = 0;
+                    } else {
+                        switch (alignment) {
+                            case CENTER:
+                                alignmentOffset = (colWidth - lineWidth) / 2;
+                                break;
+                            case RIGHT:
+                                alignmentOffset = colWidth - lineWidth;
+                                break;
+                            case LEFT:
+                            default:
+                                alignmentOffset = 0;
+                                break;
+                        }
+                    }
+
                     // Render line content, truncated to column width
-                    int col_x = x;
+                    int col_x = x + alignmentOffset;
                     List<Span> patchedSpans = line.patchStyle(cellStyle).spans();
                     for (int spanIdx = 0; spanIdx < patchedSpans.size(); spanIdx++) {
                         Span span = patchedSpans.get(spanIdx);
