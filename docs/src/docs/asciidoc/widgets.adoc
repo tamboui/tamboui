@@ -71,6 +71,10 @@ include::_attributes.adoc[]
 |Stateful
 |Animated loading indicator
 
+|<<toast,Toast>>
+|Engine + Widget
+|Timed and sticky notification overlays
+
 |<<scrollbar,Scrollbar>>
 |Stateful
 |Visual scroll position indicator
@@ -477,6 +481,70 @@ Spinner style and frames can be configured via CSS:
 NOTE: Programmatic styles set via `spinnerStyle()`, `frameSet()`, or `frames()` take precedence over CSS styles.
 
 NOTE: **For Toolkit DSL users**: Use `SpinnerElement` via `spinner()` factory methods. It manages state internally and advances automatically on each render. See <<toolkit-dsl>>.
+
+[[toast]]
+=== Toast
+
+Timed and sticky notification overlays managed by a `ToastEngine` and painted by `ToastWidget`:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=toast]
+----
+
+`ToastEngine` owns enqueueing, layout, expiration, and interaction handling. Create toasts with `ToastBuilder` factory methods:
+
+* `ToastBuilder.info(message)` - Informational toast (blue accent)
+* `ToastBuilder.success(message)` - Success toast (green accent)
+* `ToastBuilder.warning(message)` - Warning toast (yellow accent)
+* `ToastBuilder.error(message)` - Error toast (red accent)
+
+Title and lifetime options:
+
+* `.title(text)` - Optional title row
+* `.duration(Duration)` - Auto-dismiss lifetime for timed toasts (optional; defaults to `ToastBuilder.DEFAULT_DURATION`)
+* `.sticky(true)` - Stay visible until manually dismissed
+* `.titleLayout(TitleLayout)` - `COMPACT` or `GAPPED` title row
+* `.titleSeparator(TitleSeparator)` - Separator between title segments
+* `.titleAlignment(TitleAlignment)` - Title row alignment
+* `.highlight(true)` - Highlight title band with type accent background
+* `.progressStyle(ProgressStyle)` - Auto-dismiss progress indicator style
+* `.deduplicationKey(key)` - Opt-in deduplication key; toasts sharing a key are merged instead of duplicated
+
+IMPORTANT: The application must call `engine.tick(Duration)` each frame to advance timed toasts and evict expired entries.
+
+==== Toolkit DSL
+
+Use `ToastHostElement` via `toast(engine)` to render toasts and route mouse/keyboard interactions:
+
+[source,java]
+----
+ToastEngine engine = ToastEngine.builder().build();
+
+// In your layout: toast(engine) overlays the main UI
+toast(engine);
+
+// Each frame:
+engine.tick(elapsed);
+----
+
+==== CSS Child Selectors
+
+When using `ToastHostElement`, style toast parts with child selectors:
+
+[cols="1,2",options="header"]
+|===
+|Selector |Purpose
+
+|`Toast-info` |Info toast accent style (default: blue)
+|`Toast-success` |Success toast accent style (default: green)
+|`Toast-warning` |Warning toast accent style (default: yellow)
+|`Toast-error` |Error toast accent style (default: red)
+|`Toast-title` |Toast title style
+|`Toast-progress` |Toast progress indicator style
+|===
+
+NOTE: **For Toolkit DSL users**: See <<toolkit-dsl>> for integrating toast with other elements.
 
 [[wavetext]]
 === WaveText
