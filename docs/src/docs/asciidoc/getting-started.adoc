@@ -91,6 +91,7 @@ For quick experimentation, use JBang with inline dependencies:
 [source,java,subs="+attributes"]
 ----
 ///usr/bin/env jbang "$0" "$@" ; exit $?
+//REPOS central-portal-snapshots 
 //DEPS {maven-group}:{toolkit-module}:{project-version}
 //DEPS {maven-group}:{jline-module}:{project-version}
 
