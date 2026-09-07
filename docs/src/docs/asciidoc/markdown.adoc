@@ -84,7 +84,9 @@ parent marker width.
 
 |Fenced and indented code blocks
 |Wrapped in a rounded `Block`. The info string is used as the block title.
-Long lines are clipped to the inner width.
+Long lines are clipped to the inner width. Fenced blocks are syntax-highlighted
+by default (see <<Syntax highlighting>>); indented blocks have no language tag
+so they render in the plain code style.
 
 |GFM tables
 |Delegated to `Table` with equal-percentage column widths. Header rows are
@@ -214,4 +216,74 @@ MarkdownView {
     task-unchecked-color: gray;
     task-unchecked-symbol: "·";
 }
+----
+
+== Syntax highlighting
+
+Fenced code blocks are highlighted by default using `RegexSyntaxHighlighter`
+(a highlight.js-inspired regex tokenizer) combined with a `SyntaxTheme`.
+Indented code blocks carry no language info and never highlight. Grammar
+definition lives in `dev.tamboui.markdown`:
+
+* `TokenType` — the semantic categories (`KEYWORD`, `STRING`, `NUMBER`,
+  `COMMENT`, `FUNCTION`, `TYPE`, ...). `PLAIN` maps to the base code style.
+* `SyntaxTheme` — maps `TokenType` to a `Style`. The default
+  (`SyntaxTheme.DEFAULTS`) is a light-on-dark palette. Override individual
+  token colors with the builder.
+* `Grammar` — a declarative language definition: an id, aliases, and rules
+  (`pattern`, `literal`, `multiline` for block comments / triple-quoted
+  strings).
+* `SyntaxHighlighter` — the component interface
+  (`List<Line> highlight(String code, String language, Style base, SyntaxTheme)`).
+  Implement your own for a custom tokenizer; `RegexSyntaxHighlighter` is the
+  regex-based built-in.
+* `RegexSyntaxHighlighter` — built-in grammars for `java`, `kotlin`,
+  `javascript`, `typescript`, `python`, `json`, `xml` (incl. `html`), `css`,
+  `bash`, `yaml`, `sql`, `go`, and `rust`. `RegexSyntaxHighlighter.defaults()`
+  uses these; `.of(grammar...)` / `.builder()` let you add or replace grammars.
+
+Highlighting combines a base, token, and theme style: each token is rendered
+as `base.patch(tokenStyle)`, so an explicit `MarkdownStyles.codeBlock()`
+foreground color always wins over the theme unless a grammar explicitly colors
+a token.
+
+=== Custom theme
+
+[source,java]
+----
+import dev.tamboui.markdown.SyntaxTheme;
+import dev.tamboui.markdown.TokenType;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+SyntaxTheme theme = SyntaxTheme.builder()
+    .token(TokenType.KEYWORD, Style.EMPTY.bold().fg(Color.rgb(198, 120, 221)))
+    .token(TokenType.STRING, Style.EMPTY.fg(Color.hex("#98c379")))
+    .build();
+
+MarkdownView view = MarkdownView.builder()
+    .source(source)
+    .syntaxTheme(theme)
+    .build();
+----
+
+=== Disabling or custom highlighting
+
+Use `SyntaxHighlighter.none()` to disable highlighting, or wire in a
+highlighter of your own (custom grammar additions, a different tokenizer, etc.):
+
+[source,java]
+----
+import dev.tamboui.markdown.RegexSyntaxHighlighter;
+import dev.tamboui.markdown.SyntaxHighlighter;
+
+MarkdownView highlighted = MarkdownView.builder()
+    .source(source)
+    .syntaxHighlighter(RegexSyntaxHighlighter.defaults())
+    .build();
+
+MarkdownView plain = MarkdownView.builder()
+    .source(source)
+    .syntaxHighlighter(SyntaxHighlighter.none())
+    .build();
 ----

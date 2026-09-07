@@ -147,6 +147,8 @@ public final class MarkdownView implements Widget {
     private final Style style;
     private final MarkdownStyles styles;
     private final StylePropertyResolver styleResolver;
+    private final SyntaxHighlighter syntaxHighlighter;
+    private final SyntaxTheme syntaxTheme;
     private final Overflow overflow;
     private final int scroll;
 
@@ -156,6 +158,8 @@ public final class MarkdownView implements Widget {
         this.style = builder.style;
         this.styles = builder.styles;
         this.styleResolver = builder.styleResolver;
+        this.syntaxHighlighter = builder.syntaxHighlighter;
+        this.syntaxTheme = builder.syntaxTheme;
         // Programmatic value wins; otherwise consult the resolver directly
         // (resolve() would fall back to the property's CLIP default, which is
         // the wrong default for prose-flowing markdown).
@@ -205,7 +209,8 @@ public final class MarkdownView implements Widget {
         Node root = MarkdownParserHolder.parser().parse(sanitized);
         MarkdownStyles resolved = resolveStyles();
         int total = 0;
-        for (RenderedChunk chunk : MarkdownLayout.layout(root, contentWidth, resolved, overflow)) {
+        for (RenderedChunk chunk : MarkdownLayout.layout(
+            root, contentWidth, resolved, overflow, syntaxHighlighter, syntaxTheme)) {
             total += chunk.height(contentWidth);
         }
         return total + chrome;
@@ -230,7 +235,8 @@ public final class MarkdownView implements Widget {
         String sanitized = PartialMarkdownSanitizer.sanitize(source);
         Node root = MarkdownParserHolder.parser().parse(sanitized);
         MarkdownStyles resolved = resolveStyles();
-        List<RenderedChunk> chunks = MarkdownLayout.layout(root, contentArea.width(), resolved, overflow);
+        List<RenderedChunk> chunks = MarkdownLayout.layout(
+            root, contentArea.width(), resolved, overflow, syntaxHighlighter, syntaxTheme);
 
         int totalRows = 0;
         for (RenderedChunk chunk : chunks) {
@@ -402,6 +408,8 @@ public final class MarkdownView implements Widget {
         private Style style = Style.EMPTY;
         private MarkdownStyles styles = MarkdownStyles.DEFAULTS;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
+        private SyntaxHighlighter syntaxHighlighter = RegexSyntaxHighlighter.defaults();
+        private SyntaxTheme syntaxTheme = SyntaxTheme.DEFAULTS;
         private Overflow overflow;
         private int scroll;
 
@@ -495,6 +503,32 @@ public final class MarkdownView implements Widget {
          */
         public Builder scroll(int scroll) {
             this.scroll = Math.max(0, scroll);
+            return this;
+        }
+
+        /**
+         * Sets the {@link SyntaxHighlighter} used to tokenize fenced and
+         * indented code blocks. Defaults to a {@link RegexSyntaxHighlighter}
+         * covering the popular built-in languages; use
+         * {@link SyntaxHighlighter#none()} to disable syntax highlighting.
+         *
+         * @param highlighter the highlighter, must not be null
+         * @return this builder
+         */
+        public Builder syntaxHighlighter(SyntaxHighlighter highlighter) {
+            this.syntaxHighlighter = Objects.requireNonNull(highlighter, "highlighter");
+            return this;
+        }
+
+        /**
+         * Sets the {@link SyntaxTheme} mapping token types to styles. Defaults
+         * to {@link SyntaxTheme#DEFAULTS}.
+         *
+         * @param theme the syntax theme, must not be null
+         * @return this builder
+         */
+        public Builder syntaxTheme(SyntaxTheme theme) {
+            this.syntaxTheme = Objects.requireNonNull(theme, "theme");
             return this;
         }
 

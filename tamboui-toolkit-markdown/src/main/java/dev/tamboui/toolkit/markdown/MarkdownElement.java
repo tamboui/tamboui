@@ -9,6 +9,8 @@ import java.util.Objects;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.markdown.MarkdownStyles;
 import dev.tamboui.markdown.MarkdownView;
+import dev.tamboui.markdown.SyntaxHighlighter;
+import dev.tamboui.markdown.SyntaxTheme;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
@@ -42,6 +44,8 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
 
     private String source;
     private MarkdownStyles styles;
+    private SyntaxHighlighter syntaxHighlighter;
+    private SyntaxTheme syntaxTheme;
     private Overflow overflow;
     private int scroll;
 
@@ -90,6 +94,31 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
      */
     public MarkdownElement styles(MarkdownStyles styles) {
         this.styles = Objects.requireNonNull(styles, "styles");
+        return this;
+    }
+
+    /**
+     * Sets the {@link SyntaxHighlighter} used to tokenize fenced code blocks.
+     * Defaults to {@code RegexSyntaxHighlighter.defaults()}; use
+     * {@link SyntaxHighlighter#none()} to disable highlighting.
+     *
+     * @param syntaxHighlighter the highlighter, must not be null
+     * @return this element for chaining
+     */
+    public MarkdownElement syntaxHighlighter(SyntaxHighlighter syntaxHighlighter) {
+        this.syntaxHighlighter = Objects.requireNonNull(syntaxHighlighter, "syntaxHighlighter");
+        return this;
+    }
+
+    /**
+     * Sets the {@link SyntaxTheme} mapping token types to styles while
+     * highlighting fenced code blocks. Defaults to {@link SyntaxTheme#DEFAULTS}.
+     *
+     * @param syntaxTheme the syntax theme, must not be null
+     * @return this element for chaining
+     */
+    public MarkdownElement syntaxTheme(SyntaxTheme syntaxTheme) {
+        this.syntaxTheme = Objects.requireNonNull(syntaxTheme, "syntaxTheme");
         return this;
     }
 
@@ -157,6 +186,12 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
         }
         if (overflow != null) {
             b.overflow(overflow);
+        }
+        if (syntaxHighlighter != null) {
+            b.syntaxHighlighter(syntaxHighlighter);
+        }
+        if (syntaxTheme != null) {
+            b.syntaxTheme(syntaxTheme);
         }
         return b.build();
     }

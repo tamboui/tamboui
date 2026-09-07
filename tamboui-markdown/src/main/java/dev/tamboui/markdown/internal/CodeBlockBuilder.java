@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.tamboui.markdown.MarkdownStyles;
+import dev.tamboui.markdown.SyntaxHighlighter;
+import dev.tamboui.markdown.SyntaxTheme;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.CharWidth;
@@ -29,9 +31,9 @@ final class CodeBlockBuilder {
     private CodeBlockBuilder() {
     }
 
-    static RenderedChunk build(String literal, String info, int width, MarkdownStyles styles) {
+    static RenderedChunk build(String literal, String info, int width, MarkdownStyles styles,
+                               SyntaxHighlighter highlighter, SyntaxTheme theme) {
         String trimmed = literal.endsWith("\n") ? literal.substring(0, literal.length() - 1) : literal;
-        String[] codeLines = trimmed.isEmpty() ? new String[] {""} : trimmed.split("\n", -1);
 
         Block.Builder blockBuilder = Block.builder()
             .borders(Borders.ALL)
@@ -42,10 +44,7 @@ final class CodeBlockBuilder {
         Block block = blockBuilder.build();
 
         Style codeStyle = styles.codeBlock();
-        List<Line> lines = new ArrayList<>(codeLines.length);
-        for (String codeLine : codeLines) {
-            lines.add(Line.from(Span.styled(codeLine, codeStyle)));
-        }
+        List<Line> lines = highlighter.highlight(trimmed, info, codeStyle, theme);
 
         int innerWidth = Math.max(1, width - 2);
         List<Line> wrapped = clip(lines, innerWidth);
