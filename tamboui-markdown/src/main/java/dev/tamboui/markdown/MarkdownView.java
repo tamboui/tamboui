@@ -148,6 +148,7 @@ public final class MarkdownView implements Widget {
     private final MarkdownStyles styles;
     private final StylePropertyResolver styleResolver;
     private final Overflow overflow;
+    private final boolean softLineBreaks;
     private final int scroll;
 
     private MarkdownView(Builder builder) {
@@ -166,6 +167,7 @@ public final class MarkdownView implements Widget {
                 .get(StandardProperties.TEXT_OVERFLOW)
                 .orElse(Overflow.WRAP_WORD);
         }
+        this.softLineBreaks = builder.softLineBreaks;
         this.scroll = builder.scroll;
     }
 
@@ -205,7 +207,7 @@ public final class MarkdownView implements Widget {
         Node root = MarkdownParserHolder.parser().parse(sanitized);
         MarkdownStyles resolved = resolveStyles();
         int total = 0;
-        for (RenderedChunk chunk : MarkdownLayout.layout(root, contentWidth, resolved, overflow)) {
+        for (RenderedChunk chunk : MarkdownLayout.layout(root, contentWidth, resolved, overflow, softLineBreaks)) {
             total += chunk.height(contentWidth);
         }
         return total + chrome;
@@ -230,7 +232,7 @@ public final class MarkdownView implements Widget {
         String sanitized = PartialMarkdownSanitizer.sanitize(source);
         Node root = MarkdownParserHolder.parser().parse(sanitized);
         MarkdownStyles resolved = resolveStyles();
-        List<RenderedChunk> chunks = MarkdownLayout.layout(root, contentArea.width(), resolved, overflow);
+        List<RenderedChunk> chunks = MarkdownLayout.layout(root, contentArea.width(), resolved, overflow, softLineBreaks);
 
         int totalRows = 0;
         for (RenderedChunk chunk : chunks) {
@@ -403,6 +405,7 @@ public final class MarkdownView implements Widget {
         private MarkdownStyles styles = MarkdownStyles.DEFAULTS;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
         private Overflow overflow;
+        private boolean softLineBreaks;
         private int scroll;
 
         private Builder() {
@@ -483,6 +486,20 @@ public final class MarkdownView implements Widget {
          */
         public Builder overflow(Overflow overflow) {
             this.overflow = Objects.requireNonNull(overflow, "overflow");
+            return this;
+        }
+
+        /**
+         * Controls whether single newlines in the source (CommonMark soft line
+         * breaks) are preserved as line breaks. When {@code true}, each
+         * {@code \n} starts a new line; when {@code false} (default), soft line
+         * breaks collapse into a single space per the CommonMark spec.
+         *
+         * @param softLineBreaks whether to break on soft line breaks
+         * @return this builder
+         */
+        public Builder softLineBreaks(boolean softLineBreaks) {
+            this.softLineBreaks = softLineBreaks;
             return this;
         }
 

@@ -206,6 +206,32 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("collapses soft line breaks into a space by default")
+    void collapsesSoftLineBreaksByDefault() {
+        MarkdownView view = MarkdownView.builder().source("line one\nline two").build();
+        Buffer buffer = renderInto(view, 20, 1);
+
+        // Both soft lines render on one row, separated by a space.
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("l");
+        assertThat(buffer.get(8, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("l");
+    }
+
+    @Test
+    @DisplayName("preserves single newlines as line breaks when softLineBreaks is enabled")
+    void preservesSoftLineBreaksWhenEnabled() {
+        MarkdownView view = MarkdownView.builder()
+            .source("line one\nline two")
+            .softLineBreaks(true)
+            .build();
+        Buffer buffer = renderInto(view, 20, 2);
+
+        // Each soft line lands on its own row.
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("l");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("l");
+    }
+
+    @Test
     @DisplayName("renders an image as bracketed alt text plus URL")
     void rendersImage() {
         MarkdownView view = MarkdownView.builder()
