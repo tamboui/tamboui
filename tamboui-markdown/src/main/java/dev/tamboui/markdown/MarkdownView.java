@@ -32,6 +32,9 @@ import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
 
 /**
  * A widget that renders CommonMark + GFM markdown to a {@link Buffer}.

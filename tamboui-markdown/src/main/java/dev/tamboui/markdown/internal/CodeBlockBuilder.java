@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.tamboui.markdown.MarkdownStyles;
-import dev.tamboui.markdown.SyntaxHighlighter;
-import dev.tamboui.markdown.SyntaxTheme;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.CharWidth;
@@ -21,6 +19,8 @@ import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
 import dev.tamboui.widgets.paragraph.Paragraph;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
 
 /**
  * Builds a fenced or indented code block as a {@link WidgetChunk} that

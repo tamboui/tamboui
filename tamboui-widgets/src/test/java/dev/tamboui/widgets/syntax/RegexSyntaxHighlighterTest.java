@@ -2,7 +2,7 @@
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.markdown;
+package dev.tamboui.widgets.syntax;
 
 import java.util.List;
 

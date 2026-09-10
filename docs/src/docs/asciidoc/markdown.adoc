@@ -223,7 +223,7 @@ MarkdownView {
 Fenced code blocks are highlighted by default using `RegexSyntaxHighlighter`
 (a highlight.js-inspired regex tokenizer) combined with a `SyntaxTheme`.
 Indented code blocks carry no language info and never highlight. Grammar
-definition lives in `dev.tamboui.markdown`:
+definition lives in `dev.tamboui.widgets.syntax`:
 
 * `TokenType` — the semantic categories (`KEYWORD`, `STRING`, `NUMBER`,
   `COMMENT`, `FUNCTION`, `TYPE`, ...). `PLAIN` maps to the base code style.
@@ -251,8 +251,8 @@ a token.
 
 [source,java]
 ----
-import dev.tamboui.markdown.SyntaxTheme;
-import dev.tamboui.markdown.TokenType;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
+import dev.tamboui.widgets.syntax.TokenType;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
@@ -274,8 +274,8 @@ highlighter of your own (custom grammar additions, a different tokenizer, etc.):
 
 [source,java]
 ----
-import dev.tamboui.markdown.RegexSyntaxHighlighter;
-import dev.tamboui.markdown.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
 
 MarkdownView highlighted = MarkdownView.builder()
     .source(source)

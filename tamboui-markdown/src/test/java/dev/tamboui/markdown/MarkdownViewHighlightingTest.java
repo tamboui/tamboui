@@ -11,6 +11,9 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
+import dev.tamboui.widgets.syntax.TokenType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

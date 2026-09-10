@@ -9,8 +9,6 @@ import java.util.Objects;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.markdown.MarkdownStyles;
 import dev.tamboui.markdown.MarkdownView;
-import dev.tamboui.markdown.SyntaxHighlighter;
-import dev.tamboui.markdown.SyntaxTheme;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
@@ -18,6 +16,8 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
 
 /**
  * Toolkit DSL element rendering CommonMark + GFM markdown via

@@ -31,15 +31,15 @@ import org.commonmark.node.ThematicBreak;
 
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.markdown.MarkdownStyles;
-import dev.tamboui.markdown.RegexSyntaxHighlighter;
-import dev.tamboui.markdown.SyntaxHighlighter;
-import dev.tamboui.markdown.SyntaxTheme;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
 import dev.tamboui.widgets.table.Cell;
 import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.Table;

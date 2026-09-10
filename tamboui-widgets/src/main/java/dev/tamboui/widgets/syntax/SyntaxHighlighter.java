@@ -2,7 +2,7 @@
  * Copyright TamboUI Contributors
  * SPDX-License-Identifier: MIT
  */
-package dev.tamboui.markdown;
+package dev.tamboui.widgets.syntax;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +13,10 @@ import dev.tamboui.text.Span;
 
 /**
  * Converts a source code snippet into a list of styled {@link Line}s for
- * rendering inside a markdown code block. The {@link MarkdownView} consults a
- * {@code SyntaxHighlighter} whenever it renders a fenced or indented code
- * block; a plain snippet is returned when no grammar matches the requested
- * language or when the {@link MarkdownView.Builder#syntaxHighlighter} is set
- * to {@link #none()}.
+ * rendering inside a code block. Widgets consult a {@code SyntaxHighlighter}
+ * whenever they render a code block; a plain snippet is returned when no
+ * grammar matches the requested language or when the widget's highlighter is
+ * set to {@link #none()}.
  *
  * <p>Implementations are expected to be stateless and thread-safe. The built-in
  * {@link RegexSyntaxHighlighter} covers a set of popular languages using

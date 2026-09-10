@@ -691,6 +691,44 @@ Clears an area by filling it with a style. Useful for widget layering:
 include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=clear-style]
 ----
 
+[[syntax-highlighting]]
+=== Syntax Highlighting
+
+A reusable component for coloring source-code tokens, independent of any single
+widget. It lives in `dev.tamboui.widgets.syntax` and is consumed by
+`MarkdownView` for fenced code blocks, but any code/editor widget can reuse it.
+
+* `SyntaxHighlighter` — the component interface
+  (`List<Line> highlight(String code, String language, Style base, SyntaxTheme)`).
+  Implement your own for a custom tokenizer, or use `SyntaxHighlighter.none()`
+  to disable highlighting.
+* `RegexSyntaxHighlighter` — the built-in regex tokenizer (highlight.js-inspired)
+  with grammars for `java`, `kotlin`, `javascript`, `typescript`, `python`,
+  `json`, `xml`/`html`, `css`, `bash`, `yaml`, `sql`, `go` and `rust`.
+* `Grammar` — a declarative language definition: an id, aliases, and rules
+  (`pattern`, `literal`, `multiline`).
+* `SyntaxTheme` — maps a `TokenType` to a `Style`; `SyntaxTheme.DEFAULTS` is a
+  light-on-dark palette you can extend via `builder()`.
+
+[source,java]
+----
+import java.util.List;
+
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
+import dev.tamboui.widgets.syntax.TokenType;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+SyntaxHighlighter highlighter = RegexSyntaxHighlighter.defaults();
+SyntaxTheme theme = SyntaxTheme.builder()
+    .token(TokenType.KEYWORD, Style.EMPTY.bold().fg(Color.rgb(198, 120, 221)))
+    .build();
+
+List<Line> lines = highlighter.highlight("int x = 1;", "java", Style.EMPTY, theme);
+----
+
 == Markdown
 
 [[markdownview]]
