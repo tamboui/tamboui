@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Widgets Reference</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Widgets Reference</h1>
+<div class="details">
+<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#widget-overview">Widget Overview</a></li>
+<li><a href="#container-widgets">Container Widgets</a>
+<ul class="sectlevel2">
+<li><a href="#block">Block</a></li>
+<li><a href="#clear">Clear</a></li>
+</ul>
+</li>
+<li><a href="#text-widgets">Text Widgets</a>
+<ul class="sectlevel2">
+<li><a href="#paragraph">Paragraph</a></li>
+</ul>
+</li>
+<li><a href="#selection-widgets">Selection Widgets</a>
+<ul class="sectlevel2">
+<li><a href="#listwidget">ListWidget</a>
+<ul class="sectlevel3">
+<li><a href="#listwidget-vs-listcontainer">ListWidget vs ListElement</a></li>
+</ul>
+</li>
+<li><a href="#table">Table</a></li>
+<li><a href="#tabs">Tabs</a></li>
+<li><a href="#tree">Tree</a>
+<ul class="sectlevel3">
+<li><a href="#modelview-separation">Model/View Separation</a></li>
+<li><a href="#keyboard-navigation">Keyboard Navigation</a></li>
+<li><a href="#lazy-loading">Lazy Loading</a></li>
+<li><a href="#css-styling">CSS Styling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#data-visualization">Data Visualization</a>
+<ul class="sectlevel2">
+<li><a href="#gauge">Gauge</a></li>
+<li><a href="#linegauge">LineGauge</a></li>
+<li><a href="#sparkline">Sparkline</a></li>
+<li><a href="#dualsparkline">DualSparkline</a></li>
+<li><a href="#barchart">BarChart</a></li>
+<li><a href="#chart">Chart</a></li>
+<li><a href="#canvas">Canvas</a></li>
+<li><a href="#calendar">Calendar</a></li>
+</ul>
+</li>
+<li><a href="#animated-widgets">Animated Widgets</a>
+<ul class="sectlevel2">
+<li><a href="#spinner">Spinner</a>
+<ul class="sectlevel3">
+<li><a href="#css-properties">CSS Properties</a></li>
+</ul>
+</li>
+<li><a href="#wavetext">WaveText</a></li>
+</ul>
+</li>
+<li><a href="#input-widgets">Input Widgets</a>
+<ul class="sectlevel2">
+<li><a href="#textinput">TextInput</a></li>
+<li><a href="#textarea">TextArea</a></li>
+<li><a href="#checkbox">Checkbox</a></li>
+<li><a href="#toggle">Toggle</a></li>
+<li><a href="#select">Select</a></li>
+</ul>
+</li>
+<li><a href="#utility-widgets">Utility Widgets</a>
+<ul class="sectlevel2">
+<li><a href="#scrollbar">Scrollbar</a></li>
+<li><a href="#logo">Logo</a></li>
+<li><a href="#errordisplay">ErrorDisplay</a></li>
+<li><a href="#clear-style">Clear (Styled)</a></li>
+</ul>
+</li>
+<li><a href="#markdown">Markdown</a>
+<ul class="sectlevel2">
+<li><a href="#markdownview">MarkdownView</a></li>
+</ul>
+</li>
+<li><a href="#toolkit-dsl">Using Widgets with Toolkit DSL</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI provides a comprehensive set of widgets for building terminal UIs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="widget-overview"><a class="anchor" href="#widget-overview"></a><a class="link" href="#widget-overview">Widget Overview</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Widget</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#block">Block</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container with borders, titles, and padding</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#paragraph">Paragraph</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-line text with wrapping and alignment</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#listwidget">ListWidget</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scrollable list with selection</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#table">Table</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Grid with rows, columns, and selection</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#tabs">Tabs</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tab bar with selection</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#gauge">Gauge</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress bar with percentage</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#linegauge">LineGauge</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Horizontal line progress indicator</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#sparkline">Sparkline</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mini line chart for data series</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#dualsparkline">DualSparkline</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dual-series mirrored chart growing from a shared centre axis</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#barchart">BarChart</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vertical bar chart</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#chart">Chart</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line and scatter plots with axes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#canvas">Canvas</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Drawing surface with shapes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#calendar">Calendar</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Monthly calendar with date styling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#spinner">Spinner</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Animated loading indicator</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#scrollbar">Scrollbar</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Visual scroll position indicator</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#textinput">TextInput</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Single-line text input</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#textarea">TextArea</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-line text input</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#checkbox">Checkbox</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toggleable checkbox</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#toggle">Toggle</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On/off toggle switch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#select">Select</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Inline select with navigation indicators</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#tree">Tree</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hierarchical tree view with expand/collapse</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#wavetext">WaveText</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Animated wave brightness text effect</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#logo">Logo</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Renders the Tamboui logo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#errordisplay">ErrorDisplay</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Displays error information with stack trace</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#clear">Clear</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Clears an area (for widget layering)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#markdownview">MarkdownView</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Renders CommonMark + GFM markdown (separate <code>tamboui-markdown</code> module)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="container-widgets"><a class="anchor" href="#container-widgets"></a><a class="link" href="#container-widgets">Container Widgets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="block"><a class="anchor" href="#block"></a><a class="link" href="#block">Block</a></h3>
+<div class="paragraph">
+<p>A <code>Block</code> is the most fundamental container widget. It can have borders, titles, and padding.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Block block = Block.builder()
+    .title("My Title")
+    .borders(Borders.ALL)
+    .borderType(BorderType.ROUNDED)
+    .borderStyle(Style.EMPTY.fg(Color.CYAN))
+    .padding(new Padding(1, 2, 1, 2))  // top, right, bottom, left
+    .build();
+
+// Render the block
+block.render(area, buffer);
+
+// Get the inner area (after borders and padding)
+Rect inner = block.inner(area);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Border types:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>BorderType.PLAIN</code> - Simple lines (<code>─</code>, <code>│</code>)</p>
+</li>
+<li>
+<p><code>BorderType.ROUNDED</code> - Rounded corners (<code>╭</code>, <code>╮</code>, <code>╰</code>, <code>╯</code>)</p>
+</li>
+<li>
+<p><code>BorderType.DOUBLE</code> - Double lines (<code>═</code>, <code>║</code>)</p>
+</li>
+<li>
+<p><code>BorderType.THICK</code> - Thick lines (<code>━</code>, <code>┃</code>)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clear"><a class="anchor" href="#clear"></a><a class="link" href="#clear">Clear</a></h3>
+<div class="paragraph">
+<p>Clears an area by filling it with spaces. Useful before rendering overlays:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Clear.INSTANCE.render(dialogArea, buffer);
+// Then render your dialog on top</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For layout widgets (Columns, Grid, Dock, Stack, Flow), see <a href="layouts.html">Layouts Reference</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="text-widgets"><a class="anchor" href="#text-widgets"></a><a class="link" href="#text-widgets">Text Widgets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="paragraph"><a class="anchor" href="#paragraph"></a><a class="link" href="#paragraph">Paragraph</a></h3>
+<div class="paragraph">
+<p>Displays multi-line text with wrapping and alignment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Paragraph paragraph = Paragraph.builder()
+    .text(Text.from("This is a paragraph of text that can wrap across multiple lines."))
+    .overflow(Overflow.WRAP_WORD)
+    .alignment(Alignment.LEFT)
+    .block(Block.builder()
+        .title("Description")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+paragraph.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Wrap modes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Wrap.NONE</code> - No wrapping, text is clipped</p>
+</li>
+<li>
+<p><code>Wrap.CHARACTER</code> - Wrap at any character</p>
+</li>
+<li>
+<p><code>Wrap.WORD</code> - Wrap at word boundaries</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="selection-widgets"><a class="anchor" href="#selection-widgets"></a><a class="link" href="#selection-widgets">Selection Widgets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="listwidget"><a class="anchor" href="#listwidget"></a><a class="link" href="#listwidget">ListWidget</a></h3>
+<div class="paragraph">
+<p>A low-level scrollable list widget with selection. This is part of the widgets layer and requires manual state management with <code>ListState</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong>For Toolkit DSL users</strong>: Use <code>ListElement</code> instead (via <code>list()</code> factory method). It manages state internally and accepts any <code>StyledElement</code> as items. See <a href="#listwidget-vs-listcontainer">ListWidget vs ListElement</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create state
+ListState state = new ListState();
+state.select(0);  // Select first item
+
+// Build and render
+ListWidget list = ListWidget.builder()
+    .items(
+        ListItem.from("First item"),
+        ListItem.from("Second item"),
+        ListItem.from("Styled item").style(Style.EMPTY.bold())
+    )
+    .highlightStyle(Style.EMPTY.reversed())
+    .highlightSymbol("&gt;&gt; ")
+    .block(Block.builder()
+        .title("Select an Item")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+list.render(area, buffer, state);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>State methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>state.select(index)</code> - Select specific index</p>
+</li>
+<li>
+<p><code>state.selectNext(totalItems)</code> - Move selection down</p>
+</li>
+<li>
+<p><code>state.selectPrevious()</code> - Move selection up</p>
+</li>
+<li>
+<p><code>state.selectFirst()</code> - Jump to first item</p>
+</li>
+<li>
+<p><code>state.selectLast(totalItems)</code> - Jump to last item</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="listwidget-vs-listcontainer"><a class="anchor" href="#listwidget-vs-listcontainer"></a><a class="link" href="#listwidget-vs-listcontainer">ListWidget vs ListElement</a></h4>
+<div class="paragraph">
+<p>TamboUI provides two list implementations at different API levels:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Feature</th>
+<th class="tableblock halign-left valign-top">ListWidget (widgets layer)</th>
+<th class="tableblock halign-left valign-top">ListElement (toolkit layer)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">State management</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External <code>ListState</code> required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal state, no external state needed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Item types</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ListItem</code> only (text + style)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any <code>StyledElement</code> (text, rows, panels, etc.)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Usage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Direct widget rendering</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toolkit DSL fluent API</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Best for</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom TuiRunner apps, fine-grained control</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ToolkitApp, declarative UIs</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>ListWidget</strong> is for low-level control when you need to manage state externally or are building custom rendering with <code>TuiRunner</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>ListElement</strong> is for Toolkit DSL users who want:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Internal state management (no <code>ListState</code> needed)</p>
+</li>
+<li>
+<p>Rich content (any <code>StyledElement</code> as items, not just text)</p>
+</li>
+<li>
+<p>Automatic event handling (UP/DOWN navigation built-in)</p>
+</li>
+<li>
+<p>Seamless integration with other toolkit elements</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Toolkit DSL - ListElement with rich content
+list()
+    .add(row(text("*").yellow(), text(" Featured Item")))
+    .add(text("Plain Item"))
+    .add(panel("Nested Panel", text("Content")).rounded())
+    .highlightColor(Color.CYAN)
+    .autoScroll();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="table"><a class="anchor" href="#table"></a><a class="link" href="#table">Table</a></h3>
+<div class="paragraph">
+<p>A data table with rows and columns:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create table
+Table table = Table.builder()
+    .header(Row.from("Name", "Age", "City"))
+    .rows(
+        Row.from("Alice", "30", "NYC"),
+        Row.from("Bob", "25", "LA"),
+        Row.from("Charlie", "35", "Chicago")
+    )
+    .widths(
+        Constraint.percentage(40),
+        Constraint.length(10),
+        Constraint.fill()
+    )
+    .highlightStyle(Style.EMPTY.bg(Color.DARK_GRAY))
+    .block(Block.builder()
+        .title("Users")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+// Create and use state
+TableState state = new TableState();
+state.select(0);
+table.render(area, buffer, state);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tabs"><a class="anchor" href="#tabs"></a><a class="link" href="#tabs">Tabs</a></h3>
+<div class="paragraph">
+<p>A tab bar for navigation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Tabs tabs = Tabs.builder()
+    .titles("Home", "Settings", "About")
+    .highlightStyle(Style.EMPTY.bold().fg(Color.CYAN))
+    .divider(" | ")
+    .block(Block.builder()
+        .borders(Borders.BOTTOM_ONLY)
+        .build())
+    .build();
+
+TabsState state = new TabsState();
+state.select(0);
+tabs.render(area, buffer, state);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tree"><a class="anchor" href="#tree"></a><a class="link" href="#tree">Tree</a></h3>
+<div class="paragraph">
+<p>A hierarchical tree view with expand/collapse, keyboard navigation, and support for custom node rendering. Use <code>TreeElement</code> (toolkit layer) with <code>TreeNode</code> for the data model.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create tree nodes with data model
+TreeNode&lt;FileInfo&gt; src = TreeNode.of("src", new FileInfo("src", FileType.DIRECTORY))
+    .add(TreeNode.of("main", new FileInfo("main", FileType.DIRECTORY))
+        .add(TreeNode.of("App.java", new FileInfo("App.java", FileType.JAVA, 2048)).leaf())
+        .expanded())
+    .expanded();
+
+// Create tree with custom node renderer
+tree(src, docs, build)
+    .title("Project Files")
+    .rounded()
+    .highlightColor(Color.CYAN)
+    .scrollbar()
+    .nodeRenderer(node -&gt; row(
+        text(node.data().icon() + " "),
+        text(node.label()).bold(),
+        spacer(),
+        text(node.data().formattedSize()).dim()
+    ));</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="modelview-separation"><a class="anchor" href="#modelview-separation"></a><a class="link" href="#modelview-separation">Model/View Separation</a></h4>
+<div class="paragraph">
+<p>TreeElement encourages clean separation between data and presentation:</p>
+</div>
+<div class="paragraph">
+<p><strong>Model (TreeNode + Data)</strong>: Contains only data, no rendering logic.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Pure data model - no view concerns
+record FileData(String name, FileType type, long size, Status status) {
+    String icon() { /* data-derived */ return ""; }
+    String formattedSize() { /* data formatting */ return ""; }
+}
+
+FileData data = new FileData("App.java", FileType.JAVA, 2048, Status.OK);
+// TreeNode holds the data
+TreeNode&lt;FileData&gt; node = TreeNode.of("App.java", data).leaf();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>View (nodeRenderer)</strong>: Transforms data into styled elements.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Rendering logic separated from model
+tree(node).nodeRenderer(n -&gt; {
+    var info = n.data();
+    return row(
+        text(info.icon() + " "),
+        text(info.name()).fg(info.statusColor()),
+        spacer(),
+        text(info.formattedSize()).dim()
+    );
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This separation allows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Reusable models</strong>: Same <code>TreeNode&lt;T&gt;</code> data can be rendered differently in different contexts</p>
+</li>
+<li>
+<p><strong>Testable logic</strong>: Data transformations can be unit tested without UI</p>
+</li>
+<li>
+<p><strong>Flexible presentation</strong>: Change rendering without modifying data structures</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="keyboard-navigation"><a class="anchor" href="#keyboard-navigation"></a><a class="link" href="#keyboard-navigation">Keyboard Navigation</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Key</th>
+<th class="tableblock halign-left valign-top">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">↑/↓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Move selection up/down</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">→</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Expand node or move to first child</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">←</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Collapse node or move to parent</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter/Space</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toggle expand/collapse</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Home/End</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jump to first/last visible node</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Page Up/Down</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scroll by viewport height</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="lazy-loading"><a class="anchor" href="#lazy-loading"></a><a class="link" href="#lazy-loading">Lazy Loading</a></h4>
+<div class="paragraph">
+<p>Load children on-demand for large trees:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">TreeNode.of("Large Directory", dirInfo)
+    .childrenLoader(() -&gt; loadChildrenFromDisk(dirInfo.name()));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The loader is called once when the node is first expanded.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="css-styling"><a class="anchor" href="#css-styling"></a><a class="link" href="#css-styling">CSS Styling</a></h4>
+<div class="paragraph">
+<p>Style trees with CSS, including the <code>:selected</code> pseudo-class:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">/* Guide characters */
+TreeElement-guide {
+    color: #45475a;
+}
+
+/* Selected node styling */
+TreeElement-node:selected {
+    color: #89dceb;
+    background: #313244;
+    bold: true;
+}
+
+/* Scrollbar */
+TreeElement-scrollbar-thumb {
+    color: #89b4fa;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CSS selectors:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>TreeElement</code> - the container</p>
+</li>
+<li>
+<p><code>TreeElement-node</code> - each tree node</p>
+</li>
+<li>
+<p><code>TreeElement-node:selected</code> - the selected node</p>
+</li>
+<li>
+<p><code>TreeElement-guide</code> - guide/branch characters</p>
+</li>
+<li>
+<p><code>TreeElement-scrollbar-thumb</code> - scrollbar thumb</p>
+</li>
+<li>
+<p><code>TreeElement-scrollbar-track</code> - scrollbar track</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="data-visualization"><a class="anchor" href="#data-visualization"></a><a class="link" href="#data-visualization">Data Visualization</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="gauge"><a class="anchor" href="#gauge"></a><a class="link" href="#gauge">Gauge</a></h3>
+<div class="paragraph">
+<p>A progress bar showing completion percentage:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Gauge gauge = Gauge.builder()
+    .ratio(0.75)  // 75% complete
+    .label("Loading...")
+    .gaugeStyle(Style.EMPTY.fg(Color.GREEN))
+    .block(Block.builder()
+        .title("Progress")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+gauge.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="linegauge"><a class="anchor" href="#linegauge"></a><a class="link" href="#linegauge">LineGauge</a></h3>
+<div class="paragraph">
+<p>A compact single-line progress indicator:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">LineGauge lineGauge = LineGauge.builder()
+    .ratio(0.5)
+    .label("50%")
+    .lineSet(LineGauge.THICK)
+    .filledStyle(Style.EMPTY.fg(Color.CYAN))
+    .unfilledStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+    .build();
+
+lineGauge.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sparkline"><a class="anchor" href="#sparkline"></a><a class="link" href="#sparkline">Sparkline</a></h3>
+<div class="paragraph">
+<p>A mini chart showing data trends:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">int[] data = {1, 4, 2, 8, 5, 7, 3, 6};
+
+Sparkline sparkline = Sparkline.builder()
+    .data(data)
+    .foreground(Color.CYAN)
+    .showYAxis(true)
+    .xLabels("-60s", "-30s", "now")
+    .block(Block.builder()
+        .title("CPU Usage")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+sparkline.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dualsparkline"><a class="anchor" href="#dualsparkline"></a><a class="link" href="#dualsparkline">DualSparkline</a></h3>
+<div class="paragraph">
+<p>A dual-series chart where bars grow upward (top series) and downward (bottom series) from a shared centre axis — useful for displaying paired metrics such as network in/out or disk read/write rates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">long[] inRates  = {0, 2, 5, 8, 12, 9, 6, 3};
+long[] outRates = {0, 1, 3, 6,  9, 7, 4, 2};
+
+DualSparkline chart = DualSparkline.builder()
+    .topData(inRates)
+    .bottomData(outRates)
+    .topStyle(Style.EMPTY.fg(Color.GREEN))
+    .bottomStyle(Style.EMPTY.fg(Color.BLUE))
+    .xLabels("-60s", "-45s", "-30s", "-15s", "now")
+    .block(Block.builder()
+        .title("In / Out  msg/s")
+        .borders(Borders.ALL)
+        .borderType(BorderType.ROUNDED)
+        .build())
+    .build();
+
+chart.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="barchart"><a class="anchor" href="#barchart"></a><a class="link" href="#barchart">BarChart</a></h3>
+<div class="paragraph">
+<p>Vertical bar chart for comparing values:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">BarChart barChart = BarChart.builder()
+    .data(BarGroup.of(
+        Bar.of(80, "Mon"),
+        Bar.of(95, "Tue"),
+        Bar.of(60, "Wed"),
+        Bar.of(75, "Thu"),
+        Bar.of(90, "Fri")
+    ))
+    .barWidth(5)
+    .barGap(1)
+    .barColor(Color.GREEN)
+    .labelColor(Color.DARK_GRAY)
+    .block(Block.builder()
+        .title("Weekly Sales")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+barChart.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chart"><a class="anchor" href="#chart"></a><a class="link" href="#chart">Chart</a></h3>
+<div class="paragraph">
+<p>Line and scatter plots with axes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create datasets
+Dataset dataset1 = Dataset.builder()
+    .name("Series A")
+    .data(new double[][] {
+        {0, 0},
+        {1, 2},
+        {2, 1},
+        {3, 4},
+        {4, 3}
+    })
+    .marker(Dataset.Marker.BRAILLE)
+    .style(Style.EMPTY.fg(Color.CYAN))
+    .build();
+
+// Build chart
+Chart chart = Chart.builder()
+    .datasets(dataset1)
+    .xAxis(Axis.builder()
+        .title("X Axis")
+        .bounds(0, 5)
+        .build())
+    .yAxis(Axis.builder()
+        .title("Y Axis")
+        .bounds(0, 5)
+        .build())
+    .block(Block.builder()
+        .title("Line Chart")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+chart.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Marker types:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Marker.DOT</code> - Single dots</p>
+</li>
+<li>
+<p><code>Marker.BRAILLE</code> - Braille patterns for higher resolution</p>
+</li>
+<li>
+<p><code>Marker.BLOCK</code> - Block characters</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="canvas"><a class="anchor" href="#canvas"></a><a class="link" href="#canvas">Canvas</a></h3>
+<div class="paragraph">
+<p>A drawing surface for custom graphics:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Canvas canvas = Canvas.builder()
+    .xBounds(-10, 10)
+    .yBounds(-10, 10)
+    .marker(Marker.BRAILLE)
+    .paint(ctx -&gt; {
+        // Draw shapes
+        ctx.draw(new Circle(0, 0, 5, Color.RED));
+        ctx.draw(new Line(-5, -5, 5, 5, Color.GREEN));
+        ctx.draw(new Rectangle(-3, -3, 6, 6, Color.BLUE));
+    })
+    .block(Block.builder()
+        .title("Drawing")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+canvas.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Available shapes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Circle</code> - Circle with center and radius</p>
+</li>
+<li>
+<p><code>Line</code> - Line between two points</p>
+</li>
+<li>
+<p><code>Rectangle</code> - Rectangle with position and size</p>
+</li>
+<li>
+<p><code>Points</code> - Collection of individual points</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="calendar"><a class="anchor" href="#calendar"></a><a class="link" href="#calendar">Calendar</a></h3>
+<div class="paragraph">
+<p>A monthly calendar widget:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">CalendarEventStore events = CalendarEventStore.today(Style.EMPTY.bold().fg(Color.CYAN));
+
+Monthly calendar = Monthly.of(LocalDate.now(), events)
+    .showMonthHeader(Style.EMPTY.bold())
+    .showWeekdaysHeader(Style.EMPTY.fg(Color.CYAN))
+    .showSurrounding(Style.EMPTY.dim())
+    .block(Block.bordered());
+
+calendar.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="animated-widgets"><a class="anchor" href="#animated-widgets"></a><a class="link" href="#animated-widgets">Animated Widgets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="spinner"><a class="anchor" href="#spinner"></a><a class="link" href="#spinner">Spinner</a></h3>
+<div class="paragraph">
+<p>An animated loading indicator that cycles through frame characters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create spinner with built-in style
+Spinner spinner = Spinner.builder()
+    .spinnerStyle(SpinnerStyle.DOTS)
+    .style(Style.EMPTY.fg(Color.CYAN))
+    .build();
+
+// Or with custom frames
+Spinner spinnerCustom = Spinner.builder()
+    .frames("*", "+", "x", "+")
+    .build();
+
+// Or with a custom frame set
+Spinner spinnerFrameSet = Spinner.builder()
+    .frameSet(SpinnerFrameSet.of("a", "b", "c", "d"))
+    .build();
+
+// Create state and render
+SpinnerState state = new SpinnerState();
+spinner.render(area, buffer, state);
+
+// Advance state on each tick
+state.advance();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Built-in styles:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SpinnerStyle.DOTS</code> - Braille dot pattern</p>
+</li>
+<li>
+<p><code>SpinnerStyle.LINE</code> - Classic <code>-\|/</code></p>
+</li>
+<li>
+<p><code>SpinnerStyle.ARC</code> - Quarter-circle characters</p>
+</li>
+<li>
+<p><code>SpinnerStyle.CIRCLE</code> - Clock-position circle</p>
+</li>
+<li>
+<p><code>SpinnerStyle.BOUNCING_BAR</code> - Bouncing bar <code>[=== ]</code></p>
+</li>
+<li>
+<p><code>SpinnerStyle.TOGGLE</code> - Two-state toggle</p>
+</li>
+<li>
+<p><code>SpinnerStyle.GAUGE</code> - Horizontal block fill (<code>▏▎▍▌▋▊▉█</code>)</p>
+</li>
+<li>
+<p><code>SpinnerStyle.VERTICAL_GAUGE</code> - Vertical bar growth (<code>▁▂▃▄▅▆▇█</code>)</p>
+</li>
+<li>
+<p><code>SpinnerStyle.ARROWS</code> - Rotating arrow directions</p>
+</li>
+<li>
+<p><code>SpinnerStyle.CLOCK</code> - Clock face emoji (🕐🕑&#8230;&#8203;)</p>
+</li>
+<li>
+<p><code>SpinnerStyle.MOON</code> - Moon phase emoji (🌑🌒&#8230;&#8203;)</p>
+</li>
+<li>
+<p><code>SpinnerStyle.SQUARE_CORNERS</code> - Rotating square corners</p>
+</li>
+<li>
+<p><code>SpinnerStyle.GROWING_DOTS</code> - Braille dots filling</p>
+</li>
+<li>
+<p><code>SpinnerStyle.BOUNCING_BALL</code> - Bouncing ball in braille</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="css-properties"><a class="anchor" href="#css-properties"></a><a class="link" href="#css-properties">CSS Properties</a></h4>
+<div class="paragraph">
+<p>Spinner style and frames can be configured via CSS:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">/* Use a predefined style */
+.loading-spinner {
+    spinner-style: line;
+    color: cyan;
+}
+
+/* Use custom animation frames */
+.custom-spinner {
+    spinner-frames: "⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧";
+}
+
+/* spinner-frames overrides spinner-style when both are set */
+.fancy-spinner {
+    spinner-style: dots;
+    spinner-frames: "*" "+" "x" "+";  /* This takes precedence */
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Programmatic styles set via <code>spinnerStyle()</code>, <code>frameSet()</code>, or <code>frames()</code> take precedence over CSS styles.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong>For Toolkit DSL users</strong>: Use <code>SpinnerElement</code> via <code>spinner()</code> factory methods. It manages state internally and advances automatically on each render. See <a href="#toolkit-dsl">Using Widgets with Toolkit DSL</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="wavetext"><a class="anchor" href="#wavetext"></a><a class="link" href="#wavetext">WaveText</a></h3>
+<div class="paragraph">
+<p>An animated text widget with a wave brightness effect:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Dark shadow moving through bright text (default)
+WaveText wave = WaveText.builder()
+    .text("Processing...")
+    .color(Color.CYAN)
+    .build();
+
+// Bright peak moving through dim text (inverted)
+WaveText waveInverted = WaveText.builder()
+    .text("Loading...")
+    .color(Color.YELLOW)
+    .inverted(true)
+    .build();
+
+// Back-and-forth oscillation instead of looping
+WaveText waveOscillate = WaveText.builder()
+    .text("Thinking...")
+    .mode(WaveText.Mode.OSCILLATE)
+    .build();
+
+// Multiple peaks for dynamic effect
+WaveText waveMulti = WaveText.builder()
+    .text("Working hard...")
+    .color(Color.GREEN)
+    .peakCount(2)
+    .peakWidth(5)
+    .speed(1.5)
+    .build();
+
+// Create state and render
+WaveTextState state = new WaveTextState();
+wave.render(area, buffer, state);
+
+// Advance animation each frame
+state.advance();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configuration options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>color(Color)</code> - Base color of the text</p>
+</li>
+<li>
+<p><code>dimFactor(double)</code> - Brightness of dim portion (0.0-1.0, default 0.3)</p>
+</li>
+<li>
+<p><code>peakWidth(int)</code> - Width of the wave peak in characters (default 3)</p>
+</li>
+<li>
+<p><code>peakCount(int)</code> - Number of peaks in the wave (default 1)</p>
+</li>
+<li>
+<p><code>speed(double)</code> - Animation speed multiplier (default 1.0)</p>
+</li>
+<li>
+<p><code>mode(Mode)</code> - <code>LOOP</code> (continuous) or <code>OSCILLATE</code> (back-and-forth)</p>
+</li>
+<li>
+<p><code>inverted(boolean)</code> - If true, bright peak on dim text; if false, dark shadow on bright text</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CSS properties:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>color</code> - Base text color</p>
+</li>
+<li>
+<p><code>wave-dim-factor</code> - Brightness of dim portion</p>
+</li>
+<li>
+<p><code>wave-peak-width</code> - Width of wave peak</p>
+</li>
+<li>
+<p><code>wave-peak-count</code> - Number of peaks</p>
+</li>
+<li>
+<p><code>wave-speed</code> - Animation speed multiplier</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="input-widgets"><a class="anchor" href="#input-widgets"></a><a class="link" href="#input-widgets">Input Widgets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="textinput"><a class="anchor" href="#textinput"></a><a class="link" href="#textinput">TextInput</a></h3>
+<div class="paragraph">
+<p>A single-line text input field:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create state
+TextInputState state = new TextInputState();
+
+// Or with initial value
+TextInputState stateWithValue = new TextInputState("initial text");
+
+// Build widget
+TextInput textInput = TextInput.builder()
+    .placeholder("Enter your name...")
+    .cursorStyle(Style.EMPTY.reversed())
+    .block(Block.builder()
+        .title("Name")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+textInput.render(area, buffer, state);
+
+// Handle key events
+if (event.code() == KeyCode.CHAR) {
+    state.insert(event.string());
+} else if (event.code() == KeyCode.BACKSPACE) {
+    state.deleteBackward();
+} else if (event.code() == KeyCode.DELETE) {
+    state.deleteForward();
+} else if (event.code() == KeyCode.LEFT) {
+    state.moveCursorLeft();
+} else if (event.code() == KeyCode.RIGHT) {
+    state.moveCursorRight();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>State methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>state.text()</code> - Get current text</p>
+</li>
+<li>
+<p><code>state.setText(text)</code> - Set text</p>
+</li>
+<li>
+<p><code>state.insert(char)</code> - Insert character at cursor</p>
+</li>
+<li>
+<p><code>state.deleteBackward()</code> - Backspace</p>
+</li>
+<li>
+<p><code>state.deleteForward()</code> - Delete</p>
+</li>
+<li>
+<p><code>state.moveCursorLeft()</code> / <code>moveCursorRight()</code> - Move cursor</p>
+</li>
+<li>
+<p><code>state.clear()</code> - Clear all text</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="textarea"><a class="anchor" href="#textarea"></a><a class="link" href="#textarea">TextArea</a></h3>
+<div class="paragraph">
+<p>A multi-line text input field with scrolling and optional line numbers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create state
+TextAreaState state = new TextAreaState();
+
+// Or with initial content
+TextAreaState stateWithContent = new TextAreaState("Line 1\nLine 2\nLine 3");
+
+// Build widget
+TextArea textArea = TextArea.builder()
+    .placeholder("Enter text...")
+    .showLineNumbers(true)
+    .cursorStyle(Style.EMPTY.reversed())
+    .lineNumberStyle(Style.EMPTY.dim())
+    .block(Block.builder()
+        .title("Editor")
+        .borders(Borders.ALL)
+        .build())
+    .build();
+
+// Render with cursor visible
+textArea.renderWithCursor(area, buffer, state, frame);
+
+// Handle key events
+if (event.code() == KeyCode.CHAR) {
+    state.insert(event.string());
+} else if (event.code() == KeyCode.ENTER) {
+    state.insert('\n');
+} else if (event.code() == KeyCode.BACKSPACE) {
+    state.deleteBackward();
+} else if (event.code() == KeyCode.UP) {
+    state.moveCursorUp();
+} else if (event.code() == KeyCode.DOWN) {
+    state.moveCursorDown();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>State methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>state.text()</code> - Get full text content</p>
+</li>
+<li>
+<p><code>state.setText(text)</code> - Set text content</p>
+</li>
+<li>
+<p><code>state.lineCount()</code> - Get number of lines</p>
+</li>
+<li>
+<p><code>state.getLine(row)</code> - Get text of specific line</p>
+</li>
+<li>
+<p><code>state.insert(char)</code> / <code>state.insert(string)</code> - Insert at cursor</p>
+</li>
+<li>
+<p><code>state.deleteBackward()</code> / <code>state.deleteForward()</code> - Delete characters</p>
+</li>
+<li>
+<p><code>state.moveCursorUp()</code> / <code>moveCursorDown()</code> / <code>moveCursorLeft()</code> / <code>moveCursorRight()</code> - Move cursor</p>
+</li>
+<li>
+<p><code>state.moveCursorToLineStart()</code> / <code>moveCursorToLineEnd()</code> - Jump to line boundaries</p>
+</li>
+<li>
+<p><code>state.moveCursorToStart()</code> / <code>moveCursorToEnd()</code> - Jump to document boundaries</p>
+</li>
+<li>
+<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling</p>
+</li>
+<li>
+<p><code>state.clear()</code> - Clear all content</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CSS properties:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>cursor-color</code> - Cursor highlight color</p>
+</li>
+<li>
+<p><code>placeholder-color</code> - Placeholder text color</p>
+</li>
+<li>
+<p><code>line-number-color</code> - Line number gutter color</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="checkbox"><a class="anchor" href="#checkbox"></a><a class="link" href="#checkbox">Checkbox</a></h3>
+<div class="paragraph">
+<p>A toggleable checkbox widget displaying checked/unchecked state:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create state
+CheckboxState state = new CheckboxState();       // unchecked
+CheckboxState stateChecked = new CheckboxState(true);   // checked
+
+// Build widget with default style [x] / [ ]
+Checkbox checkbox = Checkbox.builder().build();
+
+// Custom symbols
+Checkbox checkboxCustom = Checkbox.builder()
+    .checkedSymbol("[v]")
+    .uncheckedSymbol("[ ]")
+    .checkedColor(Color.GREEN)
+    .uncheckedColor(Color.DARK_GRAY)
+    .build();
+
+checkbox.render(area, buffer, state);
+
+// Handle input
+if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
+    state.toggle();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>State methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>state.isChecked()</code> / <code>state.value()</code> - Get checked state</p>
+</li>
+<li>
+<p><code>state.setChecked(boolean)</code> / <code>state.setValue(boolean)</code> - Set state</p>
+</li>
+<li>
+<p><code>state.toggle()</code> - Toggle and return new value</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CSS properties:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>checkbox-checked-symbol</code> - Symbol when checked (default: "[x]")</p>
+</li>
+<li>
+<p><code>checkbox-unchecked-symbol</code> - Symbol when unchecked (default: "[ ]")</p>
+</li>
+<li>
+<p><code>checkbox-checked-color</code> - Foreground color when checked</p>
+</li>
+<li>
+<p><code>checkbox-unchecked-color</code> - Foreground color when unchecked</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="toggle"><a class="anchor" href="#toggle"></a><a class="link" href="#toggle">Toggle</a></h3>
+<div class="paragraph">
+<p>A toggle switch widget with two display modes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create state
+ToggleState state = new ToggleState();       // off
+ToggleState stateOn = new ToggleState(true);   // on
+
+// Single symbol mode (default): [ON ] or [OFF]
+Toggle toggle = Toggle.builder()
+    .onSymbol("o ON ")
+    .offSymbol("o OFF")
+    .onColor(Color.GREEN)
+    .build();
+
+// Inline choice mode: o Yes / o No
+Toggle toggleInline = Toggle.builder()
+    .inlineChoice(true)
+    .onLabel("Yes")
+    .offLabel("No")
+    .selectedIndicator("o")
+    .unselectedIndicator("o")
+    .selectedColor(Color.GREEN)
+    .unselectedColor(Color.DARK_GRAY)
+    .build();
+
+toggle.render(area, buffer, state);
+
+// Handle input
+if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
+    state.toggle();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>State methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>state.isOn()</code> / <code>state.value()</code> - Get on/off state</p>
+</li>
+<li>
+<p><code>state.setOn(boolean)</code> / <code>state.setValue(boolean)</code> - Set state</p>
+</li>
+<li>
+<p><code>state.toggle()</code> - Toggle and return new value</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CSS properties (single mode):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>toggle-on-symbol</code> - Symbol when on (default: "[ON ]")</p>
+</li>
+<li>
+<p><code>toggle-off-symbol</code> - Symbol when off (default: "[OFF]")</p>
+</li>
+<li>
+<p><code>toggle-on-color</code> - Foreground color when on</p>
+</li>
+<li>
+<p><code>toggle-off-color</code> - Foreground color when off</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CSS properties (inline choice mode):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>toggle-selected-indicator</code> - Selected option indicator (default: "●")</p>
+</li>
+<li>
+<p><code>toggle-unselected-indicator</code> - Unselected option indicator (default: "○")</p>
+</li>
+<li>
+<p><code>toggle-selected-color</code> - Color for selected option</p>
+</li>
+<li>
+<p><code>toggle-unselected-color</code> - Color for unselected option</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="select"><a class="anchor" href="#select"></a><a class="link" href="#select">Select</a></h3>
+<div class="paragraph">
+<p>An inline select widget showing the current selection with navigation indicators:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Create state with options
+SelectState state = new SelectState("Option A", "Option B", "Option C");
+
+// Build widget: &lt; Option A &gt;
+Select select = Select.builder()
+    .leftIndicator("&lt; ")
+    .rightIndicator(" &gt;")
+    .selectedColor(Color.CYAN)
+    .indicatorColor(Color.DARK_GRAY)
+    .build();
+
+select.render(area, buffer, state);
+
+// Handle navigation
+if (event.code() == KeyCode.LEFT) {
+    state.selectPrevious();  // wraps around
+} else if (event.code() == KeyCode.RIGHT) {
+    state.selectNext();      // wraps around
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>State methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>state.selectedValue()</code> / <code>state.value()</code> - Get selected option text</p>
+</li>
+<li>
+<p><code>state.selectedIndex()</code> - Get selected index</p>
+</li>
+<li>
+<p><code>state.options()</code> - Get all options</p>
+</li>
+<li>
+<p><code>state.optionCount()</code> - Get number of options</p>
+</li>
+<li>
+<p><code>state.selectIndex(int)</code> - Select by index</p>
+</li>
+<li>
+<p><code>state.selectNext()</code> / <code>state.selectPrevious()</code> - Navigate (wraps)</p>
+</li>
+<li>
+<p><code>state.selectFirst()</code> / <code>state.selectLast()</code> - Jump to ends</p>
+</li>
+<li>
+<p><code>state.setOptions(&#8230;&#8203;)</code> - Replace available options</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CSS properties:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>select-left-indicator</code> - Left navigation indicator (default: "&lt; ")</p>
+</li>
+<li>
+<p><code>select-right-indicator</code> - Right navigation indicator (default: " &gt;")</p>
+</li>
+<li>
+<p><code>select-selected-color</code> - Foreground color for selected value</p>
+</li>
+<li>
+<p><code>select-indicator-color</code> - Foreground color for indicators</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="utility-widgets"><a class="anchor" href="#utility-widgets"></a><a class="link" href="#utility-widgets">Utility Widgets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="scrollbar"><a class="anchor" href="#scrollbar"></a><a class="link" href="#scrollbar">Scrollbar</a></h3>
+<div class="paragraph">
+<p>Visual indicator of scroll position:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Scrollbar scrollbar = Scrollbar.builder()
+    .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+    .thumbStyle(Style.EMPTY.fg(Color.CYAN))
+    .trackStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+    .build();
+
+ScrollbarState state = new ScrollbarState();
+state.contentLength(100);
+state.viewportContentLength(20);
+state.position(scrollPosition);
+
+scrollbar.render(area, buffer, state);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="logo"><a class="anchor" href="#logo"></a><a class="link" href="#logo">Logo</a></h3>
+<div class="paragraph">
+<p>Renders the Tamboui logo for use in help or about screens:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Default tiny logo (2 lines)
+Logo logo = Logo.tiny();
+logo.render(area, buffer);
+
+// Or the normal size (4 lines)
+Logo logoNormal = Logo.of(Logo.Size.NORMAL);
+logoNormal.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Available sizes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Logo.Size.TINY</code> - 2-line compact logo using braille characters</p>
+</li>
+<li>
+<p><code>Logo.Size.NORMAL</code> - 4-line logo using box-drawing characters</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="errordisplay"><a class="anchor" href="#errordisplay"></a><a class="link" href="#errordisplay">ErrorDisplay</a></h3>
+<div class="paragraph">
+<p>Displays exception information with a formatted stack trace:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Quick creation from exception
+ErrorDisplay display = ErrorDisplay.from(exception);
+
+// Or with customization
+ErrorDisplay displayCustom = ErrorDisplay.builder()
+    .error(exception)
+    .title(" CRASH ")
+    .footer(" Press 'q' to quit, arrows to scroll ")
+    .borderColor(Color.RED)
+    .scroll(scrollOffset)
+    .build();
+
+display.render(area, buffer);
+
+// Handle scrolling
+int totalLines = display.lineCount();
+if (event.code() == KeyCode.DOWN) {
+    scrollOffset = Math.min(scrollOffset + 1, totalLines - visibleHeight);
+} else if (event.code() == KeyCode.UP) {
+    scrollOffset = Math.max(0, scrollOffset - 1);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The widget displays:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Exception type in red and bold</p>
+</li>
+<li>
+<p>Error message</p>
+</li>
+<li>
+<p>Full stack trace (scrollable)</p>
+</li>
+<li>
+<p>Footer with instructions</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clear-style"><a class="anchor" href="#clear-style"></a><a class="link" href="#clear-style">Clear (Styled)</a></h3>
+<div class="paragraph">
+<p>Clears an area by filling it with a style. Useful for widget layering:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Clear is a singleton widget with no style support
+Clear.INSTANCE.render(area, buffer);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="markdown"><a class="anchor" href="#markdown"></a><a class="link" href="#markdown">Markdown</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="markdownview"><a class="anchor" href="#markdownview"></a><a class="link" href="#markdownview">MarkdownView</a></h3>
+<div class="paragraph">
+<p>Renders CommonMark + GFM markdown to a buffer. Lives in its own
+<code>tamboui-markdown</code> module so consumers who do not need markdown rendering do
+not pay for the CommonMark dependency. The renderer is tolerant of partial
+input: a small sanitizer trims trailing unmatched inline markers before each
+parse, so a stream of markdown (for example produced by an LLM) can be
+displayed safely on every frame.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">MarkdownView view = MarkdownView.builder()
+    .source("# Hello\n\nThis is **markdown**.")
+    .build();
+view.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See <a href="markdown.html">Markdown Reference</a> for the full element coverage,
+streaming behaviour, and customization hooks.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="toolkit-dsl"><a class="anchor" href="#toolkit-dsl"></a><a class="link" href="#toolkit-dsl">Using Widgets with Toolkit DSL</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Toolkit DSL provides fluent factories for all widgets:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Text
+text("Hello").bold().cyan();
+
+// Panel (Block)
+panel("Title", text("child")).rounded().borderColor(Color.CYAN);
+
+// List (manages its own state)
+list("Item 1", "Item 2", "Item 3").highlightColor(Color.YELLOW).autoScroll();
+
+// Table
+table()
+    .header("Name", "Age")
+    .row("Alice", "30")
+    .state(tableState);
+
+// Gauge
+gauge(0.75).label("Loading...").gaugeColor(Color.GREEN);
+
+// Sparkline
+sparkline(1, 4, 2, 8, 5).color(Color.CYAN);
+
+// Spinner (manages its own state, advances each render)
+spinner().cyan();
+spinner(SpinnerStyle.LINE, "Loading...").green();
+
+// Tree (expand/collapse, keyboard navigation, lazy loading)
+tree(
+    TreeNode.of("Root",
+        TreeNode.of("Child 1"),
+        TreeNode.of("Child 2"))
+).highlightColor(Color.CYAN).rounded().scrollbar();
+
+// TextInput
+textInput(inputState).placeholder("Enter name...");
+
+// Layout
+row(left, right).spacing(1);
+column(top, middle, bottom).spacing(1);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For layout DSL examples (columns, grid, dock, stack, flow), see <a href="layouts.html">Layouts Reference</a>.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="api-levels.html">API Levels</a> for more details on the Toolkit DSL.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.5.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>

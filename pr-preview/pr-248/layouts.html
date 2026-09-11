@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Layouts Reference</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Layouts Reference</h1>
+<div class="details">
+<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#layout-overview">Layout Overview</a></li>
+<li><a href="#columns">Columns</a></li>
+<li><a href="#grid">Grid</a>
+<ul class="sectlevel2">
+<li><a href="#children-mode">Children Mode</a></li>
+<li><a href="#area-mode-grid-template-areas">Area Mode (Grid Template Areas)</a></li>
+</ul>
+</li>
+<li><a href="#dock">Dock</a></li>
+<li><a href="#stack">Stack</a></li>
+<li><a href="#flow">Flow</a></li>
+<li><a href="#using-layouts-with-toolkit-dsl">Using Layouts with Toolkit DSL</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI provides layout widgets for arranging children into structured compositions.
+Layout widgets live in <code>dev.tamboui.layout.*</code> subpackages within the <code>tamboui-core</code> module.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="layout-overview"><a class="anchor" href="#layout-overview"></a><a class="link" href="#layout-overview">Layout Overview</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Widget</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#columns">Columns</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-column grid layout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#grid">Grid</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CSS Grid-inspired layout with constraints and gutter</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#dock">Dock</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5-region layout (top, bottom, left, right, center)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#stack">Stack</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Overlapping layers (painter&#8217;s algorithm)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#flow">Flow</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stateless</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wrap layout (flow left-to-right, wrap on overflow)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="columns"><a class="anchor" href="#columns"></a><a class="link" href="#columns">Columns</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A grid layout widget that arranges children into a fixed number of columns.
+Children are placed into cells whose positions are determined by the ordering mode.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Columns columns = Columns.builder()
+    .children(widget1, widget2, widget3, widget4)
+    .columnCount(2)
+    .spacing(1)
+    .order(ColumnOrder.ROW_FIRST)
+    .build();
+
+columns.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Column ordering modes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ColumnOrder.ROW_FIRST</code> (default) - Items fill left-to-right, then top-to-bottom (like reading text)</p>
+</li>
+<li>
+<p><code>ColumnOrder.COLUMN_FIRST</code> - Items fill top-to-bottom, then left-to-right (like newspaper columns)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Builder options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>children(Widget&#8230;&#8203;)</code> / <code>children(List&lt;Widget&gt;)</code> - The child widgets to arrange</p>
+</li>
+<li>
+<p><code>columnCount(int)</code> - Number of columns (required, defaults to 1)</p>
+</li>
+<li>
+<p><code>spacing(int)</code> - Gap between columns in cells (default: 0)</p>
+</li>
+<li>
+<p><code>flex(Flex)</code> - How remaining space is distributed (default: <code>Flex.START</code>)</p>
+</li>
+<li>
+<p><code>order(ColumnOrder)</code> - Child ordering mode (default: <code>ROW_FIRST</code>)</p>
+</li>
+<li>
+<p><code>columnWidths(Constraint&#8230;&#8203;)</code> - Per-column width constraints (default: <code>fill()</code> for all)</p>
+</li>
+<li>
+<p><code>rowHeights(int&#8230;&#8203;)</code> - Explicit row heights (default: equal distribution)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Custom column widths and row-first ordering
+Columns grid = Columns.builder()
+    .children(headerWidget, contentWidget, sidebarWidget, footerWidget)
+    .columnCount(2)
+    .columnWidths(Constraint.length(20), Constraint.fill())
+    .rowHeights(3, 10)
+    .spacing(1)
+    .build();
+
+// Column-first ordering: fills top-to-bottom per column
+Columns newspaperLayout = Columns.builder()
+    .children(article1, article2, article3, article4)
+    .columnCount(2)
+    .order(ColumnOrder.COLUMN_FIRST)
+    .build();</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The widget-level <code>Columns</code> requires an explicit column count. For auto-detection based on child widths, use <code>ColumnsElement</code> in the Toolkit DSL (via the <code>columns()</code> factory method), which computes the column count from available width and child preferred widths.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="grid"><a class="anchor" href="#grid"></a><a class="link" href="#grid">Grid</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A CSS Grid-inspired layout widget that arranges children into a grid with explicit control over grid dimensions, per-column/per-row sizing constraints, and gutter spacing.
+Unlike <code>Columns</code> (which uses ordering modes and spacing), <code>Grid</code> provides independent horizontal and vertical gutter, per-column width constraints, per-row height constraints, and constraint cycling when fewer constraints than grid dimensions (matching Textual behavior).</p>
+</div>
+<div class="paragraph">
+<p>Grid supports two mutually exclusive modes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Children mode</strong>: Sequential placement using <code>children()</code> and <code>columnCount()</code></p>
+</li>
+<li>
+<p><strong>Area mode</strong>: Template-based placement using <code>gridAreas()</code> and <code>area()</code> (CSS grid-template-areas style)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The staged builder pattern ensures compile-time safety — you cannot mix modes.</p>
+</div>
+<div class="sect2">
+<h3 id="children-mode"><a class="anchor" href="#children-mode"></a><a class="link" href="#children-mode">Children Mode</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Grid grid = Grid.builder()
+    .children(widget1, widget2, widget3, widget4, widget5, widget6)
+    .columnCount(3)
+    .horizontalGutter(1)
+    .verticalGutter(1)
+    .build();
+
+grid.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ChildrenBuilder options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>children(Widget&#8230;&#8203;)</code> / <code>children(List&lt;Widget&gt;)</code> - The child widgets to arrange</p>
+</li>
+<li>
+<p><code>columnCount(int)</code> - Number of columns (defaults to 1)</p>
+</li>
+<li>
+<p><code>rowCount(int)</code> - Optional maximum rows (validates children fit within columns × rows)</p>
+</li>
+<li>
+<p><code>horizontalGutter(int)</code> - Gap between columns in cells (default: 0)</p>
+</li>
+<li>
+<p><code>verticalGutter(int)</code> - Gap between rows in cells (default: 0)</p>
+</li>
+<li>
+<p><code>flex(Flex)</code> - How remaining space is distributed (default: <code>Flex.START</code>)</p>
+</li>
+<li>
+<p><code>columnConstraints(Constraint&#8230;&#8203;)</code> - Per-column width constraints (default: <code>fill()</code> for all). Constraints cycle when fewer than the column count.</p>
+</li>
+<li>
+<p><code>rowConstraints(Constraint&#8230;&#8203;)</code> - Per-row height constraints. Constraints cycle when fewer than the row count.</p>
+</li>
+<li>
+<p><code>rowHeights(int&#8230;&#8203;)</code> - Explicit row heights (default: equal distribution)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Grid with custom column widths and gutter
+Grid dashboard = Grid.builder()
+    .children(cpuPanel, memoryPanel, diskPanel,
+              netUpPanel, netDownPanel, uptimePanel)
+    .columnCount(3)
+    .columnConstraints(
+        Constraint.length(16),  // fixed first column
+        Constraint.fill(),      // remaining columns fill
+        Constraint.fill()
+    )
+    .horizontalGutter(2)
+    .verticalGutter(1)
+    .build();
+
+// Grid with row constraints
+Grid sized = Grid.builder()
+    .children(header, content, sidebar, footer)
+    .columnCount(2)
+    .rowConstraints(Constraint.length(3), Constraint.fill())
+    .build();
+
+// Column constraint cycling: single constraint applied to all columns
+Grid uniform = Grid.builder()
+    .children(a, b, c, d, e, f)
+    .columnCount(3)
+    .columnConstraints(Constraint.length(10))  // all 3 cols get length(10)
+    .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="area-mode-grid-template-areas"><a class="anchor" href="#area-mode-grid-template-areas"></a><a class="link" href="#area-mode-grid-template-areas">Area Mode (Grid Template Areas)</a></h3>
+<div class="paragraph">
+<p>Area mode uses CSS <code>grid-template-areas</code> style templates for defining layouts where cells can span multiple rows and columns.
+Named areas must form contiguous rectangles — L-shapes and disconnected regions are rejected with a <code>LayoutException</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// "Holy grail" layout with spanning regions
+Grid layout = Grid.builder()
+    .gridAreas("header header header",
+               "nav    main   main",
+               "nav    main   main",
+               "footer footer footer")
+    .area("header", headerWidget)
+    .area("nav", navWidget)
+    .area("main", mainWidget)
+    .area("footer", footerWidget)
+    .horizontalGutter(1)
+    .verticalGutter(1)
+    .build();
+
+layout.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AreaBuilder options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>gridAreas(String&#8230;&#8203;)</code> - Row templates defining named areas (use <code>.</code> for empty cells)</p>
+</li>
+<li>
+<p><code>area(String, Widget)</code> - Assign a widget to a named area</p>
+</li>
+<li>
+<p><code>horizontalGutter(int)</code> - Gap between columns (default: 0)</p>
+</li>
+<li>
+<p><code>verticalGutter(int)</code> - Gap between rows (default: 0)</p>
+</li>
+<li>
+<p><code>flex(Flex)</code> - How remaining space is distributed (default: <code>Flex.START</code>)</p>
+</li>
+<li>
+<p><code>columnConstraints(Constraint&#8230;&#8203;)</code> - Per-column width constraints</p>
+</li>
+<li>
+<p><code>rowConstraints(Constraint&#8230;&#8203;)</code> - Per-row height constraints</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Template rules:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Each row is a space-separated list of area names</p>
+</li>
+<li>
+<p>All rows must have the same number of columns</p>
+</li>
+<li>
+<p>Area names must start with a letter (alphanumeric and underscores allowed)</p>
+</li>
+<li>
+<p>Use <code>.</code> (dot) for empty cells</p>
+</li>
+<li>
+<p>Named areas must form contiguous rectangles</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Dashboard with 2x2 spanning main area
+Grid dashboard = Grid.builder()
+    .gridAreas("A A B",
+               "A A C",
+               "D D D")
+    .area("A", mainPanel)    // 2x2 span
+    .area("B", sidePanel1)
+    .area("C", sidePanel2)
+    .area("D", statusBar)    // full-width span
+    .horizontalGutter(1)
+    .verticalGutter(1)
+    .build();
+
+// Empty cells with dot notation
+Grid sparse = Grid.builder()
+    .gridAreas("A . B",
+               ". C .")
+    .area("A", widget1)
+    .area("B", widget2)
+    .area("C", widget3)
+    .build();</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Areas without assigned widgets render as empty space. Assigning a widget to an undefined area throws <code>LayoutException</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The widget-level <code>Grid</code> requires an explicit column count or grid areas template. For auto-sizing based on child count (<code>ceil(sqrt(n))</code> columns) and CSS property support, use <code>GridElement</code> in the Toolkit DSL (via the <code>grid()</code> factory method).
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dock"><a class="anchor" href="#dock"></a><a class="link" href="#dock">Dock</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A 5-region dock layout widget that arranges children into top, bottom, left, right, and center regions — the most common TUI application structure (header + sidebar + content + footer).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Dock dock = Dock.builder()
+    .top(headerWidget)
+    .bottom(statusBarWidget)
+    .left(sidebarWidget)
+    .right(outlineWidget)
+    .center(editorWidget)
+    .topHeight(Constraint.length(3))
+    .bottomHeight(Constraint.length(1))
+    .leftWidth(Constraint.length(20))
+    .rightWidth(Constraint.length(20))
+    .build();
+
+dock.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Builder options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>.top(Widget)</code> / <code>.bottom(Widget)</code> / <code>.left(Widget)</code> / <code>.right(Widget)</code> / <code>.center(Widget)</code> - Set region widgets (all optional)</p>
+</li>
+<li>
+<p><code>.topHeight(Constraint)</code> - Height constraint for the top region (default: <code>length(1)</code>)</p>
+</li>
+<li>
+<p><code>.bottomHeight(Constraint)</code> - Height constraint for the bottom region (default: <code>length(1)</code>)</p>
+</li>
+<li>
+<p><code>.leftWidth(Constraint)</code> - Width constraint for the left region (default: <code>length(10)</code>)</p>
+</li>
+<li>
+<p><code>.rightWidth(Constraint)</code> - Width constraint for the right region (default: <code>length(10)</code>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Rendering algorithm: Top and bottom take full width, then the remaining middle area is split horizontally into left, center, and right. Omitted regions are skipped — for example, setting only <code>center</code> gives a full-area layout.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="stack"><a class="anchor" href="#stack"></a><a class="link" href="#stack">Stack</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An overlapping layers widget where children render on top of each other using a painter&#8217;s algorithm (last child on top). Essential for dialogs, popups, floating overlays, and any scenario where UI elements need to overlap.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Stack stack = Stack.builder()
+    .children(backgroundWidget, dialogWidget)
+    .alignment(ContentAlignment.STRETCH)
+    .build();
+
+stack.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Builder options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>.children(Widget&#8230;&#8203;)</code> / <code>.children(List&lt;Widget&gt;)</code> - The child widgets to stack</p>
+</li>
+<li>
+<p><code>.alignment(ContentAlignment)</code> - How children are positioned (default: <code>STRETCH</code>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Alignment modes: <code>TOP_LEFT</code>, <code>TOP_CENTER</code>, <code>TOP_RIGHT</code>, <code>CENTER_LEFT</code>, <code>CENTER</code>, <code>CENTER_RIGHT</code>, <code>BOTTOM_LEFT</code>, <code>BOTTOM_CENTER</code>, <code>BOTTOM_RIGHT</code>, <code>STRETCH</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="flow"><a class="anchor" href="#flow"></a><a class="link" href="#flow">Flow</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A wrap layout widget where items flow left-to-right and wrap to the next line when exceeding the available width. Useful for tag clouds, button groups, chip lists, and similar layouts where items should wrap naturally.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Flow flow = Flow.builder()
+    .item(tag1Widget, 8)
+    .item(tag2Widget, 12)
+    .item(tag3Widget, 6)
+    .horizontalSpacing(1)
+    .verticalSpacing(1)
+    .build();
+
+flow.render(area, buffer);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Builder options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>.item(Widget, int width)</code> / <code>.item(Widget, int width, int height)</code> - Add an item with explicit size</p>
+</li>
+<li>
+<p><code>.items(List&lt;FlowItem&gt;)</code> - Set items from a list</p>
+</li>
+<li>
+<p><code>.horizontalSpacing(int)</code> - Gap between items on the same row (default: 0)</p>
+</li>
+<li>
+<p><code>.verticalSpacing(int)</code> - Gap between rows (default: 0)</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The widget-level <code>Flow</code> requires explicit item widths via <code>FlowItem</code> since the <code>Widget</code> interface has no <code>preferredWidth()</code> method. For auto-measurement, use <code>FlowElement</code> in the Toolkit DSL (via the <code>flow()</code> factory method), which auto-measures children via <code>Element.preferredWidth()</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-layouts-with-toolkit-dsl"><a class="anchor" href="#using-layouts-with-toolkit-dsl"></a><a class="link" href="#using-layouts-with-toolkit-dsl">Using Layouts with Toolkit DSL</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Toolkit DSL provides fluent factories for all layout widgets:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static dev.tamboui.toolkit.Toolkit.*;
+
+// Multi-column grid (auto-detects column count from child widths)
+columns(item1, item2, item3, item4, item5, item6)
+    .spacing(1)
+
+// Explicit column count with column-first ordering
+columns(child1, child2, child3, child4)
+    .columnCount(2)
+    .columnFirst()
+
+// CSS Grid-inspired layout with gutter and constraints
+grid(item1, item2, item3, item4, item5, item6)
+    .gridSize(3)
+    .gutter(1)
+
+// Grid with explicit dimensions and column constraints
+grid(header, content, sidebar, footer)
+    .gridSize(2, 2)
+    .gridColumns(Constraint.length(20), Constraint.fill())
+    .gutter(1, 0)
+
+// Grid with template areas (CSS grid-template-areas style)
+grid()
+    .gridAreas("header header header",
+               "nav    main   main",
+               "nav    main   main",
+               "footer footer footer")
+    .area("header", text("Header").bold())
+    .area("nav", list("Nav 1", "Nav 2"))
+    .area("main", text("Main Content"))
+    .area("footer", text("Footer").dim())
+    .gutter(1)
+
+// 5-region dock layout
+dock()
+    .top(text("Header").bold())
+    .bottom(text("Footer").dim())
+    .left(list("Nav 1", "Nav 2", "Nav 3"))
+    .center(text("Main Content"))
+    .topHeight(Constraint.length(3))
+    .leftWidth(Constraint.length(20))
+
+// Overlapping layers (last child on top)
+stack(backgroundElement, dialogElement)
+    .alignment(ContentAlignment.CENTER)
+
+// Wrap layout (items flow and wrap)
+flow(tag1, tag2, tag3, tag4, tag5)
+    .spacing(1)
+    .rowSpacing(1)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See <a href="api-levels.html">API Levels</a> for more details on the Toolkit DSL.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.5.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>
