@@ -1,3 +1,9 @@
+plugins {
+    // Auto-provisions JDK toolchains (e.g. the Java 21 test toolchain used by
+    // tamboui-backend-integration-tests) when they are not installed locally.
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 rootProject.name = "tamboui-parent"
 
 val modules = listOf(
@@ -21,6 +27,7 @@ val modules = listOf(
     "tamboui-tfx-toolkit",
     "tamboui-demos",
     "tamboui-benchmarks",
+    "tamboui-backend-integration-tests",
     "docs"
 )
 
