@@ -4080,11 +4080,6 @@ compatible with Java 8.</div>
 <dd>
 <div class="block">Creates a TuiRunner with the specified configuration.</div>
 </dd>
-<dt><a href="dev/tamboui/tui/TuiRunner.html#create(dev.tamboui.tui.TuiConfig,java.lang.ClassLoader)" class="member-name-link">create(TuiConfig, ClassLoader)</a> - Static method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></dt>
-<dd>
-<div class="block">Creates a TuiRunner with the specified configuration, discovering the backend using the
-given classloader.</div>
-</dd>
 <dt><a href="dev/tamboui/terminal/BackendFactory.html#create(java.lang.ClassLoader)" class="member-name-link">create(ClassLoader)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/BackendFactory.html" title="class in dev.tamboui.terminal">BackendFactory</a></dt>
 <dd>
 <div class="block">Creates a new backend instance, discovering providers using the given classloader.</div>
@@ -14968,6 +14963,15 @@ styled spans (without wrapping).</div>
 <dd>
 <div class="block">Resolves variable references in a value.</div>
 </dd>
+<dt><a href="dev/tamboui/terminal/AnsiStringBuilder.html#restoreWindowTitle()" class="member-name-link">restoreWindowTitle()</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AnsiStringBuilder.html" title="class in dev.tamboui.terminal">AnsiStringBuilder</a></dt>
+<dd>
+<div class="block">Generates an XTWINOPS escape sequence to pop the window title from the
+terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved title.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#restoreWindowTitle()" class="member-name-link">restoreWindowTitle()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Restores the window title previously saved with <a href="dev/tamboui/terminal/Backend.html#saveWindowTitle()"><code>Backend.saveWindowTitle()</code></a>.</div>
+</dd>
 <dt><a href="dev/tamboui/widgets/list/ListState.html#resumeAutoScroll()" class="member-name-link">resumeAutoScroll()</a> - Method in class dev.tamboui.widgets.list.<a href="dev/tamboui/widgets/list/ListState.html" title="class in dev.tamboui.widgets.list">ListState</a></dt>
 <dd>
 <div class="block">Resumes auto-scrolling to the bottom (for sticky scroll).</div>
@@ -15587,6 +15591,15 @@ and continuing to try other providers.</div>
 <dt><a href="dev/tamboui/markdown/internal/PartialMarkdownSanitizer.html#sanitize(java.lang.String)" class="member-name-link">sanitize(String)</a> - Static method in class dev.tamboui.markdown.internal.<a href="dev/tamboui/markdown/internal/PartialMarkdownSanitizer.html" title="class in dev.tamboui.markdown.internal">PartialMarkdownSanitizer</a></dt>
 <dd>
 <div class="block">Returns a copy of <code>source</code> with trailing partial markers stripped.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/AnsiStringBuilder.html#saveWindowTitle()" class="member-name-link">saveWindowTitle()</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AnsiStringBuilder.html" title="class in dev.tamboui.terminal">AnsiStringBuilder</a></dt>
+<dd>
+<div class="block">Generates an XTWINOPS escape sequence to push the current window title
+onto the terminal's title stack (<code>CSI 22;2t</code>).</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#saveWindowTitle()" class="member-name-link">saveWindowTitle()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Saves the current window title on the terminal's title stack.</div>
 </dd>
 <dt><a href="dev/tamboui/image/ImageData.html#scaledDimensionsToFill(int,int)" class="member-name-link">scaledDimensionsToFill(int, int)</a> - Method in class dev.tamboui.image.<a href="dev/tamboui/image/ImageData.html" title="class in dev.tamboui.image">ImageData</a></dt>
 <dd>
@@ -16688,6 +16701,26 @@ are items above the current view.</div>
 <dt><a href="dev/tamboui/style/RichTextState.html#setViewportWidth(int)" class="member-name-link">setViewportWidth(int)</a> - Method in class dev.tamboui.style.<a href="dev/tamboui/style/RichTextState.html" title="class in dev.tamboui.style">RichTextState</a></dt>
 <dd>
 <div class="block">Sets the viewport width.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/app/ToolkitApp.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.toolkit.app.<a href="dev/tamboui/toolkit/app/ToolkitApp.html" title="class in dev.tamboui.toolkit.app">ToolkitApp</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/app/ToolkitRunner.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.toolkit.app.<a href="dev/tamboui/toolkit/app/ToolkitRunner.html" title="class in dev.tamboui.toolkit.app">ToolkitRunner</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/InlineTuiRunner.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/InlineTuiRunner.html" title="class in dev.tamboui.tui">InlineTuiRunner</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/TuiRunner.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/barchart/BarChart.BarSet.html#sevenEighths()" class="member-name-link">sevenEighths()</a> - Method in class dev.tamboui.widgets.barchart.<a href="dev/tamboui/widgets/barchart/BarChart.BarSet.html" title="class in dev.tamboui.widgets.barchart">BarChart.BarSet</a></dt>
 <dd>
@@ -21374,6 +21407,10 @@ a <code>Block</code>-wrapped <code>Paragraph</code> for fenced code blocks, or a
 <dt><a href="dev/tamboui/backend/panama/windows/WindowsTerminal.html#%3Cinit%3E()" class="member-name-link">WindowsTerminal()</a> - Constructor for class dev.tamboui.backend.panama.windows.<a href="dev/tamboui/backend/panama/windows/WindowsTerminal.html" title="class in dev.tamboui.backend.panama.windows">WindowsTerminal</a></dt>
 <dd>
 <div class="block">Creates a new Windows terminal instance.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/AnsiStringBuilder.html#windowTitle(java.lang.String)" class="member-name-link">windowTitle(String)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AnsiStringBuilder.html" title="class in dev.tamboui.terminal">AnsiStringBuilder</a></dt>
+<dd>
+<div class="block">Generates an OSC 2 escape sequence to set the terminal window title.</div>
 </dd>
 <dt><a href="dev/tamboui/backend/panama/unix/LibC.html#WINSIZE_LAYOUT" class="member-name-link">WINSIZE_LAYOUT</a> - Static variable in class dev.tamboui.backend.panama.unix.<a href="dev/tamboui/backend/panama/unix/LibC.html" title="class in dev.tamboui.backend.panama.unix">LibC</a></dt>
 <dd>

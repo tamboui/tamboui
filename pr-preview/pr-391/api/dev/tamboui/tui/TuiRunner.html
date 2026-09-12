@@ -62,7 +62,6 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#create()" tabindex="0">create()</a></li>
 <li><a href="#create(dev.tamboui.tui.TuiConfig)" tabindex="0">create(TuiConfig)</a></li>
-<li><a href="#create(dev.tamboui.tui.TuiConfig,java.lang.ClassLoader)" tabindex="0">create(TuiConfig, ClassLoader)</a></li>
 <li><a href="#run(dev.tamboui.tui.EventHandler,dev.tamboui.tui.Renderer)" tabindex="0">run(EventHandler, Renderer)</a></li>
 <li><a href="#pollEvent(java.time.Duration)" tabindex="0">pollEvent(Duration)</a></li>
 <li><a href="#pollEvent()" tabindex="0">pollEvent()</a></li>
@@ -75,6 +74,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#isRenderThread()" tabindex="0">isRenderThread()</a></li>
 <li><a href="#terminal()" tabindex="0">terminal()</a></li>
 <li><a href="#backend()" tabindex="0">backend()</a></li>
+<li><a href="#setWindowTitle(java.lang.String)" tabindex="0">setWindowTitle(String)</a></li>
 <li><a href="#scheduler()" tabindex="0">scheduler()</a></li>
 <li><a href="#close()" tabindex="0">close()</a></li>
 <li><a href="#builder()" tabindex="0">builder()</a></li>
@@ -190,68 +190,66 @@ event parsing, and the main event loop.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a TuiRunner with the specified configuration.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#create(dev.tamboui.tui.TuiConfig,java.lang.ClassLoader)" class="member-name-link">create</a><wbr>(<a href="TuiConfig.html" title="class in dev.tamboui.tui">TuiConfig</a>&nbsp;config,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link">ClassLoader</a>&nbsp;classLoader)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Creates a TuiRunner with the specified configuration, discovering the backend using the
-given classloader.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dispatch(dev.tamboui.tui.event.Event)" class="member-name-link">dispatch</a><wbr>(<a href="event/Event.html" title="interface in dev.tamboui.tui.event">Event</a>&nbsp;event)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dispatch(dev.tamboui.tui.event.Event)" class="member-name-link">dispatch</a><wbr>(<a href="event/Event.html" title="interface in dev.tamboui.tui.event">Event</a>&nbsp;event)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Dispatches an event into the event queue.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#draw(java.util.function.Consumer)" class="member-name-link">draw</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&gt;&nbsp;renderer)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#draw(java.util.function.Consumer)" class="member-name-link">draw</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&gt;&nbsp;renderer)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Draws the UI using the given renderer.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isRenderThread()" class="member-name-link">isRenderThread</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isRenderThread()" class="member-name-link">isRenderThread</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns whether the current thread is the render thread.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isRunning()" class="member-name-link">isRunning</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isRunning()" class="member-name-link">isRunning</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if the runner is still running.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="event/Event.html" title="interface in dev.tamboui.tui.event">Event</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollEvent()" class="member-name-link">pollEvent</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="event/Event.html" title="interface in dev.tamboui.tui.event">Event</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollEvent()" class="member-name-link">pollEvent</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Polls for the next event without blocking.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="event/Event.html" title="interface in dev.tamboui.tui.event">Event</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollEvent(java.time.Duration)" class="member-name-link">pollEvent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;timeout)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="event/Event.html" title="interface in dev.tamboui.tui.event">Event</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollEvent(java.time.Duration)" class="member-name-link">pollEvent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;timeout)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Polls for the next event with the specified timeout.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#quit()" class="member-name-link">quit</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#quit()" class="member-name-link">quit</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Signals the runner to stop.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(dev.tamboui.tui.EventHandler,dev.tamboui.tui.Renderer)" class="member-name-link">run</a><wbr>(<a href="EventHandler.html" title="interface in dev.tamboui.tui">EventHandler</a>&nbsp;handler,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#run(dev.tamboui.tui.EventHandler,dev.tamboui.tui.Renderer)" class="member-name-link">run</a><wbr>(<a href="EventHandler.html" title="interface in dev.tamboui.tui">EventHandler</a>&nbsp;handler,
  <a href="Renderer.html" title="interface in dev.tamboui.tui">Renderer</a>&nbsp;renderer)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Runs the main event loop with the given handler and renderer.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runLater(java.lang.Runnable)" class="member-name-link">runLater</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;action)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runLater(java.lang.Runnable)" class="member-name-link">runLater</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;action)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Queues an action to be executed on the render thread.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runOnRenderThread(java.lang.Runnable)" class="member-name-link">runOnRenderThread</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;action)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runOnRenderThread(java.lang.Runnable)" class="member-name-link">runOnRenderThread</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;action)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Executes an action on the render thread.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html" title="class or interface in java.util.concurrent" class="external-link">ScheduledExecutorService</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scheduler()" class="member-name-link">scheduler</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html" title="class or interface in java.util.concurrent" class="external-link">ScheduledExecutorService</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scheduler()" class="member-name-link">scheduler</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the shared scheduler for scheduling tasks.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the terminal window title.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../terminal/Terminal.html" title="class in dev.tamboui.terminal">Terminal</a><wbr>&lt;<a href="../terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#terminal()" class="member-name-link">terminal</a>()</code></div>
@@ -297,36 +295,15 @@ given classloader.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></span>&nbsp;<span class="element-name">create</span><wbr><span class="parameters">(<a href="TuiConfig.html" title="class in dev.tamboui.tui">TuiConfig</a>&nbsp;config)</span>
                         throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
-<div class="block">Creates a TuiRunner with the specified configuration.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>config</code> - the configuration to use</dd>
-<dt>Returns:</dt>
-<dd>a new TuiRunner</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code> - if terminal initialization fails</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="create(dev.tamboui.tui.TuiConfig,java.lang.ClassLoader)">
-<h3>create</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></span>&nbsp;<span class="element-name">create</span><wbr><span class="parameters">(<a href="TuiConfig.html" title="class in dev.tamboui.tui">TuiConfig</a>&nbsp;config,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link">ClassLoader</a>&nbsp;classLoader)</span>
-                        throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
-<div class="block">Creates a TuiRunner with the specified configuration, discovering the backend using the
-given classloader.
+<div class="block">Creates a TuiRunner with the specified configuration.
 <p>
-When <code>classLoader</code> is non-null it is used exclusively for backend discovery, taking
-precedence over <a href="TuiConfig.html#backendClassLoader()"><code>TuiConfig.backendClassLoader()</code></a>. When both are null, discovery uses
-the default candidate classloaders. Ignored when the config supplies an explicit
-<a href="TuiConfig.html#backend()"><code>TuiConfig.backend()</code></a>.</div>
+When the config supplies neither an explicit <a href="TuiConfig.html#backend()"><code>TuiConfig.backend()</code></a> nor a
+<a href="TuiConfig.html#backendClassLoader()"><code>TuiConfig.backendClassLoader()</code></a>, the backend is discovered using the default
+candidate classloaders. A non-null <code>backendClassLoader</code> is used exclusively
+for backend discovery.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>config</code> - the configuration to use</dd>
-<dd><code>classLoader</code> - the classloader to use exclusively for backend discovery, or null</dd>
 <dt>Returns:</dt>
 <dd>a new TuiRunner</dd>
 <dt>Throws:</dt>
@@ -524,6 +501,24 @@ iteration of the event loop. Has no effect if the runner is not running.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the backend instance</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setWindowTitle(java.lang.String)">
+<h3>setWindowTitle</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setWindowTitle</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</span></div>
+<div class="block">Sets the terminal window title.
+<p>
+The first call saves the current title on the terminal's title stack;
+it is restored automatically when the runner is closed.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>title</code> - the window title to set</dd>
+<dt>Throws:</dt>
+<dd><code><a href="../error/RuntimeIOException.html" title="class in dev.tamboui.error">RuntimeIOException</a></code> - if the operation fails</dd>
 </dl>
 </div>
 </section>

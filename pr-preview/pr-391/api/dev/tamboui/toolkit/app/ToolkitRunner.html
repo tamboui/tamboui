@@ -76,6 +76,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#elementRegistry()" tabindex="0">elementRegistry()</a></li>
 <li><a href="#styledAreaRegistry()" tabindex="0">styledAreaRegistry()</a></li>
 <li><a href="#styleEngine(dev.tamboui.css.engine.StyleEngine)" tabindex="0">styleEngine(StyleEngine)</a></li>
+<li><a href="#setWindowTitle(java.lang.String)" tabindex="0">setWindowTitle(String)</a></li>
 <li><a href="#tuiRunner()" tabindex="0">tuiRunner()</a></li>
 <li><a href="#close()" tabindex="0">close()</a></li>
 <li><a href="#builder()" tabindex="0">builder()</a></li>
@@ -247,19 +248,24 @@ try (var runner = ToolkitRunner.create()) {
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Schedules an action to run repeatedly with a fixed delay between runs.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../style/StyledAreaRegistry.html" title="interface in dev.tamboui.style">StyledAreaRegistry</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styledAreaRegistry()" class="member-name-link">styledAreaRegistry</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the terminal window title.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../style/StyledAreaRegistry.html" title="interface in dev.tamboui.style">StyledAreaRegistry</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styledAreaRegistry()" class="member-name-link">styledAreaRegistry</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the styled area registry for styled span lookups.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToolkitRunner.html" title="class in dev.tamboui.toolkit.app">ToolkitRunner</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styleEngine(dev.tamboui.css.engine.StyleEngine)" class="member-name-link">styleEngine</a><wbr>(<a href="../../css/engine/StyleEngine.html" title="class in dev.tamboui.css.engine">StyleEngine</a>&nbsp;styleEngine)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToolkitRunner.html" title="class in dev.tamboui.toolkit.app">ToolkitRunner</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styleEngine(dev.tamboui.css.engine.StyleEngine)" class="member-name-link">styleEngine</a><wbr>(<a href="../../css/engine/StyleEngine.html" title="class in dev.tamboui.css.engine">StyleEngine</a>&nbsp;styleEngine)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the style engine for CSS styling.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tuiRunner()" class="member-name-link">tuiRunner</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tuiRunner()" class="member-name-link">tuiRunner</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the underlying TuiRunner.</div>
 </div>
 </div>
@@ -551,6 +557,24 @@ When set, elements will have their CSS styles resolved during rendering.</div>
 <dd><code>styleEngine</code> - the style engine to use, or null to disable CSS styling</dd>
 <dt>Returns:</dt>
 <dd>this runner for chaining</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setWindowTitle(java.lang.String)">
+<h3>setWindowTitle</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setWindowTitle</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</span></div>
+<div class="block">Sets the terminal window title.
+<p>
+The first call saves the current title on the terminal's title stack;
+it is restored automatically when the runner is closed.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>title</code> - the window title to set</dd>
+<dt>Throws:</dt>
+<dd><code><a href="../../error/RuntimeIOException.html" title="class in dev.tamboui.error">RuntimeIOException</a></code> - if the operation fails</dd>
 </dl>
 </div>
 </section>
