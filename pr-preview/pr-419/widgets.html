@@ -1393,7 +1393,8 @@ if (event.code() == KeyCode.CHAR) {
 <p><code>state.moveCursorToStart()</code> / <code>moveCursorToEnd()</code> - Jump to document boundaries</p>
 </li>
 <li>
-<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling</p>
+<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling
+(<code>scrollDown(amount, visibleRows, visibleCols, overflow)</code> counts wrapped rows when wrapping)</p>
 </li>
 <li>
 <p><code>state.clear()</code> - Clear all content</p>
@@ -1422,8 +1423,11 @@ if (event.code() == KeyCode.CHAR) {
 </ul>
 </div>
 <div class="paragraph">
-<p>While wrapping, <code>Up</code>/<code>Down</code> move the cursor by visual row rather than by logical line, and the
-line-number gutter shows a number only on the first row of each logical line.</p>
+<p>While wrapping, <code>Up</code>/<code>Down</code> move the cursor by visual row rather than by logical line, keeping
+its screen column, and the line-number gutter shows a number only on the first row of each
+logical line. A line whose last row fills the whole width is followed by an empty row, so the
+cursor at the end of that line stays visible. In the Toolkit DSL, a wrapping <code>TextAreaElement</code>
+asks its container for enough rows to show every wrapped line.</p>
 </div>
 <div class="admonitionblock note">
 <table>

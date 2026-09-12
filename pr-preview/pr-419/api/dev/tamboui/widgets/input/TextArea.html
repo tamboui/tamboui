@@ -71,6 +71,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#builder()" tabindex="0">builder()</a></li>
 <li><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)" tabindex="0">render(Rect, Buffer, TextAreaState)</a></li>
 <li><a href="#renderWithCursor(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState,dev.tamboui.terminal.Frame)" tabindex="0">renderWithCursor(Rect, Buffer, TextAreaState, Frame)</a></li>
+<li><a href="#preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)" tabindex="0">preferredHeight(int, TextAreaState)</a></li>
 </ol>
 </li>
 </ol>
@@ -158,19 +159,27 @@ implements <a href="../../widget/StatefulWidget.html" title="interface in dev.ta
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a new text area builder.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">render</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
- <a href="../../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">preferredHeight</a><wbr>(int&nbsp;width,
  <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Renders this widget to the given buffer area with the provided state.</div>
+<div class="block">Returns the height, in rows, needed to show all of <code>state</code>'s text without scrolling
+when rendered <code>width</code> columns wide: one row per display row (see
+<a href="TextAreaState.html#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>TextAreaState.computeDisplayRows(int, Overflow)</code></a>), plus the rows taken by the block, if any.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#renderWithCursor(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState,dev.tamboui.terminal.Frame)" class="member-name-link">renderWithCursor</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">render</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
+ <a href="../../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer,
+ <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Renders this widget to the given buffer area with the provided state.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#renderWithCursor(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState,dev.tamboui.terminal.Frame)" class="member-name-link">renderWithCursor</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
  <a href="../../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer,
  <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state,
  <a href="../../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&nbsp;frame)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders the widget and sets the cursor position on the frame.</div>
 </div>
 </div>
@@ -280,6 +289,28 @@ Call this instead of render() when this input is focused.</div>
 <dd><code>buffer</code> - the buffer to render to</dd>
 <dd><code>state</code> - the text area state</dd>
 <dd><code>frame</code> - the frame for cursor positioning</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)">
+<h3>preferredHeight</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">preferredHeight</span><wbr><span class="parameters">(int&nbsp;width,
+ <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state)</span></div>
+<div class="block">Returns the height, in rows, needed to show all of <code>state</code>'s text without scrolling
+when rendered <code>width</code> columns wide: one row per display row (see
+<a href="TextAreaState.html#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>TextAreaState.computeDisplayRows(int, Overflow)</code></a>), plus the rows taken by the block, if any.
+<p>
+This uses the same border and gutter math as <a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)"><code>render(Rect, Buffer, TextAreaState)</code></a>, so layout code can size a
+wrapping text area without re-deriving it.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>width</code> - the width of the area the widget will be rendered into</dd>
+<dd><code>state</code> - the text area state</dd>
+<dt>Returns:</dt>
+<dd>the height that fits the whole text</dd>
 </dl>
 </div>
 </section>
