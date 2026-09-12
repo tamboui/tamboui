@@ -139,6 +139,10 @@ The following child selectors can be used to style sub-components:
   <li><code>TextAreaElement-line-number</code> - The line number style (default: dim)</li>
 </ul>
 <p>
+The <code>text-overflow</code> CSS property selects the overflow mode (<code>clip</code>,
+<code>wrap-word</code>, <code>wrap-character</code>); a programmatic <a href="#overflow(dev.tamboui.style.Overflow)"><code>overflow(Overflow)</code></a>
+value takes precedence. Ellipsis values fall back to clip for text areas.</p>
+<p>
 Example CSS:
 <pre><code>TextAreaElement-cursor { text-style: reversed; background: cyan; }
 TextAreaElement-placeholder { color: gray; text-style: italic; }
