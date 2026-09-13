@@ -61,6 +61,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#add(dev.tamboui.widgets.syntax.Grammar)" tabindex="0">add(Grammar)</a></li>
+<li><a href="#maxLineLength(int)" tabindex="0">maxLineLength(int)</a></li>
 <li><a href="#build()" tabindex="0">build()</a></li>
 </ol>
 </li>
@@ -109,6 +110,11 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Builds the <a href="RegexSyntaxHighlighter.html" title="class in dev.tamboui.widgets.syntax"><code>RegexSyntaxHighlighter</code></a>.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RegexSyntaxHighlighter.Builder.html" title="class in dev.tamboui.widgets.syntax">RegexSyntaxHighlighter.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxLineLength(int)" class="member-name-link">maxLineLength</a><wbr>(int&nbsp;maxLineLength)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Configures the maximum source line length that will be tokenized.</div>
+</div>
 </div>
 </div>
 </div>
@@ -135,6 +141,24 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>grammar</code> - the grammar to add</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="maxLineLength(int)">
+<h3>maxLineLength</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="RegexSyntaxHighlighter.Builder.html" title="class in dev.tamboui.widgets.syntax">RegexSyntaxHighlighter.Builder</a></span>&nbsp;<span class="element-name">maxLineLength</span><wbr><span class="parameters">(int&nbsp;maxLineLength)</span></div>
+<div class="block">Configures the maximum source line length that will be tokenized.
+Lines longer than this cap fall back to plain rendering, bounding the
+worst-case cost to tokenize pathological input. Defaults to
+<code>RegexSyntaxHighlighter.DEFAULT_MAX_LINE_LENGTH</code>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>maxLineLength</code> - the maximum length of a tokenized line</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
