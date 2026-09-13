@@ -82,6 +82,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#showCursor(boolean)" tabindex="0">showCursor(boolean)</a></li>
 <li><a href="#showLineNumbers()" tabindex="0">showLineNumbers()</a></li>
 <li><a href="#lineNumberStyle(dev.tamboui.style.Style)" tabindex="0">lineNumberStyle(Style)</a></li>
+<li><a href="#overflow(dev.tamboui.style.Overflow)" tabindex="0">overflow(Overflow)</a></li>
+<li><a href="#clip()" tabindex="0">clip()</a></li>
+<li><a href="#wrapWord()" tabindex="0">wrapWord()</a></li>
+<li><a href="#wrapCharacter()" tabindex="0">wrapCharacter()</a></li>
 <li><a href="#title(java.lang.String)" tabindex="0">title(String)</a></li>
 <li><a href="#rounded()" tabindex="0">rounded()</a></li>
 <li><a href="#borderColor(dev.tamboui.style.Color)" tabindex="0">borderColor(Color)</a></li>
@@ -134,6 +138,10 @@ The following child selectors can be used to style sub-components:
   <li><code>TextAreaElement-placeholder</code> - The placeholder text style (default: dim)</li>
   <li><code>TextAreaElement-line-number</code> - The line number style (default: dim)</li>
 </ul>
+<p>
+The <code>text-overflow</code> CSS property selects the overflow mode (<code>clip</code>,
+<code>wrap-word</code>, <code>wrap-character</code>); a programmatic <a href="#overflow(dev.tamboui.style.Overflow)"><code>overflow(Overflow)</code></a>
+value takes precedence. Ellipsis values fall back to clip for text areas.</p>
 <p>
 Example CSS:
 <pre><code>TextAreaElement-cursor { text-style: reversed; background: cyan; }
@@ -208,45 +216,55 @@ Note: Programmatic styles set via the corresponding setter methods take preceden
 <div class="block">Sets the border color.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorStyle(dev.tamboui.style.Style)" class="member-name-link">cursorStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clip()" class="member-name-link">clip</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Disables wrapping (horizontal scroll instead).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorStyle(dev.tamboui.style.Style)" class="member-name-link">cursorStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the cursor style.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#focusedBorderColor(dev.tamboui.style.Color)" class="member-name-link">focusedBorderColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#focusedBorderColor(dev.tamboui.style.Color)" class="member-name-link">focusedBorderColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the border color to use when focused.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getState()" class="member-name-link">getState</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getState()" class="member-name-link">getState</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the current state.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../event/EventResult.html" title="enum class in dev.tamboui.toolkit.event">EventResult</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#handleKeyEvent(dev.tamboui.tui.event.KeyEvent,boolean)" class="member-name-link">handleKeyEvent</a><wbr>(<a href="../../tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a>&nbsp;event,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../event/EventResult.html" title="enum class in dev.tamboui.toolkit.event">EventResult</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#handleKeyEvent(dev.tamboui.tui.event.KeyEvent,boolean)" class="member-name-link">handleKeyEvent</a><wbr>(<a href="../../tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a>&nbsp;event,
  boolean&nbsp;focused)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Handles a key event on this element.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../event/EventResult.html" title="enum class in dev.tamboui.toolkit.event">EventResult</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#handlePasteEvent(dev.tamboui.tui.event.PasteEvent)" class="member-name-link">handlePasteEvent</a><wbr>(<a href="../../tui/event/PasteEvent.html" title="class in dev.tamboui.tui.event">PasteEvent</a>&nbsp;event)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../event/EventResult.html" title="enum class in dev.tamboui.toolkit.event">EventResult</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#handlePasteEvent(dev.tamboui.tui.event.PasteEvent)" class="member-name-link">handlePasteEvent</a><wbr>(<a href="../../tui/event/PasteEvent.html" title="class in dev.tamboui.tui.event">PasteEvent</a>&nbsp;event)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Handles a key event for text area input.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isFocusable()" class="member-name-link">isFocusable</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isFocusable()" class="member-name-link">isFocusable</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns whether this element can receive focus.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineNumberStyle(dev.tamboui.style.Style)" class="member-name-link">lineNumberStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineNumberStyle(dev.tamboui.style.Style)" class="member-name-link">lineNumberStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the line number style.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onTextChange(dev.tamboui.toolkit.elements.TextAreaElement.TextChangeListener)" class="member-name-link">onTextChange</a><wbr>(<a href="TextAreaElement.TextChangeListener.html" title="interface in dev.tamboui.toolkit.elements">TextAreaElement.TextChangeListener</a>&nbsp;listener)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onTextChange(dev.tamboui.toolkit.elements.TextAreaElement.TextChangeListener)" class="member-name-link">onTextChange</a><wbr>(<a href="TextAreaElement.TextChangeListener.html" title="interface in dev.tamboui.toolkit.elements">TextAreaElement.TextChangeListener</a>&nbsp;listener)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets a listener for text changes.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow</a><wbr>(<a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the overflow (wrap) mode.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholder(java.lang.String)" class="member-name-link">placeholder</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;placeholder)</code></div>
@@ -311,6 +329,16 @@ Note: Programmatic styles set via the corresponding setter methods take preceden
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#title(java.lang.String)" class="member-name-link">title</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the title for the border.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#wrapCharacter()" class="member-name-link">wrapCharacter</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Wraps long lines at character boundaries.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#wrapWord()" class="member-name-link">wrapWord</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Wraps long lines at word boundaries.</div>
 </div>
 </div>
 </div>
@@ -508,6 +536,66 @@ Note: Programmatic styles set via the corresponding setter methods take preceden
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>style</code> - the line number style</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="overflow(dev.tamboui.style.Overflow)">
+<h3>overflow</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></span>&nbsp;<span class="element-name">overflow</span><wbr><span class="parameters">(<a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="block">Sets the overflow (wrap) mode.
+<p>
+<a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a> (the default) preserves horizontal-scroll behavior. <code>
+WRAP_WORD</code>/<code>WRAP_CHARACTER</code> wrap long lines across multiple screen rows instead,
+and Up/Down move the cursor by visual row rather than logical line. The truncating modes
+(<code>ELLIPSIS</code>, <code>ELLIPSIS_START</code>, <code>ELLIPSIS_MIDDLE</code>) would hide text the
+caret can still reach, so a text area falls back to <code>CLIP</code> for them.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>overflow</code> - the overflow mode</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="clip()">
+<h3>clip</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></span>&nbsp;<span class="element-name">clip</span>()</div>
+<div class="block">Disables wrapping (horizontal scroll instead). This is the default.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="wrapWord()">
+<h3>wrapWord</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></span>&nbsp;<span class="element-name">wrapWord</span>()</div>
+<div class="block">Wraps long lines at word boundaries.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="wrapCharacter()">
+<h3>wrapCharacter</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></span>&nbsp;<span class="element-name">wrapCharacter</span>()</div>
+<div class="block">Wraps long lines at character boundaries.</div>
+<dl class="notes">
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

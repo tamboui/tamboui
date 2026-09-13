@@ -429,9 +429,8 @@ For large writes exceeding the buffer size, data is written in chunks.</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">onResize</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;handler)</span></div>
 <div class="block">Registers a handler to be called when the terminal is resized.
 <p>
-On Unix systems, this installs a SIGWINCH signal handler using Panama FFI.
-The signal handler sets a flag which is checked from the main event loop
-(via <a href="#read(int)"><code>read(int)</code></a>), ensuring the handler is called from a safe context.
+SIGWINCH is dispatched through the JVM signal bridge. The bridge callback
+only marks the resize as pending; <a href="#read(int)"><code>read(int)</code></a> invokes the handler.
 <p>
 Only one handler can be registered at a time; subsequent calls
 will replace the previous handler.</div>
