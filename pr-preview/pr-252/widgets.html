@@ -357,18 +357,21 @@ paragraph.render(area, buffer);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Wrap modes:</p>
+<p>Wrap modes, set with <code>.overflow(&#8230;&#8203;)</code> (CSS property: <code>text-overflow</code>):</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>Wrap.NONE</code> - No wrapping, text is clipped</p>
+<p><code>Overflow.CLIP</code> - No wrapping, text is clipped</p>
 </li>
 <li>
-<p><code>Wrap.CHARACTER</code> - Wrap at any character</p>
+<p><code>Overflow.WRAP_CHARACTER</code> - Wrap at any character</p>
 </li>
 <li>
-<p><code>Wrap.WORD</code> - Wrap at word boundaries</p>
+<p><code>Overflow.WRAP_WORD</code> - Wrap at word boundaries</p>
+</li>
+<li>
+<p><code>Overflow.ELLIPSIS</code> / <code>ELLIPSIS_START</code> / <code>ELLIPSIS_MIDDLE</code> - Truncate with <code>&#8230;&#8203;</code> at the end, start, or middle</p>
 </li>
 </ul>
 </div>
@@ -1390,12 +1393,55 @@ if (event.code() == KeyCode.CHAR) {
 <p><code>state.moveCursorToStart()</code> / <code>moveCursorToEnd()</code> - Jump to document boundaries</p>
 </li>
 <li>
-<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling</p>
+<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling
+(<code>scrollDown(amount, visibleRows, visibleCols, overflow)</code> counts wrapped rows when wrapping)</p>
 </li>
 <li>
 <p><code>state.clear()</code> - Clear all content</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Wrap modes:</p>
+</div>
+<div class="paragraph">
+<p>By default a long line is clipped and the view scrolls horizontally. Set <code>.overflow(&#8230;&#8203;)</code> on
+<code>TextArea.Builder</code> (or <code>.overflow(&#8230;&#8203;)</code> / <code>.wrapWord()</code> / <code>.wrapCharacter()</code> / <code>.clip()</code> on
+<code>TextAreaElement</code>) to wrap it across multiple screen rows instead:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Overflow.CLIP</code> - No wrapping, horizontal scrolling (default)</p>
+</li>
+<li>
+<p><code>Overflow.WRAP_CHARACTER</code> - Wrap at any character</p>
+</li>
+<li>
+<p><code>Overflow.WRAP_WORD</code> - Wrap at word boundaries</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>While wrapping, <code>Up</code>/<code>Down</code> move the cursor by visual row rather than by logical line, keeping
+its screen column, and the line-number gutter shows a number only on the first row of each
+logical line. A line whose last row fills the whole width is followed by an empty row, so the
+cursor at the end of that line stays visible. In the Toolkit DSL, a wrapping <code>TextAreaElement</code>
+asks its container for enough rows to show every wrapped line.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Unlike <code>Paragraph</code>, a text area does not support the truncating modes (<code>Overflow.ELLIPSIS</code>,
+<code>ELLIPSIS_START</code>, <code>ELLIPSIS_MIDDLE</code>) - the cursor can move into text they would hide. They fall
+back to <code>Overflow.CLIP</code>.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>CSS properties:</p>
@@ -1410,6 +1456,9 @@ if (event.code() == KeyCode.CHAR) {
 </li>
 <li>
 <p><code>line-number-color</code> - Line number gutter color</p>
+</li>
+<li>
+<p><code>text-overflow</code> - Wrap mode (<code>clip</code>, <code>wrap-word</code>, <code>wrap-character</code>)</p>
 </li>
 </ul>
 </div>
