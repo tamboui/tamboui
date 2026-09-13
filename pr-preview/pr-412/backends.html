@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
-<title>TamboUI Documentation</title>
+<title>Terminal Backends</title>
 <link rel="stylesheet" href="./_static/tamboui.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
@@ -26,325 +26,158 @@
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>TamboUI Documentation</h1>
+<h1>Terminal Backends</h1>
 <div class="details">
 <span id="revnumber">version 0.5.0-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#introduction">Introduction</a>
-<ul class="sectlevel2">
-<li><a href="#key-features">Key Features</a></li>
-<li><a href="#module-overview">Module Overview</a></li>
-</ul>
-</li>
-<li><a href="#where-to-start">Where to Start</a></li>
-<li><a href="#foundations">Foundations</a></li>
-<li><a href="#building-blocks">Building Blocks</a></li>
-<li><a href="#toolkit-dsl">Toolkit DSL</a></li>
-<li><a href="#testing-debugging">Testing &amp; Debugging</a></li>
-<li><a href="#advanced">Advanced</a></li>
-<li><a href="#quick-example">Quick Example</a></li>
-<li><a href="#resources">Resources</a></li>
-<li><a href="#license">License</a></li>
+<li><a href="#selecting-a-backend">Selecting a backend</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="introduction"><a class="anchor" href="#introduction"></a><a class="link" href="#introduction">Introduction</a></h2>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>TamboUI is a Java library for building terminal user interfaces.
-The design follows Rust&#8217;s <a href="https://github.com/ratatui/ratatui">ratatui</a> closely - same rendering model, similar widget APIs, familiar layout system.
-If you know ratatui, you&#8217;ll pick this up quickly.</p>
+<p>TamboUI talks to the terminal through a pluggable <code>Backend</code>. Backends are discovered
+via <code>ServiceLoader</code>, so adding one is just a dependency:</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>TamboUI is still experimental and under active development. APIs may change.
-Feedback, issues, and contributions are welcome!</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="sect2">
-<h3 id="key-features"><a class="anchor" href="#key-features"></a><a class="link" href="#key-features">Key Features</a></h3>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Immediate-mode rendering</strong> - Redraw the entire UI each frame for simple state management</p>
-</li>
-<li>
-<p><strong>Intermediate buffer system</strong> - Widgets render to a buffer, enabling diff-based terminal updates</p>
-</li>
-<li>
-<p><strong>Constraint-based layout</strong> - Flexible layout system with percentage, fixed, ratio, and proportional sizing</p>
-</li>
-<li>
-<p><strong>Multiple backends</strong> - JLine 3, Panama (FFM), and Aesh for cross-platform terminal support</p>
-</li>
-<li>
-<p><strong>High-level TUI framework</strong> - TuiRunner eliminates boilerplate with built-in event handling</p>
-</li>
-<li>
-<p><strong>Declarative Toolkit DSL</strong> - Fluent API for building UIs with components and focus management</p>
-</li>
-<li>
-<p><strong>PicoCLI integration</strong> - Optional module for CLI argument parsing</p>
-</li>
-<li>
-<p><strong>GraalVM native image support</strong> - Compile to native executables for instant startup</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="module-overview"><a class="anchor" href="#module-overview"></a><a class="link" href="#module-overview">Module Overview</a></h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
-<col style="width: 75%;">
+<col style="width: 50%;">
+<col style="width: 25%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Module</th>
 <th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Requires</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-core</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Core types: Buffer, Cell, Rect, Style, Layout, Text primitives, and layout widgets (Columns, Grid, Dock, Stack, Flow)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-widgets</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">All widget implementations (Block, Paragraph, List, Table, Chart, etc.)</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-jline3-backend</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JLine 3 terminal backend</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JLine 3 based backend; the reliable default on all platforms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java 8+</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-panama-backend</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Panama (FFM) terminal backend for modern JDKs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Panama (FFM) backend with no third-party dependencies</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java 22+</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-aesh-backend</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Aesh terminal backend</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-tui</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">High-level TUI framework with TuiRunner, event handling, bindings, and key helpers</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-toolkit</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Fluent DSL for declarative UI construction with components and focus management</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-css</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CSS-based styling with TCSS format, selectors, and theme switching</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-annotations</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Annotation definitions (<code>@OnAction</code>) for action handling</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-processor</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Annotation processor for compile-time action handler generation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-image</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Image rendering with Kitty, iTerm, Sixel, and braille protocols</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-markdown</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Markdown rendering</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-toolkit-markdown</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Toolkit DSL element wrapping the markdown renderer</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-picocli</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Optional PicoCLI integration for CLI argument parsing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aesh based backend, e.g. for SSH/browser-hosted terminals</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java 8+</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>An application can ship several backends at once. <code>tamboui-panama-backend</code> is safe to include
+in applications that also run on older JVMs: on a runtime older than Java 22 its provider is
+skipped during discovery.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="where-to-start"><a class="anchor" href="#where-to-start"></a><a class="link" href="#where-to-start">Where to Start</a></h2>
+<h2 id="selecting-a-backend"><a class="anchor" href="#selecting-a-backend"></a><a class="link" href="#selecting-a-backend">Selecting a backend</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><strong>Building a full-screen TUI application?</strong> Start with <a href="getting-started.html">Getting Started</a>, then move to the <a href="api-levels.html#toolkit-dsl">Toolkit DSL</a> section. From there, explore <a href="forms.html">Forms</a>, <a href="styling.html">CSS Styling</a>, and <a href="bindings.html">Bindings</a> as needed.</p>
-</div>
-<div class="paragraph">
-<p><strong>Building a CLI tool with progress output?</strong> See <a href="api-levels.html#inline-toolkit">Inline Toolkit</a> for npm/Gradle-style progress displays.</p>
-</div>
-<div class="paragraph">
-<p><strong>Want to understand the internals?</strong> Read <a href="core-concepts.html">Core Concepts</a> first, then explore <a href="api-levels.html#immediate-mode">Immediate Mode</a> or <a href="api-levels.html#tuirunner">TuiRunner</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="foundations"><a class="anchor" href="#foundations"></a><a class="link" href="#foundations">Foundations</a></h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="getting-started.html">Getting Started</a> - Installation and hello world</p>
-</li>
-<li>
-<p><a href="core-concepts.html">Core Concepts</a> - Architecture and primitives</p>
-</li>
-<li>
-<p><a href="backends.html">Terminal Backends</a> - Backend selection and troubleshooting</p>
-</li>
-<li>
-<p><a href="api-levels.html">API Levels</a> - Immediate mode, TuiRunner, Toolkit DSL, Inline Display</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="building-blocks"><a class="anchor" href="#building-blocks"></a><a class="link" href="#building-blocks">Building Blocks</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>These work at any API level:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="widgets.html">Widgets Reference</a> - Block, Paragraph, List, Table, Chart, etc.</p>
-</li>
-<li>
-<p><a href="markdown.html">Markdown Reference</a> - Render CommonMark + GFM with the optional <code>tamboui-markdown</code> module</p>
-</li>
-<li>
-<p><a href="layouts.html">Layouts Reference</a> - Columns, Grid, Dock, Stack, Flow</p>
-</li>
-<li>
-<p><a href="markup.html">Markup Text</a> - BBCode-style text formatting</p>
-</li>
-<li>
-<p><a href="styling.html">CSS Styling</a> - External stylesheets and theming</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="toolkit-dsl"><a class="anchor" href="#toolkit-dsl"></a><a class="link" href="#toolkit-dsl">Toolkit DSL</a></h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="forms.html">Forms</a> - Form abstractions with validation</p>
-</li>
-<li>
-<p><a href="bindings.html">Bindings and Actions</a> - Input handling and @OnAction</p>
-</li>
-<li>
-<p><a href="mvc-architecture.html">Application Structure</a> - MVC patterns</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="testing-debugging"><a class="anchor" href="#testing-debugging"></a><a class="link" href="#testing-debugging">Testing &amp; Debugging</a></h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="pilot-testing.html">Pilot Testing</a> - Programmatic testing with Pilot</p>
-</li>
-<li>
-<p><a href="recording.html">Recording &amp; Playback</a> - Asciinema session recording and scripted (tape) playback</p>
-</li>
-<li>
-<p><a href="tracing.html">Tracing</a> - Profiling and introspecting with Java Flight Recorder</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="advanced"><a class="anchor" href="#advanced"></a><a class="link" href="#advanced">Advanced</a></h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="developer-guide.html">Developer Guide</a> - Creating custom widgets</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="quick-example"><a class="anchor" href="#quick-example"></a><a class="link" href="#quick-example">Quick Example</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Here&#8217;s a minimal example using the Toolkit DSL:</p>
+<p>By default, <code>BackendFactory.create()</code> auto-discovers providers on the classpath and uses the
+first one that successfully creates a backend. To control the choice, set the
+<code>tamboui.backend</code> system property or the <code>TAMBOUI_BACKEND</code> environment variable:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static dev.tamboui.toolkit.Toolkit.*;
-import dev.tamboui.toolkit.app.ToolkitApp;
-import dev.tamboui.toolkit.element.Element;
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># by simple name
+java -Dtamboui.backend=jline3 ...
 
-public class HelloTamboUI extends ToolkitApp {
+# by fully qualified provider class name
+java -Dtamboui.backend=dev.tamboui.backend.jline3.JLineBackendProvider ...
 
-    @Override
-    protected Element render() {
-        return panel("Hello",
-            text("Welcome to TamboUI!").bold().cyan(),
-            spacer(),
-            text("Press 'q' to quit").dim()
-        ).rounded();
-    }
-
-    public static void main(String[] args) throws Exception {
-        new HelloTamboUI().run();
-    }
-}</code></pre>
+# preference order with fallback: try panama, fall back to jline3
+# (e.g. when the same application runs on both Java 21 and Java 22+)
+java -Dtamboui.backend=panama,jline3 ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A comma-separated list is a <strong>preference order</strong>: entries that are not usable on the current
+JVM are skipped, and the first usable provider wins. An error is raised only when none of
+the listed providers can be used.</p>
+</div>
+<div class="paragraph">
+<p>Embedders that manage their own classloaders (plugin systems, app servers) can pin discovery
+to a specific loader via <code>TuiConfig</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">TuiConfig config = TuiConfig.builder()
+    .backendClassLoader(pluginClassLoader)
+    .build();</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="resources"><a class="anchor" href="#resources"></a><a class="link" href="#resources">Resources</a></h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://github.com/tamboui/tamboui">GitHub Repository</a></p>
-</li>
-<li>
-<p><a href="https://github.com/tamboui/tamboui/issues">Issue Tracker</a></p>
-</li>
-<li>
-<p><a href="https://tamboui.zulipchat.com">Zulip Chat</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="license"><a class="anchor" href="#license"></a><a class="link" href="#license">License</a></h2>
+<h2 id="troubleshooting"><a class="anchor" href="#troubleshooting"></a><a class="link" href="#troubleshooting">Troubleshooting</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>TamboUI is released under the MIT License.</p>
+<p>Run the diagnostic entry point of <code>tamboui-core</code> with your application&#8217;s classpath to see
+what is discovered on the current JVM, including providers that failed to load:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">jbang dev.tamboui:tamboui-core:{revnumber}
+# or: java -cp &lt;your-classpath&gt; dev.tamboui.Main</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">java.version: 21.0.9
+tamboui.backend: &lt;unset&gt;
+backend.provider_count: 1
+backend.provider_names: jline3
+backend.provider_error.0: dev/tamboui/backend/panama/PanamaBackendProvider has been compiled
+  by a more recent version of the Java Runtime (class file version 66.0), ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Selection errors distinguish three situations:</p>
+</div>
+<div class="paragraph">
+<p><strong>The requested provider exists but cannot load on this JVM</strong> — the real cause is reported,
+with a hint to add a fallback:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">BackendProvider(s) matching 'panama' were found on the classpath but could not be initialized (see cause).
+Failures:
+  dev/tamboui/backend/panama/PanamaBackendProvider has been compiled by a more recent version ...
+Available providers: jline3 (dev.tamboui.backend.jline3.JLineBackendProvider)
+Use a compatible Java runtime, or append a working fallback to the list, e.g. -Dtamboui.backend=panama,jline3</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>The requested name matches nothing</strong> — usable providers are listed, and providers that were
+found but dropped are disclosed so a typo of a present-but-incompatible backend is not
+mistaken for a missing dependency:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">No BackendProvider found on classpath for any of the specified providers: 'bogus'.
+Available providers: jline3 (dev.tamboui.backend.jline3.JLineBackendProvider)
+Note: 1 additional provider(s) were found but could not be loaded on this JVM:
+  dev/tamboui/backend/panama/PanamaBackendProvider has been compiled by a more recent version ...
+Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backend.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>No provider loads at all</strong> — each failure is reported with its cause (the first as the
+exception cause, the rest as suppressed exceptions).</p>
 </div>
 </div>
 </div>

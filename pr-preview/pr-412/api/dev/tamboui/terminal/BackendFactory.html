@@ -60,7 +60,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#initRecording()" tabindex="0">initRecording()</a></li>
+<li><a href="#recordIfEnabled(dev.tamboui.terminal.Backend)" tabindex="0">recordIfEnabled(Backend)</a></li>
 <li><a href="#create()" tabindex="0">create()</a></li>
+<li><a href="#create(java.lang.ClassLoader)" tabindex="0">create(ClassLoader)</a></li>
 </ol>
 </li>
 </ol>
@@ -117,10 +119,20 @@ The provider order can be explicitly controlled via a comma-separated list
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a new backend instance using the discovered provider.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#initRecording()" class="member-name-link">initRecording</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#create(java.lang.ClassLoader)" class="member-name-link">create</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link">ClassLoader</a>&nbsp;classLoader)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a new backend instance, discovering providers using the given classloader.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#initRecording()" class="member-name-link">initRecording</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Initializes recording if enabled via system properties.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#recordIfEnabled(dev.tamboui.terminal.Backend)" class="member-name-link">recordIfEnabled</a><wbr>(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Wraps a backend for Asciinema recording when recording is enabled via system properties.</div>
 </div>
 </div>
 </div>
@@ -157,6 +169,33 @@ If recording is already initialized, this method does nothing.</div>
 </section>
 </li>
 <li>
+<section class="detail" id="recordIfEnabled(dev.tamboui.terminal.Backend)">
+<h3>recordIfEnabled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a></span>&nbsp;<span class="element-name">recordIfEnabled</span><wbr><span class="parameters">(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend)</span></div>
+<div class="block">Wraps a backend for Asciinema recording when recording is enabled via system properties.
+<p>
+<a href="#create()"><code>create()</code></a> applies this automatically. Call it explicitly when you build a backend
+yourself and pass it to <code>TuiConfig.Builder#backend(Backend)</code>, since that path bypasses
+this factory and would otherwise silently ignore the <code>tamboui.record</code> properties.
+<p>
+If recording is not enabled, the backend is returned unchanged. The call is idempotent: a backend that is already
+recording is returned as-is, so applying it twice does not stack wrappers.
+<p>
+Enablement is read from the <code>tamboui.record</code> system property on every call. This also changes
+<a href="#create()"><code>create()</code></a>, which previously wrapped whenever the config loaded: because the config is cached
+process-wide, <code>create()</code> kept wrapping after the property had been cleared. Both paths now stop wrapping
+as soon as the property goes away.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>backend</code> - the backend to wrap</dd>
+<dt>Returns:</dt>
+<dd>a recording backend when recording is enabled, otherwise <code>backend</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="create()">
 <h3>create</h3>
 <div class="horizontal-scroll">
@@ -187,7 +226,31 @@ explicitly specified providers and auto-discovered ones.</div>
 <dd>a new backend instance</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if backend creation fails</dd>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IllegalStateException.html" title="class or interface in java.lang" class="external-link">IllegalStateException</a></code> - if no provider is found or all providers fail</dd>
+<dd><code><a href="BackendException.html" title="class in dev.tamboui.terminal">BackendException</a></code> - if no provider is found or all providers fail</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="create(java.lang.ClassLoader)">
+<h3>create</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a></span>&nbsp;<span class="element-name">create</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link">ClassLoader</a>&nbsp;classLoader)</span>
+                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Creates a new backend instance, discovering providers using the given classloader.
+<p>
+Behaves like <a href="#create()"><code>create()</code></a>, except that backend discovery uses <code>classLoader</code>
+exclusively when it is non-null (deterministic for embedders that bundle the backend in a
+known classloader). When <code>classLoader</code> is null, discovery falls back to the default
+candidate classloaders (see <a href="../util/SafeServiceLoader.html#load(java.lang.Class,java.lang.ClassLoader,java.util.function.Consumer)"><code>SafeServiceLoader.load(Class, ClassLoader, java.util.function.Consumer)</code></a>).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>classLoader</code> - the classloader to use exclusively for discovery, or null for the default</dd>
+<dt>Returns:</dt>
+<dd>a new backend instance</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if backend creation fails</dd>
+<dd><code><a href="BackendException.html" title="class in dev.tamboui.terminal">BackendException</a></code> - if no provider is found or all providers fail</dd>
 </dl>
 </div>
 </section>

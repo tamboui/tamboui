@@ -62,6 +62,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#of(int)" tabindex="0">of(int)</a></li>
 <li><a href="#of(java.lang.String)" tabindex="0">of(String)</a></li>
+<li><a href="#isEmojiVariationBase(int)" tabindex="0">isEmojiVariationBase(int)</a></li>
 <li><a href="#substringByWidth(java.lang.String,int)" tabindex="0">substringByWidth(String, int)</a></li>
 <li><a href="#substringByWidthFromEnd(java.lang.String,int)" tabindex="0">substringByWidthFromEnd(String, int)</a></li>
 <li><a href="#truncateWithEllipsis(java.lang.String,int,dev.tamboui.text.CharWidth.TruncatePosition)" tabindex="0">truncateWithEllipsis(String, int, CharWidth.TruncatePosition)</a></li>
@@ -126,42 +127,49 @@ for supplementary plane characters.</div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(int)" class="member-name-link">of</a><wbr>(int&nbsp;codePoint)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isEmojiVariationBase(int)" class="member-name-link">isEmojiVariationBase</a><wbr>(int&nbsp;codePoint)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the display width (0, 1, or 2) of a Unicode code point.</div>
+<div class="block">Returns true if the code point is a recognized emoji-variation base: a
+character for which Unicode defines both a text-style and emoji-style
+variation sequence (see <code>EMOJI_VARIATION_BASES</code>).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(java.lang.String)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(int)" class="member-name-link">of</a><wbr>(int&nbsp;codePoint)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns the display width (0, 1, or 2) of a Unicode code point.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(java.lang.String)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns the total display width of a string.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#substringByWidth(java.lang.String,int)" class="member-name-link">substringByWidth</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#substringByWidth(java.lang.String,int)" class="member-name-link">substringByWidth</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
  int&nbsp;maxWidth)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns a substring that fits within the given display width,
 respecting code point and grapheme cluster boundaries.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#substringByWidthFromEnd(java.lang.String,int)" class="member-name-link">substringByWidthFromEnd</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#substringByWidthFromEnd(java.lang.String,int)" class="member-name-link">substringByWidthFromEnd</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
  int&nbsp;maxWidth)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns a substring starting from the end that fits within the given display width.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#truncateWithEllipsis(java.lang.String,int,dev.tamboui.text.CharWidth.TruncatePosition)" class="member-name-link">truncateWithEllipsis</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#truncateWithEllipsis(java.lang.String,int,dev.tamboui.text.CharWidth.TruncatePosition)" class="member-name-link">truncateWithEllipsis</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
  int&nbsp;maxWidth,
  <a href="CharWidth.TruncatePosition.html" title="enum class in dev.tamboui.text">CharWidth.TruncatePosition</a>&nbsp;position)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Truncates a string to fit within the given display width, adding an ellipsis.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#truncateWithEllipsis(java.lang.String,int,java.lang.String,dev.tamboui.text.CharWidth.TruncatePosition)" class="member-name-link">truncateWithEllipsis</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#truncateWithEllipsis(java.lang.String,int,java.lang.String,dev.tamboui.text.CharWidth.TruncatePosition)" class="member-name-link">truncateWithEllipsis</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s,
  int&nbsp;maxWidth,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ellipsis,
  <a href="CharWidth.TruncatePosition.html" title="enum class in dev.tamboui.text">CharWidth.TruncatePosition</a>&nbsp;position)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Truncates a string to fit within the given display width, adding a custom ellipsis.</div>
 </div>
 </div>
@@ -208,12 +216,30 @@ Handles grapheme clusters correctly:
   <li>ZWJ sequences (e.g., 👨‍👦): width 2 for the combined glyph</li>
   <li>Regional Indicator pairs (flags, e.g., 🇫🇷): width 2</li>
   <li>Skin tone modifiers: zero-width (added to base emoji)</li>
+  <li>Emoji presentation sequences (1-wide base + VS16, e.g. ⌨️): width 2</li>
 </ul></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>s</code> - the string to measure</dd>
 <dt>Returns:</dt>
 <dd>the total display width in terminal columns</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isEmojiVariationBase(int)">
+<h3>isEmojiVariationBase</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEmojiVariationBase</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
+<div class="block">Returns true if the code point is a recognized emoji-variation base: a
+character for which Unicode defines both a text-style and emoji-style
+variation sequence (see <code>EMOJI_VARIATION_BASES</code>).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>codePoint</code> - the Unicode code point to check</dd>
+<dt>Returns:</dt>
+<dd>true if the code point is a recognized emoji-variation base</dd>
 </dl>
 </div>
 </section>

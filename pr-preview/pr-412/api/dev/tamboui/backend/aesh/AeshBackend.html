@@ -56,6 +56,7 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
+<li><a href="#field-summary" tabindex="0">Field Summary</a></li>
 <li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
@@ -78,6 +79,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#disableRawMode()" tabindex="0">disableRawMode()</a></li>
 <li><a href="#enableMouseCapture()" tabindex="0">enableMouseCapture()</a></li>
 <li><a href="#disableMouseCapture()" tabindex="0">disableMouseCapture()</a></li>
+<li><a href="#beginSynchronizedUpdate()" tabindex="0">beginSynchronizedUpdate()</a></li>
+<li><a href="#endSynchronizedUpdate()" tabindex="0">endSynchronizedUpdate()</a></li>
 <li><a href="#scrollUp(int)" tabindex="0">scrollUp(int)</a></li>
 <li><a href="#scrollDown(int)" tabindex="0">scrollDown(int)</a></li>
 <li><a href="#insertLines(int)" tabindex="0">insertLines(int)</a></li>
@@ -135,6 +138,15 @@ Two construction modes are supported:
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- =========== FIELD SUMMARY =========== -->
+<li>
+<section class="field-summary" id="field-summary">
+<h2>Field Summary</h2>
+<div class="inherited-list">
+<h3 id="fields-inherited-from-class-dev.tamboui.terminal.Backend">Fields inherited from interface&nbsp;<a href="../../terminal/Backend.html#field-summary" title="interface in dev.tamboui.terminal">Backend</a></h3>
+<code><a href="../../terminal/Backend.html#MODE_2026_BSU">MODE_2026_BSU</a>, <a href="../../terminal/Backend.html#MODE_2026_ESU">MODE_2026_ESU</a></code></div>
+</section>
+</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -166,45 +178,55 @@ Two construction modes are supported:
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#carriageReturn()" class="member-name-link">carriageReturn</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#beginSynchronizedUpdate()" class="member-name-link">beginSynchronizedUpdate</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Moves the cursor to the beginning of the current line (carriage return).</div>
+<div class="block">Begins a synchronized update (Mode 2026 BSU).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#carriageReturn()" class="member-name-link">carriageReturn</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Clears the terminal screen.</div>
+<div class="block">Moves the cursor to the beginning of the current line (carriage return).</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Clears the terminal screen.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Closes this backend, resetting terminal state (mouse capture, alternate screen,
 cursor visibility, raw mode).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteLines(int)" class="member-name-link">deleteLines</a><wbr>(int&nbsp;n)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteLines(int)" class="member-name-link">deleteLines</a><wbr>(int&nbsp;n)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Deletes N lines at the current cursor position, pulling lines below up.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disableMouseCapture()" class="member-name-link">disableMouseCapture</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disableMouseCapture()" class="member-name-link">disableMouseCapture</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Disables mouse capture.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disableRawMode()" class="member-name-link">disableRawMode</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#disableRawMode()" class="member-name-link">disableRawMode</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Disables raw mode.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableMouseCapture()" class="member-name-link">enableMouseCapture</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableMouseCapture()" class="member-name-link">enableMouseCapture</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables mouse capture.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableRawMode()" class="member-name-link">enableRawMode</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableRawMode()" class="member-name-link">enableRawMode</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables raw mode (disables line buffering and echo).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#endSynchronizedUpdate()" class="member-name-link">endSynchronizedUpdate</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Ends a synchronized update (Mode 2026 ESU).</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enterAlternateScreen()" class="member-name-link">enterAlternateScreen</a>()</code></div>
@@ -322,7 +344,7 @@ cursor visibility, raw mode).</div>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-dev.tamboui.terminal.Backend">Methods inherited from interface&nbsp;<a href="../../terminal/Backend.html#method-summary" title="interface in dev.tamboui.terminal">Backend</a></h3>
-<code><a href="../../terminal/Backend.html#disableBracketedPaste()" title="disableBracketedPaste()">disableBracketedPaste</a>, <a href="../../terminal/Backend.html#enableBracketedPaste()" title="enableBracketedPaste()">enableBracketedPaste</a>, <a href="../../terminal/Backend.html#writeRaw(java.lang.CharSequence)" title="writeRaw(CharSequence)">writeRaw</a></code></div>
+<code><a href="../../terminal/Backend.html#disableBracketedPaste()" title="disableBracketedPaste()">disableBracketedPaste</a>, <a href="../../terminal/Backend.html#enableBracketedPaste()" title="enableBracketedPaste()">enableBracketedPaste</a>, <a href="../../terminal/Backend.html#restoreWindowTitle()" title="restoreWindowTitle()">restoreWindowTitle</a>, <a href="../../terminal/Backend.html#saveWindowTitle()" title="saveWindowTitle()">saveWindowTitle</a>, <a href="../../terminal/Backend.html#setWindowTitle(java.lang.String)" title="setWindowTitle(String)">setWindowTitle</a>, <a href="../../terminal/Backend.html#writeRaw(java.lang.CharSequence)" title="writeRaw(CharSequence)">writeRaw</a></code></div>
 </section>
 </li>
 </ul>
@@ -558,6 +580,48 @@ when this backend is closed.</div>
 <dl class="notes">
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if disabling mouse capture fails</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="beginSynchronizedUpdate()">
+<h3>beginSynchronizedUpdate</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">beginSynchronizedUpdate</span>()
+                             throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../terminal/Backend.html#beginSynchronizedUpdate()">Backend</a></code></span></div>
+<div class="block">Begins a synchronized update (Mode 2026 BSU).
+<p>
+When supported, the terminal buffers all subsequent output until
+<a href="../../terminal/Backend.html#endSynchronizedUpdate()"><code>Backend.endSynchronizedUpdate()</code></a> is called, then renders everything
+in a single frame. This prevents screen tearing during redraws.
+<p>
+Terminals that do not support Mode 2026 safely ignore the escape sequence.</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if the operation fails</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="endSynchronizedUpdate()">
+<h3>endSynchronizedUpdate</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">endSynchronizedUpdate</span>()
+                           throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../terminal/Backend.html#endSynchronizedUpdate()">Backend</a></code></span></div>
+<div class="block">Ends a synchronized update (Mode 2026 ESU).
+<p>
+The terminal renders all buffered output since the last
+<a href="../../terminal/Backend.html#beginSynchronizedUpdate()"><code>Backend.beginSynchronizedUpdate()</code></a> call as a single atomic frame.
+<p>
+Must be called in a <code>finally</code> block to avoid leaving the
+terminal in a stuck buffering state.</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if the operation fails</dd>
 </dl>
 </div>
 </section>

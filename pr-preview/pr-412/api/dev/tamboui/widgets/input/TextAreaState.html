@@ -56,6 +56,7 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
+<li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
 <li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
@@ -73,6 +74,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#cursorCol()" tabindex="0">cursorCol()</a></li>
 <li><a href="#scrollRow()" tabindex="0">scrollRow()</a></li>
 <li><a href="#scrollCol()" tabindex="0">scrollCol()</a></li>
+<li><a href="#lastRenderedWidth()" tabindex="0">lastRenderedWidth()</a></li>
 <li><a href="#insert(char)" tabindex="0">insert(char)</a></li>
 <li><a href="#insert(java.lang.String)" tabindex="0">insert(String)</a></li>
 <li><a href="#deleteBackward()" tabindex="0">deleteBackward()</a></li>
@@ -80,14 +82,20 @@ loadScripts(document, 'script');</script>
 <li><a href="#moveCursorLeft()" tabindex="0">moveCursorLeft()</a></li>
 <li><a href="#moveCursorRight()" tabindex="0">moveCursorRight()</a></li>
 <li><a href="#moveCursorUp()" tabindex="0">moveCursorUp()</a></li>
+<li><a href="#moveCursorUp(int,dev.tamboui.style.Overflow)" tabindex="0">moveCursorUp(int, Overflow)</a></li>
 <li><a href="#moveCursorDown()" tabindex="0">moveCursorDown()</a></li>
+<li><a href="#moveCursorDown(int,dev.tamboui.style.Overflow)" tabindex="0">moveCursorDown(int, Overflow)</a></li>
 <li><a href="#moveCursorToLineStart()" tabindex="0">moveCursorToLineStart()</a></li>
 <li><a href="#moveCursorToLineEnd()" tabindex="0">moveCursorToLineEnd()</a></li>
 <li><a href="#moveCursorToStart()" tabindex="0">moveCursorToStart()</a></li>
 <li><a href="#moveCursorToEnd()" tabindex="0">moveCursorToEnd()</a></li>
+<li><a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)" tabindex="0">computeDisplayRows(int, Overflow)</a></li>
 <li><a href="#ensureCursorVisible(int,int)" tabindex="0">ensureCursorVisible(int, int)</a></li>
+<li><a href="#ensureCursorVisible(int,int,dev.tamboui.style.Overflow)" tabindex="0">ensureCursorVisible(int, int, Overflow)</a></li>
+<li><a href="#findDisplayRowIndex(java.util.List,int,int)" tabindex="0">findDisplayRowIndex(List, int, int)</a></li>
 <li><a href="#scrollUp(int)" tabindex="0">scrollUp(int)</a></li>
 <li><a href="#scrollDown(int,int)" tabindex="0">scrollDown(int, int)</a></li>
+<li><a href="#scrollDown(int,int,int,dev.tamboui.style.Overflow)" tabindex="0">scrollDown(int, int, int, Overflow)</a></li>
 <li><a href="#clear()" tabindex="0">clear()</a></li>
 <li><a href="#setText(java.lang.String)" tabindex="0">setText(String)</a></li>
 </ol>
@@ -112,6 +120,24 @@ loadScripts(document, 'script');</script>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="caption"><span>Nested Classes</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static final class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="TextAreaState.DisplayRow.html" class="type-name-link" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">One visually-wrapped row of a logical line: the character-offset range
+<code>[startCol, endCol)</code> of that line rendered on a single screen row.</div>
+</div>
+</div>
+</section>
+</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -136,7 +162,7 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -147,46 +173,74 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Clears all text and resets the cursor and scroll positions.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorCol()" class="member-name-link">cursorCol</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)" class="member-name-link">computeDisplayRows</a><wbr>(int&nbsp;visibleWidth,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the cursor column.</div>
+<div class="block">Computes the visual rows produced by wrapping every logical line to <code>visibleWidth</code>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorRow()" class="member-name-link">cursorRow</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorCol()" class="member-name-link">cursorCol</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the cursor column.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorRow()" class="member-name-link">cursorRow</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the cursor row.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteBackward()" class="member-name-link">deleteBackward</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteBackward()" class="member-name-link">deleteBackward</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Deletes the grapheme cluster before the cursor.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteForward()" class="member-name-link">deleteForward</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteForward()" class="member-name-link">deleteForward</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Deletes the grapheme cluster after the cursor.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ensureCursorVisible(int,int)" class="member-name-link">ensureCursorVisible</a><wbr>(int&nbsp;visibleRows,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ensureCursorVisible(int,int)" class="member-name-link">ensureCursorVisible</a><wbr>(int&nbsp;visibleRows,
  int&nbsp;visibleCols)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Adjusts scroll offsets to keep the cursor visible, assuming <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>
+(no wrapping, horizontal scroll instead).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ensureCursorVisible(int,int,dev.tamboui.style.Overflow)" class="member-name-link">ensureCursorVisible</a><wbr>(int&nbsp;visibleRows,
+ int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Adjusts scroll offsets to keep the cursor visible.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLine(int)" class="member-name-link">getLine</a><wbr>(int&nbsp;row)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#findDisplayRowIndex(java.util.List,int,int)" class="member-name-link">findDisplayRowIndex</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a>&gt;&nbsp;rows,
+ int&nbsp;logicalRow,
+ int&nbsp;col)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Finds the index within <code>rows</code> (as returned by <a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>computeDisplayRows(int, Overflow)</code></a>) of the
+display row containing the given logical position.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLine(int)" class="member-name-link">getLine</a><wbr>(int&nbsp;row)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the text of the line at the given row.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#insert(char)" class="member-name-link">insert</a><wbr>(char&nbsp;c)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#insert(char)" class="member-name-link">insert</a><wbr>(char&nbsp;c)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Inserts a character at the cursor position.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#insert(java.lang.String)" class="member-name-link">insert</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#insert(java.lang.String)" class="member-name-link">insert</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Inserts a string at the cursor position.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lastRenderedWidth()" class="member-name-link">lastRenderedWidth</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the text-content width, in display columns, that the most recent render used
+(that is, the area width minus any block border and line-number gutter).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineCount()" class="member-name-link">lineCount</a>()</code></div>
@@ -196,42 +250,54 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorDown()" class="member-name-link">moveCursorDown</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Moves the cursor one row down.</div>
+<div class="block">Moves the cursor one logical row down (assumes <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>, no wrapping).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorLeft()" class="member-name-link">moveCursorLeft</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorDown(int,dev.tamboui.style.Overflow)" class="member-name-link">moveCursorDown</a><wbr>(int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Moves the cursor down one row.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorLeft()" class="member-name-link">moveCursorLeft</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor one grapheme cluster to the left.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorRight()" class="member-name-link">moveCursorRight</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorRight()" class="member-name-link">moveCursorRight</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor one grapheme cluster to the right.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToEnd()" class="member-name-link">moveCursorToEnd</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToEnd()" class="member-name-link">moveCursorToEnd</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor to the very end of the text.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToLineEnd()" class="member-name-link">moveCursorToLineEnd</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToLineEnd()" class="member-name-link">moveCursorToLineEnd</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor to the end of the current line.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToLineStart()" class="member-name-link">moveCursorToLineStart</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToLineStart()" class="member-name-link">moveCursorToLineStart</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor to the start of the current line.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToStart()" class="member-name-link">moveCursorToStart</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToStart()" class="member-name-link">moveCursorToStart</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor to the very beginning of the text.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorUp()" class="member-name-link">moveCursorUp</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Moves the cursor one logical row up (assumes <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>, no wrapping).</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorUp()" class="member-name-link">moveCursorUp</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorUp(int,dev.tamboui.style.Overflow)" class="member-name-link">moveCursorUp</a><wbr>(int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Moves the cursor one row up.</div>
+<div class="block">Moves the cursor up one row.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scrollCol()" class="member-name-link">scrollCol</a>()</code></div>
@@ -244,24 +310,32 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Scrolls down by the given amount of rows.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scrollRow()" class="member-name-link">scrollRow</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scrollDown(int,int,int,dev.tamboui.style.Overflow)" class="member-name-link">scrollDown</a><wbr>(int&nbsp;amount,
+ int&nbsp;visibleRows,
+ int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Scrolls down by the given amount of rows.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scrollRow()" class="member-name-link">scrollRow</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the vertical scroll offset.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scrollUp(int)" class="member-name-link">scrollUp</a><wbr>(int&nbsp;amount)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scrollUp(int)" class="member-name-link">scrollUp</a><wbr>(int&nbsp;amount)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Scrolls up by the given amount of rows.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setText(java.lang.String)" class="member-name-link">setText</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;newText)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setText(java.lang.String)" class="member-name-link">setText</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;newText)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Replaces the text content and moves the cursor to the end.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#text()" class="member-name-link">text</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#text()" class="member-name-link">text</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the full text content.</div>
 </div>
 </div>
@@ -405,6 +479,24 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="lastRenderedWidth()">
+<h3>lastRenderedWidth</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">lastRenderedWidth</span>()</div>
+<div class="block">Returns the text-content width, in display columns, that the most recent render used
+(that is, the area width minus any block border and line-number gutter).
+<p>
+This is the single source of truth for callers that need the wrap width outside of a
+render pass, such as <code>Up</code>/<code>Down</code> key handling. It is <code>0</code> until the
+widget has been rendered at least once.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the last rendered text-content width, or <code>0</code> if never rendered</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="insert(char)">
 <h3>insert</h3>
 <div class="horizontal-scroll">
@@ -471,7 +563,28 @@ loadScripts(document, 'script');</script>
 <h3>moveCursorUp</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorUp</span>()</div>
-<div class="block">Moves the cursor one row up.</div>
+<div class="block">Moves the cursor one logical row up (assumes <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>, no wrapping).</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="moveCursorUp(int,dev.tamboui.style.Overflow)">
+<h3>moveCursorUp</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorUp</span><wbr><span class="parameters">(int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="block">Moves the cursor up one row.
+<p>
+With <code>WRAP_WORD</code>/<code>WRAP_CHARACTER</code>, moves to the previous visual (wrapped)
+row, which may be a wrapped segment of the same logical line or the last segment of the
+previous logical line. Every other <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style"><code>Overflow</code></a> value (including <code>null</code>) is
+treated as <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a> and behaves exactly like <a href="#moveCursorUp()"><code>moveCursorUp()</code></a> (one
+logical row) — see <a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>computeDisplayRows(int, Overflow)</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>visibleCols</code> - the number of visible columns (used to compute wrapped rows)</dd>
+<dd><code>overflow</code> - the overflow mode</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -480,7 +593,28 @@ loadScripts(document, 'script');</script>
 <h3>moveCursorDown</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorDown</span>()</div>
-<div class="block">Moves the cursor one row down.</div>
+<div class="block">Moves the cursor one logical row down (assumes <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>, no wrapping).</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="moveCursorDown(int,dev.tamboui.style.Overflow)">
+<h3>moveCursorDown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorDown</span><wbr><span class="parameters">(int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="block">Moves the cursor down one row.
+<p>
+With <code>WRAP_WORD</code>/<code>WRAP_CHARACTER</code>, moves to the next visual (wrapped) row,
+which may be a wrapped segment of the same logical line or the first segment of the next
+logical line. Every other <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style"><code>Overflow</code></a> value (including <code>null</code>) is treated as
+<a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a> and behaves exactly like <a href="#moveCursorDown()"><code>moveCursorDown()</code></a> (one logical
+row) — see <a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>computeDisplayRows(int, Overflow)</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>visibleCols</code> - the number of visible columns (used to compute wrapped rows)</dd>
+<dd><code>overflow</code> - the overflow mode</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -521,16 +655,92 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="computeDisplayRows(int,dev.tamboui.style.Overflow)">
+<h3>computeDisplayRows</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a>&gt;</span>&nbsp;<span class="element-name">computeDisplayRows</span><wbr><span class="parameters">(int&nbsp;visibleWidth,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="block">Computes the visual rows produced by wrapping every logical line to <code>visibleWidth</code>.
+<p>
+Only <a href="../../style/Overflow.html#WRAP_WORD"><code>Overflow.WRAP_WORD</code></a> and <a href="../../style/Overflow.html#WRAP_CHARACTER"><code>Overflow.WRAP_CHARACTER</code></a> wrap; every other
+value (and a non-positive width) maps each logical line to exactly one display row,
+matching the unwrapped <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a> behavior. See <code>isWrapping(Overflow)</code>.
+<p>
+When wrapping, a line whose last row fills the whole width (or ends in whitespace that a
+word break consumed) is followed by an empty row at the end of the line, so a caret placed
+there has a cell to be drawn in.
+<p>
+The result is cached and reused until the text, the width, or the mode changes, so
+calling this several times per frame is cheap.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>visibleWidth</code> - the width available for text, in display columns</dd>
+<dd><code>overflow</code> - the overflow mode</dd>
+<dt>Returns:</dt>
+<dd>an unmodifiable list of the display rows, in document order</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="ensureCursorVisible(int,int)">
 <h3>ensureCursorVisible</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">ensureCursorVisible</span><wbr><span class="parameters">(int&nbsp;visibleRows,
  int&nbsp;visibleCols)</span></div>
-<div class="block">Adjusts scroll offsets to keep the cursor visible.</div>
+<div class="block">Adjusts scroll offsets to keep the cursor visible, assuming <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>
+(no wrapping, horizontal scroll instead).</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>visibleRows</code> - the number of visible rows</dd>
 <dd><code>visibleCols</code> - the number of visible columns</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="ensureCursorVisible(int,int,dev.tamboui.style.Overflow)">
+<h3>ensureCursorVisible</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">ensureCursorVisible</span><wbr><span class="parameters">(int&nbsp;visibleRows,
+ int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="block">Adjusts scroll offsets to keep the cursor visible.
+<p>
+With <code>WRAP_WORD</code>/<code>WRAP_CHARACTER</code>, <code>scrollRow</code> is treated as an index
+into the wrapped display rows (see <a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>computeDisplayRows(int, Overflow)</code></a>) and <code>scrollCol</code> is
+always <code>0</code>, since a wrapped row always fits within <code>visibleCols</code>. Every other
+<a href="../../style/Overflow.html" title="enum class in dev.tamboui.style"><code>Overflow</code></a> value (including <code>null</code>) is treated as <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a> and
+behaves exactly like <a href="#ensureCursorVisible(int,int)"><code>ensureCursorVisible(int, int)</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>visibleRows</code> - the number of visible rows</dd>
+<dd><code>visibleCols</code> - the number of visible columns</dd>
+<dd><code>overflow</code> - the overflow mode</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="findDisplayRowIndex(java.util.List,int,int)">
+<h3>findDisplayRowIndex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">findDisplayRowIndex</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a>&gt;&nbsp;rows,
+ int&nbsp;logicalRow,
+ int&nbsp;col)</span></div>
+<div class="block">Finds the index within <code>rows</code> (as returned by <a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>computeDisplayRows(int, Overflow)</code></a>) of the
+display row containing the given logical position.
+<p>
+A position on whitespace consumed by a word-wrap break belongs to no row and resolves to
+the row before the break; see <code>findCursorDisplayRowIndex(List, int)</code> for where such a
+position is drawn.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>rows</code> - the display rows to search</dd>
+<dd><code>logicalRow</code> - the logical (newline-delimited) line index</dd>
+<dd><code>col</code> - the char offset within that logical line</dd>
+<dt>Returns:</dt>
+<dd>the index of the containing display row</dd>
 </dl>
 </div>
 </section>
@@ -559,6 +769,31 @@ loadScripts(document, 'script');</script>
 <dt>Parameters:</dt>
 <dd><code>amount</code> - the number of rows to scroll down</dd>
 <dd><code>visibleRows</code> - the number of visible rows</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="scrollDown(int,int,int,dev.tamboui.style.Overflow)">
+<h3>scrollDown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">scrollDown</span><wbr><span class="parameters">(int&nbsp;amount,
+ int&nbsp;visibleRows,
+ int&nbsp;visibleCols,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="block">Scrolls down by the given amount of rows.
+<p>
+With <code>WRAP_WORD</code>/<code>WRAP_CHARACTER</code>, <code>scrollRow</code> indexes the wrapped
+display rows (see <a href="#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>computeDisplayRows(int, Overflow)</code></a>), so scrolling is clamped to their count
+rather than to the number of logical lines. Every other <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style"><code>Overflow</code></a> value (including
+<code>null</code>) is treated as <a href="../../style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a> and behaves exactly like
+<a href="#scrollDown(int,int)"><code>scrollDown(int, int)</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>amount</code> - the number of rows to scroll down</dd>
+<dd><code>visibleRows</code> - the number of visible rows</dd>
+<dd><code>visibleCols</code> - the number of visible columns (used to compute wrapped rows)</dd>
+<dd><code>overflow</code> - the overflow mode</dd>
 </dl>
 </div>
 </section>

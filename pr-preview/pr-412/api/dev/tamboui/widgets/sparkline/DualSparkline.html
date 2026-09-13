@@ -102,7 +102,9 @@ from a shared centre axis.
 <p>
 The top series renders as bars growing <em>upward</em> from the centre; the bottom series renders as bars growing
 <em>downward</em> from the centre. Sub-pixel resolution is achieved using Unicode block characters (▁▂▃▄▅▆▇█), giving
-smooth visual gradation within a single character row. This layout matches the style of macOS Activity Monitor's
+smooth visual gradation within a single character row. Because Unicode has no top-anchored eighth blocks, partial
+cells of the bottom series are drawn as the complement block glyph in inverse video, which yields the same
+eighth-level resolution as the top series. This layout matches the style of macOS Activity Monitor's
 network and disk activity graphs.
 <p>
 Example usage:

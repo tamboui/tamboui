@@ -476,6 +476,8 @@ Handles grapheme clusters correctly:
   <li>ZWJ sequences: characters after ZWJ are appended to the preceding cell</li>
   <li>Regional Indicator pairs: combined into a single 2-wide cell</li>
   <li>Skin tone modifiers: appended to preceding cell (zero-width)</li>
+  <li>Emoji presentation sequences: a 1-wide base glyph followed by VS16 is
+      promoted to a 2-wide cell with a continuation</li>
 </ul></div>
 <dl class="notes">
 <dt>Parameters:</dt>

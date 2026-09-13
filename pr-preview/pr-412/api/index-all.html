@@ -865,6 +865,14 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 <dd>
 <div class="block">Backend interface for terminal operations.</div>
 </dd>
+<dt><a href="dev/tamboui/tui/TuiConfig.html#backendClassLoader()" class="member-name-link">backendClassLoader()</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiConfig.html" title="class in dev.tamboui.tui">TuiConfig</a></dt>
+<dd>
+<div class="block">Returns the classloader used exclusively for backend discovery, or null for the default.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/TuiConfig.Builder.html#backendClassLoader(java.lang.ClassLoader)" class="member-name-link">backendClassLoader(ClassLoader)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiConfig.Builder.html" title="class in dev.tamboui.tui">TuiConfig.Builder</a></dt>
+<dd>
+<div class="block">Sets the classloader used exclusively for backend discovery.</div>
+</dd>
 <dt><a href="dev/tamboui/terminal/BackendException.html" class="type-name-link" title="class in dev.tamboui.terminal">BackendException</a> - Exception Class in <a href="dev/tamboui/terminal/package-summary.html">dev.tamboui.terminal</a></dt>
 <dd>
 <div class="block">Exception for backend errors.</div>
@@ -1124,6 +1132,16 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 <dt><a href="dev/tamboui/widgets/scrollbar/Scrollbar.Builder.html#beginSymbol(java.lang.String)" class="member-name-link">beginSymbol(String)</a> - Method in class dev.tamboui.widgets.scrollbar.<a href="dev/tamboui/widgets/scrollbar/Scrollbar.Builder.html" title="class in dev.tamboui.widgets.scrollbar">Scrollbar.Builder</a></dt>
 <dd>
 <div class="block">Sets the begin marker symbol (e.g., up arrow for vertical scrollbar).</div>
+</dd>
+<dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#beginSynchronizedUpdate()" class="member-name-link">beginSynchronizedUpdate()</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="dev/tamboui/backend/jline3/JLineBackend.html#beginSynchronizedUpdate()" class="member-name-link">beginSynchronizedUpdate()</a> - Method in class dev.tamboui.backend.jline3.<a href="dev/tamboui/backend/jline3/JLineBackend.html" title="class in dev.tamboui.backend.jline3">JLineBackend</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="dev/tamboui/backend/panama/PanamaBackend.html#beginSynchronizedUpdate()" class="member-name-link">beginSynchronizedUpdate()</a> - Method in class dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/PanamaBackend.html" title="class in dev.tamboui.backend.panama">PanamaBackend</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#beginSynchronizedUpdate()" class="member-name-link">beginSynchronizedUpdate()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Begins a synchronized update (Mode 2026 BSU).</div>
 </dd>
 <dt><a href="dev/tamboui/image/capability/TerminalImageCapabilities.html#bestProtocol()" class="member-name-link">bestProtocol()</a> - Method in class dev.tamboui.image.capability.<a href="dev/tamboui/image/capability/TerminalImageCapabilities.html" title="class in dev.tamboui.image.capability">TerminalImageCapabilities</a></dt>
 <dd>
@@ -3139,6 +3157,10 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 <dd>
 <div class="block">Convenience method to clip text at boundaries.</div>
 </dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#clip()" class="member-name-link">clip()</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Disables wrapping (horizontal scroll instead).</div>
+</dd>
 <dt><a href="dev/tamboui/style/Overflow.html#CLIP" class="member-name-link">CLIP</a> - Enum constant in enum class dev.tamboui.style.<a href="dev/tamboui/style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a></dt>
 <dd>
 <div class="block">Silent truncation - text is clipped at the boundary with no indicator.</div>
@@ -3578,6 +3600,10 @@ compatible with Java 8.</div>
 <dt><a href="dev/tamboui/style/Width.html#compute(int,int)" class="member-name-link">compute(int, int)</a> - Method in class dev.tamboui.style.<a href="dev/tamboui/style/Width.html" title="class in dev.tamboui.style">Width</a></dt>
 <dd>
 <div class="block">Computes the actual width in characters given a container width.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#computeDisplayRows(int,dev.tamboui.style.Overflow)" class="member-name-link">computeDisplayRows(int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Computes the visual rows produced by wrapping every logical line to <code>visibleWidth</code>.</div>
 </dd>
 <dt><a href="dev/tamboui/markdown/MarkdownView.html#computeHeight(int)" class="member-name-link">computeHeight(int)</a> - Method in class dev.tamboui.markdown.<a href="dev/tamboui/markdown/MarkdownView.html" title="class in dev.tamboui.markdown">MarkdownView</a></dt>
 <dd>
@@ -4071,6 +4097,10 @@ compatible with Java 8.</div>
 <dt><a href="dev/tamboui/tui/TuiRunner.html#create(dev.tamboui.tui.TuiConfig)" class="member-name-link">create(TuiConfig)</a> - Static method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></dt>
 <dd>
 <div class="block">Creates a TuiRunner with the specified configuration.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/BackendFactory.html#create(java.lang.ClassLoader)" class="member-name-link">create(ClassLoader)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/BackendFactory.html" title="class in dev.tamboui.terminal">BackendFactory</a></dt>
+<dd>
+<div class="block">Creates a new backend instance, discovering providers using the given classloader.</div>
 </dd>
 <dt><a href="dev/tamboui/picocli/TuiCommand.html#createConfig()" class="member-name-link">createConfig()</a> - Method in class dev.tamboui.picocli.<a href="dev/tamboui/picocli/TuiCommand.html" title="class in dev.tamboui.picocli">TuiCommand</a></dt>
 <dd>
@@ -5898,6 +5928,10 @@ from a shared centre axis.</div>
 <dd>
 <div class="block">Go to end (End, vim 'G', emacs Alt+&gt;, etc.).</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html#endCol()" class="member-name-link">endCol()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a></dt>
+<dd>
+<div class="block">Returns where this row ends within its logical line.</div>
+</dd>
 <dt><a href="dev/tamboui/layout/grid/GridArea.AreaBounds.html#endColumn()" class="member-name-link">endColumn()</a> - Method in class dev.tamboui.layout.grid.<a href="dev/tamboui/layout/grid/GridArea.AreaBounds.html" title="class in dev.tamboui.layout.grid">GridArea.AreaBounds</a></dt>
 <dd>
 <div class="block">Returns the end column (exclusive).</div>
@@ -5930,7 +5964,22 @@ from a shared centre axis.</div>
 <dd>
 <div class="block">Sets the end marker symbol (e.g., down arrow for vertical scrollbar).</div>
 </dd>
+<dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#endSynchronizedUpdate()" class="member-name-link">endSynchronizedUpdate()</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="dev/tamboui/backend/jline3/JLineBackend.html#endSynchronizedUpdate()" class="member-name-link">endSynchronizedUpdate()</a> - Method in class dev.tamboui.backend.jline3.<a href="dev/tamboui/backend/jline3/JLineBackend.html" title="class in dev.tamboui.backend.jline3">JLineBackend</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="dev/tamboui/backend/panama/PanamaBackend.html#endSynchronizedUpdate()" class="member-name-link">endSynchronizedUpdate()</a> - Method in class dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/PanamaBackend.html" title="class in dev.tamboui.backend.panama">PanamaBackend</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#endSynchronizedUpdate()" class="member-name-link">endSynchronizedUpdate()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Ends a synchronized update (Mode 2026 ESU).</div>
+</dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#ensureCursorVisible(int,int)" class="member-name-link">ensureCursorVisible(int, int)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Adjusts scroll offsets to keep the cursor visible, assuming <a href="dev/tamboui/style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>
+(no wrapping, horizontal scroll instead).</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#ensureCursorVisible(int,int,dev.tamboui.style.Overflow)" class="member-name-link">ensureCursorVisible(int, int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Adjusts scroll offsets to keep the cursor visible.</div>
 </dd>
@@ -6674,6 +6723,11 @@ from a shared centre axis.</div>
 <dt><a href="dev/tamboui/widgets/braille/BraillePatterns.html#fillSweep()" class="member-name-link">fillSweep()</a> - Static method in class dev.tamboui.widgets.braille.<a href="dev/tamboui/widgets/braille/BraillePatterns.html" title="class in dev.tamboui.widgets.braille">BraillePatterns</a></dt>
 <dd>
 <div class="block">Returns fill sweep animation frames (11 frames).</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#findDisplayRowIndex(java.util.List,int,int)" class="member-name-link">findDisplayRowIndex(List, int, int)</a> - Static method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Finds the index within <code>rows</code> (as returned by <a href="dev/tamboui/widgets/input/TextAreaState.html#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>TextAreaState.computeDisplayRows(int, Overflow)</code></a>) of the
+display row containing the given logical position.</div>
 </dd>
 <dt><a href="dev/tamboui/tui/bindings/ActionHandler.html#fire(java.lang.String)" class="member-name-link">fire(String)</a> - Method in class dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/ActionHandler.html" title="class in dev.tamboui.tui.bindings">ActionHandler</a></dt>
 <dd>
@@ -9563,6 +9617,12 @@ and right borders plus horizontal padding).</div>
 <dd>
 <div class="block">Returns whether a drag operation is in progress.</div>
 </dd>
+<dt><a href="dev/tamboui/text/CharWidth.html#isEmojiVariationBase(int)" class="member-name-link">isEmojiVariationBase(int)</a> - Static method in class dev.tamboui.text.<a href="dev/tamboui/text/CharWidth.html" title="class in dev.tamboui.text">CharWidth</a></dt>
+<dd>
+<div class="block">Returns true if the code point is a recognized emoji-variation base: a
+character for which Unicode defines both a text-style and emoji-style
+variation sequence (see <code>CharWidth.EMOJI_VARIATION_BASES</code>).</div>
+</dd>
 <dt><a href="dev/tamboui/buffer/Cell.html#isEmpty()" class="member-name-link">isEmpty()</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/Cell.html" title="class in dev.tamboui.buffer">Cell</a></dt>
 <dd>
 <div class="block">Returns whether this cell is empty (single space with no style).</div>
@@ -10359,6 +10419,11 @@ indicating the child wants to explicitly inherit from parent.</div>
 <dd>
 <div class="block">The last area this element was rendered in.</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#lastRenderedWidth()" class="member-name-link">lastRenderedWidth()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Returns the text-content width, in display columns, that the most recent render used
+(that is, the area width minus any block border and line-number gutter).</div>
+</dd>
 <dt><a href="dev/tamboui/toolkit/elements/FormFieldElement.html#lastValidation()" class="member-name-link">lastValidation()</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/FormFieldElement.html" title="class in dev.tamboui.toolkit.elements">FormFieldElement</a></dt>
 <dd>
 <div class="block">Returns the last validation result.</div>
@@ -10890,6 +10955,10 @@ based on constraints.</div>
 <dd>
 <div class="block">Loads providers for the given service, skipping broken providers and continuing to try other providers.</div>
 </dd>
+<dt><a href="dev/tamboui/util/SafeServiceLoader.html#load(java.lang.Class,java.lang.ClassLoader,java.util.function.Consumer)" class="member-name-link">load(Class, ClassLoader, Consumer)</a> - Static method in class dev.tamboui.util.<a href="dev/tamboui/util/SafeServiceLoader.html" title="class in dev.tamboui.util">SafeServiceLoader</a></dt>
+<dd>
+<div class="block">Loads providers for the given service across one or more classloaders.</div>
+</dd>
 <dt><a href="dev/tamboui/util/SafeServiceLoader.html#load(java.lang.Class,java.util.function.Consumer)" class="member-name-link">load(Class, Consumer)</a> - Static method in class dev.tamboui.util.<a href="dev/tamboui/util/SafeServiceLoader.html" title="class in dev.tamboui.util">SafeServiceLoader</a></dt>
 <dd>
 <div class="block">Loads providers for the given service, skipping broken providers and continuing to try other providers.</div>
@@ -10929,6 +10998,10 @@ based on constraints.</div>
 <dt><a href="dev/tamboui/tui/error/RenderErrorHandlers.html#logAndQuit(java.io.PrintStream)" class="member-name-link">logAndQuit(PrintStream)</a> - Static method in class dev.tamboui.tui.error.<a href="dev/tamboui/tui/error/RenderErrorHandlers.html" title="class in dev.tamboui.tui.error">RenderErrorHandlers</a></dt>
 <dd>
 <div class="block">Returns a handler that logs the error to a stream and quits immediately.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html#logicalRow()" class="member-name-link">logicalRow()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a></dt>
+<dd>
+<div class="block">Returns the logical (newline-delimited) line index this row belongs to.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/logo/Logo.html" class="type-name-link" title="class in dev.tamboui.widgets.logo">Logo</a> - Class in <a href="dev/tamboui/widgets/logo/package-summary.html">dev.tamboui.widgets.logo</a></dt>
 <dd>
@@ -11563,6 +11636,14 @@ for dynamic pseudo-class resolution.</div>
 <dd>
 <div class="block">Sets the animation mode.</div>
 </dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#MODE_2026_BSU" class="member-name-link">MODE_2026_BSU</a> - Static variable in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Mode 2026 Begin Synchronized Update escape sequence.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#MODE_2026_ESU" class="member-name-link">MODE_2026_ESU</a> - Static variable in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Mode 2026 End Synchronized Update escape sequence.</div>
+</dd>
 <dt><a href="dev/tamboui/terminal/Mode2027Status.html" class="type-name-link" title="enum class in dev.tamboui.terminal">Mode2027Status</a> - Enum Class in <a href="dev/tamboui/terminal/package-summary.html">dev.tamboui.terminal</a></dt>
 <dd>
 <div class="block">Represents the status of Mode 2027 (grapheme cluster mode) support in a terminal.</div>
@@ -11703,7 +11784,7 @@ for dynamic pseudo-class resolution.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorDown()" class="member-name-link">moveCursorDown()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
-<div class="block">Moves the cursor one row down.</div>
+<div class="block">Moves the cursor one logical row down (assumes <a href="dev/tamboui/style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>, no wrapping).</div>
 </dd>
 <dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#moveCursorDown(int)" class="member-name-link">moveCursorDown(int)</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
 <dd>&nbsp;</dd>
@@ -11714,6 +11795,10 @@ for dynamic pseudo-class resolution.</div>
 <dt><a href="dev/tamboui/terminal/Backend.html#moveCursorDown(int)" class="member-name-link">moveCursorDown(int)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
 <dd>
 <div class="block">Moves the cursor down by N lines.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorDown(int,dev.tamboui.style.Overflow)" class="member-name-link">moveCursorDown(int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Moves the cursor down one row.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorLeft()" class="member-name-link">moveCursorLeft()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
@@ -11777,7 +11862,7 @@ for dynamic pseudo-class resolution.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorUp()" class="member-name-link">moveCursorUp()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
-<div class="block">Moves the cursor one row up.</div>
+<div class="block">Moves the cursor one logical row up (assumes <a href="dev/tamboui/style/Overflow.html#CLIP"><code>Overflow.CLIP</code></a>, no wrapping).</div>
 </dd>
 <dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#moveCursorUp(int)" class="member-name-link">moveCursorUp(int)</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
 <dd>&nbsp;</dd>
@@ -11788,6 +11873,10 @@ for dynamic pseudo-class resolution.</div>
 <dt><a href="dev/tamboui/terminal/Backend.html#moveCursorUp(int)" class="member-name-link">moveCursorUp(int)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
 <dd>
 <div class="block">Moves the cursor up by N lines.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorUp(int,dev.tamboui.style.Overflow)" class="member-name-link">moveCursorUp(int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Moves the cursor up one row.</div>
 </dd>
 <dt><a href="dev/tamboui/tfx/TFxDuration.html#mul(float)" class="member-name-link">mul(float)</a> - Method in class dev.tamboui.tfx.<a href="dev/tamboui/tfx/TFxDuration.html" title="class in dev.tamboui.tfx">TFxDuration</a></dt>
 <dd>
@@ -12951,6 +13040,10 @@ for dynamic pseudo-class resolution.</div>
 <dd>
 <div class="block">Sets the overflow mode for text that doesn't fit.</div>
 </dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow(Overflow)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Sets the overflow (wrap) mode.</div>
+</dd>
 <dt><a href="dev/tamboui/toolkit/elements/TextElement.html#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow(Overflow)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextElement.html" title="class in dev.tamboui.toolkit.elements">TextElement</a></dt>
 <dd>
 <div class="block">Sets the overflow mode for text that doesn't fit.</div>
@@ -12962,6 +13055,10 @@ for dynamic pseudo-class resolution.</div>
 <dt><a href="dev/tamboui/widgets/block/Title.html#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow(Overflow)</a> - Method in class dev.tamboui.widgets.block.<a href="dev/tamboui/widgets/block/Title.html" title="class in dev.tamboui.widgets.block">Title</a></dt>
 <dd>
 <div class="block">Returns a new title with the given overflow mode.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.Builder.html#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow(Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></dt>
+<dd>
+<div class="block">Sets the overflow (wrap) mode, mirroring <code>Paragraph.Builder.overflow</code>.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/paragraph/Paragraph.Builder.html#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow(Overflow)</a> - Method in class dev.tamboui.widgets.paragraph.<a href="dev/tamboui/widgets/paragraph/Paragraph.Builder.html" title="class in dev.tamboui.widgets.paragraph">Paragraph.Builder</a></dt>
 <dd>
@@ -13703,6 +13800,12 @@ one being typed token-by-token by an LLM) does not flicker as it grows.</div>
 <dd>
 <div class="block">Returns whether this token was preceded by whitespace in the source.</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.html#preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">preferredHeight(int, TextAreaState)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.html" title="class in dev.tamboui.widgets.input">TextArea</a></dt>
+<dd>
+<div class="block">Returns the height, in rows, needed to show all of <code>state</code>'s text without scrolling
+when rendered <code>width</code> columns wide: one row per display row (see
+<a href="dev/tamboui/widgets/input/TextAreaState.html#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>TextAreaState.computeDisplayRows(int, Overflow)</code></a>), plus the rows taken by the block, if any.</div>
+</dd>
 <dt><a href="dev/tamboui/toolkit/element/Element.html#preferredSize()" class="member-name-link">preferredSize()</a> - Method in interface dev.tamboui.toolkit.element.<a href="dev/tamboui/toolkit/element/Element.html" title="interface in dev.tamboui.toolkit.element">Element</a></dt>
 <dd>
 <div class="block">Convenience method for unconstrained preferred size.</div>
@@ -14317,6 +14420,10 @@ inheritance behavior, and optional default value.</div>
 <dt><a href="dev/tamboui/tui/overlay/DebugOverlay.html#recordFrame()" class="member-name-link">recordFrame()</a> - Method in class dev.tamboui.tui.overlay.<a href="dev/tamboui/tui/overlay/DebugOverlay.html" title="class in dev.tamboui.tui.overlay">DebugOverlay</a></dt>
 <dd>
 <div class="block">Records a frame render for FPS calculation.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/BackendFactory.html#recordIfEnabled(dev.tamboui.terminal.Backend)" class="member-name-link">recordIfEnabled(Backend)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/BackendFactory.html" title="class in dev.tamboui.terminal">BackendFactory</a></dt>
+<dd>
+<div class="block">Wraps a backend for Asciinema recording when recording is enabled via system properties.</div>
 </dd>
 <dt><a href="dev/tamboui/internal/record/RecordingBackend.html" class="type-name-link" title="class in dev.tamboui.internal.record">RecordingBackend</a> - Class in <a href="dev/tamboui/internal/record/package-summary.html">dev.tamboui.internal.record</a></dt>
 <dd>
@@ -14947,6 +15054,15 @@ styled spans (without wrapping).</div>
 <dd>
 <div class="block">Resolves variable references in a value.</div>
 </dd>
+<dt><a href="dev/tamboui/terminal/AnsiStringBuilder.html#restoreWindowTitle()" class="member-name-link">restoreWindowTitle()</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AnsiStringBuilder.html" title="class in dev.tamboui.terminal">AnsiStringBuilder</a></dt>
+<dd>
+<div class="block">Generates an XTWINOPS escape sequence to pop the window title from the
+terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved title.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#restoreWindowTitle()" class="member-name-link">restoreWindowTitle()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Restores the window title previously saved with <a href="dev/tamboui/terminal/Backend.html#saveWindowTitle()"><code>Backend.saveWindowTitle()</code></a>.</div>
+</dd>
 <dt><a href="dev/tamboui/widgets/list/ListState.html#resumeAutoScroll()" class="member-name-link">resumeAutoScroll()</a> - Method in class dev.tamboui.widgets.list.<a href="dev/tamboui/widgets/list/ListState.html" title="class in dev.tamboui.widgets.list">ListState</a></dt>
 <dd>
 <div class="block">Resumes auto-scrolling to the bottom (for sticky scroll).</div>
@@ -15567,6 +15683,15 @@ and continuing to try other providers.</div>
 <dd>
 <div class="block">Returns a copy of <code>source</code> with trailing partial markers stripped.</div>
 </dd>
+<dt><a href="dev/tamboui/terminal/AnsiStringBuilder.html#saveWindowTitle()" class="member-name-link">saveWindowTitle()</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AnsiStringBuilder.html" title="class in dev.tamboui.terminal">AnsiStringBuilder</a></dt>
+<dd>
+<div class="block">Generates an XTWINOPS escape sequence to push the current window title
+onto the terminal's title stack (<code>CSI 22;2t</code>).</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#saveWindowTitle()" class="member-name-link">saveWindowTitle()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Saves the current window title on the terminal's title stack.</div>
+</dd>
 <dt><a href="dev/tamboui/image/ImageData.html#scaledDimensionsToFill(int,int)" class="member-name-link">scaledDimensionsToFill(int, int)</a> - Method in class dev.tamboui.image.<a href="dev/tamboui/image/ImageData.html" title="class in dev.tamboui.image">ImageData</a></dt>
 <dd>
 <div class="block">Calculates the scaled dimensions to fill the given bounds while preserving aspect ratio.</div>
@@ -15912,6 +16037,10 @@ and continuing to try other providers.</div>
 <div class="block">Creates a scroll down event.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#scrollDown(int,int)" class="member-name-link">scrollDown(int, int)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Scrolls down by the given amount of rows.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#scrollDown(int,int,int,dev.tamboui.style.Overflow)" class="member-name-link">scrollDown(int, int, int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Scrolls down by the given amount of rows.</div>
 </dd>
@@ -16667,6 +16796,26 @@ are items above the current view.</div>
 <dt><a href="dev/tamboui/style/RichTextState.html#setViewportWidth(int)" class="member-name-link">setViewportWidth(int)</a> - Method in class dev.tamboui.style.<a href="dev/tamboui/style/RichTextState.html" title="class in dev.tamboui.style">RichTextState</a></dt>
 <dd>
 <div class="block">Sets the viewport width.</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/app/ToolkitApp.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.toolkit.app.<a href="dev/tamboui/toolkit/app/ToolkitApp.html" title="class in dev.tamboui.toolkit.app">ToolkitApp</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/app/ToolkitRunner.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.toolkit.app.<a href="dev/tamboui/toolkit/app/ToolkitRunner.html" title="class in dev.tamboui.toolkit.app">ToolkitRunner</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/InlineTuiRunner.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/InlineTuiRunner.html" title="class in dev.tamboui.tui">InlineTuiRunner</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/TuiRunner.html#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle(String)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></dt>
+<dd>
+<div class="block">Sets the terminal window title.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/barchart/BarChart.BarSet.html#sevenEighths()" class="member-name-link">sevenEighths()</a> - Method in class dev.tamboui.widgets.barchart.<a href="dev/tamboui/widgets/barchart/BarChart.BarSet.html" title="class in dev.tamboui.widgets.barchart">BarChart.BarSet</a></dt>
 <dd>
@@ -17455,6 +17604,10 @@ other using a painter's algorithm (last child on top).</div>
 <dt><a href="dev/tamboui/text/CharWidth.TruncatePosition.html#START" class="member-name-link">START</a> - Enum constant in enum class dev.tamboui.text.<a href="dev/tamboui/text/CharWidth.TruncatePosition.html" title="enum class in dev.tamboui.text">CharWidth.TruncatePosition</a></dt>
 <dd>
 <div class="block">Truncate at start: "...World"</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html#startCol()" class="member-name-link">startCol()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a></dt>
+<dd>
+<div class="block">Returns where this row starts within its logical line.</div>
 </dd>
 <dt><a href="dev/tamboui/tfx/EffectTimer.html#started()" class="member-name-link">started()</a> - Method in class dev.tamboui.tfx.<a href="dev/tamboui/tfx/EffectTimer.html" title="class in dev.tamboui.tfx">EffectTimer</a></dt>
 <dd>
@@ -18622,6 +18775,11 @@ respecting code point and grapheme cluster boundaries.</div>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#%3Cinit%3E(java.lang.String)" class="member-name-link">TextAreaState(String)</a> - Constructor for class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Creates a new text area state with the given initial text.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.DisplayRow.html" class="type-name-link" title="class in dev.tamboui.widgets.input">TextAreaState.DisplayRow</a> - Class in <a href="dev/tamboui/widgets/input/package-summary.html">dev.tamboui.widgets.input</a></dt>
+<dd>
+<div class="block">One visually-wrapped row of a logical line: the character-offset range
+<code>[startCol, endCol)</code> of that line rendered on a single screen row.</div>
 </dd>
 <dt><a href="dev/tamboui/toolkit/elements/TextElement.html" class="type-name-link" title="class in dev.tamboui.toolkit.elements">TextElement</a> - Class in <a href="dev/tamboui/toolkit/elements/package-summary.html">dev.tamboui.toolkit.elements</a></dt>
 <dd>
@@ -20001,6 +20159,11 @@ from each line.</div>
 <dd>
 <div class="block">Creates a new TUI configuration with the specified options.</div>
 </dd>
+<dt><a href="dev/tamboui/tui/TuiConfig.html#%3Cinit%3E(boolean,boolean,boolean,boolean,boolean,java.time.Duration,java.time.Duration,java.time.Duration,boolean,dev.tamboui.tui.bindings.Bindings,dev.tamboui.tui.error.RenderErrorHandler,java.io.PrintStream,boolean,java.util.List,dev.tamboui.terminal.Backend,java.util.concurrent.ScheduledExecutorService,java.lang.ClassLoader)" class="member-name-link">TuiConfig(boolean, boolean, boolean, boolean, boolean, Duration, Duration, Duration, boolean, Bindings, RenderErrorHandler, PrintStream, boolean, List, Backend, ScheduledExecutorService, ClassLoader)</a> - Constructor for class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiConfig.html" title="class in dev.tamboui.tui">TuiConfig</a></dt>
+<dd>
+<div class="block">Creates a new TUI configuration with the specified options, including an explicit
+classloader for backend discovery.</div>
+</dd>
 <dt><a href="dev/tamboui/tui/TuiConfig.Builder.html" class="type-name-link" title="class in dev.tamboui.tui">TuiConfig.Builder</a> - Class in <a href="dev/tamboui/tui/package-summary.html">dev.tamboui.tui</a></dt>
 <dd>
 <div class="block">Builder for <a href="dev/tamboui/tui/TuiConfig.html" title="class in dev.tamboui.tui"><code>TuiConfig</code></a>.</div>
@@ -21010,6 +21173,10 @@ bottom borders, top and bottom titles, and vertical padding).</div>
 <dd>
 <div class="block">Returns the viewport height (visible lines).</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/table/Table.html#viewportHeight(dev.tamboui.layout.Rect)" class="member-name-link">viewportHeight(Rect)</a> - Method in class dev.tamboui.widgets.table.<a href="dev/tamboui/widgets/table/Table.html" title="class in dev.tamboui.widgets.table">Table</a></dt>
+<dd>
+<div class="block">Computes the number of data rows visible in the given area.</div>
+</dd>
 <dt><a href="dev/tamboui/style/RichTextState.html#viewportWidth()" class="member-name-link">viewportWidth()</a> - Method in class dev.tamboui.style.<a href="dev/tamboui/style/RichTextState.html" title="class in dev.tamboui.style">RichTextState</a></dt>
 <dd>
 <div class="block">Returns the viewport width (visible columns).</div>
@@ -21349,6 +21516,10 @@ a <code>Block</code>-wrapped <code>Paragraph</code> for fenced code blocks, or a
 <dd>
 <div class="block">Creates a new Windows terminal instance.</div>
 </dd>
+<dt><a href="dev/tamboui/terminal/AnsiStringBuilder.html#windowTitle(java.lang.String)" class="member-name-link">windowTitle(String)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AnsiStringBuilder.html" title="class in dev.tamboui.terminal">AnsiStringBuilder</a></dt>
+<dd>
+<div class="block">Generates an OSC 2 escape sequence to set the terminal window title.</div>
+</dd>
 <dt><a href="dev/tamboui/backend/panama/unix/LibC.html#WINSIZE_LAYOUT" class="member-name-link">WINSIZE_LAYOUT</a> - Static variable in class dev.tamboui.backend.panama.unix.<a href="dev/tamboui/backend/panama/unix/LibC.html" title="class in dev.tamboui.backend.panama.unix">LibC</a></dt>
 <dd>
 <div class="block">Layout for the winsize structure.</div>
@@ -21507,6 +21678,10 @@ the given fallback map for inherited properties that are not set in this map.</d
 <dd>
 <div class="block">Sets character wrapping mode.</div>
 </dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#wrapCharacter()" class="member-name-link">wrapCharacter()</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Wraps long lines at character boundaries.</div>
+</dd>
 <dt><a href="dev/tamboui/tfx/toolkit/ToolkitEffects.html#wrapHandler(dev.tamboui.tui.EventHandler)" class="member-name-link">wrapHandler(EventHandler)</a> - Method in class dev.tamboui.tfx.toolkit.<a href="dev/tamboui/tfx/toolkit/ToolkitEffects.html" title="class in dev.tamboui.tfx.toolkit">ToolkitEffects</a></dt>
 <dd>
 <div class="block">Wraps an event handler to capture tick timing and force redraws.</div>
@@ -21538,6 +21713,10 @@ the given fallback map for inherited properties that are not set in this map.</d
 <dt><a href="dev/tamboui/toolkit/elements/RichTextElement.html#wrapWord()" class="member-name-link">wrapWord()</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/RichTextElement.html" title="class in dev.tamboui.toolkit.elements">RichTextElement</a></dt>
 <dd>
 <div class="block">Sets word wrapping mode.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#wrapWord()" class="member-name-link">wrapWord()</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Wraps long lines at word boundaries.</div>
 </dd>
 <dt><a href="dev/tamboui/backend/panama/PlatformTerminal.html#write(byte%5B%5D)" class="member-name-link">write(byte[])</a> - Method in interface dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/PlatformTerminal.html" title="interface in dev.tamboui.backend.panama">PlatformTerminal</a></dt>
 <dd>
