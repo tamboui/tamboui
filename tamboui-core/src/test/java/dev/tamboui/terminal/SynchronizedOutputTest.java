@@ -44,13 +44,14 @@ class SynchronizedOutputTest {
         assertThat(calls).containsExactly(
                 "beginSynchronizedUpdate",
                 "draw",
+                "hideCursor", // no cursor set on the frame -> hidden on first draw
                 "endSynchronizedUpdate",
                 "flush");
     }
 
     @Test
-    @DisplayName("draw() sends BSU/ESU even with no diff")
-    void drawSendsSyncUpdateEvenWithNoDiff() {
+    @DisplayName("draw() writes nothing at all when nothing changed")
+    void drawSkipsAllOutputWhenNothingChanged() {
         RecordingBackend backend = new RecordingBackend(10, 5);
         Terminal<RecordingBackend> terminal = new Terminal<>(backend);
 
@@ -58,13 +59,59 @@ class SynchronizedOutputTest {
         terminal.draw(frame -> {});
         backend.clearCalls();
 
-        // Second draw with same content — no diff, but BSU/ESU still sent
+        // Second draw with same content — zero bytes must reach the terminal:
+        // some terminals (e.g. Ghostty) reset the cursor blink timer on ANY
+        // output, so even an empty BSU/ESU pair keeps the cursor from blinking.
         terminal.draw(frame -> {});
 
-        List<String> calls = backend.calls();
-        assertThat(calls).contains("beginSynchronizedUpdate", "endSynchronizedUpdate", "flush");
-        // No "draw" call since there's no diff
-        assertThat(calls).doesNotContain("draw");
+        assertThat(backend.calls()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("unchanged frame with unchanged cursor position writes nothing")
+    void unchangedCursorWritesNothing() {
+        RecordingBackend backend = new RecordingBackend(10, 5);
+        Terminal<RecordingBackend> terminal = new Terminal<>(backend);
+
+        terminal.draw(frame -> frame.setCursorPosition(new Position(3, 0)));
+        backend.clearCalls();
+
+        terminal.draw(frame -> frame.setCursorPosition(new Position(3, 0)));
+
+        assertThat(backend.calls()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("moved cursor on an unchanged frame is repositioned inside BSU/ESU")
+    void movedCursorIsWritten() {
+        RecordingBackend backend = new RecordingBackend(10, 5);
+        Terminal<RecordingBackend> terminal = new Terminal<>(backend);
+
+        terminal.draw(frame -> frame.setCursorPosition(new Position(3, 0)));
+        backend.clearCalls();
+
+        terminal.draw(frame -> frame.setCursorPosition(new Position(4, 0)));
+
+        assertThat(backend.calls()).containsExactly(
+                "beginSynchronizedUpdate",
+                "setCursorPosition",
+                "endSynchronizedUpdate",
+                "flush");
+    }
+
+    @Test
+    @DisplayName("hiding the cursor on an unchanged frame still writes")
+    void cursorHideIsWritten() {
+        RecordingBackend backend = new RecordingBackend(10, 5);
+        Terminal<RecordingBackend> terminal = new Terminal<>(backend);
+
+        terminal.draw(frame -> frame.setCursorPosition(new Position(3, 0)));
+        backend.clearCalls();
+
+        // No cursor set this frame -> cursor must be hidden -> output required
+        terminal.draw(frame -> {});
+
+        assertThat(backend.calls()).contains("hideCursor", "flush");
     }
 
     @Test
@@ -153,10 +200,12 @@ class SynchronizedOutputTest {
 
         @Override
         public void showCursor() throws IOException {
+            calls.add("showCursor");
         }
 
         @Override
         public void hideCursor() throws IOException {
+            calls.add("hideCursor");
         }
 
         @Override
@@ -166,6 +215,7 @@ class SynchronizedOutputTest {
 
         @Override
         public void setCursorPosition(Position position) throws IOException {
+            calls.add("setCursorPosition");
         }
 
         @Override
