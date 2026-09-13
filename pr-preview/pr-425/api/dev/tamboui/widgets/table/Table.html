@@ -68,6 +68,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#builder()" tabindex="0">builder()</a></li>
 <li><a href="#rows()" tabindex="0">rows()</a></li>
+<li><a href="#viewportHeight(dev.tamboui.layout.Rect)" tabindex="0">viewportHeight(Rect)</a></li>
 <li><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.table.TableState)" tabindex="0">render(Rect, Buffer, TableState)</a></li>
 </ol>
 </li>
@@ -186,6 +187,11 @@ frame.renderStatefulWidget(table, area, tableState);
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the rows in this table.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#viewportHeight(dev.tamboui.layout.Rect)" class="member-name-link">viewportHeight</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the number of data rows visible in the given area.</div>
+</div>
 </div>
 </div>
 </div>
@@ -244,6 +250,26 @@ CSS property name: <code>highlight-color</code></div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the rows</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="viewportHeight(dev.tamboui.layout.Rect)">
+<h3>viewportHeight</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">viewportHeight</span><wbr><span class="parameters">(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area)</span></div>
+<div class="block">Computes the number of data rows visible in the given area.
+<p>
+This accounts for the vertical space consumed by the optional
+<a href="../block/Block.html" title="class in dev.tamboui.widgets.block"><code>Block</code></a> chrome (borders, titles, padding), the header row,
+and the footer row. The result is the height available for data
+rows and can be used by consumers that render their own scrollbar.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>area</code> - the total area the table will be rendered into</dd>
+<dt>Returns:</dt>
+<dd>the number of rows available for data content, never negative</dd>
 </dl>
 </div>
 </section>

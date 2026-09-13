@@ -61,6 +61,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#load(java.lang.Class,java.util.function.Consumer)" tabindex="0">load(Class, Consumer)</a></li>
 <li><a href="#load(java.lang.Class)" tabindex="0">load(Class)</a></li>
+<li><a href="#load(java.lang.Class,java.lang.ClassLoader,java.util.function.Consumer)" tabindex="0">load(Class, ClassLoader, Consumer)</a></li>
 </ol>
 </li>
 </ol>
@@ -113,9 +114,16 @@ general such recovery cannot be guaranteed."</div>
 <div class="block">Loads providers for the given service, skipping broken providers and continuing to try other providers.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;S&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;S&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#load(java.lang.Class,java.util.function.Consumer)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;S&gt;&nbsp;service,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#load(java.lang.Class,java.lang.ClassLoader,java.util.function.Consumer)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;S&gt;&nbsp;service,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link">ClassLoader</a>&nbsp;classLoader,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&gt;&nbsp;onError)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Loads providers for the given service across one or more classloaders.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;S&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;S&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#load(java.lang.Class,java.util.function.Consumer)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;S&gt;&nbsp;service,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&gt;&nbsp;onError)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Loads providers for the given service, skipping broken providers and continuing to try other providers.</div>
 </div>
 </div>
@@ -167,6 +175,38 @@ general such recovery cannot be guaranteed."</div>
 <dd><code>service</code> - the SPI interface/class</dd>
 <dt>Returns:</dt>
 <dd>list of successfully instantiated providers</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="load(java.lang.Class,java.lang.ClassLoader,java.util.function.Consumer)">
+<h3>load</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;S&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;S&gt;</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;S&gt;&nbsp;service,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link">ClassLoader</a>&nbsp;classLoader,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Throwable.html" title="class or interface in java.lang" class="external-link">Throwable</a>&gt;&nbsp;onError)</span></div>
+<div class="block">Loads providers for the given service across one or more classloaders.
+<p>
+When <code>classLoader</code> is non-null, discovery uses <em>only</em> that loader, so the
+result is deterministic for callers that want to control which classloader is consulted.
+When <code>classLoader</code> is null, discovery falls back to a de-duplicated, ordered set of
+candidate loaders: the thread-context classloader, this class's own classloader and the
+system classloader. This makes discovery robust in fat-jars, containers and app servers
+where the thread-context classloader is frequently not the one that bundled the provider.
+<p>
+Successfully instantiated providers are de-duplicated by concrete class name (first
+candidate loader wins). Errors are likewise forwarded to <code>onError</code> at most once per
+distinct failure, so a broken provider visible to several candidate loaders is reported once.</div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="load(java.lang.Class,java.lang.ClassLoader,java.util.function.Consumer)-type-param-S"><code>S</code> - service type</span></dd>
+<dt>Parameters:</dt>
+<dd><code>service</code> - the SPI interface/class</dd>
+<dd><code>classLoader</code> - the classloader to use exclusively, or null to use the candidate set</dd>
+<dd><code>onError</code> - optional sink for errors encountered while iterating/instantiating providers</dd>
+<dt>Returns:</dt>
+<dd>list of successfully instantiated providers (no duplicates)</dd>
 </dl>
 </div>
 </section>

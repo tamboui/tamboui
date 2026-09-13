@@ -68,6 +68,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#styleToAnsi(dev.tamboui.style.Style)" tabindex="0">styleToAnsi(Style)</a></li>
 <li><a href="#hyperlinkStart(dev.tamboui.style.Hyperlink)" tabindex="0">hyperlinkStart(Hyperlink)</a></li>
 <li><a href="#hyperlinkEnd()" tabindex="0">hyperlinkEnd()</a></li>
+<li><a href="#windowTitle(java.lang.String)" tabindex="0">windowTitle(String)</a></li>
+<li><a href="#saveWindowTitle()" tabindex="0">saveWindowTitle()</a></li>
+<li><a href="#restoreWindowTitle()" tabindex="0">restoreWindowTitle()</a></li>
 </ol>
 </li>
 </ol>
@@ -137,9 +140,26 @@ System.out.print(ansi + "Hello, World!" + AnsiStringBuilder.RESET);
 <div class="block">Generates an OSC8 hyperlink escape sequence to start a hyperlink.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#restoreWindowTitle()" class="member-name-link">restoreWindowTitle</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Generates an XTWINOPS escape sequence to pop the window title from the
+terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved title.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#saveWindowTitle()" class="member-name-link">saveWindowTitle</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Generates an XTWINOPS escape sequence to push the current window title
+onto the terminal's title stack (<code>CSI 22;2t</code>).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#styleToAnsi(dev.tamboui.style.Style)" class="member-name-link">styleToAnsi</a><wbr>(<a href="../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Converts a <a href="../style/Style.html" title="class in dev.tamboui.style"><code>Style</code></a> to an ANSI SGR (Select Graphic Rendition) escape sequence.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#windowTitle(java.lang.String)" class="member-name-link">windowTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Generates an OSC 2 escape sequence to set the terminal window title.</div>
 </div>
 </div>
 </div>
@@ -229,6 +249,58 @@ Format: <code>\033]8;;\033\\</code></div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the OSC8 escape sequence to end the hyperlink</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="windowTitle(java.lang.String)">
+<h3>windowTitle</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">windowTitle</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</span></div>
+<div class="block">Generates an OSC 2 escape sequence to set the terminal window title.
+<p>
+Format: <code>\033]2;title\007</code>
+<p>
+Control characters (ESC and BEL) are stripped from the title to prevent
+sequence injection or premature termination.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>title</code> - the window title to set</dd>
+<dt>Returns:</dt>
+<dd>the OSC 2 escape sequence</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="saveWindowTitle()">
+<h3>saveWindowTitle</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">saveWindowTitle</span>()</div>
+<div class="block">Generates an XTWINOPS escape sequence to push the current window title
+onto the terminal's title stack (<code>CSI 22;2t</code>).
+<p>
+Terminals without title-stack support ignore this sequence.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the save window title escape sequence</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="restoreWindowTitle()">
+<h3>restoreWindowTitle</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">restoreWindowTitle</span>()</div>
+<div class="block">Generates an XTWINOPS escape sequence to pop the window title from the
+terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved title.
+<p>
+Terminals without title-stack support ignore this sequence.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the restore window title escape sequence</dd>
 </dl>
 </div>
 </section>

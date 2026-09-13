@@ -71,6 +71,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#onStop()" tabindex="0">onStop()</a></li>
 <li><a href="#run()" tabindex="0">run()</a></li>
 <li><a href="#runner()" tabindex="0">runner()</a></li>
+<li><a href="#setWindowTitle(java.lang.String)" tabindex="0">setWindowTitle(String)</a></li>
 <li><a href="#quit()" tabindex="0">quit()</a></li>
 </ol>
 </li>
@@ -194,6 +195,11 @@ public class CounterApp extends ToolkitApp {
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the current runner, or null if not running.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWindowTitle(java.lang.String)" class="member-name-link">setWindowTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the terminal window title.</div>
+</div>
 </div>
 </div>
 </div>
@@ -302,6 +308,24 @@ Override to perform cleanup.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the runner, or null</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setWindowTitle(java.lang.String)">
+<h3>setWindowTitle</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setWindowTitle</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</span></div>
+<div class="block">Sets the terminal window title.
+<p>
+The first call saves the current title on the terminal's title stack;
+it is restored automatically when the application exits.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>title</code> - the window title to set</dd>
+<dt>Throws:</dt>
+<dd><code><a href="../../error/RuntimeIOException.html" title="class in dev.tamboui.error">RuntimeIOException</a></code> - if the operation fails</dd>
 </dl>
 </div>
 </section>
