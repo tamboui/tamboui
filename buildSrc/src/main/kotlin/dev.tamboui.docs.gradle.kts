@@ -79,7 +79,72 @@ val prepareAsciidocSources = tasks.register<Sync>("prepareAsciidocSources") {
     into(layout.buildDirectory.dir("asciidoc-sources"))
 }
 
+val generateSearchIndex = tasks.register("generateSearchIndex") {
+    dependsOn(tasks.asciidoctor)
+    val outDir = layout.buildDirectory.dir("docs")
+    outputs.file(layout.buildDirectory.file("docs/search-index.json"))
+    doLast {
+        val root = outDir.get().asFile
+        val htmlFiles = fileTree(root) {
+            include("**/*.html")
+            exclude("api/**")
+        }.files.sortedBy { it.relativeTo(root).invariantSeparatorsPath }
+
+        fun esc(input: String): String = buildString {
+            input.forEach { ch ->
+                when (ch) {
+                    '\\' -> append("\\\\")
+                    '"' -> append("\\\"")
+                    '\n' -> append("\\n")
+                    '\r' -> append("\\r")
+                    '\t' -> append("\\t")
+                    else -> append(ch)
+                }
+            }
+        }
+
+        fun stripHtml(html: String): String {
+            return html
+                .replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
+                .replace(Regex("<style[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), " ")
+                .replace(Regex("<[^>]+>"), " ")
+                .replace("&nbsp;", " ")
+                .replace("&amp;", "&")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+        }
+
+        fun titleOf(html: String, fallback: String): String {
+            val h1 = Regex("<h1[^>]*>(.*?)</h1>", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL))
+                .find(html)?.groupValues?.get(1)
+                ?.replace(Regex("<[^>]+>"), " ")
+                ?.replace(Regex("\\s+"), " ")
+                ?.trim()
+            if (!h1.isNullOrBlank()) return h1
+            val t = Regex("<title[^>]*>(.*?)</title>", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL))
+                .find(html)?.groupValues?.get(1)
+                ?.replace(Regex("\\s+"), " ")
+                ?.trim()
+            return if (!t.isNullOrBlank()) t else fallback
+        }
+
+        val entries = htmlFiles.map { f ->
+            val rel = f.relativeTo(root).invariantSeparatorsPath
+            val html = f.readText(Charsets.UTF_8)
+            val title = titleOf(html, rel.removeSuffix(".html"))
+            val body = stripHtml(html)
+            "{\"url\":\"${esc(rel)}\",\"title\":\"${esc(title)}\",\"body\":\"${esc(body)}\"}"
+        }
+
+        val out = root.resolve("search-index.json")
+        out.writeText("[\n" + entries.joinToString(",\n") + "\n]\n", Charsets.UTF_8)
+    }
+}
+
 tasks.asciidoctor {
+    finalizedBy(generateSearchIndex)
     val javadoc = tasks.named<Javadoc>("javadoc")
     val snippetsClasses = tasks.named("snippetsClasses")
     inputs.files(prepareAsciidocSources)
