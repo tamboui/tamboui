@@ -70,6 +70,8 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#dismissTopOn(dev.tamboui.tui.bindings.KeyTrigger)" tabindex="0">dismissTopOn(KeyTrigger)</a></li>
+<li><a href="#dismissAllOn(dev.tamboui.tui.bindings.KeyTrigger)" tabindex="0">dismissAllOn(KeyTrigger)</a></li>
 <li><a href="#engine()" tabindex="0">engine()</a></li>
 <li><a href="#styleType()" tabindex="0">styleType()</a></li>
 <li><a href="#renderContent(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect,dev.tamboui.toolkit.element.RenderContext)" tabindex="0">renderContent(Frame, Rect, RenderContext)</a></li>
@@ -100,6 +102,11 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">ToastHostElement</span>
 <span class="extends-implements">extends <a href="../element/StyledElement.html" title="class in dev.tamboui.toolkit.element">StyledElement</a>&lt;<a href="ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a>&gt;</span></div>
 <div class="block">Leaf toolkit element that renders and routes interactions for a <a href="../../widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast"><code>ToastEngine</code></a>.
+<p>
+Mouse clicks dismiss the toast under the pointer and right-clicks request a copy of its text.
+Keyboard dismiss shortcuts are registered on this host via <a href="#dismissTopOn(dev.tamboui.tui.bindings.KeyTrigger)"><code>dismissTopOn(KeyTrigger)</code></a> and
+<a href="#dismissAllOn(dev.tamboui.tui.bindings.KeyTrigger)"><code>dismissAllOn(KeyTrigger)</code></a>, keeping key matching in the TUI layer where <a href="../../tui/bindings/KeyTrigger.html" title="class in dev.tamboui.tui.bindings"><code>KeyTrigger</code></a>
+lives rather than in the widget engine.
 
 <h2 id="css-child-selectors-heading">CSS Child Selectors</h2>
 <ul>
@@ -149,6 +156,16 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismissAllOn(dev.tamboui.tui.bindings.KeyTrigger)" class="member-name-link">dismissAllOn</a><wbr>(<a href="../../tui/bindings/KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a>&nbsp;trigger)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Registers a key trigger that dismisses all toasts.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismissTopOn(dev.tamboui.tui.bindings.KeyTrigger)" class="member-name-link">dismissTopOn</a><wbr>(<a href="../../tui/bindings/KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a>&nbsp;trigger)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Registers a key trigger that dismisses the topmost toast.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#engine()" class="member-name-link">engine</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -228,6 +245,36 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="dismissTopOn(dev.tamboui.tui.bindings.KeyTrigger)">
+<h3>dismissTopOn</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a></span>&nbsp;<span class="element-name">dismissTopOn</span><wbr><span class="parameters">(<a href="../../tui/bindings/KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a>&nbsp;trigger)</span></div>
+<div class="block">Registers a key trigger that dismisses the topmost toast.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>trigger</code> - the key trigger</dd>
+<dt>Returns:</dt>
+<dd>this host for chaining</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="dismissAllOn(dev.tamboui.tui.bindings.KeyTrigger)">
+<h3>dismissAllOn</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a></span>&nbsp;<span class="element-name">dismissAllOn</span><wbr><span class="parameters">(<a href="../../tui/bindings/KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a>&nbsp;trigger)</span></div>
+<div class="block">Registers a key trigger that dismisses all toasts.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>trigger</code> - the key trigger</dd>
+<dt>Returns:</dt>
+<dd>this host for chaining</dd>
+</dl>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="engine()">
 <h3>engine</h3>

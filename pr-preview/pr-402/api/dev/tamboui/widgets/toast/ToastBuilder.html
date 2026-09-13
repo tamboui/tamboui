@@ -56,7 +56,13 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
+<li><a href="#field-summary" tabindex="0">Field Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
+<li><a href="#field-detail" tabindex="0">Field Details</a>
+<ol class="toc-list">
+<li><a href="#DEFAULT_DURATION" tabindex="0">DEFAULT_DURATION</a></li>
+</ol>
+</li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#builder()" tabindex="0">builder()</a></li>
@@ -75,7 +81,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#titleAlignment(dev.tamboui.widgets.toast.TitleAlignment)" tabindex="0">titleAlignment(TitleAlignment)</a></li>
 <li><a href="#highlight(boolean)" tabindex="0">highlight(boolean)</a></li>
 <li><a href="#progressStyle(dev.tamboui.widgets.toast.ProgressStyle)" tabindex="0">progressStyle(ProgressStyle)</a></li>
-<li><a href="#dedupKey(java.lang.String)" tabindex="0">dedupKey(String)</a></li>
+<li><a href="#deduplicationKey(java.lang.String)" tabindex="0">deduplicationKey(String)</a></li>
 <li><a href="#build()" tabindex="0">build()</a></li>
 </ol>
 </li>
@@ -109,6 +115,23 @@ Toast sticky = ToastBuilder.warning("Check logs")
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- =========== FIELD SUMMARY =========== -->
+<li>
+<section class="field-summary" id="field-summary">
+<h2>Field Summary</h2>
+<div class="caption"><span>Fields</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Field</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></code></div>
+<div class="col-second even-row-color"><code><a href="#DEFAULT_DURATION" class="member-name-link">DEFAULT_DURATION</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Default auto-dismiss lifetime applied to timed toasts that do not set an explicit duration.</div>
+</div>
+</div>
+</section>
+</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
@@ -136,7 +159,7 @@ Toast sticky = ToastBuilder.warning("Check logs")
 <div class="block">Creates a new toast builder with no preset type or message.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dedupKey(java.lang.String)" class="member-name-link">dedupKey</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dedupKey)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deduplicationKey(java.lang.String)" class="member-name-link">deduplicationKey</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deduplicationKey)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the deduplication key used by the toast engine.</div>
 </div>
@@ -222,6 +245,23 @@ Toast sticky = ToastBuilder.warning("Check logs")
 </section>
 <section class="details">
 <ul class="details-list">
+<!-- ============ FIELD DETAIL =========== -->
+<li>
+<section class="field-details" id="field-detail">
+<h2>Field Details</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="DEFAULT_DURATION">
+<h3>DEFAULT_DURATION</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></span>&nbsp;<span class="element-name">DEFAULT_DURATION</span></div>
+<div class="block">Default auto-dismiss lifetime applied to timed toasts that do not set an explicit duration.</div>
+</div>
+</section>
+</li>
+</ul>
+</section>
+</li>
 <!-- ============ METHOD DETAIL ========== -->
 <li>
 <section class="method-details" id="method-detail">
@@ -369,6 +409,7 @@ Mutually exclusive with <a href="#duration(java.time.Duration)"><code>duration(D
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></span>&nbsp;<span class="element-name">duration</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;duration)</span></div>
 <div class="block">Sets the auto-dismiss lifetime for a timed toast.
 <p>
+Optional: a timed toast that never sets a duration uses <a href="#DEFAULT_DURATION"><code>DEFAULT_DURATION</code></a>.
 Mutually exclusive with <a href="#sticky(boolean)"><code>sticky(boolean)</code></a> when <code>sticky</code> is <code>true</code>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -470,16 +511,18 @@ Mutually exclusive with <a href="#sticky(boolean)"><code>sticky(boolean)</code><
 </section>
 </li>
 <li>
-<section class="detail" id="dedupKey(java.lang.String)">
-<h3>dedupKey</h3>
+<section class="detail" id="deduplicationKey(java.lang.String)">
+<h3>deduplicationKey</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></span>&nbsp;<span class="element-name">dedupKey</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dedupKey)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></span>&nbsp;<span class="element-name">deduplicationKey</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;deduplicationKey)</span></div>
 <div class="block">Sets the deduplication key used by the toast engine.
 <p>
-When not set, defaults to a hash of type, title, and message.</div>
+Deduplication is opt-in: when left unset (the default), the toast is never merged with another.
+When two toasts share the same key, showing the second merges into the first instead of
+enqueuing a duplicate.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>dedupKey</code> - the dedup key</dd>
+<dd><code>deduplicationKey</code> - the deduplication key, or <code>null</code> to disable deduplication</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

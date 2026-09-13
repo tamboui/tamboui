@@ -61,15 +61,12 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#maxConcurrent(int)" tabindex="0">maxConcurrent(int)</a></li>
-<li><a href="#deduplication(boolean)" tabindex="0">deduplication(boolean)</a></li>
 <li><a href="#position(dev.tamboui.widgets.toast.ToastPosition)" tabindex="0">position(ToastPosition)</a></li>
 <li><a href="#offsetX(int)" tabindex="0">offsetX(int)</a></li>
 <li><a href="#offsetY(int)" tabindex="0">offsetY(int)</a></li>
 <li><a href="#borderMode(dev.tamboui.widgets.toast.BorderMode)" tabindex="0">borderMode(BorderMode)</a></li>
 <li><a href="#defaultProgressStyle(dev.tamboui.widgets.toast.ProgressStyle)" tabindex="0">defaultProgressStyle(ProgressStyle)</a></li>
 <li><a href="#onCopyRequested(dev.tamboui.widgets.toast.ToastCopyHandler)" tabindex="0">onCopyRequested(ToastCopyHandler)</a></li>
-<li><a href="#shortcuts(java.util.List)" tabindex="0">shortcuts(List)</a></li>
-<li><a href="#shortcut(dev.tamboui.widgets.toast.ToastShortcut)" tabindex="0">shortcut(ToastShortcut)</a></li>
 <li><a href="#build()" tabindex="0">build()</a></li>
 </ol>
 </li>
@@ -119,49 +116,34 @@ loadScripts(document, 'script');</script>
 <div class="block">Builds the engine.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deduplication(boolean)" class="member-name-link">deduplication</a><wbr>(boolean&nbsp;deduplication)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#defaultProgressStyle(dev.tamboui.widgets.toast.ProgressStyle)" class="member-name-link">defaultProgressStyle</a><wbr>(<a href="ProgressStyle.html" title="enum class in dev.tamboui.widgets.toast">ProgressStyle</a>&nbsp;defaultProgressStyle)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Enables or disables deduplication.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#defaultProgressStyle(dev.tamboui.widgets.toast.ProgressStyle)" class="member-name-link">defaultProgressStyle</a><wbr>(<a href="ProgressStyle.html" title="enum class in dev.tamboui.widgets.toast">ProgressStyle</a>&nbsp;defaultProgressStyle)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets default progress style.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxConcurrent(int)" class="member-name-link">maxConcurrent</a><wbr>(int&nbsp;maxConcurrent)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxConcurrent(int)" class="member-name-link">maxConcurrent</a><wbr>(int&nbsp;maxConcurrent)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets max concurrent visible toasts target.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#offsetX(int)" class="member-name-link">offsetX</a><wbr>(int&nbsp;offsetX)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#offsetX(int)" class="member-name-link">offsetX</a><wbr>(int&nbsp;offsetX)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets x-axis offset from position anchor.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#offsetY(int)" class="member-name-link">offsetY</a><wbr>(int&nbsp;offsetY)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#offsetY(int)" class="member-name-link">offsetY</a><wbr>(int&nbsp;offsetY)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets y-axis offset from position anchor.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCopyRequested(dev.tamboui.widgets.toast.ToastCopyHandler)" class="member-name-link">onCopyRequested</a><wbr>(<a href="ToastCopyHandler.html" title="interface in dev.tamboui.widgets.toast">ToastCopyHandler</a>&nbsp;copyHandler)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onCopyRequested(dev.tamboui.widgets.toast.ToastCopyHandler)" class="member-name-link">onCopyRequested</a><wbr>(<a href="ToastCopyHandler.html" title="interface in dev.tamboui.widgets.toast">ToastCopyHandler</a>&nbsp;copyHandler)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets copy request callback.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#position(dev.tamboui.widgets.toast.ToastPosition)" class="member-name-link">position</a><wbr>(<a href="ToastPosition.html" title="enum class in dev.tamboui.widgets.toast">ToastPosition</a>&nbsp;position)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets engine anchor position.</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shortcut(dev.tamboui.widgets.toast.ToastShortcut)" class="member-name-link">shortcut</a><wbr>(<a href="ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a>&nbsp;shortcut)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#position(dev.tamboui.widgets.toast.ToastPosition)" class="member-name-link">position</a><wbr>(<a href="ToastPosition.html" title="enum class in dev.tamboui.widgets.toast">ToastPosition</a>&nbsp;position)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Adds one keyboard shortcut.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shortcuts(java.util.List)" class="member-name-link">shortcuts</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a>&gt;&nbsp;shortcuts)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets keyboard shortcuts.</div>
+<div class="block">Sets engine anchor position.</div>
 </div>
 </div>
 </div>
@@ -189,21 +171,6 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>maxConcurrent</code> - maximum target count</dd>
-<dt>Returns:</dt>
-<dd>this builder</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="deduplication(boolean)">
-<h3>deduplication</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></span>&nbsp;<span class="element-name">deduplication</span><wbr><span class="parameters">(boolean&nbsp;deduplication)</span></div>
-<div class="block">Enables or disables deduplication.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>deduplication</code> - whether deduplication is enabled</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
@@ -294,36 +261,6 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>copyHandler</code> - copy callback</dd>
-<dt>Returns:</dt>
-<dd>this builder</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="shortcuts(java.util.List)">
-<h3>shortcuts</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></span>&nbsp;<span class="element-name">shortcuts</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a>&gt;&nbsp;shortcuts)</span></div>
-<div class="block">Sets keyboard shortcuts.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>shortcuts</code> - shortcuts list</dd>
-<dt>Returns:</dt>
-<dd>this builder</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="shortcut(dev.tamboui.widgets.toast.ToastShortcut)">
-<h3>shortcut</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></span>&nbsp;<span class="element-name">shortcut</span><wbr><span class="parameters">(<a href="ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a>&nbsp;shortcut)</span></div>
-<div class="block">Adds one keyboard shortcut.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>shortcut</code> - shortcut to add</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

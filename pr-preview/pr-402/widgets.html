@@ -1204,7 +1204,7 @@ engine.render(frame, frame.area());</code></pre>
 <p><code>.title(text)</code> - Optional title row</p>
 </li>
 <li>
-<p><code>.duration(Duration)</code> - Auto-dismiss lifetime for timed toasts</p>
+<p><code>.duration(Duration)</code> - Auto-dismiss lifetime for timed toasts (optional; defaults to <code>ToastBuilder.DEFAULT_DURATION</code>)</p>
 </li>
 <li>
 <p><code>.sticky(true)</code> - Stay visible until manually dismissed</p>
@@ -1225,7 +1225,7 @@ engine.render(frame, frame.area());</code></pre>
 <p><code>.progressStyle(ProgressStyle)</code> - Auto-dismiss progress indicator style</p>
 </li>
 <li>
-<p><code>.dedupKey(key)</code> - Deduplication key for the engine</p>
+<p><code>.deduplicationKey(key)</code> - Opt-in deduplication key; toasts sharing a key are merged instead of duplicated</p>
 </li>
 </ul>
 </div>

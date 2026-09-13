@@ -70,7 +70,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#titleAlignment()" tabindex="0">titleAlignment()</a></li>
 <li><a href="#highlightTitle()" tabindex="0">highlightTitle()</a></li>
 <li><a href="#progressStyle()" tabindex="0">progressStyle()</a></li>
-<li><a href="#dedupKey()" tabindex="0">dedupKey()</a></li>
+<li><a href="#deduplicationKey()" tabindex="0">deduplicationKey()</a></li>
 </ol>
 </li>
 </ol>
@@ -113,9 +113,9 @@ Build instances via <a href="ToastBuilder.html" title="class in dev.tamboui.widg
 <div class="block">Returns the optional background color override, or <code>null</code> to use defaults.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dedupKey()" class="member-name-link">dedupKey</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deduplicationKey()" class="member-name-link">deduplicationKey</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the deduplication key for queue management.</div>
+<div class="block">Returns the deduplication key, or <code>null</code> when this toast is not deduplicated.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlightTitle()" class="member-name-link">highlightTitle</a>()</code></div>
@@ -328,14 +328,17 @@ Build instances via <a href="ToastBuilder.html" title="class in dev.tamboui.widg
 </section>
 </li>
 <li>
-<section class="detail" id="dedupKey()">
-<h3>dedupKey</h3>
+<section class="detail" id="deduplicationKey()">
+<h3>deduplicationKey</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">dedupKey</span>()</div>
-<div class="block">Returns the deduplication key for queue management.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">deduplicationKey</span>()</div>
+<div class="block">Returns the deduplication key, or <code>null</code> when this toast is not deduplicated.
+<p>
+The engine merges a newly shown toast into an existing one only when both carry the same
+non-null key, so deduplication is opt-in per toast.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the dedup key</dd>
+<dd>the deduplication key, or <code>null</code></dd>
 </dl>
 </div>
 </section>

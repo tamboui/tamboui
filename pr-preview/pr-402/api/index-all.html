@@ -83,10 +83,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the action that this event matches, if any.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.html#action()" class="member-name-link">action()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a></dt>
-<dd>
-<div class="block">Returns the dismiss action bound to this shortcut.</div>
-</dd>
 <dt><a href="dev/tamboui/tui/event/ActionEvent.html" class="type-name-link" title="class in dev.tamboui.tui.event">ActionEvent&lt;T&gt;</a> - Class in <a href="dev/tamboui/tui/event/package-summary.html">dev.tamboui.tui.event</a></dt>
 <dd>
 <div class="block">Represents a programmatically fired action, as opposed to a raw input event.</div>
@@ -4046,10 +4042,6 @@ compatible with Java 8.</div>
 <dd>
 <div class="block">Copies all triggers from another bindings instance.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html#%3Cinit%3E(java.lang.String,java.lang.String)" class="member-name-link">CopyRequested(String, String)</a> - Constructor for class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html" title="class in dev.tamboui.widgets.toast">ToastInteraction.CopyRequested</a></dt>
-<dd>
-<div class="block">Creates a copy-requested interaction.</div>
-</dd>
 <dt><a href="dev/tamboui/capability/core/CoreCapabilityProvider.html" class="type-name-link" title="class in dev.tamboui.capability.core">CoreCapabilityProvider</a> - Class in <a href="dev/tamboui/capability/core/package-summary.html">dev.tamboui.capability.core</a></dt>
 <dd>
 <div class="block">Core capability contributor: prints what core assumes/uses and what it can infer from the environment.</div>
@@ -4585,21 +4577,13 @@ compatible with Java 8.</div>
 <dd>
 <div class="block">Returns the property declarations of this rule.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/Toast.html#dedupKey()" class="member-name-link">dedupKey()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/Toast.html" title="class in dev.tamboui.widgets.toast">Toast</a></dt>
+<dt><a href="dev/tamboui/widgets/toast/Toast.html#deduplicationKey()" class="member-name-link">deduplicationKey()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/Toast.html" title="class in dev.tamboui.widgets.toast">Toast</a></dt>
 <dd>
-<div class="block">Returns the deduplication key for queue management.</div>
+<div class="block">Returns the deduplication key, or <code>null</code> when this toast is not deduplicated.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastBuilder.html#dedupKey(java.lang.String)" class="member-name-link">dedupKey(String)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></dt>
+<dt><a href="dev/tamboui/widgets/toast/ToastBuilder.html#deduplicationKey(java.lang.String)" class="member-name-link">deduplicationKey(String)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></dt>
 <dd>
 <div class="block">Sets the deduplication key used by the toast engine.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastEngine.html#deduplication()" class="member-name-link">deduplication()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></dt>
-<dd>
-<div class="block">Returns whether deduplication is enabled.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastEngine.Builder.html#deduplication(boolean)" class="member-name-link">deduplication(boolean)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></dt>
-<dd>
-<div class="block">Enables or disables deduplication.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/common/SizedWidget.html#DEFAULT" class="member-name-link">DEFAULT</a> - Static variable in class dev.tamboui.widgets.common.<a href="dev/tamboui/widgets/common/SizedWidget.html" title="class in dev.tamboui.widgets.common">SizedWidget</a></dt>
 <dd>
@@ -4608,6 +4592,10 @@ compatible with Java 8.</div>
 <dt><a href="dev/tamboui/widgets/checkbox/Checkbox.html#DEFAULT_CHECKED_SYMBOL" class="member-name-link">DEFAULT_CHECKED_SYMBOL</a> - Static variable in class dev.tamboui.widgets.checkbox.<a href="dev/tamboui/widgets/checkbox/Checkbox.html" title="class in dev.tamboui.widgets.checkbox">Checkbox</a></dt>
 <dd>
 <div class="block">Default symbol for checked state.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/toast/ToastBuilder.html#DEFAULT_DURATION" class="member-name-link">DEFAULT_DURATION</a> - Static variable in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastBuilder.html" title="class in dev.tamboui.widgets.toast">ToastBuilder</a></dt>
+<dd>
+<div class="block">Default auto-dismiss lifetime applied to timed toasts that do not set an explicit duration.</div>
 </dd>
 <dt><a href="dev/tamboui/export/html/HtmlExporter.html#DEFAULT_HTML_FORMAT" class="member-name-link">DEFAULT_HTML_FORMAT</a> - Static variable in class dev.tamboui.export.html.<a href="dev/tamboui/export/html/HtmlExporter.html" title="class in dev.tamboui.export.html">HtmlExporter</a></dt>
 <dd>
@@ -5246,21 +5234,21 @@ Data-Oriented Design approach with parallel arrays.</div>
 <dd>
 <div class="block">Dismisses one toast by id.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html#DISMISS_ALL" class="member-name-link">DISMISS_ALL</a> - Enum constant in enum class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html" title="enum class in dev.tamboui.widgets.toast">ToastShortcut.Action</a></dt>
-<dd>
-<div class="block">Dismiss all visible toasts.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html#DISMISS_TOP" class="member-name-link">DISMISS_TOP</a> - Enum constant in enum class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html" title="enum class in dev.tamboui.widgets.toast">ToastShortcut.Action</a></dt>
-<dd>
-<div class="block">Dismiss the topmost visible toast.</div>
-</dd>
 <dt><a href="dev/tamboui/widgets/toast/ToastEngine.html#dismissAll()" class="member-name-link">dismissAll()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></dt>
 <dd>
 <div class="block">Dismisses all active toasts.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.Dismissed.html#%3Cinit%3E(java.lang.String)" class="member-name-link">Dismissed(String)</a> - Constructor for class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastInteraction.Dismissed.html" title="class in dev.tamboui.widgets.toast">ToastInteraction.Dismissed</a></dt>
+<dt><a href="dev/tamboui/toolkit/elements/ToastHostElement.html#dismissAllOn(dev.tamboui.tui.bindings.KeyTrigger)" class="member-name-link">dismissAllOn(KeyTrigger)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a></dt>
 <dd>
-<div class="block">Creates a dismissed interaction.</div>
+<div class="block">Registers a key trigger that dismisses all toasts.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/toast/ToastEngine.html#dismissTop()" class="member-name-link">dismissTop()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></dt>
+<dd>
+<div class="block">Dismisses the topmost active toast, if any.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/elements/ToastHostElement.html#dismissTopOn(dev.tamboui.tui.bindings.KeyTrigger)" class="member-name-link">dismissTopOn(KeyTrigger)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/ToastHostElement.html" title="class in dev.tamboui.toolkit.elements">ToastHostElement</a></dt>
+<dd>
+<div class="block">Registers a key trigger that dismisses the topmost toast.</div>
 </dd>
 <dt><a href="dev/tamboui/tui/bindings/ActionHandler.html#dispatch(dev.tamboui.tui.event.Event)" class="member-name-link">dispatch(Event)</a> - Method in class dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/ActionHandler.html" title="class in dev.tamboui.tui.bindings">ActionHandler</a></dt>
 <dd>
@@ -9133,14 +9121,6 @@ and right borders plus horizontal padding).</div>
 <dd>
 <div class="block">Returns the unique ID of this focusable element.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html#id()" class="member-name-link">id()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html" title="class in dev.tamboui.widgets.toast">ToastInteraction.CopyRequested</a></dt>
-<dd>
-<div class="block">Returns the toast identifier.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.Dismissed.html#id()" class="member-name-link">id()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastInteraction.Dismissed.html" title="class in dev.tamboui.widgets.toast">ToastInteraction.Dismissed</a></dt>
-<dd>
-<div class="block">Returns the dismissed toast identifier.</div>
-</dd>
 <dt><a href="dev/tamboui/widgets/toast/ToastRenderSnapshot.html#id()" class="member-name-link">id()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastRenderSnapshot.html" title="class in dev.tamboui.widgets.toast">ToastRenderSnapshot</a></dt>
 <dd>
 <div class="block">Returns the toast instance id.</div>
@@ -9618,10 +9598,6 @@ and right borders plus horizontal padding).</div>
 <dt><a href="dev/tamboui/tui/bindings/BindingSets.html#intellij()" class="member-name-link">intellij()</a> - Static method in class dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/BindingSets.html" title="class in dev.tamboui.tui.bindings">BindingSets</a></dt>
 <dd>
 <div class="block">IntelliJ IDEA-style binding set.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastEngine.html#interact(java.lang.Object)" class="member-name-link">interact(Object)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></dt>
-<dd>
-<div class="block">Handles a toast interaction event.</div>
 </dd>
 <dt><a href="dev/tamboui/layout/cassowary/InternalSolverException.html" class="type-name-link" title="class in dev.tamboui.layout.cassowary">InternalSolverException</a> - Exception Class in <a href="dev/tamboui/layout/cassowary/package-summary.html">dev.tamboui.layout.cassowary</a></dt>
 <dd>
@@ -12358,10 +12334,6 @@ for dynamic pseudo-class resolution.</div>
 <dd>
 <div class="block">No borders.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.html#NONE" class="member-name-link">NONE</a> - Static variable in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastInteraction.html" title="class in dev.tamboui.widgets.toast">ToastInteraction</a></dt>
-<dd>
-<div class="block">No interaction occurred.</div>
-</dd>
 <dt><a href="dev/tamboui/tfx/CellFilter.html#noneOf(java.util.List)" class="member-name-link">noneOf(List)</a> - Static method in class dev.tamboui.tfx.<a href="dev/tamboui/tfx/CellFilter.html" title="class in dev.tamboui.tfx">CellFilter</a></dt>
 <dd>
 <div class="block">Selects cells that match NONE of the given filters (logical NOR).</div>
@@ -12620,10 +12592,6 @@ for dynamic pseudo-class resolution.</div>
 <dt><a href="dev/tamboui/widgets/logo/Logo.html#of(dev.tamboui.widgets.logo.Logo.Size)" class="member-name-link">of(Logo.Size)</a> - Static method in class dev.tamboui.widgets.logo.<a href="dev/tamboui/widgets/logo/Logo.html" title="class in dev.tamboui.widgets.logo">Logo</a></dt>
 <dd>
 <div class="block">Create a new Tamboui logo widget.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.html#of(dev.tamboui.widgets.toast.ToastShortcutTrigger,dev.tamboui.widgets.toast.ToastShortcut.Action)" class="member-name-link">of(ToastShortcutTrigger, ToastShortcut.Action)</a> - Static method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a></dt>
-<dd>
-<div class="block">Creates a toast keyboard shortcut.</div>
 </dd>
 <dt><a href="dev/tamboui/css/model/PropertyValue.html#of(java.lang.String)" class="member-name-link">of(String)</a> - Static method in class dev.tamboui.css.model.<a href="dev/tamboui/css/model/PropertyValue.html" title="class in dev.tamboui.css.model">PropertyValue</a></dt>
 <dd>
@@ -15133,6 +15101,10 @@ styled spans (without wrapping).</div>
 <dd>
 <div class="block">Replaces emoji codes in text with Unicode emoji characters.</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/toast/ToastEngine.html#requestCopy(java.lang.String)" class="member-name-link">requestCopy(String)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></dt>
+<dd>
+<div class="block">Computes the copyable text for an active toast and notifies the configured copy handler.</div>
+</dd>
 <dt><a href="dev/tamboui/widgets/form/Validators.html#required()" class="member-name-link">required()</a> - Static method in class dev.tamboui.widgets.form.<a href="dev/tamboui/widgets/form/Validators.html" title="class in dev.tamboui.widgets.form">Validators</a></dt>
 <dd>
 <div class="block">Creates a validator that requires a non-empty value.</div>
@@ -17046,14 +17018,6 @@ are items above the current view.</div>
 <dd>
 <div class="block">Creates a trigger for Shift+left click.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastEngine.Builder.html#shortcut(dev.tamboui.widgets.toast.ToastShortcut)" class="member-name-link">shortcut(ToastShortcut)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></dt>
-<dd>
-<div class="block">Adds one keyboard shortcut.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastEngine.Builder.html#shortcuts(java.util.List)" class="member-name-link">shortcuts(List)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.Builder.html" title="class in dev.tamboui.widgets.toast">ToastEngine.Builder</a></dt>
-<dd>
-<div class="block">Sets keyboard shortcuts.</div>
-</dd>
 <dt><a href="dev/tamboui/toolkit/elements/InlineScopeElement.html#show()" class="member-name-link">show()</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/InlineScopeElement.html" title="class in dev.tamboui.toolkit.elements">InlineScopeElement</a></dt>
 <dd>
 <div class="block">Shows this scope (sets visibility to true).</div>
@@ -18883,10 +18847,6 @@ respecting code point and grapheme cluster boundaries.</div>
 <dd>
 <div class="block">Returns the current text.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html#text()" class="member-name-link">text()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html" title="class in dev.tamboui.widgets.toast">ToastInteraction.CopyRequested</a></dt>
-<dd>
-<div class="block">Returns the text to copy.</div>
-</dd>
 <dt><a href="dev/tamboui/widgets/wavetext/WaveText.html#text()" class="member-name-link">text()</a> - Method in class dev.tamboui.widgets.wavetext.<a href="dev/tamboui/widgets/wavetext/WaveText.html" title="class in dev.tamboui.widgets.wavetext">WaveText</a></dt>
 <dd>
 <div class="block">Returns the text being displayed.</div>
@@ -19674,17 +19634,9 @@ from each line.</div>
 <dd>
 <div class="block">Creates a toast host bound to the provided engine.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.html" class="type-name-link" title="class in dev.tamboui.widgets.toast">ToastInteraction</a> - Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
+<dt><a href="dev/tamboui/widgets/toast/ToastEngine.html#toastIdAt(int,int)" class="member-name-link">toastIdAt(int, int)</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastEngine.html" title="class in dev.tamboui.widgets.toast">ToastEngine</a></dt>
 <dd>
-<div class="block">Result of a toast interaction.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.CopyRequested.html" class="type-name-link" title="class in dev.tamboui.widgets.toast">ToastInteraction.CopyRequested</a> - Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
-<dd>
-<div class="block">Interaction indicating the user requested copying toast text.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastInteraction.Dismissed.html" class="type-name-link" title="class in dev.tamboui.widgets.toast">ToastInteraction.Dismissed</a> - Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
-<dd>
-<div class="block">Interaction indicating a toast was dismissed.</div>
+<div class="block">Returns the id of the topmost toast whose most recently rendered rectangle contains the point.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/toast/ToastPosition.html" class="type-name-link" title="enum class in dev.tamboui.widgets.toast">ToastPosition</a> - Enum Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
 <dd>
@@ -19697,18 +19649,6 @@ from each line.</div>
 <dt><a href="dev/tamboui/widgets/toast/ToastRenderSnapshot.html#%3Cinit%3E(java.lang.String,dev.tamboui.widgets.toast.ToastType,java.lang.String,java.util.List,double,dev.tamboui.widgets.toast.BorderMode,dev.tamboui.widgets.toast.TitleLayout,dev.tamboui.widgets.toast.TitleSeparator,dev.tamboui.widgets.toast.TitleAlignment,boolean,dev.tamboui.widgets.toast.ProgressStyle,dev.tamboui.style.Style,dev.tamboui.style.Style,dev.tamboui.style.Style,dev.tamboui.style.Style)" class="member-name-link">ToastRenderSnapshot(String, ToastType, String, List, double, BorderMode, TitleLayout, TitleSeparator, TitleAlignment, boolean, ProgressStyle, Style, Style, Style, Style)</a> - Constructor for class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastRenderSnapshot.html" title="class in dev.tamboui.widgets.toast">ToastRenderSnapshot</a></dt>
 <dd>
 <div class="block">Creates a render snapshot with all fields required for one paint pass.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.html" class="type-name-link" title="class in dev.tamboui.widgets.toast">ToastShortcut</a> - Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
-<dd>
-<div class="block">Keyboard shortcut bound to a toast dismiss action.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html" class="type-name-link" title="enum class in dev.tamboui.widgets.toast">ToastShortcut.Action</a> - Enum Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
-<dd>
-<div class="block">Dismiss action performed by a keyboard shortcut.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcutTrigger.html" class="type-name-link" title="interface in dev.tamboui.widgets.toast">ToastShortcutTrigger</a> - Interface in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
-<dd>
-<div class="block">Marker for a keyboard trigger bound to a toast shortcut.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/toast/ToastSizing.html" class="type-name-link" title="class in dev.tamboui.widgets.toast">ToastSizing</a> - Class in <a href="dev/tamboui/widgets/toast/package-summary.html">dev.tamboui.widgets.toast</a></dt>
 <dd>
@@ -20531,10 +20471,6 @@ from each line.</div>
 <dd>
 <div class="block">A flattened entry representing a visible tree node.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.html#trigger()" class="member-name-link">trigger()</a> - Method in class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.html" title="class in dev.tamboui.widgets.toast">ToastShortcut</a></dt>
-<dd>
-<div class="block">Returns the key trigger for this shortcut.</div>
-</dd>
 <dt><a href="dev/tamboui/tui/bindings/Bindings.html#triggersFor(java.lang.String)" class="member-name-link">triggersFor(String)</a> - Method in interface dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/Bindings.html" title="interface in dev.tamboui.tui.bindings">Bindings</a></dt>
 <dd>
 <div class="block">Returns all triggers for the given action.</div>
@@ -21230,10 +21166,6 @@ and <a href="dev/tamboui/css/cascade/UnknownPropertyBehavior.html#FAIL"><code>Un
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
 </dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html" title="enum class in dev.tamboui.widgets.toast">ToastShortcut.Action</a></dt>
-<dd>
-<div class="block">Returns the enum constant of this class with the specified name.</div>
-</dd>
 <dt><a href="dev/tamboui/widgets/toast/ToastType.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastType.html" title="enum class in dev.tamboui.widgets.toast">ToastType</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
@@ -21481,11 +21413,6 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/toast/ToastPosition.html#values()" class="member-name-link">values()</a> - Static method in enum class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastPosition.html" title="enum class in dev.tamboui.widgets.toast">ToastPosition</a></dt>
-<dd>
-<div class="block">Returns an array containing the constants of this enum class, in
-the order they are declared.</div>
-</dd>
-<dt><a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html#values()" class="member-name-link">values()</a> - Static method in enum class dev.tamboui.widgets.toast.<a href="dev/tamboui/widgets/toast/ToastShortcut.Action.html" title="enum class in dev.tamboui.widgets.toast">ToastShortcut.Action</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>

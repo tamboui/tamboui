@@ -65,7 +65,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#tick(java.time.Duration)" tabindex="0">tick(Duration)</a></li>
 <li><a href="#dismiss(java.lang.String)" tabindex="0">dismiss(String)</a></li>
 <li><a href="#dismissAll()" tabindex="0">dismissAll()</a></li>
-<li><a href="#interact(java.lang.Object)" tabindex="0">interact(Object)</a></li>
+<li><a href="#dismissTop()" tabindex="0">dismissTop()</a></li>
+<li><a href="#toastIdAt(int,int)" tabindex="0">toastIdAt(int, int)</a></li>
+<li><a href="#requestCopy(java.lang.String)" tabindex="0">requestCopy(String)</a></li>
 <li><a href="#visibleCount()" tabindex="0">visibleCount()</a></li>
 <li><a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect)" tabindex="0">render(Frame, Rect)</a></li>
 <li><a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect,dev.tamboui.widgets.toast.ToastEngine.RenderStyles)" tabindex="0">render(Frame, Rect, ToastEngine.RenderStyles)</a></li>
@@ -73,7 +75,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#lastRenderedRects()" tabindex="0">lastRenderedRects()</a></li>
 <li><a href="#activeIds()" tabindex="0">activeIds()</a></li>
 <li><a href="#maxConcurrent()" tabindex="0">maxConcurrent()</a></li>
-<li><a href="#deduplication()" tabindex="0">deduplication()</a></li>
 <li><a href="#position()" tabindex="0">position()</a></li>
 </ol>
 </li>
@@ -142,53 +143,53 @@ This class owns enqueueing, deduplication, timed expiration, and dismiss operati
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a new engine builder.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deduplication()" class="member-name-link">deduplication</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismiss(java.lang.String)" class="member-name-link">dismiss</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns whether deduplication is enabled.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismiss(java.lang.String)" class="member-name-link">dismiss</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Dismisses one toast by id.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismissAll()" class="member-name-link">dismissAll</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismissAll()" class="member-name-link">dismissAll</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Dismisses all active toasts.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastInteraction.html" title="class in dev.tamboui.widgets.toast">ToastInteraction</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#interact(java.lang.Object)" class="member-name-link">interact</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;event)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Handles a toast interaction event.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lastRenderedRects()" class="member-name-link">lastRenderedRects</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dismissTop()" class="member-name-link">dismissTop</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Dismisses the topmost active toast, if any.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lastRenderedRects()" class="member-name-link">lastRenderedRects</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns toast rectangles from the most recent layout/render pass.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxConcurrent()" class="member-name-link">maxConcurrent</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxConcurrent()" class="member-name-link">maxConcurrent</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the configured max concurrent value.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastPosition.html" title="enum class in dev.tamboui.widgets.toast">ToastPosition</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#position()" class="member-name-link">position</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ToastPosition.html" title="enum class in dev.tamboui.widgets.toast">ToastPosition</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#position()" class="member-name-link">position</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the configured anchor position.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect)" class="member-name-link">render</a><wbr>(<a href="../../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&nbsp;frame,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect)" class="member-name-link">render</a><wbr>(<a href="../../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&nbsp;frame,
  <a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders all active toasts into the given area.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect,dev.tamboui.widgets.toast.ToastEngine.RenderStyles)" class="member-name-link">render</a><wbr>(<a href="../../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&nbsp;frame,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect,dev.tamboui.widgets.toast.ToastEngine.RenderStyles)" class="member-name-link">render</a><wbr>(<a href="../../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&nbsp;frame,
  <a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
  <a href="ToastEngine.RenderStyles.html" title="class in dev.tamboui.widgets.toast">ToastEngine.RenderStyles</a>&nbsp;styles)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders all active toasts into the given area using externally resolved styles.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#requestCopy(java.lang.String)" class="member-name-link">requestCopy</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the copyable text for an active toast and notifies the configured copy handler.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAvoidArea(dev.tamboui.layout.Rect)" class="member-name-link">setAvoidArea</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;avoidArea)</code></div>
@@ -205,9 +206,15 @@ This class owns enqueueing, deduplication, timed expiration, and dismiss operati
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Advances timed toasts and evicts expired entries.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#visibleCount()" class="member-name-link">visibleCount</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toastIdAt(int,int)" class="member-name-link">toastIdAt</a><wbr>(int&nbsp;x,
+ int&nbsp;y)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the id of the topmost toast whose most recently rendered rectangle contains the point.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#visibleCount()" class="member-name-link">visibleCount</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the number of currently active toasts.</div>
 </div>
 </div>
@@ -293,18 +300,48 @@ With deduplication enabled, timed duplicates refresh remaining lifetime and stic
 </section>
 </li>
 <li>
-<section class="detail" id="interact(java.lang.Object)">
-<h3>interact</h3>
+<section class="detail" id="dismissTop()">
+<h3>dismissTop</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ToastInteraction.html" title="class in dev.tamboui.widgets.toast">ToastInteraction</a></span>&nbsp;<span class="element-name">interact</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;event)</span></div>
-<div class="block">Handles a toast interaction event.
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">dismissTop</span>()</div>
+<div class="block">Dismisses the topmost active toast, if any.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the dismissed toast id, or <code>null</code> when no toasts are active</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="toastIdAt(int,int)">
+<h3>toastIdAt</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">toastIdAt</span><wbr><span class="parameters">(int&nbsp;x,
+ int&nbsp;y)</span></div>
+<div class="block">Returns the id of the topmost toast whose most recently rendered rectangle contains the point.
 <p>
-Accepts TUI <code>MouseEvent</code> and <code>KeyEvent</code> instances when available at runtime.</div>
+Hit testing uses the rectangles produced by the last <a href="#render(dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect)"><code>render(Frame, Rect)</code></a> or <code>computeLayout(Rect)</code> pass.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>event</code> - interaction event object</dd>
+<dd><code>x</code> - column coordinate</dd>
+<dd><code>y</code> - row coordinate</dd>
 <dt>Returns:</dt>
-<dd>interaction result</dd>
+<dd>the toast id at the point, or <code>null</code> when none match</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="requestCopy(java.lang.String)">
+<h3>requestCopy</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">requestCopy</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</span></div>
+<div class="block">Computes the copyable text for an active toast and notifies the configured copy handler.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>id</code> - the toast id</dd>
+<dt>Returns:</dt>
+<dd>the copyable text, or <code>null</code> when the id is not active</dd>
 </dl>
 </div>
 </section>
@@ -402,19 +439,6 @@ Accepts TUI <code>MouseEvent</code> and <code>KeyEvent</code> instances when ava
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>max concurrent setting</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="deduplication()">
-<h3>deduplication</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">deduplication</span>()</div>
-<div class="block">Returns whether deduplication is enabled.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd><code>true</code> when dedup is enabled</dd>
 </dl>
 </div>
 </section>
