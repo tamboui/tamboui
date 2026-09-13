@@ -61,9 +61,11 @@ public final class MarkdownLayout {
      * @param width content width in columns
      * @param styles the style palette
      * @param overflow how to handle prose lines wider than {@code width}
+     * @param preserveSoftBreaks whether to preserve single {@code \n} soft line breaks
      * @return an ordered list of chunks; never null, possibly empty
      */
-    public static List<RenderedChunk> layout(Node root, int width, MarkdownStyles styles, Overflow overflow) {
+    public static List<RenderedChunk> layout(
+        Node root, int width, MarkdownStyles styles, Overflow overflow, boolean preserveSoftBreaks) {
         List<RenderedChunk> chunks = new ArrayList<>();
         if (width <= 0) {
             return chunks;
@@ -78,7 +80,7 @@ public final class MarkdownLayout {
             if (!firstBlock && needsSpacingBefore(node)) {
                 chunks.add(new LinesChunk(Collections.singletonList(Line.empty())));
             }
-            renderBlock(node, width, styles, overflow, chunks);
+            renderBlock(node, width, styles, overflow, preserveSoftBreaks, chunks);
             firstBlock = false;
             node = node.getNext();
         }
@@ -99,15 +101,19 @@ public final class MarkdownLayout {
     }
 
     private static void renderBlock(
-        Node node, int width, MarkdownStyles styles, Overflow overflow, List<RenderedChunk> out) {
+        Node node, int width, MarkdownStyles styles, Overflow overflow, boolean preserveSoftBreaks,
+        List<RenderedChunk> out) {
         if (node instanceof Heading) {
-            renderHeading((Heading) node, width, styles, overflow, out);
+            renderHeading((Heading) node, width, styles, overflow, preserveSoftBreaks, out);
         } else if (node instanceof Paragraph) {
-            out.add(new LinesChunk(MarkdownInlineRenderer.render(node, Style.EMPTY, width, styles, overflow)));
+            out.add(new LinesChunk(
+                MarkdownInlineRenderer.render(node, Style.EMPTY, width, styles, overflow, preserveSoftBreaks)));
         } else if (node instanceof BulletList || node instanceof OrderedList) {
-            out.add(new LinesChunk(renderList((ListBlock) node, "", 0, width, styles, overflow)));
+            out.add(new LinesChunk(
+                renderList((ListBlock) node, "", 0, width, styles, overflow, preserveSoftBreaks)));
         } else if (node instanceof BlockQuote) {
-            out.add(new LinesChunk(renderBlockQuote((BlockQuote) node, width, styles, overflow)));
+            out.add(new LinesChunk(
+                renderBlockQuote((BlockQuote) node, width, styles, overflow, preserveSoftBreaks)));
         } else if (node instanceof FencedCodeBlock) {
             FencedCodeBlock fenced = (FencedCodeBlock) node;
             out.add(CodeBlockBuilder.build(fenced.getLiteral(), fenced.getInfo(), width, styles));
@@ -123,9 +129,11 @@ public final class MarkdownLayout {
     }
 
     private static void renderHeading(
-        Heading heading, int width, MarkdownStyles styles, Overflow overflow, List<RenderedChunk> out) {
+        Heading heading, int width, MarkdownStyles styles, Overflow overflow, boolean preserveSoftBreaks,
+        List<RenderedChunk> out) {
         Style headingStyle = styles.heading(heading.getLevel());
-        List<Line> lines = MarkdownInlineRenderer.render(heading, headingStyle, width, styles, overflow);
+        List<Line> lines =
+            MarkdownInlineRenderer.render(heading, headingStyle, width, styles, overflow, preserveSoftBreaks);
         if (heading.getLevel() <= 2) {
             char glyph = heading.getLevel() == 1 ? '═' : HORIZONTAL_RULE_GLYPH;
             String rule = repeat(glyph, width);
@@ -138,7 +146,8 @@ public final class MarkdownLayout {
     }
 
     private static List<Line> renderList(
-        ListBlock list, String indent, int depth, int width, MarkdownStyles styles, Overflow overflow) {
+        ListBlock list, String indent, int depth, int width, MarkdownStyles styles, Overflow overflow,
+        boolean preserveSoftBreaks) {
         List<Line> result = new ArrayList<>();
         boolean ordered = list instanceof OrderedList;
         int counter = ordered ? startNumber((OrderedList) list) : 0;
@@ -160,7 +169,8 @@ public final class MarkdownLayout {
                 int prefixWidth = totalSpanWidth(prefix);
                 String continuationIndent = repeat(' ', prefixWidth);
                 renderListItem(
-                    (ListItem) child, prefix, continuationIndent, depth, width, styles, overflow, result);
+                    (ListItem) child, prefix, continuationIndent, depth, width, styles, overflow, preserveSoftBreaks,
+                    result);
             }
             child = child.getNext();
         }
@@ -169,7 +179,7 @@ public final class MarkdownLayout {
 
     private static void renderListItem(ListItem item, List<Span> prefix, String continuationIndent,
                                        int depth, int width, MarkdownStyles styles, Overflow overflow,
-                                       List<Line> out) {
+                                       boolean preserveSoftBreaks, List<Line> out) {
         Node child = item.getFirstChild();
         boolean firstParagraph = true;
         int prefixWidth = totalSpanWidth(prefix);
@@ -177,7 +187,7 @@ public final class MarkdownLayout {
             if (child instanceof Paragraph) {
                 int contentWidth = Math.max(1, width - prefixWidth);
                 List<Line> paragraphLines = MarkdownInlineRenderer.render(
-                    child, Style.EMPTY, contentWidth, styles, overflow);
+                    child, Style.EMPTY, contentWidth, styles, overflow, preserveSoftBreaks);
                 for (int i = 0; i < paragraphLines.size(); i++) {
                     if (firstParagraph && i == 0) {
                         out.add(prependSpans(prefix, paragraphLines.get(i)));
@@ -187,14 +197,15 @@ public final class MarkdownLayout {
                 }
                 firstParagraph = false;
             } else if (child instanceof BulletList || child instanceof OrderedList) {
-                List<Line> sub = renderList((ListBlock) child, continuationIndent, depth + 1, width, styles, overflow);
+                List<Line> sub = renderList((ListBlock) child, continuationIndent, depth + 1, width, styles, overflow,
+                    preserveSoftBreaks);
                 out.addAll(sub);
             } else if (child instanceof TaskListItemMarker) {
                 // Already consumed by taskCheckedFlag; skip.
             } else {
                 List<RenderedChunk> embedded = new ArrayList<>();
                 int contentWidth = Math.max(1, width - prefixWidth);
-                renderBlock(child, contentWidth, styles, overflow, embedded);
+                renderBlock(child, contentWidth, styles, overflow, preserveSoftBreaks, embedded);
                 for (RenderedChunk chunk : embedded) {
                     if (chunk instanceof LinesChunk) {
                         for (Line line : ((LinesChunk) chunk).lines()) {
@@ -251,7 +262,7 @@ public final class MarkdownLayout {
     }
 
     private static List<Line> renderBlockQuote(
-        BlockQuote quote, int width, MarkdownStyles styles, Overflow overflow) {
+        BlockQuote quote, int width, MarkdownStyles styles, Overflow overflow, boolean preserveSoftBreaks) {
         String prefix = styles.blockquotePrefix() + " ";
         int contentWidth = Math.max(1, width - CharWidth.of(prefix));
         List<RenderedChunk> inner = new ArrayList<>();
@@ -261,7 +272,7 @@ public final class MarkdownLayout {
             if (!firstChild && needsSpacingBefore(child)) {
                 inner.add(new LinesChunk(Collections.singletonList(Line.empty())));
             }
-            renderBlock(child, contentWidth, styles, overflow, inner);
+            renderBlock(child, contentWidth, styles, overflow, preserveSoftBreaks, inner);
             firstChild = false;
             child = child.getNext();
         }
