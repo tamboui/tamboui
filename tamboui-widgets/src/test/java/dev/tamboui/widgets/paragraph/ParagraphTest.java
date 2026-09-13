@@ -524,4 +524,38 @@ class ParagraphTest {
         assertThat(foundLink1).isTrue();
         assertThat(foundLink2).isTrue();
     }
+
+    @Test
+    @DisplayName("scroll clamps so the last page of content stays visible")
+    void scrollClampsToLastPage() {
+        // 5 lines, viewport height 3 -> max useful scroll is 2 (shows lines 2..4)
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("line0\nline1\nline2\nline3\nline4"))
+            .scroll(Integer.MAX_VALUE)
+            .build();
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(4, 0, "2")
+            .hasSymbolAt(4, 1, "3")
+            .hasSymbolAt(4, 2, "4");
+    }
+
+    @Test
+    @DisplayName("scroll clamp keeps content when it fits the viewport")
+    void scrollClampWhenContentFits() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("only\nlines"))
+            .scroll(99)
+            .build();
+        Rect area = new Rect(0, 0, 10, 5);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "o");
+    }
 }

@@ -138,8 +138,9 @@ public final class Paragraph implements Widget {
         // Get lines to render based on overflow mode
         List<Line> lines = processLines(text.lines(), textArea.width());
 
-        // Apply scroll
-        int startLine = Math.min(scroll, lines.size());
+        // Apply scroll, clamped so the furthest position keeps the last page of
+        // content visible instead of scrolling everything above the viewport
+        int startLine = Math.min(scroll, Math.max(0, lines.size() - textArea.height()));
         int visibleLines = Math.min(lines.size() - startLine, textArea.height());
 
         for (int i = 0; i < visibleLines; i++) {
