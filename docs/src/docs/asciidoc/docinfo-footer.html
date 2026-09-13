@@ -63,12 +63,14 @@ var TAMBOUI_PAGES = [
             setTheme(next);
         });
 
-        // Insert before details element
+        var actions = document.createElement('div');
+        actions.className = 'header-actions';
+        actions.appendChild(toggle);
         var details = header.querySelector('.details');
         if (details) {
-            header.insertBefore(toggle, details);
+            header.insertBefore(actions, details);
         } else {
-            header.appendChild(toggle);
+            header.appendChild(actions);
         }
     }
 
@@ -99,10 +101,9 @@ var TAMBOUI_PAGES = [
             nav.appendChild(a);
         });
 
-        // Insert before theme toggle
-        var themeToggle = header.querySelector('.theme-toggle');
-        if (themeToggle) {
-            header.insertBefore(nav, themeToggle);
+        var actions = header.querySelector('.header-actions');
+        if (actions) {
+            header.insertBefore(nav, actions);
         } else {
             header.appendChild(nav);
         }
@@ -118,10 +119,9 @@ var TAMBOUI_PAGES = [
         toggle.setAttribute('aria-label', 'Toggle navigation menu');
         toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
 
-        // Insert before theme toggle or at end of header
-        var themeToggle = header.querySelector('.theme-toggle');
-        if (themeToggle) {
-            header.insertBefore(toggle, themeToggle);
+        var actions = header.querySelector('.header-actions');
+        if (actions) {
+            header.insertBefore(toggle, actions);
         } else {
             header.appendChild(toggle);
         }
@@ -159,6 +159,108 @@ var TAMBOUI_PAGES = [
                 toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
             }
         });
+    }
+
+    // ===== Version selector (for multi-version docs at e.g. tamboui.dev/docs) =====
+    // When published, docs live at docs/<path>/ (e.g. docs/main/, docs/0.1.0/).
+    // versions.json format: object mapping display name -> path segment (relative to docs/).
+    // Example: { "main": "main", "0.1.0": "0.1.0", "latest": "0.1.0", "0.2.0-snapshot": "main" }
+    // URL for a version is: <origin>/docs/<pathSegment>/<page>
+    // Flat structure (e.g. /docs/index.html with no version segment) is supported: we fetch
+    // versions.json from same dir and show dropdown; current selection is first entry.
+    function getDocsVersionContext() {
+        var pathname = window.location.pathname;
+        var match = pathname.match(/\/docs\/([^/]+)\/(.*)/);
+        if (match) {
+            var segment = match[1];
+            var rest = match[2] || 'index.html';
+            if (segment.indexOf('.') !== -1) {
+                return null;
+            }
+            return {
+                docsBase: window.location.origin + pathname.substring(0, pathname.indexOf('/docs/') + 5),
+                currentPathSegment: segment,
+                pathInVersion: rest
+            };
+        }
+        return null;
+    }
+
+    function createVersionSelector() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var ctx = getDocsVersionContext();
+        var pathname = window.location.pathname;
+        var versionsUrl;
+        if (ctx) {
+            versionsUrl = ctx.docsBase + '/versions.json';
+        } else if (pathname.indexOf('/docs/') !== -1) {
+            versionsUrl = window.location.origin + pathname.substring(0, pathname.indexOf('/docs/') + 5) + '/versions.json';
+        } else {
+            versionsUrl = 'versions.json';
+        }
+
+        fetch(versionsUrl).then(function(res) {
+            if (!res.ok) return null;
+            return res.json();
+        }).then(function(versionMap) {
+            if (!versionMap || typeof versionMap !== 'object') return;
+            var entries = Object.keys(versionMap).map(function(name) {
+                return { name: name, path: versionMap[name] };
+            });
+            if (entries.length === 0) return;
+
+            var currentPath = ctx ? ctx.currentPathSegment : entries[0].path;
+            var selectedName = entries[0].name;
+            for (var i = 0; i < entries.length; i++) {
+                if (entries[i].path === currentPath) {
+                    selectedName = entries[i].name;
+                    break;
+                }
+            }
+
+            var wrap = document.createElement('div');
+            wrap.className = 'version-selector-wrap';
+
+            var label = document.createElement('span');
+            label.className = 'version-selector-label';
+            label.textContent = 'Version ';
+            wrap.appendChild(label);
+
+            var select = document.createElement('select');
+            select.className = 'version-selector';
+            select.setAttribute('aria-label', 'Documentation version');
+            entries.forEach(function(e) {
+                var opt = document.createElement('option');
+                opt.value = e.path;
+                opt.textContent = e.name;
+                if (e.name === selectedName) opt.selected = true;
+                select.appendChild(opt);
+            });
+
+            select.addEventListener('change', function() {
+                var pathSegment = select.value;
+                if (ctx && pathSegment === ctx.currentPathSegment) return;
+                if (ctx) {
+                    window.location.href = ctx.docsBase + '/' + pathSegment + '/' + ctx.pathInVersion;
+                } else {
+                    var base = window.location.origin + pathname.substring(0, pathname.indexOf('/docs/') + 5);
+                    var page = pathname.substring(pathname.lastIndexOf('/') + 1) || 'index.html';
+                    window.location.href = base + '/' + pathSegment + '/' + page;
+                }
+            });
+
+            wrap.appendChild(select);
+
+            var actions = header.querySelector('.header-actions');
+            var themeToggle = header.querySelector('.theme-toggle');
+            if (actions && themeToggle) {
+                actions.insertBefore(wrap, themeToggle);
+            } else {
+                header.appendChild(wrap);
+            }
+        }).catch(function() {});
     }
 
     function createPrevNextNavigation() {
@@ -205,6 +307,7 @@ var TAMBOUI_PAGES = [
     document.addEventListener('DOMContentLoaded', function() {
         createThemeToggle();
         createTopNavigation();
+        createVersionSelector();
         createPrevNextNavigation();
     });
 })();
