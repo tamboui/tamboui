@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>TamboUI Documentation</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>TamboUI Documentation</h1>
+<div class="details">
+<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#introduction">Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#key-features">Key Features</a></li>
+<li><a href="#module-overview">Module Overview</a></li>
+</ul>
+</li>
+<li><a href="#where-to-start">Where to Start</a></li>
+<li><a href="#foundations">Foundations</a></li>
+<li><a href="#building-blocks">Building Blocks</a></li>
+<li><a href="#toolkit-dsl">Toolkit DSL</a></li>
+<li><a href="#testing-debugging">Testing &amp; Debugging</a></li>
+<li><a href="#advanced">Advanced</a></li>
+<li><a href="#quick-example">Quick Example</a></li>
+<li><a href="#resources">Resources</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a><a class="link" href="#introduction">Introduction</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI is a Java library for building terminal user interfaces.
+The design follows Rust&#8217;s <a href="https://github.com/ratatui/ratatui">ratatui</a> closely - same rendering model, similar widget APIs, familiar layout system.
+If you know ratatui, you&#8217;ll pick this up quickly.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>TamboUI is still experimental and under active development. APIs may change.
+Feedback, issues, and contributions are welcome!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="key-features"><a class="anchor" href="#key-features"></a><a class="link" href="#key-features">Key Features</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Immediate-mode rendering</strong> - Redraw the entire UI each frame for simple state management</p>
+</li>
+<li>
+<p><strong>Intermediate buffer system</strong> - Widgets render to a buffer, enabling diff-based terminal updates</p>
+</li>
+<li>
+<p><strong>Constraint-based layout</strong> - Flexible layout system with percentage, fixed, ratio, and proportional sizing</p>
+</li>
+<li>
+<p><strong>Multiple backends</strong> - JLine 3, Panama (FFM), and Aesh for cross-platform terminal support</p>
+</li>
+<li>
+<p><strong>High-level TUI framework</strong> - TuiRunner eliminates boilerplate with built-in event handling</p>
+</li>
+<li>
+<p><strong>Declarative Toolkit DSL</strong> - Fluent API for building UIs with components and focus management</p>
+</li>
+<li>
+<p><strong>PicoCLI integration</strong> - Optional module for CLI argument parsing</p>
+</li>
+<li>
+<p><strong>GraalVM native image support</strong> - Compile to native executables for instant startup</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="module-overview"><a class="anchor" href="#module-overview"></a><a class="link" href="#module-overview">Module Overview</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Module</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-core</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Core types: Buffer, Cell, Rect, Style, Layout, Text primitives, and layout widgets (Columns, Grid, Dock, Stack, Flow)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-widgets</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">All widget implementations (Block, Paragraph, List, Table, Chart, etc.)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-jline3-backend</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JLine 3 terminal backend</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-panama-backend</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Panama (FFM) terminal backend for modern JDKs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-aesh-backend</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aesh terminal backend</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-tui</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">High-level TUI framework with TuiRunner, event handling, bindings, and key helpers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-toolkit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fluent DSL for declarative UI construction with components and focus management</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-css</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CSS-based styling with TCSS format, selectors, and theme switching</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-annotations</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Annotation definitions (<code>@OnAction</code>) for action handling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-processor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Annotation processor for compile-time action handler generation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Image rendering with Kitty, iTerm, Sixel, and braille protocols</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-markdown</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Markdown rendering</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-toolkit-markdown</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Toolkit DSL element wrapping the markdown renderer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tamboui-picocli</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional PicoCLI integration for CLI argument parsing</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="where-to-start"><a class="anchor" href="#where-to-start"></a><a class="link" href="#where-to-start">Where to Start</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>Building a full-screen TUI application?</strong> Start with <a href="getting-started.html">Getting Started</a>, then move to the <a href="api-levels.html#toolkit-dsl">Toolkit DSL</a> section. From there, explore <a href="forms.html">Forms</a>, <a href="styling.html">CSS Styling</a>, and <a href="bindings.html">Bindings</a> as needed.</p>
+</div>
+<div class="paragraph">
+<p><strong>Building a CLI tool with progress output?</strong> See <a href="api-levels.html#inline-toolkit">Inline Toolkit</a> for npm/Gradle-style progress displays.</p>
+</div>
+<div class="paragraph">
+<p><strong>Want to understand the internals?</strong> Read <a href="core-concepts.html">Core Concepts</a> first, then explore <a href="api-levels.html#immediate-mode">Immediate Mode</a> or <a href="api-levels.html#tuirunner">TuiRunner</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="foundations"><a class="anchor" href="#foundations"></a><a class="link" href="#foundations">Foundations</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="getting-started.html">Getting Started</a> - Installation and hello world</p>
+</li>
+<li>
+<p><a href="core-concepts.html">Core Concepts</a> - Architecture and primitives</p>
+</li>
+<li>
+<p><a href="api-levels.html">API Levels</a> - Immediate mode, TuiRunner, Toolkit DSL, Inline Display</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="building-blocks"><a class="anchor" href="#building-blocks"></a><a class="link" href="#building-blocks">Building Blocks</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>These work at any API level:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="widgets.html">Widgets Reference</a> - Block, Paragraph, List, Table, Chart, etc.</p>
+</li>
+<li>
+<p><a href="markdown.html">Markdown Reference</a> - Render CommonMark + GFM with the optional <code>tamboui-markdown</code> module</p>
+</li>
+<li>
+<p><a href="layouts.html">Layouts Reference</a> - Columns, Grid, Dock, Stack, Flow</p>
+</li>
+<li>
+<p><a href="markup.html">Markup Text</a> - BBCode-style text formatting</p>
+</li>
+<li>
+<p><a href="styling.html">CSS Styling</a> - External stylesheets and theming</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="toolkit-dsl"><a class="anchor" href="#toolkit-dsl"></a><a class="link" href="#toolkit-dsl">Toolkit DSL</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="forms.html">Forms</a> - Form abstractions with validation</p>
+</li>
+<li>
+<p><a href="bindings.html">Bindings and Actions</a> - Input handling and @OnAction</p>
+</li>
+<li>
+<p><a href="mvc-architecture.html">Application Structure</a> - MVC patterns</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-debugging"><a class="anchor" href="#testing-debugging"></a><a class="link" href="#testing-debugging">Testing &amp; Debugging</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="pilot-testing.html">Pilot Testing</a> - Programmatic testing with Pilot</p>
+</li>
+<li>
+<p><a href="tracing.html">Tracing</a> - Profiling and introspecting with Java Flight Recorder</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="advanced"><a class="anchor" href="#advanced"></a><a class="link" href="#advanced">Advanced</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="developer-guide.html">Developer Guide</a> - Creating custom widgets</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quick-example"><a class="anchor" href="#quick-example"></a><a class="link" href="#quick-example">Quick Example</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here&#8217;s a minimal example using the Toolkit DSL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static dev.tamboui.toolkit.Toolkit.*;
+import dev.tamboui.toolkit.app.ToolkitApp;
+import dev.tamboui.toolkit.element.Element;
+
+public class HelloTamboUI extends ToolkitApp {
+
+    @Override
+    protected Element render() {
+        return panel("Hello",
+            text("Welcome to TamboUI!").bold().cyan(),
+            spacer(),
+            text("Press 'q' to quit").dim()
+        ).rounded();
+    }
+
+    public static void main(String[] args) throws Exception {
+        new HelloTamboUI().run();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resources"><a class="anchor" href="#resources"></a><a class="link" href="#resources">Resources</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/tamboui/tamboui">GitHub Repository</a></p>
+</li>
+<li>
+<p><a href="https://github.com/tamboui/tamboui/issues">Issue Tracker</a></p>
+</li>
+<li>
+<p><a href="https://tamboui.zulipchat.com">Zulip Chat</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license"><a class="anchor" href="#license"></a><a class="link" href="#license">License</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI is released under the MIT License.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.5.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>
