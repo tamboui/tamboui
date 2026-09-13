@@ -21,7 +21,6 @@ import org.aesh.terminal.utils.ANSI;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
 import dev.tamboui.terminal.AbstractBackend;
-import dev.tamboui.terminal.Mode2027Status;
 import dev.tamboui.terminal.Mode2027Support;
 
 /**
@@ -81,7 +80,6 @@ public class AeshBackend extends AbstractBackend {
     private AeshBackend(Connection connection, boolean ownConnection) throws IOException {
         this.connection = Objects.requireNonNull(connection, "connection cannot be null");
         this.ownConnection = ownConnection;
-        this.connection.openNonBlocking();
         this.outputBuffer = new StringBuilder();
         this.inputQueue = new LinkedBlockingQueue<>();
         this.inAlternateScreen = false;
@@ -101,6 +99,9 @@ public class AeshBackend extends AbstractBackend {
                 resizeHandler.run();
             }
         });
+
+        // Start reader AFTER handlers are set up to avoid losing input (#409)
+        this.connection.openNonBlocking();
     }
 
     @Override
@@ -172,12 +173,11 @@ public class AeshBackend extends AbstractBackend {
     @Override
     public void enableRawMode() throws IOException {
         savedAttributes = connection.enterRawMode();
-        // Query and enable Mode 2027 (grapheme cluster mode) after entering raw mode
-        Mode2027Status status = Mode2027Support.query(this, 500);
-        if (status.isSupported()) {
-            Mode2027Support.enable(this);
-            mode2027Enabled = true;
-        }
+        // Enable Mode 2027 (grapheme cluster mode) unconditionally.
+        // Terminals that don't support it safely ignore the escape sequence.
+        // No DECRQM query — avoids 500ms timeout penalty (#409).
+        Mode2027Support.enable(this);
+        mode2027Enabled = true;
     }
 
     @Override
