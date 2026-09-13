@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Forms</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Forms</h1>
+<div class="details">
+<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#form-fields">Form Fields</a>
+<ul class="sectlevel2">
+<li><a href="#basic-usage">Basic Usage</a></li>
+<li><a href="#field-types">Field Types</a>
+<ul class="sectlevel3">
+<li><a href="#text-fields">Text Fields</a></li>
+<li><a href="#password-fields">Password Fields</a></li>
+<li><a href="#boolean-fields-checkboxtoggle">Boolean Fields (Checkbox/Toggle)</a></li>
+<li><a href="#select-fields">Select Fields</a></li>
+</ul>
+</li>
+<li><a href="#styling">Styling</a></li>
+<li><a href="#css-selectors">CSS Selectors</a></li>
+</ul>
+</li>
+<li><a href="#form-state">Form State</a>
+<ul class="sectlevel2">
+<li><a href="#creating-form-state">Creating Form State</a></li>
+<li><a href="#accessing-values">Accessing Values</a></li>
+</ul>
+</li>
+<li><a href="#validation">Validation</a>
+<ul class="sectlevel2">
+<li><a href="#built-in-validators">Built-in Validators</a></li>
+<li><a href="#using-validators">Using Validators</a></li>
+<li><a href="#custom-error-messages">Custom Error Messages</a></li>
+<li><a href="#triggering-validation">Triggering Validation</a></li>
+<li><a href="#custom-validators">Custom Validators</a></li>
+<li><a href="#composing-validators">Composing Validators</a></li>
+</ul>
+</li>
+<li><a href="#form-container">Form Container</a>
+<ul class="sectlevel2">
+<li><a href="#basic-usage-2">Basic Usage</a></li>
+<li><a href="#grouping-fields">Grouping Fields</a></li>
+<li><a href="#form-submission">Form Submission</a>
+<ul class="sectlevel3">
+<li><a href="#submit-on-enter">Submit on Enter</a></li>
+<li><a href="#programmatic-submit-button">Programmatic Submit (Button)</a></li>
+<li><a href="#validation-on-submit">Validation on Submit</a></li>
+</ul>
+</li>
+<li><a href="#arrow-key-navigation">Arrow Key Navigation</a></li>
+</ul>
+</li>
+<li><a href="#complete-example">Complete Example</a></li>
+<li><a href="#state-classes-reference">State Classes Reference</a>
+<ul class="sectlevel2">
+<li><a href="#textinputstate">TextInputState</a></li>
+<li><a href="#booleanfieldstate">BooleanFieldState</a></li>
+<li><a href="#selectfieldstate">SelectFieldState</a></li>
+</ul>
+</li>
+<li><a href="#migration-guide">Migration Guide</a>
+<ul class="sectlevel2">
+<li><a href="#before">Before</a></li>
+<li><a href="#after">After</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Form state and validation (<code>FormState</code>, <code>Validators</code>) are part of <code>tamboui-widgets</code> and work at any API level.
+The <code>formField()</code> and <code>form()</code> builders shown here are Toolkit DSL conveniences—see <a href="api-levels.html#toolkit-dsl">Toolkit DSL</a> for an introduction.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>TamboUI provides high-level form abstractions to simplify building interactive forms with labels, validation, and centralized state management.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a><a class="link" href="#overview">Overview</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Building forms traditionally requires significant boilerplate:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Individual state declarations for each field</p>
+</li>
+<li>
+<p>Manual label + input pairing</p>
+</li>
+<li>
+<p>Repetitive styling</p>
+</li>
+<li>
+<p>Custom helper methods</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The form abstractions reduce this to concise, declarative code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Centralized state for all form fields
+FormState form = FormState.builder()
+    .textField("fullName", "Ada Lovelace")
+    .textField("email", "ada@example.com")
+    .booleanField("subscribe", true)
+    .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
+    .build();
+
+// Simple field declarations
+Element overviewExample = formField("Full Name", form.textField("fullName"))
+    .labelWidth(12)
+    .rounded()
+    .borderColor(Color.DARK_GRAY)
+    .focusedBorderColor(Color.CYAN);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="form-fields"><a class="anchor" href="#form-fields"></a><a class="link" href="#form-fields">Form Fields</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>formField()</code> factory creates a labeled input field that pairs a label with an input widget.</p>
+</div>
+<div class="sect2">
+<h3 id="basic-usage"><a class="anchor" href="#basic-usage"></a><a class="link" href="#basic-usage">Basic Usage</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static dev.tamboui.toolkit.Toolkit.*;
+
+        // With TextInputState
+        TextInputState nameState = new TextInputState("John");
+        formField("Name", nameState);
+
+        // Creates internal state automatically
+        formField("Email")
+            .placeholder("you@example.com");</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="field-types"><a class="anchor" href="#field-types"></a><a class="link" href="#field-types">Field Types</a></h3>
+<div class="paragraph">
+<p>FormFieldElement supports multiple input types:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">State Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TEXT</code> (default)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Single-line text input</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TextInputState</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CHECKBOX</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boolean checkbox with [x] rendering</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BooleanFieldState</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TOGGLE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">On/off toggle switch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BooleanFieldState</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SELECT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dropdown selection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SelectFieldState</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="text-fields"><a class="anchor" href="#text-fields"></a><a class="link" href="#text-fields">Text Fields</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">TextInputState emailState = new TextInputState("");
+formField("Email", emailState)
+    .placeholder("you@example.com")
+    .rounded();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="password-fields"><a class="anchor" href="#password-fields"></a><a class="link" href="#password-fields">Password Fields</a></h4>
+<div class="paragraph">
+<p>Use <code>maskedField()</code> in the FormState builder for password fields:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">FormState form = FormState.builder()
+    .textField("username", "")
+    .maskedField("password", "")  // automatically masked with '*'
+    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When used with <code>FormElement</code>, masking is applied automatically.
+For <code>formField()</code>, you can use <code>.masked()</code> explicitly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">formField("Password", passwordState)
+    .placeholder("Enter password")
+    .masked()          // displays '*' for each character
+    .rounded();
+
+// Or with a custom mask character
+formField("PIN", pinState)
+    .masked('\u25CF');       // displays a filled circle for each character</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The actual text is stored in the state; only the display is masked.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="boolean-fields-checkboxtoggle"><a class="anchor" href="#boolean-fields-checkboxtoggle"></a><a class="link" href="#boolean-fields-checkboxtoggle">Boolean Fields (Checkbox/Toggle)</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">BooleanFieldState state = new BooleanFieldState(false);
+
+// Checkbox style: “Subscribe [x]” or “Subscribe [ ]”
+formField("Subscribe", state);
+
+// Toggle style: “● Yes / ○ No”
+formField("Dark Mode", state, FieldType.TOGGLE);
+
+// Display the checkbox before the label “[x] Overdrive”
+formField("Overdrive", state).inputBeforeLabel(true);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="select-fields"><a class="anchor" href="#select-fields"></a><a class="link" href="#select-fields">Select Fields</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">SelectFieldState countryState = new SelectFieldState("USA", "UK", "Germany");
+formField("Country", countryState);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="styling"><a class="anchor" href="#styling"></a><a class="link" href="#styling">Styling</a></h3>
+<div class="paragraph">
+<p>FormFieldElement supports comprehensive styling options:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">formField("Email", emailState)
+    .labelWidth(14)           // Fixed label width for alignment
+    .spacing(2)               // Gap between label and input
+    .rounded()                // Rounded border
+    .borderColor(Color.DARK_GRAY)
+    .focusedBorderColor(Color.CYAN)
+    .errorBorderColor(Color.RED);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="css-selectors"><a class="anchor" href="#css-selectors"></a><a class="link" href="#css-selectors">CSS Selectors</a></h3>
+<div class="paragraph">
+<p>FormFieldElement exposes these CSS child selectors:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Selector</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FormFieldElement-label</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The label text style</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FormFieldElement-input</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The input wrapper</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FormFieldElement-error</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The inline error message style</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Example TCSS:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">FormFieldElement-label {
+    color: gray;
+}
+
+FormFieldElement-error {
+    color: red;
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="form-state"><a class="anchor" href="#form-state"></a><a class="link" href="#form-state">Form State</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>FormState</code> provides centralized state management for all form fields, eliminating the need for individual state declarations.</p>
+</div>
+<div class="sect2">
+<h3 id="creating-form-state"><a class="anchor" href="#creating-form-state"></a><a class="link" href="#creating-form-state">Creating Form State</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">FormState form = FormState.builder()
+    // Text fields
+    .textField("username", "")
+    .textField("email", "user@example.com")
+
+    // Boolean fields
+    .booleanField("newsletter", true)
+    .booleanField("darkMode", false)
+
+    // Select fields
+    .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
+    .selectField("role", Arrays.asList("Admin", "User", "Guest"))  // defaults to index 0
+
+    .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="accessing-values"><a class="anchor" href="#accessing-values"></a><a class="link" href="#accessing-values">Accessing Values</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Get state objects for UI binding
+TextInputState usernameState = form.textField("username");
+BooleanFieldState newsletterState = form.booleanField("newsletter");
+SelectFieldState countryState = form.selectField("country");
+
+// Get/set text values directly
+String email = form.textValue("email");
+form.setTextValue("email", "new@example.com");
+
+// Get/set boolean values
+boolean subscribed = form.booleanValue("newsletter");
+form.setBooleanValue("newsletter", false);
+
+// Get/set select values
+String country = form.selectValue("country");
+int countryIndex = form.selectIndex("country");
+form.selectIndex("country", 2);  // Select "Germany"
+
+// Get all text values as map
+Map&lt;String, String&gt; allText = form.textValues();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="validation"><a class="anchor" href="#validation"></a><a class="link" href="#validation">Validation</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The validation framework provides built-in validators and supports custom validation logic.</p>
+</div>
+<div class="sect2">
+<h3 id="built-in-validators"><a class="anchor" href="#built-in-validators"></a><a class="link" href="#built-in-validators">Built-in Validators</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 40%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Validator</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>required()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Field must not be empty</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Validators.required()</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Valid email format</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Validators.email()</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>minLength(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum n characters</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Validators.minLength(3)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>maxLength(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum n characters</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Validators.maxLength(100)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pattern(regex)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Matches regex pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Validators.pattern("\\d{5}")</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>range(min, max)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Numeric value in range</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Validators.range(1, 100)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="using-validators"><a class="anchor" href="#using-validators"></a><a class="link" href="#using-validators">Using Validators</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">formField("Email", emailState)
+    .validate(Validators.required(), Validators.email())
+    .errorBorderColor(Color.RED)
+    .showInlineErrors(true);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-error-messages"><a class="anchor" href="#custom-error-messages"></a><a class="link" href="#custom-error-messages">Custom Error Messages</a></h3>
+<div class="paragraph">
+<p>All built-in validators accept an optional custom message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Validators.required("Please enter your name");
+Validators.email("Invalid email format");
+Validators.minLength(3, "Username must be at least 3 characters");
+Validators.range(1, 100, "Age must be between 1 and 100");</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="triggering-validation"><a class="anchor" href="#triggering-validation"></a><a class="link" href="#triggering-validation">Triggering Validation</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">FormFieldElement field = formField("Email", emailState)
+    .validate(Validators.required(), Validators.email());
+
+// Validate and get result
+ValidationResult result = field.validateField();
+
+if (!result.isValid()) {
+    String error = result.errorMessage();  // "Field is required" or "Invalid email"
+}
+
+// Get last validation result
+ValidationResult lastResult = field.lastValidation();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-validators"><a class="anchor" href="#custom-validators"></a><a class="link" href="#custom-validators">Custom Validators</a></h3>
+<div class="paragraph">
+<p>Create custom validators using the <code>Validator</code> functional interface:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Validator usernameAvailable = value -&gt; {
+    if (userService.exists(value)) {
+        return ValidationResult.invalid("Username already taken");
+    }
+    return ValidationResult.valid();
+};
+
+formField("Username", usernameState)
+    .validate(Validators.required(), usernameAvailable);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="composing-validators"><a class="anchor" href="#composing-validators"></a><a class="link" href="#composing-validators">Composing Validators</a></h3>
+<div class="paragraph">
+<p>Validators can be composed using <code>and()</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Validator emailValidator = Validators.required()
+    .and(Validators.email())
+    .and(Validators.maxLength(100));
+
+formField("Email", emailState)
+    .validate(emailValidator);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="form-container"><a class="anchor" href="#form-container"></a><a class="link" href="#form-container">Form Container</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>FormElement</code> provides a container for managing multiple form fields with optional grouping.</p>
+</div>
+<div class="sect2">
+<h3 id="basic-usage-2"><a class="anchor" href="#basic-usage-2"></a><a class="link" href="#basic-usage-2">Basic Usage</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">form(formState)
+    .field("fullName", "Full Name")
+    .field("email", "Email")
+    .field("role", "Role")
+    .labelWidth(14)
+    .rounded();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="grouping-fields"><a class="anchor" href="#grouping-fields"></a><a class="link" href="#grouping-fields">Grouping Fields</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">form(formState)
+    .group("Personal Info")
+        .field("fullName", "Full Name")
+        .field("email", "Email")
+        .field("phone", "Phone")
+    .group("Preferences")
+        .field("newsletter", "Newsletter", FieldType.CHECKBOX)
+        .field("darkMode", "Dark Mode", FieldType.TOGGLE)
+    .labelWidth(14)
+    .spacing(1);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="form-submission"><a class="anchor" href="#form-submission"></a><a class="link" href="#form-submission">Form Submission</a></h3>
+<div class="paragraph">
+<p>FormElement supports two submission patterns:</p>
+</div>
+<div class="sect3">
+<h4 id="submit-on-enter"><a class="anchor" href="#submit-on-enter"></a><a class="link" href="#submit-on-enter">Submit on Enter</a></h4>
+<div class="paragraph">
+<p>When enabled, pressing Enter in any text field triggers form submission:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">form(formState)
+    .field("username", "Username")
+    .field("password", "Password")
+    .submitOnEnter(true)
+    .onSubmit(state -&gt; {
+        String user = state.textValue("username");
+        String pass = state.textValue("password");
+        authenticate(user, pass);
+    });</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="programmatic-submit-button"><a class="anchor" href="#programmatic-submit-button"></a><a class="link" href="#programmatic-submit-button">Programmatic Submit (Button)</a></h4>
+<div class="paragraph">
+<p>Call <code>submit()</code> from a button or other trigger:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">FormElement loginForm = form(formState)
+    .field("username", "Username", Validators.required())
+    .field("password", "Password", Validators.required())
+    .onSubmit(state -&gt; authenticate(state));
+
+// Render form with submit button
+column(
+    loginForm,
+    text(" Login ").bold()  // Note: button() is not yet available
+);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="validation-on-submit"><a class="anchor" href="#validation-on-submit"></a><a class="link" href="#validation-on-submit">Validation on Submit</a></h4>
+<div class="paragraph">
+<p>By default, <code>submit()</code> validates all fields before calling the <code>onSubmit</code> callback.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+If validation fails, the <code>onSubmit</code> callback is <strong>not</strong> called and <code>submit()</code> returns <code>false</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">FormElement form = form(formState)
+    .field("email", "Email", Validators.required(), Validators.email())
+    .validateOnSubmit(true)  // default behavior
+    .onSubmit(state -&gt; {
+        // This is only called if ALL validations pass
+        save(state);
+    });
+
+boolean success = form.submit();
+// success == true  -&gt; validation passed, onSubmit was called
+// success == false -&gt; validation failed, onSubmit was NOT called</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To always call <code>onSubmit</code> regardless of validation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">form(formState)
+    .validateOnSubmit(false)  // skip validation
+    .onSubmit(state -&gt; save(state));  // always called</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="arrow-key-navigation"><a class="anchor" href="#arrow-key-navigation"></a><a class="link" href="#arrow-key-navigation">Arrow Key Navigation</a></h3>
+<div class="paragraph">
+<p>By default, Up/Down arrow keys only work in select fields (to change selection).
+Enable <code>arrowNavigation</code> to allow Up/Down to move between fields:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">form(formState)
+    .field("username", "Username")
+    .field("email", "Email")
+    .field("role", "Role", FieldType.SELECT)
+    .arrowNavigation(true);  // Up/Down navigate between fields</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When enabled:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Text fields</strong>: Up/Down navigate to previous/next field (like Tab/Shift+Tab)</p>
+</li>
+<li>
+<p><strong>Boolean fields</strong> (checkbox, toggle): Up/Down navigate to previous/next field</p>
+</li>
+<li>
+<p><strong>Select fields</strong>: Up/Down still change the selection (unchanged behavior)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="complete-example"><a class="anchor" href="#complete-example"></a><a class="link" href="#complete-example">Complete Example</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here&#8217;s a complete form example using all the abstractions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public static class SettingsForm {
+
+    private static final FormState FORM = FormState.builder()
+        // Profile
+        .textField("fullName", "Ada Lovelace")
+        .textField("email", "ada@analytical.io")
+        .textField("role", "Research")
+        .textField("timezone", "UTC+1")
+        // Preferences
+        .textField("theme", "Nord")
+        .booleanField("notifications", true)
+        // Security
+        .textField("twoFa", "Enabled")
+        .build();
+
+    public static Element render() {
+        return column(
+            panel("Profile", column(
+                formField("Full name", FORM.textField("fullName"))
+                    .labelWidth(14).rounded()
+                    .borderColor(Color.DARK_GRAY)
+                    .focusedBorderColor(Color.CYAN),
+                formField("Email", FORM.textField("email"))
+                    .labelWidth(14).rounded()
+                    .borderColor(Color.DARK_GRAY)
+                    .focusedBorderColor(Color.CYAN)
+                    .validate(Validators.required(), Validators.email()),
+                formField("Role", FORM.textField("role"))
+                    .labelWidth(14).rounded()
+                    .borderColor(Color.DARK_GRAY)
+                    .focusedBorderColor(Color.CYAN)
+            ).spacing(1)).rounded().borderColor(Color.CYAN),
+
+            panel("Preferences", column(
+                formField("Theme", FORM.textField("theme"))
+                    .labelWidth(14).rounded()
+                    .borderColor(Color.DARK_GRAY),
+                formField("Notifications", FORM.booleanField("notifications"))
+                    .labelWidth(14)
+            ).spacing(1)).rounded().borderColor(Color.GREEN),
+
+            row(
+                text(" Save ").bold().black().onGreen(),
+                text(" Cancel ").bold().white().bg(Color.DARK_GRAY)
+            ).spacing(2)
+        ).spacing(1).fill();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="state-classes-reference"><a class="anchor" href="#state-classes-reference"></a><a class="link" href="#state-classes-reference">State Classes Reference</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="textinputstate"><a class="anchor" href="#textinputstate"></a><a class="link" href="#textinputstate">TextInputState</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">TextInputState state = new TextInputState("initial");
+
+// Get/set text
+String text = state.text();
+state.setText("new value");
+
+// Cursor operations
+state.insert('c');
+state.deleteBackward();
+state.deleteForward();
+state.moveCursorLeft();
+state.moveCursorRight();
+state.clear();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="booleanfieldstate"><a class="anchor" href="#booleanfieldstate"></a><a class="link" href="#booleanfieldstate">BooleanFieldState</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">BooleanFieldState state = new BooleanFieldState(false);
+
+// Get/set value
+boolean value = state.value();
+state.setValue(true);
+
+// Toggle
+state.toggle();  // Flips the value</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="selectfieldstate"><a class="anchor" href="#selectfieldstate"></a><a class="link" href="#selectfieldstate">SelectFieldState</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">SelectFieldState state = new SelectFieldState("A", "B", "C");
+// Or with List
+SelectFieldState stateFromList = new SelectFieldState(options, 1);  // Select index 1
+
+// Get values
+String selected = state.selectedValue();  // "A"
+int index = state.selectedIndex();        // 0
+List&lt;String&gt; opts = state.options();   // ["A", "B", "C"]
+
+// Change selection
+state.selectIndex(2);    // Select "C"
+state.selectNext();      // Move to next option (wraps)
+state.selectPrevious();  // Move to previous option (wraps)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="migration-guide"><a class="anchor" href="#migration-guide"></a><a class="link" href="#migration-guide">Migration Guide</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To migrate from manual form construction to the new abstractions:</p>
+</div>
+<div class="sect2">
+<h3 id="before"><a class="anchor" href="#before"></a><a class="link" href="#before">Before</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Individual state declarations
+private static final TextInputState FULL_NAME = new TextInputState("Ada");
+private static final TextInputState EMAIL = new TextInputState("ada@example.com");
+private static final TextInputState ROLE = new TextInputState("Research");
+
+// Custom helper
+private static Element formRow(String label, TextInputState state) {
+    return row(
+        text(label).dim().length(14),
+        textInput(state).rounded().borderColor(Color.DARK_GRAY).fill()
+    ).spacing(1).length(3);
+}
+
+// Usage
+Element beforeExample1 = formRow("Full name", FULL_NAME);
+Element beforeExample2 = formRow("Email", EMAIL);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="after"><a class="anchor" href="#after"></a><a class="link" href="#after">After</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Centralized state
+private static final FormState FORM_STATE = FormState.builder()
+    .textField("fullName", "Ada")
+    .textField("email", "ada@example.com")
+    .textField("role", "Research")
+    .build();
+
+// Usage - no helper needed
+Element afterExample1 = formField("Full name", FORM_STATE.textField("fullName"))
+    .labelWidth(14).rounded().borderColor(Color.DARK_GRAY);
+Element afterExample2 = formField("Email", FORM_STATE.textField("email"))
+    .labelWidth(14).rounded().borderColor(Color.DARK_GRAY);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.5.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>
