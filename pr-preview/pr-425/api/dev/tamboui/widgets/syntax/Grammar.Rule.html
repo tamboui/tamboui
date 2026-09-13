@@ -61,6 +61,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#pattern(dev.tamboui.widgets.syntax.TokenType,java.util.regex.Pattern)" tabindex="0">pattern(TokenType, Pattern)</a></li>
+<li><a href="#linePattern(dev.tamboui.widgets.syntax.TokenType,java.util.regex.Pattern)" tabindex="0">linePattern(TokenType, Pattern)</a></li>
 <li><a href="#literal(dev.tamboui.widgets.syntax.TokenType,java.lang.String)" tabindex="0">literal(TokenType, String)</a></li>
 <li><a href="#multiline(dev.tamboui.widgets.syntax.TokenType,java.lang.String,java.lang.String)" tabindex="0">multiline(TokenType, String, String)</a></li>
 </ol>
@@ -102,23 +103,30 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Grammar.Rule.html" title="class in dev.tamboui.widgets.syntax">Grammar.Rule</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#literal(dev.tamboui.widgets.syntax.TokenType,java.lang.String)" class="member-name-link">literal</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;text)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#linePattern(dev.tamboui.widgets.syntax.TokenType,java.util.regex.Pattern)" class="member-name-link">linePattern</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html" title="class or interface in java.util.regex" class="external-link">Pattern</a>&nbsp;pattern)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Creates a single-line rule matching the literal <code>text</code>.</div>
+<div class="block">Creates a single-line rule that is only attempted at the start of a
+line (the first position of the input or right after a newline).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Grammar.Rule.html" title="class in dev.tamboui.widgets.syntax">Grammar.Rule</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiline(dev.tamboui.widgets.syntax.TokenType,java.lang.String,java.lang.String)" class="member-name-link">multiline</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#literal(dev.tamboui.widgets.syntax.TokenType,java.lang.String)" class="member-name-link">literal</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;text)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a single-line rule matching the literal <code>text</code>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Grammar.Rule.html" title="class in dev.tamboui.widgets.syntax">Grammar.Rule</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiline(dev.tamboui.widgets.syntax.TokenType,java.lang.String,java.lang.String)" class="member-name-link">multiline</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;open,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;close)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a multi-line rule that begins when <code>open</code> is found and
 continues until <code>close</code> is found on a later (or the same) line.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Grammar.Rule.html" title="class in dev.tamboui.widgets.syntax">Grammar.Rule</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pattern(dev.tamboui.widgets.syntax.TokenType,java.util.regex.Pattern)" class="member-name-link">pattern</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Grammar.Rule.html" title="class in dev.tamboui.widgets.syntax">Grammar.Rule</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pattern(dev.tamboui.widgets.syntax.TokenType,java.util.regex.Pattern)" class="member-name-link">pattern</a><wbr>(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html" title="class or interface in java.util.regex" class="external-link">Pattern</a>&nbsp;pattern)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a single-line rule matching <code>pattern</code>.</div>
 </div>
 </div>
@@ -149,6 +157,27 @@ continues until <code>close</code> is found on a later (or the same) line.</div>
 <dt>Parameters:</dt>
 <dd><code>type</code> - the token type</dd>
 <dd><code>pattern</code> - the regex matched against the source from the current position</dd>
+<dt>Returns:</dt>
+<dd>a new rule</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="linePattern(dev.tamboui.widgets.syntax.TokenType,java.util.regex.Pattern)">
+<h3>linePattern</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Grammar.Rule.html" title="class in dev.tamboui.widgets.syntax">Grammar.Rule</a></span>&nbsp;<span class="element-name">linePattern</span><wbr><span class="parameters">(<a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a>&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html" title="class or interface in java.util.regex" class="external-link">Pattern</a>&nbsp;pattern)</span></div>
+<div class="block">Creates a single-line rule that is only attempted at the start of a
+line (the first position of the input or right after a newline).
+Use this for line-oriented syntax such as properties keys or
+indentation-sensitive keys, which plain patterns cannot express
+because rules are matched at every position.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>type</code> - the token type</dd>
+<dd><code>pattern</code> - the regex matched against the source from the line start</dd>
 <dt>Returns:</dt>
 <dd>a new rule</dd>
 </dl>
