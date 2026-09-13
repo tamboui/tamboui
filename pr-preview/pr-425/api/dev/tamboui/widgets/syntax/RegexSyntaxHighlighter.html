@@ -144,7 +144,7 @@ highlight.js <code>beginsWith</code>/<code>endsWith</code> pair.</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns the highlighter covering the built-in languages: Java, Kotlin,
 JavaScript, TypeScript, Python, JSON, XML/HTML, CSS, Bash/Shell, YAML,
-SQL, Go and Rust, each with its common aliases.</div>
+properties, SQL, Go and Rust, each with its common aliases.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Grammar.html" title="class in dev.tamboui.widgets.syntax">Grammar</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#grammar(java.lang.String)" class="member-name-link">grammar</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language)</code></div>
@@ -190,7 +190,7 @@ one <a href="../../text/Line.html" title="class in dev.tamboui.text"><code>Line<
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="RegexSyntaxHighlighter.html" title="class in dev.tamboui.widgets.syntax">RegexSyntaxHighlighter</a></span>&nbsp;<span class="element-name">defaults</span>()</div>
 <div class="block">Returns the highlighter covering the built-in languages: Java, Kotlin,
 JavaScript, TypeScript, Python, JSON, XML/HTML, CSS, Bash/Shell, YAML,
-SQL, Go and Rust, each with its common aliases.</div>
+properties, SQL, Go and Rust, each with its common aliases.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the default highlighter</dd>
@@ -253,15 +253,15 @@ language is not recognized.</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="SyntaxHighlighter.html#highlight(java.lang.String,java.lang.String,dev.tamboui.style.Style,dev.tamboui.widgets.syntax.SyntaxTheme)">SyntaxHighlighter</a></code></span></div>
 <div class="block">Highlights <code>code</code>, which must contain only the code lines, into
 one <a href="../../text/Line.html" title="class in dev.tamboui.text"><code>Line</code></a> per source line. The returned lines may carry multiple
-spans with distinct styles; texat not matched by a grammar keeps the
+spans with distinct styles; text not matched by a grammar keeps the
 given <code>base</code> style.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="SyntaxHighlighter.html#highlight(java.lang.String,java.lang.String,dev.tamboui.style.Style,dev.tamboui.widgets.syntax.SyntaxTheme)">highlight</a></code>&nbsp;in interface&nbsp;<code><a href="SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>code</code> - the raw snippet, possibly multi-line</dd>
-<dd><code>language</code> - the fenced-block info string (e.g. <code>java</code>), or the
-       empty string when unknown; may be <code>null</code></dd>
+<dd><code>language</code> - the language identifier or alias (e.g. <code>java</code>), or
+       the empty string when unknown; may be <code>null</code></dd>
 <dd><code>base</code> - the style applied to non-tokenized text (generally the
        code-block style)</dd>
 <dd><code>theme</code> - the palette mapping token types to styles</dd>

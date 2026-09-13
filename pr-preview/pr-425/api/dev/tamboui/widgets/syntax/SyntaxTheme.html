@@ -89,11 +89,12 @@ loadScripts(document, 'script');</script>
 same spirit as a highlight.js or VS Code theme. Each <a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax"><code>TokenType</code></a> maps
 to a <a href="../../style/Style.html" title="class in dev.tamboui.style"><code>Style</code></a> (typically just a foreground <a href="../../style/Color.html" title="interface in dev.tamboui.style"><code>Color</code></a>). A token whose
 style the theme does not override falls back to the enclosing code-block
-style, so themes can be sparse.
+style.
 
-<p>An instance is immutable and can be shared. Build a customized theme with
-<a href="#builder()"><code>builder()</code></a> starting from <a href="#DEFAULTS"><code>DEFAULTS</code></a> when a tailored look is
-wanted:
+<p>An instance is immutable and can be shared. <a href="#builder()"><code>builder()</code></a> starts with
+the default palette; customize entries with <a href="SyntaxTheme.Builder.html#token(dev.tamboui.widgets.syntax.TokenType,dev.tamboui.style.Style)"><code>SyntaxTheme.Builder.token(TokenType, Style)</code></a>
+or remove them with <a href="SyntaxTheme.Builder.html#clear(dev.tamboui.widgets.syntax.TokenType)"><code>SyntaxTheme.Builder.clear(TokenType)</code></a> so those tokens inherit
+the enclosing style:
 <pre><code>SyntaxTheme theme = SyntaxTheme.builder()
     .token(TokenType.KEYWORD, Style.EMPTY.fg(Color.RED).bold())
     .token(TokenType.STRING, Style.EMPTY.fg(Color.GREEN))
@@ -183,8 +184,9 @@ IDE defaults (One Dark / Dark+).</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a></span>&nbsp;<span class="element-name">DEFAULTS</span></div>
 <div class="block">The default theme, a dark, high-contrast palette inspired by common
-IDE defaults (One Dark / Dark+). Every <a href="TokenType.html" title="enum class in dev.tamboui.widgets.syntax"><code>TokenType</code></a> gets a
-distinct foreground color; none carries a modifier.</div>
+IDE defaults (One Dark / Dark+). <a href="TokenType.html#PLAIN"><code>TokenType.PLAIN</code></a> inherits the
+enclosing style, while semantic token types receive foreground colors;
+comments are also italicized.</div>
 </div>
 </section>
 </li>

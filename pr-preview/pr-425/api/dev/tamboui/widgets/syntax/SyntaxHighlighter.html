@@ -147,13 +147,13 @@ single span in the given <code>base</code> style.</div>
  <a href="SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</span></div>
 <div class="block">Highlights <code>code</code>, which must contain only the code lines, into
 one <a href="../../text/Line.html" title="class in dev.tamboui.text"><code>Line</code></a> per source line. The returned lines may carry multiple
-spans with distinct styles; texat not matched by a grammar keeps the
+spans with distinct styles; text not matched by a grammar keeps the
 given <code>base</code> style.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>code</code> - the raw snippet, possibly multi-line</dd>
-<dd><code>language</code> - the fenced-block info string (e.g. <code>java</code>), or the
-       empty string when unknown; may be <code>null</code></dd>
+<dd><code>language</code> - the language identifier or alias (e.g. <code>java</code>), or
+       the empty string when unknown; may be <code>null</code></dd>
 <dd><code>base</code> - the style applied to non-tokenized text (generally the
        code-block style)</dd>
 <dd><code>theme</code> - the palette mapping token types to styles</dd>

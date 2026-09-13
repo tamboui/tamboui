@@ -4712,7 +4712,7 @@ compatible with Java 8.</div>
 <dd>
 <div class="block">Returns the highlighter covering the built-in languages: Java, Kotlin,
 JavaScript, TypeScript, Python, JSON, XML/HTML, CSS, Bash/Shell, YAML,
-SQL, Go and Rust, each with its common aliases.</div>
+properties, SQL, Go and Rust, each with its common aliases.</div>
 </dd>
 <dt><a href="dev/tamboui/tui/InlineTuiConfig.html#defaults(int)" class="member-name-link">defaults(int)</a> - Static method in class dev.tamboui.tui.<a href="dev/tamboui/tui/InlineTuiConfig.html" title="class in dev.tamboui.tui">InlineTuiConfig</a></dt>
 <dd>
@@ -8760,6 +8760,36 @@ one <a href="dev/tamboui/text/Line.html" title="class in dev.tamboui.text"><code
 <dt><a href="dev/tamboui/widgets/tabs/Tabs.Builder.html#highlightColor(dev.tamboui.style.Color)" class="member-name-link">highlightColor(Color)</a> - Method in class dev.tamboui.widgets.tabs.<a href="dev/tamboui/widgets/tabs/Tabs.Builder.html" title="class in dev.tamboui.widgets.tabs">Tabs.Builder</a></dt>
 <dd>
 <div class="block">Sets the selected tab highlight color programmatically.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String)" class="member-name-link">highlighter(SyntaxHighlighter, String)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting of the content (clip mode only; wrapped
+modes render unstyled).</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.Builder.html#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String)" class="member-name-link">highlighter(SyntaxHighlighter, String)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting of the text area content using the
+<a href="dev/tamboui/widgets/syntax/SyntaxTheme.html#DEFAULTS"><code>default theme</code></a>.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.Builder.html#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter(SyntaxHighlighter, String, SyntaxTheme)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting of the text area content with a custom theme.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#highlighter(java.lang.String)" class="member-name-link">highlighter(String)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting with the built-in highlighter and default theme.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.Builder.html#highlighter(java.lang.String)" class="member-name-link">highlighter(String)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting with the built-in highlighter and default theme.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/elements/TextAreaElement.html#highlighter(java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter(String, SyntaxTheme)</a> - Method in class dev.tamboui.toolkit.elements.<a href="dev/tamboui/toolkit/elements/TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting with the built-in highlighter and a custom theme.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.Builder.html#highlighter(java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter(String, SyntaxTheme)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></dt>
+<dd>
+<div class="block">Enables syntax highlighting with the built-in highlighter and a custom theme.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/table/Table.Builder.html#highlightSpacing(dev.tamboui.widgets.table.Table.HighlightSpacing)" class="member-name-link">highlightSpacing(Table.HighlightSpacing)</a> - Method in class dev.tamboui.widgets.table.<a href="dev/tamboui/widgets/table/Table.Builder.html" title="class in dev.tamboui.widgets.table">Table.Builder</a></dt>
 <dd>
@@ -15215,6 +15245,11 @@ styled spans (without wrapping).</div>
 <dt><a href="dev/tamboui/toolkit/element/RenderContext.html#resolveStyle(java.lang.String,java.lang.String...)" class="member-name-link">resolveStyle(String, String...)</a> - Method in interface dev.tamboui.toolkit.element.<a href="dev/tamboui/toolkit/element/RenderContext.html" title="interface in dev.tamboui.toolkit.element">RenderContext</a></dt>
 <dd>
 <div class="block">Resolves the CSS style for a virtual element with the given type and classes.</div>
+</dd>
+<dt><a href="dev/tamboui/toolkit/element/StyledElement.html#resolveSyntaxTheme(dev.tamboui.toolkit.element.RenderContext)" class="member-name-link">resolveSyntaxTheme(RenderContext)</a> - Method in class dev.tamboui.toolkit.element.<a href="dev/tamboui/toolkit/element/StyledElement.html" title="class in dev.tamboui.toolkit.element">StyledElement</a></dt>
+<dd>
+<div class="block">Resolves a syntax theme following the priority: element-specific CSS,
+generic syntax-token CSS, then the default syntax theme.</div>
 </dd>
 <dt><a href="dev/tamboui/css/model/Stylesheet.html#resolveVariable(java.lang.String)" class="member-name-link">resolveVariable(String)</a> - Method in class dev.tamboui.css.model.<a href="dev/tamboui/css/model/Stylesheet.html" title="class in dev.tamboui.css.model">Stylesheet</a></dt>
 <dd>
