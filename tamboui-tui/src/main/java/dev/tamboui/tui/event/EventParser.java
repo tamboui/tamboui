@@ -422,7 +422,7 @@ public final class EventParser {
             return new MouseEvent(kind, MouseButton.NONE, x, y, mods, bindings);
         }
 
-        boolean isDrag = (button & 32) != 0;
+        boolean motion = (button & 32) != 0;
         button = button & ~32;
 
         MouseButton mouseButton;
@@ -444,10 +444,12 @@ public final class EventParser {
         MouseEventKind kind;
         if (isRelease) {
             kind = MouseEventKind.RELEASE;
-        } else if (isDrag) {
-            kind = MouseEventKind.DRAG;
-        } else if (mouseButton == MouseButton.NONE) {
+        } else if (motion && mouseButton == MouseButton.NONE) {
+            // Motion with no button held is a hover (any-event tracking, DECSET 1003)
             kind = MouseEventKind.MOVE;
+        } else if (motion) {
+            // Motion with a button held is a drag
+            kind = MouseEventKind.DRAG;
         } else {
             kind = MouseEventKind.PRESS;
         }
