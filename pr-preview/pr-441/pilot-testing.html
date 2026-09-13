@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Pilot Testing</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Pilot Testing</h1>
+<div class="details">
+<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#example-app-rgb-color-switcher">Example App: RGB Color Switcher</a>
+<ul class="sectlevel2">
+<li><a href="#what-the-app-does">What the app does</a></li>
+<li><a href="#relevant-app-code">Relevant app code</a></li>
+</ul>
+</li>
+<li><a href="#example-tests-rgbapptest">Example Tests: RgbAppTest</a>
+<ul class="sectlevel2">
+<li><a href="#starting-the-test-and-getting-the-pilot">Starting the test and getting the pilot</a></li>
+<li><a href="#testing-key-presses-testkeys">Testing key presses (testKeys)</a></li>
+<li><a href="#testing-button-clicks-by-id-testbuttons">Testing button clicks by ID (testButtons)</a></li>
+<li><a href="#multiple-keys-testmultiplekeys">Multiple keys (testMultipleKeys)</a></li>
+<li><a href="#custom-terminal-size-testcustomsize">Custom terminal size (testCustomSize)</a></li>
+</ul>
+</li>
+<li><a href="#pilot-api-summary">Pilot API summary</a></li>
+<li><a href="#running-the-example-tests">Running the example tests</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Pilot is a fluent API for driving a TUI application in tests. It lets you simulate key presses, mouse events, and terminal resizes so you can verify behavior without manual interaction. This guide explains how Pilot works and how to use it, using the RGB color switcher example and its tests as the main reference.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a><a class="link" href="#overview">Overview</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pilot provides:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Key input</strong> — <code>press(char)</code>, <code>press(KeyCode)</code>, <code>press(String&#8230;&#8203;)</code> for single or multiple keys</p>
+</li>
+<li>
+<p><strong>Mouse input</strong> — <code>click(x, y)</code>, <code>doubleClick</code>, <code>tripleClick</code>, <code>hover</code>, or by element ID when using the Toolkit</p>
+</li>
+<li>
+<p><strong>Terminal</strong> — <code>resize(width, height)</code>, <code>pause()</code> for event processing, <code>quit()</code></p>
+</li>
+<li>
+<p><strong>Widget selection by ID</strong> (Toolkit only) — <code>click("element-id")</code>, <code>findElement("id")</code>, <code>hasElement("id")</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There are two integration points:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>TuiTestRunner</strong> — For applications built with <code>TuiRunner</code> (event handler + renderer). The pilot can send keys, mouse, and resize; assertions are typically on data your handler updates or on events you collect.</p>
+</li>
+<li>
+<p><strong>ToolkitTestRunner</strong> — For applications built with <code>ToolkitRunner</code> and the Toolkit DSL. In addition to keys and mouse, the pilot can target elements by ID (e.g. <code>click("submit-button")</code>), which makes tests stable and readable.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The examples in this document use the Toolkit and <code>ToolkitTestRunner</code> with the RGB app and its tests.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies"><a class="anchor" href="#dependencies"></a><a class="link" href="#dependencies">Dependencies</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To write tests that use Pilot with the Toolkit, add the Toolkit module and its test fixtures:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gradle:</strong>
+Add the following to your <code>build.gradle</code> (Groovy DSL):</p>
+<div class="literalblock">
+<div class="content">
+<pre>[source,groovy]
+----
+testImplementation(testFixtures("dev.tamboui:tamboui-toolkit"))
+----</pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Maven:</strong>
+Add the following to your <code>pom.xml</code> dependencies (replace <code>VERSION</code> accordingly):</p>
+<div class="literalblock">
+<div class="content">
+<pre>[source,xml]
+----
+&lt;dependency&gt;
+  &lt;groupId&gt;dev.tamboui&lt;/groupId&gt;
+  &lt;artifactId&gt;tamboui-toolkit&lt;/artifactId&gt;
+  &lt;classifier&gt;test-fixtures&lt;/classifier&gt;
+  &lt;version&gt;VERSION&lt;/version&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+----</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The test fixtures expose <code>ToolkitTestRunner</code>, <code>Pilot</code>, and related types. For raw <code>TuiRunner</code> tests you need the TUI module’s test fixtures (<code>tamboui-tui</code> testFixtures) which provide <code>TuiTestRunner</code> and <code>TuiPilot</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example-app-rgb-color-switcher"><a class="anchor" href="#example-app-rgb-color-switcher"></a><a class="link" href="#example-app-rgb-color-switcher">Example App: RGB Color Switcher</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The RGB example is a small Toolkit app used to demonstrate Pilot. The app is implemented in <code>RgbAppExample</code> (in the <code>tamboui-tui</code> test sources) and tested in <code>RgbAppTest</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="what-the-app-does"><a class="anchor" href="#what-the-app-does"></a><a class="link" href="#what-the-app-does">What the app does</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Renders a "RGB Color Switcher" title and three focusable text elements: "Red", "Green", "Blue", with IDs <code>red-button</code>, <code>green-button</code>, <code>blue-button</code>.</p>
+</li>
+<li>
+<p>Key bindings: <code>r</code> → set red, <code>g</code> → set green, <code>b</code> → set blue.</p>
+</li>
+<li>
+<p>Clicking a button or pressing the corresponding key changes the background color (via a CSS class on the root panel).</p>
+</li>
+<li>
+<p>The app exposes <code>getCurrentColor()</code>, <code>styleEngine()</code>, and <code>actionHandler()</code> so tests can wire the runner and assert state.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="relevant-app-code"><a class="anchor" href="#relevant-app-code"></a><a class="link" href="#relevant-app-code">Relevant app code</a></h3>
+<div class="paragraph">
+<p>The root element is built with the Toolkit DSL; buttons have <code>.id("red-button")</code> (and similarly for green/blue) so tests can use <code>pilot.click("red-button")</code>. The app uses a <code>StyleEngine</code> and an <code>ActionHandler</code> for key actions; the test runner must be configured with these so that key events and focus/actions work as in production.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// RgbAppExample builds the UI and exposes state for tests
+public Element render() {
+    return panel()
+            .id("root")
+            .addClass(colorClass)
+            .fill()
+            .onAction(actionHandler)
+            .add(
+                    column(
+                            text("RGB Color Switcher").addClass("title"),
+                            spacer(),
+                            text("Red").id("red-button").focusable().onAction(...),
+                            text("Green").id("green-button").focusable().onAction(...),
+                            text("Blue").id("blue-button").focusable().onAction(...),
+                            ...
+                    )
+            );
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The app can also be run standalone via <code>RgbAppExample.main()</code> (or with JBang using the <code>//DEPS</code> in that file) to try the same behavior manually.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="example-tests-rgbapptest"><a class="anchor" href="#example-tests-rgbapptest"></a><a class="link" href="#example-tests-rgbapptest">Example Tests: RgbAppTest</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>RgbAppTest</code> shows the standard pattern: create the app, start a test runner with the app’s render supplier, configure the runner (style engine, global action handler), then use the pilot to drive the UI and assert on app state.</p>
+</div>
+<div class="sect2">
+<h3 id="starting-the-test-and-getting-the-pilot"><a class="anchor" href="#starting-the-test-and-getting-the-pilot"></a><a class="link" href="#starting-the-test-and-getting-the-pilot">Starting the test and getting the pilot</a></h3>
+<div class="paragraph">
+<p>Use <code>ToolkitTestRunner.runTest(Supplier&lt;Element&gt;)</code> (or the overload with <code>Size</code> or <code>TuiConfig</code>) inside a try-with-resources so the runner is closed after the test. Then configure the runner and get the pilot:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">RgbAppExample app = new RgbAppExample();
+
+try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render)) {
+    test.runner().styleEngine(app.styleEngine());
+    test.runner().eventRouter().addGlobalHandler(app.actionHandler());
+    Pilot pilot = test.pilot();
+
+    // ... drive UI and assert
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>test.runner()</code> — the underlying <code>ToolkitRunner</code>; set its style engine and add the app’s action handler so keys and focus work.</p>
+</li>
+<li>
+<p><code>test.pilot()</code> — the Pilot instance (a <code>ToolkitPilot</code>) that supports both coordinate-based input and by-ID methods like <code>click("red-button")</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After each interaction that should be processed, call <code>pilot.pause()</code> so the runner thread can handle events and re-render before you assert.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-key-presses-testkeys"><a class="anchor" href="#testing-key-presses-testkeys"></a><a class="link" href="#testing-key-presses-testkeys">Testing key presses (testKeys)</a></h3>
+<div class="paragraph">
+<p>This test verifies that pressing <code>r</code>, <code>g</code>, and <code>b</code> changes the current color, that an unbound key (<code>x</code>) does nothing, and that <code>q</code> quits:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+void testKeys() throws Exception {
+    RgbAppExample app = new RgbAppExample();
+
+    try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render)) {
+        test.runner().styleEngine(app.styleEngine());
+        test.runner().eventRouter().addGlobalHandler(app.actionHandler());
+        Pilot pilot = test.pilot();
+
+        pilot.press('r');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.RED, app.getCurrentColor());
+
+        pilot.press('g');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.GREEN, app.getCurrentColor());
+
+        pilot.press('b');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+
+        pilot.press('x');
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+
+        pilot.press('q');
+        pilot.pause();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-button-clicks-by-id-testbuttons"><a class="anchor" href="#testing-button-clicks-by-id-testbuttons"></a><a class="link" href="#testing-button-clicks-by-id-testbuttons">Testing button clicks by ID (testButtons)</a></h3>
+<div class="paragraph">
+<p>This test uses the pilot’s by-ID API to click the red, green, and blue buttons and asserts the resulting color. No global action handler is required for button clicks when the buttons have their own handlers; the style engine is still set so styling is correct:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+void testButtons() throws Exception {
+    RgbAppExample app = new RgbAppExample();
+
+    try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render)) {
+        test.runner().styleEngine(app.styleEngine());
+        Pilot pilot = test.pilot();
+
+        pilot.click("red-button");
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.RED, app.getCurrentColor());
+
+        pilot.click("green-button");
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.GREEN, app.getCurrentColor());
+
+        pilot.click("blue-button");
+        pilot.pause();
+        assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());
+
+        pilot.press('q');
+        pilot.pause();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multiple-keys-testmultiplekeys"><a class="anchor" href="#multiple-keys-testmultiplekeys"></a><a class="link" href="#multiple-keys-testmultiplekeys">Multiple keys (testMultipleKeys)</a></h3>
+<div class="paragraph">
+<p>You can send a sequence of keys in one call; the pilot processes them in order:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">pilot.press("r", "g", "b");
+pilot.pause();
+assertEquals(RgbAppExample.BackgroundColor.BLUE, app.getCurrentColor());</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-terminal-size-testcustomsize"><a class="anchor" href="#custom-terminal-size-testcustomsize"></a><a class="link" href="#custom-terminal-size-testcustomsize">Custom terminal size (testCustomSize)</a></h3>
+<div class="paragraph">
+<p>Use the <code>runTest(Supplier&lt;Element&gt;, Size)</code> overload to run with a specific size:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">try (ToolkitTestRunner test = ToolkitTestRunner.runTest(app::render, new Size(100, 50))) {
+    test.runner().styleEngine(app.styleEngine());
+    test.runner().eventRouter().addGlobalHandler(app.actionHandler());
+    Pilot pilot = test.pilot();
+    pilot.press('r');
+    pilot.pause();
+    assertEquals(RgbAppExample.BackgroundColor.RED, app.getCurrentColor());
+    pilot.press('q');
+    pilot.pause();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pilot-api-summary"><a class="anchor" href="#pilot-api-summary"></a><a class="link" href="#pilot-api-summary">Pilot API summary</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>press(char)</code>, <code>press(KeyCode)</code>, <code>press(String&#8230;&#8203; keys)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Simulate key press(es). Use <code>pause()</code> after to let the app process.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>click(x, y)</code> / <code>click("element-id")</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Left click at coordinates or at the center of the element with the given ID (Toolkit only).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>doubleClick</code>, <code>tripleClick</code>, <code>hover</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate and (where supported) by-ID variants.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>resize(width, height)</code> / <code>resize(Size)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Simulate terminal resize.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pause()</code> / <code>pause(Duration)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brief delay so the runner thread can process events and redraw.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quit()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Request the application to quit.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>By-ID methods (<code>click("id")</code>, <code>findElement("id")</code>, <code>hasElement("id")</code>) are supported only when using <code>ToolkitTestRunner</code>; the default <code>Pilot</code> implementation throws or returns false for them. For raw <code>TuiRunner</code> tests, use <code>TuiTestRunner</code> and drive the UI with keys and coordinates only, and assert on your own event list or application state.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-example-tests"><a class="anchor" href="#running-the-example-tests"></a><a class="link" href="#running-the-example-tests">Running the example tests</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>From the project root:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./gradlew :tamboui-tui:test --tests "dev.tamboui.tui.pilot.RgbAppTest"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To run all Pilot-related tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./gradlew :tamboui-tui:test --tests "dev.tamboui.tui.pilot.*"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The RGB app can be run interactively via <code>RgbAppExample.main()</code> or with JBang using the <code>//DEPS</code> and <code>//FILES</code> in that class, so you can compare manual behavior with the tests.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.5.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>
