@@ -82,6 +82,8 @@ public final class EventParser {
 
     private static Event parseControlChar(int c, Bindings bindings) {
         switch (c) {
+            case 0:
+                return KeyEvent.ofChar(' ', KeyModifiers.CTRL, bindings); // Ctrl+Space (NUL)
             case 3:
                 return KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings); // Ctrl+C
             case 8:
