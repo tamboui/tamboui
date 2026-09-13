@@ -376,6 +376,15 @@ public class FileManagerView implements Element {
             }
 
             @Override
+            public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+                // The modal dialog consumes all key events, so the view-level
+                // routing in FileManagerView.handleKeyEvent never sees the
+                // scroll keys; handle them here where the dialog routes
+                // children first.
+                return handleViewerKey(event);
+            }
+
+            @Override
             public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
                 return Size.UNKNOWN;
             }
