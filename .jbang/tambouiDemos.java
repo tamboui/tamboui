@@ -2,7 +2,7 @@
 //JAVA 17+
 //REPOS mavenCentral,gradle=https://repo.gradle.org/gradle/libs-releases
 //DEPS org.gradle:gradle-tooling-api:9.2.1
-//DEPS org.slf4j:slf4j-simple:2.0.17
+//DEPS org.slf4j:slf4j-simple:2.0.19
 //DEPS info.picocli:picocli:4.7.7
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
