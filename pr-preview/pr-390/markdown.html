@@ -43,6 +43,12 @@
 <li><a href="#css-resolver">CSS resolver</a></li>
 </ul>
 </li>
+<li><a href="#syntax-highlighting">Syntax highlighting</a>
+<ul class="sectlevel2">
+<li><a href="#custom-theme">Custom theme</a></li>
+<li><a href="#disabling-or-custom-highlighting">Disabling or custom highlighting</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -153,7 +159,9 @@ parent marker width.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Fenced and indented code blocks</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Wrapped in a rounded <code>Block</code>. The info string is used as the block title.
-Long lines are clipped to the inner width.</p></td>
+Long lines are clipped to the inner width. Fenced blocks are syntax-highlighted
+by default (see <a href="#syntax-highlighting">Syntax highlighting</a>); indented blocks have no language tag
+so they render in the plain code style.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GFM tables</p></td>
@@ -336,6 +344,114 @@ would mislead) and table cells are sized by the <code>Table</code> widget.</p>
     task-unchecked-color: gray;
     task-unchecked-symbol: "·";
 }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="syntax-highlighting"><a class="anchor" href="#syntax-highlighting"></a><a class="link" href="#syntax-highlighting">Syntax highlighting</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Fenced code blocks are highlighted by default using <code>RegexSyntaxHighlighter</code>
+(a highlight.js-inspired regex tokenizer) combined with a <code>SyntaxTheme</code>.
+Indented code blocks carry no language info and never highlight. Grammar
+definition lives in <code>dev.tamboui.widgets.syntax</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>TokenType</code> — the semantic categories (<code>KEYWORD</code>, <code>STRING</code>, <code>NUMBER</code>,
+<code>COMMENT</code>, <code>FUNCTION</code>, <code>TYPE</code>, &#8230;&#8203;). <code>PLAIN</code> maps to the base code style.</p>
+</li>
+<li>
+<p><code>SyntaxTheme</code> — maps <code>TokenType</code> to a <code>Style</code>. The default
+(<code>SyntaxTheme.DEFAULTS</code>) is a light-on-dark palette. <code>builder()</code> starts with
+that palette; use <code>token()</code> to replace entries or <code>clear()</code> to make tokens
+inherit the enclosing code-block style.</p>
+</li>
+<li>
+<p><code>Grammar</code> — a declarative language definition: an id, aliases, and rules
+(<code>pattern</code>, <code>literal</code>, <code>multiline</code> for block comments / triple-quoted
+strings).</p>
+</li>
+<li>
+<p><code>SyntaxHighlighter</code> — the component interface
+(<code>List&lt;Line&gt; highlight(String code, String language, Style base, SyntaxTheme)</code>).
+Implement your own for a custom tokenizer; <code>RegexSyntaxHighlighter</code> is the
+regex-based built-in.</p>
+</li>
+<li>
+<p><code>RegexSyntaxHighlighter</code> — built-in grammars for <code>java</code>, <code>kotlin</code>,
+<code>javascript</code>, <code>typescript</code>, <code>python</code>, <code>json</code>, <code>xml</code> (incl. <code>html</code>), <code>css</code>,
+<code>bash</code>, <code>yaml</code>, <code>properties</code>, <code>sql</code>, <code>go</code>, and <code>rust</code>.
+<code>RegexSyntaxHighlighter.defaults()</code>
+uses these; <code>.of(grammar&#8230;&#8203;)</code> / <code>.builder()</code> let you add or replace grammars.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Highlighting combines a base, token, and theme style: each token is rendered
+as <code>base.patch(tokenStyle)</code>. A token style overrides properties it defines,
+including the <code>MarkdownStyles.codeBlock()</code> foreground; properties not defined by
+the token style continue to come from the code-block base style.</p>
+</div>
+<div class="paragraph">
+<p>When using <code>MarkdownElement</code>, syntax token styles can also be configured with
+CSS child selectors or generic token selectors:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">MarkdownElement-syntax-keyword { color: magenta; }
+syntax-comment { color: gray; text-style: italic; }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resolution order is an explicit <code>SyntaxTheme</code>, an element-specific child
+selector, a generic <code>syntax-&lt;token-type&gt;</code> selector, then
+<code>SyntaxTheme.DEFAULTS</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="custom-theme"><a class="anchor" href="#custom-theme"></a><a class="link" href="#custom-theme">Custom theme</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import dev.tamboui.widgets.syntax.SyntaxTheme;
+import dev.tamboui.widgets.syntax.TokenType;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+SyntaxTheme theme = SyntaxTheme.builder()
+    .token(TokenType.KEYWORD, Style.EMPTY.bold().fg(Color.rgb(198, 120, 221)))
+    .token(TokenType.STRING, Style.EMPTY.fg(Color.hex("#98c379")))
+    .build();
+
+MarkdownView view = MarkdownView.builder()
+    .source(source)
+    .syntaxTheme(theme)
+    .build();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disabling-or-custom-highlighting"><a class="anchor" href="#disabling-or-custom-highlighting"></a><a class="link" href="#disabling-or-custom-highlighting">Disabling or custom highlighting</a></h3>
+<div class="paragraph">
+<p>Use <code>SyntaxHighlighter.none()</code> to disable highlighting, or wire in a
+highlighter of your own (custom grammar additions, a different tokenizer, etc.):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+
+MarkdownView highlighted = MarkdownView.builder()
+    .source(source)
+    .syntaxHighlighter(RegexSyntaxHighlighter.defaults())
+    .build();
+
+MarkdownView plain = MarkdownView.builder()
+    .source(source)
+    .syntaxHighlighter(SyntaxHighlighter.none())
+    .build();</code></pre>
 </div>
 </div>
 </div>

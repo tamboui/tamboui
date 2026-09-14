@@ -59,6 +59,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow,dev.tamboui.widgets.syntax.SyntaxHighlighter,dev.tamboui.widgets.syntax.SyntaxTheme)" tabindex="0">layout(Node, int, MarkdownStyles, Overflow, SyntaxHighlighter, SyntaxTheme)</a></li>
 <li><a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)" tabindex="0">layout(Node, int, MarkdownStyles, Overflow)</a></li>
 </ol>
 </li>
@@ -89,18 +90,31 @@ sized to fit a given content width. The result is consumed by
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="RenderedChunk.html" title="class in dev.tamboui.markdown.internal">RenderedChunk</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)" class="member-name-link">layout</a><wbr>(org.commonmark.node.Node&nbsp;root,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="RenderedChunk.html" title="class in dev.tamboui.markdown.internal">RenderedChunk</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)" class="member-name-link">layout</a><wbr>(org.commonmark.node.Node&nbsp;root,
  int&nbsp;width,
  <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles,
  <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6">
+<div class="block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-comment">use <a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow,dev.tamboui.widgets.syntax.SyntaxHighlighter,dev.tamboui.widgets.syntax.SyntaxTheme)"><code>layout(Node, int, MarkdownStyles, Overflow, SyntaxHighlighter, SyntaxTheme)</code></a>
+instead to select the highlighter and theme explicitly.</div>
+</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="RenderedChunk.html" title="class in dev.tamboui.markdown.internal">RenderedChunk</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow,dev.tamboui.widgets.syntax.SyntaxHighlighter,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">layout</a><wbr>(org.commonmark.node.Node&nbsp;root,
+ int&nbsp;width,
+ <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow,
+ <a href="../../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter,
+ <a href="../../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Lays out the children of <code>root</code> into renderable chunks.</div>
 </div>
 </div>
@@ -121,14 +135,45 @@ sized to fit a given content width. The result is consumed by
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)">
+<section class="detail" id="layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow,dev.tamboui.widgets.syntax.SyntaxHighlighter,dev.tamboui.widgets.syntax.SyntaxTheme)">
 <h3>layout</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="RenderedChunk.html" title="class in dev.tamboui.markdown.internal">RenderedChunk</a>&gt;</span>&nbsp;<span class="element-name">layout</span><wbr><span class="parameters">(org.commonmark.node.Node&nbsp;root,
  int&nbsp;width,
  <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles,
- <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow,
+ <a href="../../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter,
+ <a href="../../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</span></div>
 <div class="block">Lays out the children of <code>root</code> into renderable chunks.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>root</code> - the root document node</dd>
+<dd><code>width</code> - content width in columns</dd>
+<dd><code>styles</code> - the style palette</dd>
+<dd><code>overflow</code> - how to handle prose lines wider than <code>width</code></dd>
+<dd><code>highlighter</code> - the syntax highlighter for code blocks</dd>
+<dd><code>theme</code> - the syntax theme used by <code>highlighter</code></dd>
+<dt>Returns:</dt>
+<dd>an ordered list of chunks; never null, possibly empty</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)">
+<h3>layout</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>
+</span><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="RenderedChunk.html" title="class in dev.tamboui.markdown.internal">RenderedChunk</a>&gt;</span>&nbsp;<span class="element-name">layout</span><wbr><span class="parameters">(org.commonmark.node.Node&nbsp;root,
+ int&nbsp;width,
+ <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles,
+ <a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</span></div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-comment">use <a href="#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow,dev.tamboui.widgets.syntax.SyntaxHighlighter,dev.tamboui.widgets.syntax.SyntaxTheme)"><code>layout(Node, int, MarkdownStyles, Overflow, SyntaxHighlighter, SyntaxTheme)</code></a>
+instead to select the highlighter and theme explicitly.</div>
+</div>
+<div class="block">Lays out the children of <code>root</code> into renderable chunks, using the
+default syntax highlighter and theme for code blocks.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>root</code> - the root document node</dd>

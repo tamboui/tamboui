@@ -67,6 +67,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#styleResolver(dev.tamboui.style.StylePropertyResolver)" tabindex="0">styleResolver(StylePropertyResolver)</a></li>
 <li><a href="#overflow(dev.tamboui.style.Overflow)" tabindex="0">overflow(Overflow)</a></li>
 <li><a href="#scroll(int)" tabindex="0">scroll(int)</a></li>
+<li><a href="#syntaxHighlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter)" tabindex="0">syntaxHighlighter(SyntaxHighlighter)</a></li>
+<li><a href="#syntaxTheme(dev.tamboui.widgets.syntax.SyntaxTheme)" tabindex="0">syntaxTheme(SyntaxTheme)</a></li>
 <li><a href="#build()" tabindex="0">build()</a></li>
 </ol>
 </li>
@@ -147,6 +149,17 @@ explicitly set on the <a href="MarkdownStyles.html" title="class in dev.tamboui.
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styles(dev.tamboui.markdown.MarkdownStyles)" class="member-name-link">styles</a><wbr>(<a href="MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the style palette used for headings, code, links, and so on.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#syntaxHighlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter)" class="member-name-link">syntaxHighlighter</a><wbr>(<a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the <a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax"><code>SyntaxHighlighter</code></a> used to tokenize fenced and
+indented code blocks.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#syntaxTheme(dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">syntaxTheme</a><wbr>(<a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the <a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax"><code>SyntaxTheme</code></a> mapping token types to styles.</div>
 </div>
 </div>
 </div>
@@ -277,6 +290,40 @@ within longer markdown documents.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>scroll</code> - first visible row, &gt;= 0</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="syntaxHighlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter)">
+<h3>syntaxHighlighter</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></span>&nbsp;<span class="element-name">syntaxHighlighter</span><wbr><span class="parameters">(<a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter)</span></div>
+<div class="block">Sets the <a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax"><code>SyntaxHighlighter</code></a> used to tokenize fenced and
+indented code blocks. Defaults to a <a href="../widgets/syntax/RegexSyntaxHighlighter.html" title="class in dev.tamboui.widgets.syntax"><code>RegexSyntaxHighlighter</code></a>
+covering the popular built-in languages; use
+<a href="../widgets/syntax/SyntaxHighlighter.html#none()"><code>SyntaxHighlighter.none()</code></a> to disable syntax highlighting.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>highlighter</code> - the highlighter, must not be null</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="syntaxTheme(dev.tamboui.widgets.syntax.SyntaxTheme)">
+<h3>syntaxTheme</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></span>&nbsp;<span class="element-name">syntaxTheme</span><wbr><span class="parameters">(<a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</span></div>
+<div class="block">Sets the <a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax"><code>SyntaxTheme</code></a> mapping token types to styles. Defaults
+to <a href="../widgets/syntax/SyntaxTheme.html#DEFAULTS"><code>SyntaxTheme.DEFAULTS</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>theme</code> - the syntax theme, must not be null</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

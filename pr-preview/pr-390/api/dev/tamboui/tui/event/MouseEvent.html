@@ -73,6 +73,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#drag(dev.tamboui.tui.event.MouseButton,int,int)" tabindex="0">drag(MouseButton, int, int)</a></li>
 <li><a href="#scrollUp(int,int)" tabindex="0">scrollUp(int, int)</a></li>
 <li><a href="#scrollDown(int,int)" tabindex="0">scrollDown(int, int)</a></li>
+<li><a href="#scrollLeft(int,int)" tabindex="0">scrollLeft(int, int)</a></li>
+<li><a href="#scrollRight(int,int)" tabindex="0">scrollRight(int, int)</a></li>
 <li><a href="#isPress()" tabindex="0">isPress()</a></li>
 <li><a href="#isRelease()" tabindex="0">isRelease()</a></li>
 <li><a href="#isLeftButton()" tabindex="0">isLeftButton()</a></li>
@@ -242,7 +244,7 @@ if (event.matches("myApp.contextMenu")) {
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isScroll()" class="member-name-link">isScroll</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns true if this is a scroll event.</div>
+<div class="block">Returns true if this is a scroll event (up, down, left, or right).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MouseEventKind.html" title="enum class in dev.tamboui.tui.event">MouseEventKind</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#kind()" class="member-name-link">kind</a>()</code></div>
@@ -292,6 +294,18 @@ if (event.matches("myApp.contextMenu")) {
  int&nbsp;y)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a scroll down event.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MouseEvent.html" title="class in dev.tamboui.tui.event">MouseEvent</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#scrollLeft(int,int)" class="member-name-link">scrollLeft</a><wbr>(int&nbsp;x,
+ int&nbsp;y)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a scroll left event.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MouseEvent.html" title="class in dev.tamboui.tui.event">MouseEvent</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#scrollRight(int,int)" class="member-name-link">scrollRight</a><wbr>(int&nbsp;x,
+ int&nbsp;y)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a scroll right event.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MouseEvent.html" title="class in dev.tamboui.tui.event">MouseEvent</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#scrollUp(int,int)" class="member-name-link">scrollUp</a><wbr>(int&nbsp;x,
@@ -511,6 +525,40 @@ if (event.matches("myApp.contextMenu")) {
 </section>
 </li>
 <li>
+<section class="detail" id="scrollLeft(int,int)">
+<h3>scrollLeft</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="MouseEvent.html" title="class in dev.tamboui.tui.event">MouseEvent</a></span>&nbsp;<span class="element-name">scrollLeft</span><wbr><span class="parameters">(int&nbsp;x,
+ int&nbsp;y)</span></div>
+<div class="block">Creates a scroll left event.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>x</code> - x coordinate</dd>
+<dd><code>y</code> - y coordinate</dd>
+<dt>Returns:</dt>
+<dd>mouse event</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="scrollRight(int,int)">
+<h3>scrollRight</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="MouseEvent.html" title="class in dev.tamboui.tui.event">MouseEvent</a></span>&nbsp;<span class="element-name">scrollRight</span><wbr><span class="parameters">(int&nbsp;x,
+ int&nbsp;y)</span></div>
+<div class="block">Creates a scroll right event.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>x</code> - x coordinate</dd>
+<dd><code>y</code> - y coordinate</dd>
+<dt>Returns:</dt>
+<dd>mouse event</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="isPress()">
 <h3>isPress</h3>
 <div class="horizontal-scroll">
@@ -567,10 +615,10 @@ if (event.matches("myApp.contextMenu")) {
 <h3>isScroll</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isScroll</span>()</div>
-<div class="block">Returns true if this is a scroll event.</div>
+<div class="block">Returns true if this is a scroll event (up, down, left, or right).</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>true if this is a scroll-up or scroll-down event</dd>
+<dd>true if this is any scroll event</dd>
 </dl>
 </div>
 </section>
