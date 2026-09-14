@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Bindings and Actions</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Bindings and Actions</h1>
+<div class="details">
+<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#predefined-binding-sets">Predefined Binding Sets</a></li>
+<li><a href="#matching-actions-in-events">Matching Actions in Events</a></li>
+<li><a href="#key-triggers">Key Triggers</a>
+<ul class="sectlevel2">
+<li><a href="#terminal-compatibility">Terminal Compatibility</a></li>
+</ul>
+</li>
+<li><a href="#mouse-triggers">Mouse Triggers</a></li>
+<li><a href="#custom-bindings">Custom Bindings</a></li>
+<li><a href="#actionhandler">ActionHandler</a></li>
+<li><a href="#onaction-annotation">@OnAction Annotation</a>
+<ul class="sectlevel2">
+<li><a href="#annotation-processing">Annotation Processing</a>
+<ul class="sectlevel3">
+<li><a href="#gradle-kotlin-dsl">Gradle (Kotlin DSL)</a></li>
+<li><a href="#gradle-groovy-dsl">Gradle (Groovy DSL)</a></li>
+<li><a href="#maven">Maven</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#loading-bindings-from-files">Loading Bindings from Files</a></li>
+<li><a href="#standard-actions">Standard Actions</a></li>
+<li><a href="#next-steps">Next Steps</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI separates physical input (keys, mouse clicks) from semantic actions.
+Instead of checking for specific keys everywhere, you define bindings that map inputs to actions like "moveUp" or "delete".</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="predefined-binding-sets"><a class="anchor" href="#predefined-binding-sets"></a><a class="link" href="#predefined-binding-sets">Predefined Binding Sets</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Several binding presets are available:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Bindings standard = BindingSets.standard();  // Arrow keys, Enter, Escape
+Bindings vim = BindingSets.vim();            // hjkl navigation, Ctrl+u/d
+Bindings emacs = BindingSets.emacs();        // Ctrl+n/p/f/b navigation</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="matching-actions-in-events"><a class="anchor" href="#matching-actions-in-events"></a><a class="link" href="#matching-actions-in-events">Matching Actions in Events</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Events carry binding information. Use semantic checks instead of hardcoding keys:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Semantic - works with any binding set
+if (event.isUp()) { }
+if (event.isSelect()) { }
+if (event.matches("delete")) { }
+
+// Low-level - when you need specific keys
+if (event.isChar('x')) { }
+if (event.isKey(KeyCode.F1)) { }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>is*()</code> methods delegate to the current bindings.
+With vim bindings, <code>isUp()</code> matches Up arrow, <code>k</code>, or <code>Ctrl+p</code>.
+With standard bindings, it only matches the Up arrow.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="key-triggers"><a class="anchor" href="#key-triggers"></a><a class="link" href="#key-triggers">Key Triggers</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>KeyTrigger</code> defines what input triggers an action:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">KeyTrigger.key(KeyCode.UP);           // Arrow key
+KeyTrigger.ch('j');                   // Character
+KeyTrigger.chIgnoreCase('j');         // j or J
+KeyTrigger.ctrl('u');                 // Ctrl+U
+KeyTrigger.alt('x');                  // Alt+X</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="terminal-compatibility"><a class="anchor" href="#terminal-compatibility"></a><a class="link" href="#terminal-compatibility">Terminal Compatibility</a></h3>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Ctrl key bindings have significant limitations</strong> due to how terminals encode keyboard input.</p>
+</div>
+<div class="paragraph">
+<p>When you press a key combination like Ctrl+A, the terminal does not send "Ctrl" + "A" separately.
+Instead, it sends a single ASCII control character (byte value 1 for Ctrl+A).
+This encoding dates back to the 1970s and causes several problems:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Ctrl+letter (a-z)</strong>: Works, but case information is lost. Ctrl+a and Ctrl+Shift+A send the same byte.</p>
+</li>
+<li>
+<p><strong>Ctrl+number</strong>: Unreliable. Ctrl+2, Ctrl+@, and Ctrl+Space all send the same byte (0). The original key cannot be determined.</p>
+</li>
+<li>
+<p><strong>Ctrl+Alt+key</strong>: Inconsistent across terminals.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Alt key bindings are more reliable</strong> because terminals send ESC followed by the actual character:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Alt+a sends <code>ESC</code> + <code>'a'</code> - we know it was lowercase 'a'</p>
+</li>
+<li>
+<p>Alt+A sends <code>ESC</code> + <code>'A'</code> - we know it was uppercase 'A' (shifted)</p>
+</li>
+<li>
+<p>Alt+2 sends <code>ESC</code> + <code>'2'</code> - we know it was '2'</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Recommendation for custom bindings:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Modifier</th>
+<th class="tableblock halign-left valign-top">Reliability</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Alt+letter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Excellent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Preserves case, works consistently</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Alt+number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Excellent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fully distinguishable</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+letter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Good</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Works but loses shift information</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Poor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Avoid - ambiguous with other combinations</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For maximum compatibility, prefer <code>Alt+key</code> bindings for custom actions.
+Use <code>Ctrl+key</code> only for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, etc.).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mouse-triggers"><a class="anchor" href="#mouse-triggers"></a><a class="link" href="#mouse-triggers">Mouse Triggers</a></h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">MouseTrigger.click();                 // Left click
+MouseTrigger.rightClick();            // Right click
+MouseTrigger.ctrlClick();             // Ctrl+click
+MouseTrigger.scrollUp();              // Scroll wheel
+MouseTrigger.drag(MouseButton.LEFT);  // Dragging</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-bindings"><a class="anchor" href="#custom-bindings"></a><a class="link" href="#custom-bindings">Custom Bindings</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Start from a preset and customize:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Bindings custom = BindingSets.standard()
+    .toBuilder()
+    .bind(KeyTrigger.ch('d'), "delete")
+    .bind(KeyTrigger.key(KeyCode.DELETE), "delete")
+    .bind(KeyTrigger.ctrl('s'), "save")
+    .bind(MouseTrigger.rightClick(), "contextMenu")
+    .build();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="actionhandler"><a class="anchor" href="#actionhandler"></a><a class="link" href="#actionhandler">ActionHandler</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For centralized action handling, use <code>ActionHandler</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">ActionHandler actions = new ActionHandler(BindingSets.vim())
+    .on(Actions.QUIT, e -&gt; runner.quit())
+    .on("save", e -&gt; save())
+    .on("delete", e -&gt; deleteSelected());</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// In your event handler:
+boolean handleEvent(Event event, TuiRunner runner) {
+    ActionHandler actions = new ActionHandler(BindingSets.vim());
+    if (actions.dispatch(event)) {
+        return true;  // Action was handled
+    }
+    // Handle other events...
+    return false;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Handlers can optionally receive the action name that triggered them:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Handler with action name (useful when same handler serves multiple actions)
+ActionHandler actions = new ActionHandler(bindings)
+    .on("red", (event, action) -&gt; setColor(action))
+    .on("blue", (event, action) -&gt; setColor(action))
+    .on("green", (event, action) -&gt; setColor(action));</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="onaction-annotation"><a class="anchor" href="#onaction-annotation"></a><a class="link" href="#onaction-annotation">@OnAction Annotation</a></h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>@OnAction</code> annotation works with Toolkit Components.
+For TuiRunner or immediate mode, use <code>ActionHandler</code> instead (see above).
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In Toolkit components, annotate methods to handle actions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class EditorComponent extends Component&lt;EditorComponent&gt; {
+    private List&lt;String&gt; lines = new ArrayList&lt;&gt;();
+    private int cursor = 0;
+
+    @OnAction(Actions.MOVE_UP)
+    void moveCursorUp(Event event) {
+        if (cursor &gt; 0) cursor--;
+    }
+
+    @OnAction(Actions.MOVE_DOWN)
+    void moveCursorDown(Event event) {
+        if (cursor &lt; lines.size() - 1) cursor++;
+    }
+
+    @OnAction("delete")
+    void deleteLine(Event event) {
+        if (!lines.isEmpty()) {
+            lines.remove(cursor);
+        }
+    }
+
+    @Override
+    protected Element render() {
+        return text("Editor");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The component framework discovers these methods and dispatches events automatically.</p>
+</div>
+<div class="sect2">
+<h3 id="annotation-processing"><a class="anchor" href="#annotation-processing"></a><a class="link" href="#annotation-processing">Annotation Processing</a></h3>
+<div class="paragraph">
+<p>By default, <code>@OnAction</code> methods are discovered at runtime using reflection.
+For better startup performance and GraalVM native image compatibility, use the annotation processor to generate action handler registrations at compile time.</p>
+</div>
+<div class="sect3">
+<h4 id="gradle-kotlin-dsl"><a class="anchor" href="#gradle-kotlin-dsl"></a><a class="link" href="#gradle-kotlin-dsl">Gradle (Kotlin DSL)</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">dependencies {
+    implementation("dev.tamboui:tamboui-toolkit:0.5.0-SNAPSHOT")
+    annotationProcessor("dev.tamboui:tamboui-processor:0.5.0-SNAPSHOT")
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="gradle-groovy-dsl"><a class="anchor" href="#gradle-groovy-dsl"></a><a class="link" href="#gradle-groovy-dsl">Gradle (Groovy DSL)</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">dependencies {
+    implementation 'dev.tamboui:tamboui-toolkit:0.5.0-SNAPSHOT'
+    annotationProcessor 'dev.tamboui:tamboui-processor:0.5.0-SNAPSHOT'
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="maven"><a class="anchor" href="#maven"></a><a class="link" href="#maven">Maven</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;dev.tamboui&lt;/groupId&gt;
+        &lt;artifactId&gt;tamboui-toolkit&lt;/artifactId&gt;
+        &lt;version&gt;0.5.0-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.13.0&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;annotationProcessorPaths&gt;
+                    &lt;path&gt;
+                        &lt;groupId&gt;dev.tamboui&lt;/groupId&gt;
+                        &lt;artifactId&gt;tamboui-processor&lt;/artifactId&gt;
+                        &lt;version&gt;0.5.0-SNAPSHOT&lt;/version&gt;
+                    &lt;/path&gt;
+                &lt;/annotationProcessorPaths&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The processor generates a <code>_ActionHandlerRegistrar</code> class for each component with <code>@OnAction</code> methods.
+These registrars are discovered via <code>ServiceLoader</code> and register action handlers without reflection.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="loading-bindings-from-files"><a class="anchor" href="#loading-bindings-from-files"></a><a class="link" href="#loading-bindings-from-files">Loading Bindings from Files</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Bindings can be externalized to properties files:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// From classpath
+Bindings bindings = BindingSets.loadResource("/my-bindings.properties");
+
+// From filesystem
+Bindings bindingsFromFile = BindingSets.load(Paths.get("~/.config/myapp/bindings.properties"));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Property file format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Navigation
+moveUp = Up, k
+moveDown = Down, j
+pageUp = PageUp, Ctrl+u
+pageDown = PageDown, Ctrl+d
+
+# Actions
+select = Enter, Space
+cancel = Escape
+delete = d, Delete
+
+# Mouse
+click = Mouse.Left.Press
+contextMenu = Mouse.Right.Press</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Multiple triggers for the same action are comma-separated.
+Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="standard-actions"><a class="anchor" href="#standard-actions"></a><a class="link" href="#standard-actions">Standard Actions</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>Actions</code> class defines common action names:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Action</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MOVE_UP</code>, <code>MOVE_DOWN</code>, <code>MOVE_LEFT</code>, <code>MOVE_RIGHT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Navigation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PAGE_UP</code>, <code>PAGE_DOWN</code>, <code>HOME</code>, <code>END</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Page navigation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SELECT</code>, <code>CONFIRM</code>, <code>CANCEL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Selection and confirmation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FOCUS_NEXT</code>, <code>FOCUS_PREVIOUS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Focus navigation (Tab/Shift+Tab)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE_BACKWARD</code>, <code>DELETE_FORWARD</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Text editing</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QUIT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Application exit</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps"><a class="anchor" href="#next-steps"></a><a class="link" href="#next-steps">Next Steps</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="api-levels.html">API Levels</a> - choosing between immediate mode, TuiRunner, and Toolkit</p>
+</li>
+<li>
+<p><a href="mvc-architecture.html">Application Structure</a> - patterns for larger applications</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.5.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>
