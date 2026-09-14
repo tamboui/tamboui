@@ -766,7 +766,7 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
             return result;
         }
 
-        if (lastFlatEntries.isEmpty()) {
+        if (!focused || lastFlatEntries.isEmpty()) {
             return EventResult.UNHANDLED;
         }
 
