@@ -122,6 +122,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     private String title;
     private BorderType borderType;
     private Color borderColor;
+    private Color focusedBorderColor;
     private boolean autoScroll;
     private boolean autoScrollToEnd;
     private boolean stickyScroll;
@@ -320,6 +321,17 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
      */
     public ListElement<T> borderColor(Color color) {
         this.borderColor = color;
+        return this;
+    }
+
+    /**
+     * Sets the border color used when the element has focus.
+     *
+     * @param color the focused border color
+     * @return this element
+     */
+    public ListElement<T> focusedBorderColor(Color color) {
+        this.focusedBorderColor = color;
         return this;
     }
 
@@ -567,7 +579,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         String effectiveSymbol = highlightSymbol != null ? highlightSymbol : DEFAULT_HIGHLIGHT_SYMBOL;
         int symbolWidth = effectiveSymbol.length();
-        int borderWidth = (title != null || borderType != null) ? 2 : 0;
+        boolean hasBorder = title != null || borderType != null || focusedBorderColor != null;
+        int borderWidth = hasBorder ? 2 : 0;
         int width = maxWidth + symbolWidth + borderWidth;
 
         int itemCount;
@@ -576,7 +589,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         } else {
             itemCount = items.size();
         }
-        int borderHeight = (title != null || borderType != null) ? 2 : 0;
+        int borderHeight = hasBorder ? 2 : 0;
         int height = itemCount + borderHeight;
 
         return Size.of(width, height);
@@ -616,7 +629,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
         this.lastItemCount = totalItems;
 
         if (totalItems == 0) {
-            if (title != null || borderType != null) {
+            if (title != null || borderType != null || focusedBorderColor != null) {
                 renderBorder(frame, area, context);
             }
             return;
@@ -758,7 +771,13 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     private Rect renderBorder(Frame frame, Rect area, RenderContext context) {
-        if (title != null || borderType != null) {
+        if (title != null || borderType != null || focusedBorderColor != null) {
+            boolean isFocused = elementId != null && context.isFocused(elementId);
+
+            Color effectiveBorderColor = isFocused && focusedBorderColor != null
+                    ? focusedBorderColor
+                    : borderColor;
+
             Block.Builder blockBuilder = Block.builder()
                     .borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
@@ -768,8 +787,8 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             if (borderType != null) {
                 blockBuilder.borderType(borderType);
             }
-            if (borderColor != null) {
-                blockBuilder.borderColor(borderColor);
+            if (effectiveBorderColor != null) {
+                blockBuilder.borderColor(effectiveBorderColor);
             }
             Block block = blockBuilder.build();
             block.render(area, frame.buffer());
@@ -789,7 +808,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             return result;
         }
 
-        if (lastItemCount == 0) {
+        if (!focused || lastItemCount == 0) {
             return EventResult.UNHANDLED;
         }
 
