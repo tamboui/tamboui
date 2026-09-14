@@ -336,26 +336,9 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         }
 
         // Calculate thumb position and size
-        int contentLength = state.contentLength();
-        int viewportLength = state.viewportContentLength() > 0
-            ? state.viewportContentLength()
-            : trackLength;
-
-        // Thumb size proportional to viewport/content ratio
-        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
-        thumbSize = Math.min(thumbSize, trackLength);
-
-        // Thumb position
-        int scrollableRange = contentLength - viewportLength;
-        int thumbPosition;
-        if (scrollableRange <= 0) {
-            thumbPosition = 0;
-        } else {
-            double scrollFraction = (double) state.position() / scrollableRange;
-            scrollFraction = Math.max(0.0, Math.min(1.0, scrollFraction));
-            int thumbRange = trackLength - thumbSize;
-            thumbPosition = (int) Math.round(scrollFraction * thumbRange);
-        }
+        ThumbGeometry thumb = computeThumbGeometry(trackLength, state);
+        int thumbSize = thumb.size;
+        int thumbPosition = thumb.position;
 
         // Get effective styles
         Style effectiveStyle = style != null ? style : Style.EMPTY;
@@ -374,6 +357,163 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
                 effectiveBegin, effectiveEnd, effectiveTrackStyle, effectiveThumbStyle,
                 effectiveBeginStyle, effectiveEndStyle, beginOffset, thumbPosition, thumbSize, trackLength);
         }
+    }
+
+    /**
+     * Handles a mouse action on this scrollbar.
+     * <p>
+     * Call this from your own mouse event handler, passing the same {@code area}
+     * used for {@link #render(Rect, Buffer, ScrollbarState) rendering}.
+     * <p>
+     * Supported interactions:
+     * <ul>
+     *   <li><b>Click on track</b>: pages up/left when clicking above/before the thumb,
+     *       pages down/right when clicking below/after</li>
+     *   <li><b>Click on thumb</b>: starts a drag operation</li>
+     *   <li><b>Drag</b>: moves the thumb proportionally to the mouse position</li>
+     *   <li><b>Release</b>: ends any in-progress drag</li>
+     *   <li><b>Scroll up/down</b>: scrolls by one position</li>
+     * </ul>
+     *
+     * <pre>{@code
+     * // In your mouse event handler:
+     * ScrollbarAction action = mapMouseEvent(mouseEvent);
+     * if (action != null) {
+     *     boolean consumed = scrollbar.handleMouseAction(
+     *         mouseEvent.x(), mouseEvent.y(), action, scrollbarArea, scrollbarState);
+     *     if (consumed) {
+     *         return;
+     *     }
+     * }
+     * }</pre>
+     *
+     * @param mouseX the mouse x coordinate (0-based)
+     * @param mouseY the mouse y coordinate (0-based)
+     * @param action the scrollbar action to perform
+     * @param area   the area passed to {@link #render}, used to compute the scrollbar track position
+     * @param state  the scrollbar state to update
+     * @return true if the event was consumed
+     * @see ScrollbarAction
+     */
+    public boolean handleMouseAction(int mouseX, int mouseY, ScrollbarAction action, Rect area, ScrollbarState state) {
+        if (area.isEmpty() || state.contentLength() == 0) {
+            if (action == ScrollbarAction.RELEASE && state.isDragging()) {
+                state.endDrag();
+                return true;
+            }
+            return false;
+        }
+
+        Rect trackArea = calculateTrackArea(area);
+        if (trackArea.isEmpty()) {
+            if (action == ScrollbarAction.RELEASE && state.isDragging()) {
+                state.endDrag();
+                return true;
+            }
+            return false;
+        }
+
+        int beginOffset = beginSymbol != null ? 1 : 0;
+        int endOffset = endSymbol != null ? 1 : 0;
+        int trackLength = (orientation.isVertical() ? trackArea.height() : trackArea.width()) - beginOffset - endOffset;
+        if (trackLength <= 0) {
+            if (action == ScrollbarAction.RELEASE && state.isDragging()) {
+                state.endDrag();
+                return true;
+            }
+            return false;
+        }
+
+        int mouseScrollPos;
+        int trackStart;
+        if (orientation.isVertical()) {
+            mouseScrollPos = mouseY;
+            trackStart = trackArea.y() + beginOffset;
+        } else {
+            mouseScrollPos = mouseX;
+            trackStart = trackArea.x() + beginOffset;
+        }
+
+        boolean inBounds = trackArea.contains(mouseX, mouseY);
+
+        if (action == ScrollbarAction.RELEASE) {
+            boolean wasDragging = state.isDragging();
+            state.endDrag();
+            return wasDragging || inBounds;
+        }
+
+        if (action == ScrollbarAction.DRAG && state.isDragging()) {
+            return handleDrag(mouseScrollPos, trackStart, trackLength, state);
+        }
+
+        if (!inBounds) {
+            return false;
+        }
+
+        if (action == ScrollbarAction.PRESS) {
+            if (beginOffset > 0 && mouseScrollPos < trackStart) {
+                state.prev();
+                return true;
+            }
+            int trackEnd = trackStart + trackLength;
+            if (endOffset > 0 && mouseScrollPos >= trackEnd) {
+                state.next();
+                return true;
+            }
+        }
+
+        switch (action) {
+            case PRESS:
+                return handlePress(mouseScrollPos, trackStart, trackLength, state);
+            case SCROLL_UP:
+                state.prev();
+                return true;
+            case SCROLL_DOWN:
+                state.next();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean handlePress(int mouseScrollPos, int trackStart, int trackLength, ScrollbarState state) {
+        int relativePos = mouseScrollPos - trackStart;
+        if (relativePos < 0 || relativePos >= trackLength) {
+            return false;
+        }
+
+        ThumbGeometry thumb = computeThumbGeometry(trackLength, state);
+
+        if (relativePos >= thumb.position && relativePos < thumb.position + thumb.size) {
+            state.startDrag(relativePos - thumb.position);
+            return true;
+        } else if (relativePos < thumb.position) {
+            state.pageUp();
+            return true;
+        } else {
+            state.pageDown();
+            return true;
+        }
+    }
+
+    private boolean handleDrag(int mouseScrollPos, int trackStart, int trackLength, ScrollbarState state) {
+        ThumbGeometry thumb = computeThumbGeometry(trackLength, state);
+
+        if (thumb.scrollableRange <= 0) {
+            return true;
+        }
+
+        int thumbRange = trackLength - thumb.size;
+        if (thumbRange <= 0) {
+            return true;
+        }
+
+        int relativePos = mouseScrollPos - trackStart;
+        double fraction = (double) (relativePos - state.dragOffset()) / thumbRange;
+        fraction = Math.max(0.0, Math.min(1.0, fraction));
+        int newPosition = (int) Math.round(fraction * thumb.scrollableRange);
+        state.position(newPosition);
+        return true;
     }
 
     private void renderVertical(Buffer buffer, Rect area, String track, String thumb,
@@ -430,6 +570,47 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
         if (end != null) {
             buffer.setString(x + trackLength, y, end, endStyle);
         }
+    }
+
+    /**
+     * Computed thumb geometry for a given track length and scrollbar state.
+     * <p>
+     * This is the single source of truth used by both rendering and mouse hit-testing,
+     * ensuring that clicks always target the visually rendered thumb.
+     */
+    private static final class ThumbGeometry {
+        final int size;
+        final int position;
+        final int scrollableRange;
+
+        ThumbGeometry(int size, int position, int scrollableRange) {
+            this.size = size;
+            this.position = position;
+            this.scrollableRange = scrollableRange;
+        }
+    }
+
+    private ThumbGeometry computeThumbGeometry(int trackLength, ScrollbarState state) {
+        int contentLength = state.contentLength();
+        int viewportLength = state.viewportContentLength() > 0
+            ? state.viewportContentLength()
+            : trackLength;
+
+        int thumbSize = Math.max(1, (int) Math.ceil((double) viewportLength / contentLength * trackLength));
+        thumbSize = Math.min(thumbSize, trackLength);
+
+        int scrollableRange = contentLength - viewportLength;
+        int thumbPosition;
+        if (scrollableRange <= 0) {
+            thumbPosition = 0;
+        } else {
+            double scrollFraction = (double) state.position() / scrollableRange;
+            scrollFraction = Math.max(0.0, Math.min(1.0, scrollFraction));
+            int thumbRange = trackLength - thumbSize;
+            thumbPosition = (int) Math.round(scrollFraction * thumbRange);
+        }
+
+        return new ThumbGeometry(thumbSize, thumbPosition, scrollableRange);
     }
 
     private Rect calculateTrackArea(Rect area) {

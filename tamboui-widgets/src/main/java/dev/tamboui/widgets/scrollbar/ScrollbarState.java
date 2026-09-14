@@ -33,6 +33,8 @@ public final class ScrollbarState {
     private int contentLength;
     private int position;
     private int viewportContentLength;
+    private boolean dragging;
+    private int dragOffset;
 
     /**
      * Creates a new scrollbar state with default values.
@@ -223,6 +225,29 @@ public final class ScrollbarState {
             return 0.0;
         }
         return (double) position / (contentLength - 1);
+    }
+
+    /**
+     * Returns whether a drag operation is currently in progress.
+     *
+     * @return true if the thumb is being dragged
+     */
+    public boolean isDragging() {
+        return dragging;
+    }
+
+    void startDrag(int offset) {
+        this.dragging = true;
+        this.dragOffset = offset;
+    }
+
+    int dragOffset() {
+        return dragOffset;
+    }
+
+    void endDrag() {
+        this.dragging = false;
+        this.dragOffset = 0;
     }
 
     private int clampPosition(int pos) {
