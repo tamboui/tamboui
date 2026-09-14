@@ -34,7 +34,7 @@ import dev.tamboui.image.protocol.SixelProtocol;
  *   <tr><td>TERM=xterm-ghostty</td><td>Kitty</td></tr>
  *   <tr><td>WEZTERM_PANE</td><td>Kitty</td></tr>
  *   <tr><td>ITERM_SESSION_ID</td><td>iTerm2</td></tr>
- *   <tr><td>TERM=rio</td><td>iTerm2, Sixel</td></tr>
+ *   <tr><td>TERM=rio</td><td>Kitty</td></tr>
  *   <tr><td>KONSOLE_VERSION</td><td>Sixel</td></tr>
  *   <tr><td>TERM contains mlterm</td><td>Sixel</td></tr>
  * </table>
@@ -199,9 +199,9 @@ public final class TerminalImageCapabilities {
                 supported.add(TerminalImageProtocol.KITTY);
             }
             if (term.equals("rio")) {
-                // Rio supports iTerm2 and Sixel; iTerm2 is preferred
-                supported.add(TerminalImageProtocol.ITERM2);
-                supported.add(TerminalImageProtocol.SIXEL);
+                // Rio renders the Kitty graphics protocol reliably; its iTerm2 inline-image and
+                // Sixel support do not display in current versions, so don't advertise them.
+                supported.add(TerminalImageProtocol.KITTY);
             }
             if (term.contains("mlterm")) {
                 supported.add(TerminalImageProtocol.SIXEL);
@@ -210,6 +210,12 @@ public final class TerminalImageCapabilities {
 
         // Check for WezTerm (supports Kitty protocol)
         if (getEnv("WEZTERM_PANE") != null) {
+            supported.add(TerminalImageProtocol.KITTY);
+        }
+
+        // Check for Ghostty (supports Kitty protocol). TERM is only "xterm-ghostty" when the
+        // bundled terminfo is installed; the env var is always present, so it is the reliable hint.
+        if (getEnv("GHOSTTY_RESOURCES_DIR") != null) {
             supported.add(TerminalImageProtocol.KITTY);
         }
 
@@ -239,6 +245,9 @@ public final class TerminalImageCapabilities {
                 supported.add(TerminalImageProtocol.ITERM2);
             }
             if (termProgram.equalsIgnoreCase("WezTerm")) {
+                supported.add(TerminalImageProtocol.KITTY);
+            }
+            if (termProgram.equalsIgnoreCase("ghostty")) {
                 supported.add(TerminalImageProtocol.KITTY);
             }
         }

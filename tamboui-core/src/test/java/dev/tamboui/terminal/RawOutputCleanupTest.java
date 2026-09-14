@@ -23,7 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class RawOutputCleanupTest {
 
-    private static final String KITTY_DELETE_ALL = "\033_Ga=d,d=a\033\\";
+    // d=A (uppercase): deletes all images AND frees their stored data; q=2 suppresses the reply.
+    // See Terminal.KITTY_DELETE_ALL.
+    private static final String KITTY_DELETE_ALL = "\033_Ga=d,d=A,q=2\033\\";
 
     static class RawWidget implements Widget, RawOutputCapable {
         @Override
