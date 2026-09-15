@@ -84,6 +84,7 @@ dev.tamboui.widgets.scrollbar
 dev.tamboui.widgets.select
 dev.tamboui.widgets.sparkline
 dev.tamboui.widgets.spinner
+dev.tamboui.widgets.syntax
 dev.tamboui.widgets.table
 dev.tamboui.widgets.tabs
 dev.tamboui.widgets.toggle
