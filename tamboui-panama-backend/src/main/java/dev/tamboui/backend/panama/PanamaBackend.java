@@ -280,6 +280,13 @@ public class PanamaBackend extends AbstractBackend {
     }
 
     @Override
+    public void writeRaw(CharSequence data) throws IOException {
+        // The default implementation calls toString(): the backend writes a cursor-positioning
+        // StringBuilder once per run of changed cells, so that is a String per run, per frame.
+        outputBuffer.appendUtf8(data);
+    }
+
+    @Override
     public void close() throws IOException {
         try {
             // Reset state

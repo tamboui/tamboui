@@ -221,12 +221,15 @@ public class RenderPipelineBenchmark {
         // 3. Diff previous vs current
         bufferA.diff(bufferB, diffResult);
 
-        // 4. Consume diff (simulating backend.draw)
-        int diffSize = diffResult.size();
-        for (int i = 0; i < diffSize; i++) {
-            blackhole.consume(diffResult.getX(i));
-            blackhole.consume(diffResult.getY(i));
-            blackhole.consume(diffResult.getCell(i));
+        // 4. Consume diff (simulating backend.draw): coordinates once per run, then cells
+        for (int run = 0, runs = diffResult.runCount(); run < runs; run++) {
+            int start = diffResult.runStart(run);
+            int end = start + diffResult.runLength(run);
+            blackhole.consume(diffResult.xOf(start));
+            blackhole.consume(diffResult.yOf(start));
+            for (int i = start; i < end; i++) {
+                blackhole.consume(diffResult.cellAt(i));
+            }
         }
 
         // 5. Clear diff and swap buffers

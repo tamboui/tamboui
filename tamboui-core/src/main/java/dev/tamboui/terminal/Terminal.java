@@ -149,7 +149,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
                 cleanupRawOutput(frame.rawOutputAreas());
 
-                // Calculate diff and draw (zero-allocation DoD variant)
+                // Calculate diff and draw (allocation-free: runs over the current buffer)
                 previousBuffer.diff(currentBuffer, diffResult);
                 boolean hadDiff = !diffResult.isEmpty();
 
@@ -189,7 +189,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
                             previousCursorPosition = null;
                         }
                     } finally {
-                        diffResult.clear();  // Release Cell refs for GC even on error
+                        diffResult.clear();  // release the reference to the drawn buffer, even on error
                         // Write ESU before flushing so BSU + draw + ESU are sent atomically.
                         // Done in finally to avoid leaving the terminal in a stuck buffering state.
                         backend.endSynchronizedUpdate();

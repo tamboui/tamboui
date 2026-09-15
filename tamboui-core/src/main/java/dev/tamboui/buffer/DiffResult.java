@@ -6,23 +6,23 @@ package dev.tamboui.buffer;
 
 import java.util.Arrays;
 
+import dev.tamboui.layout.Rect;
+
 /**
- * A reusable container for buffer diff results using a Data-Oriented Design (DoD) layout.
+ * A reusable, allocation-free container for buffer diff results.
  * <p>
- * This class uses separate arrays for x coordinates, y coordinates, and cells to achieve:
- * <ul>
- *   <li>Zero allocations per frame (after initial sizing)</li>
- *   <li>Better hardware prefetching during linear iteration</li>
- *   <li>Reduced GC pressure (no intermediate objects)</li>
- * </ul>
+ * Changed cells are stored as <em>runs</em>: pairs of {@code (startIndex, length)} over the
+ * row-major cell index of the target buffer. Consecutive changed cells collapse into one run,
+ * so a backend can position the cursor once per run and stream the cells; the cells themselves
+ * are read straight from the target buffer, so nothing per cell is copied or referenced here.
  * <p>
  * Typical usage pattern:
  * <pre>{@code
  * DiffResult diff = new DiffResult(1920);  // Pre-size for 80x24 terminal
  * while (running) {
- *     diff.clear();
  *     previousBuffer.diff(currentBuffer, diff);
  *     backend.draw(diff);
+ *     diff.clear();
  * }
  * }</pre>
  *
@@ -30,10 +30,13 @@ import java.util.Arrays;
  */
 public final class DiffResult {
 
-    private int[] xs;
-    private int[] ys;
-    private Cell[] cells;
-    private int count;
+    private int[] runs;     // (start, length) pairs
+    private int runCount;
+    private int cellCount;
+
+    // Target buffer bound by Buffer.diff(); cells are read from here.
+    private Cell[] source;
+    private int srcX, srcY, srcWidth;
 
     /**
      * Creates a new diff result with the default initial capacity (256 updates).
@@ -43,122 +46,203 @@ public final class DiffResult {
     }
 
     /**
-     * Creates a new diff result with the specified initial capacity.
+     * Creates a new diff result sized for the given number of changed cells.
      * <p>
-     * For best performance, size this to match your expected maximum number of
-     * cell updates per frame. A typical 80x24 terminal has 1,920 cells, so a
-     * capacity of 1,920 ensures no reallocation even if every cell changes.
+     * The worst case (every other cell changed) needs one run per two cells, so sizing this
+     * to the terminal cell count guarantees no reallocation.
      *
-     * @param initialCapacity the initial capacity for the parallel arrays
+     * @param initialCapacity the expected maximum number of changed cells per frame
      */
     public DiffResult(int initialCapacity) {
-        this.xs = new int[initialCapacity];
-        this.ys = new int[initialCapacity];
-        this.cells = new Cell[initialCapacity];
-        this.count = 0;
+        this.runs = new int[Math.max(2, initialCapacity + 2)];
     }
 
     /**
-     * Clears this diff result, resetting the count to zero.
+     * Binds this result to the buffer whose cells the runs refer to, discarding any
+     * previous content. Called by {@link Buffer#diff(Buffer, DiffResult)} before the
+     * first run is appended.
+     *
+     * @param content the target buffer's cells, in row-major order
+     * @param area the target buffer's area
+     */
+    void bind(Cell[] content, Rect area) {
+        this.source = content;
+        this.srcX = area.x();
+        this.srcY = area.y();
+        this.srcWidth = area.width();
+        this.runCount = 0;
+        this.cellCount = 0;
+    }
+
+    /**
+     * Appends a run of {@code length} adjacent changed cells starting at row-major
+     * {@code start}. Runs must be appended in increasing order and must not cross a row.
+     *
+     * @param start the row-major index of the run's first cell
+     * @param length the number of cells in the run
+     */
+    void addRun(int start, int length) {
+        int pos = runCount << 1;
+        if (pos + 2 > runs.length) {
+            runs = Arrays.copyOf(runs, Math.max(pos + 2, runs.length + (runs.length >> 1)));
+        }
+        runs[pos] = start;
+        runs[pos + 1] = length;
+        runCount++;
+        cellCount += length;
+    }
+
+    /**
+     * Clears this diff result and releases the reference to the target buffer.
      */
     public void clear() {
-        Arrays.fill(cells, 0, count, null);
-        this.count = 0;
+        runCount = 0;
+        cellCount = 0;
+        source = null;
     }
 
     /**
-     * Adds a cell update to this diff result.
-     * <p>
-     * If the internal arrays are full, they will be grown automatically (rare after warmup).
+     * Returns the number of changed cells across all runs.
      *
-     * @param x the x coordinate of the cell
-     * @param y the y coordinate of the cell
-     * @param cell the new cell value
-     */
-    public void add(int x, int y, Cell cell) {
-        ensureCapacity(count + 1);
-        xs[count] = x;
-        ys[count] = y;
-        cells[count] = cell;
-        count++;
-    }
-
-    /**
-     * Returns the number of cell updates in this result.
-     *
-     * @return the count of updates
+     * @return the number of changed cells
      */
     public int size() {
-        return count;
+        return cellCount;
     }
 
     /**
-     * Returns whether this diff result is empty.
+     * Returns whether this diff result holds no changed cells.
      *
-     * @return true if there are no updates
+     * @return true if there are no changed cells
      */
     public boolean isEmpty() {
-        return count == 0;
+        return cellCount == 0;
     }
 
     /**
-     * Returns the x coordinate of the update at the given index.
+     * Returns the number of runs of horizontally adjacent changed cells.
      *
-     * @param index the index (0 to size()-1)
+     * @return the number of runs
+     */
+    public int runCount() {
+        return runCount;
+    }
+
+    /**
+     * Returns the row-major index in the target buffer at which the given run starts.
+     *
+     * @param run the run index (0 to {@link #runCount()}-1)
+     * @return the row-major index of the run's first cell
+     */
+    public int runStart(int run) {
+        return runs[run << 1];
+    }
+
+    /**
+     * Returns the number of cells in the given run.
+     *
+     * @param run the run index (0 to {@link #runCount()}-1)
+     * @return the number of cells in the run
+     */
+    public int runLength(int run) {
+        return runs[(run << 1) + 1];
+    }
+
+    /**
+     * Returns the cell at the given row-major index of the target buffer.
+     *
+     * @param index a row-major index, as returned by {@link #runStart(int)}
+     * @return the cell at that index
+     */
+    public Cell cellAt(int index) {
+        return source[index];
+    }
+
+    /**
+     * Returns the x coordinate of the given row-major index in the target buffer.
+     *
+     * @param index a row-major index, as returned by {@link #runStart(int)}
      * @return the x coordinate
      */
-    public int getX(int index) {
-        return xs[index];
+    public int xOf(int index) {
+        return srcX + index % srcWidth;
     }
 
     /**
-     * Returns the y coordinate of the update at the given index.
+     * Returns the y coordinate of the given row-major index in the target buffer.
      *
-     * @param index the index (0 to size()-1)
+     * @param index a row-major index, as returned by {@link #runStart(int)}
      * @return the y coordinate
      */
-    public int getY(int index) {
-        return ys[index];
+    public int yOf(int index) {
+        return srcY + index / srcWidth;
     }
 
     /**
-     * Returns the cell at the given index.
+     * Returns the x coordinate of the i-th changed cell.
+     * <p>
+     * This is an index-based view over the runs and costs O({@link #runCount()}) per call.
+     * Backends should iterate runs with {@link #runStart(int)}/{@link #runLength(int)} instead.
      *
-     * @param index the index (0 to size()-1)
+     * @param i the index of the changed cell (0 to {@link #size()}-1)
+     * @return the x coordinate
+     */
+    public int getX(int i) {
+        return xOf(indexOf(i));
+    }
+
+    /**
+     * Returns the y coordinate of the i-th changed cell.
+     * <p>
+     * This is an index-based view over the runs and costs O({@link #runCount()}) per call.
+     * Backends should iterate runs with {@link #runStart(int)}/{@link #runLength(int)} instead.
+     *
+     * @param i the index of the changed cell (0 to {@link #size()}-1)
+     * @return the y coordinate
+     */
+    public int getY(int i) {
+        return yOf(indexOf(i));
+    }
+
+    /**
+     * Returns the i-th changed cell.
+     * <p>
+     * This is an index-based view over the runs and costs O({@link #runCount()}) per call.
+     * Backends should iterate runs with {@link #runStart(int)}/{@link #runLength(int)} instead.
+     *
+     * @param i the index of the changed cell (0 to {@link #size()}-1)
      * @return the cell
      */
-    public Cell getCell(int index) {
-        return cells[index];
+    public Cell getCell(int i) {
+        return source[indexOf(i)];
     }
 
-    /**
-     * Ensures the internal arrays can hold at least the specified capacity.
-     * <p>
-     * If the current capacity is insufficient, the arrays are grown by 50%.
-     *
-     * @param minCapacity the minimum required capacity
-     */
-    private void ensureCapacity(int minCapacity) {
-        int currentCapacity = xs.length;
-        if (minCapacity > currentCapacity) {
-            int newCapacity = Math.max(minCapacity, currentCapacity + (currentCapacity >> 1));
-            xs = Arrays.copyOf(xs, newCapacity);
-            ys = Arrays.copyOf(ys, newCapacity);
-            cells = Arrays.copyOf(cells, newCapacity);
+    private int indexOf(int i) {
+        if (i < 0 || i >= cellCount) {
+            throw new IndexOutOfBoundsException("Index: " + i + ", changed cells: " + cellCount);
         }
+        int consumed = 0;
+        for (int run = 0; run < runCount; run++) {
+            int length = runs[(run << 1) + 1];
+            if (i < consumed + length) {
+                return runs[run << 1] + (i - consumed);
+            }
+            consumed += length;
+        }
+        throw new IllegalStateException("Run lengths do not add up to " + cellCount);
     }
 
     /**
-     * Returns the current capacity of the internal arrays.
+     * Returns the number of runs this result can hold without reallocating.
      *
-     * @return the capacity
+     * @return the capacity in runs
      */
     public int capacity() {
-        return xs.length;
+        return runs.length >> 1;
     }
 
     @Override
     public String toString() {
-        return String.format("DiffResult[count=%d, capacity=%d]", count, xs.length);
+        return String.format("DiffResult[cells=%d, runs=%d, capacity=%d]", cellCount, runCount, capacity());
     }
 }

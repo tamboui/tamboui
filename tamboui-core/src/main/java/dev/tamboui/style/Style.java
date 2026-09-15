@@ -26,6 +26,9 @@ public final class Style {
     private final EnumSet<Modifier> subModifiers;
     private final Map<Class<?>, Object> extensions;
     private final int cachedHashCode;
+    // Bitmask mirrors of the modifier sets: equality/hash on ints instead of EnumSet calls
+    private final int addMask;
+    private final int subMask;
 
     /** An empty style with no colors or modifiers set. */
     public static final Style EMPTY = new Style(
@@ -81,6 +84,8 @@ public final class Style {
         this.addModifiers = EnumSet.copyOf(addModifiers);
         this.subModifiers = EnumSet.copyOf(subModifiers);
         this.extensions = extensions.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(new HashMap<>(extensions));
+        this.addMask = mask(this.addModifiers);
+        this.subMask = mask(this.subModifiers);
         this.cachedHashCode = computeHashCode();
     }
 
@@ -113,11 +118,27 @@ public final class Style {
         this.addModifiers = addModifiers;
         this.subModifiers = subModifiers;
         this.extensions = extensions;
+        this.addMask = mask(addModifiers);
+        this.subMask = mask(subModifiers);
         this.cachedHashCode = computeHashCode();
     }
 
+    private static int mask(EnumSet<Modifier> set) {
+        int m = 0;
+        for (Modifier mod : set) {
+            m |= 1 << mod.ordinal();
+        }
+        return m;
+    }
+
     private int computeHashCode() {
-        return Objects.hash(fg, bg, underlineColor, addModifiers, subModifiers, extensions);
+        int h = Objects.hashCode(fg);
+        h = 31 * h + Objects.hashCode(bg);
+        h = 31 * h + Objects.hashCode(underlineColor);
+        h = 31 * h + addMask;
+        h = 31 * h + subMask;
+        h = 31 * h + (extensions.isEmpty() ? 0 : extensions.hashCode());
+        return h;
     }
 
     /**
@@ -676,12 +697,14 @@ public final class Style {
         if (cachedHashCode != style.cachedHashCode) {
             return false;
         }
-        return Objects.equals(fg, style.fg)
+        return addMask == style.addMask
+            && subMask == style.subMask
+            && Objects.equals(fg, style.fg)
             && Objects.equals(bg, style.bg)
             && Objects.equals(underlineColor, style.underlineColor)
-            && addModifiers.equals(style.addModifiers)
-            && subModifiers.equals(style.subModifiers)
-            && extensions.equals(style.extensions);
+            && (extensions == style.extensions
+                || (extensions.isEmpty() && style.extensions.isEmpty())
+                || extensions.equals(style.extensions));
     }
 
     @Override

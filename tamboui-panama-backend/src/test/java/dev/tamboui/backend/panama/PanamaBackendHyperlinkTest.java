@@ -12,8 +12,10 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.buffer.DiffResult;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.layout.Size;
 import dev.tamboui.style.Style;
 
@@ -28,8 +30,11 @@ class PanamaBackendHyperlinkTest {
         PanamaBackend backend = new PanamaBackend(terminal);
 
         Style style = Style.EMPTY.hyperlink("https://example.com");
+        Buffer prev = Buffer.empty(Rect.of(1, 1));
+        Buffer next = Buffer.empty(Rect.of(1, 1));
+        next.set(0, 0, new Cell("A", style));
         DiffResult diff = new DiffResult();
-        diff.add(0, 0, new Cell("A", style));
+        prev.diff(next, diff);
 
         backend.draw(diff);
         backend.flush();
@@ -55,9 +60,12 @@ class PanamaBackendHyperlinkTest {
         PanamaBackend backend = new PanamaBackend(terminal);
 
         Style linkStyle = Style.EMPTY.hyperlink("https://example.com", "link-1");
+        Buffer prev = Buffer.empty(Rect.of(2, 1));
+        Buffer next = Buffer.empty(Rect.of(2, 1));
+        next.set(0, 0, new Cell("A", linkStyle));
+        next.set(1, 0, new Cell("B", Style.EMPTY));
         DiffResult diff = new DiffResult();
-        diff.add(0, 0, new Cell("A", linkStyle));
-        diff.add(1, 0, new Cell("B", Style.EMPTY));
+        prev.diff(next, diff);
 
         backend.draw(diff);
         backend.flush();

@@ -67,9 +67,15 @@ public final class RecordingBackend implements Backend {
 
     @Override
     public void draw(DiffResult diff) throws IOException {
-        // Apply updates to our buffer (DoD version)
-        for (int i = 0; i < diff.size(); i++) {
-            buffer.set(diff.getX(i), diff.getY(i), diff.getCell(i));
+        // Apply updates to our buffer, iterating runs of adjacent changed cells
+        for (int run = 0, runs = diff.runCount(); run < runs; run++) {
+            int start = diff.runStart(run);
+            int end = start + diff.runLength(run);
+            int x = diff.xOf(start);
+            int y = diff.yOf(start);
+            for (int i = start; i < end; i++) {
+                buffer.set(x++, y, diff.cellAt(i));
+            }
         }
         hasDrawn = true;
 

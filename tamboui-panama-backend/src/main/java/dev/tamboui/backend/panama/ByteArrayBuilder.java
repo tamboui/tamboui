@@ -4,7 +4,6 @@
  */
 package dev.tamboui.backend.panama;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -160,6 +159,22 @@ public final class ByteArrayBuilder {
      * @return this builder for chaining
      */
     public ByteArrayBuilder appendUtf8(String s) {
+        return appendUtf8((CharSequence) s);
+    }
+
+    /**
+     * Appends a character sequence encoded as UTF-8, without an intermediate byte array.
+     * <p>
+     * Taking a {@link CharSequence} lets callers append a {@link StringBuilder} - such as the
+     * cursor-positioning escape a backend builds once per frame - without a {@code toString()}.
+     * Non-ASCII input is encoded in place rather than through
+     * {@link String#getBytes(java.nio.charset.Charset)}, which allocated a byte array for every
+     * box-drawing or sparkline glyph written.
+     *
+     * @param s the characters to append as UTF-8
+     * @return this builder for chaining
+     */
+    public ByteArrayBuilder appendUtf8(CharSequence s) {
         int len = s.length();
         if (len == 0) {
             return this;
@@ -193,9 +208,38 @@ public final class ByteArrayBuilder {
             return this;
         }
 
-        // Fall back to full UTF-8 encoding for strings with non-ASCII characters
-        byte[] utf8 = s.getBytes(StandardCharsets.UTF_8);
-        return append(utf8);
+        // A BMP character needs at most 3 bytes; a surrogate pair needs 4, which is still
+        // within the 6 bytes its two chars reserve here.
+        ensureCapacity(len * 3);
+        for (int i = 0; i < len; i++) {
+            char c = s.charAt(i);
+            if (c < 0x80) {
+                buffer[position++] = (byte) c;
+            } else if (c < 0x800) {
+                buffer[position++] = (byte) (0xC0 | (c >> 6));
+                buffer[position++] = (byte) (0x80 | (c & 0x3F));
+            } else if (Character.isHighSurrogate(c)) {
+                char low = i + 1 < len ? s.charAt(i + 1) : 0;
+                if (Character.isLowSurrogate(low)) {
+                    int codePoint = Character.toCodePoint(c, low);
+                    i++;
+                    buffer[position++] = (byte) (0xF0 | (codePoint >> 18));
+                    buffer[position++] = (byte) (0x80 | ((codePoint >> 12) & 0x3F));
+                    buffer[position++] = (byte) (0x80 | ((codePoint >> 6) & 0x3F));
+                    buffer[position++] = (byte) (0x80 | (codePoint & 0x3F));
+                } else {
+                    // Unpaired surrogate: same substitution String.getBytes(UTF_8) makes
+                    buffer[position++] = (byte) '?';
+                }
+            } else if (Character.isLowSurrogate(c)) {
+                buffer[position++] = (byte) '?';
+            } else {
+                buffer[position++] = (byte) (0xE0 | (c >> 12));
+                buffer[position++] = (byte) (0x80 | ((c >> 6) & 0x3F));
+                buffer[position++] = (byte) (0x80 | (c & 0x3F));
+            }
+        }
+        return this;
     }
 
     /**

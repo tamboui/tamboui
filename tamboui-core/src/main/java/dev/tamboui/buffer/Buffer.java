@@ -25,6 +25,12 @@ public final class Buffer {
 
     // Pre-allocated single-char strings for ASCII codepoints to avoid repeated allocation
     private static final String[] ASCII_STRINGS = new String[128];
+    // Lazily interned symbols for U+2500..U+28FF (box drawing, block elements, geometric shapes,
+    // misc symbols, braille): the glyphs borders, sparklines and canvases emit every frame.
+    // Sharing the instance lets String.equals() exit on identity in Buffer.diff().
+    private static final int GLYPH_BASE = 0x2500;
+    private static final String[] GLYPH_STRINGS = new String[0x2900 - GLYPH_BASE];
+
     static {
         for (int i = 0; i < 128; i++) {
             ASCII_STRINGS[i] = String.valueOf((char) i);
@@ -38,6 +44,29 @@ public final class Buffer {
     private Buffer(Rect area, Cell[] content) {
         this.area = area;
         this.content = content;
+    }
+
+    /**
+     * Returns the shared {@link String} for a code point, so that cells holding the same glyph
+     * share one instance and {@link String#equals} can exit on identity when buffers are diffed.
+     *
+     * @param codePoint the code point to render
+     * @return the symbol for that code point
+     */
+    private static String symbolFor(int codePoint) {
+        if (codePoint < 128) {
+            return ASCII_STRINGS[codePoint];
+        }
+        int idx = codePoint - GLYPH_BASE;
+        if (idx >= 0 && idx < GLYPH_STRINGS.length) {
+            String s = GLYPH_STRINGS[idx];
+            if (s == null) {
+                s = String.valueOf((char) codePoint);
+                GLYPH_STRINGS[idx] = s; // benign race: equal immutable values
+            }
+            return s;
+        }
+        return new String(Character.toChars(codePoint));
     }
 
     /**
@@ -309,11 +338,11 @@ public final class Buffer {
 
             // C0 control chars (U+0000–U+001F) and DEL (U+007F) are not displayable glyphs.
             // Writing them to the terminal moves the cursor unpredictably (e.g. \t jumps to
-            // the next tab stop, \r resets to column 0), which breaks the cursor-adjacency
-            // optimisation in AbstractBackend and corrupts all subsequent cells in the row.
+            // the next tab stop, \r resets to column 0), desynchronising the cursor from the
+            // rest of the run being drawn and corrupting all subsequent cells in the row.
             String symbol = (codePoint < 0x20 || codePoint == 0x7F)
                     ? " "
-                    : codePoint < 128 ? ASCII_STRINGS[codePoint] : new String(Character.toChars(codePoint));
+                    : symbolFor(codePoint);
 
             if (charWidth == 2 && col + 1 >= area.right()) {
                 // Wide char at rightmost column: no room for continuation, replace with space
@@ -436,6 +465,13 @@ public final class Buffer {
      * @param style the style to apply
      */
     public void setStyle(Rect area, Style style) {
+        if (Style.EMPTY.equals(style)) {
+            // An empty patch reproduces every field of the cell's own style, so patchStyle
+            // returns the identical Cell for every position: the whole pass cannot change the
+            // buffer. Widgets fill their background this way on every frame, so skipping it
+            // saves a pass over the widget's entire area.
+            return;
+        }
         Rect intersection = this.area.intersection(area);
         if (intersection.isEmpty()) {
             return;
@@ -514,33 +550,55 @@ public final class Buffer {
     }
 
     /**
-     * Calculates the differences between this buffer and another using a
-     * Data-Oriented Design approach with parallel arrays.
+     * Calculates the differences between this buffer and another as runs of
+     * horizontally adjacent changed cells (see {@link DiffResult}). The result
+     * references {@code other}'s cells directly; nothing is allocated per frame.
      * <p>
-     * The output {@link DiffResult} is <b>not cleared</b> before writing - the
-     * caller must call {@link DiffResult#clear()} after the result is no longer needed.
+     * Any previous content of {@code out} is discarded. The caller must still call
+     * {@link DiffResult#clear()} once the result has been drawn, to release the reference
+     * this method takes to {@code other}'s cells.
      *
      * @param other the buffer to compare with
-     * @param out the diff result to append updates to (not cleared by this method)
+     * @param out the diff result to write the runs into
      * @see DiffResult
      */
     public void diff(Buffer other, DiffResult out) {
+        out.bind(other.content, other.area);
+        int width = other.area.width();
+        int height = other.area.height();
+
         if (!this.area.equals(other.area)) {
-            for (int y = other.area.top(); y < other.area.bottom(); y++) {
-                for (int x = other.area.left(); x < other.area.right(); x++) {
-                    out.add(x, y, other.get(x, y));
-                }
+            // Area changed: every cell is dirty, one run per row. A zero-width target has
+            // nothing to draw, and an empty run would make xOf/yOf divide by the width.
+            if (width == 0) {
+                return;
+            }
+            for (int y = 0; y < height; y++) {
+                out.addRun(y * width, width);
             }
             return;
         }
 
-        for (int i = 0; i < content.length; i++) {
-            Cell thisCell = content[i];
-            Cell otherCell = other.content[i];
-            if (thisCell != otherCell && !thisCell.equals(otherCell)) {
-                int x = area.x() + (i % area.width());
-                int y = area.y() + (i / area.width());
-                out.add(x, y, otherCell);
+        Cell[] a = content;
+        Cell[] b = other.content;
+        for (int y = 0; y < height; y++) {
+            int rowStart = y * width;
+            int rowEnd = rowStart + width;
+            int runStart = -1;
+            for (int i = rowStart; i < rowEnd; i++) {
+                Cell thisCell = a[i];
+                Cell otherCell = b[i];
+                if (thisCell != otherCell && !thisCell.equals(otherCell)) {
+                    if (runStart < 0) {
+                        runStart = i;
+                    }
+                } else if (runStart >= 0) {
+                    out.addRun(runStart, i - runStart);
+                    runStart = -1;
+                }
+            }
+            if (runStart >= 0) {
+                out.addRun(runStart, rowEnd - runStart);
             }
         }
     }

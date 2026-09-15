@@ -119,12 +119,16 @@ public class FullPipelineBenchmark {
     @Benchmark
     public void fullPipeline(Blackhole blackhole) {
         prevBuffer.diff(currBuffer, reusableDiffResult);
-        int diffSize = reusableDiffResult.size();
 
-        for (int i = 0; i < diffSize; i++) {
-            blackhole.consume(reusableDiffResult.getX(i));
-            blackhole.consume(reusableDiffResult.getY(i));
-            blackhole.consume(reusableDiffResult.getCell(i));
+        // Consume the diff the way a backend does: coordinates once per run, cells in sequence.
+        for (int run = 0, runs = reusableDiffResult.runCount(); run < runs; run++) {
+            int start = reusableDiffResult.runStart(run);
+            int end = start + reusableDiffResult.runLength(run);
+            blackhole.consume(reusableDiffResult.xOf(start));
+            blackhole.consume(reusableDiffResult.yOf(start));
+            for (int i = start; i < end; i++) {
+                blackhole.consume(reusableDiffResult.cellAt(i));
+            }
         }
 
         reusableDiffResult.clear();

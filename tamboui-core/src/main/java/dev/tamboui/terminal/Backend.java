@@ -18,11 +18,13 @@ import dev.tamboui.layout.Size;
 public interface Backend extends AutoCloseable {
 
     /**
-     * Draws the given cell updates to the terminal using a Data-Oriented Design approach.
+     * Draws the given cell updates to the terminal.
      * <p>
-     * This is the primary rendering method, optimized for zero allocations with parallel arrays.
+     * This is the primary rendering method. The updates arrive as runs of horizontally
+     * adjacent changed cells referencing the buffer that was rendered, so drawing a frame
+     * allocates nothing; see {@link DiffResult} for how to iterate them.
      *
-     * @param diff the diff result containing cell updates in Structure-of-Arrays format
+     * @param diff the diff result containing the runs of changed cells
      * @throws IOException if drawing fails
      * @see AbstractBackend
      * @see DiffResult
