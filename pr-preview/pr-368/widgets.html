@@ -28,7 +28,7 @@
 <div id="header">
 <h1>Widgets Reference</h1>
 <div class="details">
-<span id="revnumber">version 0.5.0-SNAPSHOT</span>
+<span id="revnumber">version 0.6.0-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -101,6 +101,7 @@
 <li><a href="#logo">Logo</a></li>
 <li><a href="#errordisplay">ErrorDisplay</a></li>
 <li><a href="#clear-style">Clear (Styled)</a></li>
+<li><a href="#syntax-highlighting">Syntax Highlighting</a></li>
 </ul>
 </li>
 <li><a href="#markdown">Markdown</a>
@@ -357,18 +358,21 @@ paragraph.render(area, buffer);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Wrap modes:</p>
+<p>Wrap modes, set with <code>.overflow(&#8230;&#8203;)</code> (CSS property: <code>text-overflow</code>):</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>Wrap.NONE</code> - No wrapping, text is clipped</p>
+<p><code>Overflow.CLIP</code> - No wrapping, text is clipped</p>
 </li>
 <li>
-<p><code>Wrap.CHARACTER</code> - Wrap at any character</p>
+<p><code>Overflow.WRAP_CHARACTER</code> - Wrap at any character</p>
 </li>
 <li>
-<p><code>Wrap.WORD</code> - Wrap at word boundaries</p>
+<p><code>Overflow.WRAP_WORD</code> - Wrap at word boundaries</p>
+</li>
+<li>
+<p><code>Overflow.ELLIPSIS</code> / <code>ELLIPSIS_START</code> / <code>ELLIPSIS_MIDDLE</code> - Truncate with <code>&#8230;&#8203;</code> at the end, start, or middle</p>
 </li>
 </ul>
 </div>
@@ -1390,12 +1394,55 @@ if (event.code() == KeyCode.CHAR) {
 <p><code>state.moveCursorToStart()</code> / <code>moveCursorToEnd()</code> - Jump to document boundaries</p>
 </li>
 <li>
-<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling</p>
+<p><code>state.scrollUp(amount)</code> / <code>state.scrollDown(amount, visibleRows)</code> - Manual scrolling
+(<code>scrollDown(amount, visibleRows, visibleCols, overflow)</code> counts wrapped rows when wrapping)</p>
 </li>
 <li>
 <p><code>state.clear()</code> - Clear all content</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Wrap modes:</p>
+</div>
+<div class="paragraph">
+<p>By default a long line is clipped and the view scrolls horizontally. Set <code>.overflow(&#8230;&#8203;)</code> on
+<code>TextArea.Builder</code> (or <code>.overflow(&#8230;&#8203;)</code> / <code>.wrapWord()</code> / <code>.wrapCharacter()</code> / <code>.clip()</code> on
+<code>TextAreaElement</code>) to wrap it across multiple screen rows instead:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Overflow.CLIP</code> - No wrapping, horizontal scrolling (default)</p>
+</li>
+<li>
+<p><code>Overflow.WRAP_CHARACTER</code> - Wrap at any character</p>
+</li>
+<li>
+<p><code>Overflow.WRAP_WORD</code> - Wrap at word boundaries</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>While wrapping, <code>Up</code>/<code>Down</code> move the cursor by visual row rather than by logical line, keeping
+its screen column, and the line-number gutter shows a number only on the first row of each
+logical line. A line whose last row fills the whole width is followed by an empty row, so the
+cursor at the end of that line stays visible. In the Toolkit DSL, a wrapping <code>TextAreaElement</code>
+asks its container for enough rows to show every wrapped line.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Unlike <code>Paragraph</code>, a text area does not support the truncating modes (<code>Overflow.ELLIPSIS</code>,
+<code>ELLIPSIS_START</code>, <code>ELLIPSIS_MIDDLE</code>) - the cursor can move into text they would hide. They fall
+back to <code>Overflow.CLIP</code>.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>CSS properties:</p>
@@ -1410,6 +1457,9 @@ if (event.code() == KeyCode.CHAR) {
 </li>
 <li>
 <p><code>line-number-color</code> - Line number gutter color</p>
+</li>
+<li>
+<p><code>text-overflow</code> - Wrap mode (<code>clip</code>, <code>wrap-word</code>, <code>wrap-character</code>)</p>
 </li>
 </ul>
 </div>
@@ -1770,6 +1820,58 @@ Clear.INSTANCE.render(area, buffer);</code></pre>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="syntax-highlighting"><a class="anchor" href="#syntax-highlighting"></a><a class="link" href="#syntax-highlighting">Syntax Highlighting</a></h3>
+<div class="paragraph">
+<p>A reusable component for coloring source-code tokens, independent of any single
+widget. It lives in <code>dev.tamboui.widgets.syntax</code> and is consumed by
+<code>MarkdownView</code> for fenced code blocks, but any code/editor widget can reuse it.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SyntaxHighlighter</code> — the component interface
+(<code>List&lt;Line&gt; highlight(String code, String language, Style base, SyntaxTheme)</code>).
+Implement your own for a custom tokenizer, or use <code>SyntaxHighlighter.none()</code>
+to disable highlighting.</p>
+</li>
+<li>
+<p><code>RegexSyntaxHighlighter</code> — the built-in regex tokenizer (highlight.js-inspired)
+with grammars for <code>java</code>, <code>kotlin</code>, <code>javascript</code>, <code>typescript</code>, <code>python</code>,
+<code>json</code>, <code>xml</code>/<code>html</code>, <code>css</code>, <code>bash</code>, <code>yaml</code>, <code>properties</code>, <code>sql</code>, <code>go</code> and
+<code>rust</code>.</p>
+</li>
+<li>
+<p><code>Grammar</code> — a declarative language definition: an id, aliases, and rules
+(<code>pattern</code>, <code>literal</code>, <code>multiline</code>).</p>
+</li>
+<li>
+<p><code>SyntaxTheme</code> — maps a <code>TokenType</code> to a <code>Style</code>; <code>SyntaxTheme.DEFAULTS</code> is a
+light-on-dark palette. <code>builder()</code> starts with that palette; use <code>token()</code> to
+replace entries or <code>clear()</code> to make tokens inherit the enclosing style.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.List;
+
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
+import dev.tamboui.widgets.syntax.TokenType;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
+
+SyntaxHighlighter highlighter = RegexSyntaxHighlighter.defaults();
+SyntaxTheme theme = SyntaxTheme.builder()
+    .token(TokenType.KEYWORD, Style.EMPTY.bold().fg(Color.rgb(198, 120, 221)))
+    .build();
+
+List&lt;Line&gt; lines = highlighter.highlight("int x = 1;", "java", Style.EMPTY, theme);</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1859,7 +1961,7 @@ column(top, middle, bottom).spacing(1);</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.5.0-SNAPSHOT<br>
+Version 0.6.0-SNAPSHOT<br>
 </div>
 </div>
 <script src="_static/highlight/highlight.min.js"></script>
