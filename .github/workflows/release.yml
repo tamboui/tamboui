@@ -49,6 +49,8 @@ jobs:
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JRELEASER_ZERNIO_TOKEN: ${{ secrets.ZERNIO_TOKEN }}
+          ZERNIO_PROFILE_ID: ${{ secrets.ZERNIO_PROFILE_ID }}
       - name: JReleaser release output
         if: always()
         uses: actions/upload-artifact@v6
