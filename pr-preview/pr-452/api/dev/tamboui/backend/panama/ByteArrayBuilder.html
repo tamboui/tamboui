@@ -154,7 +154,7 @@ UTF-8 operations (cell symbols) encode only when necessary.</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ByteArrayBuilder.html" title="class in dev.tamboui.backend.panama">ByteArrayBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#appendUtf8(java.lang.CharSequence)" class="member-name-link">appendUtf8</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&nbsp;s)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Appends a character sequence encoded as UTF-8, without allocating.</div>
+<div class="block">Appends a character sequence encoded as UTF-8, without an intermediate byte array.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ByteArrayBuilder.html" title="class in dev.tamboui.backend.panama">ByteArrayBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#appendUtf8(java.lang.String)" class="member-name-link">appendUtf8</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;s)</code></div>
@@ -332,7 +332,7 @@ the overhead of <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java
 <h3>appendUtf8</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ByteArrayBuilder.html" title="class in dev.tamboui.backend.panama">ByteArrayBuilder</a></span>&nbsp;<span class="element-name">appendUtf8</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&nbsp;s)</span></div>
-<div class="block">Appends a character sequence encoded as UTF-8, without allocating.
+<div class="block">Appends a character sequence encoded as UTF-8, without an intermediate byte array.
 <p>
 Taking a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link"><code>CharSequence</code></a> lets callers append a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/StringBuilder.html" title="class or interface in java.lang" class="external-link"><code>StringBuilder</code></a> - such as the
 cursor-positioning escape a backend builds once per frame - without a <code>toString()</code>.
