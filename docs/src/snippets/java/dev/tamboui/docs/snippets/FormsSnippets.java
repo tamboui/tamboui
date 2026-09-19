@@ -319,7 +319,8 @@ public class FormsSnippets {
         // Render form with submit button
         column(
             loginForm,
-            text(" Login ").bold()  // Note: button() is not yet available
+            button(text(" Login ").bold())
+                .onPress(() -> loginForm.submit())
         );
         // end::programmatic-submit[]
     }
