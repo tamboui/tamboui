@@ -8,8 +8,7 @@ Sleep 2
 Show
 
 # Recording
-Sleep 2
-Screenshot screenshots/tui-demo.svg
+Sleep 1
 Set TypingSpeed 1s
 Right
 Right
@@ -18,3 +17,4 @@ Enter
 Enter
 Space
 Space
+Screenshot screenshots/tui-demo.svg
