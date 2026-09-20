@@ -136,6 +136,13 @@ public final class EventParser {
             return KeyEvent.ofChar(next, KeyModifiers.ALT, bindings);
         }
 
+        // Terminals meta-escape Alt+Backspace as ESC followed by DEL (0x7F)
+        // or BS (0x08); those must not collapse into an undistinguishable
+        // UNKNOWN event
+        if (next == 127 || next == 8) {
+            return KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.ALT, bindings);
+        }
+
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
     }
 
