@@ -133,6 +133,57 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("Alt+Backspace (ESC DEL) is parsed as BACKSPACE with Alt")
+    void readEventMapsEscDelToAltBackspace() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 127);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.BACKSPACE);
+        assertThat(keyEvent.hasAlt()).isTrue();
+        assertThat(keyEvent.hasCtrl()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Alt+Backspace (ESC BS) is parsed as BACKSPACE with Alt")
+    void readEventMapsEscBsToAltBackspace() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 8);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.BACKSPACE);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
+    @Test
+    @DisplayName("ESC followed by another control char is still UNKNOWN")
+    void readEventMapsEscOtherControlCharToUnknown() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 1);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UNKNOWN);
+    }
+
+    @Test
+    @DisplayName("bare DEL stays a plain BACKSPACE without Alt")
+    void readEventKeepsBareDelUnaffected() throws IOException {
+        QueueBackend backend = new QueueBackend(127);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.BACKSPACE);
+        assertThat(keyEvent.modifiers()).isEqualTo(KeyModifiers.NONE);
+    }
+
+    @Test
     @DisplayName("SS3 F4 (ESC O S) is parsed as F4")
     void ss3F4ParsedCorrectly() throws IOException {
         QueueBackend backend = new QueueBackend(27, 'O', 'S');
