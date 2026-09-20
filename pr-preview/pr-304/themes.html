@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Themes</title>
+<link rel="stylesheet" href="./_static/tamboui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="_static/highlight/styles/github-dark.min.css">
+<!-- Theme toggle script - runs early to prevent flash -->
+<script>
+(function() {
+    var theme = localStorage.getItem('tamboui-theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+</script>
+<!-- Asciinema Player for demo recordings -->
+<link rel="stylesheet" type="text/css" href="_static/asciinema/asciinema-player.css" />
+<script src="_static/asciinema/asciinema-player.min.js"></script>
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Themes</h1>
+<div class="details">
+<span id="revnumber">version 0.6.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#semantic-colors">Semantic Colors</a></li>
+<li><a href="#generated-color-system">Generated Color System</a>
+<ul class="sectlevel2">
+<li><a href="#base-semantic-colors">Base Semantic Colors</a></li>
+<li><a href="#surface-hierarchy">Surface Hierarchy</a></li>
+<li><a href="#shade-variants">Shade Variants</a></li>
+<li><a href="#text-colors">Text Colors</a></li>
+<li><a href="#ui-colors">UI Colors</a></li>
+</ul>
+</li>
+<li><a href="#built-in-themes">Built-in Themes</a>
+<ul class="sectlevel2">
+<li><a href="#auto-terminal">auto-terminal</a></li>
+<li><a href="#tamboui-default">tamboui-default</a></li>
+<li><a href="#nord">nord</a></li>
+<li><a href="#gruvbox-dark">gruvbox-dark</a></li>
+<li><a href="#dracula">dracula</a></li>
+<li><a href="#catppuccin-mocha">catppuccin-mocha</a></li>
+<li><a href="#tokyo-night">tokyo-night</a></li>
+</ul>
+</li>
+<li><a href="#creating-custom-themes">Creating Custom Themes</a>
+<ul class="sectlevel2">
+<li><a href="#builder-options">Builder Options</a></li>
+<li><a href="#variable-overrides">Variable Overrides</a></li>
+</ul>
+</li>
+<li><a href="#runtime-theme-switching">Runtime Theme Switching</a></li>
+<li><a href="#using-themes-without-css">Using Themes Without CSS</a></li>
+<li><a href="#color-manipulation">Color Manipulation</a></li>
+<li><a href="#integration-with-css-stylesheets">Integration with CSS Stylesheets</a>
+<ul class="sectlevel2">
+<li><a href="#theme-aware-stylesheets">Theme-Aware Stylesheets</a></li>
+<li><a href="#mixing-theme-variables-with-overrides">Mixing Theme Variables with Overrides</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">Next Steps</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI includes a theme system that generates a complete color palette from a small set of semantic colors.
+Define a handful of colors — primary, error, success — and the system auto-derives 25+ shades, text colors, and UI colors.
+Themes integrate with both the CSS engine and the Java API.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quick-start"><a class="anchor" href="#quick-start"></a><a class="link" href="#quick-start">Quick Start</a></h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void quickStart() throws Exception {
+    // 1. Create engines
+    StyleEngine styleEngine = StyleEngine.create();
+    styleEngine.loadStylesheet("app", "/app.tcss");
+    styleEngine.setActiveStylesheet("app");
+
+    ThemeEngine themeEngine = new ThemeEngine();
+    themeEngine.setTheme("nord");
+
+    // 2. Inject theme colors as TCSS variables ($primary, $border, etc.)
+    themeEngine.injectVariables(styleEngine);
+
+    // 3. Run with theme-aware stylesheet
+    try (var runner = ToolkitRunner.create(TuiConfig.defaults())) {
+        runner.styleEngine(styleEngine);
+        runner.run(() -&gt; null /* your root element */);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>ThemeEngine</code> generates a <code>ColorSystem</code> from the theme&#8217;s semantic palette and injects every color as a TCSS <code>$variable</code>.
+Your stylesheet can then reference them:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">Panel {
+    background: $surface;
+    border-color: $border;
+}
+
+Panel:focus {
+    border-color: $border-focus;
+}
+
+.primary {
+    color: $primary;
+    text-style: bold;
+}
+
+.error {
+    color: $error;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Switch themes at runtime and the same stylesheet produces a completely different look — no extra stylesheets required.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a><a class="link" href="#architecture">Architecture</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The theme system has three layers:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Layer</th>
+<th class="tableblock halign-left valign-top">Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Core</strong> (<code>tamboui-core</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Theme</code> definition, <code>ColorSystem</code> generation, <code>ThemePropertyResolver</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>CSS</strong> (<code>tamboui-css</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ThemeEngine</code> bridges themes with <code>StyleEngine</code> via <code>$variable</code> injection</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Widgets / Toolkit</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCSS files and Java code consume <code>$primary</code>, <code>$border</code>, etc.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Data flow:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Theme (7–12 seed colors)
+  → ColorSystem.generate()  →  25+ derived colors
+      ├── CSS path:   ThemeEngine.injectVariables(styleEngine)
+      │                 → TCSS uses $primary, $surface, ...
+      └── Java path:  theme.toResolver()
+                        → resolver.get(ThemeProperties.PRIMARY)</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="semantic-colors"><a class="anchor" href="#semantic-colors"></a><a class="link" href="#semantic-colors">Semantic Colors</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A <code>Theme</code> is built from a small set of <em>semantic</em> colors that describe intent rather than appearance:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 60%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+<th class="tableblock halign-left valign-top">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>primary</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Main brand / accent color — used for focused borders, selection highlights, active elements</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secondary</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Supporting color — used for secondary actions, alternative highlights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>error</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Errors and destructive actions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>success</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success messages, positive confirmations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>warning</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Caution messages, non-blocking alerts</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Decorative accent for emphasis (defaults to <code>primary</code> if not set)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>info</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Informational content (defaults to <code>secondary</code> if not set)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Additionally, themes may specify surface colors for the background hierarchy:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>background</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">App background — the darkest (or lightest) layer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>surface</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Elevated surface — panels, cards, modals</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>panel</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Higher-elevation surface — nested containers, toolbars</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foreground</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default text / content color</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>If surface colors are omitted, they are auto-derived from the <code>dark</code> flag and <code>primary</code> color.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generated-color-system"><a class="anchor" href="#generated-color-system"></a><a class="link" href="#generated-color-system">Generated Color System</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Calling <code>theme.generate()</code> produces a <code>ColorSystem</code> containing all derived colors.
+These are the colors available as TCSS variables (<code>$name</code>) and through <code>ThemeProperties</code> constants.</p>
+</div>
+<div class="sect2">
+<h3 id="base-semantic-colors"><a class="anchor" href="#base-semantic-colors"></a><a class="link" href="#base-semantic-colors">Base Semantic Colors</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$primary</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Primary brand color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$secondary</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Secondary brand color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$error</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Error / danger color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$success</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success / positive color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$warning</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Warning / caution color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$accent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accent color (if defined on theme)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$info</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Informational color (if defined on theme)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="surface-hierarchy"><a class="anchor" href="#surface-hierarchy"></a><a class="link" href="#surface-hierarchy">Surface Hierarchy</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$background</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">App background (auto-derived: dark → <code>#121212</code>, light → <code>#efefef</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$surface</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Elevated surface (auto-derived: dark → <code>#1e1e1e</code>, light → <code>#f5f5f5</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$panel</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Panel / toolbar surface (auto-derived: <code>surface</code> blended 10% with <code>primary</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$foreground</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Content color (auto-derived: inverse of <code>background</code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="shade-variants"><a class="anchor" href="#shade-variants"></a><a class="link" href="#shade-variants">Shade Variants</a></h3>
+<div class="paragraph">
+<p>Each key color gets light, dark, and muted variants generated via HSL manipulation.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$primary-light</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>primary</code> lightened by <code>luminositySpread</code> (default 15%)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$primary-dark</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>primary</code> darkened by <code>luminositySpread</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$primary-muted</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>primary</code> blended 70% towards <code>background</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$secondary-light</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secondary</code> lightened by <code>luminositySpread</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$secondary-dark</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secondary</code> darkened by <code>luminositySpread</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$secondary-muted</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secondary</code> blended 70% towards <code>background</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$error-light</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>error</code> lightened by <code>luminositySpread</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$error-dark</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>error</code> darkened by <code>luminositySpread</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="text-colors"><a class="anchor" href="#text-colors"></a><a class="link" href="#text-colors">Text Colors</a></h3>
+<div class="paragraph">
+<p>Text colors ensure readable contrast against the background.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$text</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">WCAG contrast text for <code>background</code> (white on dark themes, black on light)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$text-muted</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text</code> blended 40% towards <code>background</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$text-disabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text</code> blended 62% towards <code>background</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$text-on-primary</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">WCAG contrast text for <code>primary</code> (for text on primary-colored backgrounds)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="ui-colors"><a class="anchor" href="#ui-colors"></a><a class="link" href="#ui-colors">UI Colors</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Derivation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$border</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>surface</code> darkened slightly (2.5%)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$border-focus</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Same as <code>primary</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$border-muted</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>surface</code> darkened very slightly (1%)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$selection-bg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>primary</code> blended 70% towards <code>background</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>$hover-bg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text</code> blended 96% towards <code>background</code> (subtle highlight)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="built-in-themes"><a class="anchor" href="#built-in-themes"></a><a class="link" href="#built-in-themes">Built-in Themes</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TamboUI ships with 7 built-in themes registered in <code>ThemeRegistry</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="auto-terminal"><a class="anchor" href="#auto-terminal"></a><a class="link" href="#auto-terminal">auto-terminal</a></h3>
+<div class="paragraph">
+<p>Adapts to your terminal&#8217;s ANSI color scheme.
+Uses named ANSI colors instead of fixed hex values, so the palette changes when you switch terminal themes.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Blue</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Cyan</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Red</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Green</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Yellow</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Light Blue</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Light Cyan</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="tamboui-default"><a class="anchor" href="#tamboui-default"></a><a class="link" href="#tamboui-default">tamboui-default</a></h3>
+<div class="paragraph">
+<p>Branded cyan/teal theme.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#00ffff</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#0080ff</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ff6b6b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#4caf50</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ffeb3b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#00ffff</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#00bcd4</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#000000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">surface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#1a1a1a</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">panel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#333333</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="nord"><a class="anchor" href="#nord"></a><a class="link" href="#nord">nord</a></h3>
+<div class="paragraph">
+<p>Arctic, north-bluish palette. Source: <a href="https://www.nordtheme.com/">nordtheme.com</a></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#88c0d0</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#81a1c1</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#bf616a</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#a3be8c</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ebcb8b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#b48ead</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#8fbcbb</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#2e3440</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">surface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#3b4252</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">panel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#434c5e</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">foreground</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#eceff4</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="gruvbox-dark"><a class="anchor" href="#gruvbox-dark"></a><a class="link" href="#gruvbox-dark">gruvbox-dark</a></h3>
+<div class="paragraph">
+<p>Retro groove color scheme. Source: <a href="https://github.com/morhetz/gruvbox">gruvbox</a></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#83a598</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#d3869b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#fb4934</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#b8bb26</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#fabd2f</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#fe8019</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#8ec07c</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#282828</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">surface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#3c3836</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">panel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#504945</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">foreground</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ebdbb2</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="dracula"><a class="anchor" href="#dracula"></a><a class="link" href="#dracula">dracula</a></h3>
+<div class="paragraph">
+<p>Dark theme with vibrant colors. Source: <a href="https://draculatheme.com/">draculatheme.com</a></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#bd93f9</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#8be9fd</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ff5555</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#50fa7b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#f1fa8c</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ff79c6</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#8be9fd</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#282a36</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">surface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#44475a</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">panel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#44475a</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">foreground</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#f8f8f2</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="catppuccin-mocha"><a class="anchor" href="#catppuccin-mocha"></a><a class="link" href="#catppuccin-mocha">catppuccin-mocha</a></h3>
+<div class="paragraph">
+<p>Soothing pastel theme. Source: <a href="https://catppuccin.com/">catppuccin.com</a></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#89b4fa</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#cba6f7</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#f38ba8</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#a6e3a1</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#f9e2af</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#f5c2e7</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#94e2d5</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#1e1e2e</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">surface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#313244</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">panel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#45475a</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">foreground</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#cdd6f4</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="tokyo-night"><a class="anchor" href="#tokyo-night"></a><a class="link" href="#tokyo-night">tokyo-night</a></h3>
+<div class="paragraph">
+<p>Clean dark theme inspired by Tokyo&#8217;s night skyline. Source: <a href="https://github.com/enkia/tokyo-night-vscode-theme">tokyo-night</a></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Color</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#7aa2f7</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secondary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#bb9af7</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">error</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#f7768e</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">success</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#9ece6a</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">warning</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#e0af68</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">accent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#ff9e64</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#7dcfff</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">background</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#1a1b26</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">surface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#24283b</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">panel</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#414868</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">foreground</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#a9b1d6</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-custom-themes"><a class="anchor" href="#creating-custom-themes"></a><a class="link" href="#creating-custom-themes">Creating Custom Themes</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use <code>Theme.Builder</code> to create a theme and register it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void customTheme() {
+    Theme myTheme = new Theme.Builder()
+        .name("my-brand")
+        .primary("#ff6600")
+        .secondary("#0066ff")
+        .error("#cc0000")
+        .success("#00cc44")
+        .warning("#ffaa00")
+        .accent("#ff00ff")
+        .background("#0a0a0a")
+        .surface("#1a1a1a")
+        .dark(true)
+        .build();
+
+    ThemeRegistry.register(myTheme);
+
+    // Now usable by name:
+    ThemeEngine engine = new ThemeEngine();
+    engine.setTheme("my-brand");
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="builder-options"><a class="anchor" href="#builder-options"></a><a class="link" href="#builder-options">Builder Options</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">Default</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name(String)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Theme name (required)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dark(boolean)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls auto-derivation of surfaces and text colors</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>primary(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Primary color (required)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secondary(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">primary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Secondary color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>error(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Red</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Error color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>success(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Green</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>warning(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI Yellow</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Warning color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accent(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional accent color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>info(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional info color</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>background(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Background color (auto: <code>#121212</code> dark / <code>#efefef</code> light)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>surface(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Surface color (auto: <code>#1e1e1e</code> dark / <code>#f5f5f5</code> light)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>panel(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Panel color (auto: surface blended 10% primary)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foreground(String|Color)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Foreground color (auto: inverse of background)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>luminositySpread(float)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0.15</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How much to lighten/darken for shade variants (0.0–1.0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>textAlpha(float)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0.95</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reserved for future text transparency support</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>variable(String, String)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">—</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override any generated color by name (e.g., <code>variable("border", "#4c566a")</code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="variable-overrides"><a class="anchor" href="#variable-overrides"></a><a class="link" href="#variable-overrides">Variable Overrides</a></h3>
+<div class="paragraph">
+<p>Use <code>variable()</code> to override any auto-generated color:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void variableOverrides() {
+    Theme nordCustom = new Theme.Builder()
+        .name("nord-custom")
+        .primary("#88c0d0")
+        .secondary("#81a1c1")
+        .error("#bf616a")
+        .success("#a3be8c")
+        .warning("#ebcb8b")
+        .background("#2e3440")
+        .dark(true)
+        // Override auto-generated colors:
+        .variable("border", "#4c566a")
+        .variable("text-muted", "#d8dee9")
+        .variable("text-on-primary", "#2e3440")
+        .build();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="runtime-theme-switching"><a class="anchor" href="#runtime-theme-switching"></a><a class="link" href="#runtime-theme-switching">Runtime Theme Switching</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Switch themes at runtime and re-inject variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void themeSwitching(ThemeEngine themeEngine, StyleEngine styleEngine) {
+    String[] themes = {"nord", "dracula", "catppuccin-mocha", "tokyo-night"};
+    int current = 0;
+
+    // Switch to next theme
+    current = (current + 1) % themes.length;
+    themeEngine.setTheme(themes[current]);
+    themeEngine.injectVariables(styleEngine);
+    // UI re-renders with new theme colors automatically
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-themes-without-css"><a class="anchor" href="#using-themes-without-css"></a><a class="link" href="#using-themes-without-css">Using Themes Without CSS</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Themes work without the CSS engine via <code>ThemeProperties</code> and <code>StylePropertyResolver</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void withoutCss() {
+    ThemeEngine themeEngine = new ThemeEngine();
+    themeEngine.setTheme("dracula");
+
+    // Access colors via typed properties
+    StylePropertyResolver resolver = themeEngine.getResolver();
+    Color primary = resolver.get(ThemeProperties.PRIMARY).orElse(Color.BLUE);
+    Color border = resolver.get(ThemeProperties.BORDER_FOCUS).orElse(Color.WHITE);
+    Color textMuted = resolver.get(ThemeProperties.TEXT_MUTED).orElse(Color.GRAY);
+
+    // Or access via ColorSystem by name
+    ColorSystem colors = themeEngine.getColorSystem();
+    Color selectionBg = colors.get("selection-bg");
+    Color hoverBg = colors.get("hover-bg");
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="color-manipulation"><a class="anchor" href="#color-manipulation"></a><a class="link" href="#color-manipulation">Color Manipulation</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>Color</code> interface provides convenience methods for color manipulation, powered by <code>ColorManipulation</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void colorManipulation() {
+    Color base = Color.hex("#3366cc");
+
+    // Lighten / darken (HSL space)
+    Color lighter = base.lighten(0.2f);
+    Color darker = base.darken(0.15f);
+
+    // Blend two colors (linear RGB interpolation)
+    Color blended = base.blend(Color.hex("#ff6600"), 0.3f);
+
+    // Get readable text color for a background
+    Color textColor = base.getContrastText();  // white or black
+
+    // Invert
+    Color inverted = base.inverse();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Low-level color space conversions are available via <code>ColorManipulation</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void colorConversions() {
+    // RGB ↔ HSL
+    float[] hsl = ColorManipulation.rgbToHsl(136, 192, 208);  // Nord primary
+    // hsl = [193.3, 43.4, 67.5]  (hue°, saturation%, lightness%)
+
+    int[] rgb = ColorManipulation.hslToRgb(193.3f, 43.4f, 67.5f);
+    // rgb = [136, 192, 208]
+
+    // RGB ↔ HSV
+    float[] hsv = ColorManipulation.rgbToHsv(136, 192, 208);
+    int[] rgb2 = ColorManipulation.hsvToRgb(hsv[0], hsv[1], hsv[2]);
+
+    // Linear interpolation between two colors
+    Color from = Color.hex("#88c0d0");
+    Color to = Color.hex("#bf616a");
+    Color mid = ColorManipulation.lerp(from, to, 0.5f);
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="integration-with-css-stylesheets"><a class="anchor" href="#integration-with-css-stylesheets"></a><a class="link" href="#integration-with-css-stylesheets">Integration with CSS Stylesheets</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="theme-aware-stylesheets"><a class="anchor" href="#theme-aware-stylesheets"></a><a class="link" href="#theme-aware-stylesheets">Theme-Aware Stylesheets</a></h3>
+<div class="paragraph">
+<p>Write a single stylesheet that works with any theme:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">/* All $variables come from the active theme */
+
+* {
+    color: $text;
+}
+
+Row, Column {
+    background: $background;
+}
+
+Panel {
+    background: $surface;
+    border-color: $border;
+}
+
+Panel:focus {
+    border-color: $border-focus;
+    border-type: double;
+}
+
+.primary   { color: $primary; text-style: bold; }
+.secondary { color: $secondary; }
+.error     { color: $error; text-style: bold; }
+.success   { color: $success; }
+.warning   { color: $warning; text-style: bold; }
+.info      { color: $info; }
+.muted     { color: $text-muted; }
+.disabled  { color: $text-disabled; }
+
+ListElement-item:selected {
+    background: $selection-bg;
+    color: $primary;
+    text-style: bold;
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mixing-theme-variables-with-overrides"><a class="anchor" href="#mixing-theme-variables-with-overrides"></a><a class="link" href="#mixing-theme-variables-with-overrides">Mixing Theme Variables with Overrides</a></h3>
+<div class="paragraph">
+<p>User-defined TCSS variables take precedence over theme-injected ones:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-css hljs" data-lang="css">/* Override the theme's primary color for this stylesheet */
+$primary: #ff6600;
+
+.custom-branded {
+    color: $primary;  /* Uses #ff6600, not the theme's primary */
+}
+
+.themed-text {
+    color: $secondary;  /* Still uses theme's secondary */
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps"><a class="anchor" href="#next-steps"></a><a class="link" href="#next-steps">Next Steps</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="styling.html">CSS Styling</a> — full TCSS reference, selectors, properties</p>
+</li>
+<li>
+<p><a href="widgets.html">Widgets Reference</a> — available components to theme</p>
+</li>
+<li>
+<p><a href="developer-guide.html">Developer Guide</a> — creating custom widgets with theme support</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.6.0-SNAPSHOT<br>
+</div>
+</div>
+<script src="_static/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<!-- Navigation data -->
+<script>
+var TAMBOUI_PAGES = [
+    { href: 'index.html', title: 'Home', short: 'Home' },
+    { href: 'getting-started.html', title: 'Getting Started', short: 'Getting Started' },
+    { href: 'core-concepts.html', title: 'Core Concepts', short: 'Core Concepts' },
+    { href: 'widgets.html', title: 'Widgets Reference', short: 'Widgets' },
+    { href: 'demos.html', title: 'Demo Gallery', short: 'Demos' },
+    { href: 'api-levels.html', title: 'API Levels', short: 'API Levels' },
+    { href: 'styling.html', title: 'CSS Styling', short: 'CSS Styling' },
+    { href: 'bindings.html', title: 'Bindings and Actions', short: 'Bindings' },
+    { href: 'mvc-architecture.html', title: 'MVC Model', short: 'MVC Model' },
+    { href: 'developer-guide.html', title: 'Developer Guide', short: 'Developer Guide' },
+    // Generated Javadoc (published by the docs build under "api/")
+    { href: 'api/index.html', title: 'API', short: 'API' }
+];
+</script>
+
+<!-- Theme toggle and navigation enhancement -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== Theme Toggle =====
+    function getTheme() {
+        return localStorage.getItem('tamboui-theme') || 'auto';
+    }
+
+    function setTheme(theme) {
+        localStorage.setItem('tamboui-theme', theme);
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function createThemeToggle() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var toggle = document.createElement('button');
+        toggle.className = 'theme-toggle';
+        toggle.setAttribute('aria-label', 'Toggle theme');
+        toggle.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg><svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>';
+
+        toggle.addEventListener('click', function() {
+            var current = getTheme();
+            var next;
+            if (current === 'auto') {
+                next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+            } else if (current === 'dark') {
+                next = 'light';
+            } else {
+                next = 'dark';
+            }
+            setTheme(next);
+        });
+
+        // Insert before details element
+        var details = header.querySelector('.details');
+        if (details) {
+            header.insertBefore(toggle, details);
+        } else {
+            header.appendChild(toggle);
+        }
+    }
+
+    // ===== Cross-page Navigation =====
+    function getCurrentPage() {
+        var path = window.location.pathname;
+        var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        return page;
+    }
+
+    function createTopNavigation() {
+        var header = document.getElementById('header');
+        if (!header) return;
+
+        var currentPage = getCurrentPage();
+
+        // Create top navigation bar
+        var nav = document.createElement('nav');
+        nav.className = 'top-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.short;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            nav.appendChild(a);
+        });
+
+        // Insert before theme toggle
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(nav, themeToggle);
+        } else {
+            header.appendChild(nav);
+        }
+
+        // Create mobile navigation
+        createMobileNavigation(header, currentPage);
+    }
+
+    function createMobileNavigation(header, currentPage) {
+        // Create hamburger button
+        var toggle = document.createElement('button');
+        toggle.className = 'mobile-nav-toggle';
+        toggle.setAttribute('aria-label', 'Toggle navigation menu');
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+
+        // Insert before theme toggle or at end of header
+        var themeToggle = header.querySelector('.theme-toggle');
+        if (themeToggle) {
+            header.insertBefore(toggle, themeToggle);
+        } else {
+            header.appendChild(toggle);
+        }
+
+        // Create mobile nav drawer
+        var mobileNav = document.createElement('nav');
+        mobileNav.className = 'mobile-nav';
+
+        TAMBOUI_PAGES.forEach(function(page) {
+            var a = document.createElement('a');
+            a.href = page.href;
+            a.textContent = page.title;
+            if (page.href === currentPage) {
+                a.className = 'current';
+            }
+            mobileNav.appendChild(a);
+        });
+
+        document.body.appendChild(mobileNav);
+
+        // Toggle mobile nav
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mobileNav.classList.toggle('open');
+            var isOpen = mobileNav.classList.contains('open');
+            toggle.innerHTML = isOpen
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+        });
+
+        // Close on outside click
+        document.addEventListener('click', function(e) {
+            if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
+                mobileNav.classList.remove('open');
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+            }
+        });
+    }
+
+    function createPrevNextNavigation() {
+        var content = document.getElementById('content');
+        var footer = document.getElementById('footer');
+        if (!content || !footer) return;
+
+        var currentPage = getCurrentPage();
+        var currentIndex = -1;
+
+        TAMBOUI_PAGES.forEach(function(page, index) {
+            if (page.href === currentPage) {
+                currentIndex = index;
+            }
+        });
+
+        if (currentIndex === -1) return;
+
+        var prev = currentIndex > 0 ? TAMBOUI_PAGES[currentIndex - 1] : null;
+        var next = currentIndex < TAMBOUI_PAGES.length - 1 ? TAMBOUI_PAGES[currentIndex + 1] : null;
+
+        if (!prev && !next) return;
+
+        var nav = document.createElement('nav');
+        nav.className = 'prev-next-nav';
+
+        if (prev) {
+            nav.innerHTML += '<a href="' + prev.href + '" class="prev"><span class="label">Previous</span><span class="title">' + prev.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="prev placeholder"></span>';
+        }
+
+        if (next) {
+            nav.innerHTML += '<a href="' + next.href + '" class="next"><span class="label">Next</span><span class="title">' + next.title + '</span></a>';
+        } else {
+            nav.innerHTML += '<span class="next placeholder"></span>';
+        }
+
+        // Insert before footer
+        footer.parentNode.insertBefore(nav, footer);
+    }
+
+    // ===== Initialize =====
+    document.addEventListener('DOMContentLoaded', function() {
+        createThemeToggle();
+        createTopNavigation();
+        createPrevNextNavigation();
+    });
+})();
+</script>
+</body>
+</html>
