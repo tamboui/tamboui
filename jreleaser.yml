@@ -43,3 +43,13 @@ release:
           - 'GitHub'
           - 'allcontributors'
           - 'dependabot'
+
+announce:
+  zernio:
+    # Announce only on final releases (not snapshots/prereleases).
+    active: RELEASE
+    # Token resolved from env JRELEASER_ZERNIO_TOKEN (set as a repo secret).
+    # apiHost defaults to https://zernio.com/api/v1.
+    # Profile whose connected accounts receive the post; set via env in CI.
+    profileId: '{{Env.ZERNIO_PROFILE_ID}}'
+    message: '🎉 TamboUI {{projectVersion}} is out — modern terminal UIs in Java. Release notes: {{repoUrl}}/releases/tag/{{tagName}}'
