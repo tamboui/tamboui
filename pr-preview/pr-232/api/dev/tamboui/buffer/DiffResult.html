@@ -67,9 +67,14 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#clear()" tabindex="0">clear()</a></li>
-<li><a href="#add(int,int,dev.tamboui.buffer.Cell)" tabindex="0">add(int, int, Cell)</a></li>
 <li><a href="#size()" tabindex="0">size()</a></li>
 <li><a href="#isEmpty()" tabindex="0">isEmpty()</a></li>
+<li><a href="#runCount()" tabindex="0">runCount()</a></li>
+<li><a href="#runStart(int)" tabindex="0">runStart(int)</a></li>
+<li><a href="#runLength(int)" tabindex="0">runLength(int)</a></li>
+<li><a href="#cellAt(int)" tabindex="0">cellAt(int)</a></li>
+<li><a href="#xOf(int)" tabindex="0">xOf(int)</a></li>
+<li><a href="#yOf(int)" tabindex="0">yOf(int)</a></li>
 <li><a href="#getX(int)" tabindex="0">getX(int)</a></li>
 <li><a href="#getY(int)" tabindex="0">getY(int)</a></li>
 <li><a href="#getCell(int)" tabindex="0">getCell(int)</a></li>
@@ -92,21 +97,19 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">DiffResult</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">A reusable container for buffer diff results using a Data-Oriented Design (DoD) layout.
+<div class="block">A reusable, allocation-free container for buffer diff results.
 <p>
-This class uses separate arrays for x coordinates, y coordinates, and cells to achieve:
-<ul>
-  <li>Zero allocations per frame (after initial sizing)</li>
-  <li>Better hardware prefetching during linear iteration</li>
-  <li>Reduced GC pressure (no intermediate objects)</li>
-</ul>
+Changed cells are stored as <em>runs</em>: pairs of <code>(startIndex, length)</code> over the
+row-major cell index of the target buffer. Consecutive changed cells collapse into one run,
+so a backend can position the cursor once per run and stream the cells; the cells themselves
+are read straight from the target buffer, so nothing per cell is copied or referenced here.
 <p>
 Typical usage pattern:
 <pre><code>DiffResult diff = new DiffResult(1920);  // Pre-size for 80x24 terminal
 while (running) {
-    diff.clear();
     previousBuffer.diff(currentBuffer, diff);
     backend.draw(diff);
+    diff.clear();
 }
 </code></pre></div>
 <dl class="notes">
@@ -135,7 +138,7 @@ while (running) {
 </div>
 <div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(int)" class="member-name-link">DiffResult</a><wbr>(int&nbsp;initialCapacity)</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Creates a new diff result with the specified initial capacity.</div>
+<div class="block">Creates a new diff result sized for the given number of changed cells.</div>
 </div>
 </div>
 </section>
@@ -151,51 +154,74 @@ while (running) {
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#add(int,int,dev.tamboui.buffer.Cell)" class="member-name-link">add</a><wbr>(int&nbsp;x,
- int&nbsp;y,
- <a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a>&nbsp;cell)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#capacity()" class="member-name-link">capacity</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Adds a cell update to this diff result.</div>
+<div class="block">Returns the number of runs this result can hold without reallocating.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#capacity()" class="member-name-link">capacity</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cellAt(int)" class="member-name-link">cellAt</a><wbr>(int&nbsp;index)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the current capacity of the internal arrays.</div>
+<div class="block">Returns the cell at the given row-major index of the target buffer.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Clears this diff result, resetting the count to zero.</div>
+<div class="block">Clears this diff result and releases the reference to the target buffer.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCell(int)" class="member-name-link">getCell</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCell(int)" class="member-name-link">getCell</a><wbr>(int&nbsp;i)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the cell at the given index.</div>
+<div class="block">Returns the i-th changed cell.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getX(int)" class="member-name-link">getX</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getX(int)" class="member-name-link">getX</a><wbr>(int&nbsp;i)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the x coordinate of the update at the given index.</div>
+<div class="block">Returns the x coordinate of the i-th changed cell.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getY(int)" class="member-name-link">getY</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getY(int)" class="member-name-link">getY</a><wbr>(int&nbsp;i)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the y coordinate of the update at the given index.</div>
+<div class="block">Returns the y coordinate of the i-th changed cell.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns whether this diff result is empty.</div>
+<div class="block">Returns whether this diff result holds no changed cells.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#size()" class="member-name-link">size</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runCount()" class="member-name-link">runCount</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the number of cell updates in this result.</div>
+<div class="block">Returns the number of runs of horizontally adjacent changed cells.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runLength(int)" class="member-name-link">runLength</a><wbr>(int&nbsp;run)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the number of cells in the given run.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runStart(int)" class="member-name-link">runStart</a><wbr>(int&nbsp;run)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the row-major index in the target buffer at which the given run starts.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#size()" class="member-name-link">size</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the number of changed cells across all runs.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#xOf(int)" class="member-name-link">xOf</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the x coordinate of the given row-major index in the target buffer.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#yOf(int)" class="member-name-link">yOf</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the y coordinate of the given row-major index in the target buffer.</div>
+</div>
 </div>
 </div>
 </div>
@@ -227,14 +253,13 @@ while (running) {
 <h3>DiffResult</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">DiffResult</span><wbr><span class="parameters">(int&nbsp;initialCapacity)</span></div>
-<div class="block">Creates a new diff result with the specified initial capacity.
+<div class="block">Creates a new diff result sized for the given number of changed cells.
 <p>
-For best performance, size this to match your expected maximum number of
-cell updates per frame. A typical 80x24 terminal has 1,920 cells, so a
-capacity of 1,920 ensures no reallocation even if every cell changes.</div>
+The worst case (every other cell changed) needs one run per two cells, so sizing this
+to the terminal cell count guarantees no reallocation.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>initialCapacity</code> - the initial capacity for the parallel arrays</dd>
+<dd><code>initialCapacity</code> - the expected maximum number of changed cells per frame</dd>
 </dl>
 </div>
 </section>
@@ -252,26 +277,7 @@ capacity of 1,920 ensures no reallocation even if every cell changes.</div>
 <h3>clear</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">clear</span>()</div>
-<div class="block">Clears this diff result, resetting the count to zero.</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="add(int,int,dev.tamboui.buffer.Cell)">
-<h3>add</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">add</span><wbr><span class="parameters">(int&nbsp;x,
- int&nbsp;y,
- <a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a>&nbsp;cell)</span></div>
-<div class="block">Adds a cell update to this diff result.
-<p>
-If the internal arrays are full, they will be grown automatically (rare after warmup).</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>x</code> - the x coordinate of the cell</dd>
-<dd><code>y</code> - the y coordinate of the cell</dd>
-<dd><code>cell</code> - the new cell value</dd>
-</dl>
+<div class="block">Clears this diff result and releases the reference to the target buffer.</div>
 </div>
 </section>
 </li>
@@ -280,10 +286,10 @@ If the internal arrays are full, they will be grown automatically (rare after wa
 <h3>size</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">size</span>()</div>
-<div class="block">Returns the number of cell updates in this result.</div>
+<div class="block">Returns the number of changed cells across all runs.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the count of updates</dd>
+<dd>the number of changed cells</dd>
 </dl>
 </div>
 </section>
@@ -293,10 +299,98 @@ If the internal arrays are full, they will be grown automatically (rare after wa
 <h3>isEmpty</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEmpty</span>()</div>
-<div class="block">Returns whether this diff result is empty.</div>
+<div class="block">Returns whether this diff result holds no changed cells.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>true if there are no updates</dd>
+<dd>true if there are no changed cells</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="runCount()">
+<h3>runCount</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">runCount</span>()</div>
+<div class="block">Returns the number of runs of horizontally adjacent changed cells.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the number of runs</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="runStart(int)">
+<h3>runStart</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">runStart</span><wbr><span class="parameters">(int&nbsp;run)</span></div>
+<div class="block">Returns the row-major index in the target buffer at which the given run starts.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>run</code> - the run index (0 to <a href="#runCount()"><code>runCount()</code></a>-1)</dd>
+<dt>Returns:</dt>
+<dd>the row-major index of the run's first cell</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="runLength(int)">
+<h3>runLength</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">runLength</span><wbr><span class="parameters">(int&nbsp;run)</span></div>
+<div class="block">Returns the number of cells in the given run.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>run</code> - the run index (0 to <a href="#runCount()"><code>runCount()</code></a>-1)</dd>
+<dt>Returns:</dt>
+<dd>the number of cells in the run</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="cellAt(int)">
+<h3>cellAt</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a></span>&nbsp;<span class="element-name">cellAt</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block">Returns the cell at the given row-major index of the target buffer.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>index</code> - a row-major index, as returned by <a href="#runStart(int)"><code>runStart(int)</code></a></dd>
+<dt>Returns:</dt>
+<dd>the cell at that index</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="xOf(int)">
+<h3>xOf</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">xOf</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block">Returns the x coordinate of the given row-major index in the target buffer.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>index</code> - a row-major index, as returned by <a href="#runStart(int)"><code>runStart(int)</code></a></dd>
+<dt>Returns:</dt>
+<dd>the x coordinate</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="yOf(int)">
+<h3>yOf</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">yOf</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block">Returns the y coordinate of the given row-major index in the target buffer.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>index</code> - a row-major index, as returned by <a href="#runStart(int)"><code>runStart(int)</code></a></dd>
+<dt>Returns:</dt>
+<dd>the y coordinate</dd>
 </dl>
 </div>
 </section>
@@ -305,11 +399,14 @@ If the internal arrays are full, they will be grown automatically (rare after wa
 <section class="detail" id="getX(int)">
 <h3>getX</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getX</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
-<div class="block">Returns the x coordinate of the update at the given index.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getX</span><wbr><span class="parameters">(int&nbsp;i)</span></div>
+<div class="block">Returns the x coordinate of the i-th changed cell.
+<p>
+This is an index-based view over the runs and costs O(<a href="#runCount()"><code>runCount()</code></a>) per call.
+Backends should iterate runs with <a href="#runStart(int)"><code>runStart(int)</code></a>/<a href="#runLength(int)"><code>runLength(int)</code></a> instead.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>index</code> - the index (0 to size()-1)</dd>
+<dd><code>i</code> - the index of the changed cell (0 to <a href="#size()"><code>size()</code></a>-1)</dd>
 <dt>Returns:</dt>
 <dd>the x coordinate</dd>
 </dl>
@@ -320,11 +417,14 @@ If the internal arrays are full, they will be grown automatically (rare after wa
 <section class="detail" id="getY(int)">
 <h3>getY</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getY</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
-<div class="block">Returns the y coordinate of the update at the given index.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getY</span><wbr><span class="parameters">(int&nbsp;i)</span></div>
+<div class="block">Returns the y coordinate of the i-th changed cell.
+<p>
+This is an index-based view over the runs and costs O(<a href="#runCount()"><code>runCount()</code></a>) per call.
+Backends should iterate runs with <a href="#runStart(int)"><code>runStart(int)</code></a>/<a href="#runLength(int)"><code>runLength(int)</code></a> instead.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>index</code> - the index (0 to size()-1)</dd>
+<dd><code>i</code> - the index of the changed cell (0 to <a href="#size()"><code>size()</code></a>-1)</dd>
 <dt>Returns:</dt>
 <dd>the y coordinate</dd>
 </dl>
@@ -335,11 +435,14 @@ If the internal arrays are full, they will be grown automatically (rare after wa
 <section class="detail" id="getCell(int)">
 <h3>getCell</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a></span>&nbsp;<span class="element-name">getCell</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
-<div class="block">Returns the cell at the given index.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a></span>&nbsp;<span class="element-name">getCell</span><wbr><span class="parameters">(int&nbsp;i)</span></div>
+<div class="block">Returns the i-th changed cell.
+<p>
+This is an index-based view over the runs and costs O(<a href="#runCount()"><code>runCount()</code></a>) per call.
+Backends should iterate runs with <a href="#runStart(int)"><code>runStart(int)</code></a>/<a href="#runLength(int)"><code>runLength(int)</code></a> instead.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>index</code> - the index (0 to size()-1)</dd>
+<dd><code>i</code> - the index of the changed cell (0 to <a href="#size()"><code>size()</code></a>-1)</dd>
 <dt>Returns:</dt>
 <dd>the cell</dd>
 </dl>
@@ -351,10 +454,10 @@ If the internal arrays are full, they will be grown automatically (rare after wa
 <h3>capacity</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">capacity</span>()</div>
-<div class="block">Returns the current capacity of the internal arrays.</div>
+<div class="block">Returns the number of runs this result can hold without reallocating.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the capacity</dd>
+<dd>the capacity in runs</dd>
 </dl>
 </div>
 </section>
