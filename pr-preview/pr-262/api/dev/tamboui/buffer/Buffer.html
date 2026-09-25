@@ -145,8 +145,8 @@ to minimize updates sent to the backend.</div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#diff(dev.tamboui.buffer.Buffer,dev.tamboui.buffer.DiffResult)" class="member-name-link">diff</a><wbr>(<a href="Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;other,
  <a href="DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;out)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Calculates the differences between this buffer and another using a
-Data-Oriented Design approach with parallel arrays.</div>
+<div class="block">Calculates the differences between this buffer and another as runs of
+horizontally adjacent changed cells (see <a href="DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a>).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Buffer.html" title="class in dev.tamboui.buffer">Buffer</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#empty(dev.tamboui.layout.Rect)" class="member-name-link">empty</a><wbr>(<a href="../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area)</code></div>
@@ -622,15 +622,17 @@ Returns the x position after the last character written.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">diff</span><wbr><span class="parameters">(<a href="Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;other,
  <a href="DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;out)</span></div>
-<div class="block">Calculates the differences between this buffer and another using a
-Data-Oriented Design approach with parallel arrays.
+<div class="block">Calculates the differences between this buffer and another as runs of
+horizontally adjacent changed cells (see <a href="DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a>). The result
+references <code>other</code>'s cells directly; nothing is allocated per frame.
 <p>
-The output <a href="DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a> is <b>not cleared</b> before writing - the
-caller must call <a href="DiffResult.html#clear()"><code>DiffResult.clear()</code></a> after the result is no longer needed.</div>
+Any previous content of <code>out</code> is discarded. The caller must still call
+<a href="DiffResult.html#clear()"><code>DiffResult.clear()</code></a> once the result has been drawn, to release the reference
+this method takes to <code>other</code>'s cells.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>other</code> - the buffer to compare with</dd>
-<dd><code>out</code> - the diff result to append updates to (not cleared by this method)</dd>
+<dd><code>out</code> - the diff result to write the runs into</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
