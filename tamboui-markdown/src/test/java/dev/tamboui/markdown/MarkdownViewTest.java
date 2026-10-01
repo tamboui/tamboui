@@ -168,6 +168,32 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("renders a fenced code block inside a list item, indented under the item")
+    void rendersFencedCodeBlockInListItem() {
+        MarkdownView view = MarkdownView.builder()
+            .source("1. It threw:\n   ```java\n   IllegalStateException\n   ```\n2. Then it was parked")
+            .build();
+        Buffer buffer = renderInto(view, 30, 6);
+
+        assertThat(row(buffer, 0)).endsWith("It threw:");
+        // the code block is drawn under the item text, at the item's indent
+        int indent = row(buffer, 0).indexOf("It");
+        assertThat(row(buffer, 1)).startsWith(" ".repeat(indent) + "╭java");
+        assertThat(row(buffer, 2)).isEqualTo(" ".repeat(indent) + "│IllegalStateException" + " ".repeat(30 - indent - 23) + "│");
+        assertThat(row(buffer, 3)).startsWith(" ".repeat(indent) + "╰─");
+        assertThat(row(buffer, 3)).endsWith("╯");
+        assertThat(row(buffer, 4)).contains("Then it was parked");
+    }
+
+    private static String row(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < buffer.width(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString().replaceAll("\\s+$", "");
+    }
+
+    @Test
     @DisplayName("renders an HTML block as dim escaped text")
     void rendersHtmlBlock() {
         MarkdownView view = MarkdownView.builder()

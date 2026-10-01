@@ -59,6 +59,57 @@ final class CodeBlockBuilder {
         return new WidgetChunk(paragraph, wrapped.size() + 2);
     }
 
+    /**
+     * Builds the code block as plain lines, its rounded border drawn with box characters, for places that can only
+     * hold lines, such as the content of a list item.
+     */
+    static List<Line> buildLines(String literal, String info, int width, MarkdownStyles styles,
+                                 SyntaxHighlighter highlighter, SyntaxTheme theme) {
+        String trimmed = literal.endsWith("\n") ? literal.substring(0, literal.length() - 1) : literal;
+        Style codeStyle = styles.codeBlock();
+        int innerWidth = Math.max(1, width - 2);
+        List<Line> wrapped = clip(highlighter.highlight(trimmed, languageFromInfo(info), codeStyle, theme), innerWidth);
+
+        List<Line> out = new ArrayList<>(wrapped.size() + 2);
+        String title = info != null && !info.isEmpty() ? clipText(info, innerWidth) : "";
+        out.add(Line.from(Span.styled("\u256d" + title + repeat('\u2500', innerWidth - CharWidth.of(title)) + "\u256e",
+            codeStyle)));
+        for (Line line : wrapped) {
+            List<Span> spans = new ArrayList<>(line.spans().size() + 3);
+            spans.add(Span.styled("\u2502", codeStyle));
+            spans.addAll(line.spans());
+            spans.add(Span.styled(repeat(' ', innerWidth - line.width()), codeStyle));
+            spans.add(Span.styled("\u2502", codeStyle));
+            out.add(Line.from(spans));
+        }
+        out.add(Line.from(Span.styled("\u2570" + repeat('\u2500', innerWidth) + "\u256f", codeStyle)));
+        return out;
+    }
+
+    private static String clipText(String text, int width) {
+        StringBuilder sb = new StringBuilder();
+        int used = 0;
+        for (int i = 0; i < text.length(); ) {
+            int cp = text.codePointAt(i);
+            int w = CharWidth.of(cp);
+            if (used + w > width) {
+                break;
+            }
+            sb.appendCodePoint(cp);
+            used += w;
+            i += Character.charCount(cp);
+        }
+        return sb.toString();
+    }
+
+    private static String repeat(char c, int count) {
+        StringBuilder sb = new StringBuilder(Math.max(0, count));
+        for (int i = 0; i < count; i++) {
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
     private static String languageFromInfo(String info) {
         if (info == null) {
             return null;
