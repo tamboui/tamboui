@@ -167,6 +167,9 @@ Wrap modes, set with `.overflow(...)` (CSS property: `text-overflow`):
 * `Overflow.WRAP_WORD` - Wrap at word boundaries
 * `Overflow.ELLIPSIS` / `ELLIPSIS_START` / `ELLIPSIS_MIDDLE` - Truncate with `...` at the end, start, or middle
 
+With a wrap mode, `.hangingIndent(true)` continues a wrapped line under its first non-blank character instead of at
+the left edge, so an indented line (a list entry, a key and its value) keeps its indent when it wraps.
+
 == Selection Widgets
 
 === ListWidget
