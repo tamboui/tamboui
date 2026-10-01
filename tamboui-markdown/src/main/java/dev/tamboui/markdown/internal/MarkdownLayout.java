@@ -362,9 +362,8 @@ public final class MarkdownLayout {
         }
 
         List<Constraint> widths = new ArrayList<>(columnCount);
-        int per = Math.max(1, 100 / columnCount);
-        for (int i = 0; i < columnCount; i++) {
-            widths.add(Constraint.percentage(per));
+        for (int w : columnWidths(header, rows, columnCount, width)) {
+            widths.add(Constraint.length(w));
         }
 
         Table.Builder tableBuilder = Table.builder()
@@ -377,6 +376,40 @@ public final class MarkdownLayout {
         int height = rows.size() + (header != null ? 1 : 0);
         TableState state = new TableState();
         return new WidgetChunk((area, buffer) -> table.render(area, buffer, state), height);
+    }
+
+    /**
+     * Sizes the columns from their content: each column is as wide as its widest cell, header included. When they do
+     * not all fit, the narrow columns keep their width and the wide ones share what is left equally.
+     */
+    static int[] columnWidths(Row header, List<Row> rows, int columnCount, int width) {
+        int[] natural = new int[columnCount];
+        List<Row> all = new ArrayList<>(rows);
+        if (header != null) {
+            all.add(header);
+        }
+        for (Row row : all) {
+            List<Cell> cells = row.cells();
+            for (int i = 0; i < cells.size() && i < columnCount; i++) {
+                natural[i] = Math.max(natural[i], cells.get(i).width());
+            }
+        }
+        // the table puts one space between columns
+        int available = Math.max(columnCount, width - (columnCount - 1));
+        Integer[] order = new Integer[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+            order[i] = i;
+        }
+        Arrays.sort(order, (a, b) -> Integer.compare(natural[a], natural[b]));
+        int[] result = new int[columnCount];
+        int remaining = available;
+        for (int k = 0; k < columnCount; k++) {
+            int col = order[k];
+            int share = remaining / (columnCount - k);
+            result[col] = Math.max(1, Math.min(Math.max(1, natural[col]), share));
+            remaining -= result[col];
+        }
+        return result;
     }
 
     private static Row buildRow(TableRow source, MarkdownStyles styles, boolean header) {

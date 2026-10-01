@@ -168,6 +168,27 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("sizes table columns from their content")
+    void sizesTableColumnsFromContent() {
+        MarkdownView view = MarkdownView.builder()
+            .source("| Field | Value |\n|---|---|\n| Order ID | ORD-1003 |\n| Items | 1x TSHIRT, 1x CAP, 2x MUG |")
+            .build();
+        Buffer buffer = renderInto(view, 80, 4);
+
+        // the key column is as wide as "Order ID", not half of the width
+        assertThat(row(buffer, 1)).isEqualTo("Order ID ORD-1003");
+        assertThat(row(buffer, 2)).isEqualTo("Items    1x TSHIRT, 1x CAP, 2x MUG");
+    }
+
+    private static String row(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < buffer.width(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString().replaceAll("\\s+$", "");
+    }
+
+    @Test
     @DisplayName("renders an HTML block as dim escaped text")
     void rendersHtmlBlock() {
         MarkdownView view = MarkdownView.builder()
