@@ -232,6 +232,67 @@ class ParagraphTest {
     }
 
     @Test
+    @DisplayName("hangingIndent continues a wrapped line under its first non-blank character")
+    void hangingIndentKeepsTheIndent() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from(Line.from(Span.raw("  - "), Span.styled("one two three four", Style.EMPTY.bold()))))
+            .overflow(Overflow.WRAP_WORD)
+            .hangingIndent(true)
+            .build();
+        Rect area = new Rect(0, 0, 12, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 0)).isEqualTo("  - one two");
+        assertThat(row(buffer, 1)).isEqualTo("  three four");
+        // the indent is plain, the text keeps its style
+        assertThat(buffer.get(1, 1).style().addModifiers()).isEmpty();
+        assertThat(buffer.get(2, 1).symbol()).isEqualTo("t");
+        assertThat(buffer.get(2, 1).style().addModifiers()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("without hangingIndent a wrapped line continues at the left edge")
+    void noHangingIndentByDefault() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("  - one two three four"))
+            .overflow(Overflow.WRAP_WORD)
+            .build();
+        Rect area = new Rect(0, 0, 12, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 1)).isEqualTo("three four");
+    }
+
+    @Test
+    @DisplayName("hangingIndent continues a character-wrapped line under its indent")
+    void hangingIndentWithCharacterWrap() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("    abcdefghijkl"))
+            .overflow(Overflow.WRAP_CHARACTER)
+            .hangingIndent(true)
+            .build();
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 0)).isEqualTo("    abcdef");
+        assertThat(row(buffer, 1)).isEqualTo("    ghijkl");
+    }
+
+    private static String row(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < buffer.width(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString().replaceAll("\\s+$", "");
+    }
+
+    @Test
     @DisplayName("WRAP_WORD breaks long words by character when necessary")
     void wrapWordBreaksLongWords() {
         Paragraph paragraph = Paragraph.builder()
