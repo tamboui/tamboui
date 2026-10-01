@@ -223,6 +223,20 @@ public final class MarkdownLayout {
                 out.addAll(sub);
             } else if (child instanceof TaskListItemMarker) {
                 // Already consumed by taskCheckedFlag; skip.
+            } else if (child instanceof FencedCodeBlock || child instanceof IndentedCodeBlock) {
+                // a code block is a widget elsewhere, but a list item holds lines: draw it as lines
+                int contentWidth = Math.max(1, width - prefixWidth);
+                String literal = child instanceof FencedCodeBlock
+                    ? ((FencedCodeBlock) child).getLiteral() : ((IndentedCodeBlock) child).getLiteral();
+                String info = child instanceof FencedCodeBlock ? ((FencedCodeBlock) child).getInfo() : null;
+                for (Line line : CodeBlockBuilder.buildLines(literal, info, contentWidth, styles, highlighter, theme)) {
+                    if (firstParagraph) {
+                        out.add(prependSpans(prefix, line));
+                        firstParagraph = false;
+                    } else {
+                        out.add(prependIndent(continuationIndent, line));
+                    }
+                }
             } else {
                 List<RenderedChunk> embedded = new ArrayList<>();
                 int contentWidth = Math.max(1, width - prefixWidth);
