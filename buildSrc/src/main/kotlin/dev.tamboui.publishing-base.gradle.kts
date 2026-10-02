@@ -31,9 +31,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git@github.com:tamboui/tamboui.git")
-                    developerConnection.set("<scm:git@github.com:tamboui/tamboui.git")
-                    url.set("scm:git@github.com:tamboui/tamboui.git")
+                    connection.set("scm:https://github.com/tamboui/tamboui.git")
+                    developerConnection.set("scm:https://github.com/tamboui/tamboui.git")
+                    url.set("scm:https://github.com/tamboui/tamboui.git")
                 }
             }
         }
