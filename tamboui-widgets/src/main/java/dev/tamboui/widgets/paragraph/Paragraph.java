@@ -321,7 +321,7 @@ public final class Paragraph implements Widget {
             }
 
             int indent = hangingIndent ? leadingWhitespaceWidth(line) : 0;
-            if (indent <= 0 || indent > maxWidth / 2) {
+            if (indent <= 0 || indent >= maxWidth) {
                 wrapped.addAll(wrapOne(line, maxWidth));
                 continue;
             }
@@ -698,7 +698,7 @@ public final class Paragraph implements Widget {
         private Block block;
         private Style style = Style.EMPTY;
         private int scroll = 0;
-        private boolean hangingIndent;
+        private boolean hangingIndent = true;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
         // Style-aware properties (resolved via styleResolver in build())
@@ -838,10 +838,11 @@ public final class Paragraph implements Widget {
         /**
          * Sets whether a wrapped line continues under its first non-blank character instead of at the left edge,
          * so an indented line (a list entry, a key and its value) keeps its indent when it wraps. Only applies with
-         * a wrapping overflow ({@link Overflow#WRAP_WORD}, {@link Overflow#WRAP_CHARACTER}); an indent of more than
-         * half of the width is not kept.
+         * a wrapping overflow ({@link Overflow#WRAP_WORD}, {@link Overflow#WRAP_CHARACTER}); an indent that leaves no
+         * room for text is not kept. On by default; turn it off for text that should continue at the left edge, such
+         * as ASCII art or a layout drawn with leading spaces.
          *
-         * @param hangingIndent true to indent the continuation rows of a wrapped line
+         * @param hangingIndent true (the default) to indent the continuation rows of a wrapped line
          * @return this builder
          */
         public Builder hangingIndent(boolean hangingIndent) {

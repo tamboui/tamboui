@@ -232,12 +232,11 @@ class ParagraphTest {
     }
 
     @Test
-    @DisplayName("hangingIndent continues a wrapped line under its first non-blank character")
+    @DisplayName("a wrapped line continues under its first non-blank character by default")
     void hangingIndentKeepsTheIndent() {
         Paragraph paragraph = Paragraph.builder()
             .text(Text.from(Line.from(Span.raw("  - "), Span.styled("one two three four", Style.EMPTY.bold()))))
             .overflow(Overflow.WRAP_WORD)
-            .hangingIndent(true)
             .build();
         Rect area = new Rect(0, 0, 12, 3);
         Buffer buffer = Buffer.empty(area);
@@ -253,11 +252,12 @@ class ParagraphTest {
     }
 
     @Test
-    @DisplayName("without hangingIndent a wrapped line continues at the left edge")
-    void noHangingIndentByDefault() {
+    @DisplayName("with hangingIndent(false) a wrapped line continues at the left edge")
+    void noHangingIndentWhenTurnedOff() {
         Paragraph paragraph = Paragraph.builder()
             .text(Text.from("  - one two three four"))
             .overflow(Overflow.WRAP_WORD)
+            .hangingIndent(false)
             .build();
         Rect area = new Rect(0, 0, 12, 3);
         Buffer buffer = Buffer.empty(area);
@@ -273,7 +273,6 @@ class ParagraphTest {
         Paragraph paragraph = Paragraph.builder()
             .text(Text.from("    abcdefghijkl"))
             .overflow(Overflow.WRAP_CHARACTER)
-            .hangingIndent(true)
             .build();
         Rect area = new Rect(0, 0, 10, 3);
         Buffer buffer = Buffer.empty(area);
@@ -282,6 +281,37 @@ class ParagraphTest {
 
         assertThat(row(buffer, 0)).isEqualTo("    abcdef");
         assertThat(row(buffer, 1)).isEqualTo("    ghijkl");
+    }
+
+    @Test
+    @DisplayName("a deep indent is kept as long as it leaves room for text")
+    void hangingIndentKeepsADeepIndent() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("       abcdef"))
+            .overflow(Overflow.WRAP_CHARACTER)
+            .build();
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 0)).isEqualTo("       abc");
+        assertThat(row(buffer, 1)).isEqualTo("       def");
+    }
+
+    @Test
+    @DisplayName("an indent that leaves no room for text continues at the left edge")
+    void hangingIndentFallsBackWhenNoRoomIsLeft() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("          abc"))
+            .overflow(Overflow.WRAP_CHARACTER)
+            .build();
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 1)).isEqualTo("abc");
     }
 
     private static String row(Buffer buffer, int y) {
