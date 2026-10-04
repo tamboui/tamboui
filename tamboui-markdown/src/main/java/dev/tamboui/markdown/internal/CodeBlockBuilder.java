@@ -71,43 +71,19 @@ final class CodeBlockBuilder {
         List<Line> wrapped = clip(highlighter.highlight(trimmed, languageFromInfo(info), codeStyle, theme), innerWidth);
 
         List<Line> out = new ArrayList<>(wrapped.size() + 2);
-        String title = info != null && !info.isEmpty() ? clipText(info, innerWidth) : "";
-        out.add(Line.from(Span.styled("\u256d" + title + repeat('\u2500', innerWidth - CharWidth.of(title)) + "\u256e",
+        String title = info != null && !info.isEmpty() ? CharWidth.substringByWidth(info, innerWidth) : "";
+        out.add(Line.from(Span.styled("\u256d" + title + MarkdownText.repeat('\u2500', innerWidth - CharWidth.of(title)) + "\u256e",
             codeStyle)));
         for (Line line : wrapped) {
             List<Span> spans = new ArrayList<>(line.spans().size() + 3);
             spans.add(Span.styled("\u2502", codeStyle));
             spans.addAll(line.spans());
-            spans.add(Span.styled(repeat(' ', innerWidth - line.width()), codeStyle));
+            spans.add(Span.styled(MarkdownText.repeat(' ', innerWidth - line.width()), codeStyle));
             spans.add(Span.styled("\u2502", codeStyle));
             out.add(Line.from(spans));
         }
-        out.add(Line.from(Span.styled("\u2570" + repeat('\u2500', innerWidth) + "\u256f", codeStyle)));
+        out.add(Line.from(Span.styled("\u2570" + MarkdownText.repeat('\u2500', innerWidth) + "\u256f", codeStyle)));
         return out;
-    }
-
-    private static String clipText(String text, int width) {
-        StringBuilder sb = new StringBuilder();
-        int used = 0;
-        for (int i = 0; i < text.length(); ) {
-            int cp = text.codePointAt(i);
-            int w = CharWidth.of(cp);
-            if (used + w > width) {
-                break;
-            }
-            sb.appendCodePoint(cp);
-            used += w;
-            i += Character.charCount(cp);
-        }
-        return sb.toString();
-    }
-
-    private static String repeat(char c, int count) {
-        StringBuilder sb = new StringBuilder(Math.max(0, count));
-        for (int i = 0; i < count; i++) {
-            sb.append(c);
-        }
-        return sb.toString();
     }
 
     private static String languageFromInfo(String info) {
