@@ -386,11 +386,12 @@ so an indented line (a list entry, a key and its value) keeps its indent when it
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Paragraph.Builder.html" title="class in dev.tamboui.widgets.paragraph">Paragraph.Builder</a></span>&nbsp;<span class="element-name">hangingIndent</span><wbr><span class="parameters">(boolean&nbsp;hangingIndent)</span></div>
 <div class="block">Sets whether a wrapped line continues under its first non-blank character instead of at the left edge,
 so an indented line (a list entry, a key and its value) keeps its indent when it wraps. Only applies with
-a wrapping overflow (<a href="../../style/Overflow.html#WRAP_WORD"><code>Overflow.WRAP_WORD</code></a>, <a href="../../style/Overflow.html#WRAP_CHARACTER"><code>Overflow.WRAP_CHARACTER</code></a>); an indent of more than
-half of the width is not kept.</div>
+a wrapping overflow (<a href="../../style/Overflow.html#WRAP_WORD"><code>Overflow.WRAP_WORD</code></a>, <a href="../../style/Overflow.html#WRAP_CHARACTER"><code>Overflow.WRAP_CHARACTER</code></a>); an indent that leaves no
+room for text is not kept. On by default; turn it off for text that should continue at the left edge, such
+as ASCII art or a layout drawn with leading spaces.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>hangingIndent</code> - true to indent the continuation rows of a wrapped line</dd>
+<dd><code>hangingIndent</code> - true (the default) to indent the continuation rows of a wrapped line</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
