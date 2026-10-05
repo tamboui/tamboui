@@ -698,6 +698,9 @@ public final class Paragraph implements Widget {
         private Block block;
         private Style style = Style.EMPTY;
         private int scroll = 0;
+        // Hanging indent is always on. The flag is kept wired (and off-by-false still works
+        // internally) but is intentionally not exposed via a public setter yet; see the
+        // commented-out hangingIndent(boolean) below.
         private boolean hangingIndent = true;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
@@ -835,20 +838,31 @@ public final class Paragraph implements Widget {
             return this;
         }
 
-        /**
-         * Sets whether a wrapped line continues under its first non-blank character instead of at the left edge,
-         * so an indented line (a list entry, a key and its value) keeps its indent when it wraps. Only applies with
-         * a wrapping overflow ({@link Overflow#WRAP_WORD}, {@link Overflow#WRAP_CHARACTER}); an indent that leaves no
-         * room for text is not kept. On by default; turn it off for text that should continue at the left edge, such
-         * as ASCII art or a layout drawn with leading spaces.
-         *
-         * @param hangingIndent true (the default) to indent the continuation rows of a wrapped line
-         * @return this builder
-         */
-        public Builder hangingIndent(boolean hangingIndent) {
-            this.hangingIndent = hangingIndent;
-            return this;
-        }
+        // Kept non-public until a valid use case shows up. Hanging indent is the default and
+        // only wrapping behaviour today; the off-at-left-edge path is still implemented behind
+        // the flag, but exposing it is an API commitment we only want to make once someone has
+        // a concrete need.
+        //
+        // When it IS exposed, prefer a continuation-indent strategy option (e.g. an enum like
+        // ContinuationIndentStrategy.HANGING / FLUSH_LEFT) rather than this boolean, parallel to
+        // Overflow: both are facets of one text-layout mechanism and should live in a shared
+        // wrapping utility, not be re-implemented per widget. The boolean below is only the
+        // internal wiring; uncomment it (and its javadoc) for a quick re-enable in the meantime.
+        //
+        // /**
+        //  * Sets whether a wrapped line continues under its first non-blank character instead of at the left edge,
+        //  * so an indented line (a list entry, a key and its value) keeps its indent when it wraps. Only applies with
+        //  * a wrapping overflow ({@link Overflow#WRAP_WORD}, {@link Overflow#WRAP_CHARACTER}); an indent that leaves no
+        //  * room for text is not kept. On by default; turn it off for text that should continue at the left edge, such
+        //  * as ASCII art or a layout drawn with leading spaces.
+        //  *
+        //  * @param hangingIndent true (the default) to indent the continuation rows of a wrapped line
+        //  * @return this builder
+        //  */
+        // public Builder hangingIndent(boolean hangingIndent) {
+        //     this.hangingIndent = hangingIndent;
+        //     return this;
+        // }
 
         /**
          * Sets the property resolver for style-aware properties.

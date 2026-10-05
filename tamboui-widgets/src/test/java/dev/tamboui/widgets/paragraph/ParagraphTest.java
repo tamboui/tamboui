@@ -252,22 +252,6 @@ class ParagraphTest {
     }
 
     @Test
-    @DisplayName("with hangingIndent(false) a wrapped line continues at the left edge")
-    void noHangingIndentWhenTurnedOff() {
-        Paragraph paragraph = Paragraph.builder()
-            .text(Text.from("  - one two three four"))
-            .overflow(Overflow.WRAP_WORD)
-            .hangingIndent(false)
-            .build();
-        Rect area = new Rect(0, 0, 12, 3);
-        Buffer buffer = Buffer.empty(area);
-
-        paragraph.render(area, buffer);
-
-        assertThat(row(buffer, 1)).isEqualTo("three four");
-    }
-
-    @Test
     @DisplayName("hangingIndent continues a character-wrapped line under its indent")
     void hangingIndentWithCharacterWrap() {
         Paragraph paragraph = Paragraph.builder()

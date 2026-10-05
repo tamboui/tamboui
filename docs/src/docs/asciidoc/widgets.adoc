@@ -168,8 +168,8 @@ Wrap modes, set with `.overflow(...)` (CSS property: `text-overflow`):
 * `Overflow.ELLIPSIS` / `ELLIPSIS_START` / `ELLIPSIS_MIDDLE` - Truncate with `...` at the end, start, or middle
 
 With a wrap mode, a wrapped line continues under its first non-blank character instead of at the left edge, so an
-indented line (a list entry, a key and its value) keeps its indent when it wraps. Use `.hangingIndent(false)` to
-continue at the left edge instead, for example for ASCII art or a layout drawn with leading spaces.
+indented line (a list entry, a key and its value) keeps its indent when it wraps. An indent that leaves no room for
+text falls back to the left edge.
 
 == Selection Widgets
 
