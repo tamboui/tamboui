@@ -209,7 +209,7 @@ Implementations handle the actual terminal I/O.</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#draw(dev.tamboui.buffer.DiffResult)" class="member-name-link">draw</a><wbr>(<a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;diff)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Draws the given cell updates to the terminal using a Data-Oriented Design approach.</div>
+<div class="block">Draws the given cell updates to the terminal.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#enableBracketedPaste()" class="member-name-link">enableBracketedPaste</a>()</code></div>
@@ -423,12 +423,14 @@ Implementations handle the actual terminal I/O.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">draw</span><wbr><span class="parameters">(<a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;diff)</span>
    throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Draws the given cell updates to the terminal using a Data-Oriented Design approach.
+<div class="block">Draws the given cell updates to the terminal.
 <p>
-This is the primary rendering method, optimized for zero allocations with parallel arrays.</div>
+This is the primary rendering method. The updates arrive as runs of horizontally
+adjacent changed cells referencing the buffer that was rendered, so drawing a frame
+allocates nothing; see <a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a> for how to iterate them.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>diff</code> - the diff result containing cell updates in Structure-of-Arrays format</dd>
+<dd><code>diff</code> - the diff result containing the runs of changed cells</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if drawing fails</dd>
 <dt>See Also:</dt>
