@@ -155,7 +155,7 @@ logic.</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#draw(dev.tamboui.buffer.DiffResult)" class="member-name-link">draw</a><wbr>(<a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;diff)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Draws the given cell updates to the terminal using Data-Oriented Design.</div>
+<div class="block">Draws the given cell updates to the terminal.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCursorPosition(dev.tamboui.layout.Position)" class="member-name-link">setCursorPosition</a><wbr>(<a href="../layout/Position.html" title="class in dev.tamboui.layout">Position</a>&nbsp;position)</code></div>
@@ -205,25 +205,23 @@ logic.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">draw</span><wbr><span class="parameters">(<a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;diff)</span>
                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Draws the given cell updates to the terminal using Data-Oriented Design.
+<div class="block">Draws the given cell updates to the terminal.
 <p>
-Iterates over the parallel arrays in <a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a>, positions the cursor
-for each cell, and writes styled content using <a href="AnsiCellWriter.html" title="class in dev.tamboui.terminal"><code>AnsiCellWriter</code></a>.
+Iterates the runs of horizontally adjacent changed cells in <a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a>,
+positions the cursor once per run, and writes the run's cells using
+<a href="AnsiCellWriter.html" title="class in dev.tamboui.terminal"><code>AnsiCellWriter</code></a>. Because a run never crosses a row, the terminal's own
+cursor advance carries the writer through the run and no per-cell cursor move
+is ever emitted.
 <p>
-Optimizations:
-<ul>
-  <li>Cursor adjacency: skips cursor move when the next cell is horizontally
-      adjacent (cursor auto-advances after writing a character)</li>
-  <li>Cursor moves use the field-level <code>cursorBuf</code> StringBuilder and
-      <a href="Backend.html#writeRaw(java.lang.CharSequence)"><code>Backend.writeRaw(CharSequence)</code></a> to avoid toString() allocation</li>
-</ul>
+Cursor moves use the field-level <code>cursorBuf</code> StringBuilder and
+<a href="Backend.html#writeRaw(java.lang.CharSequence)"><code>Backend.writeRaw(CharSequence)</code></a> to avoid a <code>toString()</code> allocation.
 <p>
 Output is sent via <a href="Backend.html#writeRaw(java.lang.CharSequence)"><code>Backend.writeRaw(CharSequence)</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="Backend.html#draw(dev.tamboui.buffer.DiffResult)">draw</a></code>&nbsp;in interface&nbsp;<code><a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>diff</code> - the diff result containing cell updates in Structure-of-Arrays format</dd>
+<dd><code>diff</code> - the diff result containing the runs of changed cells</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if drawing fails</dd>
 <dt>See Also:</dt>

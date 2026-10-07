@@ -117,10 +117,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the active recording config, or null if not recording.</div>
 </dd>
-<dt><a href="dev/tamboui/buffer/DiffResult.html#add(int,int,dev.tamboui.buffer.Cell)" class="member-name-link">add(int, int, Cell)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
-<dd>
-<div class="block">Adds a cell update to this diff result.</div>
-</dd>
 <dt><a href="dev/tamboui/layout/Fraction.html#add(dev.tamboui.layout.Fraction)" class="member-name-link">add(Fraction)</a> - Method in class dev.tamboui.layout.<a href="dev/tamboui/layout/Fraction.html" title="class in dev.tamboui.layout">Fraction</a></dt>
 <dd>
 <div class="block">Returns the sum of this fraction and another.</div>
@@ -641,6 +637,10 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 <dt><a href="dev/tamboui/backend/panama/ByteArrayBuilder.html#appendInt(int)" class="member-name-link">appendInt(int)</a> - Method in class dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/ByteArrayBuilder.html" title="class in dev.tamboui.backend.panama">ByteArrayBuilder</a></dt>
 <dd>
 <div class="block">Appends a non-negative integer as ASCII digits.</div>
+</dd>
+<dt><a href="dev/tamboui/backend/panama/ByteArrayBuilder.html#appendUtf8(java.lang.CharSequence)" class="member-name-link">appendUtf8(CharSequence)</a> - Method in class dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/ByteArrayBuilder.html" title="class in dev.tamboui.backend.panama">ByteArrayBuilder</a></dt>
+<dd>
+<div class="block">Appends a character sequence encoded as UTF-8, without an intermediate byte array.</div>
 </dd>
 <dt><a href="dev/tamboui/backend/panama/ByteArrayBuilder.html#appendUtf8(java.lang.String)" class="member-name-link">appendUtf8(String)</a> - Method in class dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/ByteArrayBuilder.html" title="class in dev.tamboui.backend.panama">ByteArrayBuilder</a></dt>
 <dd>
@@ -2602,7 +2602,7 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#capacity()" class="member-name-link">capacity()</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Returns the current capacity of the internal arrays.</div>
+<div class="block">Returns the number of runs this result can hold without reallocating.</div>
 </dd>
 <dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#carriageReturn()" class="member-name-link">carriageReturn()</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
 <dd>&nbsp;</dd>
@@ -2675,6 +2675,10 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 <dt><a href="dev/tamboui/buffer/Cell.html#%3Cinit%3E(java.lang.String,dev.tamboui.style.Style)" class="member-name-link">Cell(String, Style)</a> - Constructor for class dev.tamboui.buffer.<a href="dev/tamboui/buffer/Cell.html" title="class in dev.tamboui.buffer">Cell</a></dt>
 <dd>
 <div class="block">Creates a cell with the given symbol and style.</div>
+</dd>
+<dt><a href="dev/tamboui/buffer/DiffResult.html#cellAt(int)" class="member-name-link">cellAt(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
+<dd>
+<div class="block">Returns the cell at the given row-major index of the target buffer.</div>
 </dd>
 <dt><a href="dev/tamboui/tfx/effects/DissolveShader.html#cellFilter()" class="member-name-link">cellFilter()</a> - Method in class dev.tamboui.tfx.effects.<a href="dev/tamboui/tfx/effects/DissolveShader.html" title="class in dev.tamboui.tfx.effects">DissolveShader</a></dt>
 <dd>&nbsp;</dd>
@@ -3073,7 +3077,7 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#clear()" class="member-name-link">clear()</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Clears this diff result, resetting the count to zero.</div>
+<div class="block">Clears this diff result and releases the reference to the target buffer.</div>
 </dd>
 <dt><a href="dev/tamboui/internal/record/RecordingBackend.html#clear()" class="member-name-link">clear()</a> - Method in class dev.tamboui.internal.record.<a href="dev/tamboui/internal/record/RecordingBackend.html" title="class in dev.tamboui.internal.record">RecordingBackend</a></dt>
 <dd>&nbsp;</dd>
@@ -5079,14 +5083,14 @@ IDE defaults (One Dark / Dark+).</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/Buffer.html#diff(dev.tamboui.buffer.Buffer,dev.tamboui.buffer.DiffResult)" class="member-name-link">diff(Buffer, DiffResult)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a></dt>
 <dd>
-<div class="block">Calculates the differences between this buffer and another using a
-Data-Oriented Design approach with parallel arrays.</div>
+<div class="block">Calculates the differences between this buffer and another as runs of
+horizontally adjacent changed cells (see <a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer"><code>DiffResult</code></a>).</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/sparkline/DualSparkline.html#differences-from-sparkline-heading" class="search-tag-link">Differences from Sparkline</a> - Section in class dev.tamboui.widgets.sparkline.DualSparkline</dt>
 <dd>&nbsp;</dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html" class="type-name-link" title="class in dev.tamboui.buffer">DiffResult</a> - Class in <a href="dev/tamboui/buffer/package-summary.html">dev.tamboui.buffer</a></dt>
 <dd>
-<div class="block">A reusable container for buffer diff results using a Data-Oriented Design (DoD) layout.</div>
+<div class="block">A reusable, allocation-free container for buffer diff results.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#%3Cinit%3E()" class="member-name-link">DiffResult()</a> - Constructor for class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
@@ -5094,7 +5098,7 @@ Data-Oriented Design approach with parallel arrays.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#%3Cinit%3E(int)" class="member-name-link">DiffResult(int)</a> - Constructor for class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Creates a new diff result with the specified initial capacity.</div>
+<div class="block">Creates a new diff result sized for the given number of changed cells.</div>
 </dd>
 <dt><a href="dev/tamboui/style/Style.html#dim()" class="member-name-link">dim()</a> - Method in class dev.tamboui.style.<a href="dev/tamboui/style/Style.html" title="class in dev.tamboui.style">Style</a></dt>
 <dd>
@@ -5500,11 +5504,11 @@ left, right, and center regions — the most common TUI application structure
 <dd>&nbsp;</dd>
 <dt><a href="dev/tamboui/terminal/AbstractBackend.html#draw(dev.tamboui.buffer.DiffResult)" class="member-name-link">draw(DiffResult)</a> - Method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/AbstractBackend.html" title="class in dev.tamboui.terminal">AbstractBackend</a></dt>
 <dd>
-<div class="block">Draws the given cell updates to the terminal using Data-Oriented Design.</div>
+<div class="block">Draws the given cell updates to the terminal.</div>
 </dd>
 <dt><a href="dev/tamboui/terminal/Backend.html#draw(dev.tamboui.buffer.DiffResult)" class="member-name-link">draw(DiffResult)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
 <dd>
-<div class="block">Draws the given cell updates to the terminal using a Data-Oriented Design approach.</div>
+<div class="block">Draws the given cell updates to the terminal.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/canvas/Shape.html#draw(dev.tamboui.widgets.canvas.Painter)" class="member-name-link">draw(Painter)</a> - Method in interface dev.tamboui.widgets.canvas.<a href="dev/tamboui/widgets/canvas/Shape.html" title="interface in dev.tamboui.widgets.canvas">Shape</a></dt>
 <dd>
@@ -7722,7 +7726,7 @@ match.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#getCell(int)" class="member-name-link">getCell(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Returns the cell at the given index.</div>
+<div class="block">Returns the i-th changed cell.</div>
 </dd>
 <dt><a href="dev/tamboui/backend/panama/PlatformTerminal.html#getCharset()" class="member-name-link">getCharset()</a> - Method in interface dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/PlatformTerminal.html" title="interface in dev.tamboui.backend.panama">PlatformTerminal</a></dt>
 <dd>
@@ -7840,11 +7844,11 @@ match.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#getX(int)" class="member-name-link">getX(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Returns the x coordinate of the update at the given index.</div>
+<div class="block">Returns the x coordinate of the i-th changed cell.</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#getY(int)" class="member-name-link">getY(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Returns the y coordinate of the update at the given index.</div>
+<div class="block">Returns the y coordinate of the i-th changed cell.</div>
 </dd>
 <dt><a href="dev/tamboui/toolkit/event/GlobalEventHandler.html" class="type-name-link" title="interface in dev.tamboui.toolkit.event">GlobalEventHandler</a> - Interface in <a href="dev/tamboui/toolkit/event/package-summary.html">dev.tamboui.toolkit.event</a></dt>
 <dd>
@@ -9773,7 +9777,7 @@ variation sequence (see <code>CharWidth.EMOJI_VARIATION_BASES</code>).</div>
 </dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#isEmpty()" class="member-name-link">isEmpty()</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Returns whether this diff result is empty.</div>
+<div class="block">Returns whether this diff result holds no changed cells.</div>
 </dd>
 <dt><a href="dev/tamboui/css/cascade/TypedPropertyMap.html#isEmpty()" class="member-name-link">isEmpty()</a> - Method in class dev.tamboui.css.cascade.<a href="dev/tamboui/css/cascade/TypedPropertyMap.html" title="class in dev.tamboui.css.cascade">TypedPropertyMap</a></dt>
 <dd>
@@ -15826,6 +15830,10 @@ terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved 
 <dd>
 <div class="block">Runs the application with the given element supplier.</div>
 </dd>
+<dt><a href="dev/tamboui/buffer/DiffResult.html#runCount()" class="member-name-link">runCount()</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
+<dd>
+<div class="block">Returns the number of runs of horizontally adjacent changed cells.</div>
+</dd>
 <dt><a href="dev/tamboui/tui/InlineTuiRunner.html#runLater(java.lang.Runnable)" class="member-name-link">runLater(Runnable)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/InlineTuiRunner.html" title="class in dev.tamboui.tui">InlineTuiRunner</a></dt>
 <dd>
 <div class="block">Queues an action to be executed on the render thread.</div>
@@ -15833,6 +15841,10 @@ terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved 
 <dt><a href="dev/tamboui/tui/TuiRunner.html#runLater(java.lang.Runnable)" class="member-name-link">runLater(Runnable)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></dt>
 <dd>
 <div class="block">Queues an action to be executed on the render thread.</div>
+</dd>
+<dt><a href="dev/tamboui/buffer/DiffResult.html#runLength(int)" class="member-name-link">runLength(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
+<dd>
+<div class="block">Returns the number of cells in the given run.</div>
 </dd>
 <dt><a href="dev/tamboui/toolkit/app/InlineApp.html#runner()" class="member-name-link">runner()</a> - Method in class dev.tamboui.toolkit.app.<a href="dev/tamboui/toolkit/app/InlineApp.html" title="class in dev.tamboui.toolkit.app">InlineApp</a></dt>
 <dd>
@@ -15873,6 +15885,10 @@ terminal's title stack (<code>CSI 23;2t</code>), restoring the previously saved 
 <dt><a href="dev/tamboui/tui/TuiRunner.html#runOnRenderThread(java.lang.Runnable)" class="member-name-link">runOnRenderThread(Runnable)</a> - Method in class dev.tamboui.tui.<a href="dev/tamboui/tui/TuiRunner.html" title="class in dev.tamboui.tui">TuiRunner</a></dt>
 <dd>
 <div class="block">Executes an action on the render thread.</div>
+</dd>
+<dt><a href="dev/tamboui/buffer/DiffResult.html#runStart(int)" class="member-name-link">runStart(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
+<dd>
+<div class="block">Returns the row-major index in the target buffer at which the given run starts.</div>
 </dd>
 <dt><a href="dev/tamboui/error/RuntimeIOException.html" class="type-name-link" title="class in dev.tamboui.error">RuntimeIOException</a> - Exception Class in <a href="dev/tamboui/error/package-summary.html">dev.tamboui.error</a></dt>
 <dd>
@@ -17308,7 +17324,7 @@ are items above the current view.</div>
 <dd>&nbsp;</dd>
 <dt><a href="dev/tamboui/buffer/DiffResult.html#size()" class="member-name-link">size()</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
 <dd>
-<div class="block">Returns the number of cell updates in this result.</div>
+<div class="block">Returns the number of changed cells across all runs.</div>
 </dd>
 <dt><a href="dev/tamboui/css/cascade/TypedPropertyMap.html#size()" class="member-name-link">size()</a> - Method in class dev.tamboui.css.cascade.<a href="dev/tamboui/css/cascade/TypedPropertyMap.html" title="class in dev.tamboui.css.cascade">TypedPropertyMap</a></dt>
 <dd>
@@ -22104,6 +22120,8 @@ the given fallback map for inherited properties that are not set in this map.</d
 <dd>
 <div class="block">Writes raw bytes directly to the terminal output.</div>
 </dd>
+<dt><a href="dev/tamboui/backend/panama/PanamaBackend.html#writeRaw(java.lang.CharSequence)" class="member-name-link">writeRaw(CharSequence)</a> - Method in class dev.tamboui.backend.panama.<a href="dev/tamboui/backend/panama/PanamaBackend.html" title="class in dev.tamboui.backend.panama">PanamaBackend</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="dev/tamboui/terminal/Backend.html#writeRaw(java.lang.CharSequence)" class="member-name-link">writeRaw(CharSequence)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
 <dd>
 <div class="block">Writes a CharSequence directly to the terminal output.</div>
@@ -22195,6 +22213,10 @@ the given fallback map for inherited properties that are not set in this map.</d
 <dd>
 <div class="block">Sets the x-axis labels rendered as a single row below the sparkline bars.</div>
 </dd>
+<dt><a href="dev/tamboui/buffer/DiffResult.html#xOf(int)" class="member-name-link">xOf(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
+<dd>
+<div class="block">Returns the x coordinate of the given row-major index in the target buffer.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:Y">Y</h2>
 <dl class="index">
@@ -22273,6 +22295,10 @@ the given fallback map for inherited properties that are not set in this map.</d
 <dt><a href="dev/tamboui/style/Color.html#YELLOW" class="member-name-link">YELLOW</a> - Static variable in interface dev.tamboui.style.<a href="dev/tamboui/style/Color.html" title="interface in dev.tamboui.style">Color</a></dt>
 <dd>
 <div class="block">Yellow.</div>
+</dd>
+<dt><a href="dev/tamboui/buffer/DiffResult.html#yOf(int)" class="member-name-link">yOf(int)</a> - Method in class dev.tamboui.buffer.<a href="dev/tamboui/buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a></dt>
+<dd>
+<div class="block">Returns the y coordinate of the given row-major index in the target buffer.</div>
 </dd>
 </dl>
 <h2 class="title" id="I:Z">Z</h2>
