@@ -7,7 +7,7 @@ package dev.tamboui.image.protocol;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
@@ -37,6 +37,7 @@ public final class ITermProtocol implements ImageProtocol {
     private static final String ST = "\033\\";  // Alternative terminator
 
     private final boolean useStTerminator;
+    private final NativeImageCache cache = new NativeImageCache();
 
     /**
      * Creates an iTerm2 protocol instance using BEL terminator.
@@ -64,13 +65,27 @@ public final class ITermProtocol implements ImageProtocol {
             return;
         }
 
+        // Skip re-transmission when the same image is already shown at the same position.
+        // This is essential for iTerm2: it decodes and retains every inline image it receives,
+        // so re-sending the picture on every frame of the render loop would grow the terminal
+        // process memory without bound. The image stays on screen because the diff-based
+        // renderer leaves the image cells untouched between frames. A change in screen
+        // generation (clear/resize) forces a redraw.
+        List<Rect> stale = cache.staleAreasToClear(image, area, NativeImageCache.generationOf(rawOutput));
+        if (stale == null) {
+            return;
+        }
+        // Wipe any previously shown image whose footprint this one does not fully cover, so a
+        // shrinking image (e.g. FILL -> FIT) does not leave the larger one behind.
+        NativeImageCache.clearAreas(stale, rawOutput);
+
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
-        // Encode image as PNG
-        byte[] pngData = image.toPng();
-        String base64Data = Base64.getEncoder().encodeToString(pngData);
+        // Encode image as PNG then base64. The payload depends only on the pixels, so it is
+        // cached per image to avoid re-encoding on every frame of the render loop.
+        String base64Data = cache.payload(image, () -> NativeImageCache.encodeBase64(image));
 
         // Build the iTerm2 escape sequence
         StringBuilder cmd = new StringBuilder();

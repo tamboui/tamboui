@@ -32,6 +32,17 @@ import dev.tamboui.error.RuntimeIOException;
  */
 public final class ImageData {
 
+    static {
+        // tamboui-image uses AWT (BufferedImage/ImageIO) purely for off-screen image processing,
+        // never for a GUI. On macOS, initialising AWT in non-headless mode makes the JVM register
+        // as a Dock application and steal focus from the terminal. Default to headless so a
+        // terminal app stays a terminal app. An application that explicitly set the property
+        // (either way, e.g. because it also runs a Swing UI) is respected.
+        if (System.getProperty("java.awt.headless") == null) {
+            System.setProperty("java.awt.headless", "true");
+        }
+    }
+
     private final int width;
     private final int height;
     private final int[] pixels;
