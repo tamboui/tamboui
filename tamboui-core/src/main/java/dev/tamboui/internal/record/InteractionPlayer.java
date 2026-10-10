@@ -10,12 +10,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
 
 import static dev.tamboui.export.ExportRequest.export;
 /**
@@ -26,11 +33,26 @@ import static dev.tamboui.export.ExportRequest.export;
 final class InteractionPlayer {
 
     private static final int ESC = 27;
+    /** How long a Wait for text on the screen waits when the tape gives no timeout, as in vhs. */
+    private static final int DEFAULT_WAIT_TIMEOUT_MS = 15000;
+    /** How often the screen is checked while waiting for text on it. */
+    private static final int WAIT_POLL_MS = 50;
+    /** The number in the escape sequence of the function keys F5 to F12: ESC [ n ~. */
+    private static final int[] FUNCTION_KEY_CODES = {15, 17, 18, 19, 20, 21, 23, 24};
+    private static final Set<String> MODIFIERS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "ctrl", "control", "shift", "alt")));
+    private static final Set<String> NAMED_KEYS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "enter", "return", "tab", "space", "backspace", "back", "delete", "insert", "escape", "esc",
+            "up", "down", "left", "right", "arrow_up", "arrow_down", "arrow_left", "arrow_right",
+            "home", "end", "pageup", "pagedown")));
 
     private final List<Interaction> interactions;
     private final Deque<Integer> pendingBytes = new ArrayDeque<>();
     private int currentIndex = 0;
     private long waitUntilNanos = 0;
+    private Interaction.WaitFor waitingFor;
+    private long waitForDeadlineNanos;
+    private volatile boolean hidden;
     private final Buffer buffer;
 
     InteractionPlayer(List<Interaction> interactions, Buffer buffer) {
@@ -119,7 +141,6 @@ final class InteractionPlayer {
 
     private static void loadTapeFile(Path path, Path outputPath, List<Interaction> interactions) throws IOException {
         List<String> lines = Files.readAllLines(path);
-        boolean visible = true; // Track Show/Hide state
 
         for (String line : lines) {
             line = line.trim();
@@ -127,39 +148,32 @@ final class InteractionPlayer {
             if (line.isEmpty() || line.startsWith("#")) {
                 continue;
             }
+            String lower = line.toLowerCase(Locale.ROOT);
 
             // Handle Source directive (include another tape file)
-            if (line.toLowerCase(Locale.ROOT).startsWith("source ")) {
+            if (lower.startsWith("source ")) {
                 String includePath = line.substring(7).trim();
                 Path includeFile = path.getParent().resolve(includePath);
                 if (Files.exists(includeFile)) {
                     loadTapeFile(includeFile, outputPath, interactions);
+                } else {
+                    warn("Source tape not found: " + includeFile);
                 }
                 continue;
             }
 
-            // Skip Set commands (settings)
-            if (line.toLowerCase(Locale.ROOT).startsWith("set ")) {
+            // Skip the directives that only apply to the vhs tool (settings, output, required programs)
+            if (lower.startsWith("set ") || lower.startsWith("output ") || lower.startsWith("require ")) {
                 continue;
             }
 
-            // Skip Output command
-            if (line.toLowerCase(Locale.ROOT).startsWith("output ")) {
+            // Hide and Show keep playing the interactions in between, but leave them out of the recording
+            if (lower.equals("hide")) {
+                interactions.add(new Interaction.Visibility(true));
                 continue;
             }
-
-            // Track visibility state
-            if (line.equalsIgnoreCase("hide")) {
-                visible = false;
-                continue;
-            }
-            if (line.equalsIgnoreCase("show")) {
-                visible = true;
-                continue;
-            }
-
-            // Only process interactions when visible
-            if (!visible) {
+            if (lower.equals("show")) {
+                interactions.add(new Interaction.Visibility(false));
                 continue;
             }
 
@@ -168,32 +182,20 @@ final class InteractionPlayer {
     }
 
     private static void parseVhsCommand(Path outputPath, String line, List<Interaction> interactions) {
-        // Check for timing suffix: Command@duration count
-        // e.g., "Right@2.5s 3" means press Right 3 times with 2.5s between each
-        String cmd = line;
-        int atIndex = line.indexOf('@');
-        int repeatCount = 1;
-        int repeatDelayMs = 0;
-
+        // The command is the first word, and it may carry a timing suffix: Command@duration.
+        // "Right@2.5s 3" presses Right 3 times with 2.5s between each, "Type@50ms "text"" types a character
+        // every 50ms, and "Wait@10s /Ready/" waits at most 10s. Only the first word is checked for '@', so
+        // Type "user@example.com" types the text as it is.
+        String[] parts = line.split("\\s+", 2);
+        String head = parts[0];
+        String args = parts.length > 1 ? parts[1].trim() : "";
+        int delayMs = 0;
+        int atIndex = head.indexOf('@');
         if (atIndex > 0) {
-            // Parse timing: Command@duration count
-            String afterAt = line.substring(atIndex + 1);
-            cmd = line.substring(0, atIndex);
-            String[] timingParts = afterAt.split("\\s+", 2);
-            repeatDelayMs = parseDuration(timingParts[0]);
-            if (timingParts.length > 1) {
-                try {
-                    repeatCount = Integer.parseInt(timingParts[1]);
-                } catch (NumberFormatException e) {
-                    repeatCount = 1;
-                }
-            }
+            delayMs = parseDuration(head.substring(atIndex + 1));
+            head = head.substring(0, atIndex);
         }
-
-        // Parse the command
-        String[] parts = cmd.split("\\s+", 2);
-        String command = parts[0].toLowerCase(Locale.ROOT);
-        String args = parts.length > 1 ? parts[1] : "";
+        String command = head.toLowerCase(Locale.ROOT);
 
         switch (command) {
             case "sleep":
@@ -204,80 +206,80 @@ final class InteractionPlayer {
                 interactions.add(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
                 break;
             case "type":
-                // Type "text" - parse quoted string and type each character
-                String text = parseQuotedString(args);
-                for (char c : text.toCharArray()) {
-                    interactions.add(new Interaction.KeyPress(String.valueOf(c)));
-                }
+                addTypedText(parseQuotedString(args), delayMs, interactions);
                 break;
-
-            case "enter":
-                addRepeatedKey("enter", repeatCount, repeatDelayMs, interactions);
+            case "wait":
+            case "wait+line":
+            case "wait+screen":
+                addWaitFor(line, "wait+screen".equals(command), args, delayMs, interactions);
                 break;
-
-            case "tab":
-                addRepeatedKey("tab", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "space":
-                addRepeatedKey("space", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "backspace":
-                addRepeatedKey("backspace", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "delete":
-                addRepeatedKey("delete", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "escape":
-                addRepeatedKey("escape", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "up":
-                addRepeatedKey("up", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "down":
-                addRepeatedKey("down", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "left":
-                addRepeatedKey("left", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "right":
-                addRepeatedKey("right", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "home":
-                addRepeatedKey("home", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "end":
-                addRepeatedKey("end", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "pageup":
-                addRepeatedKey("pageup", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "pagedown":
-                addRepeatedKey("pagedown", repeatCount, repeatDelayMs, interactions);
-                break;
-
-            case "ctrl+c":
-                addRepeatedKey("ctrl+c", repeatCount, repeatDelayMs, interactions);
-                break;
-
             default:
-                // Check for modifier+key patterns (Ctrl+x, Shift+x)
-                if (command.startsWith("ctrl+") || command.startsWith("shift+")) {
-                    addRepeatedKey(command, repeatCount, repeatDelayMs, interactions);
+                if (isKey(head)) {
+                    addRepeatedKey(command, parseRepeatCount(line, args), delayMs, interactions);
+                } else {
+                    warn("Ignoring unknown tape command: " + line);
                 }
                 break;
         }
+    }
+
+    /**
+     * Whether the spec is a key the player can press: a named key such as {@code Enter} or {@code PageUp}, a function
+     * key {@code F1} to {@code F12}, or a single character with modifiers such as {@code Ctrl+c}. Named and function
+     * keys can carry modifiers too, such as {@code Shift+F8} or {@code Ctrl+Up}.
+     */
+    static boolean isKey(String spec) {
+        String key = spec;
+        boolean modified = false;
+        int plus;
+        while ((plus = key.indexOf('+')) > 0 && plus < key.length() - 1) {
+            if (!MODIFIERS.contains(key.substring(0, plus).toLowerCase(Locale.ROOT))) {
+                return false;
+            }
+            key = key.substring(plus + 1);
+            modified = true;
+        }
+        String lower = key.toLowerCase(Locale.ROOT);
+        return NAMED_KEYS.contains(lower) || functionKeyNumber(lower) > 0 || (modified && key.length() == 1);
+    }
+
+    private static int parseRepeatCount(String line, String args) {
+        if (args.isEmpty()) {
+            return 1;
+        }
+        try {
+            return Math.max(1, Integer.parseInt(args));
+        } catch (NumberFormatException e) {
+            warn("Ignoring the repeat count of: " + line);
+            return 1;
+        }
+    }
+
+    private static void addTypedText(String text, int delayMs, List<Interaction> interactions) {
+        for (int i = 0; i < text.length(); i++) {
+            if (i > 0 && delayMs > 0) {
+                interactions.add(new Interaction.Wait(delayMs));
+            }
+            interactions.add(new Interaction.KeyPress(String.valueOf(text.charAt(i))));
+        }
+    }
+
+    private static void addWaitFor(String line, boolean screen, String args, int timeoutMs,
+                                   List<Interaction> interactions) {
+        if (args.length() < 2 || !args.startsWith("/") || !args.endsWith("/")) {
+            warn("Ignoring Wait without a /regex/ to wait for: " + line);
+            return;
+        }
+        try {
+            Pattern pattern = Pattern.compile(args.substring(1, args.length() - 1));
+            interactions.add(new Interaction.WaitFor(pattern, screen, timeoutMs > 0 ? timeoutMs : DEFAULT_WAIT_TIMEOUT_MS));
+        } catch (PatternSyntaxException e) {
+            warn("Ignoring Wait with an invalid regex: " + line + " (" + e.getDescription() + ")");
+        }
+    }
+
+    private static void warn(String message) {
+        System.err.println("Warning: " + message);
     }
 
     private static void addRepeatedKey(String key, int count, int delayMs, List<Interaction> interactions) {
@@ -380,7 +382,18 @@ final class InteractionPlayer {
         if (waitUntilNanos > 0 && System.nanoTime() < waitUntilNanos) {
             return false;
         }
+        if (waitingFor != null) {
+            return false;
+        }
         return currentIndex >= interactions.size() && pendingBytes.isEmpty();
+    }
+
+    /**
+     * Returns true while the interactions between a Hide and a Show are played; their frames are left out of the
+     * recording.
+     */
+    boolean isHidden() {
+        return hidden;
     }
 
     /**
@@ -426,6 +439,23 @@ final class InteractionPlayer {
             waitUntilNanos = 0;
         }
 
+        // Check if we're waiting for text on the screen
+        if (waitingFor != null) {
+            if (!screenMatches(waitingFor)) {
+                if (System.nanoTime() < waitForDeadlineNanos) {
+                    try {
+                        Thread.sleep(Math.min(maxWaitMs, WAIT_POLL_MS));
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    return -2;
+                }
+                warn("Timed out after " + waitingFor.timeoutMillis() + "ms waiting for /" + waitingFor.pattern()
+                        + "/ on the screen");
+            }
+            waitingFor = null;
+        }
+
         // Process next interaction
         while (currentIndex < interactions.size()) {
             Interaction interaction = interactions.get(currentIndex++);
@@ -434,6 +464,12 @@ final class InteractionPlayer {
                 Interaction.Wait wait = (Interaction.Wait) interaction;
                 waitUntilNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(wait.millis());
                 return -2; // Timeout to trigger redraw
+            } else if (interaction instanceof Interaction.WaitFor) {
+                waitingFor = (Interaction.WaitFor) interaction;
+                waitForDeadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(waitingFor.timeoutMillis());
+                return -2; // Timeout to trigger redraw
+            } else if (interaction instanceof Interaction.Visibility) {
+                hidden = ((Interaction.Visibility) interaction).hidden();
             } else if (interaction instanceof Interaction.KeyPress) {
                 Interaction.KeyPress keyPress = (Interaction.KeyPress) interaction;
                 enqueueKey(keyPress.key());
@@ -456,119 +492,201 @@ final class InteractionPlayer {
         return -2;
     }
 
-    private void enqueueKey(String keySpec) {
-        String lower = keySpec.toLowerCase(Locale.ROOT);
+    /**
+     * Whether the screen shows text matching the pattern: on one line, or anywhere on the screen with its lines joined
+     * by newlines for Wait+Screen.
+     */
+    private boolean screenMatches(Interaction.WaitFor waitFor) {
+        if (buffer == null) {
+            return false;
+        }
+        Rect area = buffer.area();
+        StringBuilder screen = new StringBuilder();
+        for (int y = area.top(); y < area.bottom(); y++) {
+            StringBuilder row = new StringBuilder();
+            for (int x = area.left(); x < area.right(); x++) {
+                row.append(buffer.get(x, y).symbol());
+            }
+            if (!waitFor.screen() && waitFor.pattern().matcher(row).find()) {
+                return true;
+            }
+            if (y > area.top()) {
+                screen.append('\n');
+            }
+            screen.append(row);
+        }
+        return waitFor.screen() && waitFor.pattern().matcher(screen).find();
+    }
 
-        // Check for modifier prefixes
+    /**
+     * Queues the bytes a terminal sends for the key, all at once so that an escape sequence is read as one key.
+     * Modifiers are encoded the xterm way: a parameter in the sequence for the cursor, editing and function keys,
+     * and an ESC prefix for Alt with the other keys.
+     */
+    private void enqueueKey(String keySpec) {
         boolean ctrl = false;
         boolean shift = false;
+        boolean alt = false;
         String keyName = keySpec;
-
-        while (lower.contains("+")) {
-            int plusIdx = lower.indexOf('+');
-            String prefix = lower.substring(0, plusIdx);
-            lower = lower.substring(plusIdx + 1);
-            keyName = keyName.substring(keyName.indexOf('+') + 1);
-
-            switch (prefix) {
-                case "ctrl":
-                case "control":
-                    ctrl = true;
-                    break;
-                case "shift":
-                    shift = true;
-                    break;
-                default:
-                    break;
+        int plus;
+        // A lone "+" (typed text) is a key of its own, not a modifier separator
+        while ((plus = keyName.indexOf('+')) > 0 && plus < keyName.length() - 1) {
+            String prefix = keyName.substring(0, plus).toLowerCase(Locale.ROOT);
+            if ("ctrl".equals(prefix) || "control".equals(prefix)) {
+                ctrl = true;
+            } else if ("shift".equals(prefix)) {
+                shift = true;
+            } else if ("alt".equals(prefix)) {
+                alt = true;
+            } else {
+                break;
             }
+            keyName = keyName.substring(plus + 1);
         }
+        String lower = keyName.toLowerCase(Locale.ROOT);
+        // the xterm modifier parameter: 1 + shift + 2 * alt + 4 * ctrl
+        int modifiers = 1 + (shift ? 1 : 0) + (alt ? 2 : 0) + (ctrl ? 4 : 0);
 
-        // Convert key name to bytes
         switch (lower) {
             case "up":
             case "arrow_up":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) 'A');
+                addCursorKey('A', modifiers);
                 break;
             case "down":
             case "arrow_down":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) 'B');
+                addCursorKey('B', modifiers);
                 break;
             case "right":
             case "arrow_right":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) 'C');
+                addCursorKey('C', modifiers);
                 break;
             case "left":
             case "arrow_left":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) 'D');
+                addCursorKey('D', modifiers);
+                break;
+            case "home":
+                addCursorKey('H', modifiers);
+                break;
+            case "end":
+                addCursorKey('F', modifiers);
+                break;
+            case "insert":
+                addTildeKey(2, modifiers);
+                break;
+            case "delete":
+                addTildeKey(3, modifiers);
+                break;
+            case "pageup":
+                addTildeKey(5, modifiers);
+                break;
+            case "pagedown":
+                addTildeKey(6, modifiers);
                 break;
             case "enter":
             case "return":
-                pendingBytes.add((int) '\r');
+                addWithAlt('\r', alt);
                 break;
             case "esc":
             case "escape":
                 pendingBytes.add(ESC);
                 break;
             case "tab":
-                pendingBytes.add((int) '\t');
+                if (shift) {
+                    // back tab
+                    pendingBytes.add(ESC);
+                    pendingBytes.add((int) '[');
+                    pendingBytes.add((int) 'Z');
+                } else {
+                    addWithAlt('\t', alt);
+                }
                 break;
             case "space":
-                pendingBytes.add((int) ' ');
+                addWithAlt(ctrl ? 0 : ' ', alt);
                 break;
             case "backspace":
             case "back":
-                pendingBytes.add(127);
-                break;
-            case "home":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) 'H');
-                break;
-            case "end":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) 'F');
-                break;
-            case "delete":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) '3');
-                pendingBytes.add((int) '~');
-                break;
-            case "pageup":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) '5');
-                pendingBytes.add((int) '~');
-                break;
-            case "pagedown":
-                pendingBytes.add(ESC);
-                pendingBytes.add((int) '[');
-                pendingBytes.add((int) '6');
-                pendingBytes.add((int) '~');
+                addWithAlt(127, alt);
                 break;
             default:
-                // Single character - use keyName (with modifiers stripped) to preserve case
-                if (keyName.length() == 1) {
+                int functionKey = functionKeyNumber(lower);
+                if (functionKey > 0) {
+                    addFunctionKey(functionKey, modifiers);
+                } else if (keyName.length() == 1) {
+                    // Single character - use keyName (with modifiers stripped) to preserve case
                     char c = keyName.charAt(0);
                     if (ctrl && Character.isLetter(c)) {
                         // Ctrl+letter = letter - 'a' + 1
-                        pendingBytes.add(Character.toLowerCase(c) - 'a' + 1);
+                        addWithAlt(Character.toLowerCase(c) - 'a' + 1, alt);
                     } else if (shift && Character.isLetter(c)) {
-                        pendingBytes.add((int) Character.toUpperCase(c));
+                        addWithAlt(Character.toUpperCase(c), alt);
                     } else {
-                        pendingBytes.add((int) c);
+                        addWithAlt(c, alt);
                     }
                 }
                 break;
         }
+    }
+
+    /** The number of a function key name such as {@code f8}, or 0 when it is not F1 to F12. */
+    static int functionKeyNumber(String lower) {
+        if (lower.length() < 2 || lower.length() > 3 || lower.charAt(0) != 'f') {
+            return 0;
+        }
+        try {
+            int n = Integer.parseInt(lower.substring(1));
+            return n >= 1 && n <= 12 ? n : 0;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /** ESC [ X, or ESC [ 1 ; m X with modifiers: the cursor keys, Home, End, and F1 to F4 with modifiers. */
+    private void addCursorKey(char finalByte, int modifiers) {
+        pendingBytes.add(ESC);
+        pendingBytes.add((int) '[');
+        if (modifiers > 1) {
+            addDigits(1);
+            pendingBytes.add((int) ';');
+            addDigits(modifiers);
+        }
+        pendingBytes.add((int) finalByte);
+    }
+
+    /** ESC [ n ~, or ESC [ n ; m ~ with modifiers: the editing keys and F5 to F12. */
+    private void addTildeKey(int code, int modifiers) {
+        pendingBytes.add(ESC);
+        pendingBytes.add((int) '[');
+        addDigits(code);
+        if (modifiers > 1) {
+            pendingBytes.add((int) ';');
+            addDigits(modifiers);
+        }
+        pendingBytes.add((int) '~');
+    }
+
+    private void addFunctionKey(int n, int modifiers) {
+        if (n > 4) {
+            addTildeKey(FUNCTION_KEY_CODES[n - 5], modifiers);
+        } else if (modifiers > 1) {
+            addCursorKey((char) ('P' + n - 1), modifiers);
+        } else {
+            // ESC O P to ESC O S
+            pendingBytes.add(ESC);
+            pendingBytes.add((int) 'O');
+            pendingBytes.add('P' + n - 1);
+        }
+    }
+
+    private void addDigits(int n) {
+        for (char digit : Integer.toString(n).toCharArray()) {
+            pendingBytes.add((int) digit);
+        }
+    }
+
+    private void addWithAlt(int code, boolean alt) {
+        if (alt) {
+            pendingBytes.add(ESC);
+        }
+        pendingBytes.add(code);
     }
 }

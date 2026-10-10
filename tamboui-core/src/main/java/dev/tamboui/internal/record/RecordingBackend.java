@@ -34,6 +34,9 @@ public final class RecordingBackend implements Backend {
     private final InteractionPlayer interactionPlayer;
     private final long startTimeNanos;
     private long lastCaptureTimeNanos;
+    // time spent in the Hide sections of the tape, left out of the frame timestamps
+    private long hiddenNanos;
+    private long hiddenSinceNanos;
     private volatile boolean recording;
     private volatile boolean closed;
     private volatile boolean hasDrawn;  // Track if draw() was ever called
@@ -88,7 +91,18 @@ public final class RecordingBackend implements Backend {
 
     private void captureFrame() {
         long nowNanos = System.nanoTime();
-        long elapsedNanos = nowNanos - startTimeNanos;
+        // The frames of a Hide section are left out, and so is the time it took, so playback does not pause there
+        if (interactionPlayer.isHidden()) {
+            if (hiddenSinceNanos == 0) {
+                hiddenSinceNanos = nowNanos;
+            }
+            return;
+        }
+        if (hiddenSinceNanos != 0) {
+            hiddenNanos += nowNanos - hiddenSinceNanos;
+            hiddenSinceNanos = 0;
+        }
+        long elapsedNanos = nowNanos - startTimeNanos - hiddenNanos;
         long elapsedMs = TimeUnit.NANOSECONDS.toMillis(elapsedNanos);
 
         // Check duration limit

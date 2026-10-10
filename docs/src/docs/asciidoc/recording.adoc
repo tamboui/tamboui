@@ -102,17 +102,36 @@ Supported commands:
 |`Type "text"`
 |Type a string (supports `\n`, `\t`, `\"`, `\\`, `\xNN` escapes)
 
-|`Enter`, `Tab`, `Space`, `Backspace`, `Delete`, `Escape`
+|`Type@<speed> "text"`
+|Type a string with a pause between the characters, e.g. `Type@50ms "hello"`
+
+|`Enter`, `Tab`, `Space`, `Backspace`, `Delete`, `Insert`, `Escape`
 |Named keys
 
 |`Up`, `Down`, `Left`, `Right`, `Home`, `End`, `PageUp`, `PageDown`
 |Navigation keys
 
-|`Ctrl+<key>`, `Shift+<key>`
-|Modifier combinations (e.g. `Ctrl+C`)
+|`F1` ... `F12`
+|Function keys
+
+|`Ctrl+<key>`, `Shift+<key>`, `Alt+<key>`
+|Modifier combinations, also combined and on named and function keys (e.g. `Ctrl+C`, `Shift+F8`,
+`Ctrl+Up`, `Shift+Tab`, `Ctrl+Alt+a`)
+
+|`<Key> <count>`
+|Press a key several times, e.g. `Down 3`
 
 |`Sleep <duration>`
 |Pause, e.g. `Sleep 500ms` or `Sleep 2s`
+
+|`Wait /regex/`, `Wait+Line /regex/`
+|Wait until a line of the screen matches the regex (at most 15s); `Wait@10s /regex/` sets the timeout
+
+|`Wait+Screen /regex/`
+|Wait until the screen, its lines joined with newlines, matches the regex
+
+|`Hide`, `Show`
+|The interactions between them are played but left out of the recording, together with the time they take
 
 |`Screenshot`
 |Marks a frame of interest in the recording
@@ -124,9 +143,19 @@ Supported commands:
 |Repeat with delay, e.g. `Down@100ms 5` presses Down five times, 100ms apart
 |===
 
-`Set` and `Output` directives are accepted (for compatibility with tapes shared with the
+`Set`, `Output` and `Require` directives are accepted (for compatibility with tapes shared with the
 `vhs` tool) but the recording geometry and output come from the `tamboui.record.*`
-properties.
+properties. Any other line the player does not understand is reported on standard error and skipped,
+so a typo in a tape does not go unnoticed.
+
+Keys are sent as a terminal sends them, the xterm way: the function, cursor and editing keys as escape
+sequences with the modifiers as a parameter (`Shift+F8` is `ESC [ 19 ; 2 ~`), and `Alt` as an `ESC`
+prefix. Use the named keys rather than typing escape sequences with `Type`, which sends the characters
+one at a time.
+
+`Wait` makes a tape independent of how long the application takes, for example to wait for data to
+load or for a slow backend to answer, instead of guessing a `Sleep`. A `Wait` that times out is reported
+on standard error and the tape continues.
 
 == Headless verification recipe
 

@@ -197,6 +197,60 @@ class EventParserTest {
         assertThat(keyEvent.hasAlt()).isTrue();
     }
 
+    // -- Sequences the tape player sends for F5-F12, modified cursor keys and Alt --
+
+    @Test
+    @DisplayName("F8 (ESC[19~) is parsed as F8")
+    void f8ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '9', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F8);
+        assertThat(keyEvent.hasShift()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Shift+F8 (ESC[19;2~) is parsed as F8 with Shift")
+    void shiftF8ParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '9', ';', '2', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.F8);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Ctrl+Up (ESC[1;5A) is parsed as UP with Ctrl")
+    void ctrlUpParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', ';', '5', 'A');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.UP);
+        assertThat(keyEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Alt+x (ESC x) is parsed as x with Alt")
+    void altCharParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 'x');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.isChar('x')).isTrue();
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
     // -- Arrow key CSI sequences (ESC [ A/B/C/D) --
 
     @Test
