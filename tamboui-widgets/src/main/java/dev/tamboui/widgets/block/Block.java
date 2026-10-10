@@ -485,16 +485,18 @@ public final class Block implements Widget {
 
         // When merge strategy is active, only render title if cells are empty or borders
         // This prevents overwriting titles from overlapping blocks
+        // The title is cut to the space between the borders: with CLIP (the default) the line is not truncated
+        // beforehand, and the buffer only stops at its own edge, not at the block's
         if (mergeStrategy != MergeStrategy.REPLACE) {
-            renderTitleWithMerge(x, y, titleLine, buffer);
+            renderTitleWithMerge(x, y, titleLine, titleWidth, buffer);
         } else {
-            buffer.setLine(x, y, titleLine);
+            buffer.setLine(x, y, titleLine, titleWidth);
         }
     }
 
     private Line applyTitleOverflow(Line line, int maxWidth, Overflow overflow) {
         if (overflow == Overflow.CLIP || overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
-            // CLIP: just let it be clipped by the buffer
+            // CLIP: cut when rendered, to the title width (see renderTitle)
             // WRAP modes don't make sense for titles, treat as CLIP
             return line;
         }
@@ -556,12 +558,13 @@ public final class Block implements Widget {
         return spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
     }
 
-    private void renderTitleWithMerge(int x, int y, Line titleLine, Buffer buffer) {
+    private void renderTitleWithMerge(int x, int y, Line titleLine, int maxWidth, Buffer buffer) {
         List<Span> spans = titleLine.spans();
         int col = x;
+        int endCol = x + maxWidth;
         for (Span span : spans) {
             String content = span.content();
-            for (int i = 0; i < content.length(); ) {
+            for (int i = 0; i < content.length() && col < endCol; ) {
                 int codePoint = content.codePointAt(i);
                 String symbol = new String(Character.toChars(codePoint));
 

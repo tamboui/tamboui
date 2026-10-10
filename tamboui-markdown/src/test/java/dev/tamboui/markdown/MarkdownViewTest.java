@@ -409,4 +409,18 @@ class MarkdownViewTest {
             .hasSymbolAt(0, 4, "l")
             .hasSymbolAt(5, 4, "t");
     }
+
+    @Test
+    @DisplayName("Lines of a deeply nested list in a narrow view stay inside the block border")
+    void narrowNestedListStaysInsideBorder() {
+        String source = "- a\n  - b\n    - c\n      - d";
+        MarkdownView view = MarkdownView.builder().source(source).block(Block.bordered()).build();
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 8, 7));
+
+        view.render(buffer.area(), buffer);
+
+        for (int y = 1; y < 6; y++) {
+            assertThat(buffer.get(7, y).symbol()).as("right border on row " + y).isEqualTo("│");
+        }
+    }
 }

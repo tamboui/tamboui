@@ -149,7 +149,8 @@ public final class LineGauge implements Widget {
 
         // Render label if present
         if (label != null) {
-            startX = buffer.setLine(startX, y, label);
+            // cut to the area, the buffer only stops at its own edge
+            startX = buffer.setLine(startX, y, label, area.width());
         }
 
         // Calculate gauge width (remaining space)

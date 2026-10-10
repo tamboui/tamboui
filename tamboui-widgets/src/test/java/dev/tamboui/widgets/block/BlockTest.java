@@ -1019,4 +1019,26 @@ class BlockTest {
         assertThat(diff.size()).isEqualTo(8);
     }
 
+
+    @Test
+    @DisplayName("A title wider than the block is cut at the right border, not drawn past the block")
+    void titleClippedToBlock() {
+        for (MergeStrategy merge : new MergeStrategy[] {MergeStrategy.REPLACE, MergeStrategy.EXACT}) {
+            Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 3));
+            Block block = Block.builder().borders(Borders.ALL).title("Hello World").mergeBorders(merge).build();
+
+            block.render(new Rect(0, 0, 8, 3), buffer);
+
+            // the corner is kept and nothing is drawn right of the block
+            assertThat(rowOf(buffer, 0)).as(merge.name()).isEqualTo("┌Hello ┐            ");
+        }
+    }
+
+    private static String rowOf(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString();
+    }
 }

@@ -328,4 +328,23 @@ class TextAreaTest {
         }
         return sb.toString().trim();
     }
+
+    @Test
+    @DisplayName("A placeholder wider than the text area is cut at its right edge")
+    void placeholderClippedToArea() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 1));
+        TextArea textArea = TextArea.builder().placeholder("Type your message here").build();
+
+        textArea.render(new Rect(0, 0, 8, 1), buffer, new TextAreaState());
+
+        assertThat(rowOf(buffer, 0)).isEqualTo("Type you            ");
+    }
+
+    private static String rowOf(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString();
+    }
 }

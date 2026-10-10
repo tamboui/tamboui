@@ -111,7 +111,8 @@ public final class ErrorDisplay implements Widget {
         // Render visible lines
         for (int i = 0; i < visibleHeight && (actualScroll + i) < lines.size(); i++) {
             Line line = lines.get(actualScroll + i);
-            buffer.setLine(inner.left(), inner.top() + i, line);
+            // cut to the inner area, so a long stack trace line does not draw over the right border
+            buffer.setLine(inner.left(), inner.top() + i, line, inner.width());
         }
     }
 

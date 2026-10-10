@@ -11,8 +11,11 @@ import org.junit.jupiter.api.Test;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Hyperlink;
+import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.AnsiStringBuilder;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
 
 import static dev.tamboui.assertj.BufferAssertions.*;
 import static org.assertj.core.api.Assertions.*;
@@ -390,5 +393,28 @@ class BufferTest {
             idx += sub.length();
         }
         return count;
+    }
+
+    @Test
+    @DisplayName("setLine with a max width cuts the line by display width, keeping the span styles")
+    void setLineWithMaxWidth() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        Line line = Line.from(Span.styled("ab", Style.EMPTY.bold()), Span.raw("cd世ef"));
+
+        int end = buffer.setLine(0, 0, line, 5);
+
+        // "abcd" fit in 4 columns; 世 needs 2 columns, only 1 is left, so it is left out
+        assertThat(end).isEqualTo(4);
+        assertThat(rowOf(buffer, 0)).isEqualTo("abcd      ");
+        assertThat(buffer.get(0, 0).style().effectiveModifiers()).contains(Modifier.BOLD);
+        assertThat(buffer.get(2, 0).style().effectiveModifiers()).doesNotContain(Modifier.BOLD);
+    }
+
+    private static String rowOf(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString();
     }
 }

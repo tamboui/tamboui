@@ -295,7 +295,8 @@ public final class MarkdownView implements Widget {
                 int from = Math.min(lines.size(), chunkSkip);
                 int to = Math.min(lines.size(), from + visibleHeight);
                 for (int i = from; i < to; i++) {
-                    buffer.setLine(contentArea.left(), y + (i - from), lines.get(i));
+                    // cut to the content area: a deeply nested list in a narrow view can be wider than it
+                    buffer.setLine(contentArea.left(), y + (i - from), lines.get(i), contentArea.width());
                 }
             }
             y += visibleHeight;

@@ -80,9 +80,11 @@ public final class Flow implements Widget {
                 break;
             }
 
-            // Clamp item height to available space
+            // Clamp item width and height to available space: an item wider than the area (alone on its row)
+            // is cut at the right edge instead of drawing over what is next to the flow
+            int clampedWidth = Math.min(itemWidth, area.right() - currentX);
             int clampedHeight = Math.min(itemHeight, area.bottom() - currentY);
-            Rect itemArea = new Rect(currentX, currentY, itemWidth, clampedHeight);
+            Rect itemArea = new Rect(currentX, currentY, clampedWidth, clampedHeight);
             item.widget().render(itemArea, buffer);
 
             currentX += itemWidth + horizontalSpacing;

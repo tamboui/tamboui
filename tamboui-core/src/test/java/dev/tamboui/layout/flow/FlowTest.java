@@ -15,6 +15,8 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
 import dev.tamboui.widget.Widget;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * Tests for the {@link Flow} widget.
@@ -207,5 +209,17 @@ class FlowTest {
         BufferAssertions.assertThat(buffer)
             .hasSymbolAt(0, 0, "A")
             .hasSymbolAt(5, 0, "B");
+    }
+
+    @Test
+    @DisplayName("An item wider than the area is cut at the area's right edge")
+    void itemWiderThanAreaIsClamped() {
+        Rect[] rendered = new Rect[1];
+        Widget wide = (area, buffer) -> rendered[0] = area;
+        Flow flow = Flow.builder().item(wide, 15).build();
+
+        flow.render(new Rect(0, 0, 10, 3), Buffer.empty(new Rect(0, 0, 20, 3)));
+
+        assertThat(rendered[0]).isEqualTo(new Rect(0, 0, 10, 1));
     }
 }

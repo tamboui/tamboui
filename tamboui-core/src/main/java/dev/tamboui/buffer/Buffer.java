@@ -459,6 +459,40 @@ public final class Buffer {
     }
 
     /**
+     * Sets a line at the given position, cut to at most {@code maxWidth} display columns.
+     * <p>
+     * {@link #setLine(int, int, Line)} only stops at the edge of the buffer; this variant keeps the line within a
+     * widget's area, so that it does not draw over the widget's border or the widgets next to it. The line is cut by
+     * display width, keeping the style of each span, and a wide character that does not fit whole is left out.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param line the line to set
+     * @param maxWidth the maximum number of columns to write
+     * @return the x position after the last character written
+     */
+    public int setLine(int x, int y, Line line, int maxWidth) {
+        int col = x;
+        int remaining = maxWidth;
+        List<Span> spans = line.spans();
+        for (int i = 0; i < spans.size() && remaining > 0; i++) {
+            Span span = spans.get(i);
+            int spanWidth = CharWidth.of(span.content());
+            if (spanWidth <= remaining) {
+                col = setSpan(col, y, span);
+                remaining -= spanWidth;
+            } else {
+                String clipped = CharWidth.substringByWidth(span.content(), remaining);
+                if (!clipped.isEmpty()) {
+                    col = setSpan(col, y, new Span(clipped, span.style()));
+                }
+                break;
+            }
+        }
+        return col;
+    }
+
+    /**
      * Sets the style for all cells in the given area.
      *
      * @param area the area to set the style for

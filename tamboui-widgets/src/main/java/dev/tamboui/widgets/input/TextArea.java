@@ -158,7 +158,8 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
 
         // Show placeholder if empty
         if (text.isEmpty() && !placeholder.isEmpty()) {
-            buffer.setString(textArea.left(), textArea.top(), placeholder, placeholderStyle);
+            String visiblePlaceholder = CharWidth.substringByWidth(placeholder, textArea.width());
+            buffer.setString(textArea.left(), textArea.top(), visiblePlaceholder, placeholderStyle);
             return;
         }
 
