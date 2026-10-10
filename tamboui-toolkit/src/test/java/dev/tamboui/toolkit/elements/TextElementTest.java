@@ -84,6 +84,45 @@ class TextElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("TextElement renders each line of multi-line content on its own row")
+    void rendersMultiLineContentOnSeparateRows() {
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        column(text("Line1\nLine2").bold(), text("After"))
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(rowText(buffer, 0)).isEqualTo("Line1     ");
+        assertThat(rowText(buffer, 1)).isEqualTo("Line2     ");
+        assertThat(rowText(buffer, 2)).isEqualTo("After     ");
+        // the style applies to every line
+        assertThat(buffer.get(0, 1).style().effectiveModifiers().contains(Modifier.BOLD)).isTrue();
+    }
+
+    @Test
+    @DisplayName("TextElement keeps an empty line of multi-line content")
+    void keepsEmptyLineOfMultiLineContent() {
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        text("A\n\nB").render(frame, area, RenderContext.empty());
+
+        assertThat(rowText(buffer, 0)).isEqualTo("A         ");
+        assertThat(rowText(buffer, 1)).isEqualTo("          ");
+        assertThat(rowText(buffer, 2)).isEqualTo("B         ");
+    }
+
+    private static String rowText(Buffer buffer, int y) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < buffer.area().width(); x++) {
+            sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString();
+    }
+
+    @Test
     @DisplayName("TextElement with style renders correctly")
     void rendersWithStyle() {
         Rect area = new Rect(0, 0, 10, 1);
