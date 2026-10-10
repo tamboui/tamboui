@@ -4,6 +4,9 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -281,9 +284,17 @@ public final class TextElement extends StyledElement<TextElement> {
                 .map(r -> (StylePropertyResolver) r)
                 .orElse(StylePropertyResolver.empty());
 
+        // One line per \n-separated segment, as countLines() sizes the element; a single Line would render
+        // the whole content on its first row
+        String[] segments = content.split("\n", -1);
+        List<Line> lines = new ArrayList<>(segments.length);
+        for (String segment : segments) {
+            lines.add(Line.from(Span.styled(segment, effectiveStyle)));
+        }
+
         // Build paragraph - CSS properties are resolved by the widget
         Paragraph.Builder paragraphBuilder = Paragraph.builder()
-                .text(Text.from(Line.from(Span.styled(content, effectiveStyle))))
+                .text(Text.from(lines))
                 .style(effectiveStyle)
                 .styleResolver(resolver);
 
