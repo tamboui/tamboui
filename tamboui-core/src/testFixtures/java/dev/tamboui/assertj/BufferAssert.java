@@ -117,6 +117,32 @@ public final class BufferAssert extends AbstractAssert<BufferAssert, Buffer> {
     }
 
     /**
+     * Asserts that a single row of the buffer has the given content, ignoring styles.
+     * <p>
+     * The expected string length must match the buffer width.
+     *
+     * @param y the row index
+     * @param expectedRow the expected row content
+     * @return this assertion object
+     * @throws AssertionError if the row content differs
+     */
+    public BufferAssert hasRow(int y, String expectedRow) {
+        isNotNull();
+
+        StringBuilder actualRow = new StringBuilder();
+        for (int x = 0; x < actual.width(); x++) {
+            actualRow.append(actual.get(x, y).symbol());
+        }
+        String actualRowStr = actualRow.toString();
+        if (!actualRowStr.equals(expectedRow)) {
+            failWithMessage("Content differs at row %d:%n  expected: \"%s\"%n  actual:   \"%s\"%n%nFull buffer content:%n%s",
+                    y, expectedRow, actualRowStr, formatBuffer(actual));
+        }
+
+        return this;
+    }
+
+    /**
      * Asserts that the buffer has the given width.
      *
      * @param expectedWidth the expected width

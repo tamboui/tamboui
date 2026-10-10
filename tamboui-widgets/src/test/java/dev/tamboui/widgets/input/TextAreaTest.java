@@ -20,6 +20,7 @@ import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.syntax.SyntaxTheme;
 import dev.tamboui.widgets.syntax.TokenType;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TextAreaTest {
@@ -337,14 +338,6 @@ class TextAreaTest {
 
         textArea.render(new Rect(0, 0, 8, 1), buffer, new TextAreaState());
 
-        assertThat(rowOf(buffer, 0)).isEqualTo("Type you            ");
-    }
-
-    private static String rowOf(Buffer buffer, int y) {
-        StringBuilder sb = new StringBuilder();
-        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
-            sb.append(buffer.get(x, y).symbol());
-        }
-        return sb.toString();
+        assertThat(buffer).hasRow(0, "Type you            ");
     }
 }

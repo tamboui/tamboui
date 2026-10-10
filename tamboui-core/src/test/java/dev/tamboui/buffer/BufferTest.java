@@ -405,16 +405,8 @@ class BufferTest {
 
         // "abcd" fit in 4 columns; 世 needs 2 columns, only 1 is left, so it is left out
         assertThat(end).isEqualTo(4);
-        assertThat(rowOf(buffer, 0)).isEqualTo("abcd      ");
+        assertThat(buffer).hasRow(0, "abcd      ");
         assertThat(buffer.get(0, 0).style().effectiveModifiers()).contains(Modifier.BOLD);
         assertThat(buffer.get(2, 0).style().effectiveModifiers()).doesNotContain(Modifier.BOLD);
-    }
-
-    private static String rowOf(Buffer buffer, int y) {
-        StringBuilder sb = new StringBuilder();
-        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
-            sb.append(buffer.get(x, y).symbol());
-        }
-        return sb.toString();
     }
 }

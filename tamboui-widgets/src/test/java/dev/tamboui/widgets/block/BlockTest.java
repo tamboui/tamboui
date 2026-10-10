@@ -1030,15 +1030,7 @@ class BlockTest {
             block.render(new Rect(0, 0, 8, 3), buffer);
 
             // the corner is kept and nothing is drawn right of the block
-            assertThat(rowOf(buffer, 0)).as(merge.name()).isEqualTo("┌Hello ┐            ");
+            assertThat(buffer).as(merge.name()).hasRow(0, "┌Hello ┐            ");
         }
-    }
-
-    private static String rowOf(Buffer buffer, int y) {
-        StringBuilder sb = new StringBuilder();
-        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
-            sb.append(buffer.get(x, y).symbol());
-        }
-        return sb.toString();
     }
 }
