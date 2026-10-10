@@ -116,6 +116,59 @@ class LayoutTest {
     }
 
     @Test
+    @DisplayName("Spacing is taken out once: two fills with spacing 2 in width 10 are 4 wide each")
+    void spacingBetweenFills() {
+        List<Rect> rects = Layout.horizontal()
+            .spacing(2)
+            .constraints(Constraint.fill(), Constraint.fill())
+            .split(new Rect(0, 0, 10, 1));
+
+        assertThat(rects).containsExactly(new Rect(0, 0, 4, 1), new Rect(6, 0, 4, 1));
+    }
+
+    @Test
+    @DisplayName("Spacing is taken out once: a fill between a header and a footer reaches the footer")
+    void spacingAroundFill() {
+        List<Rect> rects = Layout.vertical()
+            .spacing(1)
+            .constraints(Constraint.length(3), Constraint.fill(), Constraint.length(1))
+            .split(new Rect(0, 0, 80, 24));
+
+        // 24 rows: header 3, gap, fill 18, gap, footer 1 on the last row
+        assertThat(rects).containsExactly(
+            new Rect(0, 0, 80, 3), new Rect(0, 4, 80, 18), new Rect(0, 23, 80, 1));
+    }
+
+    @Test
+    @DisplayName("Fill(0) next to a weighted fill takes no space and does not break the solver")
+    void fillZeroNextToWeightedFill() {
+        Rect area = new Rect(0, 0, 20, 1);
+
+        assertThat(Layout.horizontal().constraints(Constraint.length(5), Constraint.fill(0), Constraint.fill(1))
+            .split(area))
+            .containsExactly(new Rect(0, 0, 5, 1), new Rect(5, 0, 0, 1), new Rect(5, 0, 15, 1));
+        assertThat(Layout.horizontal().constraints(Constraint.fill(0), Constraint.fill(1), Constraint.fill(0))
+            .split(area))
+            .containsExactly(new Rect(0, 0, 0, 1), new Rect(0, 0, 20, 1), new Rect(20, 0, 0, 1));
+
+        List<Rect> withMin = Layout.horizontal()
+            .constraints(Constraint.fill(1), Constraint.fill(0), Constraint.min(5))
+            .split(area);
+        assertThat(withMin.get(1).width()).isZero();
+        assertThat(withMin.stream().mapToInt(Rect::width).sum()).isEqualTo(20);
+    }
+
+    @Test
+    @DisplayName("Fills that are all Fill(0) share the space equally")
+    void allFillZeroShareEqually() {
+        List<Rect> rects = Layout.horizontal()
+            .constraints(Constraint.fill(0), Constraint.fill(0))
+            .split(new Rect(0, 0, 10, 1));
+
+        assertThat(rects).containsExactly(new Rect(0, 0, 5, 1), new Rect(5, 0, 5, 1));
+    }
+
+    @Test
     @DisplayName("Layout with min constraint")
     void minConstraint() {
         Rect area = new Rect(0, 0, 100, 100);
