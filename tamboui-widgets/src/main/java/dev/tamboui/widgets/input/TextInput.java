@@ -131,8 +131,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         int visibleWidth = inputArea.width();
 
         // Calculate display width of text up to cursor
-        String displayBeforeCursor = displayText.substring(0, cursorPos);
-        int widthBeforeCursor = CharWidth.of(displayBeforeCursor);
+        int widthBeforeCursor = CharWidth.of(displayBeforeCursor(text, displayText, cursorPos));
 
         // If cursor is beyond visible area, scroll
         // scrollDisplayOffset tracks how many display columns to skip
@@ -191,8 +190,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         String displayText = maskChar != null ? new Masked(text, maskChar).value() : text;
 
         // Calculate display width of text before cursor
-        String displayBeforeCursor = displayText.substring(0, cursorPos);
-        int widthBeforeCursor = CharWidth.of(displayBeforeCursor);
+        int widthBeforeCursor = CharWidth.of(displayBeforeCursor(text, displayText, cursorPos));
 
         // Calculate scroll offset in display columns
         int scrollDisplayOffset = widthBeforeCursor >= visibleWidth ? widthBeforeCursor - visibleWidth + 1 : 0;
@@ -211,6 +209,18 @@ public final class TextInput implements StatefulWidget<TextInputState> {
                 frame.setCursorPosition(cursorX, cursorY);
             }
         }
+    }
+
+    /**
+     * The displayed text before the cursor. The cursor position is an index into the text, while the masked text has
+     * one mask character per code point, so for a masked input the cursor is mapped by counting code points (an emoji
+     * is two chars of the text but one mask character).
+     */
+    private String displayBeforeCursor(String text, String displayText, int cursorPos) {
+        if (maskChar == null) {
+            return text.substring(0, cursorPos);
+        }
+        return displayText.substring(0, text.codePointCount(0, cursorPos));
     }
 
     /**

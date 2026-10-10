@@ -619,8 +619,10 @@ public final class Paragraph implements Widget {
             }
         }
 
-        // No good break point - break at character boundary
-        return maxEnd;
+        // No good break point - break at character boundary. A character wider than the line (a wide
+        // character in a 1-column line) still takes a line of its own, as with WRAP_CHARACTER; returning
+        // startPos would never advance the wrap loop
+        return maxEnd == startPos ? startPos + 1 : maxEnd;
     }
 
     /**
