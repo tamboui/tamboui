@@ -250,6 +250,7 @@ public class HelloDsl extends ToolkitApp {
 | Row | `row(a, b, c)` | Horizontal layout |
 | Column | `column(a, b, c)` | Vertical layout |
 | Spacer | `spacer()` | Flexible empty space |
+| Divider | `divider()` | Horizontal separator with optional text |
 | Gauge | `gauge(0.75)` | Progress bar |
 | LineGauge | `lineGauge(50)` | Single-line progress indicator |
 | Sparkline | `sparkline(1,2,3,4,5)` | Mini data chart |
