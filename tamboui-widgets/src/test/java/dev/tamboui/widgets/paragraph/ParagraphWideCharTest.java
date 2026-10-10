@@ -4,6 +4,8 @@
  */
 package dev.tamboui.widgets.paragraph;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +17,7 @@ import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class ParagraphWideCharTest {
 
@@ -174,6 +177,31 @@ class ParagraphWideCharTest {
         Line line = Line.from(Span.raw("Hi"), Span.raw("世界"));
         // "Hi" = 2, "世界" = 4, total = 6
         assertThat(line.width()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("WRAP_WORD does not hang on a wide character wider than the line")
+    void wrapWordWideCharWiderThanLine() {
+        Paragraph p = Paragraph.builder()
+                .text(Text.from("中文"))
+                .overflow(Overflow.WRAP_WORD)
+                .build();
+
+        // each wide character takes a line of its own; it used to loop until out of memory
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 1, 4));
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> p.render(buffer.area(), buffer));
+    }
+
+    @Test
+    @DisplayName("WRAP_WORD does not hang when the hanging indent leaves less room than a wide character")
+    void wrapWordWideCharAfterHangingIndent() {
+        Paragraph p = Paragraph.builder()
+                .text(Text.from("   中文字"))
+                .overflow(Overflow.WRAP_WORD)
+                .build();
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 4, 6));
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> p.render(buffer.area(), buffer));
     }
 
     private String extractLineText(Buffer buffer, int y) {

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.markdown;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.StylePropertyResolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class MarkdownViewOverflowTest {
 
@@ -37,6 +39,24 @@ class MarkdownViewOverflowTest {
             sb.append(buffer.get(x, y).symbol());
         }
         return sb.toString().replaceAll("\\s+$", "");
+    }
+
+    @Test
+    @DisplayName("WRAP_CHARACTER does not hang on a wide character wider than the line")
+    void wrapCharacterWideCharWiderThanLine() {
+        MarkdownView view = MarkdownView.builder().source("世界").overflow(Overflow.WRAP_CHARACTER).build();
+
+        // each wide character takes a line of its own; it used to loop until out of memory
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> assertThat(view.computeHeight(1)).isEqualTo(2));
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> renderInto(view, 1, 4));
+    }
+
+    @Test
+    @DisplayName("WRAP_WORD keeps a wide character wider than the line instead of dropping the word")
+    void wrapWordKeepsWideCharWiderThanLine() {
+        MarkdownView view = MarkdownView.builder().source("世界").build();
+
+        assertThat(view.computeHeight(1)).isEqualTo(2);
     }
 
     @Test

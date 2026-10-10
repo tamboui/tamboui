@@ -153,7 +153,12 @@ public final class MarkdownInlineRenderer {
                 if (currentWidth == 0) {
                     String head = CharWidth.substringByWidth(segment, maxWidth);
                     if (head.isEmpty()) {
-                        idx = wordEnd;
+                        // a character wider than the whole line (a wide character at width 1) takes a line
+                        // of its own instead of the word being dropped; the next segment ends that line
+                        String wide = firstCodePoint(segment);
+                        appendSegment(current, wide, span.style());
+                        currentWidth = CharWidth.of(wide);
+                        idx += wide.length();
                         continue;
                     }
                     appendSegment(current, head, span.style());
@@ -191,10 +196,15 @@ public final class MarkdownInlineRenderer {
                 String tail = content.substring(idx);
                 String head = CharWidth.substringByWidth(tail, remaining);
                 if (head.isEmpty()) {
-                    out.add(toLine(current));
-                    current = new ArrayList<>();
-                    currentWidth = 0;
-                    continue;
+                    if (currentWidth > 0) {
+                        out.add(toLine(current));
+                        current = new ArrayList<>();
+                        currentWidth = 0;
+                        continue;
+                    }
+                    // a character wider than the whole line (a wide character at width 1) takes a line of its
+                    // own; retrying with an empty line would loop forever
+                    head = firstCodePoint(tail);
                 }
                 appendSegment(current, head, span.style());
                 currentWidth += CharWidth.of(head);
@@ -202,6 +212,11 @@ public final class MarkdownInlineRenderer {
             }
         }
         out.add(toLine(current));
+    }
+
+    /** The first code point of the text, as a string. */
+    private static String firstCodePoint(String text) {
+        return text.substring(0, Character.charCount(text.codePointAt(0)));
     }
 
     private static Line clipSpans(List<Span> spans, int maxWidth) {

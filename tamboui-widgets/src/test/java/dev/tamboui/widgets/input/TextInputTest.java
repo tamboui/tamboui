@@ -11,6 +11,7 @@ import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.TestStylePropertyResolver;
 
@@ -82,5 +83,27 @@ class TextInputTest {
 
         // Placeholder should have dark-gray foreground
         BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.DARK_GRAY);
+    }
+
+    @Test
+    @DisplayName("Masked input with an emoji renders one mask character per code point and places the cursor")
+    void maskedInputWithEmoji() {
+        TextInputState state = new TextInputState("a🔥b");
+        TextInput input = TextInput.builder().masked().build();
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+
+        // the cursor is after "b" (index 4 of the text, but the 3rd mask character)
+        input.renderWithCursor(buffer.area(), buffer, state, null);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("*");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("*");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("*");
+        assertThat(buffer.get(3, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
+
+        // with the cursor before "b", just after the emoji
+        state.moveCursorLeft();
+        Buffer buffer2 = Buffer.empty(new Rect(0, 0, 10, 1));
+        input.renderWithCursor(buffer2.area(), buffer2, state, null);
+        assertThat(buffer2.get(2, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
     }
 }
