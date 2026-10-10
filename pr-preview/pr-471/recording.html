@@ -187,7 +187,11 @@ Type "q"</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type a string (supports <code>\n</code>, <code>\t</code>, <code>\"</code>, <code>\\</code>, <code>\xNN</code> escapes)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Enter</code>, <code>Tab</code>, <code>Space</code>, <code>Backspace</code>, <code>Delete</code>, <code>Escape</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Type@&lt;speed&gt; "text"</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type a string with a pause between the characters, e.g. <code>Type@50ms "hello"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Enter</code>, <code>Tab</code>, <code>Space</code>, <code>Backspace</code>, <code>Delete</code>, <code>Insert</code>, <code>Escape</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Named keys</p></td>
 </tr>
 <tr>
@@ -195,12 +199,33 @@ Type "q"</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Navigation keys</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+&lt;key&gt;</code>, <code>Shift+&lt;key&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modifier combinations (e.g. <code>Ctrl+C</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>F1</code> &#8230;&#8203; <code>F12</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Function keys</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+&lt;key&gt;</code>, <code>Shift+&lt;key&gt;</code>, <code>Alt+&lt;key&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modifier combinations, also combined and on named and function keys (e.g. <code>Ctrl+C</code>, <code>Shift+F8</code>,
+<code>Ctrl+Up</code>, <code>Shift+Tab</code>, <code>Ctrl+Alt+a</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&lt;Key&gt; &lt;count&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Press a key several times, e.g. <code>Down 3</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Sleep &lt;duration&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Pause, e.g. <code>Sleep 500ms</code> or <code>Sleep 2s</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Wait /regex/</code>, <code>Wait+Line /regex/</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wait until a line of the screen matches the regex (at most 15s); <code>Wait@10s /regex/</code> sets the timeout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Wait+Screen /regex/</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wait until the screen, its lines joined with newlines, matches the regex</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Hide</code>, <code>Show</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The interactions between them are played but left out of the recording, together with the time they take</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Screenshot</code></p></td>
@@ -217,9 +242,21 @@ Type "q"</code></pre>
 </tbody>
 </table>
 <div class="paragraph">
-<p><code>Set</code> and <code>Output</code> directives are accepted (for compatibility with tapes shared with the
+<p><code>Set</code>, <code>Output</code> and <code>Require</code> directives are accepted (for compatibility with tapes shared with the
 <code>vhs</code> tool) but the recording geometry and output come from the <code>tamboui.record.*</code>
-properties.</p>
+properties. Any other line the player does not understand is reported on standard error and skipped,
+so a typo in a tape does not go unnoticed.</p>
+</div>
+<div class="paragraph">
+<p>Keys are sent as a terminal sends them, the xterm way: the function, cursor and editing keys as escape
+sequences with the modifiers as a parameter (<code>Shift+F8</code> is <code>ESC [ 19 ; 2 ~</code>), and <code>Alt</code> as an <code>ESC</code>
+prefix. Use the named keys rather than typing escape sequences with <code>Type</code>, which sends the characters
+one at a time.</p>
+</div>
+<div class="paragraph">
+<p><code>Wait</code> makes a tape independent of how long the application takes, for example to wait for data to
+load or for a slow backend to answer, instead of guessing a <code>Sleep</code>. A <code>Wait</code> that times out is reported
+on standard error and the tape continues.</p>
 </div>
 </div>
 </div>
