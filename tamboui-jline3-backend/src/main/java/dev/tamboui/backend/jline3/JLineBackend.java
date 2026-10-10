@@ -54,7 +54,7 @@ public class JLineBackend extends AbstractBackend {
      * @throws IOException if the terminal cannot be opened
      */
     public JLineBackend() throws IOException {
-        this(TerminalBuilder.builder().system(true).jansi(true).build(), true);
+        this(TerminalBuilder.builder().system(true).build(), true);
     }
 
     /**
@@ -94,7 +94,7 @@ public class JLineBackend extends AbstractBackend {
 
     @Override
     public Size size() throws IOException {
-        return new Size(terminal.getWidth(), terminal.getHeight());
+        return new Size(terminal.getColumns(), terminal.getRows());
     }
 
     @Override
