@@ -190,6 +190,9 @@
     "tabs-demo": {
       "script-ref": "tamboui-widgets/demos/tabs-demo/src/main/java/dev/tamboui/demo/TabsDemo.java"
     },
+    "toast-demo": {
+      "script-ref": "tamboui-widgets/demos/toast-demo/src/main/java/dev/tamboui/demo/ToastDemo.java"
+    },
     "todo-list-demo": {
       "script-ref": "tamboui-widgets/demos/todo-list-demo/src/main/java/dev/tamboui/demo/TodoListDemo.java"
     },

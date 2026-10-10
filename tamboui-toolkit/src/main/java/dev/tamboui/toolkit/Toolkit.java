@@ -49,6 +49,7 @@ import dev.tamboui.toolkit.elements.TabsElement;
 import dev.tamboui.toolkit.elements.TextAreaElement;
 import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
+import dev.tamboui.toolkit.elements.ToastHostElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
 import dev.tamboui.tui.event.KeyEvent;
@@ -61,6 +62,7 @@ import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
+import dev.tamboui.widgets.toast.ToastEngine;
 import dev.tamboui.widgets.tree.TreeNode;
 
 /**
@@ -1303,6 +1305,18 @@ public static SpinnerElement spinner(String... frames) {
     SpinnerElement element = new SpinnerElement();
     element.frames(frames);
     return element;
+}
+
+// ==================== Toast ====================
+
+/**
+ * Creates a toast host element that renders and handles interactions for a toast engine.
+ *
+ * @param engine the toast engine to host
+ * @return a new toast host element
+ */
+public static ToastHostElement toast(ToastEngine engine) {
+    return new ToastHostElement(engine);
 }
 
 // ==================== Generic Widget ====================

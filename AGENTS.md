@@ -379,6 +379,7 @@ Add a JavaDoc section to each Element class documenting its CSS child selectors:
 | ListElement | `-item`, `-scrollbar-thumb`, `-scrollbar-track` |
 | TableElement | `-row`, `-header` |
 | TabsElement | `-tab`, `-divider` |
+| ToastHostElement | `-info`, `-success`, `-warning`, `-error`, `-title`, `-progress` |
 
 ## PR Guidelines
 
