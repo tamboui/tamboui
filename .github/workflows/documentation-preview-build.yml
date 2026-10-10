@@ -31,7 +31,7 @@ jobs:
           cache-disabled: true
       - name: Build documentation
         run: ./gradlew -q :docs:asciidoctor
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: documentation-preview
           path: docs/build/docs
