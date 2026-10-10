@@ -5,7 +5,6 @@
 package dev.tamboui.markdown.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -156,7 +155,7 @@ public final class MarkdownLayout {
         List<Line> lines = MarkdownInlineRenderer.render(heading, headingStyle, width, styles, overflow);
         if (heading.getLevel() <= 2) {
             char glyph = heading.getLevel() == 1 ? '═' : HORIZONTAL_RULE_GLYPH;
-            String rule = repeat(glyph, width);
+            String rule = MarkdownText.repeat(glyph, width);
             List<Line> withRule = new ArrayList<>(lines);
             withRule.add(Line.styled(rule, Style.EMPTY.fg(Color.GRAY)));
             out.add(new LinesChunk(withRule));
@@ -187,7 +186,7 @@ public final class MarkdownLayout {
                     prefix.add(Span.styled(symbol, symbolStyle));
                 }
                 int prefixWidth = totalSpanWidth(prefix);
-                String continuationIndent = repeat(' ', prefixWidth);
+                String continuationIndent = MarkdownText.repeat(' ', prefixWidth);
                 renderListItem(
                     (ListItem) child, prefix, continuationIndent, depth, width, styles, overflow,
                     highlighter, theme, result);
@@ -223,6 +222,20 @@ public final class MarkdownLayout {
                 out.addAll(sub);
             } else if (child instanceof TaskListItemMarker) {
                 // Already consumed by taskCheckedFlag; skip.
+            } else if (child instanceof FencedCodeBlock || child instanceof IndentedCodeBlock) {
+                // a code block is a widget elsewhere, but a list item holds lines: draw it as lines
+                int contentWidth = Math.max(1, width - prefixWidth);
+                String literal = child instanceof FencedCodeBlock
+                    ? ((FencedCodeBlock) child).getLiteral() : ((IndentedCodeBlock) child).getLiteral();
+                String info = child instanceof FencedCodeBlock ? ((FencedCodeBlock) child).getInfo() : null;
+                for (Line line : CodeBlockBuilder.buildLines(literal, info, contentWidth, styles, highlighter, theme)) {
+                    if (firstParagraph) {
+                        out.add(prependSpans(prefix, line));
+                        firstParagraph = false;
+                    } else {
+                        out.add(prependIndent(continuationIndent, line));
+                    }
+                }
             } else {
                 List<RenderedChunk> embedded = new ArrayList<>();
                 int contentWidth = Math.max(1, width - prefixWidth);
@@ -327,7 +340,7 @@ public final class MarkdownLayout {
     }
 
     private static Line buildHorizontalRule(int width, MarkdownStyles styles) {
-        return Line.from(Span.styled(repeat(HORIZONTAL_RULE_GLYPH, width), styles.horizontalRule()));
+        return Line.from(Span.styled(MarkdownText.repeat(HORIZONTAL_RULE_GLYPH, width), styles.horizontalRule()));
     }
 
     private static RenderedChunk buildTable(TableBlock tableBlock, int width, MarkdownStyles styles) {
@@ -391,14 +404,5 @@ public final class MarkdownLayout {
             cellNode = cellNode.getNext();
         }
         return Row.from(cells);
-    }
-
-    private static String repeat(char c, int count) {
-        if (count <= 0) {
-            return "";
-        }
-        char[] buf = new char[count];
-        Arrays.fill(buf, c);
-        return new String(buf);
     }
 }
