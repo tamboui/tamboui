@@ -11,6 +11,8 @@ package dev.tamboui.demo;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
@@ -30,6 +32,8 @@ import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyModifiers;
+import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.tui.event.ResizeEvent;
@@ -56,12 +60,22 @@ import dev.tamboui.widgets.paragraph.Paragraph;
  */
 public class TuiDemo {
 
+    static final int EVENT_LOG_LIMIT = 12;
+    static final int ACTIVITY_PULSE_TICKS = 5;
+
     private int counter = 0;
-    private int selectedPanel = 0;
-    private final List<String> eventLog = new ArrayList<>();
+    private int keyCount = 0;
+    private int mouseCount = 0;
+    private int resizeCount = 0;
+    private final List<LoggedEvent> eventLog = new ArrayList<>();
     private int mouseX = -1;
     private int mouseY = -1;
+    private int terminalWidth = 0;
+    private int terminalHeight = 0;
     private long tickCount = 0;
+    private KeySnapshot lastKey = KeySnapshot.empty();
+    private MouseSnapshot lastMouse = MouseSnapshot.empty();
+    private final MouseDeviceState mouseDevice = new MouseDeviceState();
 
     private TuiDemo() {
 
@@ -125,85 +139,22 @@ public class TuiDemo {
     }
 
     private boolean handleKeyEvent(KeyEvent k) {
-        // Navigation with arrows (or vim keys if using vim keymap)
-        if (k.isLeft() || k.isUp()) {
-            selectedPanel = Math.max(0, selectedPanel - 1);
-            logEvent("Key: navigate left/up");
-            return true;
-        }
-        if (k.isRight() || k.isDown()) {
-            selectedPanel = Math.min(2, selectedPanel + 1);
-            logEvent("Key: navigate right/down");
-            return true;
-        }
-
-        // Select with Enter or Space
+        keyCount++;
+        lastKey = KeySnapshot.from(k);
+        logEvent(LoggedEvent.key(lastKey));
         if (k.isSelect()) {
             counter++;
-            logEvent("Key: select (counter=" + counter + ")");
-            return true;
         }
-
-        // Function keys
-        if (isFunctionKey(k)) {
-            int num = functionKeyNumber(k);
-            logEvent("Key: F" + num);
-            return true;
-        }
-
-        // Character input
-        if (k.code() == KeyCode.CHAR) {
-            logEvent("Key: '" + k.string() + "'");
-            return true;
-        }
-
-        return false;
-    }
-
-    private static boolean isFunctionKey(KeyEvent k) {
-        switch (k.code()) {
-            case F1: case F2: case F3: case F4: case F5: case F6:
-            case F7: case F8: case F9: case F10: case F11: case F12:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private static int functionKeyNumber(KeyEvent k) {
-        switch (k.code()) {
-            case F1: return 1;
-            case F2: return 2;
-            case F3: return 3;
-            case F4: return 4;
-            case F5: return 5;
-            case F6: return 6;
-            case F7: return 7;
-            case F8: return 8;
-            case F9: return 9;
-            case F10: return 10;
-            case F11: return 11;
-            case F12: return 12;
-            default: return -1;
-        }
+        return true;
     }
 
     private boolean handleMouseEvent(MouseEvent m) {
+        mouseCount++;
         mouseX = m.x();
         mouseY = m.y();
-
-        String eventName = switch (m.kind()) {
-            case PRESS -> "Mouse press " + m.button();
-            case RELEASE -> "Mouse release";
-            case DRAG -> "Mouse drag " + m.button();
-            case MOVE -> "move";
-            case SCROLL_UP -> "Scroll up";
-            case SCROLL_DOWN -> "Scroll down";
-            case SCROLL_LEFT -> "Scroll left";
-            case SCROLL_RIGHT -> "Scroll right";
-        };
-
-        logEvent(eventName + " at (" + m.x() + "," + m.y() + ")");
+        lastMouse = MouseSnapshot.from(m);
+        mouseDevice.observe(m);
+        logEvent(LoggedEvent.mouse(lastMouse));
 
         // Handle scroll to change counter
         if (m.kind() == MouseEventKind.SCROLL_UP) {
@@ -217,24 +168,29 @@ public class TuiDemo {
 
     private boolean handleTickEvent(TickEvent t) {
         tickCount = t.frameCount();
-        // Only redraw every 5th tick to reduce flickering for event log
-        return tickCount % 5 == 0;
+        boolean animated = mouseDevice.tick();
+        return animated || tickCount % 5 == 0;
     }
 
     private boolean handleResizeEvent(ResizeEvent r) {
-        logEvent("Resize: " + r.width() + "x" + r.height());
+        resizeCount++;
+        terminalWidth = r.width();
+        terminalHeight = r.height();
+        logEvent(LoggedEvent.resize(r.width(), r.height()));
         return true;
     }
 
-    private void logEvent(String event) {
+    private void logEvent(LoggedEvent event) {
         eventLog.addFirst(event);
-        if (eventLog.size() > 10) {
+        if (eventLog.size() > EVENT_LOG_LIMIT) {
             eventLog.removeLast();
         }
     }
 
     private void render(Frame frame) {
         Rect area = frame.area();
+        terminalWidth = area.width();
+        terminalHeight = area.height();
 
         // Split into header, main content, and footer
         List<Rect> layout = Layout.vertical()
@@ -266,8 +222,11 @@ public class TuiDemo {
                 .title(Title.from(
                         Line.from(
                                 Span.raw(" " + animation + " ").cyan(),
-                                Span.raw("TuiRunner Demo ").bold().cyan(),
-                                Span.raw(animation + " ").cyan()
+                                Span.raw("Tui Event Inspector ").bold().cyan(),
+                                Span.raw(animation + " ").cyan(),
+                                Span.raw("keys " + keyCount + " ").yellow(),
+                                Span.raw("mouse " + mouseCount + " ").green(),
+                                Span.raw("resize " + resizeCount + " ").magenta()
                         )
                 ).centered())
                 .build();
@@ -276,115 +235,155 @@ public class TuiDemo {
     }
 
     private void renderMain(Frame frame, Rect area) {
-        // Split into 3 panels
-        List<Rect> panels = Layout.horizontal()
+        if (area.width() >= 96) {
+            List<Rect> columns = Layout.horizontal()
+                    .constraints(
+                            Constraint.length(38),
+                            Constraint.fill()
+                    )
+                    .spacing(1)
+                    .split(area);
+            List<Rect> left = Layout.vertical()
+                    .constraints(
+                            Constraint.length(15),
+                            Constraint.fill()
+                    )
+                    .spacing(1)
+                    .split(columns.get(0));
+            List<Rect> right = Layout.vertical()
+                    .constraints(
+                            Constraint.length(11),
+                            Constraint.fill()
+                    )
+                    .spacing(1)
+                    .split(columns.get(1));
+            renderStatePanel(frame, left.get(0));
+            renderCapabilitiesPanel(frame, left.get(1));
+            renderMousePanel(frame, right.get(0));
+            renderEventsPanel(frame, right.get(1));
+            return;
+        }
+
+        List<Rect> rows = Layout.vertical()
                 .constraints(
-                        Constraint.ratio(1, 3),
-                        Constraint.ratio(1, 3),
-                        Constraint.ratio(1, 3)
+                        Constraint.length(15),
+                        Constraint.length(11),
+                        Constraint.length(8),
+                        Constraint.fill()
                 )
                 .spacing(1)
                 .split(area);
-
-        renderStatsPanel(frame, panels.get(0), selectedPanel == 0);
-        renderMousePanel(frame, panels.get(1), selectedPanel == 1);
-        renderEventsPanel(frame, panels.get(2), selectedPanel == 2);
+        renderStatePanel(frame, rows.get(0));
+        renderMousePanel(frame, rows.get(1));
+        renderCapabilitiesPanel(frame, rows.get(2));
+        renderEventsPanel(frame, rows.get(3));
     }
 
-    private void renderStatsPanel(Frame frame, Rect area, boolean focused) {
-        Color borderColor = focused ? Color.GREEN : Color.DARK_GRAY;
-
-        Text content = Text.from(
-                Line.from(Span.raw("Counter: ").bold(), Span.raw(String.valueOf(counter)).yellow()),
-                Line.empty(),
-                Line.from(Span.raw("Selected Panel: ").bold(), Span.raw(String.valueOf(selectedPanel + 1)).cyan()),
-                Line.empty(),
-                Line.from(Span.raw("Tick: ").bold(), Span.raw(String.valueOf(tickCount)).magenta()),
-                Line.empty(),
-                Line.from(Span.raw("Press ").dim(), Span.raw("Enter/Space").yellow(), Span.raw(" to increment").dim()),
-                Line.from(Span.raw("or scroll mouse wheel").dim())
-        );
-
-        Paragraph panel = Paragraph.builder()
-                .text(content)
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(borderColor))
-                        .title(Title.from(
-                                Line.from(
-                                        Span.raw("Stats "),
-                                        Span.raw(focused ? "●" : "○").fg(borderColor)
-                                )
-                        ))
-                        .build())
-                .build();
-
-        frame.renderWidget(panel, area);
-    }
-
-    private void renderMousePanel(Frame frame, Rect area, boolean focused) {
-        Color borderColor = focused ? Color.GREEN : Color.DARK_GRAY;
-
-        String posText = mouseX >= 0 ? "(" + mouseX + ", " + mouseY + ")" : "Move mouse here";
-
-        Text content = Text.from(
-                Line.from(Span.raw("Mouse Position:").bold()),
-                Line.empty(),
-                Line.from(Span.raw("  " + posText).cyan()),
-                Line.empty(),
-                Line.from(Span.raw("Move, click, drag, or scroll").dim()),
-                Line.from(Span.raw("to see mouse events").dim())
-        );
-
-        Paragraph panel = Paragraph.builder()
-                .text(content)
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(borderColor))
-                        .title(Title.from(
-                                Line.from(
-                                        Span.raw("Mouse "),
-                                        Span.raw(focused ? "●" : "○").fg(borderColor)
-                                )
-                        ))
-                        .build())
-                .build();
-
-        frame.renderWidget(panel, area);
-    }
-
-    private void renderEventsPanel(Frame frame, Rect area, boolean focused) {
-        Color borderColor = focused ? Color.GREEN : Color.DARK_GRAY;
-
+    private void renderStatePanel(Frame frame, Rect area) {
         List<Line> lines = new ArrayList<>();
-        lines.add(Line.from(Span.raw("Recent Events:").bold()));
+        lines.add(labeledValue("Counter", String.valueOf(counter), Color.YELLOW));
+        lines.add(labeledValue("Ticks", String.valueOf(tickCount), Color.MAGENTA));
+        lines.add(labeledValue("Terminal", terminalWidth + " x " + terminalHeight, Color.CYAN));
         lines.add(Line.empty());
+        lines.add(labeledValue("Last key", lastKey.logicalKey(), Color.WHITE));
+        lines.add(labeledValue("Text", lastKey.producedText(), Color.GREEN));
+        lines.add(labeledValue("Action", lastKey.action(), Color.CYAN));
+        lines.add(Line.from(modifierSpans(lastKey.modifiers())));
+        lines.add(Line.empty());
+        lines.add(Line.from(
+                Span.raw("Last mouse ").bold(),
+                kindBadge(lastMouse.kindLabel(), mouseSnapshotColor(lastMouse)),
+                Span.raw(" " + lastMouse.summary()).white()
+        ));
+        lines.add(Line.from(modifierSpans(lastMouse.modifiers())));
 
+        Paragraph panel = Paragraph.builder()
+                .text(Text.from(lines))
+                .block(panelBlock("Live State", Color.GREEN))
+                .build();
+
+        frame.renderWidget(panel, area);
+    }
+
+    private void renderMousePanel(Frame frame, Rect area) {
+        List<Line> lines = new ArrayList<>();
+        lines.add(Line.from(Span.raw("      ╭──────────────╮").fg(Color.GRAY)));
+        lines.add(Line.from(
+                Span.raw("      │ ").fg(Color.GRAY),
+                buttonSpan("L", mouseDevice.isLeftPressed(), Color.GREEN),
+                Span.raw(" ").fg(Color.GRAY),
+                buttonSpan("M", mouseDevice.isMiddlePressed(), Color.YELLOW),
+                Span.raw(" ").fg(Color.GRAY),
+                buttonSpan("R", mouseDevice.isRightPressed(), Color.CYAN),
+                Span.raw(" │").fg(Color.GRAY)
+        ));
+        lines.add(Line.from(
+                Span.raw("      │   ").fg(Color.GRAY),
+                scrollArrow("◀", mouseDevice.horizontalScrollPulse() < 0),
+                Span.raw("   ").fg(Color.GRAY),
+                wheelSpan(),
+                Span.raw("   ").fg(Color.GRAY),
+                scrollArrow("▶", mouseDevice.horizontalScrollPulse() > 0),
+                Span.raw("   │").fg(Color.GRAY)
+        ));
+        lines.add(Line.from(
+                Span.raw("      │ hover ").fg(Color.GRAY),
+                Span.raw(mouseDevice.hoverPulse() > 0 ? "●" : "○")
+                        .fg(mouseDevice.hoverPulse() > 0 ? Color.CYAN : Color.DARK_GRAY),
+                Span.raw("  drag ").fg(Color.GRAY),
+                Span.raw(mouseDevice.lastKind() == MouseEventKind.DRAG ? "●" : "○")
+                        .fg(mouseDevice.lastKind() == MouseEventKind.DRAG ? Color.YELLOW : Color.DARK_GRAY),
+                Span.raw(" │").fg(Color.GRAY)
+        ));
+        lines.add(Line.from(Span.raw("      ╰──────────────╯").fg(Color.GRAY)));
+        lines.add(Line.empty());
+        lines.add(labeledValue("Pointer", formatCoordinates(mouseX, mouseY), Color.CYAN));
+        lines.add(Line.from(
+                Span.raw("Event ").bold(),
+                kindBadge(lastMouse.kindLabel(), mouseSnapshotColor(lastMouse)),
+                Span.raw("  "),
+                Span.raw(lastMouse.buttonLabel()).fg(Color.WHITE)
+        ));
+
+        Paragraph panel = Paragraph.builder()
+                .text(Text.from(lines))
+                .block(panelBlock("Mouse Device", Color.CYAN))
+                .build();
+
+        frame.renderWidget(panel, area);
+    }
+
+    private void renderCapabilitiesPanel(Frame frame, Rect area) {
+        Text content = Text.from(
+                labeledValue("Mouse capture", "ON", Color.GREEN),
+                labeledValue("Motion 1003", "ON", Color.GREEN),
+                labeledValue("Mouse SGR", "CSI ?1006", Color.CYAN),
+                labeledValue("Keyboard", "Legacy + bindings", Color.YELLOW),
+                labeledValue("Modifier slots", "Ctrl Alt Shift + Super Hyper Meta", Color.WHITE),
+                labeledValue("TERM", envValue("TERM"), Color.CYAN),
+                labeledValue("TERM_PROGRAM", envValue("TERM_PROGRAM"), Color.CYAN)
+        );
+        Paragraph panel = Paragraph.builder()
+                .text(content)
+                .block(panelBlock("Capabilities", Color.MAGENTA))
+                .build();
+
+        frame.renderWidget(panel, area);
+    }
+
+    private void renderEventsPanel(Frame frame, Rect area) {
+        List<Line> lines = new ArrayList<>();
         if (eventLog.isEmpty()) {
-            lines.add(Line.from(Span.raw("  No events yet").dim()));
+            lines.add(Line.from(Span.raw("Press keys, click, drag, or scroll to populate the log.").dim()));
         } else {
-            for (int i = 0; i < Math.min(eventLog.size(), 8); i++) {
-                String event = eventLog.get(i);
-                Color color = i == 0 ? Color.GREEN : Color.WHITE;
-                lines.add(Line.from(Span.raw("  " + event).fg(color)));
+            for (int i = 0; i < eventLog.size(); i++) {
+                lines.add(eventLog.get(i).toLine(i == 0));
             }
         }
 
         Paragraph panel = Paragraph.builder()
                 .text(Text.from(lines))
-                .block(Block.builder()
-                        .borders(Borders.ALL)
-                        .borderType(BorderType.ROUNDED)
-                        .borderStyle(Style.EMPTY.fg(borderColor))
-                        .title(Title.from(
-                                Line.from(
-                                        Span.raw("Events "),
-                                        Span.raw(focused ? "●" : "○").fg(borderColor)
-                                )
-                        ))
-                        .build())
+                .block(panelBlock("Last " + EVENT_LOG_LIMIT + " Events", Color.YELLOW))
                 .build();
 
         frame.renderWidget(panel, area);
@@ -392,12 +391,14 @@ public class TuiDemo {
 
     private void renderFooter(Frame frame, Rect area) {
         Line helpLine = Line.from(
-                Span.raw(" h/j/k/l/←↑↓→").bold().yellow(),
-                Span.raw(" Navigate  ").dim(),
+                Span.raw("Keys").bold().yellow(),
+                Span.raw(" logical + text + modifiers  ").dim(),
+                Span.raw("Mouse").bold().yellow(),
+                Span.raw(" buttons + hover + scroll  ").dim(),
                 Span.raw("Enter/Space").bold().yellow(),
-                Span.raw(" Select  ").dim(),
-                Span.raw("Scroll").bold().yellow(),
                 Span.raw(" Counter  ").dim(),
+                Span.raw("Scroll").bold().yellow(),
+                Span.raw(" Wheel demo  ").dim(),
                 Span.raw("F12").bold().yellow(),
                 Span.raw(" Debug  ").dim(),
                 Span.raw("q/Ctrl+C").bold().yellow(),
@@ -414,5 +415,422 @@ public class TuiDemo {
                 .build();
 
         frame.renderWidget(footer, area);
+    }
+
+    static List<ModifierFlag> modifierFlags(KeyModifiers modifiers) {
+        return List.of(
+                new ModifierFlag("Ctrl", modifiers.ctrl(), true),
+                new ModifierFlag("Alt", modifiers.alt(), true),
+                new ModifierFlag("Shift", modifiers.shift(), true),
+                new ModifierFlag("Super", false, false),
+                new ModifierFlag("Hyper", false, false),
+                new ModifierFlag("Meta", false, false)
+        );
+    }
+
+    private static Line labeledValue(String label, String value, Color valueColor) {
+        return Line.from(
+                Span.raw(label + ": ").bold(),
+                Span.raw(value).fg(valueColor)
+        );
+    }
+
+    private static List<Span> modifierSpans(KeyModifiers modifiers) {
+        List<Span> spans = new ArrayList<>();
+        for (ModifierFlag flag : modifierFlags(modifiers)) {
+            if (!spans.isEmpty()) {
+                spans.add(Span.raw(" "));
+            }
+            spans.add(flag.toSpan());
+        }
+        return spans;
+    }
+
+    private static Span buttonSpan(String label, boolean active, Color activeColor) {
+        return Span.raw("[" + label + "]")
+                .fg(active ? Color.BLACK : Color.GRAY)
+                .bg(active ? activeColor : Color.DARK_GRAY)
+                .bold();
+    }
+
+    private Span wheelSpan() {
+        if (mouseDevice.verticalScrollPulse() > 0) {
+            return Span.raw("↑").fg(Color.MAGENTA).bold();
+        }
+        if (mouseDevice.verticalScrollPulse() < 0) {
+            return Span.raw("↓").fg(Color.BLUE).bold();
+        }
+        return Span.raw("●").fg(Color.GRAY);
+    }
+
+    private static Span scrollArrow(String symbol, boolean active) {
+        return Span.raw(symbol)
+                .fg(active ? Color.YELLOW : Color.DARK_GRAY)
+                .bold();
+    }
+
+    private static Block panelBlock(String title, Color borderColor) {
+        return Block.builder()
+                .borders(Borders.ALL)
+                .borderType(BorderType.ROUNDED)
+                .borderStyle(Style.EMPTY.fg(borderColor))
+                .title(Title.from(Line.from(Span.raw(" " + title + " ").fg(borderColor).bold())))
+                .build();
+    }
+
+    private static Span kindBadge(String label, Color color) {
+        return Span.raw(" " + label + " ")
+                .fg(Color.BLACK)
+                .bg(color)
+                .bold();
+    }
+
+    private static Color kindColor(MouseEventKind kind) {
+        return switch (kind) {
+            case PRESS -> Color.GREEN;
+            case RELEASE -> Color.GRAY;
+            case DRAG -> Color.YELLOW;
+            case MOVE -> Color.CYAN;
+            case SCROLL_UP -> Color.MAGENTA;
+            case SCROLL_DOWN -> Color.BLUE;
+            case SCROLL_LEFT, SCROLL_RIGHT -> Color.WHITE;
+        };
+    }
+
+    private static Color mouseSnapshotColor(MouseSnapshot snapshot) {
+        return snapshot.present() ? kindColor(snapshot.kind()) : Color.GRAY;
+    }
+
+    private static String envValue(String key) {
+        return Optional.ofNullable(System.getenv(key)).filter(value -> !value.isBlank()).orElse("<unset>");
+    }
+
+    private static String humanizeEnum(Enum<?> value) {
+        return value.name().toLowerCase(Locale.ROOT).replace('_', ' ');
+    }
+
+    private static String formatCoordinates(int x, int y) {
+        return x >= 0 ? "(" + x + ", " + y + ")" : "awaiting input";
+    }
+
+    static final class ModifierFlag {
+        private final String label;
+        private final boolean active;
+        private final boolean available;
+
+        ModifierFlag(String label, boolean active, boolean available) {
+            this.label = label;
+            this.active = active;
+            this.available = available;
+        }
+
+        String label() {
+            return label;
+        }
+
+        boolean active() {
+            return active;
+        }
+
+        boolean available() {
+            return available;
+        }
+
+        Span toSpan() {
+            Color foreground = active ? Color.BLACK : available ? Color.GRAY : Color.DARK_GRAY;
+            Color background = active ? Color.GREEN : Color.RESET;
+            Span span = Span.raw(label)
+                    .fg(foreground)
+                    .bg(background);
+            if (!available) {
+                span = span.dim();
+            }
+            return span;
+        }
+    }
+
+    static final class KeySnapshot {
+        private final boolean present;
+        private final String logicalKey;
+        private final String producedText;
+        private final String action;
+        private final KeyModifiers modifiers;
+
+        KeySnapshot(boolean present, String logicalKey, String producedText, String action, KeyModifiers modifiers) {
+            this.present = present;
+            this.logicalKey = logicalKey;
+            this.producedText = producedText;
+            this.action = action;
+            this.modifiers = modifiers;
+        }
+
+        static KeySnapshot empty() {
+            return new KeySnapshot(false, "—", "—", "—", KeyModifiers.NONE);
+        }
+
+        static KeySnapshot from(KeyEvent event) {
+            String producedText = event.code() == KeyCode.CHAR ? event.string() : "∅";
+            String action = event.action().map(TuiDemo::humanizeAction).orElse("—");
+            return new KeySnapshot(true, logicalKey(event), producedText, action, event.modifiers());
+        }
+
+        private static String logicalKey(KeyEvent event) {
+            if (event.code() == KeyCode.CHAR) {
+                return "CHAR";
+            }
+            return event.code().name();
+        }
+
+        boolean present() {
+            return present;
+        }
+
+        String logicalKey() {
+            return logicalKey;
+        }
+
+        String producedText() {
+            return producedText;
+        }
+
+        String action() {
+            return action;
+        }
+
+        KeyModifiers modifiers() {
+            return modifiers;
+        }
+    }
+
+    static final class MouseSnapshot {
+        private final boolean present;
+        private final MouseEventKind kind;
+        private final MouseButton button;
+        private final int x;
+        private final int y;
+        private final KeyModifiers modifiers;
+
+        MouseSnapshot(boolean present, MouseEventKind kind, MouseButton button, int x, int y, KeyModifiers modifiers) {
+            this.present = present;
+            this.kind = kind;
+            this.button = button;
+            this.x = x;
+            this.y = y;
+            this.modifiers = modifiers;
+        }
+
+        static MouseSnapshot empty() {
+            return new MouseSnapshot(false, MouseEventKind.MOVE, MouseButton.NONE, -1, -1, KeyModifiers.NONE);
+        }
+
+        static MouseSnapshot from(MouseEvent event) {
+            return new MouseSnapshot(true, event.kind(), event.button(), event.x(), event.y(), event.modifiers());
+        }
+
+        boolean present() {
+            return present;
+        }
+
+        MouseEventKind kind() {
+            return kind;
+        }
+
+        String kindLabel() {
+            return present ? kind.name() : "IDLE";
+        }
+
+        String buttonLabel() {
+            if (!present) {
+                return "awaiting input";
+            }
+            return button == MouseButton.NONE ? "button none" : humanizeEnum(button);
+        }
+
+        String summary() {
+            if (!present) {
+                return "awaiting input";
+            }
+            return buttonLabel() + " @ " + formatCoordinates(x, y);
+        }
+
+        KeyModifiers modifiers() {
+            return modifiers;
+        }
+    }
+
+    static final class LoggedEvent {
+        private final String badge;
+        private final Color badgeColor;
+        private final String primary;
+        private final String detail;
+
+        LoggedEvent(String badge, Color badgeColor, String primary, String detail) {
+            this.badge = badge;
+            this.badgeColor = badgeColor;
+            this.primary = primary;
+            this.detail = detail;
+        }
+
+        static LoggedEvent key(KeySnapshot key) {
+            return new LoggedEvent(
+                    "KEY",
+                    Color.YELLOW,
+                    key.logicalKey() + " text=" + key.producedText(),
+                    "mods=" + humanizeModifiers(key.modifiers()) + " action=" + key.action()
+            );
+        }
+
+        static LoggedEvent mouse(MouseSnapshot mouse) {
+            return new LoggedEvent(
+                    mouse.kindLabel(),
+                    kindColor(mouse.kind()),
+                    mouse.buttonLabel() + " @ " + formatCoordinates(mouse.x, mouse.y),
+                    "mods=" + humanizeModifiers(mouse.modifiers())
+            );
+        }
+
+        static LoggedEvent resize(int width, int height) {
+            return new LoggedEvent("RESIZE", Color.MAGENTA, width + " x " + height, "layout updated");
+        }
+
+        Line toLine(boolean latest) {
+            List<Span> spans = new ArrayList<>();
+            spans.add(kindBadge(badge, badgeColor));
+            spans.add(Span.raw(" " + primary + " ").fg(latest ? Color.WHITE : Color.GRAY));
+            spans.add(Span.raw(detail).fg(latest ? Color.CYAN : Color.DARK_GRAY));
+            return Line.from(spans);
+        }
+    }
+
+    static final class MouseDeviceState {
+        private boolean leftPressed;
+        private boolean middlePressed;
+        private boolean rightPressed;
+        private int verticalScrollPulse;
+        private int horizontalScrollPulse;
+        private int hoverPulse;
+        private MouseEventKind lastKind = MouseEventKind.MOVE;
+
+        void observe(MouseEvent event) {
+            lastKind = event.kind();
+            switch (event.kind()) {
+                case PRESS:
+                    setPressed(event.button(), true);
+                    break;
+                case DRAG:
+                    hoverPulse = ACTIVITY_PULSE_TICKS;
+                    setPressed(event.button(), true);
+                    break;
+                case RELEASE:
+                    clearButtons();
+                    break;
+                case MOVE:
+                    hoverPulse = ACTIVITY_PULSE_TICKS;
+                    break;
+                case SCROLL_UP:
+                    verticalScrollPulse = ACTIVITY_PULSE_TICKS;
+                    break;
+                case SCROLL_DOWN:
+                    verticalScrollPulse = -ACTIVITY_PULSE_TICKS;
+                    break;
+                case SCROLL_LEFT:
+                    horizontalScrollPulse = -ACTIVITY_PULSE_TICKS;
+                    break;
+                case SCROLL_RIGHT:
+                    horizontalScrollPulse = ACTIVITY_PULSE_TICKS;
+                    break;
+            }
+        }
+
+        boolean tick() {
+            boolean animated = verticalScrollPulse != 0 || horizontalScrollPulse != 0 || hoverPulse > 0;
+            verticalScrollPulse = decay(verticalScrollPulse);
+            horizontalScrollPulse = decay(horizontalScrollPulse);
+            if (hoverPulse > 0) {
+                hoverPulse--;
+            }
+            return animated;
+        }
+
+        boolean isLeftPressed() {
+            return leftPressed;
+        }
+
+        boolean isMiddlePressed() {
+            return middlePressed;
+        }
+
+        boolean isRightPressed() {
+            return rightPressed;
+        }
+
+        int verticalScrollPulse() {
+            return verticalScrollPulse;
+        }
+
+        int horizontalScrollPulse() {
+            return horizontalScrollPulse;
+        }
+
+        int hoverPulse() {
+            return hoverPulse;
+        }
+
+        MouseEventKind lastKind() {
+            return lastKind;
+        }
+
+        private void setPressed(MouseButton button, boolean pressed) {
+            switch (button) {
+                case LEFT:
+                    leftPressed = pressed;
+                    break;
+                case MIDDLE:
+                    middlePressed = pressed;
+                    break;
+                case RIGHT:
+                    rightPressed = pressed;
+                    break;
+                case NONE:
+                    break;
+            }
+        }
+
+        private void clearButtons() {
+            leftPressed = false;
+            middlePressed = false;
+            rightPressed = false;
+        }
+
+        private static int decay(int pulse) {
+            if (pulse > 0) {
+                return pulse - 1;
+            }
+            if (pulse < 0) {
+                return pulse + 1;
+            }
+            return 0;
+        }
+    }
+
+    private static String humanizeAction(String action) {
+        int dot = action.lastIndexOf('.');
+        if (dot >= 0 && dot + 1 < action.length()) {
+            return action.substring(dot + 1);
+        }
+        return action;
+    }
+
+    private static String humanizeModifiers(KeyModifiers modifiers) {
+        StringBuilder summary = new StringBuilder();
+        for (ModifierFlag flag : modifierFlags(modifiers)) {
+            if (flag.active()) {
+                if (summary.length() > 0) {
+                    summary.append('+');
+                }
+                summary.append(flag.label());
+            }
+        }
+        return summary.length() == 0 ? "none" : summary.toString();
     }
 }
