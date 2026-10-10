@@ -23,6 +23,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.DialogElement;
+import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
@@ -151,9 +152,35 @@ public class FileManagerView implements Element {
     }
 
     private DialogElement createInputDialog(String title, String prompt, Runnable onConfirm) {
+        TextInputElement input = textInput(manager.inputState())
+                .cursorStyle(dev.tamboui.style.Style.EMPTY.fg(Color.CYAN).reversed());
+        Element focusedInput = new Element() {
+            @Override
+            public void render(Frame frame, Rect renderArea, RenderContext ctx) {
+                input.render(frame, renderArea, ctx);
+            }
+
+            @Override
+            public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+                // The modal dialog is not focused, so it passes focused == false to its children and the text
+                // input would ignore the keys, which the dialog then consumes (see #440). The input owns the
+                // keys while the prompt is shown; Enter and Esc are left to the dialog.
+                return input.handleKeyEvent(event, true);
+            }
+
+            @Override
+            public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
+                return input.preferredSize(availableWidth, availableHeight, context);
+            }
+
+            @Override
+            public Constraint constraint() {
+                return input.constraint();
+            }
+        };
         return dialog(title,
                 text(prompt),
-                textInput(manager.inputState()).cursorStyle(dev.tamboui.style.Style.EMPTY.fg(Color.CYAN).reversed()),
+                focusedInput,
                 text("[Enter] Confirm  [Esc] Cancel").dim()
         ).rounded()
                 .borderColor(Color.CYAN)

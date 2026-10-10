@@ -395,6 +395,8 @@ public class FileManagerController {
      */
     public void promptGoto() {
         inputState.setText(activeBrowser().currentDirectory().toString());
+        // continue typing after the prefilled path
+        inputState.moveCursorToEnd();
         dialogMessage = "Go to directory:";
         currentDialog = DialogType.GOTO_INPUT;
     }
