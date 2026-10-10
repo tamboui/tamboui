@@ -53,10 +53,30 @@ public final class MarkdownInlineRenderer {
      */
     public static List<Line> render(
         Node parent, Style baseStyle, int maxWidth, MarkdownStyles styles, Overflow overflow) {
+        return render(parent, baseStyle, maxWidth, styles, overflow, false);
+    }
+
+    /**
+     * Renders the inline children of {@code parent} into lines using the
+     * given overflow strategy.
+     *
+     * @param parent the block node whose inline children should be rendered
+     * @param baseStyle the style applied to plain text (e.g. heading style)
+     * @param maxWidth target width in columns; values &lt;= 0 produce an empty list
+     * @param styles the style palette
+     * @param overflow how to handle lines wider than {@code maxWidth}
+     * @param preserveSoftBreaks when {@code true}, single {@code \n} soft line
+     *        breaks start a new line; when {@code false}, they collapse into a
+     *        single space per the CommonMark spec
+     * @return a list of lines that all fit within {@code maxWidth}
+     */
+    public static List<Line> render(
+        Node parent, Style baseStyle, int maxWidth, MarkdownStyles styles, Overflow overflow,
+        boolean preserveSoftBreaks) {
         if (maxWidth <= 0) {
             return new ArrayList<>();
         }
-        SpanCollector collector = new SpanCollector(baseStyle, styles);
+        SpanCollector collector = new SpanCollector(baseStyle, styles, preserveSoftBreaks);
         Node child = parent.getFirstChild();
         while (child != null) {
             child.accept(collector);
@@ -320,9 +340,11 @@ public final class MarkdownInlineRenderer {
     }
 
     /**
-     * Walks inline AST nodes and accumulates spans grouped by hard-break
-     * boundaries. {@code SoftLineBreak} renders as a single space; only
-     * {@code HardLineBreak} starts a new line group.
+     * Walks inline AST nodes and accumulates spans grouped by line-break
+     * boundaries. By default {@code SoftLineBreak} renders as a single space
+     * and only {@code HardLineBreak} starts a new line group; when constructed
+     * with {@code preserveSoftBreaks}, {@code SoftLineBreak} also starts a new
+     * line group, preserving the source's single-newline structure.
      */
     private static final class SpanCollector extends AbstractVisitor {
 
@@ -332,11 +354,17 @@ public final class MarkdownInlineRenderer {
         private List<Span> current = new ArrayList<>();
         private Style activeStyle;
         private String activeLink;
+        private final boolean preserveSoftBreaks;
 
         SpanCollector(Style baseStyle, MarkdownStyles styles) {
+            this(baseStyle, styles, false);
+        }
+
+        SpanCollector(Style baseStyle, MarkdownStyles styles, boolean preserveSoftBreaks) {
             this.baseStyle = baseStyle;
             this.styles = styles;
             this.activeStyle = baseStyle;
+            this.preserveSoftBreaks = preserveSoftBreaks;
             lineGroups.add(current);
         }
 
@@ -392,7 +420,12 @@ public final class MarkdownInlineRenderer {
 
         @Override
         public void visit(SoftLineBreak softLineBreak) {
-            push(" ");
+            if (preserveSoftBreaks) {
+                current = new ArrayList<>();
+                lineGroups.add(current);
+            } else {
+                push(" ");
+            }
         }
 
         @Override
