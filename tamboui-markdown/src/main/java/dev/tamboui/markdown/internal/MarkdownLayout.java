@@ -222,13 +222,9 @@ public final class MarkdownLayout {
                 out.addAll(sub);
             } else if (child instanceof TaskListItemMarker) {
                 // Already consumed by taskCheckedFlag; skip.
-            } else if (child instanceof FencedCodeBlock || child instanceof IndentedCodeBlock) {
-                // a code block is a widget elsewhere, but a list item holds lines: draw it as lines
+            } else {
                 int contentWidth = Math.max(1, width - prefixWidth);
-                String literal = child instanceof FencedCodeBlock
-                    ? ((FencedCodeBlock) child).getLiteral() : ((IndentedCodeBlock) child).getLiteral();
-                String info = child instanceof FencedCodeBlock ? ((FencedCodeBlock) child).getInfo() : null;
-                for (Line line : CodeBlockBuilder.buildLines(literal, info, contentWidth, styles, highlighter, theme)) {
+                for (Line line : renderBlockAsLines(child, contentWidth, styles, overflow, highlighter, theme)) {
                     if (firstParagraph) {
                         out.add(prependSpans(prefix, line));
                         firstParagraph = false;
@@ -236,25 +232,37 @@ public final class MarkdownLayout {
                         out.add(prependIndent(continuationIndent, line));
                     }
                 }
-            } else {
-                List<RenderedChunk> embedded = new ArrayList<>();
-                int contentWidth = Math.max(1, width - prefixWidth);
-                renderBlock(child, contentWidth, styles, overflow, highlighter, theme, embedded);
-                for (RenderedChunk chunk : embedded) {
-                    if (chunk instanceof LinesChunk) {
-                        for (Line line : ((LinesChunk) chunk).lines()) {
-                            if (firstParagraph) {
-                                out.add(prependSpans(prefix, line));
-                                firstParagraph = false;
-                            } else {
-                                out.add(prependIndent(continuationIndent, line));
-                            }
-                        }
-                    }
-                }
             }
             child = child.getNext();
         }
+    }
+
+    /**
+     * Lays out a block nested in a list item or a block quote as lines, which is all those hold. A code block or a
+     * table, drawn as a widget elsewhere, is drawn as lines too: the code block by {@link CodeBlockBuilder#buildLines},
+     * the table by drawing it and reading its rows back.
+     */
+    private static List<Line> renderBlockAsLines(Node node, int width, MarkdownStyles styles, Overflow overflow,
+                                                 SyntaxHighlighter highlighter, SyntaxTheme theme) {
+        if (node instanceof FencedCodeBlock) {
+            FencedCodeBlock fenced = (FencedCodeBlock) node;
+            return CodeBlockBuilder.buildLines(fenced.getLiteral(), fenced.getInfo(), width, styles, highlighter, theme);
+        }
+        if (node instanceof IndentedCodeBlock) {
+            return CodeBlockBuilder.buildLines(((IndentedCodeBlock) node).getLiteral(), null, width, styles,
+                highlighter, theme);
+        }
+        List<RenderedChunk> chunks = new ArrayList<>();
+        renderBlock(node, width, styles, overflow, highlighter, theme, chunks);
+        List<Line> lines = new ArrayList<>();
+        for (RenderedChunk chunk : chunks) {
+            if (chunk instanceof WidgetChunk) {
+                lines.addAll(((WidgetChunk) chunk).toLines(width));
+            } else if (chunk instanceof LinesChunk) {
+                lines.addAll(((LinesChunk) chunk).lines());
+            }
+        }
+        return lines;
     }
 
     private static Boolean taskCheckedFlag(ListItem item) {
@@ -300,29 +308,25 @@ public final class MarkdownLayout {
         SyntaxHighlighter highlighter, SyntaxTheme theme) {
         String prefix = styles.blockquotePrefix() + " ";
         int contentWidth = Math.max(1, width - CharWidth.of(prefix));
-        List<RenderedChunk> inner = new ArrayList<>();
+        List<Line> inner = new ArrayList<>();
         Node child = quote.getFirstChild();
         boolean firstChild = true;
         while (child != null) {
             if (!firstChild && needsSpacingBefore(child)) {
-                inner.add(new LinesChunk(Collections.singletonList(Line.empty())));
+                inner.add(Line.empty());
             }
-            renderBlock(child, contentWidth, styles, overflow, highlighter, theme, inner);
+            inner.addAll(renderBlockAsLines(child, contentWidth, styles, overflow, highlighter, theme));
             firstChild = false;
             child = child.getNext();
         }
         List<Line> out = new ArrayList<>();
-        for (RenderedChunk chunk : inner) {
-            if (chunk instanceof LinesChunk) {
-                for (Line line : ((LinesChunk) chunk).lines()) {
-                    List<Span> spans = new ArrayList<>();
-                    spans.add(Span.styled(prefix, styles.blockquote()));
-                    for (Span span : line.spans()) {
-                        spans.add(Span.styled(span.content(), span.style().patch(styles.blockquote())));
-                    }
-                    out.add(Line.from(spans));
-                }
+        for (Line line : inner) {
+            List<Span> spans = new ArrayList<>();
+            spans.add(Span.styled(prefix, styles.blockquote()));
+            for (Span span : line.spans()) {
+                spans.add(Span.styled(span.content(), span.style().patch(styles.blockquote())));
             }
+            out.add(Line.from(spans));
         }
         return out;
     }

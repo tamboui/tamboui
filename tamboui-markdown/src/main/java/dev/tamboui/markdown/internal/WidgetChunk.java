@@ -4,8 +4,15 @@
  */
 package dev.tamboui.markdown.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Style;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 
 /**
@@ -38,5 +45,45 @@ public final class WidgetChunk extends RenderedChunk {
     @Override
     public void render(Rect area, Buffer buffer) {
         widget.render(area, buffer);
+    }
+
+    /**
+     * Draws the widget into a buffer {@code width} columns wide and reads its rows back as lines, keeping the style of
+     * each cell, for places that can only hold lines, such as a block quote or a list item. The blank cells at the end
+     * of a row are left out.
+     */
+    List<Line> toLines(int width) {
+        List<Line> lines = new ArrayList<>(Math.max(0, height));
+        if (width <= 0 || height <= 0) {
+            return lines;
+        }
+        Buffer buffer = Buffer.empty(new Rect(0, 0, width, height));
+        widget.render(buffer.area(), buffer);
+        for (int y = 0; y < height; y++) {
+            int end = width;
+            while (end > 0 && buffer.get(end - 1, y).isEmpty()) {
+                end--;
+            }
+            List<Span> spans = new ArrayList<>();
+            StringBuilder run = new StringBuilder();
+            Style runStyle = null;
+            for (int x = 0; x < end; x++) {
+                Cell cell = buffer.get(x, y);
+                if (cell.isContinuation()) {
+                    continue;
+                }
+                if (runStyle != null && !runStyle.equals(cell.style())) {
+                    spans.add(Span.styled(run.toString(), runStyle));
+                    run.setLength(0);
+                }
+                runStyle = cell.style();
+                run.append(cell.symbol());
+            }
+            if (runStyle != null) {
+                spans.add(Span.styled(run.toString(), runStyle));
+            }
+            lines.add(Line.from(spans));
+        }
+        return lines;
     }
 }
