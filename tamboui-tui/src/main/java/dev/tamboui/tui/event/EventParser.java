@@ -141,6 +141,19 @@ public final class EventParser {
             return KeyEvent.ofChar(next, KeyModifiers.ALT, bindings);
         }
 
+        // Legacy Alt+special keys (no CSI encoding): ESC followed by CR/LF is
+        // Alt+Enter, ESC+Tab is Alt+Tab, ESC+BS/DEL is Alt+Backspace. These
+        // used to fall through to UNKNOWN, dropping the modifier.
+        if (next == 13 || next == 10) {
+            return KeyEvent.ofKey(KeyCode.ENTER, KeyModifiers.ALT, bindings);
+        }
+        if (next == 9) {
+            return KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.ALT, bindings);
+        }
+        if (next == 8 || next == 127) {
+            return KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.ALT, bindings);
+        }
+
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
     }
 
@@ -201,6 +214,17 @@ public final class EventParser {
             return readPasteContent(backend);
         }
 
+        // CSI-u / kitty keyboard protocol: CSI <key>;<mod>u (e.g. ESC[13;2u = Shift+Enter)
+        if (terminator == 'u') {
+            String[] parts = params.split(";");
+            KeyModifiers mods = parts.length > 1 ? parseModifierCode(parts[1]) : KeyModifiers.NONE;
+            try {
+                return keyEvent(Integer.parseInt(parts[0]), mods, bindings);
+            } catch (NumberFormatException e) {
+                return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+            }
+        }
+
         // Parse sequences like "1~" (Home), "4~" (End), "5~" (PgUp), etc.
         if (terminator == '~') {
             return parseVT(params, bindings);
@@ -212,6 +236,51 @@ public final class EventParser {
         }
 
         return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+    }
+
+    /**
+     * Maps the decimal keycode used by the CSI-u (kitty keyboard protocol) and
+     * xterm modifyOtherKeys (CSI 27 ; mod ; key ~) encodings to a key event.
+     * <p>
+     * CSI-u reports ordinary keys by their Unicode code point (always the
+     * unshifted key, e.g. {@code a} is {@code 97}) and the special legacy keys
+     * (Enter, Tab, Backspace, Escape) by their ASCII / C0 control value.
+     * kitty additionally assigns a few functional keys in the Unicode Private
+     * Use Area (57344-63743); those have no {@link KeyCode} today so they map
+     * to {@link KeyCode#UNKNOWN} rather than falling through the printable
+     * branch as characters.
+     *
+     * @param keyCode the decimal key code
+     * @param mods    the parsed modifiers
+     * @param bindings the bindings for the created event
+     * @return the parsed key event
+     */
+    private static KeyEvent keyEvent(int keyCode, KeyModifiers mods, Bindings bindings) {
+        // Control specials first: CSI-u / modifyOtherKeys report Enter, Tab,
+        // Backspace and Escape by their ASCII/C0 values (9, 13, 27) and DEL (127).
+        switch (keyCode) {
+            case 8:
+                return KeyEvent.ofKey(KeyCode.BACKSPACE, mods, bindings); // Backspace (\b)
+            case 9:
+                return KeyEvent.ofKey(KeyCode.TAB, mods, bindings); // Tab
+            case 13:
+                return KeyEvent.ofKey(KeyCode.ENTER, mods, bindings); // Enter
+            case 27:
+                return KeyEvent.ofKey(KeyCode.ESCAPE, mods, bindings); // Escape
+            case 127:
+                return KeyEvent.ofKey(KeyCode.BACKSPACE, mods, bindings); // Backspace (DEL)
+            default:
+                break;
+        }
+        if (keyCode >= 32) {
+            if (keyCode >= 57344 && keyCode <= 63743) {
+                // kitty functional keys (locks, keypad, media, modifier keys, F13+):
+                // no KeyCode exists for them, keep UNKNOWN instead of a char.
+                return KeyEvent.ofKey(KeyCode.UNKNOWN, mods, bindings);
+            }
+            return KeyEvent.ofChar(keyCode, mods, bindings);
+        }
+        return KeyEvent.ofKey(KeyCode.UNKNOWN, mods, bindings);
     }
 
     private static Event readPasteContent(Backend backend) throws IOException {
@@ -262,6 +331,12 @@ public final class EventParser {
         KeyModifiers mods = parts.length > 1 ? parseModifierCode(parts[1]) : KeyModifiers.NONE;
 
         switch (code) {
+            case 27:
+                // xterm modifyOtherKeys: CSI 27 ; mod ; key ~ (e.g. ESC[27;2;13~ = Shift+Enter).
+                // The real key code is the third parameter.
+                int key = parts.length > 2 ? parseIntOrMinusOne(parts[2]) : -1;
+                return key < 0 ? KeyEvent.ofKey(KeyCode.UNKNOWN, bindings)
+                               : keyEvent(key, mods, bindings);
             case 1:
                 return KeyEvent.ofKey(KeyCode.HOME, mods, bindings);
             case 2:
@@ -362,6 +437,14 @@ public final class EventParser {
         boolean ctrl = (mod & 4) != 0;
 
         return KeyModifiers.of(ctrl, alt, shift);
+    }
+
+    private static int parseIntOrMinusOne(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     private static Event parseSS3(Backend backend, Bindings bindings) throws IOException {
