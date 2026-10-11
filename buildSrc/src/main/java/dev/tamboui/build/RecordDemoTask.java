@@ -29,6 +29,10 @@ import org.gradle.process.ExecOperations;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Locale;
@@ -143,6 +147,10 @@ public abstract class RecordDemoTask extends DefaultTask {
         var configFileObj = getConfigFile().isPresent() ? getConfigFile().get().getAsFile() : null;
         var totalWaitMs = 0L;
         if (configFileObj != null && configFileObj.exists()) {
+            // The tape's opening Hide...Show block launches the demo by typing a shell command (for vhs).
+            // This task launches the demo directly, so strip that block, otherwise the command would be
+            // typed into the running demo (corrupting input-driven demos such as the CSS or emoji ones).
+            configFileObj = stripLaunchBlock(configFileObj, outDir);
             totalWaitMs = calculateTotalWaitTime(configFileObj);
         } else {
             return;
@@ -150,6 +158,7 @@ public abstract class RecordDemoTask extends DefaultTask {
 
         // Duration should be at least the total wait time plus buffer for processing
         var effectiveDuration = Math.max(getDuration().get().longValue(), totalWaitMs + 2000L);
+        final File recordConfig = configFileObj;
 
         var result = getExecOperations().javaexec(spec -> {
             spec.getMainClass().set(getMainClass().get());
@@ -164,8 +173,8 @@ public abstract class RecordDemoTask extends DefaultTask {
             spec.systemProperty("tamboui.record.height", String.valueOf(getHeight().get()));
 
             // Config file provides interactions (optional)
-            if (configFileObj != null && configFileObj.exists()) {
-                spec.systemProperty("tamboui.record.config", configFileObj.getAbsolutePath());
+            if (recordConfig != null && recordConfig.exists()) {
+                spec.systemProperty("tamboui.record.config", recordConfig.getAbsolutePath());
             }
 
             // Ensure stdout/stderr go to real streams, not Gradle's logging
@@ -181,5 +190,51 @@ public abstract class RecordDemoTask extends DefaultTask {
         if (result.getExitValue() != 0) {
             getLogger().warn("Demo process exited with code " + result.getExitValue());
         }
+    }
+
+    /**
+     * Removes the opening {@code Hide ... Show} block from a tape, writing the result to a new file in
+     * {@code outDir}. That block types the demo's launch command (such as {@code jbang my-demo}) into a
+     * shell for the {@code vhs} tool; this task launches the demo directly, so the block must not be
+     * replayed into the running demo. A tape without a leading {@code Hide ... Show} is returned unchanged.
+     *
+     * @param tape   the original tape file
+     * @param outDir the directory to write the stripped tape into
+     * @return the stripped tape file, or the original if there is no leading launch block
+     */
+    private File stripLaunchBlock(File tape, File outDir) {
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(tape.toPath());
+        } catch (IOException e) {
+            getLogger().warn("Could not read tape " + tape + ", using it as is: " + e.getMessage());
+            return tape;
+        }
+
+        int hideIndex = -1;
+        int showIndex = -1;
+        for (int i = 0; i < lines.size(); i++) {
+            String trimmed = lines.get(i).trim();
+            if (hideIndex < 0 && trimmed.equalsIgnoreCase("Hide")) {
+                hideIndex = i;
+            } else if (hideIndex >= 0 && trimmed.equalsIgnoreCase("Show")) {
+                showIndex = i;
+                break;
+            }
+        }
+        if (hideIndex < 0 || showIndex < 0) {
+            return tape;
+        }
+
+        List<String> stripped = new ArrayList<>(lines.subList(0, hideIndex));
+        stripped.addAll(lines.subList(showIndex + 1, lines.size()));
+        File strippedTape = new File(outDir, tape.getName() + ".recorder.tape");
+        try {
+            Files.write(strippedTape.toPath(), stripped);
+        } catch (IOException e) {
+            getLogger().warn("Could not write stripped tape, using original: " + e.getMessage());
+            return tape;
+        }
+        return strippedTape;
     }
 }
