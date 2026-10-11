@@ -83,9 +83,10 @@ public final class InlineToolkitRunner implements AutoCloseable {
      * Creates an InlineToolkitRunner with an initial height of 1.
      *
      * @return a new InlineToolkitRunner
-     * @throws Exception if terminal initialization fails
+     * @throws dev.tamboui.error.RuntimeIOException if terminal initialization fails
+     * @throws dev.tamboui.terminal.BackendException if no backend is available
      */
-    public static InlineToolkitRunner create() throws Exception {
+    public static InlineToolkitRunner create() {
         return create(InlineTuiConfig.defaults(1));
     }
 
@@ -94,9 +95,10 @@ public final class InlineToolkitRunner implements AutoCloseable {
      *
      * @param height the number of lines for the inline display
      * @return a new InlineToolkitRunner
-     * @throws Exception if terminal initialization fails
+     * @throws dev.tamboui.error.RuntimeIOException if terminal initialization fails
+     * @throws dev.tamboui.terminal.BackendException if no backend is available
      */
-    public static InlineToolkitRunner create(int height) throws Exception {
+    public static InlineToolkitRunner create(int height) {
         return create(InlineTuiConfig.defaults(height));
     }
 
@@ -105,9 +107,10 @@ public final class InlineToolkitRunner implements AutoCloseable {
      *
      * @param config the configuration to use
      * @return a new InlineToolkitRunner
-     * @throws Exception if terminal initialization fails
+     * @throws dev.tamboui.error.RuntimeIOException if terminal initialization fails
+     * @throws dev.tamboui.terminal.BackendException if no backend is available
      */
-    public static InlineToolkitRunner create(InlineTuiConfig config) throws Exception {
+    public static InlineToolkitRunner create(InlineTuiConfig config) {
         InlineTuiRunner tuiRunner = InlineTuiRunner.create(config);
         return new InlineToolkitRunner(tuiRunner, config.bindings());
     }
@@ -118,9 +121,9 @@ public final class InlineToolkitRunner implements AutoCloseable {
      * @param backend the backend to render to
      * @param config  the configuration to use
      * @return a new InlineToolkitRunner
-     * @throws Exception if initialization fails
+     * @throws dev.tamboui.error.RuntimeIOException if initialization fails
      */
-    public static InlineToolkitRunner create(Backend backend, InlineTuiConfig config) throws Exception {
+    public static InlineToolkitRunner create(Backend backend, InlineTuiConfig config) {
         InlineTuiRunner tuiRunner = InlineTuiRunner.create(backend, config);
         return new InlineToolkitRunner(tuiRunner, config.bindings());
     }
@@ -443,9 +446,10 @@ public final class InlineToolkitRunner implements AutoCloseable {
          * Builds and returns a configured InlineToolkitRunner.
          *
          * @return a new InlineToolkitRunner
-         * @throws Exception if terminal initialization fails
+         * @throws dev.tamboui.error.RuntimeIOException if terminal initialization fails
+         * @throws dev.tamboui.terminal.BackendException if no backend is available
          */
-        public InlineToolkitRunner build() throws Exception {
+        public InlineToolkitRunner build() {
             InlineToolkitRunner runner = InlineToolkitRunner.create(config);
 
             if (styleEngine != null) {
