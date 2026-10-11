@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
@@ -108,6 +109,19 @@ public final class InlineToolkitRunner implements AutoCloseable {
      */
     public static InlineToolkitRunner create(InlineTuiConfig config) throws Exception {
         InlineTuiRunner tuiRunner = InlineTuiRunner.create(config);
+        return new InlineToolkitRunner(tuiRunner, config.bindings());
+    }
+
+    /**
+     * Creates an InlineToolkitRunner on the given backend, for embedding or testing.
+     *
+     * @param backend the backend to render to
+     * @param config  the configuration to use
+     * @return a new InlineToolkitRunner
+     * @throws Exception if initialization fails
+     */
+    public static InlineToolkitRunner create(Backend backend, InlineTuiConfig config) throws Exception {
+        InlineTuiRunner tuiRunner = InlineTuiRunner.create(backend, config);
         return new InlineToolkitRunner(tuiRunner, config.bindings());
     }
 

@@ -156,7 +156,15 @@ public final class InlineTuiRunner implements AutoCloseable {
         return create(BackendFactory.create(), config);
     }
 
-    static InlineTuiRunner create(Backend backend, InlineTuiConfig config) throws Exception {
+    /**
+     * Creates an InlineTuiRunner on the given backend, for embedding or testing.
+     *
+     * @param backend the backend to render to
+     * @param config  the configuration to use
+     * @return a new InlineTuiRunner
+     * @throws Exception if initialization fails
+     */
+    public static InlineTuiRunner create(Backend backend, InlineTuiConfig config) throws Exception {
         InlineDisplay display;
 
         try {
