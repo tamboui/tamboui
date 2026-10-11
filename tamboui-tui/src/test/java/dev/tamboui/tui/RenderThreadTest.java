@@ -58,11 +58,12 @@ class RenderThreadTest {
     }
 
     @Test
-    @DisplayName("checkRenderThread throws when current thread is not marked as render thread")
-    void checkRenderThread_throws_whenNotMarked() {
+    @DisplayName("checkRenderThread passes when not marked and no render loop is active")
+    void checkRenderThread_passes_whenNotMarkedAndNoLoopActive() {
         RenderThread.clearRenderThread();
 
-        assertThatThrownBy(RenderThread::checkRenderThread).isInstanceOf(TuiException.class);
+        // Lenient: with no active render loop, a standalone render (inline println, tests) is allowed
+        assertThatCode(RenderThread::checkRenderThread).doesNotThrowAnyException();
     }
 
     @Test

@@ -4,6 +4,8 @@
  */
 package dev.tamboui.tui;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import dev.tamboui.tui.error.TuiException;
 
 /**
@@ -35,6 +37,8 @@ import dev.tamboui.tui.error.TuiException;
 public final class RenderThread {
 
     private static final ThreadLocal<Boolean> isRenderThread = new ThreadLocal<>();
+    // The number of threads currently marked as render threads (i.e. active render loops)
+    private static final AtomicInteger activeRenderThreads = new AtomicInteger(0);
 
     private RenderThread() {
         // Utility class
@@ -50,15 +54,20 @@ public final class RenderThread {
     }
 
     /**
-     * Asserts that the current thread is a render thread.
+     * Asserts that the current thread may perform render operations.
      * <p>
-     * This should be called at the start of any method that must only be
-     * executed on a render thread.
+     * The check only enforces while a render loop is active (i.e. some thread has been marked as a
+     * render thread by {@link TuiRunner#run}). In that case, this must be called from a render thread.
+     * When no render loop is active, the check passes: a standalone render, such as an inline
+     * {@code println} of an element or a unit test, needs no render thread.
      *
-     * @throws TuiException if this thread has not been marked as a render thread
+     * @throws TuiException if a render loop is active and this is not a render thread
      */
     public static void checkRenderThread() {
-        if (!Boolean.TRUE.equals(isRenderThread.get())) {
+        if (isRenderThread()) {
+            return;
+        }
+        if (activeRenderThreads.get() > 0) {
             Thread current = Thread.currentThread();
             throw new TuiException(
                 "Must be called on render thread. Current: " + current.getName() +
@@ -68,15 +77,23 @@ public final class RenderThread {
 
     /**
      * Marks the current thread as a render thread. Package-private for use by TuiRunner.
+     * <p>
+     * Idempotent: marking an already-marked thread does not change the active render thread count.
      */
     static void markAsRenderThread() {
-        isRenderThread.set(Boolean.TRUE);
+        if (!Boolean.TRUE.equals(isRenderThread.get())) {
+            isRenderThread.set(Boolean.TRUE);
+            activeRenderThreads.incrementAndGet();
+        }
     }
 
     /**
      * Clears the render thread mark from the current thread. Package-private for use by TuiRunner.
      */
     static void clearRenderThread() {
-        isRenderThread.remove();
+        if (Boolean.TRUE.equals(isRenderThread.get())) {
+            isRenderThread.remove();
+            activeRenderThreads.decrementAndGet();
+        }
     }
 }
