@@ -379,8 +379,9 @@ public final class TuiRunner implements AutoCloseable {
             // go through bindings and ignore release events, and isChar() now ignores release
             // too, so no explicit kind check is needed.
 
-            // Quit on 'q' or Escape
-            if (keyEvent.isQuit() || keyEvent.isCancel()) {
+            // Quit the error screen on the quit/cancel keys, or always on 'q' as its footer says
+            // (the named sets no longer bind 'q' to quit, but the error screen still offers it).
+            if (keyEvent.isQuit() || keyEvent.isCancel() || keyEvent.isCharIgnoreCase('q')) {
                 quit();
                 return;
             }

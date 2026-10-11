@@ -103,7 +103,7 @@ public final class BindingSets {
             }
             Properties props = new Properties();
             props.load(in);
-            return loadFromProperties(props, base, true);
+            return loadFromProperties(props, base);
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to load built-in bindings: " + resource, e);
         }
@@ -332,6 +332,10 @@ public final class BindingSets {
     /**
      * Loads bindings from a properties file.
      * <p>
+     * The loaded bindings are based on the {@link #standard()} bindings. An action listed
+     * in the file gets exactly the triggers listed for it, replacing its standard triggers;
+     * actions the file does not list keep their standard triggers.
+     * <p>
      * The file format uses standard Java properties:
      * <pre>{@code
      * # Navigation
@@ -375,8 +379,9 @@ public final class BindingSets {
     /**
      * Loads bindings from an input stream containing properties.
      * <p>
-     * The loaded bindings will be based on the standard bindings,
-     * with properties overriding/adding to them.
+     * The loaded bindings are based on the {@link #standard()} bindings. An action listed
+     * in the properties gets exactly the triggers listed for it, replacing its standard
+     * triggers; actions not listed keep their standard triggers.
      *
      * @param input the input stream
      * @return the loaded bindings
@@ -389,6 +394,9 @@ public final class BindingSets {
 
     /**
      * Loads bindings from an input stream, starting with the given base bindings.
+     * <p>
+     * An action listed in the properties gets exactly the triggers listed for it, replacing
+     * its triggers in {@code base}; actions not listed keep their triggers from {@code base}.
      *
      * @param input the input stream
      * @param base  the base bindings to extend (null for empty)
@@ -432,11 +440,6 @@ public final class BindingSets {
     }
 
     private static Bindings loadFromProperties(Properties props, Bindings base) throws IOException {
-        return loadFromProperties(props, base, false);
-    }
-
-    private static Bindings loadFromProperties(Properties props, Bindings base, boolean replaceActions)
-            throws IOException {
         Bindings.Builder builder;
         if (base != null) {
             builder = base.toBuilder();
@@ -445,15 +448,14 @@ public final class BindingSets {
         }
 
         for (String actionName : props.stringPropertyNames()) {
-            // An overlay that replaces defines each action it names completely: drop the base
-            // triggers first, then bind the ones listed. Used for platform overlays, where e.g.
-            // macOS word-nav is Option, not an addition to the base Ctrl keys.
-            if (replaceActions) {
-                builder.unbind(actionName);
-            }
+            // An action listed in the file defines its triggers completely: drop the base triggers
+            // first, then bind the ones listed. So a named set or a user file can take a standard
+            // key away (emacs binds quit to Ctrl+C only, not 'q'), and a platform overlay can swap
+            // keys (macOS word-nav is Option, not an addition to the base Ctrl keys). Actions the
+            // file does not list keep their base triggers.
+            builder.unbind(actionName);
             String bindingsStr = props.getProperty(actionName);
             String[] parts = bindingsStr.split(",");
-
             for (String part : parts) {
                 builder.bind(parseTrigger(part.trim()), actionName);
             }

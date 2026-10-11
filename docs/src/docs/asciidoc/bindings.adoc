@@ -307,6 +307,43 @@ contextMenu = Mouse.Right.Press
 Multiple triggers for the same action are comma-separated.
 Modifiers use `Ctrl+`, `Alt+`, `Shift+` prefixes.
 
+Two independent rules govern how a set is assembled: *how* a file composes onto the one below it,
+and *which* files are loaded.
+
+=== Per-action overwrite (how a file layers)
+
+Every properties source is layered on top of a base (a built-in set, or the standard bindings for a
+user file), and layering is *per action, replace* — not additive:
+
+* An action the file *lists* gets exactly the triggers listed for it, replacing the base triggers of
+  that action. So `quit = Ctrl+c` makes quit `Ctrl+c` only, removing the standard `q` and `Q`.
+* An action the file *does not list* keeps its base triggers unchanged.
+
+An action can still have *several* triggers — list them comma-separated. Replace is per action, not
+per key: `quit = Ctrl+c, q, Q` keeps all three, and `moveUp = Up, k` binds both. To keep a base key
+*and* add one, name them together (`quit = Ctrl+c, q`), since a listed action no longer inherits its
+base triggers.
+
+
+This is why the named sets differ as they do: `emacs.properties` lists `quit = Ctrl+c`, so emacs quits
+only on `Ctrl+C`, while a set that never mentions `quit` inherits the standard `q`, `Q`, `Ctrl+c`. The
+same rule applies to your own files and to the OS overlays below — a listed action always replaces,
+never adds.
+
+=== Per-OS overlay (which files are loaded)
+
+Orthogonally, `BindingSets.defaults()` also looks up an OS-specific overlay by the convention
+`<set>-<os>.properties`, where `<os>` is `macos`, `windows` or `linux`, and layers it on top of the
+set (using the same per-action replace rule) when the file exists:
+
+* On macOS, `standard-macos.properties` makes word navigation use Option (Alt), replacing the Ctrl
+  word keys that the system reserves.
+* On an OS with no matching overlay file, the set is used as-is.
+
+The two rules are independent: the per-action overwrite decides how any one file merges; the per-OS
+lookup decides whether an extra, platform-specific file is merged at all. The named accessors
+(`standard()`, `vim()`, ...) stay literal and cross-platform; only `defaults()` resolves the host OS.
+
 == Standard Actions
 
 The `Actions` class defines common action names:
