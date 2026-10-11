@@ -90,6 +90,51 @@ public class Painter {
     }
 
     /**
+     * Returns the x-axis bounds of the canvas.
+     *
+     * @return a new array {@code {min, max}}
+     */
+    public double[] xBounds() {
+        return context.xBounds().clone();
+    }
+
+    /**
+     * Returns the y-axis bounds of the canvas.
+     *
+     * @return a new array {@code {min, max}}
+     */
+    public double[] yBounds() {
+        return context.yBounds().clone();
+    }
+
+    /**
+     * Returns the number of grid points across the canvas.
+     * <p>
+     * {@link #getPoint(double, double)} maps the x bounds onto grid x coordinates
+     * 0 to {@code gridWidth() - 1}. A shape can use this, with {@link #xBounds()},
+     * to step one grid point at a time.
+     *
+     * @return the grid width: two points per cell with braille markers, one otherwise
+     */
+    public int gridWidth() {
+        return context.gridWidth();
+    }
+
+    /**
+     * Returns the number of grid points down the canvas.
+     * <p>
+     * {@link #getPoint(double, double)} maps the y bounds onto grid y coordinates
+     * 0 to {@code gridHeight() - 1}. A shape can use this, with {@link #yBounds()},
+     * to step one grid point at a time.
+     *
+     * @return the grid height: four points per cell with braille markers, two with
+     *         half blocks, one otherwise
+     */
+    public int gridHeight() {
+        return context.gridHeight();
+    }
+
+    /**
      * A point in grid space (integer coordinates).
      */
     public static final class GridPoint {

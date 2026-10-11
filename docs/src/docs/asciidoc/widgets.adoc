@@ -418,6 +418,9 @@ Available shapes:
 * `Rectangle` - Rectangle with position and size
 * `Points` - Collection of individual points
 
+Shapes are drawn one grid point at a time and cut off at the canvas bounds, whatever the scale of the bounds.
+A custom `Shape` draws through a `Painter`: `getPoint(x, y)` maps canvas coordinates to a grid point, `paint` colors one, and `xBounds()`, `yBounds()`, `gridWidth()` and `gridHeight()` tell how many grid points a canvas unit spans.
+
 === Calendar
 
 A monthly calendar widget:
