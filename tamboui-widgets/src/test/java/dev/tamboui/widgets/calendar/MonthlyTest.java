@@ -443,6 +443,54 @@ class MonthlyTest {
         assertThat(Monthly.fitToDayWidth("\u0F66\u0FA4\u0F7A\u0F53")).isEqualTo("\u0F66\u0FA4\u0F7A");
     }
 
+    @Test
+    void wideScriptWidensDayCellsSoTheWeekdayHeaderStaysAligned() {
+        // Burmese weekday names include three-column grapheme clusters (e.g. Thursday). With fixed
+        // two-column cells the header overflowed the grid; the cells now widen to three columns so the
+        // weekday header lines up with the days, and the grid is wider than a two-column locale's.
+        Buffer burmese = renderOctober2025Wide(Locale.forLanguageTag("my"));
+        Buffer english = renderOctober2025Wide(Locale.ENGLISH);
+
+        int headerRight = rightmostNonSpace(burmese, 1);  // row 0 is the month header, row 1 the weekdays
+        int gridRight = maxRightmostNonSpace(burmese, 2, 8);
+        assertThat(headerRight)
+            .as("Burmese weekday header ends at the same column as the day grid")
+            .isEqualTo(gridRight);
+
+        assertThat(maxRightmostNonSpace(burmese, 2, 8))
+            .as("three-column cells make the Burmese grid wider than the two-column English grid")
+            .isGreaterThan(maxRightmostNonSpace(english, 2, 8));
+    }
+
+    private static Buffer renderOctober2025Wide(Locale locale) {
+        Monthly calendar = Monthly.of(LocalDate.of(2025, 10, 15), d -> Style.EMPTY, locale)
+            .showMonthHeader(Style.EMPTY)
+            .showWeekdaysHeader(Style.EMPTY);
+        Rect area = new Rect(0, 0, 30, 9);
+        Buffer buffer = Buffer.empty(area);
+        calendar.render(area, buffer);
+        return buffer;
+    }
+
+    private static int rightmostNonSpace(Buffer buffer, int y) {
+        int rightmost = -1;
+        for (int x = buffer.area().left(); x < buffer.area().right(); x++) {
+            String symbol = buffer.get(x, y).symbol();
+            if (symbol != null && !symbol.isEmpty() && !symbol.equals(" ")) {
+                rightmost = x;
+            }
+        }
+        return rightmost;
+    }
+
+    private static int maxRightmostNonSpace(Buffer buffer, int startY, int endY) {
+        int max = -1;
+        for (int y = startY; y < endY; y++) {
+            max = Math.max(max, rightmostNonSpace(buffer, y));
+        }
+        return max;
+    }
+
     private static Buffer renderOctober2025(Locale locale) {
         Monthly calendar = Monthly.of(LocalDate.of(2025, 10, 15), d -> Style.EMPTY, locale)
             .showMonthHeader(Style.EMPTY)
