@@ -11,7 +11,9 @@ import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
@@ -44,6 +46,10 @@ public final class Monthly implements Widget {
 
     private static final int MIN_DAY_WIDTH = 2;  // A day number is at most two digits, so a cell is at least this wide
 
+    // Weekday labels depend only on the locale, so they are computed once per locale and shared across all
+    // calendars and renders (a calendar is often rebuilt every frame, so a per-instance cache would not help)
+    private static final Map<Locale, String[]> WEEKDAY_LABEL_CACHE = new ConcurrentHashMap<>();
+
     private final LocalDate displayDate;
     private final DateStyler dateStyler;
     private final Style monthHeaderStyle;
@@ -56,9 +62,6 @@ public final class Monthly implements Widget {
 
     // Weekday labels and the day cell width derived from them depend only on the final locale, so they are
     // computed once and reused across renders
-    private String[] cachedWeekdayLabels;
-    private int cachedDayWidth;
-
     private Monthly(Builder builder) {
         this.displayDate = builder.displayDate;
         this.dateStyler = builder.dateStyler;
@@ -227,8 +230,8 @@ public final class Monthly implements Widget {
         // The day cell is as wide as the widest weekday label (three columns for some scripts, such as
         // Burmese or Tibetan), but at least two columns for the day numbers. Every column uses this width,
         // so the weekday header lines up with the days below it.
-        String[] labels = weekdaysHeaderStyle != null ? weekdayLabels() : null;
-        int dayWidth = labels != null ? cachedDayWidth : MIN_DAY_WIDTH;
+        String[] labels = weekdaysHeaderStyle != null ? weekdayLabels(locale) : null;
+        int dayWidth = labels != null ? dayWidth(labels) : MIN_DAY_WIDTH;
 
         // Render weekdays header
         if (labels != null) {
@@ -386,6 +389,10 @@ public final class Monthly implements Widget {
      * @see DayOfWeek#getDisplayName(TextStyle, Locale)
      */
     private static String[] weekdayLabels(Locale locale) {
+        return WEEKDAY_LABEL_CACHE.computeIfAbsent(locale, Monthly::computeWeekdayLabels);
+    }
+
+    private static String[] computeWeekdayLabels(Locale locale) {
         String[] labels = weekdayLabels(locale, TextStyle.SHORT_STANDALONE);
         if (!allDistinct(labels)) {
             String[] narrowLabels = weekdayLabels(locale, TextStyle.NARROW_STANDALONE);
@@ -452,20 +459,6 @@ public final class Monthly implements Widget {
         return width;
     }
 
-    /**
-     * Returns the weekday labels for this calendar's locale, computing them (and the day cell width
-     * they imply) once and caching the result. The labels depend only on the final locale, so the
-     * cache is valid for the lifetime of the calendar.
-     *
-     * @return the seven weekday labels, ordered Monday to Sunday
-     */
-    private String[] weekdayLabels() {
-        if (cachedWeekdayLabels == null) {
-            cachedWeekdayLabels = weekdayLabels(locale);
-            cachedDayWidth = dayWidth(cachedWeekdayLabels);
-        }
-        return cachedWeekdayLabels;
-    }
 
     /**
      * Left-pads the text with spaces to the given display width. Text already at least that wide is
