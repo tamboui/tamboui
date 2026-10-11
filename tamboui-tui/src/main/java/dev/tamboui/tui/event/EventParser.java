@@ -17,8 +17,9 @@ import dev.tamboui.tui.bindings.Bindings;
 /**
  * Parses raw terminal input into typed {@link Event} objects.
  * <p>
- * Handles escape sequences for standard terminal input, mouse events (SGR mode),
- * and progressive keyboard enhancements (Kitty keyboard protocol {@code CSI u}).
+ * Handles escape sequences for standard terminal input, mouse events (SGR mode,
+ * and the X10 format of terminals without it), and progressive keyboard enhancements
+ * (Kitty keyboard protocol {@code CSI u}).
  */
 public final class EventParser {
 
@@ -187,7 +188,14 @@ public final class EventParser {
                     // Legacy xterm form of F4 (CSI S). Note: CSI R is intentionally not
                     // mapped here because it clashes with the cursor-position report.
                     return KeyEvent.ofKey(KeyCode.F4, bindings);
+                case '[':
+                    // Linux console sends F1-F5 as the double-bracket form ESC[[A..ESC[[E.
+                    return parseLinuxConsoleFunctionKey(backend, bindings);
+                case 'M':
+                    // X10 mouse report (terminals without SGR mouse): ESC[M Cb Cx Cy.
+                    return parseMouseX10(backend, bindings);
                 default:
+                    // Any other final byte right after ESC[ ends the sequence (e.g. ESC[I focus-in).
                     return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
             }
         }
@@ -812,39 +820,70 @@ public final class EventParser {
         );
     }
 
+    private static KeyCode cursorOrFunctionKey(int finalByte) {
+        switch (finalByte) {
+            case 'A':
+                return KeyCode.UP;
+            case 'B':
+                return KeyCode.DOWN;
+            case 'C':
+                return KeyCode.RIGHT;
+            case 'D':
+                return KeyCode.LEFT;
+            case 'H':
+                return KeyCode.HOME;
+            case 'F':
+                return KeyCode.END;
+            case 'E':
+                return KeyCode.KP_BEGIN;
+            case 'P':
+                return KeyCode.F1;
+            case 'Q':
+                return KeyCode.F2;
+            case 'R':
+                return KeyCode.F3;
+            case 'S':
+                return KeyCode.F4;
+            default:
+                return KeyCode.UNKNOWN;
+        }
+    }
+
+    private static Event parseLinuxConsoleFunctionKey(Backend backend, Bindings bindings) throws IOException {
+        // The Linux console sends F1-F5 as the double-bracket form ESC [ [ A to ESC [ [ E.
+        switch (backend.read(PEEK_TIMEOUT)) {
+            case 'A':
+                return KeyEvent.ofKey(KeyCode.F1, bindings);
+            case 'B':
+                return KeyEvent.ofKey(KeyCode.F2, bindings);
+            case 'C':
+                return KeyEvent.ofKey(KeyCode.F3, bindings);
+            case 'D':
+                return KeyEvent.ofKey(KeyCode.F4, bindings);
+            case 'E':
+                return KeyEvent.ofKey(KeyCode.F5, bindings);
+            default:
+                return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+        }
+    }
+
     private static Event parseSS3(Backend backend, Bindings bindings) throws IOException {
+        // SS3 sequences (typically function keys on some terminals). Konsole puts the modifier
+        // between SS3 and the final byte: ESC O 2 P is Shift+F1, as ESC [ 1 ; 2 P is elsewhere.
+        StringBuilder modifier = new StringBuilder();
         int c = backend.read(PEEK_TIMEOUT);
+        while (c >= '0' && c <= '9') {
+            modifier.append((char) c);
+            c = backend.read(PEEK_TIMEOUT);
+        }
         if (c == -2 || c == -1) {
             return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
         }
 
-        // SS3 sequences (typically function keys on some terminals)
-        switch (c) {
-            case 'P':
-                return KeyEvent.ofKey(KeyCode.F1, bindings);
-            case 'Q':
-                return KeyEvent.ofKey(KeyCode.F2, bindings);
-            case 'R':
-                return KeyEvent.ofKey(KeyCode.F3, bindings);
-            case 'S':
-                return KeyEvent.ofKey(KeyCode.F4, bindings);
-            case 'A':
-                return KeyEvent.ofKey(KeyCode.UP, bindings);
-            case 'B':
-                return KeyEvent.ofKey(KeyCode.DOWN, bindings);
-            case 'C':
-                return KeyEvent.ofKey(KeyCode.RIGHT, bindings);
-            case 'D':
-                return KeyEvent.ofKey(KeyCode.LEFT, bindings);
-            case 'H':
-                return KeyEvent.ofKey(KeyCode.HOME, bindings);
-            case 'F':
-                return KeyEvent.ofKey(KeyCode.END, bindings);
-            case 'E':
-                return KeyEvent.ofKey(KeyCode.KP_BEGIN, bindings);
-            default:
-                return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
-        }
+        KeyModifiers mods = modifier.length() > 0
+                ? parseModifierAndKind(modifier.toString()).modifiers
+                : KeyModifiers.NONE;
+        return KeyEvent.ofKey(cursorOrFunctionKey(c), mods, bindings);
     }
 
     private static Event parseMouseSGR(Backend backend, Bindings bindings) throws IOException {
@@ -865,6 +904,24 @@ public final class EventParser {
         return KeyEvent.ofKey(KeyCode.UNKNOWN);
     }
 
+    private static Event parseMouseX10(Backend backend, Bindings bindings) throws IOException {
+        // X10 mouse format: ESC [ M Cb Cx Cy, three bytes offset by 32, with 1-based coordinates.
+        // Terminals without SGR mouse support report this way, such as GNU screen 4 and the Linux console.
+        int cb = backend.read(PEEK_TIMEOUT);
+        int cx = cb < 0 ? cb : backend.read(PEEK_TIMEOUT);
+        int cy = cx < 0 ? cx : backend.read(PEEK_TIMEOUT);
+        // Coordinates start at 33. A value above 255 is not a single byte, such as the U+FFFD that a
+        // UTF-8 reader makes of a byte above 127: the report has no usable position, so drop it whole.
+        if (cb < 32 || cb > 255 || cx < 33 || cx > 255 || cy < 33 || cy > 255) {
+            return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+        }
+
+        int buttonCode = cb - 32;
+        // X10 reports every release as button 3, without saying which button was released
+        boolean isRelease = (buttonCode & ~(4 | 8 | 16)) == 3;
+        return mouseEvent(buttonCode, cx - 33, cy - 33, isRelease, bindings);
+    }
+
     private static Event parseMouseParams(String params, boolean isRelease, Bindings bindings) {
         String[] parts = params.split(";", -1);
         if (parts.length < 3) {
@@ -882,6 +939,10 @@ public final class EventParser {
             return KeyEvent.ofKey(KeyCode.UNKNOWN);
         }
 
+        return mouseEvent(buttonCode, x, y, isRelease, bindings);
+    }
+
+    private static MouseEvent mouseEvent(int buttonCode, int x, int y, boolean isRelease, Bindings bindings) {
         // Parse modifiers from button code
         boolean shift = (buttonCode & 4) != 0;
         boolean alt = (buttonCode & 8) != 0;
