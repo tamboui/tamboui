@@ -200,6 +200,220 @@ class EventParserTest {
         assertThat(keyEvent.hasShift()).isTrue();
     }
 
+    // -- CSI-u / kitty keyboard protocol (CSI <key>;<mod>u) --
+
+    @Test
+    @DisplayName("Shift+Enter (ESC[13;2u) is parsed as ENTER with Shift")
+    void csiUShiftEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '3', ';', '2', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Alt+Enter (ESC[13;3u) is parsed as ENTER with Alt")
+    void csiUAltEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '3', ';', '3', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Ctrl+Enter (ESC[13;5u) is parsed as ENTER with Ctrl")
+    void csiUCtrlEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '3', ';', '5', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("CSI-u Shift+Tab (ESC[9;2u) is parsed as TAB with Shift")
+    void csiUShiftTabParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '9', ';', '2', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.TAB);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("CSI-u plain Enter (ESC[13u) is parsed as ENTER without modifiers")
+    void csiUPlainEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '3', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasShift()).isFalse();
+        assertThat(keyEvent.hasAlt()).isFalse();
+        assertThat(keyEvent.hasCtrl()).isFalse();
+    }
+
+    @Test
+    @DisplayName("CSI-u Ctrl+Esc (ESC[27;5u) is parsed as ESCAPE with Ctrl")
+    void csiUCtrlEscapeParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '5', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(keyEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("CSI-u printable char with modifier (ESC[97;2u) is parsed as 'a' with Shift")
+    void csiUPrintableWithModifierParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '9', '7', ';', '2', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.isChar('a')).isTrue();
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("CSI-u Backspace (ESC[127;2u) is parsed as BACKSPACE with Shift")
+    void csiUBackspaceParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '1', '2', '7', ';', '2', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.BACKSPACE);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("CSI-u kitty functional key (ESC[57358;2u) is parsed as UNKNOWN, not a char")
+    void csiUFunctionalKeyParsedAsUnknown() throws IOException {
+        // 57358 = CAPS_LOCK in the kitty functional table (PUA); no KeyCode exists.
+        QueueBackend backend = new QueueBackend(27, '[', '5', '7', '3', '5', '8', ';', '2', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.UNKNOWN);
+    }
+
+    // -- xterm modifyOtherKeys (CSI 27 ; mod ; key ~) --
+
+    @Test
+    @DisplayName("Shift+Enter (ESC[27;2;13~) is parsed as ENTER with Shift")
+    void modifyOtherKeysShiftEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '2', ';', '1', '3', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Alt+Enter (ESC[27;3;13~) is parsed as ENTER with Alt")
+    void modifyOtherKeysAltEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '3', ';', '1', '3', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Ctrl+Tab (ESC[27;5;9~) is parsed as TAB with Ctrl")
+    void modifyOtherKeysCtrlTabParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '5', ';', '9', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.TAB);
+        assertThat(keyEvent.hasCtrl()).isTrue();
+    }
+
+    // -- Legacy Alt+special keys (ESC followed by a control char) --
+
+    @Test
+    @DisplayName("Alt+Enter (ESC CR) is parsed as ENTER with Alt")
+    void legacyAltEnterCrParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 13);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Alt+Enter (ESC LF) is parsed as ENTER with Alt")
+    void legacyAltEnterLfParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 10);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
+    // -- Negative guards --
+
+    @Test
+    @DisplayName("CSI-u ESC[0u is parsed as UNKNOWN")
+    void csiUZeroKeycodeParsedAsUnknown() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '0', 'u');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UNKNOWN);
+    }
+
+    @Test
+    @DisplayName("modifyOtherKeys ESC[27;2~ (missing keycode) is parsed as UNKNOWN")
+    void modifyOtherKeysMissingKeycodeParsedAsUnknown() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '2', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UNKNOWN);
+    }
+
     @Test
     @DisplayName("readEvent maps US (char 31) to Ctrl+/")
     void readEventMapsUsToCtrlSlash() throws IOException {
