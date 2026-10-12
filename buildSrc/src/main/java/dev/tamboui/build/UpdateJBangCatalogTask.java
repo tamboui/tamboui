@@ -190,7 +190,9 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
     }
 
     /**
-     * Checks if a Java file contains a main method.
+     * Checks if a Java file contains a main method, either a classic
+     * {@code public static void main(String[])} or a JEP 445 instance
+     * {@code void main()} entry point.
      *
      * @param javaFile the Java file to check
      * @return true if the file contains a main method
@@ -198,7 +200,7 @@ public abstract class UpdateJBangCatalogTask extends DefaultTask {
     private boolean containsMainMethod(Path javaFile) {
         try {
             String content = Files.readString(javaFile);
-            return content.contains("public static void main(");
+            return content.contains("void main(");
         } catch (IOException e) {
             return false;
         }

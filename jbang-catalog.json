@@ -91,11 +91,17 @@
     "action-handler-demo": {
       "script-ref": "tamboui-toolkit/demos/action-handler-demo/src/main/java/dev/tamboui/demo/actionhandler/ActionHandlerDemo.java"
     },
+    "compact-source-file-demo": {
+      "script-ref": "tamboui-toolkit/demos/compact-source-file-demo/src/main/java/CompactDemo.java"
+    },
     "custom-component-demo": {
       "script-ref": "tamboui-toolkit/demos/custom-component-demo/src/main/java/dev/tamboui/demo/CustomComponentDemo.java"
     },
     "emoji-demo": {
       "script-ref": "tamboui-toolkit/demos/emoji-demo/src/main/java/dev/tamboui/demo/EmojiDemo.java"
+    },
+    "emoji-list-demo": {
+      "script-ref": "tamboui-toolkit/demos/emoji-list-demo/src/main/java/EmojiListDemo.java"
     },
     "inline-toolkit-demo": {
       "script-ref": "tamboui-toolkit/demos/inline-toolkit-demo/src/main/java/dev/tamboui/demo/InlineToolkitDemo.java"
