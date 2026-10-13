@@ -93,7 +93,7 @@ public final class InlineTuiRunner implements AutoCloseable {
         this.running = new AtomicBoolean(true);
         this.cleanedUp = new AtomicBoolean(false);
         this.frameCount = new AtomicLong(0);
-        this.tickTimer = config.tickRate() != null ? new TickTimer(config.tickRate()) : null;
+        this.tickTimer = config.tickRate() != null ? new TickTimer(config.tickRate(), config.timeSource()) : null;
         this.lastSize = new AtomicReference<>(readCurrentSize(backend));
 
         backend.onResize(() -> {
@@ -443,6 +443,15 @@ public final class InlineTuiRunner implements AutoCloseable {
      */
     public ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    /**
+     * Returns the configuration used by this runner.
+     *
+     * @return the configuration
+     */
+    public InlineTuiConfig config() {
+        return config;
     }
 
     private static Size readCurrentSize(Backend backend) {

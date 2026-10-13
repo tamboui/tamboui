@@ -8,4 +8,5 @@ dependencies {
     api(projects.tambouiTfxTui)
     api(projects.tambouiToolkit)
     testImplementation(testFixtures(projects.tambouiToolkit))
+    testImplementation(testFixtures(projects.tambouiCore))
 }

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 import dev.tamboui.css.engine.StyleEngine;
@@ -79,7 +80,7 @@ public final class ToolkitRunner implements AutoCloseable {
     private final DefaultRenderContext renderContext;
     private final boolean faultTolerant;
     private final List<ToolkitPostRenderProcessor> postRenderProcessors;
-    private final RenderClock renderClock = new RenderClock();
+    private final RenderClock renderClock;
 
     private ToolkitRunner(TuiRunner tuiRunner,
                           Bindings bindings,
@@ -96,6 +97,7 @@ public final class ToolkitRunner implements AutoCloseable {
         this.renderContext.setFaultTolerant(faultTolerant);
         this.faultTolerant = faultTolerant;
         this.postRenderProcessors = toolkitPostRenderProcessors;
+        this.renderClock = new RenderClock(tuiRunner.config().timeSource());
     }
 
     private ToolkitRunner(TuiRunner tuiRunner, Bindings bindings) {
@@ -563,6 +565,19 @@ public final class ToolkitRunner implements AutoCloseable {
          */
         public Builder noTick() {
             this.config = config.toBuilder().noTick().build();
+            return this;
+        }
+
+        /**
+         * Sets the monotonic time source used to drive ticks and animation clocks.
+         * <p>
+         * Defaults to {@link System#nanoTime()}.
+         *
+         * @param timeSource the time source returning nanoseconds, or null for default
+         * @return this builder
+         */
+        public Builder timeSource(LongSupplier timeSource) {
+            this.config = config.toBuilder().timeSource(timeSource).build();
             return this;
         }
 

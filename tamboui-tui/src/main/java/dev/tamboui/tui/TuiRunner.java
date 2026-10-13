@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
@@ -109,7 +110,7 @@ public final class TuiRunner implements AutoCloseable {
         this.resizePending = new AtomicBoolean(false);
         this.activeRenderer = new AtomicReference<>();
         this.frameCount = new AtomicLong(0);
-        this.tickTimer = config.tickRate() != null ? new TickTimer(config.tickRate()) : null;
+        this.tickTimer = config.tickRate() != null ? new TickTimer(config.tickRate(), config.timeSource()) : null;
         this.errorHandler = config.errorHandler();
         this.errorOutput = config.errorOutput();
 
@@ -670,6 +671,15 @@ public final class TuiRunner implements AutoCloseable {
     }
 
     /**
+     * Returns the configuration used by this runner.
+     *
+     * @return the configuration
+     */
+    public TuiConfig config() {
+        return config;
+    }
+
+    /**
      * Computes the scheduler period based on tick rate and resize grace period.
      *
      * @param config the TUI configuration
@@ -1006,6 +1016,19 @@ public final class TuiRunner implements AutoCloseable {
          */
         public Builder shutdownHook(boolean shutdownHook) {
             this.configBuilder.shutdownHook(shutdownHook);
+            return this;
+        }
+
+        /**
+         * Sets the monotonic time source used to drive ticks and animation clocks.
+         * <p>
+         * Defaults to {@link System#nanoTime()}.
+         *
+         * @param timeSource the time source returning nanoseconds, or null for default
+         * @return this builder
+         */
+        public Builder timeSource(LongSupplier timeSource) {
+            this.configBuilder.timeSource(timeSource);
             return this;
         }
 

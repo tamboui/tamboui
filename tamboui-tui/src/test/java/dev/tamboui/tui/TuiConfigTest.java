@@ -298,4 +298,41 @@ class TuiConfigTest {
         assertThat(derived.ticksEnabled()).isFalse();
         assertThat(derived.shutdownHook()).isFalse();
     }
+
+    @Test
+    @DisplayName("timeSource defaults to System::nanoTime")
+    void timeSourceDefaultsToSystemNanoTime() {
+        assertThat(TuiConfig.defaults().timeSource()).isNotNull();
+        assertThat(TuiConfig.builder().build().timeSource()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("builder sets custom timeSource")
+    void builderSetsCustomTimeSource() {
+        java.util.function.LongSupplier clock = () -> 123456789L;
+        TuiConfig config = TuiConfig.builder()
+                .timeSource(clock)
+                .build();
+
+        assertThat(config.timeSource()).isSameAs(clock);
+        assertThat(config.timeSource().getAsLong()).isEqualTo(123456789L);
+    }
+
+    @Test
+    @DisplayName("toBuilder preserves timeSource")
+    void toBuilderPreservesTimeSource() {
+        java.util.function.LongSupplier clock = () -> 999L;
+        TuiConfig original = TuiConfig.builder().timeSource(clock).build();
+        TuiConfig derived = original.toBuilder().mouseCapture(true).build();
+
+        assertThat(derived.timeSource()).isSameAs(clock);
+        assertThat(derived.mouseCapture()).isTrue();
+    }
+
+    @Test
+    @DisplayName("timeSource falls back to default when null is provided")
+    void timeSourceFallsBackWhenNull() {
+        TuiConfig config = TuiConfig.builder().timeSource(null).build();
+        assertThat(config.timeSource()).isNotNull();
+    }
 }

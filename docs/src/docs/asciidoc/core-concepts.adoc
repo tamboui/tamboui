@@ -290,6 +290,14 @@ To step once per tick, use `TickEvent.frameCount()`.
 include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=render-clock-basics,indent=0]
 ----
 
+For deterministic rendering (such as tests, recording/playback, or SVG exports), configure a custom `timeSource(LongSupplier)` on `TuiConfig.builder()` or `ToolkitRunner.builder()`.
+A single monotonic clock feeds both `TickTimer` (pacing `TickEvent` emission) and `RenderClock` (measuring per-render elapsed time), ensuring both frame cadence and animation progress advance deterministically.
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=deterministic-time-source,indent=0]
+----
+
 === Exceptions
 
 TamboUI tries to enforce a clear, consistent exception hierarchy for framework errors.
