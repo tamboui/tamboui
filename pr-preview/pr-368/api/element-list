@@ -24,6 +24,7 @@ dev.tamboui.image
 dev.tamboui.image.capability
 dev.tamboui.image.protocol
 dev.tamboui.inline
+dev.tamboui.internal.export
 dev.tamboui.internal.record
 dev.tamboui.jfr
 dev.tamboui.layout
