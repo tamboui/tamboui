@@ -81,6 +81,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     private Color focusedBorderColor;
     private boolean showCursor = true;
     private boolean showLineNumbers = false;
+    private int minLineNumberDigits = 2;
     private Style lineNumberStyle;
     private Overflow overflow;
     private Overflow renderedOverflow;
@@ -198,6 +199,21 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      */
     public TextAreaElement showLineNumbers() {
         this.showLineNumbers = true;
+        return this;
+    }
+
+    /**
+     * Sets the minimum number of digits to reserve for line numbers in the gutter.
+     * The default is 2.
+     *
+     * @param minDigits the minimum number of digits (>= 1)
+     * @return this builder
+     */
+    public TextAreaElement minLineNumberDigits(int minDigits) {
+        if (minDigits < 1) {
+            throw new IllegalArgumentException("minLineNumberDigits must be at least 1: " + minDigits);
+        }
+        this.minLineNumberDigits = minDigits;
         return this;
     }
 
@@ -364,7 +380,8 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
             lineCount = text.isEmpty() ? 1 : text.split("\n", -1).length;
         }
         // Add minimum width, line number width if applicable, and border
-        int lineNumWidth = showLineNumbers ? 5 : 0;
+        int lineDigits = Math.max(minLineNumberDigits, String.valueOf(lineCount).length());
+        int lineNumWidth = showLineNumbers ? lineDigits + 2 : 0;
         int borderWidth = (title != null || borderType != null) ? 2 : 0;
         int width = Math.max(maxWidth, 20) + lineNumWidth + borderWidth;
         // Add border height
@@ -379,6 +396,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
             boolean isFocused = context != null && elementId != null && context.isFocused(elementId);
             height = TextArea.builder()
                     .showLineNumbers(showLineNumbers)
+                    .minLineNumberDigits(minLineNumberDigits)
                     .overflow(effectiveOverflow)
                     .block(buildBlock(context, isFocused))
                     .build()
@@ -526,6 +544,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
             .placeholder(placeholder)
             .placeholderStyle(effectivePlaceholderStyle)
             .showLineNumbers(showLineNumbers)
+            .minLineNumberDigits(minLineNumberDigits)
             .lineNumberStyle(effectiveLineNumberStyle)
             .overflow(effectiveOverflow)
             .block(buildBlock(context, isFocused));

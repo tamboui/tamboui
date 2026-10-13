@@ -33,6 +33,7 @@ import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static dev.tamboui.toolkit.Toolkit.textArea;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for TextAreaElement.
@@ -139,6 +140,21 @@ class TextAreaElementTest extends AbstractElementTest {
             TextAreaElement element = textArea().showLineNumbers();
 
             assertThat(element).isNotNull();
+        }
+
+        @Test
+        @DisplayName("minLineNumberDigits() sets minimum line number digits")
+        void setMinLineNumberDigits() {
+            TextAreaElement element = textArea().showLineNumbers().minLineNumberDigits(3);
+
+            assertThat(element).isNotNull();
+        }
+
+        @Test
+        @DisplayName("minLineNumberDigits() rejects values < 1")
+        void minLineNumberDigitsRejectsInvalidValue() {
+            assertThatThrownBy(() -> textArea().minLineNumberDigits(0))
+                .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -707,6 +723,21 @@ class TextAreaElementTest extends AbstractElementTest {
 
             // Start of "four five": wrapping at the full area width would not have broken at all.
             assertThat(state.cursorCol()).isEqualTo(14);
+        }
+
+        @Test
+        @DisplayName("minLineNumberDigits() sets gutter width in rendered output")
+        void minLineNumberDigitsConfiguresGutterInElement() {
+            Rect area = new Rect(0, 0, 20, 5);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            TextAreaState state = new TextAreaState("one two three four five");
+            TextAreaElement element = textArea(state).wrapWord().showLineNumbers().minLineNumberDigits(3).rounded();
+            element.render(frame, area, RenderContext.empty());
+
+            // 20 wide minus border (2) and gutter (5) leaves 13
+            assertThat(state.lastRenderedWidth()).isEqualTo(13);
         }
 
         @Test
