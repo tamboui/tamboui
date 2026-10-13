@@ -28,7 +28,7 @@
 <div id="header">
 <h1>Developer Guide</h1>
 <div class="details">
-<span id="revnumber">version 0.6.0-SNAPSHOT</span>
+<span id="revnumber">version 0.7.0-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -844,7 +844,10 @@ Always use <code>CharWidth</code> utilities for width calculations when renderin
 <div class="sect2">
 <h3 id="charwidth-utilities"><a class="anchor" href="#charwidth-utilities"></a><a class="link" href="#charwidth-utilities">CharWidth Utilities</a></h3>
 <div class="paragraph">
-<p>The <code>CharWidth</code> class provides display-width-aware string operations:</p>
+<p>The <code>CharWidth</code> class provides display-width-aware string operations.
+<code>CharWidth.substringByWidth()</code> and <code>substringByWidthFromEnd()</code> keep supported grapheme clusters intact, including ZWJ emoji, flag pairs, skin-tone modifiers, variation selectors, and combining marks.
+For cursor movement or wrapping that needs a cluster boundary, use <code>GraphemeClusters.clusterEnd(text, start)</code> and <code>GraphemeClusters.clusterStart(text, end)</code> from <code>tamboui-core</code>; offsets are UTF-16 indices, not display columns.
+These utilities implement a practical subset of Unicode grapheme rules, not the complete UAX #29 algorithm.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1114,7 +1117,7 @@ String result = CharWidth.substringByWidth("A👨‍🦲B", 3);
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.6.0-SNAPSHOT<br>
+Version 0.7.0-SNAPSHOT<br>
 </div>
 </div>
 <script src="_static/highlight/highlight.min.js"></script>
