@@ -273,11 +273,15 @@ public final class TableElement extends StyledElement<TableElement> {
         int totalWidth = 0;
         int numCols = 0;
 
-        // Determine number of columns from header or first row
+        // Determine number of columns from header, rows, or footer
         if (header != null) {
-            numCols = header.cells().size();
-        } else if (!rows.isEmpty()) {
-            numCols = rows.get(0).cells().size();
+            numCols = Math.max(numCols, header.cells().size());
+        }
+        for (Row row : rows) {
+            numCols = Math.max(numCols, row.cells().size());
+        }
+        if (footer != null) {
+            numCols = Math.max(numCols, footer.cells().size());
         }
 
         if (!widths.isEmpty()) {
