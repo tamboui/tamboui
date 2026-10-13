@@ -232,6 +232,7 @@ public final class ScrollableElement extends ContainerElement<ScrollableElement>
         }
 
         List<Element> visibleChildren = new ArrayList<>();
+        List<Constraint> visibleConstraints = new ArrayList<>();
         int heightUtilized = 0;
         if (scrollUpIndicator != null && state.position() > 0) {
             Rect topIndicatorArea = new Rect(innerArea.x(), innerArea.y(), innerArea.width(), 1);
@@ -255,12 +256,14 @@ public final class ScrollableElement extends ContainerElement<ScrollableElement>
                 heightUtilized += 1;
             }
             visibleChildren.add(children.get(i));
+            visibleConstraints.add(constraints.get(i));
         }
 
         if (moreBelow && scrollDownIndicator != null) {
             if (heightUtilized == innerArea.height()) {
                 // remove last child to fit indicator
                 visibleChildren.remove(visibleChildren.size() - 1);
+                visibleConstraints.remove(visibleConstraints.size() - 1);
             }
             Rect bottomIndicatorArea = new Rect(innerArea.x(), innerArea.y() + innerArea.height() - 1, innerArea.width(), 1);
             innerArea = new Rect(innerArea.x(), innerArea.y(), innerArea.width(), innerArea.height() - 1);
@@ -271,7 +274,7 @@ public final class ScrollableElement extends ContainerElement<ScrollableElement>
 
         frame.renderStatefulWidget(scrollbar, scrollbarArea, state);
 
-        Layout layout = Layout.vertical().constraints(constraints.toArray(new Constraint[0]));
+        Layout layout = Layout.vertical().constraints(visibleConstraints.toArray(new Constraint[0]));
         List<Rect> areas = layout.split(innerArea);
 
         // Render children

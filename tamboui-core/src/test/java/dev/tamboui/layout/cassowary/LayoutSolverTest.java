@@ -217,4 +217,61 @@ class LayoutSolverTest {
         }
         assertThat(sizes[0] + sizes[1] + sizes[2]).isLessThanOrEqualTo(10);
     }
+
+    @Test
+    @DisplayName("400 fixed length constraints solve instantly")
+    void fourHundredFixedLengthsSolveInstantly() {
+        LayoutSolver solver = new LayoutSolver();
+        Constraint[] constraints = new Constraint[400];
+        Arrays.fill(constraints, Constraint.length(1));
+
+        long start = System.currentTimeMillis();
+        int[] sizes = solver.solve(Arrays.asList(constraints), 43, 0, Flex.START);
+        long elapsed = System.currentTimeMillis() - start;
+
+        assertThat(elapsed).isLessThan(200);
+        assertThat(sizes).hasSize(400);
+        for (int i = 0; i < 43; i++) {
+            assertThat(sizes[i]).isEqualTo(1);
+        }
+        for (int i = 43; i < 400; i++) {
+            assertThat(sizes[i]).isEqualTo(0);
+        }
+    }
+
+    @Test
+    @DisplayName("400 fixed length constraints fitting in available space solve instantly")
+    void fourHundredFixedLengthsFittingSolveInstantly() {
+        LayoutSolver solver = new LayoutSolver();
+        Constraint[] constraints = new Constraint[400];
+        Arrays.fill(constraints, Constraint.length(1));
+
+        long start = System.currentTimeMillis();
+        int[] sizes = solver.solve(Arrays.asList(constraints), 500, 0, Flex.START);
+        long elapsed = System.currentTimeMillis() - start;
+
+        assertThat(elapsed).isLessThan(200);
+        assertThat(sizes).hasSize(400);
+        for (int size : sizes) {
+            assertThat(size).isEqualTo(1);
+        }
+    }
+
+    @Test
+    @DisplayName("100 fill constraints solve instantly")
+    void oneHundredFillConstraintsSolveInstantly() {
+        LayoutSolver solver = new LayoutSolver();
+        Constraint[] constraints = new Constraint[100];
+        Arrays.fill(constraints, Constraint.fill());
+
+        long start = System.currentTimeMillis();
+        int[] sizes = solver.solve(Arrays.asList(constraints), 100, 0, Flex.START);
+        long elapsed = System.currentTimeMillis() - start;
+
+        assertThat(elapsed).isLessThan(200);
+        assertThat(sizes).hasSize(100);
+        for (int size : sizes) {
+            assertThat(size).isEqualTo(1);
+        }
+    }
 }
