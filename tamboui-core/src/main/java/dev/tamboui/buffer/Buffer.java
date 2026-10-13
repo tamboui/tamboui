@@ -30,6 +30,9 @@ public final class Buffer {
     // Sharing the instance lets String.equals() exit on identity in Buffer.diff().
     private static final int GLYPH_BASE = 0x2500;
     private static final String[] GLYPH_STRINGS = new String[0x2900 - GLYPH_BASE];
+    // No character below U+1100 (the first Hangul Jamo) is wide: a one-char symbol below it
+    // can't be half of a wide character, which keeps set() cheap for the common case.
+    private static final int FIRST_WIDE_CODE_POINT = 0x1100;
 
     static {
         for (int i = 0; i < 128; i++) {
@@ -197,6 +200,9 @@ public final class Buffer {
 
     /**
      * Sets the cell at the given position.
+     * <p>
+     * A wide character that loses one of its two cells to this write is replaced by a space,
+     * so its other half does not stay behind.
      *
      * @param x the x coordinate
      * @param y the y coordinate
@@ -204,8 +210,55 @@ public final class Buffer {
      */
     public void set(int x, int y, Cell cell) {
         if (area.contains(x, y)) {
-            content[index(x, y)] = cell;
+            int i = index(x, y);
+            Cell old = content[i];
+            content[i] = cell;
+            if (old != cell) {
+                keepWideCharsWhole(i, x, old, cell);
+            }
         }
+    }
+
+    /**
+     * Repairs the wide character that the cell at index {@code i} (column {@code x}) was half
+     * of, now that it changed from {@code old} to {@code cell}.
+     * <p>
+     * A wide character takes two cells, the second a {@link Cell#CONTINUATION}. Backends skip
+     * continuation cells and let the wide character advance the cursor by two, so a
+     * continuation without its wide character, or a wide character without its continuation,
+     * shifts the rest of the row by a column on screen and leaves stale glyphs behind. The
+     * half that is left is turned into a space with its style kept.
+     */
+    private void keepWideCharsWhole(int i, int x, Cell old, Cell cell) {
+        // Assumes a cell is at most 2 columns wide (CharWidth caps a cluster at 2), so a wide
+        // character has exactly one continuation. length() counts chars, not columns: 5 for a ZWJ emoji.
+        String oldSymbol = old.symbol();
+        int length = oldSymbol.length();
+        if (length == 0) {
+            // Was the right half of the wide character to the left, unless it stays one.
+            if (!cell.isContinuation() && x > area.left()) {
+                Cell wide = content[i - 1];
+                if (!wide.isContinuation()) {
+                    content[i - 1] = new Cell(" ", wide.style());
+                }
+            }
+        } else if ((length > 1 || oldSymbol.charAt(0) >= FIRST_WIDE_CODE_POINT) && x + 1 < area.right()
+                && content[i + 1].isContinuation() && !coversTwoCells(cell, oldSymbol)) {
+            // Was a wide character, and the new cell no longer covers its right half.
+            content[i + 1] = new Cell(" ", old.style());
+        }
+    }
+
+    /**
+     * Returns whether {@code cell}, written over a wide character with {@code oldSymbol}, is
+     * itself a wide character, so the caller keeps the continuation cell after it.
+     */
+    private static boolean coversTwoCells(Cell cell, String oldSymbol) {
+        String symbol = cell.symbol();
+        if (symbol.isEmpty()) {
+            return false;
+        }
+        return symbol.equals(oldSymbol) || CharWidth.of(symbol) == 2;
     }
 
     /**
@@ -305,11 +358,6 @@ public final class Buffer {
                             }
                             col++;
                         } else if (col >= area.left()) {
-                            Cell current = get(col, y);
-                            if (current.isContinuation() && col > area.left()) {
-                                Cell prev = get(col - 1, y);
-                                set(col - 1, y, new Cell(" ", prev.style()));
-                            }
                             Cell existing = get(col, y);
                             set(col, y, new Cell(flag, existing.style().patch(style)));
                             set(col + 1, y, Cell.CONTINUATION);
@@ -356,22 +404,7 @@ public final class Buffer {
             }
 
             if (col >= area.left()) {
-                // When overwriting a continuation cell, clear the preceding wide char
-                Cell current = get(col, y);
-                if (current.isContinuation() && col > area.left()) {
-                    Cell prev = get(col - 1, y);
-                    set(col - 1, y, new Cell(" ", prev.style()));
-                }
-
-                // If this is a wide char, check if the next cell is also a continuation of something
-                if (charWidth == 2 && col + 1 < area.right()) {
-                    Cell next = get(col + 1, y);
-                    if (next.isContinuation()) {
-                        // The cell after our continuation was itself a continuation - clear its owner
-                        // (This handles overwriting in the middle of an existing wide char)
-                    }
-                }
-
+                // set() turns a wide character this overwrites half of into a space
                 Cell existing = get(col, y);
                 set(col, y, new Cell(symbol, existing.style().patch(style)));
 
