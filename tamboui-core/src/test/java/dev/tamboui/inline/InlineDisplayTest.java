@@ -7,17 +7,26 @@ package dev.tamboui.inline;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
+import dev.tamboui.terminal.TestBackend;
+import dev.tamboui.terminal.TestBackend.Op;
+import dev.tamboui.terminal.TestBackend.OpType;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -25,6 +34,8 @@ import dev.tamboui.text.Text;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InlineDisplayTest {
+
+    private static final Pattern SGR = Pattern.compile("\u001b\\[[0-9;]*m");
 
     private StringWriter stringWriter;
     private PrintWriter printWriter;
@@ -213,6 +224,71 @@ class InlineDisplayTest {
         display.render((area, buf) -> assertThat(area.width()).isEqualTo(40));
 
         assertThat(display.width()).isEqualTo(40);
+    }
+
+    @Test
+    @DisplayName("render() draws a styled space at the end of a line, such as a text input cursor")
+    void renderDrawsStyledSpaceAtEndOfLine() throws IOException {
+        TestBackend backend = new TestBackend(20, 10);
+        InlineDisplay display = InlineDisplay.withBackend(1, 20, backend);
+        Style cursorStyle = Style.EMPTY.reversed();
+
+        display.render((area, buf) -> {
+            buf.setString(0, 0, "abc", Style.EMPTY);
+            buf.set(3, 0, new Cell(" ", cursorStyle));
+        }, 1, 3, 0);
+
+        assertThat(backend.rawOutput()).contains("abc" + AnsiStringBuilder.styleToAnsi(cursorStyle) + " ");
+    }
+
+    @Test
+    @DisplayName("render() draws a background up to the last styled cell of a line")
+    void renderDrawsBackgroundUpToLastStyledCell() throws IOException {
+        TestBackend backend = new TestBackend(12, 10);
+        InlineDisplay display = InlineDisplay.withBackend(1, 12, backend);
+        Style barStyle = Style.EMPTY.bg(Color.BLUE);
+
+        display.render((area, buf) -> {
+            buf.setStyle(area, barStyle);
+            buf.setString(0, 0, "Status", barStyle);
+        });
+
+        assertThat(backend.rawOutput()).contains(AnsiStringBuilder.styleToAnsi(barStyle) + "Status      ");
+    }
+
+    @Test
+    @DisplayName("render() erases each line with the default style, so a background does not bleed into the next line")
+    void renderErasesEachLineWithDefaultStyle() throws IOException {
+        TestBackend backend = new TestBackend(20, 10);
+        InlineDisplay display = InlineDisplay.withBackend(2, 20, backend);
+
+        display.render((area, buf) -> {
+            buf.setString(0, 0, "Header", Style.EMPTY.bg(Color.BLUE));
+            buf.setString(0, 1, "plain", Style.EMPTY);
+        });
+
+        assertThat(stylesActiveAtEachErase(backend))
+            .containsExactly(AnsiStringBuilder.RESET, AnsiStringBuilder.RESET);
+    }
+
+    /**
+     * Returns the SGR sequence in effect each time a line is erased; terminals erase
+     * with the background of that style.
+     */
+    private static List<String> stylesActiveAtEachErase(TestBackend backend) {
+        List<String> styles = new ArrayList<>();
+        String active = AnsiStringBuilder.RESET;
+        for (Object entry : backend.transcript()) {
+            if (entry instanceof String) {
+                Matcher sgr = SGR.matcher((String) entry);
+                while (sgr.find()) {
+                    active = sgr.group();
+                }
+            } else if (((Op) entry).type() == OpType.ERASE_EOL) {
+                styles.add(active);
+            }
+        }
+        return styles;
     }
 
     /**

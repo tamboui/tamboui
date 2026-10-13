@@ -10,7 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.inline.InlineDisplay;
 import dev.tamboui.style.Style;
+import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.TestBackend;
+import dev.tamboui.widgets.input.TextInput;
+import dev.tamboui.widgets.input.TextInputState;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -107,5 +110,20 @@ class InlineViewportTest {
 
         assertThat(renderedWidth[0]).isEqualTo(40);
         assertThat(viewport.width()).isEqualTo(40);
+    }
+
+    @Test
+    @DisplayName("draw shows the cursor of a text input when it is at the end of the text")
+    void drawShowsTextInputCursorAtEndOfText() throws Exception {
+        InlineDisplay display = InlineDisplay.withBackend(1, 20, backend);
+        InlineViewport viewport = new InlineViewport(display);
+        TextInput input = TextInput.builder().build();
+        TextInputState state = new TextInputState("abc");
+
+        backend.reset();
+        viewport.draw(frame -> input.renderWithCursor(frame.area(), frame.buffer(), state, frame));
+
+        String reversedSpace = AnsiStringBuilder.styleToAnsi(Style.EMPTY.reversed()) + " ";
+        assertThat(backend.rawOutput()).contains("abc" + reversedSpace);
     }
 }
