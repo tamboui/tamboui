@@ -402,6 +402,9 @@ Marker types:
 * `Marker.BRAILLE` - Braille patterns for higher resolution
 * `Marker.BLOCK` - Block characters
 
+A point that falls outside the graph is not drawn, but a line to it is, up to the edge of the graph.
+A point with a NaN or infinite coordinate is not drawn at all, and a line dataset is broken there, so a missing value shows as a gap.
+
 === Canvas
 
 A drawing surface for custom graphics:
