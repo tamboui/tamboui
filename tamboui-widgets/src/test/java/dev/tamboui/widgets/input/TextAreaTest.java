@@ -237,6 +237,42 @@ class TextAreaTest {
     }
 
     @Test
+    @DisplayName("renderWithCursor on unwrapped line accounts for 2-wide VS16 emoji sequences")
+    void renderWithCursorOnUnwrappedLineWithVs16Emoji() {
+        Style cursorStyle = Style.EMPTY.reversed();
+        TextArea textArea = TextArea.builder().cursorStyle(cursorStyle).build();
+        TextAreaState state = new TextAreaState("\u23FA\uFE0Fx"); // ⏺️x: ⏺️ is 2 cols, x is 1 col
+        state.moveCursorToEnd(); // cursor at offset 3 (past 'x')
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 5, 1));
+        Frame frame = Frame.forTesting(buffer);
+
+        textArea.renderWithCursor(buffer.area(), buffer, state, frame);
+
+        // ⏺️ at cols 0-1, 'x' at col 2, cursor at col 3
+        assertThat(buffer.get(3, 0).style()).isEqualTo(cursorStyle);
+    }
+
+    @Test
+    @DisplayName("renderWithCursor on unwrapped line preserves cursor visibility when horizontally scrolled past VS16 emoji")
+    void renderWithCursorHorizontallyScrolledPastVs16Emoji() {
+        Style cursorStyle = Style.EMPTY.reversed();
+        TextArea textArea = TextArea.builder().cursorStyle(cursorStyle).build();
+        TextAreaState state = new TextAreaState("\u23FA\uFE0Fx");
+        state.moveCursorToEnd(); // cursor at offset 3 (right edge)
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 3, 1)); // 3 columns wide
+        Frame frame = Frame.forTesting(buffer);
+
+        textArea.renderWithCursor(buffer.area(), buffer, state, frame);
+
+        // ensureCursorVisible scrolled past ⏺️ (scrollCol = 2)
+        // 'x' is at col 0, cursor is at col 1
+        assertThat(state.scrollCol()).isEqualTo(2);
+        assertThat(buffer.get(1, 0).style()).isEqualTo(cursorStyle);
+    }
+
+    @Test
     @DisplayName("preferredHeight counts wrapped rows plus the block, using the render's gutter math")
     void preferredHeightFitsWrappedText() {
         TextArea.Builder builder = TextArea.builder()
