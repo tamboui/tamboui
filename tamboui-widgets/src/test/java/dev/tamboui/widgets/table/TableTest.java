@@ -12,11 +12,14 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.TestStylePropertyResolver;
+import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
 import dev.tamboui.widgets.block.Block;
 
 import static org.assertj.core.api.Assertions.*;
@@ -398,5 +401,147 @@ class TableTest {
 
         // Second row "Bob" starts at y=1 and should have blue background
         BufferAssertions.assertThat(buffer).at(0, 1).hasBackground(Color.BLUE);
+    }
+
+    @Test
+    @DisplayName("Table renders right-aligned and centered cells")
+    void rendersAlignedCells() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from(
+                    Cell.from("Hi").rightAligned(),
+                    Cell.from("Hey").centered()
+                )
+            ))
+            .widths(Constraint.length(6), Constraint.length(7))
+            .columnSpacing(0)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 15, 1);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Column 0: width 6, text "Hi" (len 2) right aligned -> offset 6 - 2 = 4 -> index 4, 5
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("i");
+
+        // Column 1: starts at x=6, width 7, text "Hey" (len 3) centered -> offset (7 - 3)/2 = 2 -> index 6+2 = 8
+        assertThat(buffer.get(6, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(7, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(8, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("e");
+        assertThat(buffer.get(10, 0).symbol()).isEqualTo("y");
+        assertThat(buffer.get(11, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(12, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Table renders with columnAlignments")
+    void rendersColumnAlignments() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from("A", "B")
+            ))
+            .widths(Constraint.length(5), Constraint.length(5))
+            .columnAlignments(Alignment.LEFT, Alignment.RIGHT)
+            .columnSpacing(0)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Col 0: left aligned "A" at x=0
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo(" ");
+
+        // Col 1: right aligned "B" at x=5 + (5 - 1) = 9
+        assertThat(buffer.get(8, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("B");
+    }
+
+    @Test
+    @DisplayName("Cell alignment takes precedence over column alignment")
+    void cellAlignmentPrecedenceOverColumn() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from(Cell.from("Hi").leftAligned())
+            ))
+            .widths(Constraint.length(6))
+            .columnAlignments(Alignment.RIGHT)
+            .columnSpacing(0)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Cell is explicitly left aligned, overriding table column alignment (RIGHT)
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("i");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Line alignment takes precedence over cell and column alignment")
+    void lineAlignmentPrecedenceOverCellAndColumn() {
+        Line line = Line.from(Span.raw("Hi")).alignment(Alignment.RIGHT);
+        Cell cell = Cell.from(line).leftAligned(); // cell is leftAligned, line is rightAligned
+
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from(cell)))
+            .widths(Constraint.length(6))
+            .columnAlignments(Alignment.CENTER)
+            .columnSpacing(0)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Line is right-aligned -> x=4, 5
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo("H");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("i");
+    }
+
+    @Test
+    @DisplayName("Table truncates overflowing text regardless of alignment")
+    void textOverflowTruncates() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from(Cell.from("ABCDEFG").rightAligned())
+            ))
+            .widths(Constraint.length(4))
+            .columnSpacing(0)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Text width 7 > col width 4: startX stays 0, truncated to 4 chars "ABCD"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("B");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("C");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo(" ");
     }
 }

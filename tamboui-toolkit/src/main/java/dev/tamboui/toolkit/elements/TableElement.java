@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import dev.tamboui.css.cascade.PseudoClassState;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -51,6 +52,7 @@ public final class TableElement extends StyledElement<TableElement> {
 
     private final List<Row> rows = new ArrayList<>();
     private final List<Constraint> widths = new ArrayList<>();
+    private final List<Alignment> columnAlignments = new ArrayList<>();
     private Row header;
     private Row footer;
     private TableState state;
@@ -178,6 +180,60 @@ public final class TableElement extends StyledElement<TableElement> {
         this.widths.clear();
         this.widths.addAll(widths);
         return this;
+    }
+
+    /**
+     * Sets the column text alignments.
+     *
+     * @param columnAlignments the column alignments
+     * @return this builder
+     */
+    public TableElement columnAlignments(Alignment... columnAlignments) {
+        this.columnAlignments.clear();
+        if (columnAlignments != null) {
+            this.columnAlignments.addAll(Arrays.asList(columnAlignments));
+        }
+        return this;
+    }
+
+    /**
+     * Sets the column text alignments from a list.
+     *
+     * @param columnAlignments the column alignments
+     * @return this builder
+     */
+    public TableElement columnAlignments(List<Alignment> columnAlignments) {
+        this.columnAlignments.clear();
+        if (columnAlignments != null) {
+            this.columnAlignments.addAll(columnAlignments);
+        }
+        return this;
+    }
+
+    /**
+     * Sets the text alignment for a specific column.
+     *
+     * @param column the column index (0-based)
+     * @param alignment the text alignment
+     * @return this builder
+     */
+    public TableElement columnAlignment(int column, Alignment alignment) {
+        if (column >= 0) {
+            while (this.columnAlignments.size() <= column) {
+                this.columnAlignments.add(null);
+            }
+            this.columnAlignments.set(column, alignment);
+        }
+        return this;
+    }
+
+    /**
+     * Returns the column text alignments.
+     *
+     * @return the list of column alignments
+     */
+    public List<Alignment> columnAlignments() {
+        return Collections.unmodifiableList(columnAlignments);
     }
 
     /**
@@ -366,6 +422,7 @@ public final class TableElement extends StyledElement<TableElement> {
         Table.Builder builder = Table.builder()
             .rows(rows)
             .widths(widths)
+            .columnAlignments(columnAlignments)
             .style(context.currentStyle())
             .highlightStyle(effectiveHighlightStyle)
             .highlightSymbol(effectiveHighlightSymbol)

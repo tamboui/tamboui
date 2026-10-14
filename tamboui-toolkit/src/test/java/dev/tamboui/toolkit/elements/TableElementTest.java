@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -211,5 +212,44 @@ class TableElementTest extends AbstractElementTest {
         table().header("Name", "Age").row("Alice", "30").title("Users").rounded().render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Test
+    @DisplayName("columnAlignments configures alignments and renders aligned content")
+    void columnAlignmentsConfigurationAndRender() {
+        TableElement table = table()
+            .header("A", "B")
+            .row("1", "2")
+            .columnAlignments(Alignment.LEFT, Alignment.RIGHT)
+            .columnSpacing(0)
+            .highlightSymbol("")
+            .widths(Constraint.length(5), Constraint.length(5));
+
+        assertThat(table.columnAlignments()).containsExactly(Alignment.LEFT, Alignment.RIGHT);
+
+        Rect area = new Rect(0, 0, 10, 2);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        table.render(frame, area, RenderContext.empty());
+
+        // Header row: "A" at 0, "B" right-aligned at 5 + 4 = 9
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("A");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("B");
+
+        // Data row: "1" at 0, "2" right-aligned at 9
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("1");
+        assertThat(buffer.get(9, 1).symbol()).isEqualTo("2");
+    }
+
+    @Test
+    @DisplayName("columnAlignment sets alignment for individual column index")
+    void individualColumnAlignment() {
+        TableElement table = table()
+            .columnAlignment(1, Alignment.RIGHT);
+
+        assertThat(table.columnAlignments()).hasSize(2);
+        assertThat(table.columnAlignments().get(0)).isNull();
+        assertThat(table.columnAlignments().get(1)).isEqualTo(Alignment.RIGHT);
     }
 }

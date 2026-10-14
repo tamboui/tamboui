@@ -219,6 +219,34 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("renders a GFM table with column alignments")
+    void rendersTableWithColumnAlignments() {
+        String md = "| Item | Cost |\n| :--- | ---: |\n| Tea | 5 |\n| Cake | 12 |";
+        MarkdownView view = MarkdownView.builder().source(md).build();
+        Buffer buffer = renderInto(view, 20, 3);
+
+        // Column 0 is left-aligned: "Item" at (0, 0), "Tea" at (0, 1)
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("I");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("T");
+
+        // Column 1 is right-aligned: width 10, starts at x=10, ends at x=19.
+        // Cost (len 4) -> 10 + (10 - 4) = 16
+        assertThat(buffer.get(16, 0).symbol()).isEqualTo("C");
+        assertThat(buffer.get(17, 0).symbol()).isEqualTo("o");
+        assertThat(buffer.get(18, 0).symbol()).isEqualTo("s");
+        assertThat(buffer.get(19, 0).symbol()).isEqualTo("t");
+
+        // "5" (len 1) -> 10 + (10 - 1) = 19
+        assertThat(buffer.get(18, 1).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(19, 1).symbol()).isEqualTo("5");
+
+        // "12" (len 2) -> 10 + (10 - 2) = 18
+        assertThat(buffer.get(17, 2).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(18, 2).symbol()).isEqualTo("1");
+        assertThat(buffer.get(19, 2).symbol()).isEqualTo("2");
+    }
+
+    @Test
     @DisplayName("scrolls past the first chunk when scroll is set")
     void scrollsContent() {
         // Layout produces: heading(1) + rule(1) + spacer(1) + paragraph(1) = 4 rows
