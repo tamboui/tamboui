@@ -18,7 +18,9 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.Element;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -266,6 +268,56 @@ class PanelTest extends AbstractElementTest {
         assertThat(horizontal.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(4); // 1+1 + 2 borders
     }
 
+    @Test
+    @DisplayName("A panel with a margin in a column gets rows for its top and bottom margin")
+    void panelWithMarginInColumn() {
+        Rect area = new Rect(0, 0, 10, 6);
+        Buffer buffer = Buffer.empty(area);
+
+        column(panel(text("p")).margin(1), text("c"))
+            .render(Frame.forTesting(buffer), area, DefaultRenderContext.createEmpty());
+
+        assertThat(buffer).hasContent(
+            "          ",
+            " ┌──────┐ ",
+            " │p     │ ",
+            " └──────┘ ",
+            "          ",
+            "c         "
+        );
+    }
+
+    @Test
+    @DisplayName("A margin and padding set in CSS count in the preferred size")
+    void cssMarginAndPaddingInColumn() {
+        Buffer buffer = renderPanelStyled(column(panel(text("p")).addClass("card"), text("c")),
+            new Rect(0, 0, 12, 8), ".card { margin: 1; padding: 1; }");
+
+        assertThat(buffer).hasContent(
+            "            ",
+            " ┌────────┐ ",
+            " │        │ ",
+            " │ p      │ ",
+            " │        │ ",
+            " └────────┘ ",
+            "            ",
+            "c           "
+        );
+    }
+
+    @Test
+    @DisplayName("A direction set in CSS decides how the children add up in the preferred size")
+    void cssDirectionInRow() {
+        Buffer buffer = renderPanelStyled(row(panel(text("a"), text("b")).addClass("bar"), text("c")),
+            new Rect(0, 0, 8, 3), ".bar { direction: horizontal; }");
+
+        assertThat(buffer).hasContent(
+            "┌──┐c   ",
+            "│ab│    ",
+            "└──┘    "
+        );
+    }
+
     private static Buffer renderPanel(Panel panel, Rect area) {
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
@@ -273,7 +325,7 @@ class PanelTest extends AbstractElementTest {
         return buffer;
     }
 
-    private static Buffer renderPanelStyled(Panel panel, Rect area, String css) {
+    private static Buffer renderPanelStyled(Element element, Rect area, String css) {
         StyleEngine styleEngine = StyleEngine.create();
         styleEngine.addStylesheet("test", css);
         styleEngine.setActiveStylesheet("test");
@@ -283,7 +335,7 @@ class PanelTest extends AbstractElementTest {
 
         Buffer buffer = Buffer.empty(area);
         Frame frame = Frame.forTesting(buffer);
-        panel.render(frame, area, context);
+        element.render(frame, area, context);
         return buffer;
     }
 }

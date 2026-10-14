@@ -115,7 +115,12 @@ public final class Row extends ContainerElement<Row> {
             return Size.of(0, 1);
         }
 
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        // Use the margin and spacing that rendering applies, including CSS values
+        CssStyleResolver cssResolver = context != null ? context.resolveStyle(this).orElse(null) : null;
+        Margin effectiveMargin = resolveMargin(cssResolver);
+        int marginWidth = effectiveMargin != null ? effectiveMargin.horizontalTotal() : 0;
+        int marginHeight = effectiveMargin != null ? effectiveMargin.verticalTotal() : 0;
+        int effectiveSpacing = resolveSpacing(cssResolver);
 
         // Calculate width: sum of children widths + spacing
         int width = 0;
@@ -126,13 +131,11 @@ public final class Row extends ContainerElement<Row> {
         if (children.size() > 1) {
             width += effectiveSpacing * (children.size() - 1);
         }
-        if (margin != null) {
-            width += margin.left() + margin.right();
-        }
+        width += marginWidth;
 
         // Calculate height: max of children heights
         int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
-        int contentWidth = availableWidth > 0 ? Math.max(1, availableWidth - totalSpacing) : -1;
+        int contentWidth = availableWidth > 0 ? Math.max(1, availableWidth - totalSpacing - marginWidth) : -1;
         int childWidth = contentWidth > 0 ? Math.max(1, contentWidth / children.size()) : -1;
 
         int maxHeight = 1;
@@ -140,6 +143,7 @@ public final class Row extends ContainerElement<Row> {
             Size childSize = child.preferredSize(childWidth, availableHeight, context);
             maxHeight = Math.max(maxHeight, childSize.heightOr(1));
         }
+        maxHeight += marginHeight;
 
         // If a length constraint is set, use it for height (Row uses constraint for height in vertical parent)
         if (layoutConstraint instanceof Constraint.Length) {
@@ -158,11 +162,7 @@ public final class Row extends ContainerElement<Row> {
         // Get CSS resolver for property resolution
         CssStyleResolver cssResolver = context.resolveStyle(this).orElse(null);
 
-        // Resolve margin: programmatic > CSS > none
-        Margin effectiveMargin = this.margin;
-        if (effectiveMargin == null && cssResolver != null) {
-            effectiveMargin = cssResolver.margin().orElse(null);
-        }
+        Margin effectiveMargin = resolveMargin(cssResolver);
 
         // Apply margin to get the effective render area
         Rect effectiveArea = area;
@@ -187,11 +187,7 @@ public final class Row extends ContainerElement<Row> {
             effectiveFlex = Flex.START;
         }
 
-        // Resolve spacing: programmatic > CSS > 0
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
-        if (this.spacing == null && cssResolver != null) {
-            effectiveSpacing = cssResolver.spacing().orElse(0);
-        }
+        int effectiveSpacing = resolveSpacing(cssResolver);
 
         // Build constraints, accounting for spacing
         List<Constraint> constraints = new ArrayList<>();
@@ -236,5 +232,31 @@ public final class Row extends ContainerElement<Row> {
             context.renderChild(child, frame, childArea);
             childIndex++;
         }
+    }
+
+    /**
+     * Resolves the margin: programmatic, then CSS, else none.
+     *
+     * @param cssResolver the CSS resolver for this row, or null
+     * @return the margin, or null for none
+     */
+    private Margin resolveMargin(CssStyleResolver cssResolver) {
+        if (margin != null || cssResolver == null) {
+            return margin;
+        }
+        return cssResolver.margin().orElse(null);
+    }
+
+    /**
+     * Resolves the spacing between children: programmatic, then CSS, else 0.
+     *
+     * @param cssResolver the CSS resolver for this row, or null
+     * @return the spacing in cells
+     */
+    private int resolveSpacing(CssStyleResolver cssResolver) {
+        if (spacing != null) {
+            return spacing;
+        }
+        return cssResolver != null ? cssResolver.spacing().orElse(0) : 0;
     }
 }

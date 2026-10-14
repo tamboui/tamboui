@@ -463,8 +463,15 @@ public final class Panel extends ContainerElement<Panel> {
 
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
-        Direction effectiveDirection = this.direction != null ? this.direction : Direction.VERTICAL;
-        int effectiveSpacing = this.spacing != null ? this.spacing : 0;
+        // Use the layout properties that rendering applies, including CSS values
+        CssStyleResolver cssResolver = context != null ? context.resolveStyle(this).orElse(null) : null;
+        Direction effectiveDirection = resolveDirection(cssResolver);
+        Integer resolvedSpacing = resolveSpacing(cssResolver);
+        int effectiveSpacing = resolvedSpacing != null ? resolvedSpacing : 0;
+        Padding effectivePadding = resolvePadding(cssResolver);
+        Margin effectiveMargin = resolveMargin(cssResolver);
+        int marginWidth = effectiveMargin != null ? effectiveMargin.horizontalTotal() : 0;
+        int marginHeight = effectiveMargin != null ? effectiveMargin.verticalTotal() : 0;
 
         // Calculate width
         int childrenWidth = 0;
@@ -489,24 +496,20 @@ public final class Panel extends ContainerElement<Panel> {
         }
 
         int width = childrenWidth;
-        if (padding != null) {
-            width += padding.horizontalTotal();
-        }
+        width += effectivePadding.horizontalTotal();
         width += 2; // borders
-        if (margin != null) {
-            width += margin.left() + margin.right();
-        }
+        width += marginWidth;
 
         // Calculate height
         int height = 2; // borders
-        if (padding != null) {
-            height += padding.verticalTotal();
-        }
+        height += effectivePadding.verticalTotal();
+        height += marginHeight;
 
         if (!children.isEmpty()) {
             // Content width for child height calculation
-            int paddingHorizontal = padding != null ? padding.horizontalTotal() : 0;
-            int contentWidth = availableWidth > 0 ? Math.max(1, availableWidth - 2 - paddingHorizontal) : -1;
+            int contentWidth = availableWidth > 0
+                    ? Math.max(1, availableWidth - 2 - effectivePadding.horizontalTotal() - marginWidth)
+                    : -1;
 
             if (effectiveDirection == Direction.VERTICAL) {
                 int totalSpacing = effectiveSpacing * Math.max(0, children.size() - 1);
@@ -569,11 +572,7 @@ public final class Panel extends ContainerElement<Panel> {
         // Get CSS resolver for property resolution
         CssStyleResolver cssResolver = context.resolveStyle(this).orElse(null);
 
-        // Resolve margin: programmatic > CSS > none
-        Margin effectiveMargin = this.margin;
-        if (effectiveMargin == null && cssResolver != null) {
-            effectiveMargin = cssResolver.margin().orElse(null);
-        }
+        Margin effectiveMargin = resolveMargin(cssResolver);
 
         // Apply margin to get the effective render area
         Rect effectiveArea = area;
@@ -598,13 +597,7 @@ public final class Panel extends ContainerElement<Panel> {
                 ? focusedBorderColor
                 : borderColor;
 
-        // Get padding: programmatic > CSS > none
-        Padding effectivePadding = this.padding;
-        if (effectivePadding == null && cssResolver != null) {
-            effectivePadding = cssResolver.padding().orElse(Padding.NONE);
-        } else if (effectivePadding == null) {
-            effectivePadding = Padding.NONE;
-        }
+        Padding effectivePadding = resolvePadding(cssResolver);
 
         // Build the block - CSS properties are resolved by the widget
         Block.Builder blockBuilder = Block.builder()
@@ -651,22 +644,14 @@ public final class Panel extends ContainerElement<Panel> {
         }
 
         // Resolve layout properties: programmatic > CSS > defaults
-        Direction effectiveDirection = this.direction;
-        if (effectiveDirection == null && cssResolver != null) {
-            effectiveDirection = cssResolver.direction().orElse(Direction.VERTICAL);
-        } else if (effectiveDirection == null) {
-            effectiveDirection = Direction.VERTICAL;
-        }
+        Direction effectiveDirection = resolveDirection(cssResolver);
 
         Flex effectiveFlex = this.flex;
         if (effectiveFlex == null && cssResolver != null) {
             effectiveFlex = cssResolver.flex().orElse(null);
         }
 
-        Integer effectiveSpacing = this.spacing;
-        if (effectiveSpacing == null && cssResolver != null) {
-            effectiveSpacing = cssResolver.spacing().orElse(null);
-        }
+        Integer effectiveSpacing = resolveSpacing(cssResolver);
 
         // Layout children using resolved direction, flex, and spacing
         List<Constraint> constraints = new ArrayList<>();
@@ -712,6 +697,58 @@ public final class Panel extends ContainerElement<Panel> {
             Rect childArea = areas.get(i);
             context.renderChild(child, frame, childArea);
         }
+    }
+
+    /**
+     * Resolves the margin: programmatic, then CSS, else none.
+     *
+     * @param cssResolver the CSS resolver for this panel, or null
+     * @return the margin, or null for none
+     */
+    private Margin resolveMargin(CssStyleResolver cssResolver) {
+        if (margin != null || cssResolver == null) {
+            return margin;
+        }
+        return cssResolver.margin().orElse(null);
+    }
+
+    /**
+     * Resolves the padding: programmatic, then CSS, else {@link Padding#NONE}.
+     *
+     * @param cssResolver the CSS resolver for this panel, or null
+     * @return the padding, never null
+     */
+    private Padding resolvePadding(CssStyleResolver cssResolver) {
+        if (padding != null) {
+            return padding;
+        }
+        return cssResolver != null ? cssResolver.padding().orElse(Padding.NONE) : Padding.NONE;
+    }
+
+    /**
+     * Resolves the layout direction: programmatic, then CSS, else {@link Direction#VERTICAL}.
+     *
+     * @param cssResolver the CSS resolver for this panel, or null
+     * @return the direction, never null
+     */
+    private Direction resolveDirection(CssStyleResolver cssResolver) {
+        if (direction != null) {
+            return direction;
+        }
+        return cssResolver != null ? cssResolver.direction().orElse(Direction.VERTICAL) : Direction.VERTICAL;
+    }
+
+    /**
+     * Resolves the spacing between children: programmatic, then CSS.
+     *
+     * @param cssResolver the CSS resolver for this panel, or null
+     * @return the spacing in cells, or null when neither sets it
+     */
+    private Integer resolveSpacing(CssStyleResolver cssResolver) {
+        if (spacing != null || cssResolver == null) {
+            return spacing;
+        }
+        return cssResolver.spacing().orElse(null);
     }
 
     /**
