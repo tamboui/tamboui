@@ -348,6 +348,66 @@ class EventParserTest {
         assertThat(keyEvent.hasAlt()).isTrue();
     }
 
+    @Test
+    @DisplayName("ESC ESC [ A is ESCAPE then UP, not the text \"[A\"")
+    void escEscFollowedBySequenceKeepsTheSequence() throws IOException {
+        // Alt+Up from a terminal that sends Alt as an ESC prefix, or Escape followed quickly by Up
+        QueueBackend backend = new QueueBackend(27, 27, '[', 'A');
+
+        KeyEvent first = (KeyEvent) EventParser.readEvent(backend, 0);
+        KeyEvent second = (KeyEvent) EventParser.readEvent(backend, 0);
+
+        assertThat(first.code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(second.code()).isEqualTo(KeyCode.UP);
+        assertThat(EventParser.readEvent(backend, 0)).isNull();
+    }
+
+    @Test
+    @DisplayName("Two quick Escape presses (ESC ESC) are two ESCAPE events")
+    void escEscIsTwoEscapes() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 27);
+
+        Event first = EventParser.readEvent(backend, 0);
+        Event second = EventParser.readEvent(backend, 0);
+
+        assertThat(first).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) first).code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(second).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) second).code()).isEqualTo(KeyCode.ESCAPE);
+    }
+
+    @Test
+    @DisplayName("Alt+Enter and Alt+Tab (ESC CR, ESC LF, ESC TAB) are the key with Alt")
+    void escControlKeyIsKeyWithAlt() throws IOException {
+        assertKeyWithAlt(new QueueBackend(27, '\r'), KeyCode.ENTER);
+        assertKeyWithAlt(new QueueBackend(27, '\n'), KeyCode.ENTER);
+        assertKeyWithAlt(new QueueBackend(27, '\t'), KeyCode.TAB);
+    }
+
+    private static void assertKeyWithAlt(QueueBackend backend, KeyCode expected) throws IOException {
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(expected);
+        assertThat(keyEvent.hasAlt()).isTrue();
+        assertThat(keyEvent.hasCtrl()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Ctrl+Alt+A (ESC 0x01) is 'a' with Ctrl and Alt")
+    void escCtrlLetterIsCtrlAltLetter() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 1);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.isChar('a')).isTrue();
+        assertThat(keyEvent.hasCtrl()).isTrue();
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
     // -- Arrow key CSI sequences (ESC [ A/B/C/D) --
 
     @Test
