@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
  */
 class ErrorPlaceholderTest extends AbstractElementTest {
 
+    private static final String CODER = "👩‍💻";
+
     @Test
     @DisplayName("from(Throwable, String) creates placeholder with element ID")
     void fromWithElementId() {
@@ -150,5 +152,38 @@ class ErrorPlaceholderTest extends AbstractElementTest {
         BufferAssertions.assertThat(buffer).at(0, 2).hasSymbol("└");
         // Bottom-right border corner
         BufferAssertions.assertThat(buffer).at(29, 2).hasSymbol("┘");
+    }
+
+    @Test
+    @DisplayName("render() cuts a long message at the right border, not drawing past the placeholder")
+    void renderCutsLongMessageAtRightBorder() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 40, 3));
+        Frame frame = Frame.forTesting(buffer);
+        RenderContext context = RenderContext.empty();
+
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(
+                new IllegalStateException("the price column expects a number"),
+                "prices"
+        );
+
+        placeholder.render(frame, new Rect(0, 0, 20, 3), context);
+
+        // the right border is kept and nothing is drawn right of the placeholder
+        BufferAssertions.assertThat(buffer).hasRow(1, "│! IllegalStateExce│                    ");
+    }
+
+    @Test
+    @DisplayName("render() keeps a ZWJ emoji at the right border whole, or leaves it out when it does not fit")
+    void renderCutsZwjEmojiAtRightBorder() {
+        // "! RuntimeException: a" takes 21 columns, the emoji the next two
+        ErrorPlaceholder placeholder = ErrorPlaceholder.from(new RuntimeException("a" + CODER + " is not a price"));
+
+        Buffer fits = Buffer.empty(new Rect(0, 0, 30, 3));
+        placeholder.render(Frame.forTesting(fits), new Rect(0, 0, 25, 3), RenderContext.empty());
+        BufferAssertions.assertThat(fits).hasRow(1, "│! RuntimeException: a" + CODER + "│     ");
+
+        Buffer oneColumnShort = Buffer.empty(new Rect(0, 0, 30, 3));
+        placeholder.render(Frame.forTesting(oneColumnShort), new Rect(0, 0, 24, 3), RenderContext.empty());
+        BufferAssertions.assertThat(oneColumnShort).hasRow(1, "│! RuntimeException: a │      ");
     }
 }
