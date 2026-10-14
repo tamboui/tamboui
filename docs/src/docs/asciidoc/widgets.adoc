@@ -522,6 +522,12 @@ A single-line text input field:
 include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=text-input]
 ----
 
+`TextEditing.handle` (from `tamboui-tui`) edits the state the way the toolkit's `textInput()` does.
+Typed characters are inserted whole, emoji and CJK included.
+Backspace, Delete, Left, Right, Home and End edit, and so do the keys the bindings bind to these actions, such as the emacs Ctrl+A and Ctrl+E.
+Other Ctrl and Alt keys are not inserted, and are left to the application: check its own keys, such as Enter, first.
+A paste goes in on one line.
+
 State methods:
 
 * `state.text()` - Get current text
@@ -541,6 +547,10 @@ A multi-line text input field with scrolling and optional line numbers:
 ----
 include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=text-area]
 ----
+
+For a text area, `TextEditing.handle` also inserts a line break on Enter and moves the cursor Up and Down.
+With `TextEditing.handle(state, event, overflow)`, Up and Down move by the rows on screen when the text area wraps.
+A paste keeps its line breaks, also when the terminal sends them as CR.
 
 State methods:
 

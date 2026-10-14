@@ -52,6 +52,7 @@ import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.TextEditing;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
 import dev.tamboui.widgets.form.FieldType;
@@ -1337,46 +1338,16 @@ public static SpinnerElement spinner(String... frames) {
     /**
      * Handles common key events for text input.
      * <p>
-     * Handles: character input, backspace, delete, left/right arrows, home/end.
+     * Handles: character input, backspace, delete, left/right arrows, home/end, and the keys
+     * the event's bindings bind to these actions, such as the emacs Ctrl+B and Ctrl+A.
+     * It delegates to {@link TextEditing}, which apps can also use without the toolkit.
      *
      * @param state the text input state to modify
      * @param event the key event to handle
      * @return true if the event was handled, false otherwise
      */
     public static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case HOME:
-                state.moveCursorToStart();
-                return true;
-            case END:
-                state.moveCursorToEnd();
-                return true;
-            case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
-                    return false;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                return false;
-        }
+        return TextEditing.handle(state, event);
     }
 
 }

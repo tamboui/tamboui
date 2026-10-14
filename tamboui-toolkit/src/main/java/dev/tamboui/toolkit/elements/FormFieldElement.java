@@ -18,6 +18,7 @@ import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.PasteEvent;
+import dev.tamboui.tui.event.TextEditing;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -615,7 +616,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     public EventResult handlePasteEvent(PasteEvent event) {
         if (fieldType == FieldType.TEXT || fieldType == FieldType.TEXT_AREA) {
             if (textState != null) {
-                textState.insert(event.text());
+                TextEditing.handle(textState, event);
                 if (!validators.isEmpty()) {
                     validateField();
                 }
