@@ -322,8 +322,49 @@ class TextElementTest extends AbstractElementTest {
         @Test
         @DisplayName("preferredHeight(width) calculates wrapped lines for WRAP_WORD")
         void wrapWordCalculation() {
-            // Same calculation as WRAP_CHARACTER for preferredHeight
+            // No spaces, so the text breaks by character
             TextElement element = text("12345678901234567890").overflow(Overflow.WRAP_WORD);
+            assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("preferredHeight(width) counts the rows WRAP_WORD wraps whole words into")
+        void wrapWordCountsWholeWords() {
+            // 19 columns, but each row ends before the word that does not fit
+            TextElement element = text("aaa bbb ccc ddd eee").overflow(Overflow.WRAP_WORD);
+            assertThat(element.preferredSize(6, -1, null).heightOr(0)).isEqualTo(5);
+        }
+
+        @Test
+        @DisplayName("preferredHeight(width) counts the continuation rows of an indented line under its indent")
+        void wrapCountsTheIndentOfContinuationRows() {
+            TextElement trace = text("    at org.apache.camel.processor.Pipeline.process(Pipeline.java:163)")
+                    .overflow(Overflow.WRAP_WORD);
+            assertThat(trace.preferredSize(24, -1, null).heightOr(0)).isEqualTo(5);
+
+            TextElement character = text("    abcdefghijklmnopqrstuvwx").overflow(Overflow.WRAP_CHARACTER);
+            assertThat(character.preferredSize(10, -1, null).heightOr(0)).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("a wrapped text rendered at its preferredHeight(width) shows its last row")
+        void preferredHeightShowsTheLastRow() {
+            TextElement trace = text("    at org.apache.camel.processor.Pipeline.process(Pipeline.java:163)")
+                    .overflow(Overflow.WRAP_WORD);
+            int height = trace.preferredSize(24, -1, null).heightOr(0);
+            Rect area = new Rect(0, 0, 24, height);
+            Buffer buffer = Buffer.empty(area);
+
+            trace.render(Frame.forTesting(buffer), area, RenderContext.empty());
+
+            assertThat(buffer.get(4, height - 1).symbol()).isEqualTo("3");
+            assertThat(buffer.get(5, height - 1).symbol()).isEqualTo(")");
+        }
+
+        @Test
+        @DisplayName("preferredHeight(width) counts the empty row after a trailing newline")
+        void wrapCountsATrailingNewline() {
+            TextElement element = text("abc\n").overflow(Overflow.WRAP_WORD);
             assertThat(element.preferredSize(10, -1, null).heightOr(0)).isEqualTo(2);
         }
 

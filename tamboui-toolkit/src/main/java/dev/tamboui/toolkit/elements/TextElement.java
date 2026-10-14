@@ -206,24 +206,17 @@ public final class TextElement extends StyledElement<TextElement> {
             return countLines();
         }
 
-        // For wrapping modes, calculate how many lines we'll need using display width
-        int totalLines = 0;
-        int start = 0;
-        for (int i = 0; i <= content.length(); i++) {
-            if (i == content.length() || content.charAt(i) == '\n') {
-                // Process this logical line
-                String lineContent = content.substring(start, i);
-                int lineDisplayWidth = CharWidth.of(lineContent);
-                if (lineDisplayWidth == 0) {
-                    totalLines++;
-                } else {
-                    // Calculate wrapped lines for this segment
-                    totalLines += (lineDisplayWidth + width - 1) / width;
-                }
-                start = i + 1;
-            }
+        // The rows the Paragraph that renders the text wraps it into, one line per \n-separated segment
+        String[] segments = content.split("\n", -1);
+        Line[] lines = new Line[segments.length];
+        for (int i = 0; i < segments.length; i++) {
+            lines[i] = Line.from(segments[i]);
         }
-        return Math.max(1, totalLines);
+        Paragraph paragraph = Paragraph.builder()
+                .text(Text.from(lines))
+                .overflow(effectiveOverflow)
+                .build();
+        return Math.max(1, paragraph.lineCount(width));
     }
 
     @Override
