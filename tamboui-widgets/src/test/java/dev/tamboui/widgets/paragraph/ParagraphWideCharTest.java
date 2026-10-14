@@ -220,6 +220,22 @@ class ParagraphWideCharTest {
         assertClusterStaysWhole("🇫🇷", Overflow.WRAP_WORD);
     }
 
+    @Test
+    @DisplayName("WRAP_WORD does not start a row with the space after a word that ends at the edge")
+    void wrapWordDropsTheSpaceAtTheEdgeBeforeAZwjSequence() {
+        Paragraph paragraph = Paragraph.builder()
+                .text(Text.from("family 👨‍👩‍👧"))
+                .overflow(Overflow.WRAP_WORD)
+                .build();
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 6, 2));
+        paragraph.render(buffer.area(), buffer);
+
+        Buffer expected = Buffer.empty(buffer.area());
+        expected.setString(0, 0, "family", Style.EMPTY);
+        expected.setString(0, 1, "👨‍👩‍👧", Style.EMPTY);
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
     private void assertClusterStaysWhole(String cluster, Overflow overflow) {
         Paragraph paragraph = Paragraph.builder()
                 .text(Text.from(cluster + "X"))

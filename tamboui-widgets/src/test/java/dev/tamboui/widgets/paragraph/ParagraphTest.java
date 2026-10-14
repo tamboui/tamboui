@@ -327,6 +327,42 @@ class ParagraphTest {
     }
 
     @Test
+    @DisplayName("WRAP_WORD keeps a word that ends right at the edge on its row")
+    void wrapWordKeepsAWordThatEndsAtTheEdge() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("first line wraps here"))
+            .overflow(Overflow.WRAP_WORD)
+            .build();
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "first line", Style.EMPTY);
+        expected.setString(0, 1, "wraps here", Style.EMPTY);
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("WRAP_WORD keeps a word that ends right at the edge on a continuation row under the indent")
+    void wrapWordKeepsAWordThatEndsAtTheEdgeUnderTheIndent() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("  - one two three four five"))
+            .overflow(Overflow.WRAP_WORD)
+            .build();
+        Rect area = new Rect(0, 0, 12, 4);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 0)).isEqualTo("  - one two");
+        assertThat(row(buffer, 1)).isEqualTo("  three four");
+        assertThat(row(buffer, 2)).isEqualTo("  five");
+        assertThat(row(buffer, 3)).isEmpty();
+    }
+
+    @Test
     @DisplayName("ELLIPSIS truncates with ellipsis at end")
     void ellipsisOverflow() {
         Paragraph paragraph = Paragraph.builder()
