@@ -97,6 +97,18 @@ public final class Line {
     }
 
     /**
+     * Creates a line from a string with ANSI escape sequences, such as a log line.
+     * <p>
+     * The string is parsed as by {@link Text#fromAnsi(String)}, except that line feeds are dropped.
+     *
+     * @param text the text with ANSI escape sequences
+     * @return a new line
+     */
+    public static Line fromAnsi(String text) {
+        return AnsiParser.parseLine(Objects.requireNonNull(text, "text"));
+    }
+
+    /**
      * Returns the display width of this line (sum of span widths).
      *
      * @return the display width in columns
