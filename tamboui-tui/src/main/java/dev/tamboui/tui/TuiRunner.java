@@ -34,7 +34,6 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.Actions;
-import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.ErrorAction;
 import dev.tamboui.tui.error.ErrorContext;
@@ -841,7 +840,6 @@ public final class TuiRunner implements AutoCloseable {
      */
     public static final class Builder {
         private TuiConfig.Builder configBuilder = TuiConfig.builder();
-        private Bindings bindings = BindingSets.defaults();
         private EventHandler eventHandler;
         private Renderer renderer;
         private boolean autoBindingRegistration;
@@ -851,12 +849,16 @@ public final class TuiRunner implements AutoCloseable {
 
         /**
          * Sets the bindings to use for action matching.
+         * <p>
+         * They apply to the key and mouse events the runner reads from the terminal,
+         * so that methods such as {@link KeyEvent#isUp()} follow them, and to the
+         * action handler created by {@link #autoBindingRegistration(boolean)}.
          *
          * @param bindings the bindings
          * @return this builder
          */
         public Builder bindings(Bindings bindings) {
-            this.bindings = bindings;
+            this.configBuilder.bindings(bindings);
             return this;
         }
 
@@ -1021,7 +1023,7 @@ public final class TuiRunner implements AutoCloseable {
 
             ActionHandler actionHandler = null;
             if (autoBindingRegistration && eventHandler != null) {
-                actionHandler = new ActionHandler(bindings)
+                actionHandler = new ActionHandler(config.bindings())
                         .registerAnnotated(eventHandler);
             }
 
