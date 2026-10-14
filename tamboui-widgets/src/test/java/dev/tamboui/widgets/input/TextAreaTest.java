@@ -15,8 +15,11 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.Line;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.Borders;
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
 import dev.tamboui.widgets.syntax.SyntaxTheme;
 import dev.tamboui.widgets.syntax.TokenType;
 
@@ -97,6 +100,74 @@ class TextAreaTest {
         assertThat(extractLineText(buffer, 0)).isEqualTo("\"str\"");
         Style string = SyntaxTheme.DEFAULTS.style(TokenType.STRING, Style.EMPTY);
         assertThat(buffer.get(0, 0).style().fg()).isEqualTo(string.fg());
+    }
+
+    @Test
+    @DisplayName("the text is highlighted again only after it changes")
+    void highlightsAgainOnlyAfterTheTextChanges() {
+        CountingHighlighter highlighter = new CountingHighlighter();
+        TextAreaState state = new TextAreaState("class A {}");
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 2));
+
+        // Like an app, build the widget for every frame; moving the cursor leaves the text as it is.
+        for (int frame = 0; frame < 3; frame++) {
+            state.moveCursorLeft();
+            TextArea.builder().highlighter(highlighter, "java").build().render(buffer.area(), buffer, state);
+        }
+        assertThat(highlighter.calls).isEqualTo(1);
+
+        state.moveCursorToStart();
+        state.insert("int x;\n");
+        TextArea.builder().highlighter(highlighter, "java").build().render(buffer.area(), buffer, state);
+
+        assertThat(highlighter.calls).isEqualTo(2);
+        assertThat(extractLineText(buffer, 0)).isEqualTo("int x;");
+        Style keyword = SyntaxTheme.DEFAULTS.style(TokenType.KEYWORD, Style.EMPTY);
+        assertThat(buffer.get(0, 0).style().fg()).isEqualTo(keyword.fg());
+    }
+
+    @Test
+    @DisplayName("a new language, theme or style highlights the text again, once")
+    void highlightsAgainOnceAfterTheSettingsChange() {
+        CountingHighlighter highlighter = new CountingHighlighter();
+        TextAreaState state = new TextAreaState("class A {}");
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 1));
+        SyntaxTheme red = SyntaxTheme.builder().token(TokenType.KEYWORD, Style.EMPTY.fg(Color.RED)).build();
+        Style blue = Style.EMPTY.bg(Color.BLUE);
+
+        for (int frame = 0; frame < 2; frame++) {
+            TextArea.builder().highlighter(highlighter, "java").build().render(buffer.area(), buffer, state);
+        }
+        for (int frame = 0; frame < 2; frame++) {
+            TextArea.builder().highlighter(highlighter, "kotlin").build().render(buffer.area(), buffer, state);
+        }
+        for (int frame = 0; frame < 2; frame++) {
+            TextArea.builder().highlighter(highlighter, "kotlin", red).build().render(buffer.area(), buffer, state);
+        }
+        for (int frame = 0; frame < 2; frame++) {
+            TextArea.builder().highlighter(highlighter, "kotlin", red).style(blue).build()
+                .render(buffer.area(), buffer, state);
+        }
+
+        assertThat(highlighter.calls).isEqualTo(4);
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
+        assertThat(buffer.get(0, 0).style().bg()).contains(Color.BLUE);
+    }
+
+    @Test
+    @DisplayName("a theme built again for every frame with the same styles does not highlight again")
+    void equalThemeBuiltPerFrameKeepsTheHighlight() {
+        CountingHighlighter highlighter = new CountingHighlighter();
+        TextAreaState state = new TextAreaState("class A {}");
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 1));
+
+        for (int frame = 0; frame < 3; frame++) {
+            SyntaxTheme theme = SyntaxTheme.builder().token(TokenType.KEYWORD, Style.EMPTY.fg(Color.RED)).build();
+            TextArea.builder().highlighter(highlighter, "java", theme).build().render(buffer.area(), buffer, state);
+        }
+
+        assertThat(highlighter.calls).isEqualTo(1);
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
     }
 
     @Test
@@ -315,6 +386,17 @@ class TextAreaTest {
             }
         }
         return sb.toString().replaceAll("\\s+$", "");
+    }
+
+    /** Highlights with the built-in highlighter and counts how often it is asked to. */
+    private static final class CountingHighlighter implements SyntaxHighlighter {
+        private int calls;
+
+        @Override
+        public List<Line> highlight(String code, String language, Style base, SyntaxTheme theme) {
+            calls++;
+            return RegexSyntaxHighlighter.defaults().highlight(code, language, base, theme);
+        }
     }
 
     private String extractLineText(Buffer buffer, int y) {

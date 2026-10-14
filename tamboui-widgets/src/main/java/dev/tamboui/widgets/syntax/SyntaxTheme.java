@@ -4,6 +4,7 @@
  */
 package dev.tamboui.widgets.syntax;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import dev.tamboui.style.Color;
@@ -16,7 +17,8 @@ import dev.tamboui.style.Style;
  * style the theme does not override falls back to the enclosing code-block
  * style.
  *
- * <p>An instance is immutable and can be shared. {@link #builder()} starts with
+ * <p>An instance is immutable and can be shared; two themes with the same
+ * token styles are equal. {@link #builder()} starts with
  * the default palette; customize entries with {@link Builder#token(TokenType, Style)}
  * or remove them with {@link Builder#clear(TokenType)} so those tokens inherit
  * the enclosing style:
@@ -66,6 +68,22 @@ public final class SyntaxTheme {
     public Style style(TokenType type, Style fallback) {
         Style overridden = tokenStyles[type.ordinal()];
         return overridden != null ? fallback.patch(overridden) : fallback;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SyntaxTheme)) {
+            return false;
+        }
+        return Arrays.equals(tokenStyles, ((SyntaxTheme) o).tokenStyles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(tokenStyles);
     }
 
     /**

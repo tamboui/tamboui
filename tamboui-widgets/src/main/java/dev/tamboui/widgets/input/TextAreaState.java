@@ -7,10 +7,15 @@ package dev.tamboui.widgets.input;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import dev.tamboui.style.Overflow;
+import dev.tamboui.style.Style;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.GraphemeClusters;
+import dev.tamboui.text.Line;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxTheme;
 
 /**
  * State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
@@ -32,6 +37,14 @@ public final class TextAreaState {
     private int cachedWidth;
     private Overflow cachedOverflow;
     private int cachedVersion = -1;
+
+    // Cached result of the most recent highlightedLines() call.
+    private List<Line> cachedHighlight;
+    private SyntaxHighlighter cachedHighlighter;
+    private String cachedLanguage;
+    private Style cachedBaseStyle;
+    private SyntaxTheme cachedTheme;
+    private int cachedHighlightVersion = -1;
 
     /** Creates a new empty text area state. */
     public TextAreaState() {
@@ -532,6 +545,28 @@ public final class TextAreaState {
         cachedOverflow = overflow;
         cachedVersion = textVersion;
         return cachedRows;
+    }
+
+    /**
+     * Returns the text highlighted by {@code highlighter}, one line per logical line. The result is
+     * kept and returned again until the text, the highlighter, the language, the base style or the
+     * theme changes, so {@link TextArea} can ask for it on every render without highlighting the
+     * whole text each time.
+     */
+    List<Line> highlightedLines(SyntaxHighlighter highlighter, String language, Style base, SyntaxTheme theme) {
+        if (cachedHighlightVersion != textVersion
+                || !Objects.equals(cachedHighlighter, highlighter)
+                || !Objects.equals(cachedLanguage, language)
+                || !Objects.equals(cachedBaseStyle, base)
+                || !Objects.equals(cachedTheme, theme)) {
+            cachedHighlight = Collections.unmodifiableList(highlighter.highlight(text(), language, base, theme));
+            cachedHighlighter = highlighter;
+            cachedLanguage = language;
+            cachedBaseStyle = base;
+            cachedTheme = theme;
+            cachedHighlightVersion = textVersion;
+        }
+        return cachedHighlight;
     }
 
     // Both wrap modes step by grapheme cluster, measured as a whole, so a ZWJ sequence or a

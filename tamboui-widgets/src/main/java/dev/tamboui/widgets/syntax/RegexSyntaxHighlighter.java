@@ -62,11 +62,14 @@ public final class RegexSyntaxHighlighter implements SyntaxHighlighter {
      * Returns the highlighter covering the built-in languages: Java, Kotlin,
      * JavaScript, TypeScript, Python, JSON, XML/HTML, CSS, Bash/Shell, YAML,
      * properties, SQL, Go and Rust, each with its common aliases.
+     * <p>
+     * Every call returns the same immutable instance, so a widget built for
+     * each frame can tell that its highlighter did not change.
      *
      * @return the default highlighter
      */
     public static RegexSyntaxHighlighter defaults() {
-        return new RegexSyntaxHighlighter(DefaultGrammarsHolder.GRAMMARS, DEFAULT_MAX_LINE_LENGTH);
+        return DefaultGrammarsHolder.DEFAULTS;
     }
 
     /**
@@ -341,6 +344,8 @@ public final class RegexSyntaxHighlighter implements SyntaxHighlighter {
 
     private static final class DefaultGrammarsHolder {
         private static final List<Grammar> GRAMMARS = createDefaultGrammars();
+        private static final RegexSyntaxHighlighter DEFAULTS =
+            new RegexSyntaxHighlighter(GRAMMARS, DEFAULT_MAX_LINE_LENGTH);
 
         private DefaultGrammarsHolder() {
         }
