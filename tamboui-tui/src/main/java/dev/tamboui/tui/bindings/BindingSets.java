@@ -215,6 +215,10 @@ public final class BindingSets {
     /**
      * Loads bindings from a properties file.
      * <p>
+     * The loaded bindings are based on the {@link #standard()} bindings. An action listed
+     * in the file gets exactly the triggers listed for it, replacing its standard triggers;
+     * actions the file does not list keep their standard triggers.
+     * <p>
      * The file format uses standard Java properties:
      * <pre>{@code
      * # Navigation
@@ -258,8 +262,9 @@ public final class BindingSets {
     /**
      * Loads bindings from an input stream containing properties.
      * <p>
-     * The loaded bindings will be based on the standard bindings,
-     * with properties overriding/adding to them.
+     * The loaded bindings are based on the {@link #standard()} bindings. An action listed
+     * in the properties gets exactly the triggers listed for it, replacing its standard
+     * triggers; actions not listed keep their standard triggers.
      *
      * @param input the input stream
      * @return the loaded bindings
@@ -272,6 +277,9 @@ public final class BindingSets {
 
     /**
      * Loads bindings from an input stream, starting with the given base bindings.
+     * <p>
+     * An action listed in the properties gets exactly the triggers listed for it, replacing
+     * its triggers in {@code base}; actions not listed keep their triggers from {@code base}.
      *
      * @param input the input stream
      * @param base  the base bindings to extend (null for empty)
@@ -326,6 +334,8 @@ public final class BindingSets {
             String bindingsStr = props.getProperty(actionName);
             String[] parts = bindingsStr.split(",");
 
+            // The listed triggers replace the base triggers of this action
+            builder.unbind(actionName);
             for (String part : parts) {
                 builder.bind(parseTrigger(part.trim()), actionName);
             }

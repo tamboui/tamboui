@@ -568,6 +568,43 @@ class BindingsTest {
     }
 
     @Test
+    @DisplayName("Emacs bindings quit on Ctrl+C but not on q")
+    void emacsBindingsQuitOnCtrlCButNotOnQ() {
+        assertQuitsOnlyOnCtrlC(BindingSets.emacs());
+    }
+
+    @Test
+    @DisplayName("IntelliJ bindings quit on Ctrl+C but not on q")
+    void intellijBindingsQuitOnCtrlCButNotOnQ() {
+        assertQuitsOnlyOnCtrlC(BindingSets.intellij());
+    }
+
+    @Test
+    @DisplayName("VSCode bindings quit on Ctrl+C but not on q")
+    void vscodeBindingsQuitOnCtrlCButNotOnQ() {
+        assertQuitsOnlyOnCtrlC(BindingSets.vscode());
+    }
+
+    @Test
+    @DisplayName("Vim bindings keep the standard quit keys")
+    void vimBindingsKeepStandardQuitKeys() {
+        Bindings bindings = BindingSets.vim();
+
+        assertThat(KeyEvent.ofChar('q', bindings).isQuit()).isTrue();
+        assertThat(bindings.describeBindings(Actions.QUIT)).isEqualTo("q, Q, Ctrl+c");
+    }
+
+    @Test
+    @DisplayName("Binding sets list each trigger of an action once")
+    void bindingSetsListEachTriggerOnce() {
+        assertEachTriggerOnce("standard", BindingSets.standard());
+        assertEachTriggerOnce("vim", BindingSets.vim());
+        assertEachTriggerOnce("emacs", BindingSets.emacs());
+        assertEachTriggerOnce("intellij", BindingSets.intellij());
+        assertEachTriggerOnce("vscode", BindingSets.vscode());
+    }
+
+    @Test
     @DisplayName("defaults() returns standard bindings")
     void defaultsReturnsStandardBindings() {
         Bindings bindings = BindingSets.defaults();
@@ -592,5 +629,20 @@ class BindingsTest {
         MouseEvent mouseEvent = MouseEvent.press(MouseButton.LEFT, 0, 0);
 
         assertThat(trigger.matches(mouseEvent)).isFalse();
+    }
+
+    private static void assertQuitsOnlyOnCtrlC(Bindings bindings) {
+        assertThat(bindings.describeBindings(Actions.QUIT)).isEqualTo("Ctrl+c");
+        assertThat(KeyEvent.ofChar('q', bindings).isQuit()).as("q quits").isFalse();
+        assertThat(KeyEvent.ofChar('Q', bindings).isQuit()).as("Q quits").isFalse();
+        assertThat(KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings).isQuit()).as("Ctrl+c quits").isTrue();
+    }
+
+    private static void assertEachTriggerOnce(String name, Bindings bindings) {
+        for (String action : ((DefaultBindings) bindings).actions()) {
+            assertThat(bindings.triggersFor(action))
+                .as("%s %s", name, action)
+                .doesNotHaveDuplicates();
+        }
     }
 }

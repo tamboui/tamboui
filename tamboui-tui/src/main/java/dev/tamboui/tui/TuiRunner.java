@@ -364,8 +364,8 @@ public final class TuiRunner implements AutoCloseable {
         if (event instanceof KeyEvent) {
             KeyEvent keyEvent = (KeyEvent) event;
 
-            // Quit on 'q' or Escape
-            if (keyEvent.isQuit() || keyEvent.code() == KeyCode.ESCAPE) {
+            // Quit on the quit keys, Escape, or 'q' as the footer says (whatever the bindings)
+            if (keyEvent.isQuit() || keyEvent.isCharIgnoreCase('q') || keyEvent.code() == KeyCode.ESCAPE) {
                 quit();
                 return;
             }
