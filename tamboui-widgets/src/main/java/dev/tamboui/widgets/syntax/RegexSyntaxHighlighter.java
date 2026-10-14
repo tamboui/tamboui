@@ -164,7 +164,11 @@ public final class RegexSyntaxHighlighter implements SyntaxHighlighter {
         for (int r = 0; r < rules.size(); r++) {
             Grammar.Rule rule = rules.get(r);
             if (!rule.multiline()) {
-                matchers[r] = rule.pattern().matcher(code).useTransparentBounds(true);
+                // Each match runs in a region starting at the current position. With the default
+                // anchoring bounds, ^ would match at every region start, so it would match anywhere.
+                matchers[r] = rule.pattern().matcher(code)
+                    .useTransparentBounds(true)
+                    .useAnchoringBounds(false);
             }
         }
         int i = 0;
@@ -614,8 +618,12 @@ public final class RegexSyntaxHighlighter implements SyntaxHighlighter {
         b.rule(singleString());
         b.rule(Grammar.Rule.pattern(TokenType.NUMBER, Pattern.compile(NUMBERS)));
         b.rule(words("true false null yes no on off NULL TRUE FALSE"));
+        // A key is a name followed by ':' and a space or the line end, as in highlight.js, whether it
+        // starts the line or follows "- " or "{". The ':' in a value such as timer:tick or http://host is
+        // not a key. A name never starts inside another one, so a long value is scanned once, not once
+        // per character.
         b.rule(Grammar.Rule.pattern(TokenType.KEYWORD,
-            Pattern.compile("^\\s*[A-Za-z_][-A-Za-z0-9_.]*\\s*:", Pattern.MULTILINE)));
+            Pattern.compile("[ \\t]*+(?<![-A-Za-z0-9_.])[A-Za-z_][-A-Za-z0-9_.]*+[ \\t]*+:(?=\\s|$)")));
         b.rule(Grammar.Rule.pattern(TokenType.OPERATOR, Pattern.compile(":|[-]")));
         b.rule(Grammar.Rule.pattern(TokenType.PUNCTUATION, Pattern.compile("[\\-\\[\\]{},]")));
         return b.build();
