@@ -14,7 +14,10 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.widgets.input.TextInputState;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,5 +81,44 @@ class TextInputElementTest extends AbstractElementTest {
         textInput().placeholder("Enter...").rounded().render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.YELLOW);
+    }
+
+    @Test
+    @DisplayName("A focused border color alone leaves room for the border, so the text stays visible when focused")
+    void focusedBorderColorAlone_keepsTextVisibleWhenFocused() {
+        Buffer buffer = renderAboveNext(
+            textInput(new TextInputState("hello")).id("ti").focusedBorderColor(Color.CYAN), "ti");
+
+        assertThat(buffer).hasContent(
+            "┌──────────────────┐",
+            "│hello             │",
+            "└──────────────────┘",
+            "next                ");
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Test
+    @DisplayName("A border color alone leaves room for the border it draws")
+    void borderColorAlone_leavesRoomForTheBorder() {
+        Buffer buffer = renderAboveNext(
+            textInput(new TextInputState("hello")).borderColor(Color.CYAN), null);
+
+        assertThat(buffer).hasContent(
+            "┌──────────────────┐",
+            "│hello             │",
+            "└──────────────────┘",
+            "next                ");
+    }
+
+    /** Renders the element above a "next" text in a 20x4 column, with the given element id focused. */
+    private static Buffer renderAboveNext(Element element, String focusedId) {
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        if (focusedId != null) {
+            context.focusManager().setFocus(focusedId);
+        }
+        Rect area = new Rect(0, 0, 20, 4);
+        Buffer buffer = Buffer.empty(area);
+        column(element, text("next")).render(Frame.forTesting(buffer), area, context);
+        return buffer;
     }
 }
