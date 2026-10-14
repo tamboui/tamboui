@@ -192,6 +192,79 @@ class DialogElementTest extends AbstractElementTest {
         assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(30);
     }
 
+    @Test
+    @DisplayName("preferredWidth() measures a wide-character title by display width")
+    void preferredWidth_wideCharTitle() {
+        DialogElement dialog = dialog("設定ファイルを削除しますか");  // 13 characters, 26 cells
+        // max(minWidth=20, titleWidth=26) + padding*2 (4) + borders (2) = 32
+        assertThat(dialog.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(32);
+    }
+
+    // ============ rendered width tests ============
+
+    @Test
+    @DisplayName("Dialog is drawn with its preferred width")
+    void render_widthMatchesPreferredWidth() {
+        DialogElement[] dialogs = {
+            dialog(),
+            dialog("Confirm", text("Delete file?")),
+            dialog("This is a very long dialog title", text("x")),
+            dialog(text("Yes"), text("No"), text("Cancel")).horizontal().spacing(2).minWidth(10),
+            dialog(text("A")).padding(5)
+        };
+        for (int i = 0; i < dialogs.length; i++) {
+            Buffer buffer = renderDialog(dialogs[i], 60, 10);
+
+            assertThat(boxWidth(buffer))
+                .as("drawn width of dialog %d", i)
+                .isEqualTo(dialogs[i].preferredSize(-1, -1, null).widthOr(0));
+        }
+    }
+
+    @Test
+    @DisplayName("Dialog shows content wider than minWidth in full")
+    void render_wideContentShownInFull() {
+        Buffer buffer = renderDialog(dialog(text("This is a very long line that exceeds minWidth")), 60, 5);
+
+        // Preferred width 52, centered in 60 columns
+        assertThat(buffer).hasContent(
+            "                                                            ",
+            "    ┌──────────────────────────────────────────────────┐    ",
+            "    │This is a very long line that exceeds minWidth    │    ",
+            "    └──────────────────────────────────────────────────┘    ",
+            "                                                            "
+        );
+    }
+
+    @Test
+    @DisplayName("Dialog shows a wide-character title in full")
+    void render_wideCharTitleShownInFull() {
+        Buffer buffer = renderDialog(dialog("設定ファイルを削除しますか", text("OK")), 40, 5);
+
+        // Preferred width 32: the 26-cell title, 4 padding cells and 2 borders
+        assertThat(buffer).hasContent(
+            "                                        ",
+            "    ┌設定ファイルを削除しますか────┐    ",
+            "    │OK                            │    ",
+            "    └──────────────────────────────┘    ",
+            "                                        "
+        );
+    }
+
+    @Test
+    @DisplayName("Dialog wider than the area is clamped to the area")
+    void render_widerThanAreaIsClamped() {
+        Buffer buffer = renderDialog(dialog(text("This is a very long line that exceeds minWidth")), 30, 5);
+
+        assertThat(buffer).hasContent(
+            "                              ",
+            "┌────────────────────────────┐",
+            "│This is a very long line tha│",
+            "└────────────────────────────┘",
+            "                              "
+        );
+    }
+
     // ============ height calculation tests ============
 
     @Test
@@ -314,6 +387,28 @@ class DialogElementTest extends AbstractElementTest {
 
         // Height = borders (2) + children (3) + spacing (2 gaps * 1) = 7
         assertThat(bottomY - topY + 1).isEqualTo(7);
+    }
+
+    private Buffer renderDialog(DialogElement dialog, int width, int height) {
+        Rect area = new Rect(0, 0, width, height);
+        Buffer buffer = Buffer.empty(area);
+        dialog.render(Frame.forTesting(buffer), area, DefaultRenderContext.createEmpty());
+        return buffer;
+    }
+
+    private int boxWidth(Buffer buffer) {
+        int y = findTopBorder(buffer, buffer.area());
+        int left = -1;
+        int right = -1;
+        for (int x = 0; x < buffer.width(); x++) {
+            String symbol = buffer.get(x, y).symbol();
+            if ("┌".equals(symbol)) {
+                left = x;
+            } else if ("┐".equals(symbol)) {
+                right = x;
+            }
+        }
+        return right - left + 1;
     }
 
     private int findTopBorder(Buffer buffer, Rect area) {

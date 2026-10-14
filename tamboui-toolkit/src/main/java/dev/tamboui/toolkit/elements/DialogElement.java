@@ -20,6 +20,7 @@ import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.toolkit.element.ContainerElement;
@@ -351,8 +352,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
                 }
             }
 
-            // Calculate title width (same logic as calculateWidth private method)
-            int titleWidth = title != null ? title.length() : 0;
+            int titleWidth = title != null ? CharWidth.of(title) : 0;
             int contentWidth = Math.max(Math.max(minWidth, titleWidth), childrenWidth);
 
             // Add padding (left and right) and borders (2)
@@ -380,13 +380,10 @@ public final class DialogElement extends ContainerElement<DialogElement> {
             return;
         }
 
-        // Calculate dialog dimensions
-        int dialogWidth = calculateWidth(area);
-        int dialogHeight = calculateHeight();
-
-        // Ensure dialog fits in available area
-        dialogWidth = Math.min(dialogWidth, area.width());
-        dialogHeight = Math.min(dialogHeight, area.height());
+        // Use the preferred size, clamped to the available area
+        Size size = preferredSize(area.width(), area.height(), context);
+        int dialogWidth = Math.min(size.width(), area.width());
+        int dialogHeight = Math.min(size.height(), area.height());
 
         // Center the dialog
         int x = (area.width() - dialogWidth) / 2;
@@ -487,16 +484,6 @@ public final class DialogElement extends ContainerElement<DialogElement> {
         for (int i = 0; i < children.size() && i < areas.size(); i++) {
             context.renderChild(children.get(i), frame, areas.get(i));
         }
-    }
-
-    private int calculateWidth(Rect area) {
-        if (fixedWidth != null) {
-            return fixedWidth;
-        }
-
-        // Calculate based on title and minimum
-        int titleWidth = title != null ? title.length() + 4 : 0;
-        return Math.max(minWidth, titleWidth) + padding * 2;
     }
 
     private int calculateHeight() {
