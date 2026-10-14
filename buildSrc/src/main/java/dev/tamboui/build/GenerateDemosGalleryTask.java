@@ -252,11 +252,16 @@ public abstract class GenerateDemosGalleryTask extends DefaultTask {
             // Use passthrough block to embed the asciinema player
             sb.append("++++\n");
             sb.append("<div id=\"player-").append(demo.id()).append("\" class=\"demo-player\"></div>\n");
-            sb.append("<script>\n");
+            // Module script so we can import the wterm (libghostty) terminal backend,
+            // which gives full emoji/ZWJ/grapheme shaping. Swap to wtermBackend() for the
+            // lighter built-in core, or drop terminalBackend entirely to use default avt.
+            sb.append("<script type=\"module\">\n");
+            sb.append("import { wtermBackend } from './_static/asciinema/wterm-backend.js';\n");
             sb.append("AsciinemaPlayer.create('").append(castBasePath).append("/")
                     .append(demo.castFileName()).append("', document.getElementById('player-")
                     .append(demo.id()).append("'), {\n");
-            sb.append("    autoPlay: true, terminalLineHeight: 1, loop: true, fit: 'width'\n");
+            sb.append("    autoPlay: true, terminalLineHeight: 1, loop: true, fit: 'width',\n");
+            sb.append("    terminalBackend: wtermBackend({ ghostty: true })\n");
             sb.append("});\n");
             sb.append("</script>\n");
             sb.append("++++\n\n");
