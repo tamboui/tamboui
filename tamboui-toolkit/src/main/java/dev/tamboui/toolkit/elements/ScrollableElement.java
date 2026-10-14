@@ -271,7 +271,9 @@ public final class ScrollableElement extends ContainerElement<ScrollableElement>
 
         frame.renderStatefulWidget(scrollbar, scrollbarArea, state);
 
-        Layout layout = Layout.vertical().constraints(constraints.toArray(new Constraint[0]));
+        List<Constraint> visibleConstraints =
+            constraints.subList(startingPosition, startingPosition + visibleChildren.size());
+        Layout layout = Layout.vertical().constraints(visibleConstraints.toArray(new Constraint[0]));
         List<Rect> areas = layout.split(innerArea);
 
         // Render children
