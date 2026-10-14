@@ -5,11 +5,15 @@
 package dev.tamboui.css.parser;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import dev.tamboui.css.cascade.CascadeResolver;
 import dev.tamboui.css.model.PropertyValue;
 import dev.tamboui.css.model.Rule;
 import dev.tamboui.css.model.Stylesheet;
 import dev.tamboui.css.selector.*;
+import dev.tamboui.style.PropertyDefinition;
 
 /**
  * Recursive descent parser for Textual-style CSS.
@@ -33,6 +37,13 @@ import dev.tamboui.css.selector.*;
  */
 public final class CssParser {
 
+    private static final Pattern PERCENT_PATTERN = Pattern.compile("(\\d+)%");
+    private static final Pattern FR_PATTERN = Pattern.compile("(\\d+)fr");
+    private static final Pattern RGB_PATTERN = Pattern.compile("rgb\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)");
+    private static final Pattern INDEXED_PATTERN = Pattern.compile("indexed\\s*\\(\\s*(\\d+)\\s*\\)");
+    private static final Pattern RATIO_PATTERN = Pattern.compile("(\\d+)\\s*/\\s*(\\d+)");
+    private static final Pattern FUNC_PATTERN = Pattern.compile("(min|max|fill)\\s*\\(\\s*(\\d+)\\s*\\)");
+
     private final List<Token> tokens;
     private int pos;
     private int ruleOrder;
@@ -51,10 +62,271 @@ public final class CssParser {
      * @throws CssParseException if parsing fails
      */
     public static Stylesheet parse(String css) {
+        return parse(css, false);
+    }
+
+    /**
+     * Parses CSS input into a stylesheet, optionally validating declarations in strict mode.
+     *
+     * @param css    the CSS source code
+     * @param strict if true, validates all declarations and throws {@link CssParseException} on errors
+     * @return the parsed stylesheet
+     * @throws CssParseException if parsing fails or if strict validation fails
+     */
+    public static Stylesheet parse(String css, boolean strict) {
         CssLexer lexer = new CssLexer(css);
         List<Token> tokens = lexer.tokenizeFiltered();
         CssParser parser = new CssParser(tokens);
-        return parser.parseStylesheet();
+        Stylesheet stylesheet = parser.parseStylesheet();
+        if (strict) {
+            List<CssDiagnostic> diagnostics = validate(stylesheet);
+            if (!diagnostics.isEmpty()) {
+                CssDiagnostic first = diagnostics.get(0);
+                throw new CssParseException(
+                        "CSS validation failed: " + first.reason() + " (" + diagnostics.size() + " problem(s))",
+                        first.position(),
+                        diagnostics);
+            }
+        }
+        return stylesheet;
+    }
+
+    /**
+     * Parses and validates CSS source code, returning diagnostics for any invalid declarations.
+     *
+     * @param css the CSS source code
+     * @return an unmodifiable list of diagnostics (empty if valid)
+     * @throws CssParseException if syntax parsing fails
+     */
+    public static List<CssDiagnostic> validate(String css) {
+        return validate(parse(css, false));
+    }
+
+    /**
+     * Validates a parsed stylesheet and collects diagnostics for invalid declarations.
+     *
+     * @param stylesheet the stylesheet to validate
+     * @return an unmodifiable list of diagnostics (empty if valid)
+     */
+    public static List<CssDiagnostic> validate(Stylesheet stylesheet) {
+        Objects.requireNonNull(stylesheet, "stylesheet cannot be null");
+        List<CssDiagnostic> diagnostics = new ArrayList<>();
+        Map<String, String> variables = stylesheet.variables();
+
+        for (Rule rule : stylesheet.rules()) {
+            Selector selector = rule.selector();
+            for (Map.Entry<String, PropertyValue> entry : rule.declarations().entrySet()) {
+                String property = entry.getKey();
+                PropertyValue pv = entry.getValue();
+                String rawValue = pv.raw();
+                Token.Position pos = pv.position();
+
+                if (pv.isInherit()) {
+                    continue;
+                }
+
+                // Check for unresolved variables
+                Set<String> unresolvedVars = new LinkedHashSet<>();
+                String resolvedValue = fullyResolveVariables(rawValue, variables, unresolvedVars);
+                if (!unresolvedVars.isEmpty()) {
+                    for (String varName : unresolvedVars) {
+                        diagnostics.add(new CssDiagnostic(
+                                selector,
+                                pos,
+                                property,
+                                rawValue,
+                                "unresolved variable: '$" + varName + "' in '" + rawValue + "'",
+                                CssDiagnostic.Kind.UNRESOLVED_VARIABLE));
+                    }
+                    continue;
+                }
+
+                // Check for unknown property
+                Optional<PropertyDefinition<?>> propDef = CascadeResolver.findProperty(property);
+                if (!propDef.isPresent()) {
+                    diagnostics.add(new CssDiagnostic(
+                            selector,
+                            pos,
+                            property,
+                            rawValue,
+                            "unknown property: '" + property + "'",
+                            CssDiagnostic.Kind.UNKNOWN_PROPERTY));
+                    continue;
+                }
+
+                // Validate property conversion
+                boolean converted = false;
+                String errorMsg = null;
+                try {
+                    Optional<?> res = propDef.get().convert(resolvedValue);
+                    converted = res.isPresent();
+                } catch (RuntimeException e) {
+                    converted = false;
+                    errorMsg = e.getMessage();
+                }
+
+                if (!converted) {
+                    if (isOutOfRange(resolvedValue)) {
+                        diagnostics.add(new CssDiagnostic(
+                                selector,
+                                pos,
+                                property,
+                                rawValue,
+                                "out-of-range: value '" + rawValue + "' is out of range for property '" + property + "'",
+                                CssDiagnostic.Kind.OUT_OF_RANGE));
+                    } else {
+                        String reason = "unconvertible: cannot convert value '" + rawValue + "' for property '" + property + "'";
+                        if (errorMsg != null && !errorMsg.isEmpty()) {
+                            reason += " (" + errorMsg + ")";
+                        }
+                        diagnostics.add(new CssDiagnostic(
+                                selector,
+                                pos,
+                                property,
+                                rawValue,
+                                reason,
+                                CssDiagnostic.Kind.UNCONVERTIBLE_VALUE));
+                    }
+                }
+            }
+        }
+
+        return Collections.unmodifiableList(diagnostics);
+    }
+
+    private static String fullyResolveVariables(String value, Map<String, String> variables, Set<String> unresolvedOut) {
+        if (value == null || !value.contains("$")) {
+            return value;
+        }
+        String current = value;
+        for (int i = 0; i < 10; i++) {
+            Matcher matcher = dev.tamboui.css.property.PropertyConverter.VAR_PATTERN.matcher(current);
+            if (!matcher.find()) {
+                break;
+            }
+            matcher.reset();
+            StringBuilder sb = new StringBuilder();
+            int lastEnd = 0;
+            boolean replacedAny = false;
+            while (matcher.find()) {
+                sb.append(current, lastEnd, matcher.start());
+                String name = matcher.group(1);
+                if (variables.containsKey(name)) {
+                    sb.append(variables.get(name));
+                    replacedAny = true;
+                } else {
+                    sb.append(matcher.group(0));
+                    unresolvedOut.add(name);
+                }
+                lastEnd = matcher.end();
+            }
+            sb.append(current.substring(lastEnd));
+            current = sb.toString();
+            if (!replacedAny) {
+                break;
+            }
+        }
+        return current;
+    }
+
+    /**
+     * Determines whether a CSS value string represents a recognized syntax with out-of-range
+     * values (such as rgb components &gt; 255, percentage &gt; 100%, division by zero, or integer overflow).
+     *
+     * @param value the CSS value to inspect
+     * @return true if the value is syntactically an out-of-range value
+     */
+    public static boolean isOutOfRange(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return false;
+        }
+        String trimmed = value.trim().toLowerCase();
+
+        // 1. Percentage: e.g. "150%" or "99999999999%"
+        Matcher percentMatcher = PERCENT_PATTERN.matcher(trimmed);
+        if (percentMatcher.matches()) {
+            try {
+                int p = Integer.parseInt(percentMatcher.group(1));
+                if (p > 100) {
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                return true;
+            }
+        }
+
+        // 2. FR pattern overflow: e.g. "99999999999fr"
+        Matcher frMatcher = FR_PATTERN.matcher(trimmed);
+        if (frMatcher.matches()) {
+            try {
+                Integer.parseInt(frMatcher.group(1));
+            } catch (NumberFormatException e) {
+                return true;
+            }
+        }
+
+        // 3. RGB function: e.g. "rgb(300, 0, 0)" or "rgb(0, 0, 99999999999)"
+        Matcher rgbMatcher = RGB_PATTERN.matcher(trimmed);
+        if (rgbMatcher.matches()) {
+            for (int i = 1; i <= 3; i++) {
+                try {
+                    int c = Integer.parseInt(rgbMatcher.group(i));
+                    if (c > 255 || c < 0) {
+                        return true;
+                    }
+                } catch (NumberFormatException e) {
+                    return true;
+                }
+            }
+        }
+
+        // 4. Indexed color: e.g. "indexed(300)" or "indexed(99999999999)"
+        Matcher indexedMatcher = INDEXED_PATTERN.matcher(trimmed);
+        if (indexedMatcher.matches()) {
+            try {
+                int idx = Integer.parseInt(indexedMatcher.group(1));
+                if (idx > 255 || idx < 0) {
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                return true;
+            }
+        }
+
+        // 5. Ratio: e.g. "1/0" or "1/99999999999"
+        Matcher ratioMatcher = RATIO_PATTERN.matcher(trimmed);
+        if (ratioMatcher.matches()) {
+            try {
+                int denom = Integer.parseInt(ratioMatcher.group(2));
+                if (denom == 0) {
+                    return true;
+                }
+                Integer.parseInt(ratioMatcher.group(1));
+            } catch (NumberFormatException e) {
+                return true;
+            }
+        }
+
+        // 6. Function overflow: e.g. "fill(99999999999)", "min(99999999999)", "max(99999999999)"
+        Matcher funcMatcher = FUNC_PATTERN.matcher(trimmed);
+        if (funcMatcher.matches()) {
+            try {
+                Integer.parseInt(funcMatcher.group(2));
+            } catch (NumberFormatException e) {
+                return true;
+            }
+        }
+
+        // 7. Plain integer overflow: e.g. "99999999999"
+        if (trimmed.matches("-?\\d+")) {
+            try {
+                Integer.parseInt(trimmed);
+            } catch (NumberFormatException e) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Stylesheet parseStylesheet() {
@@ -188,7 +460,7 @@ public final class CssParser {
 
         String trimmedValue = value.toString().trim();
         declarations.put(property.value(),
-                new PropertyValue(trimmedValue, important));
+                new PropertyValue(trimmedValue, important, property.position()));
     }
 
     private Selector parseSelector() {
