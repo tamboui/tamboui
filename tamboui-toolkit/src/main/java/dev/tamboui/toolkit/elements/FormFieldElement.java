@@ -632,21 +632,28 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         }
 
         // Handle based on field type
+        EventResult result;
         switch (fieldType) {
             case TEXT:
             case TEXT_AREA:
-                return handleTextFieldKey(event);
+                result = handleTextFieldKey(event);
+                break;
 
             case CHECKBOX:
             case TOGGLE:
-                return handleBooleanFieldKey(event);
+                result = handleBooleanFieldKey(event);
+                break;
 
             case SELECT:
-                return handleSelectFieldKey(event);
+                result = handleSelectFieldKey(event);
+                break;
 
             default:
-                return EventResult.UNHANDLED;
+                result = EventResult.UNHANDLED;
+                break;
         }
+        // A key the field does not use goes to a handler set with onKeyEvent or on
+        return result.isUnhandled() ? super.handleKeyEvent(event, focused) : result;
     }
 
     private EventResult handleTextFieldKey(KeyEvent event) {

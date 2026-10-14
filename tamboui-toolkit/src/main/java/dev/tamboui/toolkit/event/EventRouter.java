@@ -307,8 +307,8 @@ public final class EventRouter implements AutoCloseable {
                         focusManager.focusPrevious();
                         return EventResult.HANDLED;
                     }
-                    // Try lambda handler
-                    KeyEventHandler handler = element.keyEventHandler();
+                    // Try lambda handler (StyledElement.handleKeyEvent runs it itself)
+                    KeyEventHandler handler = element instanceof StyledElement ? null : element.keyEventHandler();
                     if (handler != null) {
                         result = handler.handle(event);
                         if (result.isHandled()) {
@@ -330,6 +330,8 @@ public final class EventRouter implements AutoCloseable {
                     if (CandidateEvent.enabled()) {
                         CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "focused", "unhandled", null);
                     }
+                    // The focused element has had the key; a LazyElement shares its id
+                    break;
                 }
             }
         }

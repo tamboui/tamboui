@@ -71,10 +71,12 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
     }
 
     /**
-     * Handles key events by first trying custom handlers, then forwarding to children.
+     * Handles key events by first trying custom handlers, then, when this container is
+     * focused, forwarding to children.
      * <p>
      * Children receive events with {@code focused=true} since they are within
-     * the focused container's subtree.
+     * the focused container's subtree. An unfocused container does not forward: the
+     * event router offers the event to each child itself.
      *
      * @param event the key event
      * @param focused whether this container is focused
@@ -88,10 +90,13 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
             return result;
         }
 
-        // Forward to children (they inherit focused state from parent)
-        for (Element child : children) {
-            if (child.handleKeyEvent(event, focused) == EventResult.HANDLED) {
-                return EventResult.HANDLED;
+        // A focused container passes the key on to its children (they inherit its focus).
+        // When it is not focused, the event router offers the key to each child itself.
+        if (focused) {
+            for (Element child : children) {
+                if (child.handleKeyEvent(event, true) == EventResult.HANDLED) {
+                    return EventResult.HANDLED;
+                }
             }
         }
 

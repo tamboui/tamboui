@@ -324,7 +324,11 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
             onSubmit.run();
             return EventResult.HANDLED;
         }
-        return handleTextInputKey(state, event) ? EventResult.HANDLED : EventResult.UNHANDLED;
+        if (handleTextInputKey(state, event)) {
+            return EventResult.HANDLED;
+        }
+        // A key the input does not use goes to a handler set with onKeyEvent or on
+        return super.handleKeyEvent(event, focused);
     }
 
     @Override

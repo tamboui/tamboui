@@ -433,7 +433,8 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         if (handled && changeListener != null) {
             changeListener.onTextChange(state.text());
         }
-        return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
+        // A key the text area does not use goes to a handler set with onKeyEvent or on
+        return handled ? EventResult.HANDLED : super.handleKeyEvent(event, focused);
     }
 
     /**
