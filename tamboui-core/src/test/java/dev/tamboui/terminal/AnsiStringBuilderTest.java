@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Hyperlink;
+import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,6 +72,22 @@ class AnsiStringBuilderTest {
         assertThat(result).contains(";1");   // bold
         assertThat(result).contains(";3");   // italic
         assertThat(result).contains(";4");   // underlined
+    }
+
+    @Test
+    @DisplayName("styleToAnsi with NORMAL keeps the colors")
+    void normalModifierKeepsColors() {
+        Style style = Style.EMPTY.fg(Color.RED).bg(Color.BLUE).addModifier(Modifier.NORMAL);
+        String result = AnsiStringBuilder.styleToAnsi(style);
+        assertThat(result).isEqualTo("\u001b[0;31;44m");
+    }
+
+    @Test
+    @DisplayName("styleToAnsi with NORMAL and another modifier writes only the other modifier")
+    void normalModifierWithBold() {
+        Style style = Style.EMPTY.fg(Color.RED).addModifier(Modifier.NORMAL).bold();
+        String result = AnsiStringBuilder.styleToAnsi(style);
+        assertThat(result).isEqualTo("\u001b[0;31;1m");
     }
 
     @Test
