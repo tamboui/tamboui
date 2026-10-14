@@ -41,6 +41,8 @@ public final class LayoutSolver {
     private static final Strength ALL_SEGMENT_GROW = Strength.WEAK;                 // Equal-size tiebreaker
 
     private final Solver solver;
+    // whether the constraints being solved hold a weighted Fill or a Min, so that Fill(0) collapses
+    private boolean weightedFill;
 
     /**
      * Creates a new layout solver.
@@ -65,6 +67,7 @@ public final class LayoutSolver {
         }
 
         solver.reset();
+        weightedFill = hasWeightedFill(constraints);
 
         Variable[] sizes = new Variable[n];
         Variable[] positions = new Variable[n + 1];
@@ -185,10 +188,11 @@ public final class LayoutSolver {
                     .equalTo(value, MAX_SIZE_EQ));
 
         } else if (c instanceof Constraint.Fill) {
-            // Fill: try to grow to fill available space
-            // Proportionality is handled by collectFillProportionalityConstraints
+            // Fill: try to grow to fill available space, except Fill(0) next to a weighted fill, which
+            // collapses. Proportionality is handled by collectFillProportionalityConstraints
+            boolean collapse = ((Constraint.Fill) c).weight() == 0 && weightedFill;
             dest.add(Expression.variable(size)
-                    .equalTo(available, FILL_GROW));
+                    .equalTo(collapse ? 0 : available, FILL_GROW));
         }
     }
 
@@ -222,13 +226,30 @@ public final class LayoutSolver {
     private Fraction getFillScale(Constraint c) {
         if (c instanceof Constraint.Fill) {
             int weight = ((Constraint.Fill) c).weight();
-            // Use small fraction for weight 0 to allow proportional collapse
-            return weight == 0 ? Fraction.of(1, 1_000_000) : Fraction.of(weight);
+            if (weight == 0) {
+                // Fill(0) takes no part next to a weighted fill (it collapses, see collectConstraintFor); when
+                // all fills are Fill(0) they share the space equally. A tiny scale such as 1/1_000_000 instead
+                // overflows the solver's exact Fraction arithmetic
+                return weightedFill ? Fraction.ZERO : Fraction.ONE;
+            }
+            return Fraction.of(weight);
         } else if (c instanceof Constraint.Min) {
             // Min behaves like Fill(1) for proportionality
             return Fraction.ONE;
         }
         return Fraction.ZERO;
+    }
+
+    /**
+     * Whether a Fill with a weight above 0, or a Min (which grows like Fill(1)), is among the constraints.
+     */
+    private static boolean hasWeightedFill(List<Constraint> constraints) {
+        for (Constraint c : constraints) {
+            if ((c instanceof Constraint.Fill && ((Constraint.Fill) c).weight() > 0) || c instanceof Constraint.Min) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
