@@ -12,6 +12,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.tui.event.PasteEvent;
 
 /**
  * Base class for container elements that hold children and forward events to them.
@@ -59,6 +60,25 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
     public T add(Element... children) {
         this.children.addAll(Arrays.asList(children));
         return self();
+    }
+
+    /**
+     * Handles paste events by forwarding them to children, as key events are.
+     * <p>
+     * The event router gives a paste to the focused element only. A focused container
+     * passes it on, so a text input inside it gets pasted text as it gets typed keys.
+     *
+     * @param event the paste event
+     * @return HANDLED if a child handled the event
+     */
+    @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        for (Element child : children) {
+            if (child.handlePasteEvent(event) == EventResult.HANDLED) {
+                return EventResult.HANDLED;
+            }
+        }
+        return EventResult.UNHANDLED;
     }
 
     /**

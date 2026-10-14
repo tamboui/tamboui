@@ -17,6 +17,7 @@ import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.toolkit.event.MouseEventHandler;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.tui.event.PasteEvent;
 
 /**
  * An element that lazily evaluates its content on each render.
@@ -103,6 +104,11 @@ public final class LazyElement implements Element {
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         return lastElement != null ? lastElement.handleKeyEvent(event, focused) : EventResult.UNHANDLED;
+    }
+
+    @Override
+    public EventResult handlePasteEvent(PasteEvent event) {
+        return lastElement != null ? lastElement.handlePasteEvent(event) : EventResult.UNHANDLED;
     }
 
     @Override

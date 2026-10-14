@@ -34,7 +34,7 @@ import dev.tamboui.tui.event.PasteEvent;
  * <p>
  * Events are routed as follows:
  * <ul>
- *   <li>Key events go to the focused element</li>
+ *   <li>Key and paste events go to the focused element</li>
  *   <li>Mouse events go to the element at the mouse position</li>
  *   <li>Tab/Shift+Tab navigate focus</li>
  *   <li>Drag events are tracked and routed to the dragged element</li>
@@ -168,8 +168,8 @@ public final class EventRouter implements AutoCloseable {
     /**
      * Routes an event to the appropriate element(s).
      * <p>
-     * For key events, the focused element is given first chance to handle the event.
-     * This allows text inputs to consume character keys before global handlers see them.
+     * For key and paste events, the focused element is given first chance to handle the event.
+     * This allows text inputs to consume character keys and pasted text before global handlers see them.
      * Global handlers are called after element routing if the event wasn't handled.
      *
      * @param event the event to route
@@ -186,7 +186,11 @@ public final class EventRouter implements AutoCloseable {
             if (event instanceof KeyEvent) {
                 result = routeKeyEvent(routeId, (KeyEvent) event);
             } else if (event instanceof PasteEvent) {
+                // Like a key: the focused element first, then the global handlers
                 result = routePasteEvent((PasteEvent) event);
+                if (result.isUnhandled()) {
+                    result = routeGlobalHandlers(routeId, event);
+                }
             } else if (event instanceof MouseEvent) {
                 // For non-key events, call global handlers first
                 result = routeGlobalHandlers(routeId, event);
