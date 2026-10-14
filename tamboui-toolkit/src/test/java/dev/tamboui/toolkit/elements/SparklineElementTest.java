@@ -148,4 +148,56 @@ class SparklineElementTest extends AbstractElementTest {
 
         assertThat(buffer).at(0, 0).hasSymbol("╭").hasForeground(Color.CYAN);
     }
+
+    @Test
+    @DisplayName("SparklineElement with gradient")
+    void withGradient() {
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        sparkline(0, 100)
+            .max(100)
+            .gradient(Color.GREEN, Color.RED)
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
+        assertThat(buffer).at(1, 0).hasForeground(Color.RED);
+    }
+
+    @Test
+    @DisplayName("SparklineElement with colorMapper")
+    void withColorMapper() {
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        sparkline(10, 80)
+            .max(100)
+            .colorMapper(val -> val > 50 ? Color.RED : Color.GREEN)
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
+        assertThat(buffer).at(1, 0).hasForeground(Color.RED);
+    }
+
+    @Test
+    @DisplayName("CSS gradient properties style SparklineElement")
+    void cssGradientProperties() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "SparklineElement { gradient-low: green; gradient-high: red; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        sparkline(0, 100).max(100).render(frame, area, context);
+
+        assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
+        assertThat(buffer).at(1, 0).hasForeground(Color.RED);
+    }
 }

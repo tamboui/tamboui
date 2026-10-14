@@ -4,7 +4,9 @@
  */
 package dev.tamboui.widgets.sparkline;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.LongFunction;
 import java.util.stream.IntStream;
 
@@ -12,7 +14,9 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.CharWidth;
@@ -104,6 +108,54 @@ public final class DualSparkline implements Widget {
     public static final PropertyDefinition<Color> BOTTOM_COLOR =
             PropertyDefinition.of("bottom-color", ColorConverter.INSTANCE);
 
+    /**
+     * CSS property for the top series gradient low stop colour ({@code top-gradient-low}).
+     */
+    public static final PropertyDefinition<Color> TOP_GRADIENT_LOW =
+            PropertyDefinition.of("top-gradient-low", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the top series gradient mid stop colour ({@code top-gradient-mid}).
+     */
+    public static final PropertyDefinition<Color> TOP_GRADIENT_MID =
+            PropertyDefinition.of("top-gradient-mid", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the top series gradient high stop colour ({@code top-gradient-high}).
+     */
+    public static final PropertyDefinition<Color> TOP_GRADIENT_HIGH =
+            PropertyDefinition.of("top-gradient-high", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the bottom series gradient low stop colour ({@code bottom-gradient-low}).
+     */
+    public static final PropertyDefinition<Color> BOTTOM_GRADIENT_LOW =
+            PropertyDefinition.of("bottom-gradient-low", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the bottom series gradient mid stop colour ({@code bottom-gradient-mid}).
+     */
+    public static final PropertyDefinition<Color> BOTTOM_GRADIENT_MID =
+            PropertyDefinition.of("bottom-gradient-mid", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the bottom series gradient high stop colour ({@code bottom-gradient-high}).
+     */
+    public static final PropertyDefinition<Color> BOTTOM_GRADIENT_HIGH =
+            PropertyDefinition.of("bottom-gradient-high", ColorConverter.INSTANCE);
+
+    static {
+        PropertyRegistry.registerAll(
+                TOP_COLOR,
+                BOTTOM_COLOR,
+                TOP_GRADIENT_LOW,
+                TOP_GRADIENT_MID,
+                TOP_GRADIENT_HIGH,
+                BOTTOM_GRADIENT_LOW,
+                BOTTOM_GRADIENT_MID,
+                BOTTOM_GRADIENT_HIGH);
+    }
+
     private static final int Y_LABEL_WIDTH = 4;
     private static final Style DIM = Style.EMPTY.dim();
     private static final String CENTRE_SEPARATOR = "─";
@@ -119,6 +171,10 @@ public final class DualSparkline implements Widget {
     private final boolean showYAxis;
     private final LongFunction<String> yAxisFormatter;
     private final String[] xLabels;
+    private final LongFunction<Color> topColorMapper;
+    private final LongFunction<Color> bottomColorMapper;
+    private final ColorGradient topGradient;
+    private final ColorGradient bottomGradient;
 
     private DualSparkline(Builder builder) {
         this.topData = builder.topData;
@@ -130,6 +186,20 @@ public final class DualSparkline implements Widget {
         this.showYAxis = builder.showYAxis;
         this.yAxisFormatter = builder.yAxisFormatter;
         this.xLabels = builder.xLabels;
+        this.topColorMapper = builder.topColorMapper;
+        this.bottomColorMapper = builder.bottomColorMapper;
+
+        ColorGradient resolvedTopGrad = builder.topGradient;
+        if (resolvedTopGrad == null) {
+            resolvedTopGrad = builder.resolveTopGradient();
+        }
+        this.topGradient = resolvedTopGrad;
+
+        ColorGradient resolvedBottomGrad = builder.bottomGradient;
+        if (resolvedBottomGrad == null) {
+            resolvedBottomGrad = builder.resolveBottomGradient();
+        }
+        this.bottomGradient = resolvedBottomGrad;
 
         Color resolvedTopFg = builder.resolveTopColor();
         Style baseTopStyle = builder.topStyle;
@@ -138,6 +208,42 @@ public final class DualSparkline implements Widget {
         Color resolvedBottomFg = builder.resolveBottomColor();
         Style baseBottomStyle = builder.bottomStyle;
         this.bottomStyle = resolvedBottomFg != null ? baseBottomStyle.fg(resolvedBottomFg) : baseBottomStyle;
+    }
+
+    /**
+     * Returns the custom color mapper for the top series, if set.
+     *
+     * @return the top color mapper, or empty
+     */
+    public Optional<LongFunction<Color>> topColorMapper() {
+        return Optional.ofNullable(topColorMapper);
+    }
+
+    /**
+     * Returns the custom color mapper for the bottom series, if set.
+     *
+     * @return the bottom color mapper, or empty
+     */
+    public Optional<LongFunction<Color>> bottomColorMapper() {
+        return Optional.ofNullable(bottomColorMapper);
+    }
+
+    /**
+     * Returns the color gradient for the top series, if set.
+     *
+     * @return the top color gradient, or empty
+     */
+    public Optional<ColorGradient> topGradient() {
+        return Optional.ofNullable(topGradient);
+    }
+
+    /**
+     * Returns the color gradient for the bottom series, if set.
+     *
+     * @return the bottom color gradient, or empty
+     */
+    public Optional<ColorGradient> bottomGradient() {
+        return Optional.ofNullable(bottomGradient);
     }
 
     /**
@@ -263,6 +369,28 @@ public final class DualSparkline implements Widget {
                 long topVal = dataIdx >= 0 && dataIdx < topData.length ? topData[dataIdx] : 0;
                 long botVal = dataIdx >= 0 && dataIdx < bottomData.length ? bottomData[dataIdx] : 0;
 
+                Style currentTopStyle = topStyle;
+                if (topColorMapper != null) {
+                    Color c = topColorMapper.apply(topVal);
+                    if (c != null) {
+                        currentTopStyle = currentTopStyle.fg(c);
+                    }
+                } else if (topGradient != null) {
+                    double ratio = effectiveMax > 0 ? (double) topVal / effectiveMax : 0.0;
+                    currentTopStyle = currentTopStyle.fg(topGradient.at(ratio));
+                }
+
+                Style currentBottomStyle = bottomStyle;
+                if (bottomColorMapper != null) {
+                    Color c = bottomColorMapper.apply(botVal);
+                    if (c != null) {
+                        currentBottomStyle = currentBottomStyle.fg(c);
+                    }
+                } else if (bottomGradient != null) {
+                    double ratio = effectiveMax > 0 ? (double) botVal / effectiveMax : 0.0;
+                    currentBottomStyle = currentBottomStyle.fg(bottomGradient.at(ratio));
+                }
+
                 String ch;
                 Style style;
 
@@ -282,7 +410,7 @@ public final class DualSparkline implements Widget {
                     } else {
                         ch = barSet.empty();
                     }
-                    style = topStyle;
+                    style = currentTopStyle;
                 } else if (hasCentre && r == centerRow) {
                     ch = CENTRE_SEPARATOR;
                     style = DIM;
@@ -298,7 +426,7 @@ public final class DualSparkline implements Widget {
                     long threshold = (long) rowOffset * 8;
                     if (barPx >= threshold + 8) {
                         ch = barSet.full();
-                        style = bottomStyle;
+                        style = currentBottomStyle;
                     } else if (barPx > threshold) {
                         // Complement the effective level of the symbol the top series
                         // would draw, not the raw pixel fraction, so coarse bar sets
@@ -307,14 +435,14 @@ public final class DualSparkline implements Widget {
                         int eighths = effectiveEighths(barSet, (int) (barPx - threshold));
                         if (eighths == 8) {
                             ch = barSet.full();
-                            style = bottomStyle;
+                            style = currentBottomStyle;
                         } else {
                             ch = barSet.symbolForLevel((8 - eighths) / 8.0);
-                            style = bottomStyle.reversed();
+                            style = currentBottomStyle.reversed();
                         }
                     } else {
                         ch = barSet.empty();
-                        style = bottomStyle;
+                        style = currentBottomStyle;
                     }
                 } else {
                     // Spare row (even height) — empty
@@ -396,6 +524,16 @@ public final class DualSparkline implements Widget {
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
         private Color topForeground;
         private Color bottomForeground;
+        private LongFunction<Color> topColorMapper;
+        private LongFunction<Color> bottomColorMapper;
+        private ColorGradient topGradient;
+        private ColorGradient bottomGradient;
+        private Color topGradientLow;
+        private Color topGradientMid;
+        private Color topGradientHigh;
+        private Color bottomGradientLow;
+        private Color bottomGradientMid;
+        private Color bottomGradientHigh;
 
         private Builder() {
         }
@@ -633,12 +771,188 @@ public final class DualSparkline implements Widget {
             return this;
         }
 
+        /**
+         * Sets a custom color mapper function for the top series bars.
+         *
+         * @param mapper the color mapper function
+         * @return this builder
+         */
+        public Builder topColorMapper(LongFunction<Color> mapper) {
+            this.topColorMapper = mapper;
+            return this;
+        }
+
+        /**
+         * Sets a custom color mapper function for the bottom series bars.
+         *
+         * @param mapper the color mapper function
+         * @return this builder
+         */
+        public Builder bottomColorMapper(LongFunction<Color> mapper) {
+            this.bottomColorMapper = mapper;
+            return this;
+        }
+
+        /**
+         * Sets color gradient stops for the top series bars.
+         *
+         * @param stops the color stops
+         * @return this builder
+         */
+        public Builder topGradient(Color... stops) {
+            this.topGradient = (stops != null && stops.length > 0) ? ColorGradient.of(stops) : null;
+            return this;
+        }
+
+        /**
+         * Sets a color gradient for the top series bars.
+         *
+         * @param gradient the color gradient
+         * @return this builder
+         */
+        public Builder topGradient(ColorGradient gradient) {
+            this.topGradient = gradient;
+            return this;
+        }
+
+        /**
+         * Sets color gradient stops for the bottom series bars.
+         *
+         * @param stops the color stops
+         * @return this builder
+         */
+        public Builder bottomGradient(Color... stops) {
+            this.bottomGradient = (stops != null && stops.length > 0) ? ColorGradient.of(stops) : null;
+            return this;
+        }
+
+        /**
+         * Sets a color gradient for the bottom series bars.
+         *
+         * @param gradient the color gradient
+         * @return this builder
+         */
+        public Builder bottomGradient(ColorGradient gradient) {
+            this.bottomGradient = gradient;
+            return this;
+        }
+
+        /**
+         * Sets the top gradient low stop color programmatically.
+         *
+         * @param color the low stop color
+         * @return this builder
+         */
+        public Builder topGradientLow(Color color) {
+            this.topGradientLow = color;
+            return this;
+        }
+
+        /**
+         * Sets the top gradient mid stop color programmatically.
+         *
+         * @param color the mid stop color
+         * @return this builder
+         */
+        public Builder topGradientMid(Color color) {
+            this.topGradientMid = color;
+            return this;
+        }
+
+        /**
+         * Sets the top gradient high stop color programmatically.
+         *
+         * @param color the high stop color
+         * @return this builder
+         */
+        public Builder topGradientHigh(Color color) {
+            this.topGradientHigh = color;
+            return this;
+        }
+
+        /**
+         * Sets the bottom gradient low stop color programmatically.
+         *
+         * @param color the low stop color
+         * @return this builder
+         */
+        public Builder bottomGradientLow(Color color) {
+            this.bottomGradientLow = color;
+            return this;
+        }
+
+        /**
+         * Sets the bottom gradient mid stop color programmatically.
+         *
+         * @param color the mid stop color
+         * @return this builder
+         */
+        public Builder bottomGradientMid(Color color) {
+            this.bottomGradientMid = color;
+            return this;
+        }
+
+        /**
+         * Sets the bottom gradient high stop color programmatically.
+         *
+         * @param color the high stop color
+         * @return this builder
+         */
+        public Builder bottomGradientHigh(Color color) {
+            this.bottomGradientHigh = color;
+            return this;
+        }
+
         private Color resolveTopColor() {
             return styleResolver.resolve(TOP_COLOR, topForeground);
         }
 
         private Color resolveBottomColor() {
             return styleResolver.resolve(BOTTOM_COLOR, bottomForeground);
+        }
+
+        private ColorGradient resolveTopGradient() {
+            Color low = styleResolver.get(TOP_GRADIENT_LOW)
+                    .orElseGet(() -> styleResolver.resolve(Sparkline.GRADIENT_LOW, topGradientLow));
+            Color mid = styleResolver.get(TOP_GRADIENT_MID)
+                    .orElseGet(() -> styleResolver.resolve(Sparkline.GRADIENT_MID, topGradientMid));
+            Color high = styleResolver.get(TOP_GRADIENT_HIGH)
+                    .orElseGet(() -> styleResolver.resolve(Sparkline.GRADIENT_HIGH, topGradientHigh));
+
+            List<Color> stops = new ArrayList<>();
+            if (low != null) {
+                stops.add(low);
+            }
+            if (mid != null) {
+                stops.add(mid);
+            }
+            if (high != null) {
+                stops.add(high);
+            }
+
+            return stops.isEmpty() ? null : ColorGradient.of(stops);
+        }
+
+        private ColorGradient resolveBottomGradient() {
+            Color low = styleResolver.get(BOTTOM_GRADIENT_LOW)
+                    .orElseGet(() -> styleResolver.resolve(Sparkline.GRADIENT_LOW, bottomGradientLow));
+            Color mid = styleResolver.get(BOTTOM_GRADIENT_MID)
+                    .orElseGet(() -> styleResolver.resolve(Sparkline.GRADIENT_MID, bottomGradientMid));
+            Color high = styleResolver.get(BOTTOM_GRADIENT_HIGH)
+                    .orElseGet(() -> styleResolver.resolve(Sparkline.GRADIENT_HIGH, bottomGradientHigh));
+
+            List<Color> stops = new ArrayList<>();
+            if (low != null) {
+                stops.add(low);
+            }
+            if (mid != null) {
+                stops.add(mid);
+            }
+            if (high != null) {
+                stops.add(high);
+            }
+
+            return stops.isEmpty() ? null : ColorGradient.of(stops);
         }
 
         /**

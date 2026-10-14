@@ -207,4 +207,40 @@ class GaugeElementTest extends AbstractElementTest {
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
     }
+
+    @Test
+    @DisplayName("GaugeElement renders with programmatic gradient")
+    void withGradient() {
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        gauge(1.0)
+            .label("")
+            .gradient(Color.GREEN, Color.RED)
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(4, 0).style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("CSS gradient properties style GaugeElement")
+    void cssGradientProperties() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "GaugeElement { gradient-low: green; gradient-high: red; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        gauge(1.0).label("").render(frame, area, context);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(4, 0).style().fg()).contains(Color.RED);
+    }
 }
