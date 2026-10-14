@@ -9,6 +9,7 @@ package dev.tamboui.demo;
 import java.time.Duration;
 import java.util.List;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Margin;
@@ -20,7 +21,6 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.tfx.Fx;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.Motion;
 import dev.tamboui.tfx.tui.TfxIntegration;
 import dev.tamboui.tui.TuiConfig;

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tfx;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.style.Color;
 import dev.tamboui.tfx.effects.FadeShader;
 

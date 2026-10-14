@@ -5,6 +5,7 @@
  * buffers, cells, layouts, styles, text, and widget interfaces.
  */
 module dev.tamboui.core {
+    exports dev.tamboui.animation;
     exports dev.tamboui.buffer;
     exports dev.tamboui.inline;
     exports dev.tamboui.layout;

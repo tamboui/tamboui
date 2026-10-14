@@ -10,10 +10,10 @@ package dev.tamboui.demo;
 
 import java.time.Duration;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.tfx.Fx;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.toolkit.ToolkitEffects;
 import dev.tamboui.toolkit.app.ToolkitRunner;
 import dev.tamboui.toolkit.element.Element;
