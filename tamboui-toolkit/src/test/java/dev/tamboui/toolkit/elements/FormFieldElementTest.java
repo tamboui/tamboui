@@ -12,7 +12,12 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyModifiers;
+import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.form.*;
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.toolkit.Toolkit.formField;
@@ -327,5 +332,117 @@ class FormFieldElementTest extends AbstractElementTest {
             }
         }
         assertThat(foundJ).as("Should display actual text").isTrue();
+    }
+
+    // ==================== TextArea Field Tests ====================
+
+    @Test
+    @DisplayName("formField with TextAreaState renders label and text")
+    void formFieldWithTextAreaStateRenders() {
+        TextAreaState state = new TextAreaState("Line 1\nLine 2");
+        FormFieldElement field = formField("Bio", state).labelWidth(10).rows(3);
+
+        Rect area = new Rect(0, 0, 40, 3);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        field.render(frame, area, RenderContext.empty());
+
+        // Label rendered
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("B");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("i");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("o");
+
+        // Content rendered (starts at labelWidth + spacing = 10 + 1 = 11)
+        assertThat(buffer.get(11, 0).symbol()).isEqualTo("L");
+        assertThat(buffer.get(12, 0).symbol()).isEqualTo("i");
+        assertThat(buffer.get(13, 0).symbol()).isEqualTo("n");
+        assertThat(buffer.get(14, 0).symbol()).isEqualTo("e");
+        assertThat(buffer.get(11, 1).symbol()).isEqualTo("L");
+    }
+
+    @Test
+    @DisplayName("formField with TextArea preferredSize respects rows and borders")
+    void formFieldTextAreaPreferredSize() {
+        TextAreaState state = new TextAreaState("test");
+        FormFieldElement field = formField("Description", state).rows(4);
+
+        // Non-bordered: rows = 4
+        assertThat(field.preferredSize(50, 10, null).heightOr(0)).isEqualTo(4);
+
+        // Bordered: rows + 2 = 6
+        field.rounded();
+        assertThat(field.preferredSize(50, 10, null).heightOr(0)).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("formField with TextArea handles typing and newline on Enter")
+    void formFieldTextAreaHandlesTypingAndEnter() {
+        TextAreaState state = new TextAreaState();
+        FormFieldElement field = formField("Notes", state);
+
+        // Type 'a'
+        field.handleKeyEvent(KeyEvent.ofChar('a'), true);
+        assertThat(state.text()).isEqualTo("a");
+
+        // Press Enter -> inserts newline
+        field.handleKeyEvent(new KeyEvent(KeyCode.ENTER, KeyModifiers.NONE, 0), true);
+        assertThat(state.text()).isEqualTo("a\n");
+
+        // Type 'b'
+        field.handleKeyEvent(KeyEvent.ofChar('b'), true);
+        assertThat(state.text()).isEqualTo("a\nb");
+    }
+
+    @Test
+    @DisplayName("formField with TextArea triggers onSubmit on Ctrl+Enter")
+    void formFieldTextAreaTriggersSubmitOnCtrlEnter() {
+        TextAreaState state = new TextAreaState("Some notes");
+        java.util.concurrent.atomic.AtomicBoolean submitted = new java.util.concurrent.atomic.AtomicBoolean(false);
+
+        FormFieldElement field = formField("Notes", state)
+                .onSubmit(() -> submitted.set(true));
+
+        // Regular enter does not trigger onSubmit
+        field.handleKeyEvent(new KeyEvent(KeyCode.ENTER, KeyModifiers.NONE, 0), true);
+        assertThat(submitted.get()).isFalse();
+
+        // Ctrl+Enter triggers onSubmit
+        field.handleKeyEvent(new KeyEvent(KeyCode.ENTER, KeyModifiers.CTRL, 0), true);
+        assertThat(submitted.get()).isTrue();
+    }
+
+    @Test
+    @DisplayName("formField with TextArea handles paste events")
+    void formFieldTextAreaHandlesPaste() {
+        TextAreaState state = new TextAreaState();
+        FormFieldElement field = formField("Code", state);
+
+        field.handlePasteEvent(new PasteEvent("first line\nsecond line"));
+        assertThat(state.text()).isEqualTo("first line\nsecond line");
+    }
+
+    @Test
+    @DisplayName("formField with TextArea validates field content")
+    void formFieldTextAreaValidation() {
+        TextAreaState state = new TextAreaState("");
+        FormFieldElement field = formField("Feedback", state)
+                .validate(Validators.required());
+
+        ValidationResult result = field.validateField();
+        assertThat(result.isValid()).isFalse();
+
+        state.setText("Great framework!");
+        result = field.validateField();
+        assertThat(result.isValid()).isTrue();
+    }
+
+    @Test
+    @DisplayName("formField textArea() fluent builder converts to TextArea")
+    void formFieldTextAreaFluentBuilder() {
+        FormFieldElement field = formField("Bio").textArea(5).value("Hello world");
+        assertThat(field.textAreaState()).isNotNull();
+        assertThat(field.textAreaState().text()).isEqualTo("Hello world");
+        assertThat(field.rows()).isEqualTo(5);
     }
 }

@@ -54,6 +54,10 @@ FormFieldElement supports multiple input types:
 |Single-line text input
 |`TextInputState`
 
+|`TEXT_AREA`
+|Multi-line text input
+|`TextAreaState`
+
 |`CHECKBOX`
 |Boolean checkbox with [x] rendering
 |`BooleanFieldState`
@@ -72,6 +76,15 @@ FormFieldElement supports multiple input types:
 [source,java]
 ----
 include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=text-fields]
+----
+
+==== Text Area Fields
+
+Multi-line text input can be created with `TextAreaState` or `.textArea()`:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/FormsSnippets.java[tags=text-area-fields]
 ----
 
 ==== Password Fields

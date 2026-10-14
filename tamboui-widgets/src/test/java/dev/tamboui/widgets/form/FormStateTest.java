@@ -87,6 +87,75 @@ class FormStateTest {
                 .hasMessageContaining("unknown");
     }
 
+    // ==================== Text Area Fields ====================
+
+    @Test
+    @DisplayName("textAreaField() returns TextAreaState")
+    void textAreaFieldReturnsState() {
+        FormState form = FormState.builder()
+                .textAreaField("bio", "Software engineer\nOpen source contributor")
+                .build();
+
+        assertThat(form.textAreaField("bio")).isNotNull();
+        assertThat(form.textAreaField("bio").text()).isEqualTo("Software engineer\nOpen source contributor");
+    }
+
+    @Test
+    @DisplayName("textAreaValue() returns current value")
+    void textAreaValueReturnsValue() {
+        FormState form = FormState.builder()
+                .textAreaField("notes", "line 1\nline 2")
+                .build();
+
+        assertThat(form.textAreaValue("notes")).isEqualTo("line 1\nline 2");
+    }
+
+    @Test
+    @DisplayName("setTextAreaValue() updates value")
+    void setTextAreaValueUpdates() {
+        FormState form = FormState.builder()
+                .textAreaField("notes", "initial")
+                .build();
+
+        form.setTextAreaValue("notes", "updated\ntext");
+        assertThat(form.textAreaValue("notes")).isEqualTo("updated\ntext");
+    }
+
+    @Test
+    @DisplayName("textAreaValues() returns all text area values")
+    void textAreaValuesReturnsAll() {
+        FormState form = FormState.builder()
+                .textAreaField("bio", "About me")
+                .textAreaField("notes", "My notes")
+                .build();
+
+        Map<String, String> values = form.textAreaValues();
+        assertThat(values).containsEntry("bio", "About me");
+        assertThat(values).containsEntry("notes", "My notes");
+    }
+
+    @Test
+    @DisplayName("textAreaField() with empty value creates empty state")
+    void textAreaFieldWithEmptyValue() {
+        FormState form = FormState.builder()
+                .textAreaField("description")
+                .build();
+
+        assertThat(form.textAreaValue("description")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("textAreaField() throws on unknown field")
+    void textAreaFieldThrowsOnUnknown() {
+        FormState form = FormState.builder()
+                .textAreaField("bio", "John")
+                .build();
+
+        assertThatThrownBy(() -> form.textAreaField("unknown"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("unknown");
+    }
+
     // ==================== Boolean Fields ====================
 
     @Test

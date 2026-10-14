@@ -440,51 +440,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      * Handles common key events for text area input.
      */
     private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, int visibleWidth, Overflow overflow) {
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case UP:
-                state.moveCursorUp(visibleWidth, overflow);
-                return true;
-            case DOWN:
-                state.moveCursorDown(visibleWidth, overflow);
-                return true;
-            case HOME:
-                state.moveCursorToLineStart();
-                return true;
-            case END:
-                state.moveCursorToLineEnd();
-                return true;
-            case ENTER:
-                state.insert('\n');
-                return true;
-            case TAB:
-                state.insert("    "); // 4 spaces for tab
-                return true;
-            case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
-                    return false;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                return false;
-        }
+        return dev.tamboui.toolkit.Toolkit.handleTextAreaKey(state, event, visibleWidth, overflow);
     }
 
     /**

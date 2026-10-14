@@ -12,7 +12,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.form.*;
 
 import static dev.tamboui.toolkit.Toolkit.form;
@@ -435,5 +439,88 @@ class FormElementTest extends AbstractElementTest {
         FormElement borderedForm = form(state).field("name", "Name").rounded();
 
         assertThat(borderedForm.preferredSize(-1, -1, null).heightOr(0)).isGreaterThan(plainForm.preferredSize(-1, -1, null).heightOr(0));
+    }
+
+    // ==================== TextArea Field Tests ====================
+
+    @Test
+    @DisplayName("field() with TEXT_AREA adds TextArea field to form")
+    void fieldWithTextAreaAddsField() {
+        FormState state = FormState.builder()
+                .textAreaField("bio", "Software Engineer")
+                .build();
+
+        FormElement form = form(state)
+                .field("bio", "Bio", FieldType.TEXT_AREA);
+
+        assertThat(form.validateAll()).isTrue();
+    }
+
+    @Test
+    @DisplayName("field() with TEXT_AREA and rows accounts for height in preferredSize")
+    void fieldWithTextAreaRowsAccountsForHeight() {
+        FormState state = FormState.builder()
+                .textField("name", "John")
+                .textAreaField("bio", "Line 1\nLine 2")
+                .build();
+
+        FormElement form = form(state)
+                .field("name", "Name")
+                .field("bio", "Bio", FieldType.TEXT_AREA, 5)
+                .fieldSpacing(1);
+
+        // name: 1 row, spacing: 1 row, bio: 5 rows => total 7 rows
+        assertThat(form.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(7);
+
+        // Bordered: name = 3 rows, spacing = 1 row, bio = 5 + 2 = 7 rows => total 11 rows
+        form.rounded();
+        assertThat(form.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(11);
+    }
+
+    @Test
+    @DisplayName("field() with TEXT_AREA validates properly")
+    void fieldWithTextAreaValidatesProperly() {
+        FormState state = FormState.builder()
+                .textAreaField("comments", "")
+                .build();
+
+        FormElement form = form(state)
+                .field("comments", "Comments", FieldType.TEXT_AREA, Validators.required());
+
+        assertThat(form.validateAll()).isFalse();
+        assertThat(form.validationErrors()).containsKey("comments");
+
+        state.setTextAreaValue("comments", "All good");
+        assertThat(form.validateAll()).isTrue();
+        assertThat(form.validationErrors()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("FormElement renders TEXT_AREA field to buffer")
+    void formElementRendersTextArea() {
+        FormState state = FormState.builder()
+                .textField("name", "Alice")
+                .textAreaField("bio", "Line1\nLine2")
+                .build();
+
+        FormElement form = form(state)
+                .labelWidth(10)
+                .field("name", "Name")
+                .field("bio", "Bio", FieldType.TEXT_AREA, 2);
+
+        Rect area = new Rect(0, 0, 40, 6);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        form.render(frame, area, RenderContext.empty());
+
+        // Name field at row 0
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("N");
+        // Bio label at row 2 (row 0: name, row 1: spacing, row 2: bio)
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("B");
+        // Bio content at row 2, column 11
+        assertThat(buffer.get(11, 2).symbol()).isEqualTo("L");
+        // Second line of bio at row 3, column 11
+        assertThat(buffer.get(11, 3).symbol()).isEqualTo("L");
     }
 }

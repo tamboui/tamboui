@@ -191,6 +191,38 @@ public final class FormElement extends StyledElement<FormElement> {
     }
 
     /**
+     * Adds a field with a specific type and number of rows to the form.
+     *
+     * @param fieldName the field name in FormState
+     * @param label the display label
+     * @param type the field type
+     * @param rows the number of rows (for TEXT_AREA)
+     * @return this element for chaining
+     */
+    public FormElement field(String fieldName, String label, FieldType type, int rows) {
+        return field(fieldName, label, type, rows, (Validator[]) null);
+    }
+
+    /**
+     * Adds a field with a specific type, number of rows, and validators to the form.
+     *
+     * @param fieldName the field name in FormState
+     * @param label the display label
+     * @param type the field type
+     * @param rows the number of rows (for TEXT_AREA)
+     * @param validators the validators to apply
+     * @return this element for chaining
+     */
+    public FormElement field(String fieldName, String label, FieldType type, int rows, Validator... validators) {
+        FieldConfig config = new FieldConfig(fieldName, label, type != null ? type : FieldType.TEXT, rows, currentGroup);
+        if (validators != null) {
+            config.validators.addAll(Arrays.asList(validators));
+        }
+        fields.add(config);
+        return this;
+    }
+
+    /**
      * Adds a field with a placeholder.
      *
      * @param fieldName the field name in FormState
@@ -503,6 +535,8 @@ public final class FormElement extends StyledElement<FormElement> {
                 return String.valueOf(formState.booleanValue(fieldName));
             case SELECT:
                 return formState.selectValue(fieldName);
+            case TEXT_AREA:
+                return formState.textAreaValue(fieldName);
             default:
                 return formState.textValue(fieldName);
         }
@@ -520,7 +554,6 @@ public final class FormElement extends StyledElement<FormElement> {
         if (fields.isEmpty()) {
             height = 1;
         } else {
-            int fieldHeight = borderType != null ? 3 : 1;
             int errorHeight = showInlineErrors ? 1 : 0;
             int totalHeight = 0;
 
@@ -528,7 +561,12 @@ public final class FormElement extends StyledElement<FormElement> {
             long groupCount = groups.size();
 
             // Fields
-            totalHeight += fields.size() * (fieldHeight + errorHeight);
+            for (FieldConfig f : fields) {
+                int fieldHeight = borderType != null
+                        ? (f.type == FieldType.TEXT_AREA ? f.rows + 2 : 3)
+                        : (f.type == FieldType.TEXT_AREA ? f.rows : 1);
+                totalHeight += fieldHeight + errorHeight;
+            }
 
             // Spacing between fields
             if (fields.size() > 1) {
@@ -626,6 +664,17 @@ public final class FormElement extends StyledElement<FormElement> {
                         formState.selectField(config.fieldName));
                 break;
 
+            case TEXT_AREA:
+                field = new FormFieldElement(config.label,
+                        formState.textAreaField(config.fieldName));
+                if (config.placeholder != null) {
+                    field.placeholder(config.placeholder);
+                }
+                if (config.rows > 0) {
+                    field.rows(config.rows);
+                }
+                break;
+
             default:
                 field = new FormFieldElement(config.label,
                         formState.textField(config.fieldName));
@@ -691,14 +740,20 @@ public final class FormElement extends StyledElement<FormElement> {
         final String fieldName;
         final String label;
         final FieldType type;
+        final int rows;
         final String group;
         final List<Validator> validators = new ArrayList<>();
         String placeholder;
 
         FieldConfig(String fieldName, String label, FieldType type, String group) {
+            this(fieldName, label, type, 3, group);
+        }
+
+        FieldConfig(String fieldName, String label, FieldType type, int rows, String group) {
             this.fieldName = fieldName;
             this.label = label;
             this.type = type;
+            this.rows = rows > 0 ? rows : 3;
             this.group = group;
         }
     }
@@ -741,7 +796,12 @@ public final class FormElement extends StyledElement<FormElement> {
             if (isGroupTitle()) {
                 return 1;
             }
-            int fieldHeight = borderType != null ? 3 : 1;
+            int fieldHeight;
+            if (fieldConfig.type == FieldType.TEXT_AREA) {
+                fieldHeight = borderType != null ? fieldConfig.rows + 2 : fieldConfig.rows;
+            } else {
+                fieldHeight = borderType != null ? 3 : 1;
+            }
             return showInlineErrors ? fieldHeight + 1 : fieldHeight;
         }
     }

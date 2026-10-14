@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Overflow;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.StyledElement;
@@ -1074,6 +1075,17 @@ public final class Toolkit {
         return new FormFieldElement(label, state);
     }
 
+    /**
+     * Creates a form field with a label and text area state.
+     *
+     * @param label the field label
+     * @param state the text area state
+     * @return a new form field element
+     */
+    public static FormFieldElement formField(String label, TextAreaState state) {
+        return new FormFieldElement(label, state);
+    }
+
     // ==================== Form Container ====================
 
     /**
@@ -1362,6 +1374,81 @@ public static SpinnerElement spinner(String... frames) {
                 return true;
             case END:
                 state.moveCursorToEnd();
+                return true;
+            case CHAR:
+                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
+                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                    return false;
+                }
+                int c = event.codePoint();
+                if (c >= 32 && c != 127) {
+                    state.insert(event.string());
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Handles common key events for text area input.
+     * <p>
+     * Handles: character input, backspace, delete, left/right/up/down arrows, home/end, enter, tab.
+     *
+     * @param state the text area state to modify
+     * @param event the key event to handle
+     * @return true if the event was handled, false otherwise
+     */
+    public static boolean handleTextAreaKey(TextAreaState state, KeyEvent event) {
+        return handleTextAreaKey(state, event, 0, null);
+    }
+
+    /**
+     * Handles common key events for text area input with layout awareness.
+     * <p>
+     * Handles: character input, backspace, delete, left/right/up/down arrows (with wrapping support), home/end, enter, tab.
+     *
+     * @param state the text area state to modify
+     * @param event the key event to handle
+     * @param visibleWidth the visible width used for line wrapping navigation
+     * @param overflow the overflow mode used for line wrapping navigation
+     * @return true if the event was handled, false otherwise
+     */
+    public static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, int visibleWidth, Overflow overflow) {
+        switch (event.code()) {
+            case BACKSPACE:
+                state.deleteBackward();
+                return true;
+            case DELETE:
+                state.deleteForward();
+                return true;
+            case LEFT:
+                state.moveCursorLeft();
+                return true;
+            case RIGHT:
+                state.moveCursorRight();
+                return true;
+            case UP:
+                state.moveCursorUp(visibleWidth, overflow);
+                return true;
+            case DOWN:
+                state.moveCursorDown(visibleWidth, overflow);
+                return true;
+            case HOME:
+                state.moveCursorToLineStart();
+                return true;
+            case END:
+                state.moveCursorToLineEnd();
+                return true;
+            case ENTER:
+                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                    return false;
+                }
+                state.insert('\n');
+                return true;
+            case TAB:
+                state.insert("    "); // 4 spaces for tab
                 return true;
             case CHAR:
                 // Don't consume characters with Ctrl or Alt modifiers - those are control sequences

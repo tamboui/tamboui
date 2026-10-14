@@ -12,12 +12,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 
 /**
  * Centralized state container for all fields in a form.
  * <p>
- * FormState holds the state for text fields, boolean fields (checkbox/toggle),
+ * FormState holds the state for text fields, text area fields, boolean fields (checkbox/toggle),
  * and select fields (dropdown). It provides type-safe access to field states
  * and convenient methods for getting/setting values.
  * <p>
@@ -27,28 +28,35 @@ import dev.tamboui.widgets.input.TextInputState;
  * FormState form = FormState.builder()
  *     .textField("fullName", "Ada Lovelace")
  *     .textField("email", "ada@analytical.io")
+ *     .textAreaField("bio", "Mathematician and writer")
  *     .booleanField("newsletter", true)
  *     .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
  *     .build();
  *
  * // Access text field state for UI binding
  * formField("Full name", form.textField("fullName"))
+ * formField("Bio", form.textAreaField("bio"))
  *
  * // Get/set values
  * String email = form.textValue("email");
  * form.setTextValue("email", "new@example.com");
+ * String bio = form.textAreaValue("bio");
+ * form.setTextAreaValue("bio", "Pioneer in computing");
  *
  * // Get all values
  * Map<String, String> values = form.textValues();
+ * Map<String, String> bioValues = form.textAreaValues();
  * }</pre>
  *
  * @see TextInputState for text field state
+ * @see TextAreaState for text area field state
  * @see BooleanFieldState for boolean field state
  * @see SelectFieldState for select field state
  */
 public final class FormState {
 
     private final Map<String, TextInputState> textFields;
+    private final Map<String, TextAreaState> textAreaFields;
     private final Map<String, BooleanFieldState> booleanFields;
     private final Map<String, SelectFieldState> selectFields;
     private final Set<String> maskedFields;
@@ -56,6 +64,7 @@ public final class FormState {
 
     private FormState(Builder builder) {
         this.textFields = new LinkedHashMap<>(builder.textFields);
+        this.textAreaFields = new LinkedHashMap<>(builder.textAreaFields);
         this.booleanFields = new LinkedHashMap<>(builder.booleanFields);
         this.selectFields = new LinkedHashMap<>(builder.selectFields);
         this.maskedFields = new HashSet<>(builder.maskedFields);
@@ -130,6 +139,58 @@ public final class FormState {
      */
     public boolean isMaskedField(String name) {
         return maskedFields.contains(name);
+    }
+
+    // ==================== Text Area Field Access ====================
+
+    /**
+     * Returns the TextAreaState for the given field name.
+     *
+     * @param name the field name
+     * @return the text area state
+     * @throws IllegalArgumentException if no text area field with that name exists
+     */
+    public TextAreaState textAreaField(String name) {
+        TextAreaState state = textAreaFields.get(name);
+        if (state == null) {
+            throw new IllegalArgumentException("No text area field named: " + name);
+        }
+        return state;
+    }
+
+    /**
+     * Returns the current text area value for the given field name.
+     *
+     * @param name the field name
+     * @return the text area value
+     * @throws IllegalArgumentException if no text area field with that name exists
+     */
+    public String textAreaValue(String name) {
+        return textAreaField(name).text();
+    }
+
+    /**
+     * Sets the text area value for the given field name.
+     *
+     * @param name the field name
+     * @param value the new value
+     * @throws IllegalArgumentException if no text area field with that name exists
+     */
+    public void setTextAreaValue(String name, String value) {
+        textAreaField(name).setText(value != null ? value : "");
+    }
+
+    /**
+     * Returns all text area field values as a map.
+     *
+     * @return an unmodifiable map of field names to values
+     */
+    public Map<String, String> textAreaValues() {
+        Map<String, String> values = new LinkedHashMap<>();
+        for (Map.Entry<String, TextAreaState> entry : textAreaFields.entrySet()) {
+            values.put(entry.getKey(), entry.getValue().text());
+        }
+        return Collections.unmodifiableMap(values);
     }
 
     // ==================== Boolean Field Access ====================
@@ -300,6 +361,7 @@ public final class FormState {
     public static final class Builder {
 
         private final Map<String, TextInputState> textFields = new LinkedHashMap<>();
+        private final Map<String, TextAreaState> textAreaFields = new LinkedHashMap<>();
         private final Map<String, BooleanFieldState> booleanFields = new LinkedHashMap<>();
         private final Map<String, SelectFieldState> selectFields = new LinkedHashMap<>();
         private final Set<String> maskedFields = new HashSet<>();
@@ -328,6 +390,29 @@ public final class FormState {
          */
         public Builder textField(String name) {
             return textField(name, "");
+        }
+
+        /**
+         * Adds a text area field with the given initial value.
+         *
+         * @param name the field name
+         * @param initialValue the initial value
+         * @return this builder for chaining
+         */
+        public Builder textAreaField(String name, String initialValue) {
+            Objects.requireNonNull(name, "Field name must not be null");
+            textAreaFields.put(name, new TextAreaState(initialValue != null ? initialValue : ""));
+            return this;
+        }
+
+        /**
+         * Adds a text area field with an empty initial value.
+         *
+         * @param name the field name
+         * @return this builder for chaining
+         */
+        public Builder textAreaField(String name) {
+            return textAreaField(name, "");
         }
 
         /**

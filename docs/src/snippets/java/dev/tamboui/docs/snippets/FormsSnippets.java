@@ -11,6 +11,7 @@ import dev.tamboui.widgets.form.SelectFieldState;
 import dev.tamboui.widgets.form.ValidationResult;
 import dev.tamboui.widgets.form.Validator;
 import dev.tamboui.widgets.form.Validators;
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class FormsSnippets {
     FormState form = FormState.builder()
         .textField("fullName", "Ada Lovelace")
         .textField("email", "ada@example.com")
+        .textAreaField("bio", "Mathematician and writer")
         .booleanField("subscribe", true)
         .selectField("country", Arrays.asList("USA", "UK", "Germany"), 0)
         .build();
@@ -62,6 +64,16 @@ public class FormsSnippets {
             .placeholder("you@example.com")
             .rounded();
         // end::text-fields[]
+    }
+
+    void textAreaFields() {
+        // tag::text-area-fields[]
+        TextAreaState bioState = new TextAreaState("Mathematician and writer\nRecognized as first computer programmer");
+        formField("Bio", bioState)
+            .rows(4)
+            .placeholder("Enter biography...")
+            .rounded();
+        // end::text-area-fields[]
     }
 
     void passwordFieldsBuilder() {
