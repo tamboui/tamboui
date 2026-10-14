@@ -20,6 +20,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Hyperlink;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -632,5 +633,118 @@ class ParagraphTest {
         paragraph.render(area, buffer);
 
         BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "o");
+    }
+
+    @Test
+    @DisplayName("Paragraph renders tabs with default tabSize 8")
+    void rendersTabsWithDefaultTabSize() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("at\tcom.example"))
+            .build();
+        Rect area = new Rect(0, 0, 25, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "a")
+            .hasSymbolAt(1, 0, "t")
+            .hasSymbolAt(2, 0, " ")
+            .hasSymbolAt(7, 0, " ")
+            .hasSymbolAt(8, 0, "c")
+            .hasSymbolAt(9, 0, "o")
+            .hasSymbolAt(10, 0, "m");
+    }
+
+    @Test
+    @DisplayName("Paragraph renders tabs with custom tabSize")
+    void rendersTabsWithCustomTabSize() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("a\tb\tc"))
+            .tabSize(4)
+            .build();
+        Rect area = new Rect(0, 0, 15, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "a")
+            .hasSymbolAt(1, 0, " ")
+            .hasSymbolAt(3, 0, " ")
+            .hasSymbolAt(4, 0, "b")
+            .hasSymbolAt(5, 0, " ")
+            .hasSymbolAt(7, 0, " ")
+            .hasSymbolAt(8, 0, "c");
+    }
+
+    @Test
+    @DisplayName("Paragraph.Builder rejects negative tabSize")
+    void negativeTabSizeThrows() {
+        assertThatThrownBy(() -> Paragraph.builder().tabSize(-1))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Paragraph resolves tabSize from StylePropertyResolver")
+    void resolvesTabSizeFromResolver() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("a\tb"))
+            .styleResolver(TestStylePropertyResolver.of("tab-size", 4))
+            .build();
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "a")
+            .hasSymbolAt(4, 0, "b");
+    }
+
+    @Test
+    @DisplayName("Paragraph hanging indent preserves tab indentation on wrapped lines")
+    void stackTraceHangingIndentPreserved() {
+        // Line starts with \t, then some text that wraps
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("\tat com.example.service.UserService.findUserById(UserService.java:42)"))
+            .overflow(Overflow.WRAP_WORD)
+            .build();
+        // Width 25: row 0 gets "\tat com.example.service.", row 1 continues with indent
+        Rect area = new Rect(0, 0, 25, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        // Row 0 has 8 spaces indent from \t
+        for (int col = 0; col < 8; col++) {
+            BufferAssertions.assertThat(buffer).hasSymbolAt(col, 0, " ");
+        }
+        BufferAssertions.assertThat(buffer).hasSymbolAt(8, 0, "a");
+
+        // Row 1 continuation line also has 8 spaces hanging indent
+        for (int col = 0; col < 8; col++) {
+            BufferAssertions.assertThat(buffer).hasSymbolAt(col, 1, " ");
+        }
+    }
+
+    @Test
+    @DisplayName("Paragraph alignment calculates position using expanded tab width")
+    void alignmentUsesExpandedTabWidth() {
+        // "a\tb" with tabSize 4 is "a   b", width 5
+        // Centered in area of width 11 -> start at (11 - 5) / 2 = 3
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("a\tb"))
+            .tabSize(4)
+            .centered()
+            .build();
+        Rect area = new Rect(0, 0, 11, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(3, 0, "a")
+            .hasSymbolAt(7, 0, "b");
     }
 }

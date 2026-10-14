@@ -71,4 +71,38 @@ class TextTest {
         assertThat(text.height()).isEqualTo(0);
         assertThat(text.width()).isEqualTo(0);
     }
+
+    @Test
+    @DisplayName("Text.stripControlCodes strips harmful control codes")
+    void stripControlCodes() {
+        assertThat(Text.stripControlCodes("Hello\u0007\b\u000b\f\rWorld"))
+            .isEqualTo("HelloWorld");
+    }
+
+    @Test
+    @DisplayName("Text expandTabs expands tabs on all lines")
+    void expandTabs() {
+        Text text = Text.from("Line1\tCol2\nLine2\tat\tcom.example");
+        Text expanded = text.expandTabs(8);
+        assertThat(expanded.lines().get(0).rawContent()).isEqualTo("Line1   Col2");
+        assertThat(expanded.lines().get(1).rawContent()).isEqualTo("Line2   at      com.example");
+    }
+
+    @Test
+    @DisplayName("Text expandTabs returns same instance when no lines contain tabs")
+    void expandTabsNoOp() {
+        Text text = Text.from("Line 1\nLine 2");
+        assertThat(text.expandTabs()).isSameAs(text);
+
+        Text empty = Text.empty();
+        assertThat(empty.expandTabs()).isSameAs(empty);
+    }
+
+    @Test
+    @DisplayName("Text expandTabs throws on negative tabSize")
+    void expandTabsNegative() {
+        Text text = Text.from("Line\t1");
+        assertThatThrownBy(() -> text.expandTabs(-1))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }

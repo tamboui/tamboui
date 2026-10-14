@@ -4,6 +4,8 @@
  */
 package dev.tamboui.text;
 
+import java.util.Objects;
+
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 
@@ -18,14 +20,56 @@ public final class Span {
 
     /**
      * Creates a new span with the given content and style.
+     * Harmful control characters (bell {@code \u0007}, backspace {@code \b},
+     * vertical tab {@code \u000B}, form feed {@code \f}, and carriage return {@code \r})
+     * are stripped from the content upon construction.
      *
      * @param content the text content
      * @param style   the style to apply
      */
     public Span(String content, Style style) {
-        this.content = content;
-        this.style = style;
+        this.content = stripControlCodes(Objects.requireNonNull(content, "content"));
+        this.style = Objects.requireNonNull(style, "style");
         this.cachedHashCode = computeHashCode();
+    }
+
+    /**
+     * Strips harmful control characters (bell {@code \u0007}, backspace {@code \b},
+     * vertical tab {@code \u000B}, form feed {@code \f}, and carriage return {@code \r})
+     * from the given text.
+     *
+     * @param text the text to sanitize
+     * @return the sanitized text with harmful control characters removed, or {@code null} if text is null
+     */
+    public static String stripControlCodes(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        int len = text.length();
+        int firstDirty = -1;
+        for (int i = 0; i < len; i++) {
+            char c = text.charAt(i);
+            if (isHarmfulControlCode(c)) {
+                firstDirty = i;
+                break;
+            }
+        }
+        if (firstDirty == -1) {
+            return text;
+        }
+        StringBuilder sb = new StringBuilder(len - 1);
+        sb.append(text, 0, firstDirty);
+        for (int i = firstDirty + 1; i < len; i++) {
+            char c = text.charAt(i);
+            if (!isHarmfulControlCode(c)) {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private static boolean isHarmfulControlCode(char c) {
+        return c == 7 || c == '\b' || c == 11 || c == '\f' || c == '\r';
     }
 
     private int computeHashCode() {

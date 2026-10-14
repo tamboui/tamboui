@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Optional;
+
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
@@ -190,6 +192,27 @@ public final class MarkupTextElement extends StyledElement<MarkupTextElement> {
     public MarkupTextElement right() {
         delegate.right();
         return this;
+    }
+
+    /**
+     * Sets the tab size (number of spaces per tab stop).
+     *
+     * @param tabSize the tab size, must be non-negative
+     * @return this element for chaining
+     * @throws IllegalArgumentException if tabSize is negative
+     */
+    public MarkupTextElement tabSize(int tabSize) {
+        delegate.tabSize(tabSize);
+        return this;
+    }
+
+    /**
+     * Returns the tab size, or empty if not set programmatically.
+     *
+     * @return the tab size
+     */
+    public Optional<Integer> tabSize() {
+        return delegate.tabSize();
     }
 
     @Override

@@ -5,6 +5,7 @@
 package dev.tamboui.toolkit.elements;
 
 import java.util.List;
+import java.util.Optional;
 
 import dev.tamboui.css.cascade.CssStyleResolver;
 import dev.tamboui.layout.Alignment;
@@ -13,6 +14,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.RichTextState;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Line;
@@ -99,6 +101,7 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     private Color scrollbarThumbColor;
     private Color scrollbarTrackColor;
     private Color focusedBorderColor;
+    private Integer tabSize;
 
     // Internal scroll state
     private final RichTextState state;
@@ -224,6 +227,30 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
     public MarkupTextAreaElement right() {
         this.alignment = Alignment.RIGHT;
         return this;
+    }
+
+    /**
+     * Sets the tab size (number of spaces per tab stop).
+     *
+     * @param tabSize the tab size, must be non-negative
+     * @return this element for chaining
+     * @throws IllegalArgumentException if tabSize is negative
+     */
+    public MarkupTextAreaElement tabSize(int tabSize) {
+        if (tabSize < 0) {
+            throw new IllegalArgumentException("tabSize must be non-negative: " + tabSize);
+        }
+        this.tabSize = tabSize;
+        return this;
+    }
+
+    /**
+     * Returns the tab size, or empty if not set programmatically.
+     *
+     * @return the tab size
+     */
+    public Optional<Integer> tabSize() {
+        return Optional.ofNullable(tabSize);
     }
 
     /**
@@ -547,8 +574,9 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         }
 
         // Update state with content dimensions
+        int effectiveTabSize = tabSize != null ? tabSize : styleResolver(context).resolve(StandardProperties.TAB_SIZE, Paragraph.DEFAULT_TAB_SIZE);
         state.setContentHeight(parsedLines.size());
-        state.setContentWidth(maxLineWidth(parsedLines));
+        state.setContentWidth(maxLineWidth(parsedText.expandTabs(effectiveTabSize).lines()));
         state.setViewportHeight(textContentArea.height());
         state.setViewportWidth(textContentArea.width());
 
@@ -592,6 +620,9 @@ public final class MarkupTextAreaElement extends StyledElement<MarkupTextAreaEle
         }
         if (alignment != null) {
             paragraphBuilder.alignment(alignment);
+        }
+        if (tabSize != null) {
+            paragraphBuilder.tabSize(tabSize);
         }
 
         Paragraph paragraph = paragraphBuilder.build();

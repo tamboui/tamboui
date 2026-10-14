@@ -37,6 +37,7 @@ import dev.tamboui.layout.PaddingConverter;
  *   <li>{@code color} - foreground/text color</li>
  *   <li>{@code text-style} - text modifiers (bold, italic, etc.)</li>
  *   <li>{@code border-type} - border style (for nested containers)</li>
+ *   <li>{@code tab-size} - tab stop size in spaces</li>
  * </ul>
  *
  * <h2>Non-inheritable properties:</h2>
@@ -83,6 +84,8 @@ public final class StandardProperties {
     public static final String NAME_WIDTH = "width";
     /** Property name for element height constraint. */
     public static final String NAME_HEIGHT = "height";
+    /** Property name for tab stop size. */
+    public static final String NAME_TAB_SIZE = "tab-size";
 
     // ═══════════════════════════════════════════════════════════════
     // Inheritable properties
@@ -103,6 +106,17 @@ public final class StandardProperties {
      */
     public static final PropertyDefinition<Set<Modifier>> TEXT_STYLE =
             PropertyDefinition.builder(NAME_TEXT_STYLE, ModifierConverter.INSTANCE)
+                    .inheritable()
+                    .build();
+
+    /**
+     * The {@code tab-size} property for tab stop size in spaces.
+     * This property is inheritable per CSS spec.
+     * Default: 8
+     */
+    public static final PropertyDefinition<Integer> TAB_SIZE =
+            PropertyDefinition.builder(NAME_TAB_SIZE, IntegerConverter.INSTANCE)
+                    .defaultValue(8)
                     .inheritable()
                     .build();
 
@@ -220,6 +234,7 @@ public final class StandardProperties {
         register(WIDTH);
         register(HEIGHT);
         register(TEXT_OVERFLOW);
+        register(TAB_SIZE);
     }
 
     private static void register(PropertyDefinition<?> property) {

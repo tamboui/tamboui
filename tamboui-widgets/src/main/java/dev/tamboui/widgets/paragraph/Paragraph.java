@@ -36,6 +36,9 @@ import dev.tamboui.widgets.block.Block;
  */
 public final class Paragraph implements Widget {
 
+    /** Default tab stop interval in spaces. */
+    public static final int DEFAULT_TAB_SIZE = 8;
+
     private static final String ELLIPSIS = "...";
 
     private final Text text;
@@ -45,6 +48,7 @@ public final class Paragraph implements Widget {
     private final Overflow overflow;
     private final int scroll;
     private final boolean hangingIndent;
+    private final int tabSize;
 
     private Paragraph(Builder builder) {
         this.text = builder.text;
@@ -53,6 +57,7 @@ public final class Paragraph implements Widget {
         this.overflow = builder.resolveOverflow();
         this.hangingIndent = builder.hangingIndent;
         this.scroll = builder.scroll;
+        this.tabSize = builder.resolveTabSize();
 
         Color resolvedBackground = builder.resolveBackground();
         Color resolvedForeground = builder.resolveForeground();
@@ -115,6 +120,15 @@ public final class Paragraph implements Widget {
         return builder().text(Text.from(span)).build();
     }
 
+    /**
+     * Returns the tab size in spaces.
+     *
+     * @return the tab size
+     */
+    public int tabSize() {
+        return tabSize;
+    }
+
     @Override
     public void render(Rect area, Buffer buffer) {
         if (area.isEmpty()) {
@@ -175,20 +189,25 @@ public final class Paragraph implements Widget {
             return Collections.emptyList();
         }
 
+        List<Line> expandedLines = new ArrayList<>(lines.size());
+        for (int i = 0; i < lines.size(); i++) {
+            expandedLines.add(lines.get(i).expandTabs(tabSize));
+        }
+
         switch (overflow) {
             case WRAP_CHARACTER:
             case WRAP_WORD:
-                return wrapLines(lines, maxWidth);
+                return wrapLines(expandedLines, maxWidth);
             case ELLIPSIS:
-                return truncateWithEllipsis(lines, maxWidth, EllipsisPosition.END);
+                return truncateWithEllipsis(expandedLines, maxWidth, EllipsisPosition.END);
             case ELLIPSIS_START:
-                return truncateWithEllipsis(lines, maxWidth, EllipsisPosition.START);
+                return truncateWithEllipsis(expandedLines, maxWidth, EllipsisPosition.START);
             case ELLIPSIS_MIDDLE:
-                return truncateWithEllipsis(lines, maxWidth, EllipsisPosition.MIDDLE);
+                return truncateWithEllipsis(expandedLines, maxWidth, EllipsisPosition.MIDDLE);
             case CLIP:
             default:
                 // Always clip as safety measure to prevent rendering outside bounds
-                return clipLines(lines, maxWidth);
+                return clipLines(expandedLines, maxWidth);
         }
     }
 
@@ -693,6 +712,7 @@ public final class Paragraph implements Widget {
         private Overflow overflow;
         private Color background;
         private Color foreground;
+        private Integer tabSize;
 
         private Builder() {}
 
@@ -863,6 +883,22 @@ public final class Paragraph implements Widget {
         }
 
         /**
+         * Sets the tab size (number of spaces per tab stop).
+         * Default is 8.
+         *
+         * @param tabSize the tab size, must be non-negative
+         * @return this builder
+         * @throws IllegalArgumentException if tabSize is negative
+         */
+        public Builder tabSize(int tabSize) {
+            if (tabSize < 0) {
+                throw new IllegalArgumentException("tabSize must be non-negative: " + tabSize);
+            }
+            this.tabSize = tabSize;
+            return this;
+        }
+
+        /**
          * Builds the paragraph.
          *
          * @return a new Paragraph
@@ -886,6 +922,11 @@ public final class Paragraph implements Widget {
 
         private Color resolveForeground() {
             return styleResolver.resolve(StandardProperties.COLOR, foreground);
+        }
+
+        private int resolveTabSize() {
+            Integer resolved = styleResolver.resolve(StandardProperties.TAB_SIZE, tabSize);
+            return resolved != null && resolved >= 0 ? resolved : DEFAULT_TAB_SIZE;
         }
     }
 }

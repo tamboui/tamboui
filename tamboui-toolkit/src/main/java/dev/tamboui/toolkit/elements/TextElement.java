@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Optional;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
@@ -12,7 +14,6 @@ import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -32,6 +33,7 @@ public final class TextElement extends StyledElement<TextElement> {
     private final String content;
     private Overflow overflow;
     private Alignment alignment;
+    private Integer tabSize;
 
     /**
      * Creates a new text element with the given string content.
@@ -133,6 +135,30 @@ public final class TextElement extends StyledElement<TextElement> {
     }
 
     /**
+     * Sets the tab size (number of spaces per tab stop).
+     *
+     * @param tabSize the tab size, must be non-negative
+     * @return this element for chaining
+     * @throws IllegalArgumentException if tabSize is negative
+     */
+    public TextElement tabSize(int tabSize) {
+        if (tabSize < 0) {
+            throw new IllegalArgumentException("tabSize must be non-negative: " + tabSize);
+        }
+        this.tabSize = tabSize;
+        return this;
+    }
+
+    /**
+     * Returns the tab size, or empty if not set programmatically.
+     *
+     * @return the tab size
+     */
+    public Optional<Integer> tabSize() {
+        return Optional.ofNullable(tabSize);
+    }
+
+    /**
      * Returns the layout constraint for this text element.
      * <p>
      * If no explicit constraint is set, a sensible default is calculated based on
@@ -197,30 +223,23 @@ public final class TextElement extends StyledElement<TextElement> {
      * @param effectiveOverflow the overflow mode to use
      * @return the number of lines needed
      */
-    private int calculateWrappedHeight(int width, Overflow effectiveOverflow) {
+    private int calculateWrappedHeight(Text text, int width, Overflow effectiveOverflow) {
         if (width <= 0 || content.isEmpty()) {
             return 1;
         }
 
         if (effectiveOverflow != Overflow.WRAP_CHARACTER && effectiveOverflow != Overflow.WRAP_WORD) {
-            return countLines();
+            return text.height();
         }
 
         // For wrapping modes, calculate how many lines we'll need using display width
         int totalLines = 0;
-        int start = 0;
-        for (int i = 0; i <= content.length(); i++) {
-            if (i == content.length() || content.charAt(i) == '\n') {
-                // Process this logical line
-                String lineContent = content.substring(start, i);
-                int lineDisplayWidth = CharWidth.of(lineContent);
-                if (lineDisplayWidth == 0) {
-                    totalLines++;
-                } else {
-                    // Calculate wrapped lines for this segment
-                    totalLines += (lineDisplayWidth + width - 1) / width;
-                }
-                start = i + 1;
+        for (Line line : text.lines()) {
+            int lineDisplayWidth = line.width();
+            if (lineDisplayWidth == 0) {
+                totalLines++;
+            } else {
+                totalLines += (lineDisplayWidth + width - 1) / width;
             }
         }
         return Math.max(1, totalLines);
@@ -228,28 +247,32 @@ public final class TextElement extends StyledElement<TextElement> {
 
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
-        // Width: longest line by display width
-        int maxWidth = 0;
-        int lineStart = 0;
-        for (int i = 0; i <= content.length(); i++) {
-            if (i == content.length() || content.charAt(i) == '\n') {
-                String lineContent = content.substring(lineStart, i);
-                int lineWidth = CharWidth.of(lineContent);
-                maxWidth = Math.max(maxWidth, lineWidth);
-                lineStart = i + 1;
-            }
-        }
+        int effectiveTabSize = resolveTabSize(context);
+        Text text = Text.from(content).expandTabs(effectiveTabSize);
+        int maxWidth = text.width();
 
         // Height: depends on wrapping and available width
         int height;
         if (availableWidth > 0) {
             Overflow effectiveOverflow = resolveOverflow(context);
-            height = calculateWrappedHeight(availableWidth, effectiveOverflow);
+            height = calculateWrappedHeight(text, availableWidth, effectiveOverflow);
         } else {
-            height = countLines();
+            height = text.height();
         }
 
         return Size.of(maxWidth, height);
+    }
+
+    private int resolveTabSize(RenderContext context) {
+        if (tabSize != null) {
+            return tabSize;
+        }
+        if (context != null) {
+            return context.resolveStyle(this)
+                    .flatMap(resolver -> resolver.get(StandardProperties.TAB_SIZE))
+                    .orElse(Paragraph.DEFAULT_TAB_SIZE);
+        }
+        return Paragraph.DEFAULT_TAB_SIZE;
     }
 
     /**
@@ -293,6 +316,9 @@ public final class TextElement extends StyledElement<TextElement> {
         }
         if (overflow != null) {
             paragraphBuilder.overflow(overflow);
+        }
+        if (tabSize != null) {
+            paragraphBuilder.tabSize(tabSize);
         }
 
         Paragraph paragraph = paragraphBuilder.build();

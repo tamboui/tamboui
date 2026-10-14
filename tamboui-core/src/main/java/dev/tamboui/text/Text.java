@@ -331,6 +331,56 @@ public final class Text {
     }
 
     /**
+     * Strips harmful control characters (bell {@code \u0007}, backspace {@code \b},
+     * vertical tab {@code \u000B}, form feed {@code \f}, and carriage return {@code \r})
+     * from the given text.
+     *
+     * @param text the text to sanitize
+     * @return the sanitized text with harmful control characters removed, or {@code null} if text is null
+     */
+    public static String stripControlCodes(String text) {
+        return Span.stripControlCodes(text);
+    }
+
+    /**
+     * Returns a new text with all tab characters ('\t') expanded to column-aligned spaces
+     * using the given tab stop size.
+     *
+     * @param tabSize the number of columns per tab stop (must be non-negative)
+     * @return a new text with expanded tabs, or this text if no tabs were present
+     * @throws IllegalArgumentException if tabSize is negative
+     */
+    public Text expandTabs(int tabSize) {
+        if (tabSize < 0) {
+            throw new IllegalArgumentException("tabSize must be non-negative: " + tabSize);
+        }
+        if (lines.isEmpty()) {
+            return this;
+        }
+        boolean changed = false;
+        List<Line> newLines = new ArrayList<>(lines.size());
+        for (int i = 0; i < lines.size(); i++) {
+            Line line = lines.get(i);
+            Line expanded = line.expandTabs(tabSize);
+            if (expanded != line) {
+                changed = true;
+            }
+            newLines.add(expanded);
+        }
+        return changed ? new Text(newLines, alignment) : this;
+    }
+
+    /**
+     * Returns a new text with all tab characters ('\t') expanded to column-aligned spaces
+     * using the default tab stop size of 8.
+     *
+     * @return a new text with expanded tabs, or this text if no tabs were present
+     */
+    public Text expandTabs() {
+        return expandTabs(8);
+    }
+
+    /**
      * Returns the lines of this text.
      *
      * @return the lines

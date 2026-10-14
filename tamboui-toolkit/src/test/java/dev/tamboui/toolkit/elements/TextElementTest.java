@@ -410,5 +410,47 @@ class TextElementTest extends AbstractElementTest {
             // With CSS providing wrap-character, should wrap to 2 lines
             assertThat(element.preferredSize(10, -1, context).heightOr(0)).isEqualTo(2);
         }
+
+        @Test
+        @DisplayName("preferredSize calculates width taking into account expanded tabs")
+        void preferredSizeWithTabs() {
+            // "a\tb" with default tabSize 8 -> "a       b", width 9
+            TextElement element = text("a\tb");
+            assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(9);
+
+            // With custom tabSize 4 -> "a   b", width 5
+            element.tabSize(4);
+            assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(5);
+        }
+
+        @Test
+        @DisplayName("resolves tabSize from CSS")
+        void resolvesTabSizeFromCss() {
+            TextElement element = text("a\tb");
+
+            CssStyleResolver cssResolver = CssStyleResolver.builder()
+                    .tabSize(4)
+                    .build();
+
+            RenderContext context = new RenderContext() {
+                @Override
+                public boolean isFocused(String elementId) {
+                    return false;
+                }
+
+                @Override
+                public boolean hasFocus() {
+                    return false;
+                }
+
+                @Override
+                public java.util.Optional<CssStyleResolver> resolveStyle(dev.tamboui.css.Styleable styleable) {
+                    return java.util.Optional.of(cssResolver);
+                }
+            };
+
+            // With CSS tab-size: 4 -> width 5
+            assertThat(element.preferredSize(-1, -1, context).widthOr(0)).isEqualTo(5);
+        }
     }
 }
