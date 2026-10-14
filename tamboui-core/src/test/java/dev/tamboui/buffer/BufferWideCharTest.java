@@ -88,6 +88,82 @@ class BufferWideCharTest {
     }
 
     @Test
+    @DisplayName("Overwriting wide char base with narrow char clears its continuation cell")
+    void overwriteWideCharBaseWithNarrowClearsContinuation() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        buffer.setString(0, 0, "世", Style.EMPTY);
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+
+        buffer.setString(0, 0, "X", Style.EMPTY);
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("X");
+        assertThat(buffer.get(1, 0).isContinuation()).isFalse();
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Overwriting so wide char continuation lands on another wide char base clears orphaned continuation")
+    void overwriteWideCharOverlapsAnotherWideCharBase() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        buffer.setString(1, 0, "界", Style.EMPTY);
+        assertThat(buffer.get(2, 0).isContinuation()).isTrue();
+
+        // Write "世" at column 0 (occupies 0 and 1). Column 1 was "界", whose continuation was at 2.
+        buffer.setString(0, 0, "世", Style.EMPTY);
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("世");
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+        assertThat(buffer.get(2, 0).isContinuation()).isFalse();
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Overwriting so flag emoji continuation lands on another wide char base clears orphaned continuation")
+    void overwriteFlagEmojiOverlapsAnotherWideCharBase() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        buffer.setString(1, 0, "界", Style.EMPTY);
+        assertThat(buffer.get(2, 0).isContinuation()).isTrue();
+
+        // Write US flag emoji at column 0 (occupies 0 and 1)
+        buffer.setString(0, 0, "\uD83C\uDDFA\uD83C\uDDF8", Style.EMPTY);
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("\uD83C\uDDFA\uD83C\uDDF8");
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+        assertThat(buffer.get(2, 0).isContinuation()).isFalse();
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Emoji presentation promotion (VS16) clears orphaned continuation of overwritten wide char")
+    void emojiPresentationPromotionClearsOrphanedContinuation() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        // Place wide char at column 1 (occupies 1 and 2)
+        buffer.setString(1, 0, "界", Style.EMPTY);
+        assertThat(buffer.get(2, 0).isContinuation()).isTrue();
+
+        // Write keyboard symbol (U+2328) at column 0 followed by VS16
+        // U+2328 is 1-wide; with VS16 it gets promoted to 2-wide, claiming col 1 as continuation
+        buffer.setString(0, 0, "\u2328\uFE0F", Style.EMPTY);
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("\u2328\uFE0F");
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+        assertThat(buffer.get(2, 0).isContinuation()).isFalse();
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Wide char truncated at right edge clears overwritten continuation cell")
+    void wideCharTruncatedAtRightEdgeClearsOverwrittenContinuation() {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 2, 1));
+        // Place wide char at column 0 (occupies 0 and 1)
+        buffer.setString(0, 0, "世", Style.EMPTY);
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+
+        // Place wide char at column 1 (right edge for 2-wide: occupies 1, no room for continuation)
+        // Column 1 is replaced with space; column 0 must be cleared since its continuation was at 1
+        buffer.setString(1, 0, "界", Style.EMPTY);
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(1, 0).isContinuation()).isFalse();
+    }
+
+    @Test
     @DisplayName("toAnsiString skips continuation cells")
     void toAnsiStringSkipsContinuation() {
         Buffer buffer = Buffer.empty(new Rect(0, 0, 4, 1));

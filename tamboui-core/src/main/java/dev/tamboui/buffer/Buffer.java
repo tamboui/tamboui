@@ -275,6 +275,7 @@ public final class Buffer {
                     // 1-wide text presentation, matching how wide characters truncate at the right edge.
                     if (codePoint == 0xFE0F && baseCol == col - 1 && col < area.right()
                             && CharWidth.isEmojiVariationBase(baseCell.symbol().codePointAt(0))) {
+                        clearOrphanedContinuation(col + 1, y);
                         set(col, y, Cell.CONTINUATION);
                         col++;
                     }
@@ -300,16 +301,14 @@ public final class Buffer {
                         if (col + 1 >= area.right()) {
                             // No room for 2-wide flag, replace with space
                             if (col >= area.left()) {
+                                clearPrecedingWideCharIfContinuation(col, y);
                                 Cell existing = get(col, y);
                                 set(col, y, new Cell(" ", existing.style().patch(style)));
                             }
                             col++;
                         } else if (col >= area.left()) {
-                            Cell current = get(col, y);
-                            if (current.isContinuation() && col > area.left()) {
-                                Cell prev = get(col - 1, y);
-                                set(col - 1, y, new Cell(" ", prev.style()));
-                            }
+                            clearPrecedingWideCharIfContinuation(col, y);
+                            clearOrphanedContinuation(col + 2, y);
                             Cell existing = get(col, y);
                             set(col, y, new Cell(flag, existing.style().patch(style)));
                             set(col + 1, y, Cell.CONTINUATION);
@@ -347,6 +346,7 @@ public final class Buffer {
             if (charWidth == 2 && col + 1 >= area.right()) {
                 // Wide char at rightmost column: no room for continuation, replace with space
                 if (col >= area.left()) {
+                    clearPrecedingWideCharIfContinuation(col, y);
                     Cell existing = get(col, y);
                     set(col, y, new Cell(" ", existing.style().patch(style)));
                 }
@@ -357,20 +357,11 @@ public final class Buffer {
 
             if (col >= area.left()) {
                 // When overwriting a continuation cell, clear the preceding wide char
-                Cell current = get(col, y);
-                if (current.isContinuation() && col > area.left()) {
-                    Cell prev = get(col - 1, y);
-                    set(col - 1, y, new Cell(" ", prev.style()));
-                }
+                clearPrecedingWideCharIfContinuation(col, y);
 
-                // If this is a wide char, check if the next cell is also a continuation of something
-                if (charWidth == 2 && col + 1 < area.right()) {
-                    Cell next = get(col + 1, y);
-                    if (next.isContinuation()) {
-                        // The cell after our continuation was itself a continuation - clear its owner
-                        // (This handles overwriting in the middle of an existing wide char)
-                    }
-                }
+                // If overwriting a wide char's base, clear its orphaned continuation cell
+                int lastCol = (charWidth == 2) ? col + 1 : col;
+                clearOrphanedContinuation(lastCol + 1, y);
 
                 Cell existing = get(col, y);
                 set(col, y, new Cell(symbol, existing.style().patch(style)));
@@ -386,6 +377,31 @@ public final class Buffer {
         }
 
         return col;
+    }
+
+    /**
+     * If the cell at col is a continuation cell, clears the preceding wide character cell.
+     */
+    private void clearPrecedingWideCharIfContinuation(int col, int y) {
+        if (col > area.left() && col < area.right()) {
+            Cell current = get(col, y);
+            if (current.isContinuation()) {
+                Cell prev = get(col - 1, y);
+                set(col - 1, y, new Cell(" ", prev.style()));
+            }
+        }
+    }
+
+    /**
+     * If the cell at nextCol is a continuation cell whose owner was overwritten, clears it to space.
+     */
+    private void clearOrphanedContinuation(int nextCol, int y) {
+        if (nextCol >= area.left() && nextCol < area.right()) {
+            Cell next = get(nextCol, y);
+            if (next.isContinuation()) {
+                set(nextCol, y, new Cell(" ", next.style()));
+            }
+        }
     }
 
     /**
