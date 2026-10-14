@@ -56,6 +56,12 @@ public final class EventRouter implements AutoCloseable {
     private final IdentityHashMap<Element, Rect> elementAreas = new IdentityHashMap<>();
     private final List<GlobalEventHandler> globalHandlers = new ArrayList<>();
 
+    // Render order, for mouse hit-testing: an element before its children, an earlier sibling
+    // before a later one. Elements drawn later are on top.
+    private final List<Element> renderOrder = new ArrayList<>();
+    // Per element: its index in renderOrder, and the end of its subtree there (exclusive)
+    private final IdentityHashMap<Element, int[]> renderSpans = new IdentityHashMap<>();
+
     // Drag state
     private Element draggingElement;
     private DragHandler dragHandler;
@@ -139,6 +145,29 @@ public final class EventRouter implements AutoCloseable {
         }
 
         elementRegistry.register(id, type, cssClasses, area);
+
+        // An element registers once it has rendered: everything that began rendering since
+        // it did is one of its descendants
+        beginElement(element);
+        renderSpans.get(element)[1] = renderOrder.size();
+    }
+
+    /**
+     * Records that an element starts rendering, before its children render.
+     * <p>
+     * Mouse events go to the elements under the pointer in the reverse of this order, so the
+     * element drawn last comes first: a child before its container, and the top layer of a
+     * stack before the layers below it.
+     * <p>
+     * Called by the render context; internal use only.
+     *
+     * @param element the element about to render
+     */
+    public void beginElement(Element element) {
+        if (!renderSpans.containsKey(element)) {
+            renderSpans.put(element, new int[] {renderOrder.size(), renderOrder.size() + 1});
+            renderOrder.add(element);
+        }
     }
 
     /**
@@ -162,6 +191,8 @@ public final class EventRouter implements AutoCloseable {
     public void clear() {
         elements.clear();
         elementAreas.clear();
+        renderOrder.clear();
+        renderSpans.clear();
         elementRegistry.clear();
     }
 
@@ -396,72 +427,65 @@ public final class EventRouter implements AutoCloseable {
             }
         }
 
-        // Handle new press - check for drag or focus
-        if (event.kind() == MouseEventKind.PRESS && event.isLeftButton()) {
-            // Find element at position (reverse order for z-ordering)
-            for (int i = elements.size() - 1; i >= 0; i--) {
-                Element element = elements.get(i);
-                Rect area = getArea(element);
-                if (area != null && area.contains(event.x(), event.y())) {
-                    if (CandidateEvent.enabled()) {
-                        CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "hit", "at (" + event.x() + "," + event.y() + ")");
-                    }
+        // Offer the event to the elements under the pointer, topmost first (a child before its
+        // container, the top layer of a stack before the layers below), until one handles it
+        List<Element> hits = elementsAt(event.x(), event.y());
+        boolean leftPress = event.kind() == MouseEventKind.PRESS && event.isLeftButton();
+        for (Element element : hits) {
+            if (!leftPress) {
+                EventResult result = dispatchMouseEvent(element, event);
+                if (result.isHandled()) {
+                    return result;
+                }
+                continue;
+            }
 
-                    // Focus the element first (before potential drag)
-                    boolean wasFocused = false;
-                    if (element.isFocusable() && element.id() != null) {
-                        String prevFocus = focusManager.focusedId();
-                        focusManager.setFocus(element.id());
-                        wasFocused = true;
-                        if (!element.id().equals(prevFocus)) {
-                            if (FocusChangeEvent.enabled()) {
-                                FocusChangeEvent.commit(routeId, prevFocus, element.id(), "click to focus");
-                            }
-                        }
-                    }
+            if (CandidateEvent.enabled()) {
+                CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "hit", "at (" + event.x() + "," + event.y() + ")");
+            }
 
-                    // Check if draggable
-                    if (element.isDraggable() && element instanceof StyledElement) {
-                        StyledElement<?> styled = (StyledElement<?>) element;
-                        DragHandler handler = styled.dragHandler();
-                        if (handler != null) {
-                            startDrag(routeId, element, handler, event.x(), event.y());
-                            return EventResult.HANDLED;
-                        }
-                    }
+            // Focus the element first (before potential drag)
+            boolean focusable = isFocusTarget(element);
+            if (focusable) {
+                focus(routeId, element);
+            }
 
-                    // Route to element's handler
-                    EventResult result = element.handleMouseEvent(event);
-                    if (result.isHandled()) {
-                        if (CandidateEvent.enabled()) {
-                            CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "handleMouseEvent returned HANDLED");
-                        }
-                        return result;
+            // Check if draggable
+            if (element.isDraggable() && element instanceof StyledElement) {
+                StyledElement<?> styled = (StyledElement<?>) element;
+                DragHandler handler = styled.dragHandler();
+                if (handler != null) {
+                    if (!focusable) {
+                        focusNearestFocusableAncestor(routeId, element, hits);
                     }
-                    MouseEventHandler handler = element.mouseEventHandler();
-                    if (handler != null) {
-                        result = handler.handle(event);
-                        if (result.isHandled()) {
-                            if (CandidateEvent.enabled()) {
-                                CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "mouseEventHandler returned HANDLED");
-                            }
-                            return result;
-                        }
-                    }
-
-                    // Only stop here if we actually did something (focused or had handlers)
-                    // Otherwise continue to check elements underneath
-                    if (wasFocused) {
-                        if (CandidateEvent.enabled()) {
-                            CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "click focused element");
-                        }
-                        return EventResult.HANDLED;
-                    }
-                    // Continue checking other elements - this one didn't handle the click
+                    startDrag(routeId, element, handler, event.x(), event.y());
+                    return EventResult.HANDLED;
                 }
             }
 
-            // Clicked outside all elements - clear focus
+            EventResult result = dispatchMouseEvent(element, event);
+            if (result.isHandled()) {
+                if (!focusable) {
+                    focusNearestFocusableAncestor(routeId, element, hits);
+                }
+                if (CandidateEvent.enabled()) {
+                    CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "handleMouseEvent returned HANDLED");
+                }
+                return result;
+            }
+
+            // Only stop here if we actually did something (focused or had handlers)
+            // Otherwise continue to check elements underneath
+            if (focusable) {
+                if (CandidateEvent.enabled()) {
+                    CandidateEvent.commit(routeId, element.id(), elementTypeOf(element), "mouse_press", "handled", "click focused element");
+                }
+                return EventResult.HANDLED;
+            }
+        }
+
+        if (leftPress) {
+            // Clicked where no element took focus or the click - clear focus
             String prevFocus = focusManager.focusedId();
             if (prevFocus != null) {
                 focusManager.clearFocus();
@@ -471,31 +495,73 @@ public final class EventRouter implements AutoCloseable {
             }
         }
 
-        // Route other mouse events to element at position
-        if (event.kind() == MouseEventKind.MOVE ||
-            event.kind() == MouseEventKind.SCROLL_UP ||
-            event.kind() == MouseEventKind.SCROLL_DOWN) {
+        return EventResult.UNHANDLED;
+    }
 
-            for (int i = elements.size() - 1; i >= 0; i--) {
-                Element element = elements.get(i);
-                Rect area = getArea(element);
-                if (area != null && area.contains(event.x(), event.y())) {
-                    EventResult result = element.handleMouseEvent(event);
-                    if (result.isHandled()) {
-                        return result;
-                    }
-                    MouseEventHandler handler = element.mouseEventHandler();
-                    if (handler != null) {
-                        result = handler.handle(event);
-                        if (result.isHandled()) {
-                            return result;
-                        }
-                    }
-                }
+    /**
+     * Returns the elements whose area contains the position, topmost first: the reverse of
+     * render order.
+     */
+    private List<Element> elementsAt(int x, int y) {
+        List<Element> hits = new ArrayList<>();
+        for (int i = renderOrder.size() - 1; i >= 0; i--) {
+            Element element = renderOrder.get(i);
+            Rect area = getArea(element);
+            if (area != null && area.contains(x, y)) {
+                hits.add(element);
             }
         }
+        return hits;
+    }
 
-        return EventResult.UNHANDLED;
+    /**
+     * Gives an element a mouse event for itself, once. Its children under the pointer are drawn
+     * on top of it and have been offered the event already.
+     */
+    private static EventResult dispatchMouseEvent(Element element, MouseEvent event) {
+        EventResult result = element.handleMouseEvent(event);
+        if (result.isHandled() || element instanceof StyledElement) {
+            // StyledElement.handleMouseEvent runs the element's mouse handler itself
+            return result;
+        }
+        MouseEventHandler handler = element.mouseEventHandler();
+        return handler != null ? handler.handle(event) : EventResult.UNHANDLED;
+    }
+
+    private static boolean isFocusTarget(Element element) {
+        return element.isFocusable() && element.id() != null;
+    }
+
+    private void focus(long routeId, Element element) {
+        String prevFocus = focusManager.focusedId();
+        focusManager.setFocus(element.id());
+        if (!element.id().equals(prevFocus)) {
+            if (FocusChangeEvent.enabled()) {
+                FocusChangeEvent.commit(routeId, prevFocus, element.id(), "click to focus");
+            }
+        }
+    }
+
+    /**
+     * Focuses the nearest focusable ancestor of an element that took a click without being
+     * focusable itself, such as a clickable text inside a focusable panel.
+     */
+    private void focusNearestFocusableAncestor(long routeId, Element element, List<Element> hits) {
+        for (Element candidate : hits) {
+            if (isFocusTarget(candidate) && isAncestor(candidate, element)) {
+                focus(routeId, candidate);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Returns whether {@code ancestor} contains {@code element} in the last rendered tree.
+     */
+    private boolean isAncestor(Element ancestor, Element element) {
+        int[] outer = renderSpans.get(ancestor);
+        int[] inner = renderSpans.get(element);
+        return outer != null && inner != null && outer[0] < inner[0] && inner[0] < outer[1];
     }
 
     private void startDrag(long routeId, Element element, DragHandler handler, int x, int y) {

@@ -24,6 +24,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.elements.ErrorPlaceholder;
+import dev.tamboui.toolkit.elements.LazyElement;
 import dev.tamboui.toolkit.event.EventRouter;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.bindings.BindingSets;
@@ -240,6 +241,12 @@ public final class DefaultRenderContext implements RenderContext {
     @Override
     public void renderChild(Element child, Frame frame, Rect area) {
         String childId = child.id();
+        // A LazyElement renders the element it supplies through renderChild, which routes events
+        // to that element; routing them to the wrapper too would deliver each event twice
+        boolean routed = !(child instanceof LazyElement);
+        if (routed) {
+            eventRouter.beginElement(child);
+        }
 
         if (faultTolerant) {
             try {
@@ -252,7 +259,9 @@ public final class DefaultRenderContext implements RenderContext {
                 }
                 try {
                     child.render(frame, area, this);
-                    registerElement(child, area);
+                    if (routed) {
+                        registerElement(child, area);
+                    }
                     return;
                 } finally {
                     if (childId != null) {
@@ -277,7 +286,9 @@ public final class DefaultRenderContext implements RenderContext {
         }
         try {
                 child.render(frame, area, this);
-                registerElement(child, area);
+                if (routed) {
+                    registerElement(child, area);
+                }
         } finally {
             if (childId != null) {
                 frame.popContextKey();
@@ -471,6 +482,10 @@ public final class DefaultRenderContext implements RenderContext {
      * @param action the action to execute
      */
     public void withElement(Styleable element, Style style, CssStyleResolver resolver, Runnable action) {
+        if (element instanceof Element) {
+            // Covers the root, which is not rendered through renderChild
+            eventRouter.beginElement((Element) element);
+        }
         Style merged = currentStyle().patch(style);
         styleStack.push(merged);
         elementStack.push(element);

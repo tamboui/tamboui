@@ -8,17 +8,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import dev.tamboui.layout.Rect;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
-import dev.tamboui.tui.event.MouseEvent;
 
 /**
- * Base class for container elements that hold children and forward events to them.
+ * Base class for container elements that hold children and forward key events to them.
  * <p>
- * When a container receives an event it doesn't handle itself, it forwards the event
+ * When a container receives a key event it doesn't handle itself, it forwards the event
  * to its children. This enables interactive elements (lists, text inputs) inside
  * containers to receive events when their parent container is focused.
+ * <p>
+ * Mouse events are not forwarded: the event router offers a mouse event to the elements
+ * under the pointer itself, topmost first, so a child gets it before its container.
  * <p>
  * Subclasses should:
  * <ul>
@@ -92,36 +93,6 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
         for (Element child : children) {
             if (child.handleKeyEvent(event, focused) == EventResult.HANDLED) {
                 return EventResult.HANDLED;
-            }
-        }
-
-        return EventResult.UNHANDLED;
-    }
-
-    /**
-     * Handles mouse events by first trying custom handlers, then forwarding to children.
-     * <p>
-     * Only forwards to children whose rendered area contains the mouse position,
-     * ensuring that mouse events are routed to the correct child in multi-panel layouts.
-     *
-     * @param event the mouse event
-     * @return HANDLED if this container or a child handled the event
-     */
-    @Override
-    public EventResult handleMouseEvent(MouseEvent event) {
-        // Let custom handler run first if set
-        EventResult result = super.handleMouseEvent(event);
-        if (result.isHandled()) {
-            return result;
-        }
-
-        // Forward to children whose area contains the mouse position
-        for (Element child : children) {
-            Rect area = child.renderedArea();
-            if (area != null && area.contains(event.x(), event.y())) {
-                if (child.handleMouseEvent(event) == EventResult.HANDLED) {
-                    return EventResult.HANDLED;
-                }
             }
         }
 
