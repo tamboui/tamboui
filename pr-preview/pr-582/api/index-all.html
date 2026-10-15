@@ -3950,13 +3950,38 @@ using the specified options.</div>
 <dd>
 <div class="block">A continuation cell placeholder for the trailing column(s) of a wide character.</div>
 </dd>
+<dt><a href="dev/tamboui/markdown/MarkdownView.html#continuationIndent()" class="member-name-link">continuationIndent()</a> - Method in class dev.tamboui.markdown.<a href="dev/tamboui/markdown/MarkdownView.html" title="class in dev.tamboui.markdown">MarkdownView</a></dt>
+<dd>
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+</dd>
 <dt><a href="dev/tamboui/text/TextWrapOptions.html#continuationIndent()" class="member-name-link">continuationIndent()</a> - Method in class dev.tamboui.text.<a href="dev/tamboui/text/TextWrapOptions.html" title="class in dev.tamboui.text">TextWrapOptions</a></dt>
 <dd>
 <div class="block">Returns the continuation indent strategy.</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.html#continuationIndent()" class="member-name-link">continuationIndent()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.html" title="class in dev.tamboui.widgets.input">TextArea</a></dt>
+<dd>
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/paragraph/Paragraph.html#continuationIndent()" class="member-name-link">continuationIndent()</a> - Method in class dev.tamboui.widgets.paragraph.<a href="dev/tamboui/widgets/paragraph/Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></dt>
+<dd>
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+</dd>
+<dt><a href="dev/tamboui/markdown/MarkdownView.Builder.html#continuationIndent(dev.tamboui.style.ContinuationIndent)" class="member-name-link">continuationIndent(ContinuationIndent)</a> - Method in class dev.tamboui.markdown.<a href="dev/tamboui/markdown/MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></dt>
+<dd>
+<div class="block">Sets the continuation indent strategy used when wrapping lines, mirroring
+<code>Paragraph.Builder.continuationIndent</code>.</div>
+</dd>
 <dt><a href="dev/tamboui/text/TextWrapOptions.Builder.html#continuationIndent(dev.tamboui.style.ContinuationIndent)" class="member-name-link">continuationIndent(ContinuationIndent)</a> - Method in class dev.tamboui.text.<a href="dev/tamboui/text/TextWrapOptions.Builder.html" title="class in dev.tamboui.text">TextWrapOptions.Builder</a></dt>
 <dd>
 <div class="block">Sets the continuation indent strategy.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextArea.Builder.html#continuationIndent(dev.tamboui.style.ContinuationIndent)" class="member-name-link">continuationIndent(ContinuationIndent)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></dt>
+<dd>
+<div class="block">Sets the continuation indent strategy used when wrapping lines, mirroring <code>Paragraph.Builder.continuationIndent</code>.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/paragraph/Paragraph.Builder.html#continuationIndent(dev.tamboui.style.ContinuationIndent)" class="member-name-link">continuationIndent(ContinuationIndent)</a> - Method in class dev.tamboui.widgets.paragraph.<a href="dev/tamboui/widgets/paragraph/Paragraph.Builder.html" title="class in dev.tamboui.widgets.paragraph">Paragraph.Builder</a></dt>
+<dd>
+<div class="block">Sets the continuation indent strategy used when wrapping lines.</div>
 </dd>
 <dt><a href="dev/tamboui/style/ContinuationIndent.html" class="type-name-link" title="enum class in dev.tamboui.style">ContinuationIndent</a> - Enum Class in <a href="dev/tamboui/style/package-summary.html">dev.tamboui.style</a></dt>
 <dd>
@@ -6099,6 +6124,10 @@ from a shared centre axis.</div>
 (no wrapping, horizontal scroll instead).</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#ensureCursorVisible(int,int,dev.tamboui.style.Overflow)" class="member-name-link">ensureCursorVisible(int, int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Adjusts scroll offsets to keep the cursor visible.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#ensureCursorVisible(int,int,dev.tamboui.text.TextWrapOptions)" class="member-name-link">ensureCursorVisible(int, int, TextWrapOptions)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Adjusts scroll offsets to keep the cursor visible.</div>
 </dd>
@@ -10668,6 +10697,15 @@ instead to select the highlighter and theme explicitly.</div>
 <dd>
 <div class="block">Lays out the children of <code>root</code> into renderable chunks.</div>
 </dd>
+<dt><a href="dev/tamboui/markdown/internal/MarkdownLayout.html#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.text.TextWrapOptions)" class="member-name-link">layout(Node, int, MarkdownStyles, TextWrapOptions)</a> - Static method in class dev.tamboui.markdown.internal.<a href="dev/tamboui/markdown/internal/MarkdownLayout.html" title="class in dev.tamboui.markdown.internal">MarkdownLayout</a></dt>
+<dd>
+<div class="block">Lays out the children of <code>root</code> into renderable chunks, using the
+default syntax highlighter and theme for code blocks.</div>
+</dd>
+<dt><a href="dev/tamboui/markdown/internal/MarkdownLayout.html#layout(org.commonmark.node.Node,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.text.TextWrapOptions,dev.tamboui.widgets.syntax.SyntaxHighlighter,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">layout(Node, int, MarkdownStyles, TextWrapOptions, SyntaxHighlighter, SyntaxTheme)</a> - Static method in class dev.tamboui.markdown.internal.<a href="dev/tamboui/markdown/internal/MarkdownLayout.html" title="class in dev.tamboui.markdown.internal">MarkdownLayout</a></dt>
+<dd>
+<div class="block">Lays out the children of <code>root</code> into renderable chunks.</div>
+</dd>
 <dt><a href="dev/tamboui/layout/Layout.html" class="type-name-link" title="class in dev.tamboui.layout">Layout</a> - Class in <a href="dev/tamboui/layout/package-summary.html">dev.tamboui.layout</a></dt>
 <dd>
 <div class="block">A layout defines how to split a rectangular area into smaller areas
@@ -12058,6 +12096,10 @@ no wrapping).</div>
 <dd>
 <div class="block">Moves the cursor down one row.</div>
 </dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorDown(int,dev.tamboui.text.TextWrapOptions)" class="member-name-link">moveCursorDown(int, TextWrapOptions)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Moves the cursor down one row.</div>
+</dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorLeft()" class="member-name-link">moveCursorLeft()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Moves the cursor one grapheme cluster to the left.</div>
@@ -12134,6 +12176,10 @@ no wrapping).</div>
 <div class="block">Moves the cursor up by N lines.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorUp(int,dev.tamboui.style.Overflow)" class="member-name-link">moveCursorUp(int, Overflow)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Moves the cursor up one row.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#moveCursorUp(int,dev.tamboui.text.TextWrapOptions)" class="member-name-link">moveCursorUp(int, TextWrapOptions)</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Moves the cursor up one row.</div>
 </dd>
@@ -15052,6 +15098,11 @@ inheritance behavior, and optional default value.</div>
 <dd>
 <div class="block">Renders the inline children of <code>parent</code> into lines using the
 given overflow strategy.</div>
+</dd>
+<dt><a href="dev/tamboui/markdown/internal/MarkdownInlineRenderer.html#render(org.commonmark.node.Node,dev.tamboui.style.Style,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.text.TextWrapOptions)" class="member-name-link">render(Node, Style, int, MarkdownStyles, TextWrapOptions)</a> - Static method in class dev.tamboui.markdown.internal.<a href="dev/tamboui/markdown/internal/MarkdownInlineRenderer.html" title="class in dev.tamboui.markdown.internal">MarkdownInlineRenderer</a></dt>
+<dd>
+<div class="block">Renders the inline children of <code>parent</code> into lines using the
+given text wrap options.</div>
 </dd>
 <dt><a href="dev/tamboui/toolkit/element/DefaultRenderContext.html#renderChild(dev.tamboui.toolkit.element.Element,dev.tamboui.terminal.Frame,dev.tamboui.layout.Rect)" class="member-name-link">renderChild(Element, Frame, Rect)</a> - Method in class dev.tamboui.toolkit.element.<a href="dev/tamboui/toolkit/element/DefaultRenderContext.html" title="class in dev.tamboui.toolkit.element">DefaultRenderContext</a></dt>
 <dd>&nbsp;</dd>

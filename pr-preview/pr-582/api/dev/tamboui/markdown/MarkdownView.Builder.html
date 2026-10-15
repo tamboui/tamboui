@@ -66,6 +66,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#styles(dev.tamboui.markdown.MarkdownStyles)" tabindex="0">styles(MarkdownStyles)</a></li>
 <li><a href="#styleResolver(dev.tamboui.style.StylePropertyResolver)" tabindex="0">styleResolver(StylePropertyResolver)</a></li>
 <li><a href="#overflow(dev.tamboui.style.Overflow)" tabindex="0">overflow(Overflow)</a></li>
+<li><a href="#continuationIndent(dev.tamboui.style.ContinuationIndent)" tabindex="0">continuationIndent(ContinuationIndent)</a></li>
 <li><a href="#scroll(int)" tabindex="0">scroll(int)</a></li>
 <li><a href="#syntaxHighlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter)" tabindex="0">syntaxHighlighter(SyntaxHighlighter)</a></li>
 <li><a href="#syntaxTheme(dev.tamboui.widgets.syntax.SyntaxTheme)" tabindex="0">syntaxTheme(SyntaxTheme)</a></li>
@@ -118,47 +119,53 @@ loadScripts(document, 'script');</script>
 <div class="block">Builds the <a href="MarkdownView.html" title="class in dev.tamboui.markdown"><code>MarkdownView</code></a> instance.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow</a><wbr>(<a href="../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#continuationIndent(dev.tamboui.style.ContinuationIndent)" class="member-name-link">continuationIndent</a><wbr>(<a href="../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a>&nbsp;continuationIndent)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the continuation indent strategy used when wrapping lines, mirroring
+<code>Paragraph.Builder.continuationIndent</code>.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow</a><wbr>(<a href="../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets how prose lines wider than the content width are handled.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scroll(int)" class="member-name-link">scroll</a><wbr>(int&nbsp;scroll)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scroll(int)" class="member-name-link">scroll</a><wbr>(int&nbsp;scroll)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the index of the first visible content row.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#source(java.lang.String)" class="member-name-link">source</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;source)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#source(java.lang.String)" class="member-name-link">source</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;source)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the markdown source to render.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#style(dev.tamboui.style.Style)" class="member-name-link">style</a><wbr>(<a href="../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#style(dev.tamboui.style.Style)" class="member-name-link">style</a><wbr>(<a href="../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the base style applied to the whole content area before
 rendering.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styleResolver(dev.tamboui.style.StylePropertyResolver)" class="member-name-link">styleResolver</a><wbr>(<a href="../style/StylePropertyResolver.html" title="interface in dev.tamboui.style">StylePropertyResolver</a>&nbsp;resolver)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styleResolver(dev.tamboui.style.StylePropertyResolver)" class="member-name-link">styleResolver</a><wbr>(<a href="../style/StylePropertyResolver.html" title="interface in dev.tamboui.style">StylePropertyResolver</a>&nbsp;resolver)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the property resolver consulted for any markdown style not
 explicitly set on the <a href="MarkdownStyles.html" title="class in dev.tamboui.markdown"><code>MarkdownStyles</code></a> passed to
 <a href="#styles(dev.tamboui.markdown.MarkdownStyles)"><code>styles(MarkdownStyles)</code></a>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styles(dev.tamboui.markdown.MarkdownStyles)" class="member-name-link">styles</a><wbr>(<a href="MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styles(dev.tamboui.markdown.MarkdownStyles)" class="member-name-link">styles</a><wbr>(<a href="MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the style palette used for headings, code, links, and so on.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#syntaxHighlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter)" class="member-name-link">syntaxHighlighter</a><wbr>(<a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#syntaxHighlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter)" class="member-name-link">syntaxHighlighter</a><wbr>(<a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the <a href="../widgets/syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax"><code>SyntaxHighlighter</code></a> used to tokenize fenced and
 indented code blocks.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#syntaxTheme(dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">syntaxTheme</a><wbr>(<a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#syntaxTheme(dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">syntaxTheme</a><wbr>(<a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the <a href="../widgets/syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax"><code>SyntaxTheme</code></a> mapping token types to styles.</div>
 </div>
 </div>
@@ -274,6 +281,22 @@ mislead) and table cells are sized by the <code>Table</code> widget.
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>overflow</code> - the overflow mode</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="continuationIndent(dev.tamboui.style.ContinuationIndent)">
+<h3>continuationIndent</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MarkdownView.Builder.html" title="class in dev.tamboui.markdown">MarkdownView.Builder</a></span>&nbsp;<span class="element-name">continuationIndent</span><wbr><span class="parameters">(<a href="../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a>&nbsp;continuationIndent)</span></div>
+<div class="block">Sets the continuation indent strategy used when wrapping lines, mirroring
+<code>Paragraph.Builder.continuationIndent</code>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>continuationIndent</code> - the continuation indent strategy, or null for default (<a href="../style/ContinuationIndent.html#HANGING"><code>ContinuationIndent.HANGING</code></a>)</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

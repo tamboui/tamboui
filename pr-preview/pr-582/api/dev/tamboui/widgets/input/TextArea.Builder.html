@@ -68,6 +68,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#showLineNumbers(boolean)" tabindex="0">showLineNumbers(boolean)</a></li>
 <li><a href="#lineNumberStyle(dev.tamboui.style.Style)" tabindex="0">lineNumberStyle(Style)</a></li>
 <li><a href="#overflow(dev.tamboui.style.Overflow)" tabindex="0">overflow(Overflow)</a></li>
+<li><a href="#continuationIndent(dev.tamboui.style.ContinuationIndent)" tabindex="0">continuationIndent(ContinuationIndent)</a></li>
 <li><a href="#highlighter(java.lang.String)" tabindex="0">highlighter(String)</a></li>
 <li><a href="#highlighter(java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" tabindex="0">highlighter(String, SyntaxTheme)</a></li>
 <li><a href="#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String)" tabindex="0">highlighter(SyntaxHighlighter, String)</a></li>
@@ -132,88 +133,93 @@ loadScripts(document, 'script');</script>
 <div class="block">Builds the text area.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorColor(dev.tamboui.style.Color)" class="member-name-link">cursorColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#continuationIndent(dev.tamboui.style.ContinuationIndent)" class="member-name-link">continuationIndent</a><wbr>(<a href="../../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a>&nbsp;continuationIndent)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the continuation indent strategy used when wrapping lines, mirroring <code>Paragraph.Builder.continuationIndent</code>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorColor(dev.tamboui.style.Color)" class="member-name-link">cursorColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the cursor color programmatically.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorStyle(dev.tamboui.style.Style)" class="member-name-link">cursorStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;cursorStyle)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cursorStyle(dev.tamboui.style.Style)" class="member-name-link">cursorStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;cursorStyle)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the cursor style.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#foreground(dev.tamboui.style.Color)" class="member-name-link">foreground</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#foreground(dev.tamboui.style.Color)" class="member-name-link">foreground</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the foreground (text) color programmatically.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String)" class="member-name-link">highlighter</a><wbr>(<a href="../syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String)" class="member-name-link">highlighter</a><wbr>(<a href="../syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables syntax highlighting of the text area content using the
 <a href="../syntax/SyntaxTheme.html#DEFAULTS"><code>default theme</code></a>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter</a><wbr>(<a href="../syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(dev.tamboui.widgets.syntax.SyntaxHighlighter,java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter</a><wbr>(<a href="../syntax/SyntaxHighlighter.html" title="interface in dev.tamboui.widgets.syntax">SyntaxHighlighter</a>&nbsp;highlighter,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language,
  <a href="../syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables syntax highlighting of the text area content with a custom theme.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(java.lang.String)" class="member-name-link">highlighter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(java.lang.String)" class="member-name-link">highlighter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables syntax highlighting with the built-in highlighter and default theme.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#highlighter(java.lang.String,dev.tamboui.widgets.syntax.SyntaxTheme)" class="member-name-link">highlighter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;language,
  <a href="../syntax/SyntaxTheme.html" title="class in dev.tamboui.widgets.syntax">SyntaxTheme</a>&nbsp;theme)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables syntax highlighting with the built-in highlighter and a custom theme.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineNumberColor(dev.tamboui.style.Color)" class="member-name-link">lineNumberColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineNumberColor(dev.tamboui.style.Color)" class="member-name-link">lineNumberColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the line number gutter color programmatically.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineNumberStyle(dev.tamboui.style.Style)" class="member-name-link">lineNumberStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lineNumberStyle(dev.tamboui.style.Style)" class="member-name-link">lineNumberStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the line number style.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow</a><wbr>(<a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#overflow(dev.tamboui.style.Overflow)" class="member-name-link">overflow</a><wbr>(<a href="../../style/Overflow.html" title="enum class in dev.tamboui.style">Overflow</a>&nbsp;overflow)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the overflow (wrap) mode, mirroring <code>Paragraph.Builder.overflow</code>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholder(java.lang.String)" class="member-name-link">placeholder</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;placeholder)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholder(java.lang.String)" class="member-name-link">placeholder</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;placeholder)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the placeholder text shown when the text area is empty.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholderColor(dev.tamboui.style.Color)" class="member-name-link">placeholderColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholderColor(dev.tamboui.style.Color)" class="member-name-link">placeholderColor</a><wbr>(<a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the placeholder text color programmatically.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholderStyle(dev.tamboui.style.Style)" class="member-name-link">placeholderStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;placeholderStyle)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#placeholderStyle(dev.tamboui.style.Style)" class="member-name-link">placeholderStyle</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;placeholderStyle)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the placeholder text style.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#showLineNumbers(boolean)" class="member-name-link">showLineNumbers</a><wbr>(boolean&nbsp;show)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#showLineNumbers(boolean)" class="member-name-link">showLineNumbers</a><wbr>(boolean&nbsp;show)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets whether to show line numbers.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#style(dev.tamboui.style.Style)" class="member-name-link">style</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#style(dev.tamboui.style.Style)" class="member-name-link">style</a><wbr>(<a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;style)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the base style.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styleResolver(dev.tamboui.style.StylePropertyResolver)" class="member-name-link">styleResolver</a><wbr>(<a href="../../style/StylePropertyResolver.html" title="interface in dev.tamboui.style">StylePropertyResolver</a>&nbsp;resolver)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#styleResolver(dev.tamboui.style.StylePropertyResolver)" class="member-name-link">styleResolver</a><wbr>(<a href="../../style/StylePropertyResolver.html" title="interface in dev.tamboui.style">StylePropertyResolver</a>&nbsp;resolver)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the property resolver for style-aware properties.</div>
 </div>
 </div>
@@ -353,6 +359,21 @@ reach, so a text area falls back to <code>CLIP</code> for them.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>overflow</code> - the overflow mode</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="continuationIndent(dev.tamboui.style.ContinuationIndent)">
+<h3>continuationIndent</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextArea.Builder.html" title="class in dev.tamboui.widgets.input">TextArea.Builder</a></span>&nbsp;<span class="element-name">continuationIndent</span><wbr><span class="parameters">(<a href="../../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a>&nbsp;continuationIndent)</span></div>
+<div class="block">Sets the continuation indent strategy used when wrapping lines, mirroring <code>Paragraph.Builder.continuationIndent</code>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>continuationIndent</code> - the continuation indent strategy, or null for default (<a href="../../style/ContinuationIndent.html#HANGING"><code>ContinuationIndent.HANGING</code></a>)</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

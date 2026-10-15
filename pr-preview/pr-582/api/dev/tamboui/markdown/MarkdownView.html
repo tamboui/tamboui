@@ -72,6 +72,7 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#continuationIndent()" tabindex="0">continuationIndent()</a></li>
 <li><a href="#builder()" tabindex="0">builder()</a></li>
 <li><a href="#computeHeight(int)" tabindex="0">computeHeight(int)</a></li>
 <li><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer)" tabindex="0">render(Rect, Buffer)</a></li>
@@ -241,10 +242,15 @@ MarkdownView {
 <div class="block">Computes the total number of rows the rendered markdown would take at
 <code>width</code> columns.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer)" class="member-name-link">render</a><wbr>(<a href="../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
- <a href="../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#continuationIndent()" class="member-name-link">continuationIndent</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer)" class="member-name-link">render</a><wbr>(<a href="../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
+ <a href="../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders this widget to the given buffer area.</div>
 </div>
 </div>
@@ -299,6 +305,19 @@ MarkdownView {
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="continuationIndent()">
+<h3>continuationIndent</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a></span>&nbsp;<span class="element-name">continuationIndent</span>()</div>
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the continuation indent strategy</dd>
+</dl>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="builder()">
 <h3>builder</h3>

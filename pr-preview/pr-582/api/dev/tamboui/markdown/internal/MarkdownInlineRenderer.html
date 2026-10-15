@@ -59,6 +59,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#render(org.commonmark.node.Node,dev.tamboui.style.Style,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.text.TextWrapOptions)" tabindex="0">render(Node, Style, int, MarkdownStyles, TextWrapOptions)</a></li>
 <li><a href="#render(org.commonmark.node.Node,dev.tamboui.style.Style,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)" tabindex="0">render(Node, Style, int, MarkdownStyles, Overflow)</a></li>
 <li><a href="#renderSpans(org.commonmark.node.Node,dev.tamboui.style.Style,dev.tamboui.markdown.MarkdownStyles)" tabindex="0">renderSpans(Node, Style, MarkdownStyles)</a></li>
 </ol>
@@ -106,11 +107,21 @@ descends into emphasis, strong, code, and link nodes.</div>
 <div class="block">Renders the inline children of <code>parent</code> into lines using the
 given overflow strategy.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../../text/Span.html" title="class in dev.tamboui.text">Span</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#renderSpans(org.commonmark.node.Node,dev.tamboui.style.Style,dev.tamboui.markdown.MarkdownStyles)" class="member-name-link">renderSpans</a><wbr>(org.commonmark.node.Node&nbsp;parent,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../../text/Line.html" title="class in dev.tamboui.text">Line</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#render(org.commonmark.node.Node,dev.tamboui.style.Style,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.text.TextWrapOptions)" class="member-name-link">render</a><wbr>(org.commonmark.node.Node&nbsp;parent,
+ <a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;baseStyle,
+ int&nbsp;maxWidth,
+ <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles,
+ <a href="../../text/TextWrapOptions.html" title="class in dev.tamboui.text">TextWrapOptions</a>&nbsp;options)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Renders the inline children of <code>parent</code> into lines using the
+given text wrap options.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../../text/Span.html" title="class in dev.tamboui.text">Span</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#renderSpans(org.commonmark.node.Node,dev.tamboui.style.Style,dev.tamboui.markdown.MarkdownStyles)" class="member-name-link">renderSpans</a><wbr>(org.commonmark.node.Node&nbsp;parent,
  <a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;baseStyle,
  <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Walks the inline children of <code>parent</code> and emits a list of plain
 styled spans (without wrapping).</div>
 </div>
@@ -131,6 +142,30 @@ styled spans (without wrapping).</div>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="render(org.commonmark.node.Node,dev.tamboui.style.Style,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.text.TextWrapOptions)">
+<h3>render</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../text/Line.html" title="class in dev.tamboui.text">Line</a>&gt;</span>&nbsp;<span class="element-name">render</span><wbr><span class="parameters">(org.commonmark.node.Node&nbsp;parent,
+ <a href="../../style/Style.html" title="class in dev.tamboui.style">Style</a>&nbsp;baseStyle,
+ int&nbsp;maxWidth,
+ <a href="../MarkdownStyles.html" title="class in dev.tamboui.markdown">MarkdownStyles</a>&nbsp;styles,
+ <a href="../../text/TextWrapOptions.html" title="class in dev.tamboui.text">TextWrapOptions</a>&nbsp;options)</span></div>
+<div class="block">Renders the inline children of <code>parent</code> into lines using the
+given text wrap options.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>parent</code> - the block node whose inline children should be rendered</dd>
+<dd><code>baseStyle</code> - the style applied to plain text (e.g. heading style)</dd>
+<dd><code>maxWidth</code> - target width in columns; values &lt;= 0 produce an empty list</dd>
+<dd><code>styles</code> - the style palette</dd>
+<dd><code>options</code> - the text wrap options</dd>
+<dt>Returns:</dt>
+<dd>a list of lines that all fit within <code>maxWidth</code></dd>
+</dl>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="render(org.commonmark.node.Node,dev.tamboui.style.Style,int,dev.tamboui.markdown.MarkdownStyles,dev.tamboui.style.Overflow)">
 <h3>render</h3>

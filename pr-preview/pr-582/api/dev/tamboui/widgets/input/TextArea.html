@@ -69,6 +69,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#builder()" tabindex="0">builder()</a></li>
+<li><a href="#continuationIndent()" tabindex="0">continuationIndent()</a></li>
 <li><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)" tabindex="0">render(Rect, Buffer, TextAreaState)</a></li>
 <li><a href="#renderWithCursor(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState,dev.tamboui.terminal.Frame)" tabindex="0">renderWithCursor(Rect, Buffer, TextAreaState, Frame)</a></li>
 <li><a href="#preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)" tabindex="0">preferredHeight(int, TextAreaState)</a></li>
@@ -159,27 +160,32 @@ implements <a href="../../widget/StatefulWidget.html" title="interface in dev.ta
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a new text area builder.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">preferredHeight</a><wbr>(int&nbsp;width,
- <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#continuationIndent()" class="member-name-link">continuationIndent</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#preferredHeight(int,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">preferredHeight</a><wbr>(int&nbsp;width,
+ <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the height, in rows, needed to show all of <code>state</code>'s text without scrolling
 when rendered <code>width</code> columns wide: one row per display row (see
 <a href="TextAreaState.html#computeDisplayRows(int,dev.tamboui.style.Overflow)"><code>TextAreaState.computeDisplayRows(int, Overflow)</code></a>), plus the rows taken by the block, if any.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">render</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState)" class="member-name-link">render</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
  <a href="../../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer,
  <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders this widget to the given buffer area with the provided state.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#renderWithCursor(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState,dev.tamboui.terminal.Frame)" class="member-name-link">renderWithCursor</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#renderWithCursor(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer,dev.tamboui.widgets.input.TextAreaState,dev.tamboui.terminal.Frame)" class="member-name-link">renderWithCursor</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
  <a href="../../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer,
  <a href="TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a>&nbsp;state,
  <a href="../../terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a>&nbsp;frame)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders the widget and sets the cursor position on the frame.</div>
 </div>
 </div>
@@ -249,6 +255,19 @@ CSS property name: <code>line-number-color</code></div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>a new Builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="continuationIndent()">
+<h3>continuationIndent</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a></span>&nbsp;<span class="element-name">continuationIndent</span>()</div>
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the continuation indent strategy</dd>
 </dl>
 </div>
 </section>

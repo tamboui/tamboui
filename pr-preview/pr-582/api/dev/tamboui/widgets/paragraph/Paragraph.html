@@ -65,6 +65,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#from(dev.tamboui.text.Text)" tabindex="0">from(Text)</a></li>
 <li><a href="#from(dev.tamboui.text.Line)" tabindex="0">from(Line)</a></li>
 <li><a href="#from(dev.tamboui.text.Span)" tabindex="0">from(Span)</a></li>
+<li><a href="#continuationIndent()" tabindex="0">continuationIndent()</a></li>
 <li><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer)" tabindex="0">render(Rect, Buffer)</a></li>
 </ol>
 </li>
@@ -129,30 +130,35 @@ Supports style-aware properties: <code>text-overflow</code>, <code>text-align</c
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a new paragraph builder.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(dev.tamboui.text.Line)" class="member-name-link">from</a><wbr>(<a href="../../text/Line.html" title="class in dev.tamboui.text">Line</a>&nbsp;line)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#continuationIndent()" class="member-name-link">continuationIndent</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(dev.tamboui.text.Line)" class="member-name-link">from</a><wbr>(<a href="../../text/Line.html" title="class in dev.tamboui.text">Line</a>&nbsp;line)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a paragraph from a line.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(dev.tamboui.text.Span)" class="member-name-link">from</a><wbr>(<a href="../../text/Span.html" title="class in dev.tamboui.text">Span</a>&nbsp;span)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(dev.tamboui.text.Span)" class="member-name-link">from</a><wbr>(<a href="../../text/Span.html" title="class in dev.tamboui.text">Span</a>&nbsp;span)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a paragraph from a span.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(dev.tamboui.text.Text)" class="member-name-link">from</a><wbr>(<a href="../../text/Text.html" title="class in dev.tamboui.text">Text</a>&nbsp;text)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(dev.tamboui.text.Text)" class="member-name-link">from</a><wbr>(<a href="../../text/Text.html" title="class in dev.tamboui.text">Text</a>&nbsp;text)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a paragraph from a text.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(java.lang.String)" class="member-name-link">from</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;text)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Paragraph.html" title="class in dev.tamboui.widgets.paragraph">Paragraph</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(java.lang.String)" class="member-name-link">from</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;text)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a paragraph from a string.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer)" class="member-name-link">render</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(dev.tamboui.layout.Rect,dev.tamboui.buffer.Buffer)" class="member-name-link">render</a><wbr>(<a href="../../layout/Rect.html" title="class in dev.tamboui.layout">Rect</a>&nbsp;area,
  <a href="../../buffer/Buffer.html" title="class in dev.tamboui.buffer">Buffer</a>&nbsp;buffer)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Renders this widget to the given buffer area.</div>
 </div>
 </div>
@@ -241,6 +247,19 @@ Supports style-aware properties: <code>text-overflow</code>, <code>text-align</c
 <dd><code>span</code> - the span content</dd>
 <dt>Returns:</dt>
 <dd>a new Paragraph</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="continuationIndent()">
+<h3>continuationIndent</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../style/ContinuationIndent.html" title="enum class in dev.tamboui.style">ContinuationIndent</a></span>&nbsp;<span class="element-name">continuationIndent</span>()</div>
+<div class="block">Returns the continuation indent strategy used when wrapping lines.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the continuation indent strategy</dd>
 </dl>
 </div>
 </section>
