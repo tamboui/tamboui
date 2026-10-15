@@ -144,6 +144,15 @@ public final class Table implements StatefulWidget<TableState> {
     }
 
     /**
+     * Returns the column width constraints.
+     *
+     * @return the column width constraints
+     */
+    public List<Constraint> widths() {
+        return widths;
+    }
+
+    /**
      * Computes the number of data rows visible in the given area.
      * <p>
      * This accounts for the vertical space consumed by the optional
@@ -265,10 +274,11 @@ public final class Table implements StatefulWidget<TableState> {
     }
 
     private List<Integer> calculateColumnWidths(int availableWidth) {
+        List<Constraint> effectiveWidths = resolveFitConstraints();
         // Use Layout to calculate column widths based on constraints
         Rect fakeArea = new Rect(0, 0, availableWidth, 1);
         List<Rect> columnRects = Layout.horizontal()
-            .constraints(widths)
+            .constraints(effectiveWidths)
             .split(fakeArea);
 
         List<Integer> widthList = new ArrayList<>(columnRects.size());
@@ -276,6 +286,55 @@ public final class Table implements StatefulWidget<TableState> {
             widthList.add(rect.width());
         }
         return widthList;
+    }
+
+    private List<Constraint> resolveFitConstraints() {
+        boolean hasFit = false;
+        for (Constraint constraint : widths) {
+            if (constraint instanceof Constraint.Fit) {
+                hasFit = true;
+                break;
+            }
+        }
+        if (!hasFit) {
+            return widths;
+        }
+
+        List<Constraint> resolved = new ArrayList<>(widths.size());
+        for (int i = 0; i < widths.size(); i++) {
+            Constraint c = widths.get(i);
+            if (c instanceof Constraint.Fit) {
+                resolved.add(Constraint.length(maxColumnContentWidth(i)));
+            } else {
+                resolved.add(c);
+            }
+        }
+        return resolved;
+    }
+
+    private int maxColumnContentWidth(int columnIndex) {
+        int maxWidth = 0;
+        if (header != null && columnIndex < header.cells().size()) {
+            Cell cell = header.cells().get(columnIndex);
+            if (cell != null) {
+                maxWidth = Math.max(maxWidth, cell.width());
+            }
+        }
+        for (Row row : rows) {
+            if (columnIndex < row.cells().size()) {
+                Cell cell = row.cells().get(columnIndex);
+                if (cell != null) {
+                    maxWidth = Math.max(maxWidth, cell.width());
+                }
+            }
+        }
+        if (footer != null && columnIndex < footer.cells().size()) {
+            Cell cell = footer.cells().get(columnIndex);
+            if (cell != null) {
+                maxWidth = Math.max(maxWidth, cell.width());
+            }
+        }
+        return maxWidth;
     }
 
     private int renderRow(Buffer buffer, Rect tableArea, int y, Row row,

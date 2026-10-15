@@ -399,4 +399,85 @@ class TableTest {
         // Second row "Bob" starts at y=1 and should have blue background
         BufferAssertions.assertThat(buffer).at(0, 1).hasBackground(Color.BLUE);
     }
+
+    @Test
+    @DisplayName("Table with Constraint.fit() sizes columns to content width")
+    void fitConstraintsSizeToContent() {
+        Row header = Row.from("PID", "NAME", "STATUS");
+        List<Row> rows = Arrays.asList(
+            Row.from("1234", "java", "●"),
+            Row.from("5678", "node", "◐")
+        );
+        Table table = Table.builder()
+            .header(header)
+            .rows(rows)
+            .widths(Constraint.fit(), Constraint.fit(), Constraint.fit())
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 40, 3);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Header: "PID" (width 3), "NAME" (width 4), "STATUS" (width 6)
+        // Col 0: max("PID", "1234", "5678") = 4 -> x in [0, 4)
+        // Col 1: max("NAME", "java", "node") = 4 -> starts at 4 + 1 = 5, x in [5, 9)
+        // Col 2: max("STATUS", "●", "◐") = 6 -> starts at 5 + 4 + 1 = 10, x in [10, 16)
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("P");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("N");
+        assertThat(buffer.get(10, 0).symbol()).isEqualTo("S");
+
+        // Row 1
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("1");
+        assertThat(buffer.get(5, 1).symbol()).isEqualTo("j");
+        assertThat(buffer.get(10, 1).symbol()).isEqualTo("●");
+
+        // Row 2
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("5");
+        assertThat(buffer.get(5, 2).symbol()).isEqualTo("n");
+        assertThat(buffer.get(10, 2).symbol()).isEqualTo("◐");
+    }
+
+    @Test
+    @DisplayName("Table with mixed Fit and Fill constraints allocates remaining space to Fill")
+    void mixedFitAndFillConstraints() {
+        Row header = Row.from("ID", "Description");
+        List<Row> rows = Arrays.asList(
+            Row.from("1", "A very long description that fills remaining space")
+        );
+        Table table = Table.builder()
+            .header(header)
+            .rows(rows)
+            .widths(Constraint.fit(), Constraint.fill())
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 50, 2);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Col 0 max width is 2 ("ID"), so Col 1 starts at 2 + 1 = 3
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("I");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("D");
+
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("1");
+        assertThat(buffer.get(3, 1).symbol()).isEqualTo("A");
+    }
+
+    @Test
+    @DisplayName("Table exposes widths getter")
+    void widthsGetter() {
+        List<Constraint> constraints = Arrays.asList(Constraint.fit(), Constraint.length(10));
+        Table table = Table.builder()
+            .widths(constraints)
+            .build();
+
+        assertThat(table.widths()).isEqualTo(constraints);
+    }
 }

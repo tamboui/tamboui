@@ -375,9 +375,8 @@ public final class MarkdownLayout {
         }
 
         List<Constraint> widths = new ArrayList<>(columnCount);
-        int per = Math.max(1, 100 / columnCount);
         for (int i = 0; i < columnCount; i++) {
-            widths.add(Constraint.percentage(per));
+            widths.add(Constraint.fit());
         }
 
         Table.Builder tableBuilder = Table.builder()

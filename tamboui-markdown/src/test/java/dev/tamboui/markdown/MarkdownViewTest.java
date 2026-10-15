@@ -219,6 +219,28 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("renders a GFM table with content-based column widths")
+    void rendersTableContentBasedWidths() {
+        String md = "| Field | Value |\n|---|---|\n| Order ID | ORD-1003 |\n| Items | 1x CAMEL-TSHIRT |";
+        MarkdownView view = MarkdownView.builder().source(md).build();
+        // In a wide area (80 cols), the first column ("Order ID", len 8) should not take 40 cols (50%).
+        // Second column should start right after column 0 + spacing (8 + 1 = 9).
+        Buffer buffer = renderInto(view, 80, 3);
+
+        // Header: "Field" at 0, "Value" at 9
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("F");
+        assertThat(buffer.get(9, 0).symbol()).isEqualTo("V");
+
+        // Row 1: "Order ID" at 0, "ORD-1003" at 9
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("O");
+        assertThat(buffer.get(9, 1).symbol()).isEqualTo("O");
+
+        // Row 2: "Items" at 0, "1x CAMEL-TSHIRT" at 9
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("I");
+        assertThat(buffer.get(9, 2).symbol()).isEqualTo("1");
+    }
+
+    @Test
     @DisplayName("scrolls past the first chunk when scroll is set")
     void scrollsContent() {
         // Layout produces: heading(1) + rule(1) + spacer(1) + paragraph(1) = 4 rows
