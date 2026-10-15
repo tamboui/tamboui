@@ -23,7 +23,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.elements.DialogElement;
-import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.block.Block;
@@ -152,35 +151,9 @@ public class FileManagerView implements Element {
     }
 
     private DialogElement createInputDialog(String title, String prompt, Runnable onConfirm) {
-        TextInputElement input = textInput(manager.inputState())
-                .cursorStyle(dev.tamboui.style.Style.EMPTY.fg(Color.CYAN).reversed());
-        Element focusedInput = new Element() {
-            @Override
-            public void render(Frame frame, Rect renderArea, RenderContext ctx) {
-                input.render(frame, renderArea, ctx);
-            }
-
-            @Override
-            public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-                // The modal dialog is not focused, so it passes focused == false to its children and the text
-                // input would ignore the keys, which the dialog then consumes (see #440). The input owns the
-                // keys while the prompt is shown; Enter and Esc are left to the dialog.
-                return input.handleKeyEvent(event, true);
-            }
-
-            @Override
-            public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
-                return input.preferredSize(availableWidth, availableHeight, context);
-            }
-
-            @Override
-            public Constraint constraint() {
-                return input.constraint();
-            }
-        };
         return dialog(title,
                 text(prompt),
-                focusedInput,
+                textInput(manager.inputState()).cursorStyle(dev.tamboui.style.Style.EMPTY.fg(Color.CYAN).reversed()),
                 text("[Enter] Confirm  [Esc] Cancel").dim()
         ).rounded()
                 .borderColor(Color.CYAN)
@@ -211,13 +184,9 @@ public class FileManagerView implements Element {
      */
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        // Route to input dialog if one is present (modal behavior with text input)
-        if (currentDialog != null && manager.isInputDialog()) {
+        // Route to input or viewer dialog if one is present (modal behavior with text input and viewer keys)
+        if (currentDialog != null && (manager.isInputDialog() || manager.isViewerDialog())) {
             return currentDialog.handleKeyEvent(event, true);
-        }
-        // Route to viewer dialog if one is present
-        if (manager.isViewerDialog()) {
-            return handleViewerKey(event);
         }
         // For confirmation dialogs and browser, use the key handler
         return keyHandler.handle(event);
@@ -406,15 +375,6 @@ public class FileManagerView implements Element {
             }
 
             @Override
-            public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-                // The modal dialog consumes all key events, so the view-level
-                // routing in FileManagerView.handleKeyEvent never sees the
-                // scroll keys; handle them here where the dialog routes
-                // children first.
-                return handleViewerKey(event);
-            }
-
-            @Override
             public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
                 return Size.UNKNOWN;
             }
@@ -435,6 +395,7 @@ public class FileManagerView implements Element {
                 .borderColor(Color.CYAN)
                 .width(dialogWidth)
                 .length(dialogHeight)
+                .onKey(this::handleViewerKey)
                 .onCancel(manager::dismissDialog);
 
         currentDialog.render(frame, area, context);

@@ -268,6 +268,8 @@ public class MvcSnippets {
     TextInputState inputState = new TextInputState();
     void createDirectory(String name) {}
     void dismissDialog() {}
+    void scrollUp() {}
+    void scrollDown() {}
 
     void dialogElement() {
         // tag::dialog-element[]
@@ -281,6 +283,21 @@ public class MvcSnippets {
          .onConfirm(() -> createDirectory(inputState.text()))
          .onCancel(() -> dismissDialog());
         // end::dialog-element[]
+    }
+
+    void scrollableDialog() {
+        // tag::dialog-onkey[]
+        var viewerDialog = dialog("Log Viewer",
+            text("Log output line 1..."),
+            text("[Esc] Close  [↑↓] Scroll").dim()
+        ).rounded()
+         .onKey(event -> {
+             if (event.isUp()) { scrollUp(); return EventResult.HANDLED; }
+             if (event.isDown()) { scrollDown(); return EventResult.HANDLED; }
+             return EventResult.UNHANDLED;
+         })
+         .onCancel(() -> dismissDialog());
+        // end::dialog-onkey[]
     }
 
     // tag::custom-overlay[]

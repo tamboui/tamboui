@@ -138,9 +138,25 @@ include::{snippets-dir}/dev/tamboui/docs/snippets/MvcSnippets.java[tags=multi-pa
 
 === The Dialog Element
 
+`DialogElement` simplifies creating modal dialogs by centering itself, clearing background area, and managing modal key events.
+
 [source,java]
 ----
 include::{snippets-dir}/dev/tamboui/docs/snippets/MvcSnippets.java[tags=dialog-element]
+----
+
+==== Key Routing and Content Hooks
+
+Because `DialogElement` is modal, it consumes keyboard events to prevent them from leaking to background elements. Keys are dispatched in order:
+
+1. **Children first**: Offered to child elements with `focused=true`, so components like `textInput()` handle text entry and editing keys.
+2. **Content-key hook (`.onKey(...)`)**: If no child handles the key, the handler registered via `.onKey(...)` is invoked. This allows dialog owners to handle scrolling or paging (e.g. in file or log viewers) without subclassing child elements.
+3. **Confirm and Cancel**: Enter invokes `.onConfirm(...)` and Escape invokes `.onCancel(...)`.
+4. **Modal consume-all**: Any remaining unhandled keys are consumed.
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/MvcSnippets.java[tags=dialog-onkey]
 ----
 
 === Implementing Custom Overlay
