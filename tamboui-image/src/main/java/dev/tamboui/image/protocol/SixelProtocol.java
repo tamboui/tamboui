@@ -76,6 +76,11 @@ public final class SixelProtocol implements ImageProtocol {
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
+        // Mark covered cells in buffer
+        int coveredCols = Math.min(area.width(), (image.width() + 7) / 8);
+        int coveredRows = Math.min(area.height(), (image.height() + 15) / 16);
+        ImageProtocol.markCoveredCells(buffer, new Rect(area.x(), area.y(), coveredCols, coveredRows));
+
         // Generate and write Sixel data
         // The image should already be scaled by Image.scaleImage() based on the scaling mode
         byte[] sixelData = encodeSixel(image);

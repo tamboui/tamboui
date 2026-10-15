@@ -45,6 +45,11 @@ public final class TerminalImageCapabilities {
 
     private final Set<TerminalImageProtocol> supportedProtocols;
     private final TerminalImageProtocol bestSupport;
+    private final ImageProtocol kittyProtocol = new KittyProtocol();
+    private final ImageProtocol itermProtocol = new ITermProtocol();
+    private final ImageProtocol sixelProtocol = new SixelProtocol();
+    private final ImageProtocol halfBlockProtocol = new HalfBlockProtocol();
+    private final ImageProtocol brailleProtocol = new BrailleProtocol();
 
     private TerminalImageCapabilities(Set<TerminalImageProtocol> supportedProtocols) {
         this.supportedProtocols = EnumSet.copyOf(supportedProtocols);
@@ -142,20 +147,8 @@ public final class TerminalImageCapabilities {
      * @return the best available protocol
      */
     public ImageProtocol bestProtocol() {
-        switch (bestSupport) {
-            case KITTY:
-                return new KittyProtocol();
-            case ITERM2:
-                return new ITermProtocol();
-            case SIXEL:
-                return new SixelProtocol();
-            case HALF_BLOCK:
-                return new HalfBlockProtocol();
-            case BRAILLE:
-                return new BrailleProtocol();
-            default:
-                return new HalfBlockProtocol();
-        }
+        ImageProtocol p = protocolFor(bestSupport);
+        return p != null ? p : halfBlockProtocol;
     }
 
     /**
@@ -165,17 +158,20 @@ public final class TerminalImageCapabilities {
      * @return the protocol implementation, or null if not available
      */
     public ImageProtocol protocolFor(TerminalImageProtocol support) {
+        if (support == null) {
+            return null;
+        }
         switch (support) {
             case KITTY:
-                return new KittyProtocol();
+                return kittyProtocol;
             case ITERM2:
-                return new ITermProtocol();
+                return itermProtocol;
             case SIXEL:
-                return new SixelProtocol();
+                return sixelProtocol;
             case HALF_BLOCK:
-                return new HalfBlockProtocol();
+                return halfBlockProtocol;
             case BRAILLE:
-                return new BrailleProtocol();
+                return brailleProtocol;
             default:
                 return null;
         }

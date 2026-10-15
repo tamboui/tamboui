@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.image.ImageData;
 import dev.tamboui.image.capability.TerminalImageProtocol;
 import dev.tamboui.layout.Rect;
@@ -120,6 +121,34 @@ public interface ImageProtocol {
          */
         public int heightMultiplier() {
             return heightMultiplier;
+        }
+    }
+
+    /**
+     * Marks the cells covered by a native image in the buffer as continuation cells.
+     * <p>
+     * Marking covered cells prevents the terminal diff from overwriting the rendered image
+     * in the current frame, and ensures that when the image is moved, resized, or removed in
+     * subsequent frames, the diff naturally detects the uncovered cells and erases them by
+     * writing spaces to the terminal.
+     *
+     * @param buffer the buffer to mark cells in (may be null)
+     * @param area   the bounding box in character cells to mark
+     */
+    static void markCoveredCells(Buffer buffer, Rect area) {
+        if (buffer == null || area == null || area.isEmpty()) {
+            return;
+        }
+        Rect bufArea = buffer.area();
+        int right = Math.min(area.right(), bufArea.right());
+        int bottom = Math.min(area.bottom(), bufArea.bottom());
+        int startX = Math.max(area.x(), bufArea.x());
+        int startY = Math.max(area.y(), bufArea.y());
+
+        for (int y = startY; y < bottom; y++) {
+            for (int x = startX; x < right; x++) {
+                buffer.set(x, y, Cell.CONTINUATION);
+            }
         }
     }
 }

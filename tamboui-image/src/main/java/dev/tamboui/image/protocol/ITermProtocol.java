@@ -68,6 +68,9 @@ public final class ITermProtocol implements ImageProtocol {
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
+        // Mark covered cells in buffer
+        ImageProtocol.markCoveredCells(buffer, area);
+
         // Encode image as PNG
         byte[] pngData = image.toPng();
         String base64Data = Base64.getEncoder().encodeToString(pngData);
