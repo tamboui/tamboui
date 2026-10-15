@@ -195,6 +195,24 @@ class TableElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("preferredSize accounts for Constraint.fit() using content width")
+    void preferredSizeWithFitConstraint() {
+        TableElement element = table()
+            .header("PID", "NAME")
+            .row("1234", "java")
+            .widths(Constraint.fit(), Constraint.fit());
+
+        // Col 0: max("PID", "1234") = 4
+        // Col 1: max("NAME", "java") = 4
+        // Spacing: 1
+        // Highlight symbol (">> "): 2
+        // Total width: 4 + 4 + 1 + 2 = 11
+        // Height: 1 header + 1 row = 2
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(11);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("Attribute selector [title] affects Table border color")
     void attributeSelector_title_affectsBorderColor() {
         StyleEngine styleEngine = StyleEngine.create();

@@ -24,6 +24,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.table.Cell;
 import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.Table;
 import dev.tamboui.widgets.table.TableState;
@@ -281,21 +282,14 @@ public final class TableElement extends StyledElement<TableElement> {
         }
 
         if (!widths.isEmpty()) {
-            // Use constraint widths
-            for (Constraint w : widths) {
+            for (int i = 0; i < numCols; i++) {
+                Constraint w = widths.get(i < widths.size() ? i : i % widths.size());
                 if (w instanceof Constraint.Length) {
                     totalWidth += ((Constraint.Length) w).value();
+                } else if (w instanceof Constraint.Fit) {
+                    totalWidth += maxColumnContentWidth(i);
                 } else {
                     totalWidth += 10; // Default column width
-                }
-            }
-            // Cycle if fewer widths than columns
-            for (int i = widths.size(); i < numCols; i++) {
-                Constraint w = widths.get(i % widths.size());
-                if (w instanceof Constraint.Length) {
-                    totalWidth += ((Constraint.Length) w).value();
-                } else {
-                    totalWidth += 10;
                 }
             }
         } else {
@@ -330,6 +324,31 @@ public final class TableElement extends StyledElement<TableElement> {
         }
 
         return Size.of(totalWidth, height);
+    }
+
+    private int maxColumnContentWidth(int columnIndex) {
+        int maxWidth = 0;
+        if (header != null && columnIndex < header.cells().size()) {
+            Cell cell = header.cells().get(columnIndex);
+            if (cell != null) {
+                maxWidth = Math.max(maxWidth, cell.width());
+            }
+        }
+        for (Row row : rows) {
+            if (columnIndex < row.cells().size()) {
+                Cell cell = row.cells().get(columnIndex);
+                if (cell != null) {
+                    maxWidth = Math.max(maxWidth, cell.width());
+                }
+            }
+        }
+        if (footer != null && columnIndex < footer.cells().size()) {
+            Cell cell = footer.cells().get(columnIndex);
+            if (cell != null) {
+                maxWidth = Math.max(maxWidth, cell.width());
+            }
+        }
+        return maxWidth;
     }
 
     @Override
