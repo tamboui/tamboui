@@ -11,6 +11,8 @@ demo {
 
 dependencies {
     implementation(projects.tambouiTui)
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.bundles.testing)
 }
 
 application {
