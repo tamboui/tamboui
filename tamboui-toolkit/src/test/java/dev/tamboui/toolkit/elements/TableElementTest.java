@@ -212,4 +212,31 @@ class TableElementTest extends AbstractElementTest {
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }
+
+    @Test
+    @DisplayName("TableElement with Constraint.fit() derives column widths and preferredSize")
+    void tableElementWithFitConstraints() {
+        TableElement element = table()
+            .header("PID", "NAME")
+            .row("1234", "java")
+            .row("5678", "node")
+            .widths(Constraint.fit(), Constraint.fit())
+            .columnSpacing(1);
+
+        // PID=4, NAME=4 -> totalWidth = 4 + 4 + 1 (spacing) + 2 (default highlight symbol) = 11
+        // Height = 1 header + 2 rows = 3
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(11);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(3);
+
+        Rect area = new Rect(0, 0, 20, 5);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        element.render(frame, area, RenderContext.empty());
+
+        // When no row is selected, highlightWidth is 0.
+        // Col 0 at x=0: "PID"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("P");
+        // Col 1 at x=4+1=5: "NAME"
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("N");
+    }
 }
