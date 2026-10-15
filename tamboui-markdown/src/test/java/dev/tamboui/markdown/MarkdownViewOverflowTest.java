@@ -17,12 +17,14 @@ import org.junit.jupiter.api.Test;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.markdown.internal.MarkdownInlineRenderer;
+import dev.tamboui.style.ContinuationIndent;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
+import dev.tamboui.text.TextWrapOptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
@@ -194,5 +196,33 @@ class MarkdownViewOverflowTest {
         Buffer buffer = renderInto(view, 20, 1);
 
         assertThat(row(buffer, 0)).endsWith("...");
+    }
+
+    @Test
+    @DisplayName("MarkdownView supports continuationIndent configuration")
+    void continuationIndentConfiguration() {
+        MarkdownView defaultView = MarkdownView.builder().source("test").build();
+        assertThat(defaultView.continuationIndent()).isEqualTo(ContinuationIndent.HANGING);
+
+        MarkdownView flushLeftView = MarkdownView.builder()
+            .source("test")
+            .continuationIndent(ContinuationIndent.FLUSH_LEFT)
+            .build();
+        assertThat(flushLeftView.continuationIndent()).isEqualTo(ContinuationIndent.FLUSH_LEFT);
+    }
+
+    @Test
+    @DisplayName("MarkdownInlineRenderer respects continuationIndent options")
+    void inlineRendererContinuationIndent() {
+        org.commonmark.node.Node paragraph = Parser.builder().build().parse("word1 word2 word3 word4").getFirstChild();
+        List<Line> hangingLines = MarkdownInlineRenderer.render(
+            paragraph, Style.EMPTY, 12, MarkdownStyles.DEFAULTS,
+            TextWrapOptions.of(Overflow.WRAP_WORD, ContinuationIndent.HANGING));
+        List<Line> flushLeftLines = MarkdownInlineRenderer.render(
+            paragraph, Style.EMPTY, 12, MarkdownStyles.DEFAULTS,
+            TextWrapOptions.of(Overflow.WRAP_WORD, ContinuationIndent.FLUSH_LEFT));
+
+        assertThat(hangingLines).isNotEmpty();
+        assertThat(flushLeftLines).isNotEmpty();
     }
 }

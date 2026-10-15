@@ -36,6 +36,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
+import dev.tamboui.text.TextWrapOptions;
 import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
 import dev.tamboui.widgets.syntax.SyntaxHighlighter;
 import dev.tamboui.widgets.syntax.SyntaxTheme;
@@ -62,12 +63,12 @@ public final class MarkdownLayout {
      * @param root the root document node
      * @param width content width in columns
      * @param styles the style palette
-     * @param overflow how to handle prose lines wider than {@code width}
+     * @param options text wrap options
      * @param highlighter the syntax highlighter for code blocks
      * @param theme the syntax theme used by {@code highlighter}
      * @return an ordered list of chunks; never null, possibly empty
      */
-    public static List<RenderedChunk> layout(Node root, int width, MarkdownStyles styles, Overflow overflow,
+    public static List<RenderedChunk> layout(Node root, int width, MarkdownStyles styles, TextWrapOptions options,
                                              SyntaxHighlighter highlighter, SyntaxTheme theme) {
         List<RenderedChunk> chunks = new ArrayList<>();
         if (width <= 0) {
@@ -83,11 +84,41 @@ public final class MarkdownLayout {
             if (!firstBlock && needsSpacingBefore(node)) {
                 chunks.add(new LinesChunk(Collections.singletonList(Line.empty())));
             }
-            renderBlock(node, width, styles, overflow, highlighter, theme, chunks);
+            renderBlock(node, width, styles, options, highlighter, theme, chunks);
             firstBlock = false;
             node = node.getNext();
         }
         return chunks;
+    }
+
+    /**
+     * Lays out the children of {@code root} into renderable chunks.
+     *
+     * @param root the root document node
+     * @param width content width in columns
+     * @param styles the style palette
+     * @param overflow how to handle prose lines wider than {@code width}
+     * @param highlighter the syntax highlighter for code blocks
+     * @param theme the syntax theme used by {@code highlighter}
+     * @return an ordered list of chunks; never null, possibly empty
+     */
+    public static List<RenderedChunk> layout(Node root, int width, MarkdownStyles styles, Overflow overflow,
+                                             SyntaxHighlighter highlighter, SyntaxTheme theme) {
+        return layout(root, width, styles, TextWrapOptions.of(overflow), highlighter, theme);
+    }
+
+    /**
+     * Lays out the children of {@code root} into renderable chunks, using the
+     * default syntax highlighter and theme for code blocks.
+     *
+     * @param root the root document node
+     * @param width content width in columns
+     * @param styles the style palette
+     * @param options text wrap options
+     * @return an ordered list of chunks; never null, possibly empty
+     */
+    public static List<RenderedChunk> layout(Node root, int width, MarkdownStyles styles, TextWrapOptions options) {
+        return layout(root, width, styles, options, RegexSyntaxHighlighter.defaults(), SyntaxTheme.DEFAULTS);
     }
 
     /**
@@ -104,7 +135,7 @@ public final class MarkdownLayout {
      */
     @Deprecated
     public static List<RenderedChunk> layout(Node root, int width, MarkdownStyles styles, Overflow overflow) {
-        return layout(root, width, styles, overflow, RegexSyntaxHighlighter.defaults(), SyntaxTheme.DEFAULTS);
+        return layout(root, width, styles, TextWrapOptions.of(overflow));
     }
 
     private static boolean needsSpacingBefore(Node node) {
@@ -121,17 +152,17 @@ public final class MarkdownLayout {
     }
 
     private static void renderBlock(
-        Node node, int width, MarkdownStyles styles, Overflow overflow,
+        Node node, int width, MarkdownStyles styles, TextWrapOptions options,
         SyntaxHighlighter highlighter, SyntaxTheme theme, List<RenderedChunk> out) {
         if (node instanceof Heading) {
-            renderHeading((Heading) node, width, styles, overflow, out);
+            renderHeading((Heading) node, width, styles, options, out);
         } else if (node instanceof Paragraph) {
-            out.add(new LinesChunk(MarkdownInlineRenderer.render(node, Style.EMPTY, width, styles, overflow)));
+            out.add(new LinesChunk(MarkdownInlineRenderer.render(node, Style.EMPTY, width, styles, options)));
         } else if (node instanceof BulletList || node instanceof OrderedList) {
-            out.add(new LinesChunk(renderList((ListBlock) node, "", 0, width, styles, overflow,
+            out.add(new LinesChunk(renderList((ListBlock) node, "", 0, width, styles, options,
                 highlighter, theme)));
         } else if (node instanceof BlockQuote) {
-            out.add(new LinesChunk(renderBlockQuote((BlockQuote) node, width, styles, overflow,
+            out.add(new LinesChunk(renderBlockQuote((BlockQuote) node, width, styles, options,
                 highlighter, theme)));
         } else if (node instanceof FencedCodeBlock) {
             FencedCodeBlock fenced = (FencedCodeBlock) node;
@@ -150,9 +181,9 @@ public final class MarkdownLayout {
     }
 
     private static void renderHeading(
-        Heading heading, int width, MarkdownStyles styles, Overflow overflow, List<RenderedChunk> out) {
+        Heading heading, int width, MarkdownStyles styles, TextWrapOptions options, List<RenderedChunk> out) {
         Style headingStyle = styles.heading(heading.getLevel());
-        List<Line> lines = MarkdownInlineRenderer.render(heading, headingStyle, width, styles, overflow);
+        List<Line> lines = MarkdownInlineRenderer.render(heading, headingStyle, width, styles, options);
         if (heading.getLevel() <= 2) {
             char glyph = heading.getLevel() == 1 ? '═' : HORIZONTAL_RULE_GLYPH;
             String rule = MarkdownText.repeat(glyph, width);
@@ -165,7 +196,7 @@ public final class MarkdownLayout {
     }
 
     private static List<Line> renderList(
-        ListBlock list, String indent, int depth, int width, MarkdownStyles styles, Overflow overflow,
+        ListBlock list, String indent, int depth, int width, MarkdownStyles styles, TextWrapOptions options,
         SyntaxHighlighter highlighter, SyntaxTheme theme) {
         List<Line> result = new ArrayList<>();
         boolean ordered = list instanceof OrderedList;
@@ -188,7 +219,7 @@ public final class MarkdownLayout {
                 int prefixWidth = totalSpanWidth(prefix);
                 String continuationIndent = MarkdownText.repeat(' ', prefixWidth);
                 renderListItem(
-                    (ListItem) child, prefix, continuationIndent, depth, width, styles, overflow,
+                    (ListItem) child, prefix, continuationIndent, depth, width, styles, options,
                     highlighter, theme, result);
             }
             child = child.getNext();
@@ -197,7 +228,7 @@ public final class MarkdownLayout {
     }
 
     private static void renderListItem(ListItem item, List<Span> prefix, String continuationIndent,
-                                       int depth, int width, MarkdownStyles styles, Overflow overflow,
+                                       int depth, int width, MarkdownStyles styles, TextWrapOptions options,
                                        SyntaxHighlighter highlighter, SyntaxTheme theme,
                                        List<Line> out) {
         Node child = item.getFirstChild();
@@ -207,7 +238,7 @@ public final class MarkdownLayout {
             if (child instanceof Paragraph) {
                 int contentWidth = Math.max(1, width - prefixWidth);
                 List<Line> paragraphLines = MarkdownInlineRenderer.render(
-                    child, Style.EMPTY, contentWidth, styles, overflow);
+                    child, Style.EMPTY, contentWidth, styles, options);
                 for (int i = 0; i < paragraphLines.size(); i++) {
                     if (firstParagraph && i == 0) {
                         out.add(prependSpans(prefix, paragraphLines.get(i)));
@@ -218,7 +249,7 @@ public final class MarkdownLayout {
                 firstParagraph = false;
             } else if (child instanceof BulletList || child instanceof OrderedList) {
                 List<Line> sub = renderList((ListBlock) child, continuationIndent, depth + 1,
-                    width, styles, overflow, highlighter, theme);
+                    width, styles, options, highlighter, theme);
                 out.addAll(sub);
             } else if (child instanceof TaskListItemMarker) {
                 // Already consumed by taskCheckedFlag; skip.
@@ -239,7 +270,7 @@ public final class MarkdownLayout {
             } else {
                 List<RenderedChunk> embedded = new ArrayList<>();
                 int contentWidth = Math.max(1, width - prefixWidth);
-                renderBlock(child, contentWidth, styles, overflow, highlighter, theme, embedded);
+                renderBlock(child, contentWidth, styles, options, highlighter, theme, embedded);
                 for (RenderedChunk chunk : embedded) {
                     if (chunk instanceof LinesChunk) {
                         for (Line line : ((LinesChunk) chunk).lines()) {
@@ -296,7 +327,7 @@ public final class MarkdownLayout {
     }
 
     private static List<Line> renderBlockQuote(
-        BlockQuote quote, int width, MarkdownStyles styles, Overflow overflow,
+        BlockQuote quote, int width, MarkdownStyles styles, TextWrapOptions options,
         SyntaxHighlighter highlighter, SyntaxTheme theme) {
         String prefix = styles.blockquotePrefix() + " ";
         int contentWidth = Math.max(1, width - CharWidth.of(prefix));
@@ -307,7 +338,7 @@ public final class MarkdownLayout {
             if (!firstChild && needsSpacingBefore(child)) {
                 inner.add(new LinesChunk(Collections.singletonList(Line.empty())));
             }
-            renderBlock(child, contentWidth, styles, overflow, highlighter, theme, inner);
+            renderBlock(child, contentWidth, styles, options, highlighter, theme, inner);
             firstChild = false;
             child = child.getNext();
         }

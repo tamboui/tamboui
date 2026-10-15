@@ -17,6 +17,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ContinuationIndent;
 import dev.tamboui.style.Hyperlink;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
@@ -265,6 +266,28 @@ class ParagraphTest {
 
         assertThat(row(buffer, 0)).isEqualTo("    abcdef");
         assertThat(row(buffer, 1)).isEqualTo("    ghijkl");
+    }
+
+    @Test
+    @DisplayName("FLUSH_LEFT restarts wrapped rows at column 0")
+    void flushLeftRestartsAtEdge() {
+        Paragraph defaultParagraph = Paragraph.builder().text(Text.from("test")).build();
+        assertThat(defaultParagraph.continuationIndent()).isEqualTo(ContinuationIndent.HANGING);
+
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from("    abcdefghijkl"))
+            .overflow(Overflow.WRAP_CHARACTER)
+            .continuationIndent(ContinuationIndent.FLUSH_LEFT)
+            .build();
+        assertThat(paragraph.continuationIndent()).isEqualTo(ContinuationIndent.FLUSH_LEFT);
+
+        Rect area = new Rect(0, 0, 10, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        assertThat(row(buffer, 0)).isEqualTo("    abcdef");
+        assertThat(row(buffer, 1)).isEqualTo("ghijkl");
     }
 
     @Test

@@ -21,6 +21,7 @@ import dev.tamboui.markdown.internal.RenderedChunk;
 import dev.tamboui.markdown.internal.WidgetChunk;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.ContinuationIndent;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.ModifierConverter;
 import dev.tamboui.style.Overflow;
@@ -30,6 +31,7 @@ import dev.tamboui.style.StringConverter;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
+import dev.tamboui.text.TextWrapOptions;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
@@ -153,6 +155,7 @@ public final class MarkdownView implements Widget {
     private final SyntaxHighlighter syntaxHighlighter;
     private final SyntaxTheme syntaxTheme;
     private final Overflow overflow;
+    private final ContinuationIndent continuationIndent;
     private final int scroll;
 
     private MarkdownView(Builder builder) {
@@ -175,7 +178,21 @@ public final class MarkdownView implements Widget {
                 .get(StandardProperties.TEXT_OVERFLOW)
                 .orElse(Overflow.WRAP_WORD);
         }
+        this.continuationIndent = builder.continuationIndent != null ? builder.continuationIndent : ContinuationIndent.HANGING;
         this.scroll = builder.scroll;
+    }
+
+    /**
+     * Returns the continuation indent strategy used when wrapping lines.
+     *
+     * @return the continuation indent strategy
+     */
+    public ContinuationIndent continuationIndent() {
+        return continuationIndent;
+    }
+
+    private TextWrapOptions wrapOptions() {
+        return TextWrapOptions.of(overflow, continuationIndent);
     }
 
     /**
@@ -215,7 +232,7 @@ public final class MarkdownView implements Widget {
         MarkdownStyles resolved = resolveStyles();
         int total = 0;
         for (RenderedChunk chunk : MarkdownLayout.layout(
-            root, contentWidth, resolved, overflow, syntaxHighlighter, syntaxTheme)) {
+            root, contentWidth, resolved, wrapOptions(), syntaxHighlighter, syntaxTheme)) {
             total += chunk.height(contentWidth);
         }
         return total + chrome;
@@ -241,7 +258,7 @@ public final class MarkdownView implements Widget {
         Node root = MarkdownParserHolder.parser().parse(sanitized);
         MarkdownStyles resolved = resolveStyles();
         List<RenderedChunk> chunks = MarkdownLayout.layout(
-            root, contentArea.width(), resolved, overflow, syntaxHighlighter, syntaxTheme);
+            root, contentArea.width(), resolved, wrapOptions(), syntaxHighlighter, syntaxTheme);
 
         int totalRows = 0;
         for (RenderedChunk chunk : chunks) {
@@ -417,6 +434,7 @@ public final class MarkdownView implements Widget {
         private SyntaxHighlighter syntaxHighlighter;
         private SyntaxTheme syntaxTheme = SyntaxTheme.DEFAULTS;
         private Overflow overflow;
+        private ContinuationIndent continuationIndent;
         private int scroll;
 
         private Builder() {
@@ -497,6 +515,18 @@ public final class MarkdownView implements Widget {
          */
         public Builder overflow(Overflow overflow) {
             this.overflow = Objects.requireNonNull(overflow, "overflow");
+            return this;
+        }
+
+        /**
+         * Sets the continuation indent strategy used when wrapping lines, mirroring
+         * {@code Paragraph.Builder.continuationIndent}.
+         *
+         * @param continuationIndent the continuation indent strategy, or null for default ({@link ContinuationIndent#HANGING})
+         * @return this builder
+         */
+        public Builder continuationIndent(ContinuationIndent continuationIndent) {
+            this.continuationIndent = continuationIndent != null ? continuationIndent : ContinuationIndent.HANGING;
             return this;
         }
 
