@@ -145,6 +145,8 @@ public final class ListState {
 
     /**
      * Scrolls the list to ensure the selected item is visible.
+     * <p>
+     * A selection past the last item scrolls to the last item.
      *
      * @param visibleHeight the visible height in the display area
      * @param items the list of items
@@ -154,12 +156,14 @@ public final class ListState {
             return;
         }
 
+        int sel = Math.min(selected, items.size() - 1);
+
         // Calculate the top position of the selected item
         int selectedTop = 0;
-        for (int i = 0; i < selected && i < items.size(); i++) {
+        for (int i = 0; i < sel; i++) {
             selectedTop += items.get(i).height();
         }
-        int selectedBottom = selectedTop + items.get(selected).height();
+        int selectedBottom = selectedTop + items.get(sel).height();
 
         // Adjust offset if needed
         if (selectedTop < offset) {

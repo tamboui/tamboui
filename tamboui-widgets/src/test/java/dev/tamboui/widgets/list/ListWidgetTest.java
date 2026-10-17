@@ -359,4 +359,15 @@ class ListWidgetTest {
 
         assertThat(buffer).isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("ListState scrollToSelected with the selection past the items scrolls to the last item")
+    void scrollToSelectedPastLastItemScrollsToLastItem() {
+        ListState state = new ListState();
+        state.select(5);
+
+        state.scrollToSelected(2, Arrays.asList(ListItem.from("a"), ListItem.from("b"), ListItem.from("c")));
+
+        assertThat(state.offset()).isEqualTo(1);
+    }
 }
