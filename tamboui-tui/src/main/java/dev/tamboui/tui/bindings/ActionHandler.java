@@ -199,10 +199,19 @@ public final class ActionHandler {
     }
 
     /**
+     * Checks if any action handlers are registered.
+     *
+     * @return true if no handlers are registered, false otherwise
+     */
+    public boolean isEmpty() {
+        return handlers.isEmpty();
+    }
+
+    /**
      * Discovers and registers action handlers from the target object.
      * <p>
      * First attempts to find generated {@link ActionHandlerRegistrar} implementations
-     * via ServiceLoader. If no registrar is found for the target's exact class,
+     * via ServiceLoader. If no registrar is found for a class in the target's class hierarchy,
      * falls back to reflection-based discovery of {@code @OnAction} annotated methods.
      *
      * @param target the object containing {@code @OnAction} annotated methods
@@ -212,46 +221,64 @@ public final class ActionHandler {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> ActionHandler registerAnnotated(T target) {
         Class<?> targetClass = target.getClass();
-        boolean foundRegistrar = false;
-
-        ServiceLoader<ActionHandlerRegistrar> loader =
-                ServiceLoader.load(ActionHandlerRegistrar.class);
+        ClassLoader classLoader = targetClass.getClassLoader();
+        ServiceLoader<ActionHandlerRegistrar> loader = classLoader != null
+                ? ServiceLoader.load(ActionHandlerRegistrar.class, classLoader)
+                : ServiceLoader.load(ActionHandlerRegistrar.class);
+        List<ActionHandlerRegistrar<?>> registrars = new ArrayList<>();
         for (ActionHandlerRegistrar<?> registrar : loader) {
-            if (registrar.targetType() == targetClass) {
-                ((ActionHandlerRegistrar<T>) registrar).register(target, this);
-                foundRegistrar = true;
-            }
+            registrars.add(registrar);
         }
 
-        if (!foundRegistrar) {
-            registerViaReflection(target);
+        Set<String> seenMethods = new HashSet<>();
+        Class<?> clazz = targetClass;
+        while (clazz != null && clazz != Object.class) {
+            boolean foundRegistrar = false;
+            for (ActionHandlerRegistrar<?> registrar : registrars) {
+                if (registrar.targetType() == clazz) {
+                    ((ActionHandlerRegistrar<Object>) registrar).register(target, this);
+                    foundRegistrar = true;
+                }
+            }
+
+            if (!foundRegistrar) {
+                registerViaReflection(target, clazz, seenMethods);
+            }
+            clazz = clazz.getSuperclass();
         }
 
         return this;
     }
 
     /**
-     * Registers action handlers via reflection by scanning for {@code @OnAction} methods.
+     * Registers action handlers via reflection by scanning for {@code @OnAction} methods on the given class.
      */
-    private <T> void registerViaReflection(T target) {
-        for (Method method : target.getClass().getDeclaredMethods()) {
+    private <T> void registerViaReflection(T target, Class<?> clazz, Set<String> seenMethods) {
+        for (Method method : clazz.getDeclaredMethods()) {
             OnAction annotation = method.getAnnotation(OnAction.class);
             if (annotation != null) {
-                String action = annotation.value();
-                method.setAccessible(true);
-                Class<?>[] parameterTypes = method.getParameterTypes();
-                on(action, event -> {
-                    // A method taking a subtype such as KeyEvent is only called for events of that type
-                    if (parameterTypes.length == 1 && !parameterTypes[0].isInstance(event)) {
-                        return;
-                    }
-                    try {
-                        method.invoke(target, event);
-                    } catch (Exception e) {
-                        throw new IllegalStateException(
-                                "Failed to invoke @OnAction method: " + method.getName(), e);
-                    }
-                });
+                String signature = method.getName() + Arrays.toString(method.getParameterTypes());
+                if (seenMethods.add(signature)) {
+                    String action = annotation.value();
+                    method.setAccessible(true);
+                    Class<?>[] parameterTypes = method.getParameterTypes();
+                    on(action, event -> {
+                        // A method taking a subtype such as KeyEvent is only called for events of that type
+                        if (parameterTypes.length == 1 && !parameterTypes[0].isInstance(event)) {
+                            return;
+                        }
+                        try {
+                            if (parameterTypes.length == 0) {
+                                method.invoke(target);
+                            } else {
+                                method.invoke(target, event);
+                            }
+                        } catch (Exception e) {
+                            throw new IllegalStateException(
+                                    "Failed to invoke @OnAction method: " + method.getName(), e);
+                        }
+                    });
+                }
             }
         }
     }
