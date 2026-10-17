@@ -771,46 +771,27 @@ public final class TextAreaState {
 
     private static int findScrollColForCursor(String line, int cursorCol, int visibleCols) {
         int end = Math.min(cursorCol, line.length());
-        // prefixWidth[i] = display width of line.substring(0, i), respecting ZWJ
-        // sequences and Regional Indicator pairs the same way CharWidth.of(String) does.
+        // prefixWidth[i] = display width of line.substring(0, i), respecting grapheme
+        // clusters (including VS16 presentation sequences and ZWJ sequences) the same way
+        // CharWidth.of(String) does.
         // For a multi-char cluster, the width is recorded on the offset past the cluster;
         // intermediate offsets carry the running width as it stood before the cluster.
         int[] prefixWidth = new int[end + 1];
         int width = 0;
         int i = 0;
         while (i < end) {
-            int cp = line.codePointAt(i);
-            int charCount = Character.charCount(cp);
-            int clusterChars;
-            int clusterWidth;
-
-            if (cp == 0x200D) {
-                // ZWJ + following code point: contributes 0 (the joiner and the joined glyph).
-                clusterChars = charCount;
-                if (i + charCount < end) {
-                    clusterChars += Character.charCount(line.codePointAt(i + charCount));
-                }
-                clusterWidth = 0;
-            } else if (cp >= 0x1F1E6 && cp <= 0x1F1FF
-                && i + charCount < end
-                && isRegionalIndicator(line.codePointAt(i + charCount))) {
-                int nextCp = line.codePointAt(i + charCount);
-                clusterChars = charCount + Character.charCount(nextCp);
-                clusterWidth = 2;
-            } else {
-                clusterChars = charCount;
-                clusterWidth = CharWidth.of(cp);
-            }
-
+            int next = GraphemeClusters.clusterEnd(line, i);
+            int clusterChars = Math.min(next, end) - i;
+            int clusterWidth = (next <= end)
+                    ? CharWidth.of(line.substring(i, next))
+                    : CharWidth.of(line.substring(i, end));
             int newWidth = width + clusterWidth;
-            // Carry the previous running width across intermediate offsets, then jump
-            // to the new running width at the offset past the cluster.
             for (int j = 1; j < clusterChars; j++) {
                 prefixWidth[i + j] = width;
             }
             prefixWidth[i + clusterChars] = newWidth;
             width = newWidth;
-            i += clusterChars;
+            i = next;
         }
 
         int totalWidth = prefixWidth[end];
@@ -820,10 +801,6 @@ public final class TextAreaState {
             }
         }
         return 0;
-    }
-
-    private static boolean isRegionalIndicator(int cp) {
-        return cp >= 0x1F1E6 && cp <= 0x1F1FF;
     }
 
     /**
