@@ -13,6 +13,7 @@ public final class ListState {
 
     private Integer selected;
     private int offset;
+    private int horizontalOffset;
 
     // Sticky scroll state
     private boolean userScrolledAway;
@@ -24,6 +25,7 @@ public final class ListState {
     public ListState() {
         this.selected = null;
         this.offset = 0;
+        this.horizontalOffset = 0;
     }
 
     /**
@@ -116,6 +118,33 @@ public final class ListState {
      */
     public void scrollBy(int delta) {
         this.offset = Math.max(0, this.offset + delta);
+    }
+
+    /**
+     * Returns the horizontal scroll offset in columns.
+     *
+     * @return the horizontal scroll offset
+     */
+    public int horizontalOffset() {
+        return horizontalOffset;
+    }
+
+    /**
+     * Sets the horizontal scroll offset directly.
+     *
+     * @param offset the horizontal scroll offset to set
+     */
+    public void setHorizontalOffset(int offset) {
+        this.horizontalOffset = Math.max(0, offset);
+    }
+
+    /**
+     * Adjusts the horizontal scroll offset by a delta.
+     *
+     * @param delta the amount to scroll (positive = right, negative = left)
+     */
+    public void scrollHorizontalBy(int delta) {
+        this.horizontalOffset = Math.max(0, this.horizontalOffset + delta);
     }
 
     /**
