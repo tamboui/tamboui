@@ -11,6 +11,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.markdown.MarkdownStyles;
+import dev.tamboui.markdown.MarkdownViewState;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Overflow;
@@ -163,5 +164,25 @@ class MarkdownElementTest extends AbstractElementTest {
 
         assertThat(wide).isEqualTo(1);
         assertThat(narrow).isGreaterThan(wide);
+    }
+
+    @Test
+    @DisplayName("state() configures and retrieves MarkdownViewState")
+    void stateConfiguredAndRetrieved() {
+        MarkdownViewState state = new MarkdownViewState();
+        MarkdownElement element = MarkdownElement.of("hello").state(state);
+        assertThat(element.state()).isSameAs(state);
+    }
+
+    @Test
+    @DisplayName("stateful rendering through MarkdownElement updates state dimensions and offset")
+    void statefulRenderingUpdatesState() {
+        MarkdownViewState state = new MarkdownViewState(6);
+        Buffer buffer = renderInto(
+            MarkdownElement.of("# Title\n\nbody line one\n\nbody line two").state(state), 20, 1);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("b");
+        assertThat(state.totalRows()).isGreaterThan(0);
+        assertThat(state.viewportHeight()).isEqualTo(1);
     }
 }
