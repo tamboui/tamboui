@@ -8,9 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import dev.tamboui.error.RuntimeIOException;
 import dev.tamboui.tui.error.TuiException;
@@ -279,7 +284,33 @@ public final class BindingSets {
      * @throws IOException if the stream cannot be read or parsed
      */
     public static Bindings load(InputStream input, Bindings base) throws IOException {
-        Properties props = new Properties();
+        Properties props = new Properties() {
+            private final Set<String> orderedNames = new LinkedHashSet<>();
+
+            @Override
+            public synchronized Object put(Object key, Object value) {
+                if (key instanceof String) {
+                    orderedNames.remove((String) key);
+                    orderedNames.add((String) key);
+                }
+                return super.put(key, value);
+            }
+
+            @Override
+            public Set<String> stringPropertyNames() {
+                return Collections.unmodifiableSet(orderedNames);
+            }
+
+            @Override
+            public synchronized Enumeration<Object> keys() {
+                return Collections.enumeration(new ArrayList<>(orderedNames));
+            }
+
+            @Override
+            public Set<Object> keySet() {
+                return new LinkedHashSet<>(orderedNames);
+            }
+        };
         props.load(input);
         return loadFromProperties(props, base);
     }

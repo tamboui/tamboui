@@ -127,6 +127,20 @@ Handlers can optionally receive the action name that triggered them:
 include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=action-handler-with-name]
 ----
 
+=== Overlapping Bindings and Precedence
+
+A single input event can match more than one action. For example, in standard bindings, kbd:[Enter] matches both `confirm` and `select`, and wheel up matches both `scrollUp` and `scroll`.
+
+TamboUI uses a deterministic priority policy to resolve overlapping bindings:
+
+1. **Trigger specificity**: Exact modifier matches take precedence over permissive matches.
+* For named keys like kbd:[Tab], matching is strict: plain kbd:[Tab] never matches kbd:[Shift+Tab], and kbd:[Shift+Tab] resolves exclusively to `focusPrevious`.
+* For arrow keys (kbd:[Up], kbd:[Down], etc.), Shift matching remains permissive when unbound, but binding an explicit `Shift+Up` trigger takes precedence over a plain `Up` trigger.
+2. **Binding recency**: When specificity is equal, later-bound actions take precedence over earlier-bound actions. Custom bindings added or rebound via `toBuilder().bind(...)` or `rebind(...)` override default bindings. In standard bindings, `confirm` is defined after `select`, so `confirm` takes precedence on kbd:[Enter].
+3. **Dispatch invariant**: `ActionHandler.dispatch(event)` iterates matching actions in precedence order and dispatches to the first action that has registered handlers. At most one semantic action is fired per input event.
+
+You can inspect the ordered matching actions for an event using `bindings.actionsFor(event)` or `event.actions()`.
+
 == @OnAction Annotation
 
 [NOTE]

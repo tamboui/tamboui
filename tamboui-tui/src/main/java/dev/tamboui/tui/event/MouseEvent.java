@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui.event;
 
+import java.util.List;
 import java.util.Optional;
 
 import dev.tamboui.tui.bindings.Actions;
@@ -317,6 +318,15 @@ public final class MouseEvent implements Event {
      */
     public Optional<String> action() {
         return bindings.actionFor(this);
+    }
+
+    /**
+     * Returns all actions that this event matches, in precedence order.
+     *
+     * @return list of matching action names in precedence order (empty if none match)
+     */
+    public List<String> actions() {
+        return bindings.actionsFor(this);
     }
 
     /**
