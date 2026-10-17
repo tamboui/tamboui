@@ -226,6 +226,71 @@ class ScrollbarTest {
     }
 
     @Test
+    @DisplayName("Thumb style wins over the base style, which fills in what it leaves unset")
+    void thumbStyleWinsOverBaseStyle() {
+        Scrollbar scrollbar = Scrollbar.builder()
+            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+            .style(Style.EMPTY.fg(Color.GRAY).bg(Color.BLACK))
+            .thumbStyle(Style.EMPTY.fg(Color.WHITE))
+            .build();
+        ScrollbarState state = new ScrollbarState(100).viewportContentLength(10).position(0);
+        Rect area = new Rect(0, 0, 1, 10);
+        Buffer buffer = Buffer.empty(area);
+
+        scrollbar.render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer)
+            .at(0, 0).hasSymbol("█").hasForeground(Color.WHITE).hasBackground(Color.BLACK).and()
+            .at(0, 5).hasSymbol("│").hasForeground(Color.GRAY).hasBackground(Color.BLACK);
+    }
+
+    @Test
+    @DisplayName("Track, begin and end styles win over the base style")
+    void trackBeginAndEndStylesWinOverBaseStyle() {
+        Scrollbar scrollbar = Scrollbar.builder()
+            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+            .beginSymbol("↑")
+            .endSymbol("↓")
+            .style(Style.EMPTY.fg(Color.GRAY))
+            .trackStyle(Style.EMPTY.fg(Color.BLUE))
+            .beginStyle(Style.EMPTY.fg(Color.GREEN))
+            .endStyle(Style.EMPTY.fg(Color.RED))
+            .build();
+        ScrollbarState state = new ScrollbarState(100).viewportContentLength(8).position(0);
+        Rect area = new Rect(0, 0, 1, 10);
+        Buffer buffer = Buffer.empty(area);
+
+        scrollbar.render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer)
+            .at(0, 0).hasSymbol("↑").hasForeground(Color.GREEN).and()
+            .at(0, 5).hasSymbol("│").hasForeground(Color.BLUE).and()
+            .at(0, 9).hasSymbol("↓").hasForeground(Color.RED);
+    }
+
+    @Test
+    @DisplayName("thumb-color and track-color properties win over the base style")
+    void colorPropertiesWinOverBaseStyle() {
+        Scrollbar scrollbar = Scrollbar.builder()
+            .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
+            .style(Style.EMPTY.fg(Color.GRAY))
+            .styleResolver(TestStylePropertyResolver.builder()
+                .set("thumb-color", Color.YELLOW)
+                .set("track-color", Color.DARK_GRAY)
+                .build())
+            .build();
+        ScrollbarState state = new ScrollbarState(100).viewportContentLength(10).position(0);
+        Rect area = new Rect(0, 0, 1, 10);
+        Buffer buffer = Buffer.empty(area);
+
+        scrollbar.render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer)
+            .at(0, 0).hasSymbol("█").hasForeground(Color.YELLOW).and()
+            .at(0, 5).hasSymbol("│").hasForeground(Color.DARK_GRAY);
+    }
+
+    @Test
     @DisplayName("Empty area renders nothing")
     void emptyAreaRendersNothing() {
         Scrollbar scrollbar = Scrollbar.vertical();
