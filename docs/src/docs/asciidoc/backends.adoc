@@ -81,6 +81,7 @@ java.version: 21.0.9
 tamboui.backend: <unset>
 backend.provider_count: 1
 backend.provider_names: jline3
+backend.selected: jline3
 backend.provider_error.0: dev/tamboui/backend/panama/PanamaBackendProvider has been compiled
   by a more recent version of the Java Runtime (class file version 66.0), ...
 ----
