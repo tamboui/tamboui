@@ -7,7 +7,9 @@ package dev.tamboui.tui.event;
 import java.io.EOFException;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -294,6 +296,61 @@ class EventParserTest {
         assertThat(keyEvent.hasAlt()).isTrue();
     }
 
+    // -- Forms other terminals send: keypad 5, focus reports, Linux console and Konsole F-keys --
+
+    @Test
+    @DisplayName("ESC[E / ESC[G (keypad 5) and ESC[I / ESC[O (focus) do not swallow the key typed next")
+    void csiFinalByteRightAfterBracketDoesNotSwallowNextKey() throws IOException {
+        QueueBackend backend = new QueueBackend(
+            27, '[', 'E', 'a',
+            27, '[', 'G', 'b',
+            27, '[', 'I', 'c',
+            27, '[', 'O', 'd');
+
+        List<String> keys = new ArrayList<>();
+        Event event;
+        while ((event = EventParser.readEvent(backend, 0)) != null) {
+            KeyEvent keyEvent = (KeyEvent) event;
+            keys.add(keyEvent.code() == KeyCode.CHAR ? keyEvent.string() : keyEvent.code().name());
+        }
+
+        assertThat(keys).containsExactly("UNKNOWN", "a", "UNKNOWN", "b", "UNKNOWN", "c", "UNKNOWN", "d");
+    }
+
+    @Test
+    @DisplayName("Linux console F1-F5 (ESC [ [ A to ESC [ [ E) are F1-F5, not arrow keys")
+    void linuxConsoleFunctionKeysParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(
+            27, '[', '[', 'A',
+            27, '[', '[', 'B',
+            27, '[', '[', 'C',
+            27, '[', '[', 'D',
+            27, '[', '[', 'E');
+
+        List<KeyCode> codes = new ArrayList<>();
+        Event event;
+        while ((event = EventParser.readEvent(backend, 0)) != null) {
+            codes.add(((KeyEvent) event).code());
+        }
+
+        assertThat(codes).containsExactly(KeyCode.F1, KeyCode.F2, KeyCode.F3, KeyCode.F4, KeyCode.F5);
+    }
+
+    @Test
+    @DisplayName("Konsole's Shift+F1 (ESC O 2 P) and Ctrl+F4 (ESC O 5 S) keep their modifier")
+    void ss3WithModifierParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 'O', '2', 'P', 27, 'O', '5', 'S');
+
+        KeyEvent shiftF1 = (KeyEvent) EventParser.readEvent(backend, 0);
+        KeyEvent ctrlF4 = (KeyEvent) EventParser.readEvent(backend, 0);
+
+        assertThat(shiftF1.code()).isEqualTo(KeyCode.F1);
+        assertThat(shiftF1.modifiers()).isEqualTo(KeyModifiers.SHIFT);
+        assertThat(ctrlF4.code()).isEqualTo(KeyCode.F4);
+        assertThat(ctrlF4.modifiers()).isEqualTo(KeyModifiers.CTRL);
+        assertThat(EventParser.readEvent(backend, 0)).isNull();
+    }
+
     // -- Sequences the tape player sends for F5-F12, modified cursor keys and Alt --
 
     @Test
@@ -563,6 +620,69 @@ class EventParserTest {
         MouseEvent mouse = (MouseEvent) event;
         assertThat(mouse.kind()).isEqualTo(MouseEventKind.PRESS);
         assertThat(mouse.button()).isEqualTo(MouseButton.LEFT);
+    }
+
+    // -- X10 mouse reports (ESC [ M Cb Cx Cy), from terminals without SGR mouse support --
+
+    @Test
+    @DisplayName("X10 press and release are mouse events, not stray characters")
+    void x10PressAndReleaseParsed() throws IOException {
+        // Left press at column 81, row 3: each byte is 32 more than the value, so the column is 'q'.
+        // X10 reports a release as button 3, without the button that was released.
+        QueueBackend backend = new QueueBackend(
+            27, '[', 'M', 32, 32 + 81, 32 + 3,
+            27, '[', 'M', 32 + 3, 32 + 81, 32 + 3);
+
+        Event press = EventParser.readEvent(backend, 0);
+        Event release = EventParser.readEvent(backend, 0);
+
+        assertThat(press).isInstanceOf(MouseEvent.class);
+        MouseEvent pressEvent = (MouseEvent) press;
+        assertThat(pressEvent.kind()).isEqualTo(MouseEventKind.PRESS);
+        assertThat(pressEvent.button()).isEqualTo(MouseButton.LEFT);
+        assertThat(pressEvent.x()).isEqualTo(80);
+        assertThat(pressEvent.y()).isEqualTo(2);
+        assertThat(release).isInstanceOf(MouseEvent.class);
+        MouseEvent releaseEvent = (MouseEvent) release;
+        assertThat(releaseEvent.kind()).isEqualTo(MouseEventKind.RELEASE);
+        assertThat(releaseEvent.x()).isEqualTo(80);
+        assertThat(releaseEvent.y()).isEqualTo(2);
+        assertThat(EventParser.readEvent(backend, 0)).isNull();
+    }
+
+    @Test
+    @DisplayName("X10 hover, drag and wheel are MOVE, DRAG and SCROLL_UP, not arrow keys")
+    void x10MotionAndWheelParsed() throws IOException {
+        // Button 35 is motion with no button ('C'), 32 is a left-button drag ('@'), 64 is wheel up ('`')
+        QueueBackend backend = new QueueBackend(
+            27, '[', 'M', 32 + 35, 32 + 10, 32 + 5,
+            27, '[', 'M', 32 + 32, 32 + 10, 32 + 5,
+            27, '[', 'M', 32 + 64, 32 + 10, 32 + 5);
+
+        List<MouseEventKind> kinds = new ArrayList<>();
+        Event event;
+        while ((event = EventParser.readEvent(backend, 0)) != null) {
+            assertThat(event).isInstanceOf(MouseEvent.class);
+            MouseEvent mouse = (MouseEvent) event;
+            assertThat(mouse.x()).isEqualTo(9);
+            assertThat(mouse.y()).isEqualTo(4);
+            kinds.add(mouse.kind());
+        }
+
+        assertThat(kinds).containsExactly(MouseEventKind.MOVE, MouseEventKind.DRAG, MouseEventKind.SCROLL_UP);
+    }
+
+    @Test
+    @DisplayName("X10 report with a coordinate the reader could not decode is dropped whole")
+    void x10ReportWithUndecodableCoordinateIsDroppedWhole() throws IOException {
+        // Past column 95 the column byte is above 127; a UTF-8 reader turns it into U+FFFD
+        QueueBackend backend = new QueueBackend(27, '[', 'M', 32, 0xFFFD, 32 + 3);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UNKNOWN);
+        assertThat(EventParser.readEvent(backend, 0)).isNull();
     }
 
     private static final class QueueBackend extends TestBackend {
