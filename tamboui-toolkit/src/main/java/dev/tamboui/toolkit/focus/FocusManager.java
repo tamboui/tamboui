@@ -167,7 +167,7 @@ public final class FocusManager {
      */
     public boolean focusAt(int x, int y) {
         for (Map.Entry<String, Rect> entry : focusableAreas.entrySet()) {
-            if (entry.getValue().contains(x, y)) {
+            if (entry.getValue() != null && entry.getValue().contains(x, y)) {
                 focusedId = entry.getKey();
                 return true;
             }
