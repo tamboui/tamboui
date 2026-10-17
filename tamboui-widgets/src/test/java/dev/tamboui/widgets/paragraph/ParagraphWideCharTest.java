@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
@@ -22,6 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class ParagraphWideCharTest {
+
+    private static final String CODER = "\uD83D\uDC69\u200D\uD83D\uDCBB";
+    private static final String FAMILY = "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67";
+    private static final Style RED = Style.EMPTY.fg(Color.RED);
+    private static final Style BLUE = Style.EMPTY.fg(Color.BLUE);
 
     @Test
     @DisplayName("Clip mode clips CJK text at display width boundary")
@@ -71,6 +77,42 @@ class ParagraphWideCharTest {
 
         String line = extractLineText(buffer, 0);
         assertThat(line).isEqualTo("...好啊");
+    }
+
+    @Test
+    @DisplayName("Ellipsis modes keep a CJK character at the cut whole or leave it out, keeping span styles")
+    void ellipsisCjkAtCutKeepsSpanStyles() {
+        // 2 + 8 + 3 = 13 display cols
+        Line line = Line.from(new Span("ab", BLUE), new Span("世界你好", RED), new Span("end", BLUE));
+
+        // 界 does not fit in the column left before the ellipsis, which takes the style of the text it replaces
+        assertRendersAs(line, Overflow.ELLIPSIS, 8, new Span("ab", BLUE), new Span("世...", RED));
+        // 你 does not fit in the column left after the ellipsis
+        assertRendersAs(line, Overflow.ELLIPSIS_START, 9, new Span("...好", RED), new Span("end", BLUE));
+        // 好 does not fit in the column left after the ellipsis
+        assertRendersAs(line, Overflow.ELLIPSIS_MIDDLE, 11,
+                new Span("ab", BLUE), new Span("世...", RED), new Span("end", BLUE));
+    }
+
+    @Test
+    @DisplayName("Ellipsis modes keep a ZWJ emoji at the cut whole or leave it out, keeping span styles")
+    void ellipsisZwjEmojiAtCutKeepsSpanStyles() {
+        // At each cut the emoji gets one column, and is left out, or exactly its two columns, and is kept whole
+        Line end = Line.from(new Span("ab", BLUE), new Span(" " + CODER + " and more", RED));
+        assertRendersAs(end, Overflow.ELLIPSIS, 7, new Span("ab", BLUE), new Span(" ...", RED));
+        assertRendersAs(end, Overflow.ELLIPSIS, 8, new Span("ab", BLUE), new Span(" " + CODER + "...", RED));
+
+        Line start = Line.from(new Span("more text " + FAMILY + " ", RED), new Span("end", BLUE));
+        assertRendersAs(start, Overflow.ELLIPSIS_START, 8, new Span("... ", RED), new Span("end", BLUE));
+        assertRendersAs(start, Overflow.ELLIPSIS_START, 9,
+                new Span("..." + FAMILY + " ", RED), new Span("end", BLUE));
+
+        Line middle = Line.from(
+                new Span("ab", BLUE), new Span(" " + CODER + " text that is long ", RED), new Span("end", BLUE));
+        assertRendersAs(middle, Overflow.ELLIPSIS_MIDDLE, 11,
+                new Span("ab", BLUE), new Span(" ... ", RED), new Span("end", BLUE));
+        assertRendersAs(middle, Overflow.ELLIPSIS_MIDDLE, 12,
+                new Span("ab", BLUE), new Span(" " + CODER + "... ", RED), new Span("end", BLUE));
     }
 
     @Test
@@ -232,6 +274,20 @@ class ParagraphWideCharTest {
         expected.setString(0, 0, cluster, Style.EMPTY);
         expected.setString(0, 1, "X", Style.EMPTY);
         BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    private static void assertRendersAs(Line line, Overflow overflow, int width, Span... expectedSpans) {
+        Paragraph paragraph = Paragraph.builder()
+                .text(Text.from(line))
+                .overflow(overflow)
+                .build();
+        Rect area = new Rect(0, 0, width, 1);
+        Buffer buffer = Buffer.empty(area);
+        paragraph.render(area, buffer);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setLine(0, 0, Line.from(expectedSpans));
+        BufferAssertions.assertThat(buffer).as("%s in %d columns", overflow, width).isEqualTo(expected);
     }
 
     private String extractLineText(Buffer buffer, int y) {

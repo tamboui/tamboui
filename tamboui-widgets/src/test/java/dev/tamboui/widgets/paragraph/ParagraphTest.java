@@ -415,6 +415,115 @@ class ParagraphTest {
         BufferAssertions.assertThat(buffer).isEqualTo(expected);
     }
 
+    @Test
+    @DisplayName("ELLIPSIS keeps the style of each span, the ellipsis taking the style of the text it replaces")
+    void ellipsisPreservesSpanStyles() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from(statusLine()))
+            .overflow(Overflow.ELLIPSIS)
+            .build();
+        Rect area = new Rect(0, 0, 12, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        // "Error: di..." - the ellipsis replaces the rest of the plain span
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "Error:", Style.EMPTY.fg(Color.RED));
+        expected.setString(6, 0, " di...", Style.EMPTY);
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS_START keeps the style of each span")
+    void ellipsisStartPreservesSpanStyles() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from(statusLine()))
+            .overflow(Overflow.ELLIPSIS_START)
+            .build();
+        Rect area = new Rect(0, 0, 16, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        // "...s almost full" - the ellipsis replaces the start of the plain span
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "...s ", Style.EMPTY);
+        expected.setString(5, 0, "almost full", Style.EMPTY.fg(Color.BLUE));
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS_MIDDLE keeps the style of each span")
+    void ellipsisMiddlePreservesSpanStyles() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from(statusLine()))
+            .overflow(Overflow.ELLIPSIS_MIDDLE)
+            .build();
+        Rect area = new Rect(0, 0, 16, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        // "Error: ...t full"
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "Error:", Style.EMPTY.fg(Color.RED));
+        expected.setString(6, 0, " ...", Style.EMPTY);
+        expected.setString(10, 0, "t full", Style.EMPTY.fg(Color.BLUE));
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS clips when width is too small for ellipsis, keeping the style of each span")
+    void ellipsisWithTinyWidthPreservesSpanStyles() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from(Line.from(
+                new Span("ab", Style.EMPTY.fg(Color.RED)),
+                new Span("cdef", Style.EMPTY.fg(Color.BLUE))
+            )))
+            .overflow(Overflow.ELLIPSIS)
+            .build();
+        Rect area = new Rect(0, 0, 3, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "ab", Style.EMPTY.fg(Color.RED));
+        expected.setString(2, 0, "c", Style.EMPTY.fg(Color.BLUE));
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS keeps a leading hyperlink on the link text only")
+    void ellipsisKeepsHyperlinkOnLinkText() {
+        Paragraph paragraph = Paragraph.builder()
+            .text(Text.from(Line.from(
+                Span.raw("Docs").hyperlink("https://example.com"),
+                Span.raw(" are on the website")
+            )))
+            .overflow(Overflow.ELLIPSIS)
+            .build();
+        Rect area = new Rect(0, 0, 12, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        paragraph.render(area, buffer);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "Docs", Style.EMPTY.hyperlink("https://example.com"));
+        expected.setString(4, 0, " are ...", Style.EMPTY);
+        BufferAssertions.assertThat(buffer).isEqualTo(expected);
+    }
+
+    /** A red "Error:", a plain " disk is " and a blue "almost full": 26 columns. */
+    private static Line statusLine() {
+        return Line.from(
+            new Span("Error:", Style.EMPTY.fg(Color.RED)),
+            new Span(" disk is ", Style.EMPTY),
+            new Span("almost full", Style.EMPTY.fg(Color.BLUE))
+        );
+    }
+
     // ========== Hyperlink Tests ==========
 
     @Test
