@@ -351,6 +351,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
     /**
      * Sets the border color when focused.
+     * Setting it draws a border around the input, also while it is not focused.
      *
      * @param color the focused border color
      * @return this element for chaining
@@ -362,6 +363,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
     /**
      * Sets the border color when validation fails.
+     * Setting it draws a border around the input, also while the value is valid.
      *
      * @param color the error border color
      * @return this element for chaining
@@ -593,12 +595,12 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Label width + spacing + minimum input width + border
         int inputWidth = Math.max(10, placeholder.length());
-        int borderWidth = borderType != null ? 2 : 0;
+        int borderWidth = hasBorder() ? 2 : 0;
         int width = labelWidth + spacing + inputWidth + borderWidth;
 
         // For bordered inputs: 3 rows; for non-bordered: 1 row
         // Add 1 row if showing inline errors
-        int baseHeight = borderType != null ? 3 : 1;
+        int baseHeight = hasBorder() ? 3 : 1;
         int height = showInlineErrors && !lastValidation().isValid() ? baseHeight + 1 : baseHeight;
 
         return Size.of(width, height);
@@ -770,7 +772,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
         // Determine if we need error row
         boolean hasError = !lastValidation().isValid();
-        int inputHeight = borderType != null ? 3 : 1;
+        int inputHeight = hasBorder() ? 3 : 1;
         int totalHeight = showInlineErrors && hasError ? inputHeight + 1 : inputHeight;
 
         // Render label
@@ -800,7 +802,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         }
 
         // Render label text (vertically centered if bordered input)
-        int labelY = borderType != null ? area.y() + 1 : area.y();
+        int labelY = hasBorder() ? area.y() + 1 : area.y();
         frame.buffer().setString(area.x(), labelY, displayLabel, style);
     }
 
@@ -852,7 +854,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
             builder.masked(maskChar);
         }
 
-        if (borderType != null || effectiveBorderColor != null) {
+        if (hasBorder()) {
             Block.Builder blockBuilder = Block.builder()
                     .borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
@@ -910,7 +912,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
         // Create state from BooleanFieldState and render
         CheckboxState state = new CheckboxState(booleanState.value());
-        int y = borderType != null ? area.y() + 1 : area.y();
+        int y = hasBorder() ? area.y() + 1 : area.y();
         Rect checkboxArea = new Rect(area.x(), y, checkbox.width(), 1);
 
         frame.renderStatefulWidget(checkbox, checkboxArea, state);
@@ -936,7 +938,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
         // Create state from BooleanFieldState and render
         ToggleState state = new ToggleState(booleanState.value());
-        int y = borderType != null ? area.y() + 1 : area.y();
+        int y = hasBorder() ? area.y() + 1 : area.y();
         Rect toggleArea = new Rect(area.x(), y, toggle.width(), 1);
 
         frame.renderStatefulWidget(toggle, toggleArea, state);
@@ -962,7 +964,7 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
 
         // Create state from SelectFieldState and render
         SelectState state = new SelectState(selectState.options(), selectState.selectedIndex());
-        int y = borderType != null ? area.y() + 1 : area.y();
+        int y = hasBorder() ? area.y() + 1 : area.y();
         Rect selectArea = new Rect(area.x(), y, area.width(), 1);
 
         frame.renderStatefulWidget(select, selectArea, state);
@@ -980,5 +982,13 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
         }
 
         frame.buffer().setString(area.x(), area.y(), error, style);
+    }
+
+    /**
+     * Returns whether the input has a border. A border color asks for one as a border type does,
+     * focused or not and valid or not, so the size reserves room for the border that is drawn.
+     */
+    private boolean hasBorder() {
+        return borderType != null || borderColor != null || focusedBorderColor != null || errorBorderColor != null;
     }
 }

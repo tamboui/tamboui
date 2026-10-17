@@ -9,13 +9,20 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.form.*;
 import dev.tamboui.widgets.input.TextInputState;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
+import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.formField;
+import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -327,5 +334,81 @@ class FormFieldElementTest extends AbstractElementTest {
             }
         }
         assertThat(foundJ).as("Should display actual text").isTrue();
+    }
+
+    @Test
+    @DisplayName("A focused border color alone leaves room for the border, so the text stays visible when focused")
+    void focusedBorderColorAlone_keepsTextVisibleWhenFocused() {
+        Buffer buffer = renderAboveNext(
+            formField("Name", new TextInputState("Ada")).id("name").labelWidth(5).focusedBorderColor(Color.CYAN),
+            "name");
+
+        assertThat(buffer).hasContent(
+            "      ┌────────────┐",
+            "Name  │Ada         │",
+            "      └────────────┘",
+            "next                ",
+            "                    ")
+            .hasForegroundAt(6, 0, Color.CYAN);
+        assertThat(buffer.get(10, 1).style().effectiveModifiers()).as("cursor after the text").contains(Modifier.REVERSED);
+    }
+
+    @Test
+    @DisplayName("A focused border color alone keeps the field rows and label position while it is not focused")
+    void focusedBorderColorAlone_keepsLayoutWhenNotFocused() {
+        Buffer buffer = renderAboveNext(
+            formField("Name", new TextInputState("Ada")).id("name").labelWidth(5).focusedBorderColor(Color.CYAN),
+            null);
+
+        assertThat(buffer).hasContent(
+            "      ┌────────────┐",
+            "Name  │Ada         │",
+            "      └────────────┘",
+            "next                ",
+            "                    ");
+    }
+
+    @Test
+    @DisplayName("A border color alone leaves room for the border it draws")
+    void borderColorAlone_leavesRoomForTheBorder() {
+        Buffer buffer = renderAboveNext(
+            formField("Name", new TextInputState("Ada")).labelWidth(5).borderColor(Color.CYAN), null);
+
+        assertThat(buffer).hasContent(
+            "      ┌────────────┐",
+            "Name  │Ada         │",
+            "      └────────────┘",
+            "next                ",
+            "                    ");
+    }
+
+    @Test
+    @DisplayName("An error border color alone leaves room for the border, so the text stays visible on a validation error")
+    void errorBorderColorAlone_keepsTextVisibleOnValidationError() {
+        FormFieldElement field = formField("Email", new TextInputState("ada@")).labelWidth(5)
+            .validate(Validators.required(), Validators.email())
+            .errorBorderColor(Color.RED)
+            .showInlineErrors(true);
+        field.validateField();
+
+        assertThat(renderAboveNext(field, null)).hasContent(
+            "      ┌────────────┐",
+            "Email │ada@        │",
+            "      └────────────┘",
+            "      Invalid email ",
+            "next                ")
+            .hasForegroundAt(6, 0, Color.RED);
+    }
+
+    /** Renders the element above a "next" text in a 20x5 column, with the given element id focused. */
+    private static Buffer renderAboveNext(Element element, String focusedId) {
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        if (focusedId != null) {
+            context.focusManager().setFocus(focusedId);
+        }
+        Rect area = new Rect(0, 0, 20, 5);
+        Buffer buffer = Buffer.empty(area);
+        column(element, text("next")).render(Frame.forTesting(buffer), area, context);
+        return buffer;
     }
 }
