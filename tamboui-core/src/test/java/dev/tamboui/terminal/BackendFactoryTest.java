@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -221,6 +224,129 @@ class BackendFactoryTest {
         } finally {
             Thread.currentThread().setContextClassLoader(original);
         }
+    }
+
+    @Test
+    @DisplayName("candidateProvider returns first discovered provider when no spec is set")
+    void candidateProvider_returnsFirstDiscoveredWhenNoSpecSet() {
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider();
+        assertThat(candidate).isPresent();
+        assertThat(candidate.get().name()).isEqualTo("test");
+    }
+
+    @Test
+    @DisplayName("candidateProvider respects explicit tamboui.backend selection")
+    void candidateProvider_respectsExplicitSelection() {
+        System.setProperty("tamboui.backend", "test");
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider();
+        assertThat(candidate).isPresent();
+        assertThat(candidate.get().name()).isEqualTo("test");
+    }
+
+    @Test
+    @DisplayName("candidateProvider skips unavailable provider and selects fallback")
+    void candidateProvider_skipsUnavailableAndSelectsFallback() {
+        System.setProperty("tamboui.backend", "nonexistent,test");
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider();
+        assertThat(candidate).isPresent();
+        assertThat(candidate.get().name()).isEqualTo("test");
+    }
+
+    @Test
+    @DisplayName("candidateProvider returns empty when configured spec does not match")
+    void candidateProvider_returnsEmptyWhenSpecDoesNotMatch() {
+        System.setProperty("tamboui.backend", "nonexistent");
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider();
+        assertThat(candidate).isEmpty();
+    }
+
+    @Test
+    @DisplayName("candidateProvider matches fully qualified provider class name")
+    void candidateProvider_matchesFullyQualifiedClassName() {
+        System.setProperty("tamboui.backend", WORKING_PROVIDER);
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider();
+        assertThat(candidate).isPresent();
+        assertThat(candidate.get().name()).isEqualTo("test");
+    }
+
+    @Test
+    @DisplayName("candidateProvider with isolated class loader returns empty when no providers present")
+    void candidateProvider_withIsolatedClassLoader_noProviders(@TempDir Path tempDir) {
+        ClassLoader empty = new IsolatedServiceClassLoader(getClass().getClassLoader(), SERVICE, tempDir);
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider(empty);
+        assertThat(candidate).isEmpty();
+    }
+
+    @Test
+    @DisplayName("candidateProvider with isolated class loader skips broken provider")
+    void candidateProvider_withIsolatedClassLoader_brokenProvider(@TempDir Path tempDir) {
+        ClassLoader broken = new IsolatedServiceClassLoader(
+                getClass().getClassLoader(), SERVICE, tempDir, BROKEN_PROVIDER);
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider(broken);
+        assertThat(candidate).isEmpty();
+    }
+
+    @Test
+    @DisplayName("candidateProvider with isolated class loader selects working provider in mixed environment")
+    void candidateProvider_withIsolatedClassLoader_mixed(@TempDir Path tempDir) {
+        ClassLoader mixed = new IsolatedServiceClassLoader(
+                getClass().getClassLoader(), SERVICE, tempDir, BROKEN_PROVIDER, WORKING_PROVIDER);
+        System.setProperty("tamboui.backend", "throwing,test");
+        Optional<BackendProvider> candidate = BackendFactory.candidateProvider(mixed);
+        assertThat(candidate).isPresent();
+        assertThat(candidate.get().name()).isEqualTo("test");
+    }
+
+    @Test
+    @DisplayName("resolveCandidate returns empty when provider list is null or empty")
+    void resolveCandidate_emptyProviders() {
+        assertThat(BackendFactory.resolveCandidate("alpha", null)).isEmpty();
+        assertThat(BackendFactory.resolveCandidate("alpha", Collections.emptyList())).isEmpty();
+        assertThat(BackendFactory.resolveCandidate(null, Collections.emptyList())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("resolveCandidate returns first provider when spec is null or blank")
+    void resolveCandidate_nullOrBlankSpec() {
+        BackendProvider alpha = new StubBackendProvider("alpha");
+        BackendProvider beta = new StubBackendProvider("beta");
+        List<BackendProvider> providers = Arrays.asList(alpha, beta);
+
+        assertThat(BackendFactory.resolveCandidate(null, providers)).contains(alpha);
+        assertThat(BackendFactory.resolveCandidate("", providers)).contains(alpha);
+        assertThat(BackendFactory.resolveCandidate("   ", providers)).contains(alpha);
+    }
+
+    @Test
+    @DisplayName("resolveCandidate selects first matching provider according to preference spec order")
+    void resolveCandidate_preferenceOrder() {
+        BackendProvider alpha = new StubBackendProvider("alpha");
+        BackendProvider beta = new StubBackendProvider("beta");
+        List<BackendProvider> providers = Arrays.asList(alpha, beta);
+
+        assertThat(BackendFactory.resolveCandidate("beta,alpha", providers)).contains(beta);
+        assertThat(BackendFactory.resolveCandidate("alpha,beta", providers)).contains(alpha);
+    }
+
+    @Test
+    @DisplayName("resolveCandidate skips unavailable provider and selects first match")
+    void resolveCandidate_skipsUnavailable() {
+        BackendProvider alpha = new StubBackendProvider("alpha");
+        BackendProvider beta = new StubBackendProvider("beta");
+        List<BackendProvider> providers = Arrays.asList(alpha, beta);
+
+        assertThat(BackendFactory.resolveCandidate("gamma,beta", providers)).contains(beta);
+    }
+
+    @Test
+    @DisplayName("resolveCandidate returns empty when no specified provider matches")
+    void resolveCandidate_noMatch() {
+        BackendProvider alpha = new StubBackendProvider("alpha");
+        BackendProvider beta = new StubBackendProvider("beta");
+        List<BackendProvider> providers = Arrays.asList(alpha, beta);
+
+        assertThat(BackendFactory.resolveCandidate("gamma,delta", providers)).isEmpty();
+        assertThat(BackendFactory.resolveCandidate("  , ,  ", providers)).isEmpty();
     }
 
     @SuppressWarnings("unchecked")
