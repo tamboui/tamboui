@@ -4,6 +4,7 @@
  */
 package dev.tamboui.widgets.table;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
@@ -161,6 +163,106 @@ class TableTest {
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("D");
         // Footer at bottom
         assertThat(buffer.get(0, 2).symbol()).isEqualTo("T");
+    }
+
+    @Test
+    @DisplayName("Selected multi-line row scrolled into view is drawn whole, inside the table")
+    void selectedMultiLineRowScrolledIntoViewIsDrawnWhole() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from("a0\nb0"),
+                Row.from("a1\nb1"),
+                Row.from("a2\nb2")
+            ))
+            .widths(Constraint.length(4))
+            .build();
+
+        // The table is drawn into the top 5 lines of a taller buffer
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 8));
+        TableState state = new TableState();
+        state.select(2);
+
+        table.render(new Rect(0, 0, 10, 5), buffer, state);
+
+        // Scrolled by one line: row 0 shows its second line, row 2 both of its lines
+        BufferAssertions.assertThat(buffer).hasContent(
+            "   b0     ",
+            "   a1     ",
+            "   b1     ",
+            ">> a2     ",
+            "   b2     ",
+            "          ",
+            "          ",
+            "          ");
+        // The highlight covers both lines of the selected row and stops at the table
+        assertThat(buffer.get(3, 4).style().addModifiers()).contains(Modifier.REVERSED);
+        assertThat(reversedCells(buffer, 5)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Multi-line row above the footer is cut off at the footer")
+    void multiLineRowAboveFooterIsCutOffAtFooter() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from("a0\nb0", "c0\nd0"),
+                Row.from("a1\nb1", "c1\nd1")
+            ))
+            .footer(Row.from("sum"))
+            .widths(Constraint.length(3), Constraint.length(3))
+            .build();
+
+        Rect area = new Rect(0, 0, 8, 4);
+        Buffer buffer = Buffer.empty(area);
+
+        table.render(area, buffer, new TableState());
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "a0  c0  ",
+            "b0  d0  ",
+            "a1  c1  ",
+            "sum     ");
+    }
+
+    @Test
+    @DisplayName("Selected multi-line row above the footer stays out of the footer")
+    void selectedMultiLineRowAboveFooterStaysOutOfFooter() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(
+                Row.from("a0\nb0", "c0\nd0"),
+                Row.from("a1\nb1", "c1\nd1"),
+                Row.from("a2\nb2", "c2\nd2")
+            ))
+            .footer(Row.from("sum"))
+            .widths(Constraint.length(3), Constraint.length(3))
+            .build();
+
+        Rect area = new Rect(0, 0, 11, 4);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+        state.select(2);
+
+        table.render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "   b1  d1  ",
+            ">> a2  c2  ",
+            "   b2  d2  ",
+            "   sum     ");
+        // The highlight covers both lines of the selected row and stops at the footer
+        assertThat(buffer.get(3, 2).style().addModifiers()).contains(Modifier.REVERSED);
+        assertThat(reversedCells(buffer, 3)).isEmpty();
+    }
+
+    private static List<String> reversedCells(Buffer buffer, int fromY) {
+        List<String> cells = new ArrayList<>();
+        for (int y = fromY; y < buffer.height(); y++) {
+            for (int x = 0; x < buffer.width(); x++) {
+                if (buffer.get(x, y).style().addModifiers().contains(Modifier.REVERSED)) {
+                    cells.add("(" + x + "," + y + ")");
+                }
+            }
+        }
+        return cells;
     }
 
     @Test
