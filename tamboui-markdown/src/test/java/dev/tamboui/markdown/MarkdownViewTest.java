@@ -142,6 +142,80 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("renders a fenced code block inside a blockquote, with the quote bar on its rows")
+    void rendersFencedCodeBlockInBlockquote() {
+        MarkdownView view = MarkdownView.builder()
+            .source("> quote\n>\n> ```\n> code\n> ```")
+            .build();
+        Buffer buffer = renderInto(view, 16, 5);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "│ quote         ",
+            "│               ",
+            "│ ╭────────────╮",
+            "│ │code        │",
+            "│ ╰────────────╯");
+        assertThat(view.computeHeight(16)).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("renders a GFM table inside a blockquote, with the quote bar on its rows")
+    void rendersTableInBlockquote() {
+        MarkdownView view = MarkdownView.builder()
+            .source("> | Name | Age |\n> | --- | --- |\n> | Ada | 36 |")
+            .build();
+        Buffer buffer = renderInto(view, 20, 2);
+
+        assertThat(row(buffer, 0)).startsWith("│ Name").endsWith("Age");
+        assertThat(row(buffer, 1)).startsWith("│ Ada").endsWith("36");
+        assertThat(buffer.get(2, 0).style().addModifiers()).contains(Modifier.BOLD);
+        assertThat(view.computeHeight(20)).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("renders a GFM table inside a list item, indented under the item")
+    void rendersTableInListItem() {
+        MarkdownView view = MarkdownView.builder()
+            .source("1. Pick a size:\n\n   | Size | Stock |\n   | --- | --- |\n   | S | 3 |\n\n2. Check out")
+            .build();
+        Buffer buffer = renderInto(view, 30, 4);
+
+        assertThat(row(buffer, 0)).isEqualTo("1. Pick a size:");
+        assertThat(row(buffer, 1)).startsWith("   Size").endsWith("Stock");
+        assertThat(row(buffer, 2)).startsWith("   S ").endsWith("3");
+        assertThat(row(buffer, 3)).isEqualTo("2. Check out");
+    }
+
+    @Test
+    @DisplayName("renders a GFM table in a list item inside a blockquote")
+    void rendersTableInListItemInBlockquote() {
+        MarkdownView view = MarkdownView.builder()
+            .source("> - Sizes:\n>\n>   | Size | Stock |\n>   | --- | --- |\n>   | S | 3 |")
+            .build();
+        Buffer buffer = renderInto(view, 30, 3);
+
+        assertThat(row(buffer, 0)).isEqualTo("│ • Sizes:");
+        assertThat(row(buffer, 1)).startsWith("│   Size").endsWith("Stock");
+        assertThat(row(buffer, 2)).startsWith("│   S ").endsWith("3");
+    }
+
+    @Test
+    @DisplayName("renders a fenced code block in a blockquote inside a list item")
+    void rendersFencedCodeBlockInBlockquoteInListItem() {
+        MarkdownView view = MarkdownView.builder()
+            .source("- Output:\n\n  > ```\n  > ok\n  > ```\n- Done")
+            .build();
+        Buffer buffer = renderInto(view, 16, 5);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "• Output:       ",
+            "  │ ╭──────────╮",
+            "  │ │ok        │",
+            "  │ ╰──────────╯",
+            "• Done          ");
+    }
+
+    @Test
     @DisplayName("renders a thematic break as a row of horizontal-rule glyphs")
     void rendersThematicBreak() {
         MarkdownView view = MarkdownView.builder().source("---").build();
