@@ -161,15 +161,13 @@ public final class Grid implements Widget {
         // Extract only column areas (skip gutter areas)
         List<Rect> columnRects = extractColumnRects(colAreas);
 
-        // Compute row heights and Y positions
-        int[] heights;
+        // Row areas, placed with the flex mode like the columns
+        List<Rect> rowRects;
         if (rowConstraints != null && !rowConstraints.isEmpty()) {
-            heights = computeRowHeightsFromConstraints(area, rows);
+            rowRects = splitRows(area, rows);
         } else {
-            heights = computeEqualRowHeightsForAreas(area.height(), rows);
+            rowRects = splitEqualRows(area, rows);
         }
-
-        int[] rowYPositions = computeRowYPositions(area.y(), heights, rows);
 
         // Render each named area
         for (Map.Entry<String, Widget> entry : areaWidgets.entrySet()) {
@@ -183,7 +181,7 @@ public final class Grid implements Widget {
             }
 
             // Calculate merged cell rect
-            Rect cellRect = computeMergedCellRect(bounds, columnRects, rowYPositions, heights);
+            Rect cellRect = computeMergedCellRect(bounds, columnRects, rowRects);
             widget.render(cellRect, buffer);
         }
     }
@@ -203,95 +201,11 @@ public final class Grid implements Widget {
         return constraints;
     }
 
-    private int[] computeRowHeightsFromConstraints(Rect area, int rows) {
-        // Build row constraints with gutters
-        List<Constraint> vConstraints = new ArrayList<>();
-        for (int r = 0; r < rows; r++) {
-            vConstraints.add(rowConstraints.get(r % rowConstraints.size()));
-            if (verticalGutter > 0 && r < rows - 1) {
-                vConstraints.add(Constraint.length(verticalGutter));
-            }
-        }
-
-        List<Rect> allRowAreas = Layout.vertical()
-            .constraints(vConstraints)
-            .flex(flex)
-            .split(area);
-
-        // Extract row heights (skip gutter areas)
-        int[] heights = new int[rows];
-        int rowIndex = 0;
-        for (int i = 0; i < allRowAreas.size() && rowIndex < rows; i++) {
-            if (verticalGutter > 0 && i % 2 == 1) {
-                continue;
-            }
-            heights[rowIndex++] = allRowAreas.get(i).height();
-        }
-        return heights;
-    }
-
-    private int[] computeEqualRowHeightsForAreas(int availableHeight, int rows) {
-        int totalGutter = verticalGutter * (rows - 1);
-        int distributable = Math.max(0, availableHeight - totalGutter);
-        int baseHeight = distributable / rows;
-        int remainder = distributable % rows;
-
-        int[] heights = new int[rows];
-        for (int i = 0; i < rows; i++) {
-            heights[i] = baseHeight + (i < remainder ? 1 : 0);
-        }
-        return heights;
-    }
-
-    private int[] computeRowYPositions(int startY, int[] heights, int rows) {
-        int[] positions = new int[rows];
-        int currentY = startY;
-        for (int r = 0; r < rows; r++) {
-            positions[r] = currentY;
-            currentY += heights[r] + verticalGutter;
-        }
-        return positions;
-    }
-
-    private Rect computeMergedCellRect(GridArea.AreaBounds bounds,
-            List<Rect> columnRects, int[] rowYPositions, int[] rowHeights) {
-
-        int startCol = bounds.column();
-        int endCol = bounds.endColumn() - 1;
-        int startRow = bounds.row();
-        int endRow = bounds.endRow() - 1;
-
-        // Clamp to available columns/rows
-        if (startCol >= columnRects.size() || startRow >= rowYPositions.length) {
-            return new Rect(0, 0, 0, 0);
-        }
-        endCol = Math.min(endCol, columnRects.size() - 1);
-        endRow = Math.min(endRow, rowYPositions.length - 1);
-
-        // X position from first column
-        int x = columnRects.get(startCol).x();
-
-        // Width spans from first column start to last column end (includes gutters between)
-        int endX = columnRects.get(endCol).right();
-        int width = endX - x;
-
-        // Y position from first row
-        int y = rowYPositions[startRow];
-
-        // Height spans rows plus gutters between them
-        int totalHeight = 0;
-        for (int r = startRow; r <= endRow; r++) {
-            totalHeight += rowHeights[r];
-            if (r < endRow) {
-                totalHeight += verticalGutter;
-            }
-        }
-
-        return new Rect(x, y, width, totalHeight);
-    }
-
-    private void renderWithRowConstraints(Rect area, Buffer buffer, int rows, int cols,
-                                          List<Rect> columnRects) {
+    /**
+     * Splits the area into rows with the row constraints, the vertical gutter and the flex
+     * mode, and returns the row areas without the gutters.
+     */
+    private List<Rect> splitRows(Rect area, int rows) {
         // Build row constraints: cycle rowConstraints over rows, interleave with vertical gutter
         List<Constraint> vConstraints = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
@@ -314,6 +228,63 @@ public final class Grid implements Widget {
             }
             rowRects.add(allRowAreas.get(i));
         }
+        return rowRects;
+    }
+
+    /**
+     * Splits the area into rows of equal height that fill it, with the vertical gutter between them.
+     */
+    private List<Rect> splitEqualRows(Rect area, int rows) {
+        int totalGutter = verticalGutter * (rows - 1);
+        int distributable = Math.max(0, area.height() - totalGutter);
+        int baseHeight = distributable / rows;
+        int remainder = distributable % rows;
+
+        List<Rect> rowRects = new ArrayList<>();
+        int y = area.y();
+        for (int r = 0; r < rows; r++) {
+            int height = baseHeight + (r < remainder ? 1 : 0);
+            rowRects.add(new Rect(area.x(), y, area.width(), height));
+            y += height + verticalGutter;
+        }
+        return rowRects;
+    }
+
+    private Rect computeMergedCellRect(GridArea.AreaBounds bounds,
+            List<Rect> columnRects, List<Rect> rowRects) {
+
+        int startCol = bounds.column();
+        int endCol = bounds.endColumn() - 1;
+        int startRow = bounds.row();
+        int endRow = bounds.endRow() - 1;
+
+        // Clamp to available columns/rows
+        if (startCol >= columnRects.size() || startRow >= rowRects.size()) {
+            return new Rect(0, 0, 0, 0);
+        }
+        endCol = Math.min(endCol, columnRects.size() - 1);
+        endRow = Math.min(endRow, rowRects.size() - 1);
+
+        // X position from first column
+        int x = columnRects.get(startCol).x();
+
+        // Width spans from first column start to last column end (includes gutters between)
+        int endX = columnRects.get(endCol).right();
+        int width = endX - x;
+
+        // Y position from first row
+        int y = rowRects.get(startRow).y();
+
+        // Height spans from first row start to last row end (includes gutters between)
+        int endY = rowRects.get(endRow).bottom();
+        int height = endY - y;
+
+        return new Rect(x, y, width, height);
+    }
+
+    private void renderWithRowConstraints(Rect area, Buffer buffer, int rows, int cols,
+                                          List<Rect> columnRects) {
+        List<Rect> rowRects = splitRows(area, rows);
 
         // Render children
         for (int row = 0; row < rows && row < rowRects.size(); row++) {
