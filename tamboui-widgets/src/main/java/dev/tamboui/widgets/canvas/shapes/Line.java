@@ -13,7 +13,8 @@ import dev.tamboui.widgets.canvas.Shape;
 /**
  * A line segment between two points.
  * <p>
- * Draws a line from (x1, y1) to (x2, y2) using Bresenham's algorithm.
+ * Draws a line from (x1, y1) to (x2, y2) using Bresenham's algorithm, one grid
+ * point per step. The part of the line outside the canvas bounds is cut off.
  *
  * <pre>{@code
  * context.draw(new Line(0, 0, 10, 10, Color.RED));
@@ -62,44 +63,58 @@ public final class Line implements Shape {
 
     @Override
     public void draw(Painter painter) {
-        Optional<Painter.GridPoint> p1 = painter.getPoint(x1, y1);
-        Optional<Painter.GridPoint> p2 = painter.getPoint(x2, y2);
-
-        if (!p1.isPresent() || !p2.isPresent()) {
-            // Fall back to drawing what we can if points are partially visible
-            drawWithClipping(painter);
-            return;
-        }
-
-        drawBresenham(painter, p1.get().x(), p1.get().y(), p2.get().x(), p2.get().y());
+        drawSegment(painter, x1, y1, x2, y2, color);
     }
 
-    private void drawWithClipping(Painter painter) {
-        // Sample points along the line and draw visible ones
+    /**
+     * Draws the part of the segment from (x1, y1) to (x2, y2) that is inside the canvas
+     * bounds, one grid point per step. A segment with a NaN or infinite coordinate is not drawn.
+     */
+    static void drawSegment(Painter painter, double x1, double y1, double x2, double y2, Color color) {
         double dx = x2 - x1;
         double dy = y2 - y1;
-        double length = Math.sqrt(dx * dx + dy * dy);
-
-        if (length == 0) {
-            painter.getPoint(x1, y1).ifPresent(p ->
-                painter.paint(p.x(), p.y(), color));
+        if (!Double.isFinite(x1) || !Double.isFinite(y1) || !Double.isFinite(dx) || !Double.isFinite(dy)) {
             return;
         }
-
-        // Step size - smaller for longer lines
-        double step = 0.5;
-        int steps = (int) Math.ceil(length / step);
-
-        for (int i = 0; i <= steps; i++) {
-            double t = (double) i / steps;
-            double x = x1 + t * dx;
-            double y = y1 + t * dy;
-            painter.getPoint(x, y).ifPresent(p ->
-                painter.paint(p.x(), p.y(), color));
+        double[] xBounds = painter.xBounds();
+        double[] yBounds = painter.yBounds();
+        // Liang-Barsky: narrow the segment, from t = 0 at (x1, y1) to t = 1 at (x2, y2),
+        // to its part on the inner side of each edge of the bounds
+        double[] range = {0, 1};
+        if (!clipEdge(-dx, x1 - xBounds[0], range) || !clipEdge(dx, xBounds[1] - x1, range)
+                || !clipEdge(-dy, y1 - yBounds[0], range) || !clipEdge(dy, yBounds[1] - y1, range)) {
+            return;
+        }
+        // An unclipped end keeps its exact coordinates; a clipped one is kept inside the bounds
+        // despite rounding, so that getPoint maps it to the edge of the grid
+        Optional<Painter.GridPoint> start = painter.getPoint(
+            clamp(x1 + range[0] * dx, xBounds), clamp(y1 + range[0] * dy, yBounds));
+        Optional<Painter.GridPoint> end = painter.getPoint(
+            clamp(x2 - (1 - range[1]) * dx, xBounds), clamp(y2 - (1 - range[1]) * dy, yBounds));
+        if (start.isPresent() && end.isPresent()) {
+            drawBresenham(painter, start.get().x(), start.get().y(), end.get().x(), end.get().y(), color);
         }
     }
 
-    private void drawBresenham(Painter painter, int x0, int y0, int x1, int y1) {
+    private static boolean clipEdge(double p, double q, double[] range) {
+        if (p == 0) {
+            // Parallel to the edge: all inside or all outside
+            return q >= 0;
+        }
+        double t = q / p;
+        if (p < 0) {
+            range[0] = Math.max(range[0], t);
+        } else {
+            range[1] = Math.min(range[1], t);
+        }
+        return range[0] <= range[1];
+    }
+
+    private static double clamp(double value, double[] bounds) {
+        return Math.max(bounds[0], Math.min(bounds[1], value));
+    }
+
+    private static void drawBresenham(Painter painter, int x0, int y0, int x1, int y1, Color color) {
         int dx = Math.abs(x1 - x0);
         int dy = Math.abs(y1 - y0);
         int sx = x0 < x1 ? 1 : -1;

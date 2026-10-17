@@ -8,7 +8,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.assertj.BufferAssertions;
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.widgets.canvas.Canvas;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.Painter;
@@ -77,5 +81,22 @@ class RectangleTest {
 
         rect.draw(new Painter(ctx));
         // Should clip and not throw
+    }
+
+    @Test
+    void rectangle_partly_outside_the_bounds_is_drawn_up_to_the_edge() {
+        // Default bounds [0, 1]: the right edge, at x = 1.25, is outside
+        Rectangle rect = new Rectangle(0.25, 0.25, 1.0, 0.5, Color.RED);
+        Rect area = new Rect(0, 0, 20, 5);
+        Buffer buffer = Buffer.empty(area);
+
+        Canvas.builder().paint(ctx -> ctx.draw(rect)).build().render(area, buffer);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "                    ",
+            "     ⡖⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒",
+            "     ⡇              ",
+            "     ⠧⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤",
+            "                    ");
     }
 }

@@ -135,4 +135,28 @@ class PainterTest {
         Optional<Painter.GridPoint> point = painter.getPoint(5, 5);
         assertThat(point).isEmpty();
     }
+
+    @Test
+    void bounds_and_grid_size() {
+        Context ctx = new Context(20, 10, new double[] {-5, 5}, new double[] {0, 100}, Marker.BRAILLE);
+        Painter painter = new Painter(ctx);
+
+        assertThat(painter.xBounds()).containsExactly(-5.0, 5.0);
+        assertThat(painter.yBounds()).containsExactly(0.0, 100.0);
+        assertThat(painter.gridWidth()).isEqualTo(40);
+        assertThat(painter.gridHeight()).isEqualTo(40);
+    }
+
+    @Test
+    void changing_the_returned_bounds_does_not_change_the_canvas() {
+        Context ctx = new Context(10, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.DOT);
+        Painter painter = new Painter(ctx);
+
+        painter.xBounds()[1] = 100;
+        painter.yBounds()[1] = 100;
+
+        assertThat(painter.xBounds()).containsExactly(0.0, 10.0);
+        assertThat(painter.yBounds()).containsExactly(0.0, 10.0);
+        assertThat(painter.getPoint(10, 10)).contains(new Painter.GridPoint(9, 0));
+    }
 }

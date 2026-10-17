@@ -4,11 +4,16 @@
  */
 package dev.tamboui.widgets.canvas.shapes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.assertj.BufferAssertions;
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.widgets.canvas.Canvas;
 import dev.tamboui.widgets.canvas.Context;
 import dev.tamboui.widgets.canvas.Marker;
 import dev.tamboui.widgets.canvas.Painter;
@@ -104,5 +109,77 @@ class CircleTest {
 
         circle.draw(new Painter(ctx));
         // Should not throw, should do nothing
+    }
+
+    @Test
+    void small_circle_is_drawn_as_a_ring() {
+        Buffer buffer = render(Canvas.builder().xBounds(0, 0.1).yBounds(0, 0.1), new Circle(0.05, 0.05, 0.02, Color.RED));
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "                    ",
+            "      ⢀⣠⠤⠤⠤⠤⣄⡀      ",
+            "      ⣏      ⣹      ",
+            "      ⠈⠙⠒⠒⠒⠒⠋⠁      ",
+            "                    ");
+    }
+
+    @Test
+    void circle_has_no_gaps_with_several_grid_points_per_canvas_unit() {
+        // 40 x 40 braille points for 10 x 10 canvas units
+        Context ctx = new Context(20, 10, new double[] {0, 10}, new double[] {0, 10}, Marker.BRAILLE);
+
+        new Circle(5, 5, 4, Color.GREEN).draw(new Painter(ctx));
+
+        // A closed curve has no ends: each point touches the points before and after it
+        Color[][] grid = ctx.allLayers().get(0);
+        int painted = 0;
+        List<String> curveEnds = new ArrayList<>();
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[y].length; x++) {
+                if (grid[y][x] != null) {
+                    painted++;
+                    if (paintedNeighbours(grid, x, y) < 2) {
+                        curveEnds.add(x + "," + y);
+                    }
+                }
+            }
+        }
+        assertThat(painted).isPositive();
+        assertThat(curveEnds).isEmpty();
+    }
+
+    @Test
+    void circle_much_larger_than_the_canvas_draws_its_arc_across_it() {
+        // The top of the circle, at y = 0.6, crosses the default [0, 1] bounds
+        Buffer buffer = render(Canvas.builder(), new Circle(0.5, -1e6, 1e6 + 0.6, Color.RED));
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "                    ",
+            "                    ",
+            "⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉",
+            "                    ",
+            "                    ");
+    }
+
+    private static Buffer render(Canvas.Builder canvas, Circle circle) {
+        Rect area = new Rect(0, 0, 20, 5);
+        Buffer buffer = Buffer.empty(area);
+        canvas.paint(ctx -> ctx.draw(circle)).build().render(area, buffer);
+        return buffer;
+    }
+
+    private static int paintedNeighbours(Color[][] grid, int x, int y) {
+        int count = 0;
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                int nx = x + dx;
+                int ny = y + dy;
+                if ((dx != 0 || dy != 0) && ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[ny].length
+                        && grid[ny][nx] != null) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

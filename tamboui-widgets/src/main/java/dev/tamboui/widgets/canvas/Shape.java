@@ -17,19 +17,16 @@ package dev.tamboui.widgets.canvas;
  *
  *     @Override
  *     public void draw(Painter painter) {
- *         // Draw horizontal line
- *         for (double dx = -size; dx <= size; dx += 0.5) {
- *             painter.getPoint(x + dx, y).ifPresent(p ->
- *                 painter.paint(p.x(), p.y(), color));
- *         }
- *         // Draw vertical line
- *         for (double dy = -size; dy <= size; dy += 0.5) {
- *             painter.getPoint(x, y + dy).ifPresent(p ->
- *                 painter.paint(p.x(), p.y(), color));
- *         }
+ *         new Line(x - size, y, x + size, y, color).draw(painter);
+ *         new Line(x, y - size, x, y + size, color).draw(painter);
  *     }
  * }
  * }</pre>
+ * <p>
+ * A shape that paints its own points should space them by grid point, from
+ * {@link Painter#gridWidth()} and {@link Painter#xBounds()}, rather than by a fixed
+ * distance in canvas coordinates: that leaves gaps when the bounds are small, and
+ * takes very long when they are large.
  *
  * @see Canvas
  * @see Painter
