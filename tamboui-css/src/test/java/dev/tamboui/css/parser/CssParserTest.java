@@ -279,6 +279,16 @@ class CssParserTest {
     }
 
     @Test
+    void parsesRatioValueNextToComments() {
+        String css = "Panel { /* a third */ width: 1/3; height: 2/3/* of the rows */; }";
+        Stylesheet stylesheet = CssParser.parse(css);
+
+        Rule rule = stylesheet.rules().get(0);
+        assertThat(rule.declarations().get("width").raw()).isEqualTo("1/3");
+        assertThat(rule.declarations().get("height").raw()).isEqualTo("2/3");
+    }
+
+    @Test
     void preservesSourceOrder() {
         String css = "Panel { color: red; }\nButton { color: blue; }\nLabel { color: green; }";
         Stylesheet stylesheet = CssParser.parse(css);

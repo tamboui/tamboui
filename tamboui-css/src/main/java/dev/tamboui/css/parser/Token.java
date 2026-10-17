@@ -289,7 +289,7 @@ public abstract class Token {
     }
 
     /**
-     * A delimiter character (e.g., ".", "&gt;", "*", "&amp;").
+     * A delimiter character (e.g., ".", "&gt;", "*", "&amp;", or the "/" of a ratio such as 1/3).
      */
     public static final class Delim extends Token {
         private final char value;

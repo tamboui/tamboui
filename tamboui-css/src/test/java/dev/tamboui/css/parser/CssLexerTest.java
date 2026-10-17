@@ -137,6 +137,20 @@ class CssLexerTest {
     }
 
     @Test
+    void tokenizesSlashOfRatioAsDelimiter() {
+        CssLexer lexer = new CssLexer("1/3/* a third */;");
+        List<Token> tokens = lexer.tokenizeFiltered();
+
+        assertThat(tokens).hasSize(5);
+        assertThat(((Token.Number) tokens.get(0)).value()).isEqualTo("1");
+        assertThat(tokens.get(1)).isInstanceOf(Token.Delim.class);
+        assertThat(((Token.Delim) tokens.get(1)).value()).isEqualTo('/');
+        assertThat(((Token.Number) tokens.get(2)).value()).isEqualTo("3");
+        assertThat(tokens.get(3)).isInstanceOf(Token.Semicolon.class);
+        assertThat(tokens.get(4)).isInstanceOf(Token.EOF.class);
+    }
+
+    @Test
     void tokenizesCompleteRule() {
         String css = ".error { color: red; text-style: bold; }";
         CssLexer lexer = new CssLexer(css);

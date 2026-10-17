@@ -155,6 +155,8 @@ public final class CssLexer {
             case '^':
             case '$':
             case '~':
+            // A '/' that starts a comment was skipped above, so this one is part of a value such as 1/3
+            case '/':
                 return new Token.Delim(c, startPos);
             default:
                 throw new CssParseException("Unexpected character: " + c, startPos);
