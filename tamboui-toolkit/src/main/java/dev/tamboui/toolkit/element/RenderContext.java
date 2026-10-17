@@ -12,6 +12,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.toolkit.focus.FocusManager;
 
 /**
  * Context provided during rendering, giving access to focus state and CSS styling.
@@ -35,6 +36,25 @@ public interface RenderContext {
      * @return true if an element is focused
      */
     boolean hasFocus();
+
+    /**
+     * Returns the focus manager for tracking and managing focus state.
+     *
+     * @return the focus manager, or null if not available
+     */
+    default FocusManager focusManager() {
+        return null;
+    }
+
+    /**
+     * Returns the ID of the currently focused element, if any.
+     *
+     * @return the focused element ID, or null if nothing is focused
+     */
+    default String focusedId() {
+        FocusManager fm = focusManager();
+        return fm != null ? fm.focusedId() : null;
+    }
 
     /**
      * Resolves the CSS style for an element.

@@ -153,6 +153,11 @@ public final class DefaultRenderContext implements RenderContext {
     }
 
     @Override
+    public String focusedId() {
+        return focusManager.focusedId();
+    }
+
+    @Override
     public Optional<CssStyleResolver> resolveStyle(Styleable element) {
         if (styleEngine == null) {
             return Optional.empty();
