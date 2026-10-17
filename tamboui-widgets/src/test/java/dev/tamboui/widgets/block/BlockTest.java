@@ -26,11 +26,17 @@ import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.symbols.merge.MergeStrategy;
 import dev.tamboui.text.Line;
+import dev.tamboui.text.Span;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BlockTest {
+
+    private static final String CODER = "👩‍💻";
+    private static final String FAMILY = "👨‍👩‍👧";
+    private static final Style RED = Style.EMPTY.fg(Color.RED);
+    private static final Style BLUE = Style.EMPTY.fg(Color.BLUE);
 
     @Test
     @DisplayName("Block.bordered creates block with all borders")
@@ -1032,5 +1038,112 @@ class BlockTest {
             // the corner is kept and nothing is drawn right of the block
             assertThat(buffer).as(merge.name()).hasRow(0, "┌Hello ┐            ");
         }
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS keeps the style of each title span, the ellipsis taking the style of the text it replaces")
+    void titleEllipsisKeepsSpanStyles() {
+        // ┌Error: di...┐ - the ellipsis replaces the rest of the plain span
+        Buffer expected = borderedWithTitle(14, new Span("Error:", RED), new Span(" di...", Style.EMPTY));
+        for (MergeStrategy merge : new MergeStrategy[] {MergeStrategy.REPLACE, MergeStrategy.EXACT}) {
+            assertThat(renderTitle(Title.from(statusLine()).ellipsis(), 14, merge)).as(merge.name())
+                    .isEqualTo(expected);
+        }
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS_START keeps the style of each title span")
+    void titleEllipsisStartKeepsSpanStyles() {
+        // ┌...s almost full┐ - the ellipsis replaces the start of the plain span
+        assertTitleRendersAs(Title.from(statusLine()).ellipsisStart(), 18,
+                new Span("...s ", Style.EMPTY), new Span("almost full", BLUE));
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS_MIDDLE keeps the style of each title span")
+    void titleEllipsisMiddleKeepsSpanStyles() {
+        // ┌Error: ...t full┐
+        assertTitleRendersAs(Title.from(statusLine()).ellipsisMiddle(), 18,
+                new Span("Error:", RED), new Span(" ...", Style.EMPTY), new Span("t full", BLUE));
+    }
+
+    @Test
+    @DisplayName("A title in less room than the ellipsis is clipped, keeping the style of each span")
+    void titleEllipsisWithTinyWidthKeepsSpanStyles() {
+        Title title = Title.from(Line.from(new Span("ab", RED), new Span("cdef", BLUE))).ellipsis();
+        assertTitleRendersAs(title, 5, new Span("ab", RED), new Span("c", BLUE));
+
+        // a ZWJ emoji is kept whole in its two columns, or left out of one
+        Title emoji = Title.from(Line.from(new Span("a", RED), new Span(CODER + "bc", BLUE))).ellipsis();
+        assertTitleRendersAs(emoji, 5, new Span("a", RED), new Span(CODER, BLUE));
+        assertTitleRendersAs(emoji, 4, new Span("a", RED));
+    }
+
+    @Test
+    @DisplayName("Title ellipsis modes keep a CJK character at the cut whole or leave it out, keeping span styles")
+    void titleEllipsisCjkAtCutKeepsSpanStyles() {
+        // 2 + 8 + 3 = 13 display cols
+        Line line = Line.from(new Span("ab", BLUE), new Span("世界你好", RED), new Span("end", BLUE));
+
+        // 界 does not fit in the column left before the ellipsis, which takes the style of the text it replaces
+        assertTitleRendersAs(Title.from(line).ellipsis(), 10, new Span("ab", BLUE), new Span("世...", RED));
+        // 你 does not fit in the column left after the ellipsis
+        assertTitleRendersAs(Title.from(line).ellipsisStart(), 11, new Span("...好", RED), new Span("end", BLUE));
+        // 好 does not fit in the column left after the ellipsis
+        assertTitleRendersAs(Title.from(line).ellipsisMiddle(), 13,
+                new Span("ab", BLUE), new Span("世...", RED), new Span("end", BLUE));
+    }
+
+    @Test
+    @DisplayName("Title ellipsis modes keep a ZWJ emoji at the cut whole or leave it out, keeping span styles")
+    void titleEllipsisZwjEmojiAtCutKeepsSpanStyles() {
+        // At each cut the emoji gets one column, and is left out, or exactly its two columns, and is kept whole
+        Title end = Title.from(Line.from(new Span("ab", BLUE), new Span(" " + CODER + " and more", RED))).ellipsis();
+        assertTitleRendersAs(end, 9, new Span("ab", BLUE), new Span(" ...", RED));
+        assertTitleRendersAs(end, 10, new Span("ab", BLUE), new Span(" " + CODER + "...", RED));
+
+        Title start = Title.from(Line.from(new Span("more text " + FAMILY + " ", RED), new Span("end", BLUE)))
+                .ellipsisStart();
+        assertTitleRendersAs(start, 10, new Span("... ", RED), new Span("end", BLUE));
+        assertTitleRendersAs(start, 11, new Span("..." + FAMILY + " ", RED), new Span("end", BLUE));
+
+        Title middle = Title.from(Line.from(
+                new Span("ab", BLUE), new Span(" " + CODER + " text that is long ", RED), new Span("end", BLUE)))
+                .ellipsisMiddle();
+        assertTitleRendersAs(middle, 13, new Span("ab", BLUE), new Span(" ... ", RED), new Span("end", BLUE));
+        assertTitleRendersAs(middle, 14,
+                new Span("ab", BLUE), new Span(" " + CODER + "... ", RED), new Span("end", BLUE));
+    }
+
+    /** A red "Error:", a plain " disk is " and a blue "almost full": 26 columns. */
+    private static Line statusLine() {
+        return Line.from(
+            new Span("Error:", RED),
+            new Span(" disk is ", Style.EMPTY),
+            new Span("almost full", BLUE)
+        );
+    }
+
+    /** Renders a bordered block, {@code width} columns wide and 3 rows high, with the given top title. */
+    private static Buffer renderTitle(Title title, int width, MergeStrategy merge) {
+        Rect area = new Rect(0, 0, width, 3);
+        Buffer buffer = Buffer.empty(area);
+        Block.builder().borders(Borders.ALL).title(title).mergeBorders(merge).build().render(area, buffer);
+        return buffer;
+    }
+
+    /** A bordered block, {@code width} columns wide and 3 rows high, with the spans drawn on its top border. */
+    private static Buffer borderedWithTitle(int width, Span... titleSpans) {
+        Rect area = new Rect(0, 0, width, 3);
+        Buffer buffer = Buffer.empty(area);
+        Block.bordered().render(area, buffer);
+        buffer.setLine(1, 0, Line.from(titleSpans));
+        return buffer;
+    }
+
+    private static void assertTitleRendersAs(Title title, int width, Span... expectedSpans) {
+        assertThat(renderTitle(title, width, MergeStrategy.REPLACE))
+                .as("%s in a block %d columns wide", title.overflow(), width)
+                .isEqualTo(borderedWithTitle(width, expectedSpans));
     }
 }

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.widgets.block;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -494,6 +495,11 @@ public final class Block implements Widget {
         }
     }
 
+    /**
+     * Shortens a title that is too wide, keeping the style of each span. The ellipsis takes the style of the text it
+     * replaces next to it: the first character cut away for ELLIPSIS and ELLIPSIS_MIDDLE, the last one for
+     * ELLIPSIS_START.
+     */
     private Line applyTitleOverflow(Line line, int maxWidth, Overflow overflow) {
         if (overflow == Overflow.CLIP || overflow == Overflow.WRAP_CHARACTER || overflow == Overflow.WRAP_WORD) {
             // CLIP: cut when rendered, to the title width (see renderTitle)
@@ -501,61 +507,80 @@ public final class Block implements Widget {
             return line;
         }
 
-        // Extract text content and style
-        String fullText = lineToString(line);
-        Style lineStyle = getLineStyle(line);
-
-        if (maxWidth <= CharWidth.of(ELLIPSIS)) {
+        List<Span> spans = line.spans();
+        List<Span> kept = new ArrayList<>();
+        int ellipsisWidth = CharWidth.of(ELLIPSIS);
+        if (maxWidth <= ellipsisWidth) {
             // Not enough room for ellipsis, just clip
-            return Line.from(new Span(CharWidth.substringByWidth(fullText, maxWidth), lineStyle));
+            keepHead(spans, maxWidth, kept);
+            return Line.from(kept);
         }
 
-        String truncated;
+        int availableWidth = maxWidth - ellipsisWidth;
+        List<Span> tail = new ArrayList<>();
+        Style ellipsisStyle;
         switch (overflow) {
             case ELLIPSIS:
-                truncated = truncateEnd(fullText, maxWidth);
+                ellipsisStyle = keepHead(spans, availableWidth, kept);
                 break;
             case ELLIPSIS_START:
-                truncated = truncateStart(fullText, maxWidth);
+                ellipsisStyle = keepTail(spans, availableWidth, tail);
                 break;
             case ELLIPSIS_MIDDLE:
-                truncated = truncateMiddle(fullText, maxWidth);
+                ellipsisStyle = keepHead(spans, (availableWidth + 1) / 2, kept);
+                keepTail(spans, availableWidth / 2, tail);
                 break;
             default:
                 return line;
         }
-
-        return Line.from(new Span(truncated, lineStyle));
+        kept.add(new Span(ELLIPSIS, ellipsisStyle));
+        kept.addAll(tail);
+        return Line.from(kept);
     }
 
-    private String truncateEnd(String text, int maxWidth) {
-        int availableWidth = maxWidth - CharWidth.of(ELLIPSIS);
-        return CharWidth.substringByWidth(text, availableWidth) + ELLIPSIS;
-    }
-
-    private String truncateStart(String text, int maxWidth) {
-        int availableWidth = maxWidth - CharWidth.of(ELLIPSIS);
-        return ELLIPSIS + CharWidth.substringByWidthFromEnd(text, availableWidth);
-    }
-
-    private String truncateMiddle(String text, int maxWidth) {
-        int availableWidth = maxWidth - CharWidth.of(ELLIPSIS);
-        int leftWidth = (availableWidth + 1) / 2;
-        int rightWidth = availableWidth / 2;
-        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS + CharWidth.substringByWidthFromEnd(text, rightWidth);
-    }
-
-    private String lineToString(Line line) {
-        StringBuilder sb = new StringBuilder();
-        for (Span span : line.spans()) {
-            sb.append(span.content());
+    /**
+     * Adds the start of a title that fits in {@code width} columns to {@code out}: the spans that fit whole, then the
+     * head of the next span, cut between grapheme clusters. The spans must be wider than {@code width} in total.
+     *
+     * @return the style of the span the cut falls in
+     */
+    private static Style keepHead(List<Span> spans, int width, List<Span> out) {
+        int remaining = width;
+        int i = 0;
+        while (spans.get(i).width() <= remaining) {
+            out.add(spans.get(i));
+            remaining -= spans.get(i).width();
+            i++;
         }
-        return sb.toString();
+        Span cut = spans.get(i);
+        String head = CharWidth.substringByWidth(cut.content(), remaining);
+        if (!head.isEmpty()) {
+            out.add(new Span(head, cut.style()));
+        }
+        return cut.style();
     }
 
-    private Style getLineStyle(Line line) {
-        List<Span> spans = line.spans();
-        return spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
+    /**
+     * Adds the end of a title that fits in {@code width} columns to {@code out}: the tail of the span the cut falls
+     * in, cut between grapheme clusters, then the spans after it. The spans must be wider than {@code width} in
+     * total.
+     *
+     * @return the style of the span the cut falls in
+     */
+    private static Style keepTail(List<Span> spans, int width, List<Span> out) {
+        int remaining = width;
+        int i = spans.size() - 1;
+        while (spans.get(i).width() <= remaining) {
+            remaining -= spans.get(i).width();
+            i--;
+        }
+        Span cut = spans.get(i);
+        String tail = CharWidth.substringByWidthFromEnd(cut.content(), remaining);
+        if (!tail.isEmpty()) {
+            out.add(new Span(tail, cut.style()));
+        }
+        out.addAll(spans.subList(i + 1, spans.size()));
+        return cut.style();
     }
 
     private void renderTitleWithMerge(int x, int y, Line titleLine, int maxWidth, Buffer buffer) {
