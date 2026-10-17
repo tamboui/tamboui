@@ -240,36 +240,83 @@ public final class MarkdownInlineRenderer {
         return toLine(out);
     }
 
+    /**
+     * Shortens a line that is too wide, keeping the style of each span. The
+     * ellipsis takes the style of the text it replaces next to it: the first
+     * character cut away for END and MIDDLE, the last one for START.
+     */
     private static Line ellipsizeSpans(List<Span> spans, int maxWidth, EllipsisPosition position) {
-        int total = totalWidth(spans);
-        if (total <= maxWidth) {
+        if (totalWidth(spans) <= maxWidth) {
             return toLine(new ArrayList<>(spans));
         }
-        Style style = spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
-        String text = spansToString(spans);
         int ellipsisWidth = CharWidth.of(ELLIPSIS);
         if (maxWidth <= ellipsisWidth) {
-            return Line.from(Span.styled(CharWidth.substringByWidth(text, maxWidth), style));
+            return clipSpans(spans, maxWidth);
         }
         int available = maxWidth - ellipsisWidth;
-        String truncated;
+        List<Span> out = new ArrayList<>();
+        List<Span> tail = new ArrayList<>();
+        Style ellipsisStyle;
         switch (position) {
             case START:
-                truncated = ELLIPSIS + CharWidth.substringByWidthFromEnd(text, available);
+                ellipsisStyle = keepTail(spans, available, tail);
                 break;
-            case MIDDLE: {
-                int leftWidth = (available + 1) / 2;
-                int rightWidth = available / 2;
-                truncated = CharWidth.substringByWidth(text, leftWidth)
-                    + ELLIPSIS
-                    + CharWidth.substringByWidthFromEnd(text, rightWidth);
+            case MIDDLE:
+                ellipsisStyle = keepHead(spans, (available + 1) / 2, out);
+                keepTail(spans, available / 2, tail);
                 break;
-            }
             case END:
             default:
-                truncated = CharWidth.substringByWidth(text, available) + ELLIPSIS;
+                ellipsisStyle = keepHead(spans, available, out);
+                break;
         }
-        return Line.from(Span.styled(truncated, style));
+        appendSegment(out, ELLIPSIS, ellipsisStyle);
+        for (Span span : tail) {
+            appendSegment(out, span.content(), span.style());
+        }
+        return toLine(out);
+    }
+
+    /**
+     * Appends the start of the line that fits in {@code width} columns: the
+     * spans that fit whole, then the head of the next span, cut between
+     * grapheme clusters. The spans must be wider than {@code width} in total.
+     *
+     * @return the style of the span the cut falls in
+     */
+    private static Style keepHead(List<Span> spans, int width, List<Span> out) {
+        int remaining = width;
+        int i = 0;
+        while (spans.get(i).width() <= remaining) {
+            appendSegment(out, spans.get(i).content(), spans.get(i).style());
+            remaining -= spans.get(i).width();
+            i++;
+        }
+        Span cut = spans.get(i);
+        appendSegment(out, CharWidth.substringByWidth(cut.content(), remaining), cut.style());
+        return cut.style();
+    }
+
+    /**
+     * Appends the end of the line that fits in {@code width} columns: the tail
+     * of the span the cut falls in, cut between grapheme clusters, then the
+     * spans after it. The spans must be wider than {@code width} in total.
+     *
+     * @return the style of the span the cut falls in
+     */
+    private static Style keepTail(List<Span> spans, int width, List<Span> out) {
+        int remaining = width;
+        int i = spans.size() - 1;
+        while (spans.get(i).width() <= remaining) {
+            remaining -= spans.get(i).width();
+            i--;
+        }
+        Span cut = spans.get(i);
+        appendSegment(out, CharWidth.substringByWidthFromEnd(cut.content(), remaining), cut.style());
+        for (int j = i + 1; j < spans.size(); j++) {
+            appendSegment(out, spans.get(j).content(), spans.get(j).style());
+        }
+        return cut.style();
     }
 
     private static int totalWidth(List<Span> spans) {
@@ -278,14 +325,6 @@ public final class MarkdownInlineRenderer {
             total += span.width();
         }
         return total;
-    }
-
-    private static String spansToString(List<Span> spans) {
-        StringBuilder sb = new StringBuilder();
-        for (Span span : spans) {
-            sb.append(span.content());
-        }
-        return sb.toString();
     }
 
     private enum EllipsisPosition {
