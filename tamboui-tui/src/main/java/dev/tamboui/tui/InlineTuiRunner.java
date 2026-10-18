@@ -24,6 +24,7 @@ import dev.tamboui.layout.Size;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.text.Text;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.ResizeEvent;
@@ -176,6 +177,9 @@ public final class InlineTuiRunner implements AutoCloseable {
         try {
             // Enable raw mode for key events
             backend.enableRawMode();
+            if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+                backend.pushKeyboardProtocol(config.keyboardProtocol());
+            }
             if (config.bracketedPaste()) {
                 backend.enableBracketedPaste();
             }
@@ -199,6 +203,11 @@ public final class InlineTuiRunner implements AutoCloseable {
     }
 
     private static void closeQuietly(Backend backend) {
+        try {
+            backend.popKeyboardProtocol();
+        } catch (Exception ignored) {
+            // best effort during cleanup
+        }
         try {
             backend.disableRawMode();
         } catch (IOException ignored) {
@@ -538,6 +547,13 @@ public final class InlineTuiRunner implements AutoCloseable {
         if (windowTitleSet.get()) {
             try {
                 backend.restoreWindowTitle();
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+            try {
+                backend.popKeyboardProtocol();
             } catch (Exception ignored) {
             }
         }

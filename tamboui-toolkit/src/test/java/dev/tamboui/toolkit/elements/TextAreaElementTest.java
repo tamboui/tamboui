@@ -356,6 +356,55 @@ class TextAreaElementTest extends AbstractElementTest {
             assertThat(result).isEqualTo(EventResult.HANDLED);
             assertThat(element.getState().text()).isEqualTo("    ");
         }
+
+        @Test
+        @DisplayName("Release key events are ignored")
+        void releaseKeyEventsIgnored() {
+            TextAreaElement element = textArea().text("Hello");
+            KeyEvent release = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character('x')
+                    .kind(dev.tamboui.tui.event.KeyEventKind.RELEASE)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(release, true);
+
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().text()).isEqualTo("Hello");
+        }
+
+        @Test
+        @DisplayName("Inserts text from event text() property")
+        void insertsAssociatedText() {
+            TextAreaElement element = textArea().text("");
+            KeyEvent textEvent = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .text("World")
+                    .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(textEvent, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().text()).isEqualTo("World");
+        }
+
+        @Test
+        @DisplayName("Characters with Super or Meta modifier are ignored")
+        void ignoresSuperOrMetaCharacters() {
+            TextAreaElement element = textArea().text("");
+            KeyEvent superEvent = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character('s')
+                    .modifiers(KeyModifiers.SUPER)
+                    .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(superEvent, true);
+
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().text()).isEmpty();
+        }
     }
 
     @Nested

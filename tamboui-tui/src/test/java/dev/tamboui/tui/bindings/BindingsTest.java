@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyEventKind;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
@@ -508,6 +509,83 @@ class BindingsTest {
         assertThat(KeyTrigger.ch(' ').describe()).isEqualTo("Space");
         assertThat(KeyTrigger.key(KeyCode.TAB, false, false, true).describe())
             .isEqualTo("Shift+Tab");
+        assertThat(KeyTrigger.key(KeyCode.ENTER).withSuper().describe()).isEqualTo("Super+Enter");
+    }
+
+    @Test
+    @DisplayName("KeyTrigger ignores RELEASE events by default")
+    void keyTriggerIgnoresReleaseByDefault() {
+        KeyTrigger trigger = KeyTrigger.ch('q');
+
+        KeyEvent press = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.PRESS).build();
+        KeyEvent repeat = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.REPEAT).build();
+        KeyEvent release = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.RELEASE).build();
+
+        assertThat(trigger.matches(press)).isTrue();
+        assertThat(trigger.matches(repeat)).isTrue();
+        assertThat(trigger.matches(release)).isFalse();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger with explicit RELEASE kind matches only release events")
+    void keyTriggerWithExplicitReleaseKind() {
+        KeyTrigger trigger = KeyTrigger.ch('q').withKind(dev.tamboui.tui.event.KeyEventKind.RELEASE);
+
+        KeyEvent press = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.PRESS).build();
+        KeyEvent release = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.RELEASE).build();
+
+        assertThat(trigger.matches(press)).isFalse();
+        assertThat(trigger.matches(release)).isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger matches base layout key code point")
+    void keyTriggerMatchesBaseLayoutKey() {
+        KeyTrigger trigger = KeyTrigger.ch('c');
+
+        // Cyrillic 'с' (code point 1089) with base layout 'c' (code point 99)
+        KeyEvent cyrillicS = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('с')
+                .keyCodePoint(1089)
+                .baseLayoutKeyCodePoint(99)
+                .build();
+
+        assertThat(trigger.matches(cyrillicS)).isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger matches shifted key code point")
+    void keyTriggerMatchesShiftedKey() {
+        KeyTrigger trigger = KeyTrigger.ch('+');
+
+        KeyEvent shiftedEquals = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .modifiers(KeyModifiers.SHIFT)
+                .keyCodePoint('=')
+                .shiftedKeyCodePoint('+')
+                .text("+")
+                .build();
+
+        assertThat(trigger.matches(shiftedEquals)).isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger with Super modifier matches event with Super")
+    void keyTriggerSuperModifier() {
+        KeyTrigger trigger = KeyTrigger.key(KeyCode.ENTER).withSuper();
+
+        KeyEvent eventWithSuper = KeyEvent.builder()
+                .code(KeyCode.ENTER)
+                .modifiers(KeyModifiers.SUPER)
+                .build();
+        KeyEvent eventWithoutSuper = KeyEvent.builder()
+                .code(KeyCode.ENTER)
+                .modifiers(KeyModifiers.NONE)
+                .build();
+
+        assertThat(trigger.matches(eventWithSuper)).isTrue();
+        assertThat(trigger.matches(eventWithoutSuper)).isFalse();
     }
 
     // ========== Bindings Interface Tests ==========

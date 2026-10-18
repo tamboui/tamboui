@@ -440,6 +440,9 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      * Handles common key events for text area input.
      */
     private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, int visibleWidth, Overflow overflow) {
+        if (event.isRelease()) {
+            return false;
+        }
         switch (event.code()) {
             case BACKSPACE:
                 state.deleteBackward();
@@ -472,9 +475,14 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 state.insert("    "); // 4 spaces for tab
                 return true;
             case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                // Don't consume characters with Ctrl, Alt, Super, or Meta modifiers - those are control sequences
+                if (event.modifiers().ctrl() || event.modifiers().alt() || event.modifiers().superKey() || event.modifiers().meta()) {
                     return false;
+                }
+                String text = event.text();
+                if (!text.isEmpty()) {
+                    state.insert(text);
+                    return true;
                 }
                 int c = event.codePoint();
                 if (c >= 32 && c != 127) {

@@ -79,4 +79,56 @@ class TextInputElementTest extends AbstractElementTest {
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.YELLOW);
     }
+
+    @Test
+    @DisplayName("TextInputElement ignores release key events")
+    void ignoresReleaseKeyEvents() {
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState("Initial");
+        TextInputElement element = textInput(state);
+        dev.tamboui.tui.event.KeyEvent release = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+                .character('x')
+                .kind(dev.tamboui.tui.event.KeyEventKind.RELEASE)
+                .build();
+
+        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(release, true);
+
+        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.UNHANDLED);
+        assertThat(state.text()).isEqualTo("Initial");
+    }
+
+    @Test
+    @DisplayName("TextInputElement inserts text from event text() property")
+    void insertsAssociatedText() {
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputElement element = textInput(state);
+        dev.tamboui.tui.event.KeyEvent textEvent = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+                .text("Hello")
+                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .build();
+
+        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(textEvent, true);
+
+        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.HANDLED);
+        assertThat(state.text()).isEqualTo("Hello");
+    }
+
+    @Test
+    @DisplayName("TextInputElement ignores character when Super or Meta is pressed")
+    void ignoresSuperOrMetaKey() {
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputElement element = textInput(state);
+        dev.tamboui.tui.event.KeyEvent superEvent = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+                .character('c')
+                .modifiers(dev.tamboui.tui.event.KeyModifiers.SUPER)
+                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .build();
+
+        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(superEvent, true);
+
+        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.UNHANDLED);
+        assertThat(state.text()).isEmpty();
+    }
 }

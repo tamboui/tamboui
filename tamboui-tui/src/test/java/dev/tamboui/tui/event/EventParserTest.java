@@ -565,6 +565,268 @@ class EventParserTest {
         assertThat(mouse.button()).isEqualTo(MouseButton.LEFT);
     }
 
+    // ==================== Kitty Keyboard Protocol Tests ====================
+
+    @Test
+    @DisplayName("Kitty CSI 27u is parsed as ESCAPE key")
+    void kittyEscapeKey() throws IOException {
+        QueueBackend backend = backendFor("\033[27u");
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent key = (KeyEvent) event;
+        assertThat(key.code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(key.modifiers()).isEqualTo(KeyModifiers.NONE);
+        assertThat(key.kind()).isEqualTo(KeyEventKind.PRESS);
+        assertThat(key.isPress()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty CSI 27;1:3u is parsed as ESCAPE release")
+    void kittyEscapeRelease() throws IOException {
+        QueueBackend backend = backendFor("\033[27;1:3u");
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent key = (KeyEvent) event;
+        assertThat(key.code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(key.kind()).isEqualTo(KeyEventKind.RELEASE);
+        assertThat(key.isRelease()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty disambiguates Tab from Ctrl+I")
+    void kittyDisambiguatesTabFromCtrlI() throws IOException {
+        // Tab key: CSI 9 u
+        QueueBackend tabBackend = backendFor("\033[9u");
+        KeyEvent tabEvent = (KeyEvent) EventParser.readEvent(tabBackend, 0);
+        assertThat(tabEvent.code()).isEqualTo(KeyCode.TAB);
+        assertThat(tabEvent.modifiers()).isEqualTo(KeyModifiers.NONE);
+
+        // Ctrl+I: CSI 105;5 u
+        QueueBackend ctrlIBackend = backendFor("\033[105;5u");
+        KeyEvent ctrlIEvent = (KeyEvent) EventParser.readEvent(ctrlIBackend, 0);
+        assertThat(ctrlIEvent.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(ctrlIEvent.isChar('i')).isTrue();
+        assertThat(ctrlIEvent.hasCtrl()).isTrue();
+        assertThat(ctrlIEvent.hasShift()).isFalse();
+
+        // Ctrl+Tab: CSI 9;5 u
+        QueueBackend ctrlTabBackend = backendFor("\033[9;5u");
+        KeyEvent ctrlTabEvent = (KeyEvent) EventParser.readEvent(ctrlTabBackend, 0);
+        assertThat(ctrlTabEvent.code()).isEqualTo(KeyCode.TAB);
+        assertThat(ctrlTabEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty disambiguates Enter from Ctrl+M")
+    void kittyDisambiguatesEnterFromCtrlM() throws IOException {
+        // Enter key: CSI 13 u
+        QueueBackend enterBackend = backendFor("\033[13u");
+        KeyEvent enterEvent = (KeyEvent) EventParser.readEvent(enterBackend, 0);
+        assertThat(enterEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(enterEvent.modifiers()).isEqualTo(KeyModifiers.NONE);
+
+        // Ctrl+M: CSI 109;5 u
+        QueueBackend ctrlMBackend = backendFor("\033[109;5u");
+        KeyEvent ctrlMEvent = (KeyEvent) EventParser.readEvent(ctrlMBackend, 0);
+        assertThat(ctrlMEvent.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(ctrlMEvent.isChar('m')).isTrue();
+        assertThat(ctrlMEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty parses Ctrl+Shift combinations")
+    void kittyCtrlShift() throws IOException {
+        // Ctrl+Shift+A: CSI 97;6 u (modifier 6 = Shift(1) + Ctrl(4) + 1 = 6)
+        QueueBackend backend = backendFor("\033[97;6u");
+        KeyEvent event = (KeyEvent) EventParser.readEvent(backend, 0);
+
+        assertThat(event.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(event.hasCtrl()).isTrue();
+        assertThat(event.hasShift()).isTrue();
+        assertThat(event.keyCodePoint()).isEqualTo(97);
+        assertThat(event.isChar('a')).isTrue();
+        assertThat(event.isCharIgnoreCase('a')).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty parses extended modifiers: Super, Hyper, Meta")
+    void kittyExtendedModifiers() throws IOException {
+        // Super+A: modifier 8 + 1 = 9
+        QueueBackend superBackend = backendFor("\033[97;9u");
+        KeyEvent superEvent = (KeyEvent) EventParser.readEvent(superBackend, 0);
+        assertThat(superEvent.hasSuper()).isTrue();
+        assertThat(superEvent.hasCtrl()).isFalse();
+
+        // Hyper+A: modifier 16 + 1 = 17
+        QueueBackend hyperBackend = backendFor("\033[97;17u");
+        KeyEvent hyperEvent = (KeyEvent) EventParser.readEvent(hyperBackend, 0);
+        assertThat(hyperEvent.hasHyper()).isTrue();
+
+        // Meta+A: modifier 32 + 1 = 33
+        QueueBackend metaBackend = backendFor("\033[97;33u");
+        KeyEvent metaEvent = (KeyEvent) EventParser.readEvent(metaBackend, 0);
+        assertThat(metaEvent.hasMeta()).isTrue();
+
+        // Super+Alt+A: modifier 8 + 2 + 1 = 11
+        QueueBackend superAltBackend = backendFor("\033[97;11u");
+        KeyEvent superAltEvent = (KeyEvent) EventParser.readEvent(superAltBackend, 0);
+        assertThat(superAltEvent.hasSuper()).isTrue();
+        assertThat(superAltEvent.hasAlt()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty parses event kinds: Press, Repeat, Release")
+    void kittyEventKinds() throws IOException {
+        // Press: :1
+        QueueBackend pressBackend = backendFor("\033[97;1:1u");
+        KeyEvent press = (KeyEvent) EventParser.readEvent(pressBackend, 0);
+        assertThat(press.kind()).isEqualTo(KeyEventKind.PRESS);
+        assertThat(press.isPress()).isTrue();
+
+        // Repeat: :2
+        QueueBackend repeatBackend = backendFor("\033[97;1:2u");
+        KeyEvent repeat = (KeyEvent) EventParser.readEvent(repeatBackend, 0);
+        assertThat(repeat.kind()).isEqualTo(KeyEventKind.REPEAT);
+        assertThat(repeat.isRepeat()).isTrue();
+
+        // Release: :3
+        QueueBackend releaseBackend = backendFor("\033[97;1:3u");
+        KeyEvent release = (KeyEvent) EventParser.readEvent(releaseBackend, 0);
+        assertThat(release.kind()).isEqualTo(KeyEventKind.RELEASE);
+        assertThat(release.isRelease()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Modified VT arrow key parses event kind")
+    void modifiedVtEventKind() throws IOException {
+        // Shift+Up Release: ESC[1;2:3A
+        QueueBackend backend = backendFor("\033[1;2:3A");
+        KeyEvent event = (KeyEvent) EventParser.readEvent(backend, 0);
+
+        assertThat(event.code()).isEqualTo(KeyCode.UP);
+        assertThat(event.hasShift()).isTrue();
+        assertThat(event.kind()).isEqualTo(KeyEventKind.RELEASE);
+        assertThat(event.isRelease()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Kitty parses alternate shifted and base layout keys")
+    void kittyAlternateKeys() throws IOException {
+        // Key '=', Shift pressed, shifted key '+' (43): CSI 61:43;2 u
+        QueueBackend shiftedBackend = backendFor("\033[61:43;2u");
+        KeyEvent shiftedEvent = (KeyEvent) EventParser.readEvent(shiftedBackend, 0);
+        assertThat(shiftedEvent.keyCodePoint()).isEqualTo(61);
+        assertThat(shiftedEvent.shiftedKeyCodePoint()).hasValue(43);
+        assertThat(shiftedEvent.isChar('+')).isTrue();
+
+        // Cyrillic 'с' (1089) with base layout 'c' (99): CSI 1089::99;1 u
+        QueueBackend cyrillicBackend = backendFor("\033[1089::99;1u");
+        KeyEvent cyrillicEvent = (KeyEvent) EventParser.readEvent(cyrillicBackend, 0);
+        assertThat(cyrillicEvent.keyCodePoint()).isEqualTo(1089);
+        assertThat(cyrillicEvent.baseLayoutKeyCodePoint()).hasValue(99);
+        assertThat(cyrillicEvent.baseLayoutKeyCodePoint().getAsInt()).isEqualTo((int) 'c');
+    }
+
+    @Test
+    @DisplayName("Kitty parses associated text subfield")
+    void kittyAssociatedText() throws IOException {
+        // Code 97 ('a'), text 'A' (65): CSI 97;1;65 u
+        QueueBackend backend = backendFor("\033[97;1;65u");
+        KeyEvent event = (KeyEvent) EventParser.readEvent(backend, 0);
+
+        assertThat(event.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(event.text()).isEqualTo("A");
+        assertThat(event.string()).isEqualTo("A");
+        assertThat(event.keyCodePoint()).isEqualTo(97);
+    }
+
+    @Test
+    @DisplayName("Kitty parses functional, keypad, and media keys")
+    void kittyFunctionalAndMediaKeys() throws IOException {
+        // Keypad 5: 57404
+        QueueBackend kp5Backend = backendFor("\033[57404u");
+        KeyEvent kp5 = (KeyEvent) EventParser.readEvent(kp5Backend, 0);
+        assertThat(kp5.code()).isEqualTo(KeyCode.KP_5);
+        assertThat(kp5.isKeypad()).isTrue();
+
+        // Keypad Add: 57413
+        QueueBackend kpAddBackend = backendFor("\033[57413u");
+        KeyEvent kpAdd = (KeyEvent) EventParser.readEvent(kpAddBackend, 0);
+        assertThat(kpAdd.code()).isEqualTo(KeyCode.KP_ADD);
+
+        // Keypad Enter: 57414
+        QueueBackend kpEnterBackend = backendFor("\033[57414u");
+        KeyEvent kpEnter = (KeyEvent) EventParser.readEvent(kpEnterBackend, 0);
+        assertThat(kpEnter.code()).isEqualTo(KeyCode.KP_ENTER);
+
+        // F13: 57376
+        QueueBackend f13Backend = backendFor("\033[57376u");
+        KeyEvent f13 = (KeyEvent) EventParser.readEvent(f13Backend, 0);
+        assertThat(f13.code()).isEqualTo(KeyCode.F13);
+
+        // F35: 57398
+        QueueBackend f35Backend = backendFor("\033[57398u");
+        KeyEvent f35 = (KeyEvent) EventParser.readEvent(f35Backend, 0);
+        assertThat(f35.code()).isEqualTo(KeyCode.F35);
+
+        // Lock keys: CapsLock (57358), NumLock (57360)
+        QueueBackend capsBackend = backendFor("\033[57358u");
+        KeyEvent caps = (KeyEvent) EventParser.readEvent(capsBackend, 0);
+        assertThat(caps.code()).isEqualTo(KeyCode.CAPS_LOCK);
+
+        QueueBackend numBackend = backendFor("\033[57360u");
+        KeyEvent num = (KeyEvent) EventParser.readEvent(numBackend, 0);
+        assertThat(num.code()).isEqualTo(KeyCode.NUM_LOCK);
+
+        // Media key: Play (57428)
+        QueueBackend playBackend = backendFor("\033[57428u");
+        KeyEvent play = (KeyEvent) EventParser.readEvent(playBackend, 0);
+        assertThat(play.code()).isEqualTo(KeyCode.MEDIA_PLAY);
+    }
+
+    @Test
+    @DisplayName("Atomic CSI parsing consumes unknown sequences without corrupting input stream")
+    void atomicCsiParsingConsumesUnknownSequence() throws IOException {
+        // An unknown CSI sequence e.g. ESC[999;888z followed immediately by normal key 'a'
+        QueueBackend backend = backendFor("\033[999;888za");
+
+        // The unknown CSI sequence should be consumed and ignored (return null), then 'a' is read
+        Event first = EventParser.readEvent(backend, 0);
+        Event second = EventParser.readEvent(backend, 0);
+
+        assertThat(second).isInstanceOf(KeyEvent.class);
+        KeyEvent key = (KeyEvent) second;
+        assertThat(key.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(key.isChar('a')).isTrue();
+    }
+
+    @Test
+    @DisplayName("Oversized CSI sequence exceeding 128 chars is bounded safely")
+    void oversizedCsiSequenceBoundedSafely() throws IOException {
+        // Create a 140 character parameter sequence inside CSI ... u
+        StringBuilder sb = new StringBuilder("\033[");
+        for (int i = 0; i < 140; i++) {
+            sb.append('1');
+        }
+        sb.append("ux"); // Sequence followed by 'x'
+        QueueBackend backend = backendFor(sb.toString());
+
+        // Oversized sequence is consumed/aborted without throwing
+        EventParser.readEvent(backend, 0);
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent key = (KeyEvent) event;
+        assertThat(key.code()).isEqualTo(KeyCode.CHAR);
+        assertThat(key.isChar('x')).isTrue();
+    }
+
+    private static QueueBackend backendFor(String sequence) {
+        return new QueueBackend(sequence.codePoints().toArray());
+    }
+
     private static final class QueueBackend extends TestBackend {
 
         private final int[] input;

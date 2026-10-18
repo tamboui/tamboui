@@ -202,6 +202,36 @@ public interface Backend extends AutoCloseable {
     }
 
     /**
+     * Pushes Kitty keyboard enhancement flags to the terminal's keyboard stack.
+     * <p>
+     * When supported, enables progressive keyboard enhancements such as disambiguation
+     * of escape codes, alternate keys, event types, etc.
+     *
+     * @param protocol the keyboard protocol mode
+     * @throws IOException if writing to the terminal fails
+     * @see KeyboardProtocol
+     * @see KittyKeyboardSupport
+     */
+    default void pushKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
+        if (protocol != null && protocol != KeyboardProtocol.LEGACY && protocol.flags() > 0) {
+            writeRaw(KittyKeyboardSupport.pushMode(protocol.flags()));
+            flush();
+        }
+    }
+
+    /**
+     * Pops keyboard enhancement flags from the terminal's keyboard stack.
+     *
+     * @throws IOException if writing to the terminal fails
+     * @see KeyboardProtocol
+     * @see KittyKeyboardSupport
+     */
+    default void popKeyboardProtocol() throws IOException {
+        writeRaw(KittyKeyboardSupport.popMode());
+        flush();
+    }
+
+    /**
      * Scrolls the screen up by the given number of lines.
      *
      * @param lines the number of lines to scroll up

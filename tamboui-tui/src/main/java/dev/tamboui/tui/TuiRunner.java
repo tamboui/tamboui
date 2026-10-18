@@ -29,6 +29,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
@@ -206,6 +207,9 @@ public final class TuiRunner implements AutoCloseable {
             if (config.alternateScreen()) {
                 backend.enterAlternateScreen();
             }
+            if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+                backend.pushKeyboardProtocol(config.keyboardProtocol());
+            }
             if (config.hideCursor()) {
                 backend.hideCursor();
             }
@@ -219,6 +223,12 @@ public final class TuiRunner implements AutoCloseable {
             Terminal<Backend> terminal = new Terminal<>(backend);
             return new TuiRunner(backend, terminal, config);
         } catch (Exception e) {
+            try {
+                if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+                    backend.popKeyboardProtocol();
+                }
+            } catch (Exception ignored) {
+            }
             backend.close();
             throw e;
         }
@@ -787,6 +797,9 @@ public final class TuiRunner implements AutoCloseable {
             if (windowTitleSet.get()) {
                 backend.restoreWindowTitle();
             }
+            if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+                backend.popKeyboardProtocol();
+            }
             if (config.bracketedPaste()) {
                 backend.disableBracketedPaste();
             }
@@ -948,6 +961,17 @@ public final class TuiRunner implements AutoCloseable {
          */
         public Builder mouseCapture(boolean mouseCapture) {
             this.configBuilder.mouseCapture(mouseCapture);
+            return this;
+        }
+
+        /**
+         * Sets the keyboard protocol mode.
+         *
+         * @param keyboardProtocol the keyboard protocol mode
+         * @return this builder
+         */
+        public Builder keyboardProtocol(KeyboardProtocol keyboardProtocol) {
+            this.configBuilder.keyboardProtocol(keyboardProtocol);
             return this;
         }
 
