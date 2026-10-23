@@ -981,3 +981,58 @@ body.toc2.toc-left .prev-next-nav {
     background: rgba(30, 30, 46, 0.9);
     border-top: 1px solid var(--sl-color-hairline);
 }
+
+/* --- Docs Search (Lunr) --- */
+#header .doc-search {
+  position: relative;
+  margin: 0 0.55rem 0 0;
+  flex: 0 1 260px;
+  min-width: 190px;
+  max-width: 320px;
+}
+
+#doc-search-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #444);
+  background: var(--color-panel, #111);
+  color: inherit;
+}
+
+.doc-search-results {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 6px);
+  left: 0;
+  width: min(760px, 96vw);
+  max-height: 60vh;
+  overflow: auto;
+  border: 1px solid var(--color-border, #444);
+  border-radius: 10px;
+  background: var(--color-panel, #1a1a1a);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+.doc-search-item {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid var(--color-border-soft, #2d2d2d);
+}
+
+.doc-search-item:hover {
+  background: rgba(127, 127, 127, 0.12);
+}
+
+.doc-search-item .title {
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.doc-search-item .snippet,
+.doc-search-empty {
+  font-size: 0.92rem;
+  opacity: 0.9;
+}
