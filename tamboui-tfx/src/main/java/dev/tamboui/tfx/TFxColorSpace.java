@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tfx;
 
+import dev.tamboui.color.ColorManipulation;
 import dev.tamboui.style.Color;
 
 /**
@@ -216,170 +217,21 @@ public enum TFxColorSpace {
     }
     
     // Color conversion utilities
-    
+
     float[] rgbToHsl(int r, int g, int b) {
-        float rf = r / 255.0f;
-        float gf = g / 255.0f;
-        float bf = b / 255.0f;
-        
-        float max = java.lang.Math.max(rf, java.lang.Math.max(gf, bf));
-        float min = java.lang.Math.min(rf, java.lang.Math.min(gf, bf));
-        float delta = max - min;
-        
-        // Lightness
-        float l = (max + min) / 2.0f;
-        
-        // Saturation
-        float s;
-        if (delta == 0.0f) {
-            s = 0.0f;
-        } else {
-            s = delta / (1.0f - java.lang.Math.abs(2.0f * l - 1.0f));
-        }
-        
-        // Hue
-        float h;
-        if (delta == 0.0f) {
-            h = 0.0f;
-        } else if (max == rf) {
-            h = 60.0f * (((gf - bf) / delta) % 6.0f);
-        } else if (max == gf) {
-            h = 60.0f * ((bf - rf) / delta + 2.0f);
-        } else {
-            h = 60.0f * ((rf - gf) / delta + 4.0f);
-        }
-        
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        
-        return new float[]{h, s * 100.0f, l * 100.0f};
+        return ColorManipulation.rgbToHsl(r, g, b);
     }
-    
+
     int[] hslToRgb(float h, float s, float l) {
-        h = h % 360.0f;
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        s = s / 100.0f;
-        l = l / 100.0f;
-        
-        float c = (1.0f - java.lang.Math.abs(2.0f * l - 1.0f)) * s;
-        float x = c * (1.0f - java.lang.Math.abs((h / 60.0f) % 2.0f - 1.0f));
-        float m = l - c / 2.0f;
-        
-        float r, g, b;
-        if (h < 60.0f) {
-            r = c;
-            g = x;
-            b = 0.0f;
-        } else if (h < 120.0f) {
-            r = x;
-            g = c;
-            b = 0.0f;
-        } else if (h < 180.0f) {
-            r = 0.0f;
-            g = c;
-            b = x;
-        } else if (h < 240.0f) {
-            r = 0.0f;
-            g = x;
-            b = c;
-        } else if (h < 300.0f) {
-            r = x;
-            g = 0.0f;
-            b = c;
-        } else {
-            r = c;
-            g = 0.0f;
-            b = x;
-        }
-        
-        return new int[]{
-            java.lang.Math.round((r + m) * 255.0f),
-            java.lang.Math.round((g + m) * 255.0f),
-            java.lang.Math.round((b + m) * 255.0f)
-        };
+        return ColorManipulation.hslToRgb(h, s, l);
     }
-    
+
     float[] rgbToHsv(int r, int g, int b) {
-        float rf = r / 255.0f;
-        float gf = g / 255.0f;
-        float bf = b / 255.0f;
-        
-        float max = java.lang.Math.max(rf, java.lang.Math.max(gf, bf));
-        float min = java.lang.Math.min(rf, java.lang.Math.min(gf, bf));
-        float delta = max - min;
-        
-        // Hue
-        float h;
-        if (delta == 0.0f) {
-            h = 0.0f;
-        } else if (max == rf) {
-            h = 60.0f * (((gf - bf) / delta) % 6.0f);
-        } else if (max == gf) {
-            h = 60.0f * ((bf - rf) / delta + 2.0f);
-        } else {
-            h = 60.0f * ((rf - gf) / delta + 4.0f);
-        }
-        
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        
-        // Saturation
-        float s = max == 0.0f ? 0.0f : delta / max;
-        
-        // Value
-        float v = max;
-        
-        return new float[]{h, s * 100.0f, v * 100.0f};
+        return ColorManipulation.rgbToHsv(r, g, b);
     }
-    
+
     int[] hsvToRgb(float h, float s, float v) {
-        h = h % 360.0f;
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        s = s / 100.0f;
-        v = v / 100.0f;
-        
-        float c = v * s;
-        float x = c * (1.0f - java.lang.Math.abs((h / 60.0f) % 2.0f - 1.0f));
-        float m = v - c;
-        
-        float r, g, b;
-        if (h < 60.0f) {
-            r = c;
-            g = x;
-            b = 0.0f;
-        } else if (h < 120.0f) {
-            r = x;
-            g = c;
-            b = 0.0f;
-        } else if (h < 180.0f) {
-            r = 0.0f;
-            g = c;
-            b = x;
-        } else if (h < 240.0f) {
-            r = 0.0f;
-            g = x;
-            b = c;
-        } else if (h < 300.0f) {
-            r = x;
-            g = 0.0f;
-            b = c;
-        } else {
-            r = c;
-            g = 0.0f;
-            b = x;
-        }
-        
-        return new int[]{
-            java.lang.Math.round((r + m) * 255.0f),
-            java.lang.Math.round((g + m) * 255.0f),
-            java.lang.Math.round((b + m) * 255.0f)
-        };
+        return ColorManipulation.hsvToRgb(h, s, v);
     }
     
     /**
@@ -454,57 +306,55 @@ public enum TFxColorSpace {
     
     /**
      * Creates a color from HSL (Hue, Saturation, Lightness) values.
-     * 
+     *
      * @param h Hue in degrees (0-360)
      * @param s Saturation percentage (0-100)
      * @param l Lightness percentage (0-100)
      * @return An RGB color
      */
     public static Color fromHsl(float h, float s, float l) {
-        TFxColorSpace instance = HSL; // Use any instance to access private methods
-        int[] rgb = instance.hslToRgb(h, s, l);
+        int[] rgb = ColorManipulation.hslToRgb(h, s, l);
         return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
-    
+
     /**
      * Creates a color from HSV (Hue, Saturation, Value) values.
-     * 
+     *
      * @param h Hue in degrees (0-360)
      * @param s Saturation percentage (0-100)
      * @param v Value/brightness percentage (0-100)
      * @return An RGB color
      */
     public static Color fromHsv(float h, float s, float v) {
-        TFxColorSpace instance = HSV; // Use any instance to access private methods
-        int[] rgb = instance.hsvToRgb(h, s, v);
+        int[] rgb = ColorManipulation.hsvToRgb(h, s, v);
         return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
     
     /**
      * Converts a color to HSL components.
-     * 
+     *
      * @param color The color to convert
      * @return An array [hue, saturation, lightness] where:
      *         - hue is in degrees (0-360)
      *         - saturation and lightness are percentages (0-100)
      */
     public static float[] toHsl(Color color) {
-        TFxColorSpace instance = HSL; // Use any instance to access private methods
+        TFxColorSpace instance = HSL;
         int[] rgb = instance.toRgbComponents(color);
-        return instance.rgbToHsl(rgb[0], rgb[1], rgb[2]);
+        return ColorManipulation.rgbToHsl(rgb[0], rgb[1], rgb[2]);
     }
-    
+
     /**
      * Converts a color to HSV components.
-     * 
+     *
      * @param color The color to convert
      * @return An array [hue, saturation, value] where:
      *         - hue is in degrees (0-360)
      *         - saturation and value are percentages (0-100)
      */
     public static float[] toHsv(Color color) {
-        TFxColorSpace instance = HSL; // Use any instance to access private methods
+        TFxColorSpace instance = HSL;
         int[] rgb = instance.toRgbComponents(color);
-        return instance.rgbToHsv(rgb[0], rgb[1], rgb[2]);
+        return ColorManipulation.rgbToHsv(rgb[0], rgb[1], rgb[2]);
     }
 }
