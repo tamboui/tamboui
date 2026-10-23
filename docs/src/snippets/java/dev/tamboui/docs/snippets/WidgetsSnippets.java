@@ -55,6 +55,9 @@ import dev.tamboui.widgets.spinner.Spinner;
 import dev.tamboui.widgets.spinner.SpinnerFrameSet;
 import dev.tamboui.widgets.spinner.SpinnerState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
+import dev.tamboui.widgets.toast.ToastBuilder;
+import dev.tamboui.widgets.toast.ToastEngine;
+import dev.tamboui.widgets.toast.ToastPosition;
 import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.Table;
 import dev.tamboui.widgets.table.TableState;
@@ -66,6 +69,7 @@ import dev.tamboui.widgets.tree.TreeNode;
 import dev.tamboui.widgets.wavetext.WaveText;
 import dev.tamboui.widgets.wavetext.WaveTextState;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -489,6 +493,19 @@ public class WidgetsSnippets {
         // Advance state on each tick
         state.advance();
         // end::spinner[]
+    }
+
+    void toastWidget() {
+        // tag::toast[]
+        ToastEngine engine = ToastEngine.builder()
+            .position(ToastPosition.BOTTOM_RIGHT)
+            .maxConcurrent(4)
+            .build();
+
+        engine.show(ToastBuilder.success("Saved").title("Done").duration(Duration.ofSeconds(3)).build());
+        engine.tick(Duration.ofMillis(16));
+        engine.render(frame, frame.area());
+        // end::toast[]
     }
 
     void waveTextWidget() {
