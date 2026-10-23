@@ -12,10 +12,10 @@ import dev.tamboui.tui.event.Event;
  * Global handlers can intercept events before they reach elements, allowing
  * for application-wide keyboard shortcuts or action handling.
  *
- * @see EventRouter#addGlobalHandler(GlobalEventHandler)
+ * @see EventRouter#addGlobalHandler(EventHandler)
  */
 @FunctionalInterface
-public interface GlobalEventHandler {
+public interface EventHandler {
 
     /**
      * Handles an event.
