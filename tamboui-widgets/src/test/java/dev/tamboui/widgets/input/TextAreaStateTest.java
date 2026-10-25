@@ -399,6 +399,26 @@ class TextAreaStateTest {
         }
 
         @Test
+        @DisplayName("Move cursor up and down preserves screen column across VS16 emoji presentation sequences")
+        void moveCursorUpDownAcrossVs16Emoji() {
+            // "\u23FA\uFE0F" (⏺️) is 2 chars, 2 columns.
+            // Line 0: "⏺️x" (char offset 3, screen column 3)
+            // Line 1: "abc" (char offset 3, screen column 3)
+            TextAreaState state = new TextAreaState("\u23FA\uFE0Fx\nabc");
+            state.moveCursorToStart();
+            state.moveCursorToLineEnd(); // end of line 0: after "x" (cursorCol = 3, screen col = 3)
+            assertThat(state.cursorCol()).isEqualTo(3);
+
+            state.moveCursorDown();
+            assertThat(state.cursorRow()).isEqualTo(1);
+            assertThat(state.cursorCol()).isEqualTo(3); // after "c" (screen col = 3)
+
+            state.moveCursorUp();
+            assertThat(state.cursorRow()).isEqualTo(0);
+            assertThat(state.cursorCol()).isEqualTo(3); // after "x" (screen col = 3)
+        }
+
+        @Test
         @DisplayName("Move cursor up never lands inside a ZWJ sequence")
         void moveCursorUpOntoZwjSequence() {
             // "👨‍👩‍👧" is one 2-column glyph made of 8 chars; screen column 1 falls inside it.
@@ -513,6 +533,42 @@ class TextAreaStateTest {
             state.scrollDown(10, 2); // With 3 lines and 2 visible, max scroll is 1
 
             assertThat(state.scrollRow()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("Ensure cursor visible accounts for VS16 emoji presentation sequences in horizontal scroll")
+        void ensureCursorVisibleAccountsForVs16EmojiSequences() {
+            // "\u23FA\uFE0F" (⏺️ record button): 2 chars, display width 2.
+            // 5 record buttons = 10 chars, display width 10 columns.
+            String line = "\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F";
+            TextAreaState state = new TextAreaState(line);
+            // setText sets cursorRow to 0, cursorCol to 10 (at the end).
+            assertThat(state.cursorCol()).isEqualTo(10);
+
+            // With 6 visible columns, the last 4 columns (2 emoji = 4 chars) fit in the viewport.
+            // scrollCol should advance to 6 (the start of the 4th emoji).
+            state.ensureCursorVisible(1, 6);
+
+            assertThat(state.scrollCol()).isEqualTo(6);
+            int visibleCursorCol = CharWidth.of(state.getLine(0).substring(state.scrollCol(), state.cursorCol()));
+            assertThat(visibleCursorCol).isEqualTo(4);
+            assertThat(visibleCursorCol).isLessThan(6);
+        }
+
+        @Test
+        @DisplayName("Ensure cursor visible with keyboard emoji sequence (U+2328 U+FE0F)")
+        void ensureCursorVisibleWithKeyboardEmojiSequence() {
+            // "\u2328\uFE0F" (⌨️ keyboard): 2 chars, display width 2.
+            String line = "\u2328\uFE0F\u2328\uFE0F\u2328\uFE0F\u2328\uFE0F"; // 4 emoji, 8 chars, width 8
+            TextAreaState state = new TextAreaState(line);
+
+            state.ensureCursorVisible(1, 5);
+
+            // 5 visible columns: cursor at end (width 8) must scroll.
+            // Slicing from scrollCol to 8 must have display width < 5.
+            assertThat(state.scrollCol()).isPositive();
+            int visibleCursorCol = CharWidth.of(state.getLine(0).substring(state.scrollCol(), state.cursorCol()));
+            assertThat(visibleCursorCol).isLessThan(5);
         }
     }
 
