@@ -11,8 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.style.ContinuationIndent;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.text.CharWidth;
+import dev.tamboui.text.TextWrapOptions;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -563,6 +565,38 @@ class TextAreaStateTest {
             assertThat(rows).hasSize(2);
             assertThat(state.getLine(0).substring(rows.get(0).startCol(), rows.get(0).endCol()))
                 .isEqualTo("one two");
+            assertThat(state.getLine(0).substring(rows.get(1).startCol(), rows.get(1).endCol()))
+                .isEqualTo("three");
+        }
+
+        @Test
+        @DisplayName("computeDisplayRows preserves hanging indent on continuation rows")
+        void computeDisplayRowsHangingIndent() {
+            TextAreaState state = new TextAreaState("  - one two three");
+            TextWrapOptions options = TextWrapOptions.of(Overflow.WRAP_WORD, ContinuationIndent.HANGING);
+
+            List<TextAreaState.DisplayRow> rows = state.computeDisplayRows(11, options);
+
+            assertThat(rows).hasSize(2);
+            assertThat(rows.get(0).indent()).isEqualTo(0);
+            assertThat(state.getLine(0).substring(rows.get(0).startCol(), rows.get(0).endCol()))
+                .isEqualTo("  - one two");
+            assertThat(rows.get(1).indent()).isEqualTo(2);
+            assertThat(state.getLine(0).substring(rows.get(1).startCol(), rows.get(1).endCol()))
+                .isEqualTo("three");
+        }
+
+        @Test
+        @DisplayName("computeDisplayRows with FLUSH_LEFT restarts continuation rows at 0 indent")
+        void computeDisplayRowsFlushLeft() {
+            TextAreaState state = new TextAreaState("  - one two three");
+            TextWrapOptions options = TextWrapOptions.of(Overflow.WRAP_WORD, ContinuationIndent.FLUSH_LEFT);
+
+            List<TextAreaState.DisplayRow> rows = state.computeDisplayRows(11, options);
+
+            assertThat(rows).hasSize(2);
+            assertThat(rows.get(0).indent()).isEqualTo(0);
+            assertThat(rows.get(1).indent()).isEqualTo(0);
             assertThat(state.getLine(0).substring(rows.get(1).startCol(), rows.get(1).endCol()))
                 .isEqualTo("three");
         }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ContinuationIndent;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
@@ -339,5 +340,35 @@ class TextAreaTest {
         textArea.render(new Rect(0, 0, 8, 1), buffer, new TextAreaState());
 
         assertThat(buffer).hasRow(0, "Type you            ");
+    }
+
+    @Test
+    @DisplayName("TextArea supports continuationIndent configuration")
+    void continuationIndentConfiguration() {
+        TextArea defaultArea = TextArea.builder().build();
+        assertThat(defaultArea.continuationIndent()).isEqualTo(ContinuationIndent.HANGING);
+
+        TextArea flushLeftArea = TextArea.builder()
+            .overflow(Overflow.WRAP_WORD)
+            .continuationIndent(ContinuationIndent.FLUSH_LEFT)
+            .build();
+        assertThat(flushLeftArea.continuationIndent()).isEqualTo(ContinuationIndent.FLUSH_LEFT);
+
+        TextAreaState state = new TextAreaState("  - one two three four");
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 12, 3));
+        flushLeftArea.render(buffer.area(), buffer, state);
+
+        assertThat(extractRegion(buffer, 0, 0, 12)).isEqualTo("  - one two");
+        assertThat(extractRegion(buffer, 1, 0, 12)).isEqualTo("three four");
+
+        TextArea hangingArea = TextArea.builder()
+            .overflow(Overflow.WRAP_WORD)
+            .continuationIndent(ContinuationIndent.HANGING)
+            .build();
+        Buffer bufferHanging = Buffer.empty(new Rect(0, 0, 12, 3));
+        hangingArea.render(bufferHanging.area(), bufferHanging, state);
+
+        assertThat(extractRegion(bufferHanging, 0, 0, 12)).isEqualTo("  - one two");
+        assertThat(extractRegion(bufferHanging, 1, 0, 12)).isEqualTo("  three four");
     }
 }

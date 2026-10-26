@@ -24,10 +24,10 @@ import org.commonmark.node.Text;
 import dev.tamboui.markdown.MarkdownStyles;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
-import dev.tamboui.text.CharWidth;
-import dev.tamboui.text.GraphemeClusters;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
+import dev.tamboui.text.TextWrapOptions;
+import dev.tamboui.text.TextWrapper;
 
 /**
  * Renders the inline children of a markdown block node into a list of
@@ -43,6 +43,31 @@ public final class MarkdownInlineRenderer {
 
     /**
      * Renders the inline children of {@code parent} into lines using the
+     * given text wrap options.
+     *
+     * @param parent the block node whose inline children should be rendered
+     * @param baseStyle the style applied to plain text (e.g. heading style)
+     * @param maxWidth target width in columns; values &lt;= 0 produce an empty list
+     * @param styles the style palette
+     * @param options the text wrap options
+     * @return a list of lines that all fit within {@code maxWidth}
+     */
+    public static List<Line> render(
+        Node parent, Style baseStyle, int maxWidth, MarkdownStyles styles, TextWrapOptions options) {
+        if (maxWidth <= 0) {
+            return new ArrayList<>();
+        }
+        SpanCollector collector = new SpanCollector(baseStyle, styles);
+        Node child = parent.getFirstChild();
+        while (child != null) {
+            child.accept(collector);
+            child = child.getNext();
+        }
+        return applyOverflow(collector.lineGroups, maxWidth, options);
+    }
+
+    /**
+     * Renders the inline children of {@code parent} into lines using the
      * given overflow strategy.
      *
      * @param parent the block node whose inline children should be rendered
@@ -54,16 +79,7 @@ public final class MarkdownInlineRenderer {
      */
     public static List<Line> render(
         Node parent, Style baseStyle, int maxWidth, MarkdownStyles styles, Overflow overflow) {
-        if (maxWidth <= 0) {
-            return new ArrayList<>();
-        }
-        SpanCollector collector = new SpanCollector(baseStyle, styles);
-        Node child = parent.getFirstChild();
-        while (child != null) {
-            child.accept(collector);
-            child = child.getNext();
-        }
-        return applyOverflow(collector.lineGroups, maxWidth, overflow);
+        return render(parent, baseStyle, maxWidth, styles, TextWrapOptions.of(overflow));
     }
 
     /**
@@ -91,246 +107,17 @@ public final class MarkdownInlineRenderer {
     }
 
     private static List<Line> applyOverflow(
-        List<List<Span>> sourceLines, int maxWidth, Overflow overflow) {
-        List<Line> result = new ArrayList<>();
-        switch (overflow) {
-            case CLIP:
-                for (List<Span> spans : sourceLines) {
-                    result.add(clipSpans(spans, maxWidth));
-                }
-                break;
-            case WRAP_CHARACTER:
-                for (List<Span> spans : sourceLines) {
-                    wrapByCharacter(spans, maxWidth, result);
-                }
-                break;
-            case ELLIPSIS:
-                for (List<Span> spans : sourceLines) {
-                    result.add(ellipsizeSpans(spans, maxWidth, EllipsisPosition.END));
-                }
-                break;
-            case ELLIPSIS_START:
-                for (List<Span> spans : sourceLines) {
-                    result.add(ellipsizeSpans(spans, maxWidth, EllipsisPosition.START));
-                }
-                break;
-            case ELLIPSIS_MIDDLE:
-                for (List<Span> spans : sourceLines) {
-                    result.add(ellipsizeSpans(spans, maxWidth, EllipsisPosition.MIDDLE));
-                }
-                break;
-            case WRAP_WORD:
-            default:
-                for (List<Span> spans : sourceLines) {
-                    wrapByWord(spans, maxWidth, result);
-                }
-                break;
+        List<List<Span>> sourceLines, int maxWidth, TextWrapOptions options) {
+        List<Line> lines = new ArrayList<>(sourceLines.size());
+        for (List<Span> spans : sourceLines) {
+            lines.add(Line.from(spans));
         }
+        List<Line> result = TextWrapper.wrap(lines, maxWidth, options);
         if (result.isEmpty()) {
+            result = new ArrayList<>();
             result.add(Line.empty());
         }
         return result;
-    }
-
-    private static void wrapByWord(List<Span> spans, int maxWidth, List<Line> out) {
-        List<Span> current = new ArrayList<>();
-        int currentWidth = 0;
-        for (Span span : spans) {
-            String content = span.content();
-            int idx = 0;
-            int len = content.length();
-            while (idx < len) {
-                int wordEnd = nextWordEnd(content, idx);
-                String segment = content.substring(idx, wordEnd);
-                int segWidth = CharWidth.of(segment);
-
-                if (currentWidth + segWidth <= maxWidth) {
-                    appendSegment(current, segment, span.style());
-                    currentWidth += segWidth;
-                    idx = wordEnd;
-                    continue;
-                }
-
-                if (currentWidth == 0) {
-                    String head = CharWidth.substringByWidth(segment, maxWidth);
-                    if (head.isEmpty()) {
-                        // Keep the first grapheme together even when it is wider than the line.
-                        String wide = firstTooWideCluster(segment);
-                        appendSegment(current, wide, span.style());
-                        currentWidth = CharWidth.of(wide);
-                        idx += wide.length();
-                        continue;
-                    }
-                    appendSegment(current, head, span.style());
-                    out.add(toLine(current));
-                    current = new ArrayList<>();
-                    currentWidth = 0;
-                    idx += head.length();
-                } else {
-                    out.add(toLine(current));
-                    current = new ArrayList<>();
-                    currentWidth = 0;
-                    while (idx < len && content.charAt(idx) == ' ') {
-                        idx++;
-                    }
-                }
-            }
-        }
-        out.add(toLine(current));
-    }
-
-    private static void wrapByCharacter(List<Span> spans, int maxWidth, List<Line> out) {
-        List<Span> current = new ArrayList<>();
-        int currentWidth = 0;
-        for (Span span : spans) {
-            String content = span.content();
-            int idx = 0;
-            while (idx < content.length()) {
-                int remaining = maxWidth - currentWidth;
-                if (remaining <= 0) {
-                    out.add(toLine(current));
-                    current = new ArrayList<>();
-                    currentWidth = 0;
-                    remaining = maxWidth;
-                }
-                String tail = content.substring(idx);
-                String head = CharWidth.substringByWidth(tail, remaining);
-                if (head.isEmpty()) {
-                    if (currentWidth > 0) {
-                        out.add(toLine(current));
-                        current = new ArrayList<>();
-                        currentWidth = 0;
-                        continue;
-                    }
-                    // Keep the first grapheme together even when it is wider than the line.
-                    head = firstTooWideCluster(tail);
-                }
-                appendSegment(current, head, span.style());
-                currentWidth += CharWidth.of(head);
-                idx += head.length();
-            }
-        }
-        out.add(toLine(current));
-    }
-
-    /** Takes one grapheme wider than the available column, without splitting a ZWJ sequence. */
-    private static String firstTooWideCluster(String text) {
-        return text.substring(0, GraphemeClusters.clusterEnd(text, 0));
-    }
-
-    private static Line clipSpans(List<Span> spans, int maxWidth) {
-        List<Span> out = new ArrayList<>();
-        int remaining = maxWidth;
-        for (Span span : spans) {
-            if (remaining <= 0) {
-                break;
-            }
-            int w = span.width();
-            if (w <= remaining) {
-                out.add(span);
-                remaining -= w;
-            } else {
-                String head = CharWidth.substringByWidth(span.content(), remaining);
-                if (!head.isEmpty()) {
-                    out.add(Span.styled(head, span.style()));
-                }
-                break;
-            }
-        }
-        return toLine(out);
-    }
-
-    private static Line ellipsizeSpans(List<Span> spans, int maxWidth, EllipsisPosition position) {
-        int total = totalWidth(spans);
-        if (total <= maxWidth) {
-            return toLine(new ArrayList<>(spans));
-        }
-        Style style = spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
-        String text = spansToString(spans);
-        int ellipsisWidth = CharWidth.of(ELLIPSIS);
-        if (maxWidth <= ellipsisWidth) {
-            return Line.from(Span.styled(CharWidth.substringByWidth(text, maxWidth), style));
-        }
-        int available = maxWidth - ellipsisWidth;
-        String truncated;
-        switch (position) {
-            case START:
-                truncated = ELLIPSIS + CharWidth.substringByWidthFromEnd(text, available);
-                break;
-            case MIDDLE: {
-                int leftWidth = (available + 1) / 2;
-                int rightWidth = available / 2;
-                truncated = CharWidth.substringByWidth(text, leftWidth)
-                    + ELLIPSIS
-                    + CharWidth.substringByWidthFromEnd(text, rightWidth);
-                break;
-            }
-            case END:
-            default:
-                truncated = CharWidth.substringByWidth(text, available) + ELLIPSIS;
-        }
-        return Line.from(Span.styled(truncated, style));
-    }
-
-    private static int totalWidth(List<Span> spans) {
-        int total = 0;
-        for (Span span : spans) {
-            total += span.width();
-        }
-        return total;
-    }
-
-    private static String spansToString(List<Span> spans) {
-        StringBuilder sb = new StringBuilder();
-        for (Span span : spans) {
-            sb.append(span.content());
-        }
-        return sb.toString();
-    }
-
-    private enum EllipsisPosition {
-        START, MIDDLE, END
-    }
-
-    private static int nextWordEnd(String s, int start) {
-        int len = s.length();
-        if (start >= len) {
-            return len;
-        }
-        char first = s.charAt(start);
-        if (first == ' ') {
-            int i = start;
-            while (i < len && s.charAt(i) == ' ') {
-                i++;
-            }
-            return i;
-        }
-        int i = start;
-        while (i < len && s.charAt(i) != ' ') {
-            i++;
-        }
-        return i;
-    }
-
-    private static void appendSegment(List<Span> current, String content, Style style) {
-        if (content.isEmpty()) {
-            return;
-        }
-        if (!current.isEmpty()) {
-            Span last = current.get(current.size() - 1);
-            if (last.style().equals(style)) {
-                current.set(current.size() - 1, Span.styled(last.content() + content, style));
-                return;
-            }
-        }
-        current.add(Span.styled(content, style));
-    }
-
-    private static Line toLine(List<Span> spans) {
-        if (spans.isEmpty()) {
-            return Line.empty();
-        }
-        return Line.from(new ArrayList<>(spans));
     }
 
     /**
