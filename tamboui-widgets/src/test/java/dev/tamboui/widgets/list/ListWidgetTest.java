@@ -359,4 +359,114 @@ class ListWidgetTest {
 
         assertThat(buffer).isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("ListWidget renders horizontally scrolled content")
+    void horizontalScrollRendersOffsetContent() {
+        ListWidget list = ListWidget.builder()
+            .items("0123456789", "abcdefghij")
+            .highlightSymbol("")
+            .build();
+        Rect area = new Rect(0, 0, 5, 2);
+        Buffer buffer = Buffer.empty(area);
+        ListState state = new ListState();
+        state.setHorizontalOffset(3);
+
+        list.render(area, buffer, state);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "34567", Style.EMPTY);
+        expected.setString(0, 1, "defgh", Style.EMPTY);
+
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("ListWidget horizontal scroll preserves highlight symbol at left edge")
+    void horizontalScrollPreservesHighlightSymbol() {
+        Style highlightStyle = Style.EMPTY.reversed();
+        ListWidget list = ListWidget.builder()
+            .items("0123456789", "abcdefghij")
+            .highlightSymbol("> ")
+            .highlightStyle(highlightStyle)
+            .build();
+        Rect area = new Rect(0, 0, 7, 2);
+        Buffer buffer = Buffer.empty(area);
+        ListState state = new ListState();
+        state.select(0);
+        state.setHorizontalOffset(3);
+
+        list.render(area, buffer, state);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, "> ", highlightStyle);
+        expected.setString(2, 0, "34567", Style.EMPTY);
+        expected.setStyle(new Rect(0, 0, 7, 1), highlightStyle);
+        expected.setString(2, 1, "defgh", Style.EMPTY);
+
+        assertThat(buffer).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("ListWidget horizontal scroll handles wide characters cleanly at boundaries")
+    void horizontalScrollWideCharacters() {
+        // "A" (width 1, col 0) + "漢" (width 2, col 1-2) + "B" (width 1, col 3)
+        ListWidget list = ListWidget.builder()
+            .items("A漢B")
+            .highlightSymbol("")
+            .build();
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+        ListState state = new ListState();
+
+        // Offset 2 cuts through "漢" (continuation is at col 2, B is at col 3)
+        // Col 0 in viewport should become space instead of an orphaned continuation cell
+        state.setHorizontalOffset(2);
+        list.render(area, buffer, state);
+
+        Buffer expected = Buffer.empty(area);
+        expected.setString(0, 0, " ", Style.EMPTY);
+        expected.setString(1, 0, "B", Style.EMPTY);
+        assertThat(buffer).isEqualTo(expected);
+
+        // Offset 0 with width 2: col 0 has "A", col 1 would have "漢" which needs 2 cols
+        // Since it cannot fit in remaining 1 col, it should be replaced with space
+        buffer = Buffer.empty(area);
+        state.setHorizontalOffset(0);
+        // Using horizontal offset > 0 triggers the column slicing path:
+        // Text "XA漢B", offset 1: col 0 has "A", col 1 has "漢" which overflows right edge of 2-col viewport
+        ListWidget listOverflow = ListWidget.builder()
+            .items("XA漢B")
+            .highlightSymbol("")
+            .build();
+        state.setHorizontalOffset(1);
+        listOverflow.render(area, buffer, state);
+
+        Buffer expectedOverflow = Buffer.empty(area);
+        expectedOverflow.setString(0, 0, "A", Style.EMPTY);
+        expectedOverflow.setString(1, 0, " ", Style.EMPTY);
+        assertThat(buffer).isEqualTo(expectedOverflow);
+    }
+
+    @Test
+    @DisplayName("ListState tracks and adjusts horizontal scroll offset")
+    void listStateHorizontalScrollTracking() {
+        ListState state = new ListState();
+        assertThat(state.horizontalOffset()).isEqualTo(0);
+
+        state.setHorizontalOffset(10);
+        assertThat(state.horizontalOffset()).isEqualTo(10);
+
+        state.setHorizontalOffset(-5);
+        assertThat(state.horizontalOffset()).isEqualTo(0);
+
+        state.scrollHorizontalBy(5);
+        assertThat(state.horizontalOffset()).isEqualTo(5);
+
+        state.scrollHorizontalBy(-2);
+        assertThat(state.horizontalOffset()).isEqualTo(3);
+
+        state.scrollHorizontalBy(-10);
+        assertThat(state.horizontalOffset()).isEqualTo(0);
+    }
 }

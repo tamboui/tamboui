@@ -19,7 +19,12 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.error.TuiException;
+import dev.tamboui.tui.event.KeyModifiers;
+import dev.tamboui.tui.event.MouseButton;
+import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.tui.event.MouseEventKind;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
 import static dev.tamboui.toolkit.Toolkit.list;
@@ -489,5 +494,44 @@ class ListElementTest extends AbstractElementTest {
         list("A", "B").title("Items").render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Test
+    @DisplayName("horizontalOffset and scrollHorizontalBy configure and adjust horizontal offset")
+    void horizontalOffsetMethods() {
+        ListElement<?> element = list("Long item 1", "Long item 2");
+        assertThat(element.horizontalOffset()).isEqualTo(0);
+
+        element.horizontalOffset(5);
+        assertThat(element.horizontalOffset()).isEqualTo(5);
+
+        element.scrollHorizontalBy(3);
+        assertThat(element.horizontalOffset()).isEqualTo(8);
+
+        element.scrollHorizontalBy(-4);
+        assertThat(element.horizontalOffset()).isEqualTo(4);
+
+        element.scrollHorizontalBy(-10);
+        assertThat(element.horizontalOffset()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("handleMouseEvent handles SCROLL_LEFT and SCROLL_RIGHT")
+    void handleMouseEvent_horizontalScroll() {
+        ListElement<?> element = list("Long item 1", "Long item 2");
+        Rect area = new Rect(0, 0, 20, 5);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+        element.render(frame, area, RenderContext.empty());
+
+        MouseEvent scrollRight = new MouseEvent(MouseEventKind.SCROLL_RIGHT, MouseButton.NONE, 5, 2, KeyModifiers.NONE);
+        EventResult rightResult = element.handleMouseEvent(scrollRight);
+        assertThat(rightResult.isHandled()).isTrue();
+        assertThat(element.horizontalOffset()).isEqualTo(3);
+
+        MouseEvent scrollLeft = new MouseEvent(MouseEventKind.SCROLL_LEFT, MouseButton.NONE, 5, 2, KeyModifiers.NONE);
+        EventResult leftResult = element.handleMouseEvent(scrollLeft);
+        assertThat(leftResult.isHandled()).isTrue();
+        assertThat(element.horizontalOffset()).isEqualTo(0);
     }
 }
