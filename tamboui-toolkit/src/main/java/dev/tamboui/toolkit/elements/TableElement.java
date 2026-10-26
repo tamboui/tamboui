@@ -282,9 +282,12 @@ public final class TableElement extends StyledElement<TableElement> {
 
         if (!widths.isEmpty()) {
             // Use constraint widths
-            for (Constraint w : widths) {
+            for (int i = 0; i < widths.size(); i++) {
+                Constraint w = widths.get(i);
                 if (w instanceof Constraint.Length) {
                     totalWidth += ((Constraint.Length) w).value();
+                } else if (w instanceof Constraint.Fit) {
+                    totalWidth += columnMaxContentWidth(i);
                 } else {
                     totalWidth += 10; // Default column width
                 }
@@ -294,6 +297,8 @@ public final class TableElement extends StyledElement<TableElement> {
                 Constraint w = widths.get(i % widths.size());
                 if (w instanceof Constraint.Length) {
                     totalWidth += ((Constraint.Length) w).value();
+                } else if (w instanceof Constraint.Fit) {
+                    totalWidth += columnMaxContentWidth(i);
                 } else {
                     totalWidth += 10;
                 }
@@ -330,6 +335,22 @@ public final class TableElement extends StyledElement<TableElement> {
         }
 
         return Size.of(totalWidth, height);
+    }
+
+    private int columnMaxContentWidth(int col) {
+        int maxWidth = 0;
+        if (header != null && col < header.cells().size()) {
+            maxWidth = Math.max(maxWidth, header.cells().get(col).width());
+        }
+        for (Row row : rows) {
+            if (col < row.cells().size()) {
+                maxWidth = Math.max(maxWidth, row.cells().get(col).width());
+            }
+        }
+        if (footer != null && col < footer.cells().size()) {
+            maxWidth = Math.max(maxWidth, footer.cells().get(col).width());
+        }
+        return maxWidth;
     }
 
     @Override
