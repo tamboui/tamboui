@@ -11,6 +11,7 @@ package dev.tamboui.demo;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
@@ -18,6 +19,7 @@ import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -30,6 +32,7 @@ import dev.tamboui.tui.bindings.KeyTrigger;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyEventState;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
@@ -81,6 +84,8 @@ public class TuiDemo {
     private KeyModifiers lastModifiers = KeyModifiers.NONE;
     private KeyCode lastKeyCode = null;
     private String lastProducedText = "";
+    private KeyEvent lastKeyEvent = null;
+    private KeyboardProtocol currentProtocol = KeyboardProtocol.AUTO;
 
     private long tickCount = 0;
     private long totalEventsCount = 0;
@@ -170,9 +175,31 @@ public class TuiDemo {
     }
 
     private boolean handleKeyEvent(KeyEvent k, TuiRunner runner) {
+        lastKeyEvent = k;
         lastKeyCode = k.code();
         lastProducedText = k.string();
         lastModifiers = k.modifiers();
+
+        // Release events arrive only under the Kitty FULL protocol. Log them so they are
+        // visible, but do not drive actions: one physical key must not fire twice.
+        if (k.isRelease()) {
+            logEvent(new EventRecord(
+                    ++totalEventsCount,
+                    " REL-KEY",
+                    Color.DARK_GRAY,
+                    Color.WHITE,
+                    keyLabel(k) + describeKind(k),
+                    k.modifiers(),
+                    "Key released"
+            ));
+            return true;
+        }
+
+        // Runtime toggle for the Kitty keyboard protocol (LEGACY -> AUTO -> FULL) via 'p' or 'P'
+        if (k.code() == KeyCode.CHAR && k.string().equalsIgnoreCase("p")) {
+            cycleKeyboardProtocol(runner);
+            return true;
+        }
 
         // Runtime toggle for mouse motion (DECSET 1003) via 'm' or 'M'
         if (k.code() == KeyCode.CHAR && k.string().equalsIgnoreCase("m")) {
@@ -275,10 +302,10 @@ public class TuiDemo {
             String cpHex = String.format("U+%04X", k.codePoint());
             logEvent(new EventRecord(
                     ++totalEventsCount,
-                    " KEY    ",
+                    k.isRepeat() ? " REPEAT " : " KEY    ",
                     Color.CYAN,
                     Color.BLACK,
-                    charDisplay + " (" + cpHex + ")",
+                    charDisplay + " (" + cpHex + ")" + describeKind(k),
                     k.modifiers(),
                     "Char input: " + k.string()
             ));
@@ -288,14 +315,97 @@ public class TuiDemo {
         // Other special keys (Escape, Tab, Backspace, etc.)
         logEvent(new EventRecord(
                 ++totalEventsCount,
-                " KEY    ",
+                k.isRepeat() ? " REPEAT " : " KEY    ",
                 Color.CYAN,
                 Color.BLACK,
-                k.code().name(),
+                k.code().name() + describeKind(k),
                 k.modifiers(),
                 "Key code: " + k.code()
         ));
         return true;
+    }
+
+    /**
+     * Cycles the Kitty keyboard protocol mode at runtime: LEGACY to AUTO to FULL and back.
+     * Pops the previously pushed mode (if any) and pushes the new one, so the terminal keeps a
+     * single enhancement entry on its stack.
+     *
+     * @param runner the active runner whose backend carries the keyboard protocol stack
+     */
+    private void cycleKeyboardProtocol(TuiRunner runner) {
+        KeyboardProtocol next;
+        switch (currentProtocol) {
+            case LEGACY:
+                next = KeyboardProtocol.AUTO;
+                break;
+            case AUTO:
+                next = KeyboardProtocol.FULL;
+                break;
+            default:
+                next = KeyboardProtocol.LEGACY;
+                break;
+        }
+        if (runner != null) {
+            try {
+                if (currentProtocol != KeyboardProtocol.LEGACY) {
+                    runner.backend().popKeyboardProtocol();
+                }
+                if (next != KeyboardProtocol.LEGACY) {
+                    runner.backend().pushKeyboardProtocol(next);
+                }
+            } catch (Exception ignored) {
+                // ignore backend toggle errors
+            }
+        }
+        currentProtocol = next;
+        logEvent(new EventRecord(
+                ++totalEventsCount,
+                " SYSTEM ",
+                Color.YELLOW,
+                Color.BLACK,
+                "Keyboard protocol -> " + next + " (CSI " + next.flags() + " u)",
+                KeyModifiers.NONE,
+                "Kitty keyboard mode switched"
+        ));
+    }
+
+    private static String describeKind(KeyEvent k) {
+        return k.isRepeat() ? "  [REPEAT]" : "";
+    }
+
+    private static String keyLabel(KeyEvent k) {
+        if (k.code() == KeyCode.CHAR) {
+            return "'" + k.string() + "'";
+        }
+        return k.code().name();
+    }
+
+    private static String codePointLabel(int codePoint) {
+        if (codePoint <= 0) {
+            return "\u2014";
+        }
+        return String.format("U+%04X '%s'", codePoint, new String(Character.toChars(codePoint)));
+    }
+
+    private static String optionalCodePointLabel(OptionalInt codePoint) {
+        return codePoint.isPresent() ? codePointLabel(codePoint.getAsInt()) : "\u2014";
+    }
+
+    private static String stateLabel(KeyEventState state) {
+        if (state == null || state.isEmpty()) {
+            return "\u2014";
+        }
+        List<String> parts = new ArrayList<>();
+        if (state.capsLock()) {
+            parts.add("Caps");
+        }
+        if (state.numLock()) {
+            parts.add("Num");
+        }
+        if (state.keypad()) {
+            parts.add("Keypad");
+        }
+        return String.join("+", parts);
     }
 
     private static boolean isFunctionKey(KeyEvent k) {
@@ -615,6 +725,11 @@ public class TuiDemo {
                         mouseMotionEnabled ? Style.EMPTY.fg(Color.GREEN).bold() : Style.EMPTY.fg(Color.RED))));
         lines.add(Line.from(Span.raw("  Horiz Scroll: ").dim(), Span.raw("DECSET (#399)").magenta()));
         lines.add(Line.from(Span.raw("  Brkt Paste:   ").dim(), Span.raw("2004 Enabled").dim()));
+        lines.add(Line.from(Span.raw("  Keyboard:     ").dim(),
+                Span.raw(currentProtocol + " (CSI " + currentProtocol.flags() + " u)").style(
+                        currentProtocol == KeyboardProtocol.LEGACY
+                                ? Style.EMPTY.fg(Color.RED)
+                                : Style.EMPTY.fg(Color.GREEN).bold())));
         lines.add(Line.empty());
 
         lines.add(Line.from(Span.raw("Live Modifiers").bold().cyan()));
@@ -632,13 +747,37 @@ public class TuiDemo {
                         ? Style.EMPTY.bg(Color.MAGENTA).fg(Color.WHITE).bold()
                         : Style.EMPTY.fg(Color.DARK_GRAY))
         ));
+        lines.add(Line.from(
+                Span.raw("  "),
+                Span.raw(" SUPER ").style(lastModifiers.superKey()
+                        ? Style.EMPTY.bg(Color.BLUE).fg(Color.WHITE).bold()
+                        : Style.EMPTY.fg(Color.DARK_GRAY)),
+                Span.raw(" "),
+                Span.raw(" HYPER ").style(lastModifiers.hyper()
+                        ? Style.EMPTY.bg(Color.GREEN).fg(Color.BLACK).bold()
+                        : Style.EMPTY.fg(Color.DARK_GRAY)),
+                Span.raw(" "),
+                Span.raw(" META ").style(lastModifiers.meta()
+                        ? Style.EMPTY.bg(Color.RED).fg(Color.WHITE).bold()
+                        : Style.EMPTY.fg(Color.DARK_GRAY))
+        ));
 
         if (area.height() >= 22) {
             lines.add(Line.empty());
             lines.add(Line.from(Span.raw("Last Key Identity (#446)").bold().cyan()));
-            lines.add(Line.from(Span.raw("  Code: ").dim(), Span.raw(lastKeyCode != null ? lastKeyCode.name() : "None").yellow()));
-            String textDisplay = lastProducedText.isEmpty() ? "None" : "'" + lastProducedText + "'";
-            lines.add(Line.from(Span.raw("  Text: ").dim(), Span.raw(textDisplay).white()));
+            if (lastKeyEvent == null) {
+                lines.add(Line.from(Span.raw("  (press a key)").dim()));
+            } else {
+                KeyEvent k = lastKeyEvent;
+                lines.add(Line.from(Span.raw("  Kind:    ").dim(), Span.raw(k.kind().name()).yellow()));
+                lines.add(Line.from(Span.raw("  Code:    ").dim(), Span.raw(k.code().name()).yellow()));
+                lines.add(Line.from(Span.raw("  Logical: ").dim(), Span.raw(codePointLabel(k.keyCodePoint())).white()));
+                lines.add(Line.from(Span.raw("  Shifted: ").dim(), Span.raw(optionalCodePointLabel(k.shiftedKeyCodePoint())).white()));
+                lines.add(Line.from(Span.raw("  Base:    ").dim(), Span.raw(optionalCodePointLabel(k.baseLayoutKeyCodePoint())).white()));
+                String textDisplay = k.text().isEmpty() ? "None" : "'" + k.text() + "'";
+                lines.add(Line.from(Span.raw("  Text:    ").dim(), Span.raw(textDisplay).white()));
+                lines.add(Line.from(Span.raw("  State:   ").dim(), Span.raw(stateLabel(k.state())).magenta()));
+            }
         }
 
         Paragraph panel = Paragraph.builder()
@@ -904,6 +1043,10 @@ public class TuiDemo {
                 Span.raw(mouseMotionEnabled ? "ON " : "OFF ").fg(mouseMotionEnabled ? Color.GREEN : Color.RED).bold(),
                 Span.raw("c").bold().yellow(),
                 Span.raw(" Clear  ").dim(),
+                Span.raw("p").bold().yellow(),
+                Span.raw(" Kbd:").dim(),
+                Span.raw(currentProtocol + " ").fg(
+                        currentProtocol == KeyboardProtocol.LEGACY ? Color.RED : Color.GREEN).bold(),
                 Span.raw("F12").bold().yellow(),
                 Span.raw(" Debug  ").dim(),
                 Span.raw("q").bold().yellow(),
