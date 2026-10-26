@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.LongSupplier;
 
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
@@ -51,6 +52,7 @@ public final class TuiConfig {
     private final Backend backend;
     private final ScheduledExecutorService scheduler;
     private final ClassLoader backendClassLoader;
+    private final LongSupplier timeSource;
 
     /**
      * Creates a new TUI configuration with the specified options.
@@ -94,7 +96,7 @@ public final class TuiConfig {
     ) {
         this(rawMode, alternateScreen, hideCursor, mouseCapture, false, bracketedPaste, pollTimeout, tickRate,
                 resizeGracePeriod, shutdownHook, bindings, errorHandler, errorOutput, fpsOverlayEnabled,
-                postRenderProcessors, backend, scheduler, null);
+                postRenderProcessors, backend, scheduler, null, null);
     }
 
     /**
@@ -142,6 +144,58 @@ public final class TuiConfig {
             ScheduledExecutorService scheduler,
             ClassLoader backendClassLoader
     ) {
+        this(rawMode, alternateScreen, hideCursor, mouseCapture, mouseMotion, bracketedPaste, pollTimeout, tickRate,
+                resizeGracePeriod, shutdownHook, bindings, errorHandler, errorOutput, fpsOverlayEnabled,
+                postRenderProcessors, backend, scheduler, backendClassLoader, null);
+    }
+
+    /**
+     * Creates a new TUI configuration with the specified options, including an explicit
+     * classloader for backend discovery and a pluggable time source.
+     * <p>
+     * Prefer using {@link #builder()} or {@link #defaults()} instead of this constructor.
+     *
+     * @param rawMode whether to enable raw terminal mode
+     * @param alternateScreen whether to use the alternate screen buffer
+     * @param hideCursor whether to hide the cursor
+     * @param mouseCapture whether to capture mouse events
+     * @param mouseMotion whether to also capture bare mouse motion (hover) events
+     * @param bracketedPaste whether to enable bracketed paste mode
+     * @param pollTimeout timeout for polling events
+     * @param tickRate interval between tick events, or null to disable
+     * @param resizeGracePeriod grace period for resize events, or null to disable
+     * @param shutdownHook whether to register a JVM shutdown hook
+     * @param bindings the key/mouse bindings for semantic actions
+     * @param errorHandler the handler for render errors
+     * @param errorOutput the output stream for error logging
+     * @param fpsOverlayEnabled whether to show the FPS overlay
+     * @param postRenderProcessors list of post-render processors
+     * @param backend the backend to use (optional)
+     * @param scheduler external scheduler to use, or null to create an internal one
+     * @param backendClassLoader classloader used exclusively for backend discovery, or null for the default
+     * @param timeSource monotonic time source returning nanoseconds, or null for {@link System#nanoTime()}
+     */
+    public TuiConfig(
+            boolean rawMode,
+            boolean alternateScreen,
+            boolean hideCursor,
+            boolean mouseCapture,
+            boolean mouseMotion,
+            boolean bracketedPaste,
+            Duration pollTimeout,
+            Duration tickRate,
+            Duration resizeGracePeriod,
+            boolean shutdownHook,
+            Bindings bindings,
+            RenderErrorHandler errorHandler,
+            PrintStream errorOutput,
+            boolean fpsOverlayEnabled,
+            List<PostRenderProcessor> postRenderProcessors,
+            Backend backend,
+            ScheduledExecutorService scheduler,
+            ClassLoader backendClassLoader,
+            LongSupplier timeSource
+    ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
         this.hideCursor = hideCursor;
@@ -162,6 +216,7 @@ public final class TuiConfig {
         this.backend = backend;
         this.scheduler = scheduler;
         this.backendClassLoader = backendClassLoader;
+        this.timeSource = timeSource != null ? timeSource : System::nanoTime;
     }
 
     /**
@@ -416,6 +471,17 @@ public final class TuiConfig {
     }
 
     /**
+     * Returns the monotonic time source used to drive ticks and animation clocks.
+     * <p>
+     * Defaults to {@link System#nanoTime()}.
+     *
+     * @return the time source returning nanoseconds
+     */
+    public LongSupplier timeSource() {
+        return timeSource;
+    }
+
+    /**
      * Returns a builder pre-populated with this config's values.
      * <p>
      * This is useful for creating a modified copy of an existing config.
@@ -442,6 +508,7 @@ public final class TuiConfig {
         b.backend = backend;
         b.scheduler = scheduler;
         b.backendClassLoader = backendClassLoader;
+        b.timeSource = timeSource;
         return b;
     }
 
@@ -465,7 +532,8 @@ public final class TuiConfig {
                 && (resizeGracePeriod != null ? resizeGracePeriod.equals(that.resizeGracePeriod) : that.resizeGracePeriod == null)
                 && bindings.equals(that.bindings)
                 && fpsOverlayEnabled == that.fpsOverlayEnabled
-                && Objects.equals(backend, that.backend);
+                && Objects.equals(backend, that.backend)
+                && Objects.equals(timeSource, that.timeSource);
     }
 
     @Override
@@ -482,6 +550,7 @@ public final class TuiConfig {
         result = 31 * result + bindings.hashCode();
         result = 31 * result + Boolean.hashCode(fpsOverlayEnabled);
         result = 31 * result + Objects.hashCode(backend);
+        result = 31 * result + Objects.hashCode(timeSource);
         return result;
     }
 
@@ -525,6 +594,7 @@ public final class TuiConfig {
         private Backend backend;
         private ScheduledExecutorService scheduler;
         private ClassLoader backendClassLoader;
+        private LongSupplier timeSource = System::nanoTime;
 
         private Builder() {
         }
@@ -792,6 +862,21 @@ public final class TuiConfig {
         }
 
         /**
+         * Sets the monotonic time source used to drive ticks and animation clocks.
+         * <p>
+         * Defaults to {@link System#nanoTime()}. A custom time source can be used to
+         * make tick cadence and animation progression completely deterministic in
+         * tests, recordings, or SVG exports.
+         *
+         * @param timeSource the time source returning nanoseconds, or null to use the default
+         * @return this builder
+         */
+        public Builder timeSource(LongSupplier timeSource) {
+            this.timeSource = timeSource != null ? timeSource : System::nanoTime;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          *
          * @return the constructed TuiConfig
@@ -815,7 +900,8 @@ public final class TuiConfig {
                     postRenderProcessors,
                     backend,
                     scheduler,
-                    backendClassLoader
+                    backendClassLoader,
+                    timeSource
             );
         }
     }

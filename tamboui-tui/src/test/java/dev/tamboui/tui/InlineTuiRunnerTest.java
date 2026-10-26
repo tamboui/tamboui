@@ -77,4 +77,19 @@ class InlineTuiRunnerTest {
         assertThat(lastWidth.get()).isEqualTo(50);
         assertThat(resizeEvent.get()).isEqualTo(ResizeEvent.of(50, 24));
     }
+
+    @Test
+    @DisplayName("runner preserves custom timeSource from InlineTuiConfig")
+    void runnerPreservesCustomTimeSource() {
+        TestBackend backend = new TestBackend(80, 24);
+        java.util.function.LongSupplier clock = () -> 42L;
+        InlineTuiConfig config = InlineTuiConfig.builder(4)
+                .timeSource(clock)
+                .build();
+
+        assertThat(config.timeSource()).isSameAs(clock);
+        try (InlineTuiRunner runner = InlineTuiRunner.create(backend, config)) {
+            assertThat(runner.config().timeSource()).isSameAs(clock);
+        }
+    }
 }

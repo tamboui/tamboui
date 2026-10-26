@@ -387,4 +387,15 @@ public class CoreConceptsSnippets {
 
     private void updateAnimation(Duration elapsed) {
     }
+
+    void deterministicTimeSource() {
+        // tag::deterministic-time-source[]
+        // Drive both tick cadence and animation clocks deterministically
+        long[] time = { 0L };
+        TuiConfig config = TuiConfig.builder()
+            .tickRate(Duration.ofMillis(16))
+            .timeSource(() -> time[0])
+            .build();
+        // end::deterministic-time-source[]
+    }
 }

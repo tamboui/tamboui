@@ -4,6 +4,8 @@
  */
 package dev.tamboui.tfx.toolkit;
 
+import java.util.function.LongSupplier;
+
 import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.TFxDuration;
@@ -71,6 +73,15 @@ public final class ToolkitEffects {
      */
     public ToolkitEffects() {
         this(new RenderClock());
+    }
+
+    /**
+     * Creates a new ToolkitEffects instance reading time from the given time source.
+     *
+     * @param timeSource monotonic time source returning nanoseconds, or null for default
+     */
+    public ToolkitEffects(LongSupplier timeSource) {
+        this(new RenderClock(timeSource != null ? timeSource : System::nanoTime));
     }
 
     /**

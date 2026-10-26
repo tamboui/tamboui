@@ -6,6 +6,7 @@ package dev.tamboui.tui;
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.LongSupplier;
 
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
@@ -44,9 +45,11 @@ public final class InlineTuiConfig {
     private final boolean bracketedPaste;
     private final Bindings bindings;
     private final ScheduledExecutorService scheduler;
+    private final LongSupplier timeSource;
 
     private InlineTuiConfig(int height, Duration tickRate, Duration pollTimeout,
-                            boolean clearOnClose, boolean bracketedPaste, Bindings bindings, ScheduledExecutorService scheduler) {
+                            boolean clearOnClose, boolean bracketedPaste, Bindings bindings,
+                            ScheduledExecutorService scheduler, LongSupplier timeSource) {
         this.height = height;
         this.tickRate = tickRate;
         this.pollTimeout = pollTimeout;
@@ -54,6 +57,12 @@ public final class InlineTuiConfig {
         this.bracketedPaste = bracketedPaste;
         this.bindings = bindings;
         this.scheduler = scheduler;
+        this.timeSource = timeSource != null ? timeSource : System::nanoTime;
+    }
+
+    private InlineTuiConfig(int height, Duration tickRate, Duration pollTimeout,
+                            boolean clearOnClose, boolean bracketedPaste, Bindings bindings, ScheduledExecutorService scheduler) {
+        this(height, tickRate, pollTimeout, clearOnClose, bracketedPaste, bindings, scheduler, null);
     }
 
     /**
@@ -168,6 +177,17 @@ public final class InlineTuiConfig {
     }
 
     /**
+     * Returns the monotonic time source used to drive ticks and animation clocks.
+     * <p>
+     * Defaults to {@link System#nanoTime()}.
+     *
+     * @return the time source returning nanoseconds
+     */
+    public LongSupplier timeSource() {
+        return timeSource;
+    }
+
+    /**
      * Returns a builder pre-populated with this config's values.
      * <p>
      * This is useful for creating a modified copy of an existing config.
@@ -182,6 +202,7 @@ public final class InlineTuiConfig {
         b.bracketedPaste = bracketedPaste;
         b.bindings = bindings;
         b.scheduler = scheduler;
+        b.timeSource = timeSource;
         return b;
     }
 
@@ -203,6 +224,7 @@ public final class InlineTuiConfig {
         private boolean bracketedPaste = false;
         private Bindings bindings = BindingSets.defaults();
         private ScheduledExecutorService scheduler;
+        private LongSupplier timeSource = System::nanoTime;
 
         private Builder(int height) {
             if (height <= 0) {
@@ -307,12 +329,25 @@ public final class InlineTuiConfig {
         }
 
         /**
+         * Sets the monotonic time source used to drive ticks and animation clocks.
+         * <p>
+         * Defaults to {@link System#nanoTime()}.
+         *
+         * @param timeSource the time source returning nanoseconds, or null to use the default
+         * @return this builder
+         */
+        public Builder timeSource(LongSupplier timeSource) {
+            this.timeSource = timeSource != null ? timeSource : System::nanoTime;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          *
          * @return a new InlineTuiConfig
          */
         public InlineTuiConfig build() {
-            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bracketedPaste, bindings, scheduler);
+            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bracketedPaste, bindings, scheduler, timeSource);
         }
     }
 }

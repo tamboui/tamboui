@@ -4,6 +4,8 @@
  */
 package dev.tamboui.tfx.tui;
 
+import java.util.function.LongSupplier;
+
 import dev.tamboui.layout.Rect;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
@@ -51,6 +53,15 @@ public final class TfxIntegration {
      */
     public TfxIntegration() {
         this(new RenderClock());
+    }
+
+    /**
+     * Creates a new TfxIntegration instance reading time from the given time source.
+     *
+     * @param timeSource monotonic time source returning nanoseconds, or null for default
+     */
+    public TfxIntegration(LongSupplier timeSource) {
+        this(new RenderClock(timeSource != null ? timeSource : System::nanoTime));
     }
 
     /**
