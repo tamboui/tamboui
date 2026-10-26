@@ -66,6 +66,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
     private final String placeholder;
     private final Style placeholderStyle;
     private final boolean showLineNumbers;
+    private final int minLineNumberDigits;
     private final Style lineNumberStyle;
     private final Overflow overflow;
     private final SyntaxHighlighter highlighter;
@@ -76,6 +77,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         this.block = builder.block;
         this.placeholder = builder.placeholder;
         this.showLineNumbers = builder.showLineNumbers;
+        this.minLineNumberDigits = builder.minLineNumberDigits;
         this.overflow = builder.resolveOverflow();
 
         // Resolve style-aware properties
@@ -123,6 +125,15 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * Returns the minimum number of digits reserved for line numbers in the gutter.
+     *
+     * @return the minimum line number digits
+     */
+    public int minLineNumberDigits() {
+        return minLineNumberDigits;
     }
 
     @Override
@@ -179,7 +190,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
             return 0;
         }
         int lineDigits = String.valueOf(state.lineCount()).length();
-        return Math.max(2, lineDigits) + 2;
+        return Math.max(minLineNumberDigits, lineDigits) + 2;
     }
 
     /** The area left for text inside {@code inputArea} once the gutter is carved off. */
@@ -430,6 +441,7 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         private String placeholder = "";
         private Style placeholderStyle = Style.EMPTY.dim();
         private boolean showLineNumbers = false;
+        private int minLineNumberDigits = 2;
         private Style lineNumberStyle = Style.EMPTY.dim();
         private Overflow overflow;
         private SyntaxHighlighter highlighter;
@@ -509,6 +521,21 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          */
         public Builder showLineNumbers(boolean show) {
             this.showLineNumbers = show;
+            return this;
+        }
+
+        /**
+         * Sets the minimum number of digits to reserve for line numbers in the gutter.
+         * The default is 2.
+         *
+         * @param minDigits the minimum number of digits (>= 1)
+         * @return this builder
+         */
+        public Builder minLineNumberDigits(int minDigits) {
+            if (minDigits < 1) {
+                throw new IllegalArgumentException("minLineNumberDigits must be at least 1: " + minDigits);
+            }
+            this.minLineNumberDigits = minDigits;
             return this;
         }
 

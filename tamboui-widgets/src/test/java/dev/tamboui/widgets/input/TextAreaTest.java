@@ -22,6 +22,7 @@ import dev.tamboui.widgets.syntax.TokenType;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TextAreaTest {
 
@@ -339,5 +340,71 @@ class TextAreaTest {
         textArea.render(new Rect(0, 0, 8, 1), buffer, new TextAreaState());
 
         assertThat(buffer).hasRow(0, "Type you            ");
+    }
+
+    @Test
+    @DisplayName("minLineNumberDigits configures minimum gutter width")
+    void minLineNumberDigitsConfiguresGutterWidth() {
+        TextArea textArea = TextArea.builder()
+            .showLineNumbers(true)
+            .minLineNumberDigits(3)
+            .build();
+        TextAreaState state = new TextAreaState("line 1\nline 2");
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 2));
+
+        textArea.render(buffer.area(), buffer, state);
+
+        // With minDigits = 3, gutter width is 3 digits + space + separator = 5
+        // Row 0 line number is "  1 |", row 1 is "  2 |"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("1");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo("|");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("l");
+
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(1, 1).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(2, 1).symbol()).isEqualTo("2");
+        assertThat(buffer.get(3, 1).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(4, 1).symbol()).isEqualTo("|");
+        assertThat(buffer.get(5, 1).symbol()).isEqualTo("l");
+    }
+
+    @Test
+    @DisplayName("minLineNumberDigits expands when actual line count has more digits")
+    void minLineNumberDigitsExpandsWhenLineCountExceedsMin() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= 1000; i++) {
+            sb.append("line ").append(i).append("\n");
+        }
+        TextArea textArea = TextArea.builder()
+            .showLineNumbers(true)
+            .minLineNumberDigits(2)
+            .build();
+        TextAreaState state = new TextAreaState(sb.toString());
+        state.moveCursorToStart();
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 20, 2));
+
+        textArea.render(buffer.area(), buffer, state);
+
+        // 1000 lines has 4 digits > min 2 digits -> gutter is 4 + 2 = 6
+        // Row 0 is "   1 |"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("1");
+        assertThat(buffer.get(4, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("|");
+        assertThat(buffer.get(6, 0).symbol()).isEqualTo("l");
+    }
+
+    @Test
+    @DisplayName("minLineNumberDigits rejects value less than 1")
+    void minLineNumberDigitsRejectsInvalidValue() {
+        assertThatThrownBy(() -> TextArea.builder().minLineNumberDigits(0))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> TextArea.builder().minLineNumberDigits(-1))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
