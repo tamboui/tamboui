@@ -11,7 +11,9 @@ import dev.tamboui.terminal.TestBackend;
 import dev.tamboui.tui.InlineTuiConfig;
 
 import static dev.tamboui.toolkit.Toolkit.row;
+import static dev.tamboui.toolkit.Toolkit.table;
 import static dev.tamboui.toolkit.Toolkit.text;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
@@ -29,5 +31,23 @@ class InlineToolkitRunnerPrintlnTest {
             assertThatCode(() -> runner.println(row(text("A"), text("B"))))
                 .doesNotThrowAnyException();
         }
+    }
+
+    @Test
+    @DisplayName("println of a table without widths renders content")
+    void printlnOfTableWithoutWidthsRendersContent() throws Exception {
+        TestBackend backend = new TestBackend(80, 24);
+        try (InlineToolkitRunner runner = InlineToolkitRunner.create(backend,
+                InlineTuiConfig.builder(1).noTick().build())) {
+            runner.println(table().header("Name", "Age", "City")
+                    .row("Alice", "30", "NYC")
+                    .row("Bob", "25", "LA")
+                    .row("Charlie", "35", "Chicago"));
+        }
+        assertThat(backend.rawOutput())
+            .contains("Name")
+            .contains("Alice")
+            .contains("Bob")
+            .contains("Charlie");
     }
 }

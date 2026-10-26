@@ -259,8 +259,43 @@ class TableTest {
     }
 
     @Test
-    @DisplayName("Table without widths renders nothing")
-    void noWidths() {
+    @DisplayName("Table without widths auto-derives column widths")
+    void tableWithoutWidthsAutoDerivesColumns() {
+        Table table = Table.builder()
+            .header(Row.from("Name", "Age", "City"))
+            .rows(Arrays.asList(
+                Row.from("Alice", "30", "NYC"),
+                Row.from("Bob", "25", "LA")
+            ))
+            .highlightSymbol("")
+            .build();
+
+        // 32 width: 3 columns, spacing 1 -> total spacing 2, available 30 -> 10 per column
+        Rect area = new Rect(0, 0, 32, 4);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Header: "Name" at x=0, "Age" at x=11, "City" at x=22
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("N");
+        assertThat(buffer.get(11, 0).symbol()).isEqualTo("A");
+        assertThat(buffer.get(22, 0).symbol()).isEqualTo("C");
+
+        // Row 1: "Alice" at x=0, "30" at x=11, "NYC" at x=22
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("A");
+        assertThat(buffer.get(11, 1).symbol()).isEqualTo("3");
+        assertThat(buffer.get(22, 1).symbol()).isEqualTo("N");
+
+        // Row 2: "Bob" at x=0, "25" at x=11, "LA" at x=22
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("B");
+        assertThat(buffer.get(11, 2).symbol()).isEqualTo("2");
+        assertThat(buffer.get(22, 2).symbol()).isEqualTo("L");
+    }
+
+    @Test
+    @DisplayName("Table with only rows and no widths auto-derives column widths")
+    void tableWithOnlyRowsAndNoWidthsAutoDerivesColumns() {
         Table table = Table.builder()
             .rows(Arrays.asList(Row.from("Data")))
             .build();
@@ -271,7 +306,24 @@ class TableTest {
 
         table.render(area, buffer, state);
 
-        // Without widths, nothing renders
+        // Without widths, auto-derives fill constraint for single column and renders
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("a");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("t");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("a");
+    }
+
+    @Test
+    @DisplayName("Empty table without widths renders nothing")
+    void emptyTableWithoutWidths() {
+        Table table = Table.builder().build();
+
+        Rect area = new Rect(0, 0, 15, 3);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
         assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
     }
 
