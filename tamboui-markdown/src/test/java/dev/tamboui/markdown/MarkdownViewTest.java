@@ -14,6 +14,7 @@ import dev.tamboui.style.Modifier;
 import dev.tamboui.widgets.block.Block;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MarkdownViewTest {
 
@@ -448,5 +449,85 @@ class MarkdownViewTest {
         for (int y = 1; y < 6; y++) {
             assertThat(buffer.get(7, y).symbol()).as("right border on row " + y).isEqualTo("│");
         }
+    }
+
+    @Test
+    @DisplayName("compact() suppresses blank lines between paragraphs")
+    void compactModeSuppressesParagraphSpacing() {
+        String source = "first paragraph\n\nsecond paragraph";
+
+        MarkdownView standardView = MarkdownView.builder().source(source).build();
+        Buffer standardBuffer = renderInto(standardView, 30, 3);
+        assertThat(standardView.isCompact()).isFalse();
+        assertThat(standardView.paragraphSpacing()).isEqualTo(1);
+        // Row 0: first paragraph, Row 1: empty line, Row 2: second paragraph
+        assertThat(standardBuffer.get(0, 0).symbol()).isEqualTo("f");
+        assertThat(standardBuffer.get(0, 1).symbol()).isEqualTo(" ");
+        assertThat(standardBuffer.get(0, 2).symbol()).isEqualTo("s");
+
+        MarkdownView compactView = MarkdownView.builder().source(source).compact().build();
+        Buffer compactBuffer = renderInto(compactView, 30, 3);
+        assertThat(compactView.isCompact()).isTrue();
+        assertThat(compactView.paragraphSpacing()).isEqualTo(0);
+        // Row 0: first paragraph, Row 1: second paragraph (no blank line)
+        assertThat(compactBuffer.get(0, 0).symbol()).isEqualTo("f");
+        assertThat(compactBuffer.get(0, 1).symbol()).isEqualTo("s");
+    }
+
+    @Test
+    @DisplayName("paragraphSpacing(int) configures blank line count between paragraphs")
+    void paragraphSpacingConfiguresBlankLines() {
+        String source = "p1\n\np2";
+
+        MarkdownView view = MarkdownView.builder().source(source).paragraphSpacing(2).build();
+        Buffer buffer = renderInto(view, 20, 5);
+        assertThat(view.paragraphSpacing()).isEqualTo(2);
+        assertThat(view.isCompact()).isFalse();
+
+        // Row 0: p1, Row 1: space, Row 2: space, Row 3: p2
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("p");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(0, 3).symbol()).isEqualTo("p");
+    }
+
+    @Test
+    @DisplayName("paragraphSpacing rejects negative value")
+    void paragraphSpacingRejectsNegative() {
+        assertThatThrownBy(() -> MarkdownView.builder().paragraphSpacing(-1))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("computeHeight reflects compact mode")
+    void compactModeAffectsComputeHeight() {
+        String source = "# Title\n\nfirst paragraph\n\nsecond paragraph";
+        MarkdownView standard = MarkdownView.builder().source(source).build();
+        MarkdownView compact = MarkdownView.builder().source(source).compact().build();
+
+        // Standard: title(1) + rule(1) + spacer(1) + p1(1) + spacer(1) + p2(1) = 6
+        assertThat(standard.computeHeight(80)).isEqualTo(6);
+        // Compact: title(1) + rule(1) + p1(1) + p2(1) = 4
+        assertThat(compact.computeHeight(80)).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("compact() suppresses blank lines between paragraphs inside blockquotes")
+    void compactModeInBlockquote() {
+        String source = "> quote 1\n>\n> quote 2";
+
+        MarkdownView standard = MarkdownView.builder().source(source).build();
+        Buffer standardBuf = renderInto(standard, 30, 3);
+        // Row 1 is a quote spacer line ("│ ")
+        assertThat(standardBuf.get(0, 1).symbol()).isEqualTo("│");
+        assertThat(standardBuf.get(2, 1).symbol()).isEqualTo(" ");
+
+        MarkdownView compact = MarkdownView.builder().source(source).compact().build();
+        Buffer compactBuf = renderInto(compact, 30, 3);
+        // Row 0: quote 1, Row 1: quote 2 directly
+        assertThat(compactBuf.get(0, 0).symbol()).isEqualTo("│");
+        assertThat(compactBuf.get(2, 0).symbol()).isEqualTo("q");
+        assertThat(compactBuf.get(0, 1).symbol()).isEqualTo("│");
+        assertThat(compactBuf.get(2, 1).symbol()).isEqualTo("q");
     }
 }

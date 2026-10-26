@@ -164,4 +164,74 @@ class MarkdownElementTest extends AbstractElementTest {
         assertThat(wide).isEqualTo(1);
         assertThat(narrow).isGreaterThan(wide);
     }
+
+    @Test
+    @DisplayName("compact() and paragraphSpacing() configure element settings")
+    void compactFluentApi() {
+        MarkdownElement element = MarkdownElement.of("text");
+        assertThat(element.isCompact()).isFalse();
+        assertThat(element.paragraphSpacing()).isEqualTo(1);
+
+        element.compact();
+        assertThat(element.isCompact()).isTrue();
+        assertThat(element.paragraphSpacing()).isEqualTo(0);
+
+        element.compact(false);
+        assertThat(element.isCompact()).isFalse();
+        assertThat(element.paragraphSpacing()).isEqualTo(1);
+
+        element.paragraphSpacing(3);
+        assertThat(element.paragraphSpacing()).isEqualTo(3);
+        assertThat(element.isCompact()).isFalse();
+    }
+
+    @Test
+    @DisplayName("paragraphSpacing rejects negative value in MarkdownElement")
+    void paragraphSpacingRejectsNegative() {
+        assertThatThrownBy(() -> MarkdownElement.of("text").paragraphSpacing(-1))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("preferredSize reflects compact mode")
+    void preferredSizeWithCompact() {
+        String source = "# Title\n\nfirst paragraph\n\nsecond paragraph";
+        MarkdownElement standard = MarkdownElement.of(source);
+        MarkdownElement compact = MarkdownElement.of(source).compact();
+
+        // Standard: 6 rows
+        assertThat(standard.preferredSize(80, -1, RenderContext.empty()).height()).isEqualTo(6);
+        // Compact: 4 rows (no spacers)
+        assertThat(compact.preferredSize(80, -1, RenderContext.empty()).height()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("compact() renders consecutive paragraphs without blank lines")
+    void rendersCompactWithoutBlankLines() {
+        String source = "first paragraph\n\nsecond paragraph";
+        Buffer buffer = renderInto(MarkdownElement.of(source).compact(), 30, 2);
+
+        // Row 0: "first paragraph", Row 1: "second paragraph"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("f");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("s");
+    }
+
+    @Test
+    @DisplayName("CSS paragraph-spacing resolves to element")
+    void cssParagraphSpacingResolves() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "MarkdownElement { paragraph-spacing: 0; }");
+        styleEngine.setActiveStylesheet("test");
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        String source = "first paragraph\n\nsecond paragraph";
+        Rect area = new Rect(0, 0, 30, 2);
+        Buffer buffer = Buffer.empty(area);
+
+        MarkdownElement.of(source).render(Frame.forTesting(buffer), area, context);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("f");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("s");
+    }
 }
