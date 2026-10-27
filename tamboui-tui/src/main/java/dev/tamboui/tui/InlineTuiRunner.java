@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -75,9 +74,7 @@ public final class InlineTuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final AtomicBoolean windowTitleSet = new AtomicBoolean(false);
-    private final ScheduledExecutorService scheduler;
-    private final boolean schedulerOwned;
-    private final ScheduledFuture<?> schedulerTask;
+    private final RunnerScheduler scheduler;
     private final AtomicLong frameCount;
     private final Thread shutdownHook;
     private final TickTimer tickTimer;
@@ -110,17 +107,9 @@ public final class InlineTuiRunner implements AutoCloseable {
         });
 
         // Set up scheduler - use provided scheduler or create one
-        Schedulers.Scheduler scheduler = Schedulers.resolve(config.scheduler());
-        this.scheduler = scheduler.scheduler();
-        this.schedulerOwned = scheduler.owned();
-
-        // Only schedule the internal callback if ticks are enabled
-        if (config.ticksEnabled() && config.tickRate() != null) {
-            long periodMs = config.tickRate().toMillis();
-            this.schedulerTask = this.scheduler.scheduleAtFixedRate(
-                this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
-        } else {
-            this.schedulerTask = null;
+        this.scheduler = new RunnerScheduler(config.scheduler());
+        if (config.ticksEnabled()) {
+            this.scheduler.start(config.tickRate(), this::schedulerCallback);
         }
 
         // Create and start the input reader thread
@@ -442,7 +431,7 @@ public final class InlineTuiRunner implements AutoCloseable {
      * @return the scheduler (never null)
      */
     public ScheduledExecutorService scheduler() {
-        return scheduler;
+        return scheduler.service();
     }
 
     private static Size readCurrentSize(Backend backend) {
@@ -496,21 +485,8 @@ public final class InlineTuiRunner implements AutoCloseable {
             // JVM is already shutting down
         }
 
-        // A scheduler passed in the config is not shut down below, and would otherwise keep
-        // running the callback, and holding on to this runner, after close
-        if (schedulerTask != null) {
-            schedulerTask.cancel(false);
-        }
-
-        // Shutdown scheduler only if we own it
-        if (schedulerOwned) {
-            scheduler.shutdownNow();
-            try {
-                scheduler.awaitTermination(100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        // Closes the scheduler: cancels periodic task and shuts down if owned
+        scheduler.close();
 
         cleanup();
     }
