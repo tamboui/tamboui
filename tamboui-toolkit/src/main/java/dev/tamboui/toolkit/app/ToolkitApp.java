@@ -92,12 +92,34 @@ public abstract class ToolkitApp {
     }
 
     /**
+     * Creates a {@link ToolkitRunner.Builder} configured for this application.
+     * <p>
+     * Override this method if you need to customize runner configuration beyond what is
+     * provided by {@link #configure()} (such as setting a custom style engine,
+     * post-render processors, or fault-tolerant rendering).
+     * <p>
+     * By default, this configures the runner with {@link #configure()}, registers this
+     * application instance as {@link ToolkitRunner.Builder#app(Object)}, and enables
+     * {@link ToolkitRunner.Builder#withAutoBindingRegistration()} so that any methods
+     * annotated with {@link dev.tamboui.annotations.bindings.OnAction @OnAction} on this
+     * class are automatically registered as global action handlers.
+     *
+     * @return a new preconfigured runner builder
+     */
+    protected ToolkitRunner.Builder createRunnerBuilder() {
+        return ToolkitRunner.builder()
+                .config(configure())
+                .app(this)
+                .withAutoBindingRegistration();
+    }
+
+    /**
      * Runs the application.
      *
      * @throws Exception if an error occurs
      */
     public void run() throws Exception {
-        try (ToolkitRunner r = ToolkitRunner.create(configure())) {
+        try (ToolkitRunner r = createRunnerBuilder().build()) {
             this.runner = r;
             onStart();
             r.run(this::render);

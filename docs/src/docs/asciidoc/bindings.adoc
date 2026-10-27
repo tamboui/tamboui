@@ -130,7 +130,9 @@ include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=act
 == @OnAction Annotation
 
 [NOTE]
-The `@OnAction` annotation works with Toolkit Components.
+The `@OnAction` annotation works with `ToolkitApp` and Toolkit Components.
+On `ToolkitApp`, annotated methods are automatically registered as application-level action handlers.
+On `Component`s, annotated methods handle actions when the component is focused.
 For TuiRunner or immediate mode, use `ActionHandler` instead (see above).
 
 In Toolkit components, annotate methods to handle actions:
