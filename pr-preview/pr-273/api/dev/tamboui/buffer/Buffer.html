@@ -440,7 +440,10 @@ effect targeting without Buffer needing to know about registries.</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">set</span><wbr><span class="parameters">(int&nbsp;x,
  int&nbsp;y,
  <a href="Cell.html" title="class in dev.tamboui.buffer">Cell</a>&nbsp;cell)</span></div>
-<div class="block">Sets the cell at the given position.</div>
+<div class="block">Sets the cell at the given position.
+<p>
+A wide character that loses one of its two cells to this write is replaced by a space,
+so its other half does not stay behind.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>x</code> - the x coordinate</dd>
