@@ -43,7 +43,7 @@ jobs:
           JRELEASER_ZERNIO_PROFILE_ID: ${{ secrets.ZERNIO_PROFILE_ID }}
       - name: JReleaser announce output
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: jreleaser-announce
           path: |
