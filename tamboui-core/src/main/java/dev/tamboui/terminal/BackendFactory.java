@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import dev.tamboui.internal.record.RecordingBackend;
@@ -124,11 +125,7 @@ public final class BackendFactory {
      * @throws BackendException if no provider is found or all providers fail
      */
     public static Backend create(ClassLoader classLoader) throws IOException {
-        // Check system property first, then environment variable
-        String userSelectedProvider = System.getProperty("tamboui.backend");
-        if (userSelectedProvider == null || userSelectedProvider.isEmpty()) {
-            userSelectedProvider = System.getenv("TAMBOUI_BACKEND");
-        }
+        String userSelectedProvider = getSelectedProviderSpec();
 
         // Load all available providers, capturing any that fail to instantiate so that a present
         // but broken backend is not mistaken for an absent one.
@@ -136,12 +133,92 @@ public final class BackendFactory {
         List<BackendProvider> allProviders =
                 SafeServiceLoader.load(BackendProvider.class, classLoader, loadFailures::add);
 
-        List<BackendProvider> providers = (userSelectedProvider != null && !userSelectedProvider.isEmpty())
+        List<BackendProvider> providers = userSelectedProvider != null
                 ? resolveProviders(userSelectedProvider, allProviders, loadFailures)
                 : allProviders;
 
         // Check if recording is enabled and wrap the backend
         return recordIfEnabled(tryProviders(providers, loadFailures));
+    }
+
+    /**
+     * Returns the candidate backend provider that would be selected based on the current
+     * configuration, without attempting to create a backend instance.
+     * <p>
+     * Selection follows the same priority as {@link #create()}:
+     * <ol>
+     *   <li>System property {@code tamboui.backend} (if set)</li>
+     *   <li>Environment variable {@code TAMBOUI_BACKEND} (if set)</li>
+     *   <li>First auto-discovered provider via ServiceLoader</li>
+     * </ol>
+     * <p>
+     * When a comma-separated list is configured, the first matching provider on the classpath is returned.
+     * Note that this represents the initial candidate; actual backend creation may still fail at runtime
+     * (e.g. if no TTY is available) and fall back to subsequent providers if specified.
+     *
+     * @return the candidate provider, or {@link Optional#empty()} if no matching provider is available
+     */
+    public static Optional<BackendProvider> candidateProvider() {
+        return candidateProvider((ClassLoader) null);
+    }
+
+    /**
+     * Returns the candidate backend provider that would be selected using the given classloader,
+     * without attempting to create a backend instance.
+     * <p>
+     * Behaves like {@link #candidateProvider()}, except that backend discovery uses {@code classLoader}
+     * exclusively when non-null.
+     *
+     * @param classLoader the classloader to use exclusively for discovery, or null for default discovery
+     * @return the candidate provider, or {@link Optional#empty()} if no matching provider is available
+     */
+    public static Optional<BackendProvider> candidateProvider(ClassLoader classLoader) {
+        String userSelectedProvider = getSelectedProviderSpec();
+        List<BackendProvider> allProviders =
+                SafeServiceLoader.load(BackendProvider.class, classLoader, null);
+        return resolveCandidate(userSelectedProvider, allProviders);
+    }
+
+    /**
+     * Resolves the candidate provider from the given specification and available providers.
+     *
+     * @param providerSpec the provider specification (may be comma-separated, or null/empty for auto-discovery)
+     * @param allProviders all available providers
+     * @return the candidate provider, or {@link Optional#empty()} if none matched or none are available
+     */
+    static Optional<BackendProvider> resolveCandidate(String providerSpec, List<BackendProvider> allProviders) {
+        if (allProviders == null || allProviders.isEmpty()) {
+            return Optional.empty();
+        }
+        if (providerSpec == null || providerSpec.trim().isEmpty()) {
+            return Optional.of(allProviders.get(0));
+        }
+        for (String spec : providerSpec.split(",")) {
+            String trimmedSpec = spec.trim();
+            if (trimmedSpec.isEmpty()) {
+                continue;
+            }
+            for (BackendProvider provider : allProviders) {
+                if (matches(provider, trimmedSpec)) {
+                    return Optional.of(provider);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean matches(BackendProvider provider, String spec) {
+        return provider.name().equals(spec) || provider.getClass().getName().equals(spec);
+    }
+
+    private static String getSelectedProviderSpec() {
+        String userSelectedProvider = System.getProperty("tamboui.backend");
+        if (userSelectedProvider == null || userSelectedProvider.trim().isEmpty()) {
+            userSelectedProvider = System.getenv("TAMBOUI_BACKEND");
+        }
+        return (userSelectedProvider != null && !userSelectedProvider.trim().isEmpty())
+                ? userSelectedProvider.trim()
+                : null;
     }
 
     /**
@@ -165,8 +242,7 @@ public final class BackendFactory {
                 continue;
             }
             allProviders.stream()
-                    .filter(p -> p.name().equals(trimmedSpec)
-                            || p.getClass().getName().equals(trimmedSpec))
+                    .filter(p -> matches(p, trimmedSpec))
                     .findFirst()
                     .ifPresent(resolved::add);
         }
