@@ -16,6 +16,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
+import dev.tamboui.text.GraphemeClusters;
 import dev.tamboui.text.Masked;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
@@ -144,9 +145,10 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         int scrollCharOffset = 0;
         int widthCount = 0;
         while (scrollCharOffset < displayText.length() && widthCount < scrollDisplayOffset) {
-            int cp = displayText.codePointAt(scrollCharOffset);
-            widthCount += CharWidth.of(cp);
-            scrollCharOffset += Character.charCount(cp);
+            int next = GraphemeClusters.clusterEnd(displayText, scrollCharOffset);
+            int clusterWidth = CharWidth.of(displayText.substring(scrollCharOffset, next));
+            widthCount += clusterWidth;
+            scrollCharOffset = next;
         }
 
         // Render visible text starting from scrollCharOffset

@@ -106,4 +106,19 @@ class TextInputTest {
         input.renderWithCursor(buffer2.area(), buffer2, state, null);
         assertThat(buffer2.get(2, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
     }
+
+    @Test
+    @DisplayName("scrolling with VS16 emoji presentation sequence scrolls past whole cluster")
+    void scrollingWithVs16Emoji() {
+        TextInputState state = new TextInputState("\u23FA\uFE0Fxyz"); // width = 2 + 3 = 5
+        TextInput input = TextInput.builder().build();
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 4, 1)); // width = 4
+
+        input.renderWithCursor(buffer.area(), buffer, state, null);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("x");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("y");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("z");
+        assertThat(buffer.get(3, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
+    }
 }

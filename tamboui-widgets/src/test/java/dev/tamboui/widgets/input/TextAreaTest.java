@@ -237,6 +237,50 @@ class TextAreaTest {
     }
 
     @Test
+    @DisplayName("renderWithCursor places cursor correctly on unwrapped line after typing VS16 emoji")
+    void renderWithCursorAfterVs16Emoji() {
+        Style cursorStyle = Style.EMPTY.bg(Color.RED);
+        TextArea textArea = TextArea.builder()
+            .cursorStyle(cursorStyle)
+            .build();
+
+        TextAreaState state = new TextAreaState();
+        state.insert("\u23FA\uFE0Fx"); // "⏺️x": ⏺️ is 2 cols, x is 1 col -> cursor at col 3
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 10, 1));
+        Frame frame = Frame.forTesting(buffer);
+
+        textArea.renderWithCursor(buffer.area(), buffer, state, frame);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("\u23FA\uFE0F");
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("x");
+        assertThat(buffer.get(3, 0).style()).isEqualTo(cursorStyle);
+    }
+
+    @Test
+    @DisplayName("renderWithCursor places cursor correctly when scrolled past VS16 emoji")
+    void renderWithCursorScrolledPastVs16Emoji() {
+        Style cursorStyle = Style.EMPTY.bg(Color.RED);
+        TextArea textArea = TextArea.builder()
+            .cursorStyle(cursorStyle)
+            .build();
+
+        TextAreaState state = new TextAreaState("\u23FA\uFE0Fxyz");
+        state.ensureCursorVisible(1, 4); // Viewport width 4: scrolls past \u23FA\uFE0F to offset 2
+
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 4, 1));
+        Frame frame = Frame.forTesting(buffer);
+
+        textArea.renderWithCursor(buffer.area(), buffer, state, frame);
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("x");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("y");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("z");
+        assertThat(buffer.get(3, 0).style()).isEqualTo(cursorStyle);
+    }
+
+    @Test
     @DisplayName("preferredHeight counts wrapped rows plus the block, using the render's gutter math")
     void preferredHeightFitsWrappedText() {
         TextArea.Builder builder = TextArea.builder()
