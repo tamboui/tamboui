@@ -359,6 +359,14 @@ public final class EventRouter implements AutoCloseable {
                     }
                     return result;
                 }
+                if (result == EventResult.FOCUS_NEXT) {
+                    focusManager.focusNext();
+                    return EventResult.HANDLED;
+                }
+                if (result == EventResult.FOCUS_PREVIOUS) {
+                    focusManager.focusPrevious();
+                    return EventResult.HANDLED;
+                }
             }
         }
 
