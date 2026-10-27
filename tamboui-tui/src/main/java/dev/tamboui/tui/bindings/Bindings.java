@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui.bindings;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,14 +58,31 @@ public interface Bindings {
     boolean matches(Event event, String action);
 
     /**
-     * Returns the action that matches the event, if any.
+     * Returns the highest-precedence action that matches the event, if any.
      * <p>
-     * If multiple actions could match, returns the first one found.
+     * When multiple actions match an event, the winner is determined by:
+     * <ol>
+     *   <li>Trigger specificity (exact modifier matches beat permissive modifier matches)</li>
+     *   <li>Binding recency (custom/later bindings beat default/earlier bindings)</li>
+     * </ol>
      *
      * @param event the input event
      * @return the matching action, or empty if no action matches
      */
     Optional<String> actionFor(Event event);
+
+    /**
+     * Returns all actions that match the event, ordered by precedence
+     * (highest specificity first, then latest bound).
+     *
+     * @param event the input event
+     * @return list of matching action names in precedence order (empty if none match)
+     */
+    default List<String> actionsFor(Event event) {
+        return actionFor(event)
+                .map(Collections::singletonList)
+                .orElse(Collections.emptyList());
+    }
 
     /**
      * Returns all triggers for the given action.

@@ -163,24 +163,24 @@ public final class ActionHandler {
     /**
      * Dispatches an event to registered handlers.
      * <p>
-     * The event is matched against the bindings, and the handlers of one matching action are
-     * invoked in registration order. An event can match several actions (with the standard
-     * bindings Enter is both {@link Actions#SELECT} and {@link Actions#CONFIRM}), so the action
-     * fired is the first one that has handlers: the action the bindings resolve the event to
-     * ({@link Bindings#actionFor}), otherwise the other matching actions in the order their
-     * handlers were first registered.
+     * The event is matched against the bindings in precedence order (highest specificity
+     * first, then latest bound). The first matching action that has registered handlers
+     * is fired, invoking its handlers in registration order. At most one semantic action
+     * is dispatched per input event.
      *
      * @param event the event to dispatch
-     * @return true if the event was handled (a matching action with registered handlers),
+     * @return true if the event was handled (a matching action had registered handlers),
      *         false otherwise
      */
     public boolean dispatch(Event event) {
-        Optional<String> resolved = bindings.actionFor(event);
-        if (resolved.isPresent() && fire(resolved.get(), event)) {
-            return true;
+        List<String> matchingActions = bindings.actionsFor(event);
+        for (String action : matchingActions) {
+            if (hasHandlers(action)) {
+                return fire(action, event);
+            }
         }
         for (String action : handlers.keySet()) {
-            if (!action.equals(resolved.orElse(null)) && bindings.matches(event, action)) {
+            if (!matchingActions.contains(action) && bindings.matches(event, action)) {
                 return fire(action, event);
             }
         }

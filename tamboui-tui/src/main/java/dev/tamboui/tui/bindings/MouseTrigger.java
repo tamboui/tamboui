@@ -232,6 +232,27 @@ public final class MouseTrigger implements InputTrigger {
     }
 
     @Override
+    public int specificity(Event event) {
+        if (!(event instanceof MouseEvent)) {
+            return 0;
+        }
+        int score = 100; // Mouse modifiers must match strictly
+        if (this.ctrl) {
+            score += 10;
+        }
+        if (this.alt) {
+            score += 10;
+        }
+        if (this.shift) {
+            score += 10;
+        }
+        if (this.button != MouseButton.NONE) {
+            score += 10;
+        }
+        return score;
+    }
+
+    @Override
     public String describe() {
         StringBuilder sb = new StringBuilder();
         if (ctrl) {

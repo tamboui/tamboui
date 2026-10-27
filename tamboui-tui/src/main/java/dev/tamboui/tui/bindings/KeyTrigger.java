@@ -175,7 +175,8 @@ public final class KeyTrigger implements InputTrigger {
      * <ul>
      *   <li>Key code must match</li>
      *   <li>Ctrl and Alt modifiers must match exactly</li>
-     *   <li>Shift is only checked if explicitly required by the trigger</li>
+     *   <li>Shift must match exactly for TAB (so plain Tab never matches Shift+Tab)</li>
+     *   <li>For other keys, Shift is only checked if explicitly required by the trigger</li>
      *   <li>For character triggers, the character must match (respecting ignoreCase)</li>
      * </ul>
      *
@@ -193,8 +194,12 @@ public final class KeyTrigger implements InputTrigger {
         if (ctrl != mods.ctrl() || alt != mods.alt()) {
             return false;
         }
-        // Shift is only checked if explicitly required
-        if (shift && !mods.shift()) {
+        // Shift is checked strictly for TAB (plain Tab never matches Shift+Tab)
+        if (keyCode == KeyCode.TAB) {
+            if (shift != mods.shift()) {
+                return false;
+            }
+        } else if (shift && !mods.shift()) {
             return false;
         }
 
@@ -208,6 +213,37 @@ public final class KeyTrigger implements InputTrigger {
         }
 
         return true;
+    }
+
+    @Override
+    public int specificity(Event event) {
+        if (!(event instanceof KeyEvent)) {
+            return 0;
+        }
+        KeyEvent keyEvent = (KeyEvent) event;
+        int score = 0;
+        KeyModifiers mods = keyEvent.modifiers();
+
+        // Exact modifier match vs permissive match
+        if (this.shift == mods.shift()) {
+            score += 100;
+        }
+        if (this.ctrl) {
+            score += 10;
+        }
+        if (this.alt) {
+            score += 10;
+        }
+        if (this.shift) {
+            score += 10;
+        }
+        if (this.keyCode == KeyCode.CHAR && this.character != null) {
+            score += 10;
+            if (!this.ignoreCase) {
+                score += 5;
+            }
+        }
+        return score;
     }
 
     @Override

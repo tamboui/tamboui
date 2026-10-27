@@ -593,4 +593,110 @@ class BindingsTest {
 
         assertThat(trigger.matches(mouseEvent)).isFalse();
     }
+
+    // ========== Precedence and Specificity Tests (Issue #484) ==========
+
+    @Test
+    @DisplayName("Enter returns actions in precedence order with confirm before select")
+    void enterReturnsActionsInPrecedenceOrder() {
+        Bindings bindings = BindingSets.standard();
+        KeyEvent enter = KeyEvent.ofKey(KeyCode.ENTER, bindings);
+
+        assertThat(enter.actions()).containsExactly(Actions.CONFIRM, Actions.SELECT);
+        assertThat(enter.action()).contains(Actions.CONFIRM);
+    }
+
+    @Test
+    @DisplayName("Space returns only select action")
+    void spaceReturnsOnlySelectAction() {
+        Bindings bindings = BindingSets.standard();
+        KeyEvent space = KeyEvent.ofChar(' ', bindings);
+
+        assertThat(space.actions()).containsExactly(Actions.SELECT);
+        assertThat(space.action()).contains(Actions.SELECT);
+    }
+
+    @Test
+    @DisplayName("Shift+Tab returns only focusPrevious and does not match plain Tab trigger")
+    void shiftTabReturnsOnlyFocusPrevious() {
+        Bindings bindings = BindingSets.standard();
+        KeyEvent shiftTab = KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.SHIFT, bindings);
+
+        assertThat(shiftTab.actions()).containsExactly(Actions.FOCUS_PREVIOUS);
+        assertThat(shiftTab.action()).contains(Actions.FOCUS_PREVIOUS);
+        assertThat(shiftTab.matches(Actions.FOCUS_NEXT)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Plain Tab returns only focusNext and does not match focusPrevious trigger")
+    void plainTabReturnsOnlyFocusNext() {
+        Bindings bindings = BindingSets.standard();
+        KeyEvent tab = KeyEvent.ofKey(KeyCode.TAB, bindings);
+
+        assertThat(tab.actions()).containsExactly(Actions.FOCUS_NEXT);
+        assertThat(tab.action()).contains(Actions.FOCUS_NEXT);
+        assertThat(tab.matches(Actions.FOCUS_PREVIOUS)).isFalse();
+    }
+
+    @Test
+    @DisplayName("actionsFor returns empty list for unbound event")
+    void actionsForReturnsEmptyForUnboundEvent() {
+        Bindings bindings = BindingSets.standard();
+        KeyEvent f12 = KeyEvent.ofKey(KeyCode.F12, bindings);
+
+        assertThat(f12.actions()).isEmpty();
+        assertThat(f12.action()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("actionsFor prefers higher specificity for Shift+Arrow over permissive match")
+    void actionsForPrefersHigherSpecificityForShiftArrow() {
+        Bindings custom = BindingSets.standard().toBuilder()
+                .bind(KeyTrigger.key(KeyCode.UP, false, false, true), "selectUp")
+                .build();
+
+        KeyEvent shiftUp = KeyEvent.ofKey(KeyCode.UP, KeyModifiers.SHIFT, custom);
+        // selectUp (exact shift match) has higher specificity than moveUp (permissive shift match)
+        assertThat(shiftUp.actions()).containsExactly("selectUp", Actions.MOVE_UP);
+        assertThat(shiftUp.action()).contains("selectUp");
+
+        KeyEvent plainUp = KeyEvent.ofKey(KeyCode.UP, custom);
+        assertThat(plainUp.actions()).containsExactly(Actions.MOVE_UP);
+        assertThat(plainUp.action()).contains(Actions.MOVE_UP);
+    }
+
+    @Test
+    @DisplayName("actionsFor prefers custom later bindings over default bindings")
+    void actionsForPrefersCustomLaterBindings() {
+        Bindings custom = BindingSets.standard().toBuilder()
+                .bind(KeyTrigger.key(KeyCode.ENTER), "submit")
+                .build();
+
+        KeyEvent enter = KeyEvent.ofKey(KeyCode.ENTER, custom);
+        assertThat(enter.actions()).containsExactly("submit", Actions.CONFIRM, Actions.SELECT);
+        assertThat(enter.action()).contains("submit");
+    }
+
+    @Test
+    @DisplayName("actionsFor prefers rebound bindings")
+    void actionsForPrefersReboundBindings() {
+        Bindings custom = BindingSets.standard().toBuilder()
+                .rebind(KeyTrigger.key(KeyCode.ENTER), Actions.SELECT)
+                .build();
+
+        KeyEvent enter = KeyEvent.ofKey(KeyCode.ENTER, custom);
+        assertThat(enter.actions()).containsExactly(Actions.SELECT, Actions.CONFIRM);
+        assertThat(enter.action()).contains(Actions.SELECT);
+    }
+
+    @Test
+    @DisplayName("actionsFor returns mouse scroll actions in precedence order")
+    void actionsForReturnsMouseScrollActionsInPrecedenceOrder() {
+        Bindings bindings = BindingSets.standard();
+        MouseEvent scrollUp = new MouseEvent(
+                MouseEventKind.SCROLL_UP, MouseButton.NONE, 0, 0, KeyModifiers.NONE, bindings);
+
+        assertThat(scrollUp.actions()).containsExactly(Actions.SCROLL_UP, Actions.SCROLL);
+        assertThat(scrollUp.action()).contains(Actions.SCROLL_UP);
+    }
 }

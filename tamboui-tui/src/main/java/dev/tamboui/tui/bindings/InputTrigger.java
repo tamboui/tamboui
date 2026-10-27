@@ -37,4 +37,16 @@ public interface InputTrigger {
      * @return the trigger description
      */
     String describe();
+
+    /**
+     * Computes the specificity of this trigger for the given matching event.
+     * Higher values indicate a more specific match (e.g., exact modifier match
+     * vs permissive modifier match).
+     *
+     * @param event the event that this trigger matched
+     * @return the specificity score (higher = more specific)
+     */
+    default int specificity(Event event) {
+        return 0;
+    }
 }

@@ -142,17 +142,179 @@ class ActionHandlerTest {
     }
 
     @Test
-    void dispatchFiresOneActionWhenSeveralMatchingActionsHaveHandlers() {
-        // Shift+Tab matches "focusPrevious" and also "focusNext", whose Tab trigger does not check
-        // Shift. Firing both would move the focus forward and straight back.
+    void dispatchFiresConfirmOnEnterWhenBothConfirmAndSelectHaveHandlers() {
+        // Enter matches both "confirm" and "select". Regardless of handler registration order,
+        // the deterministic precedence policy must choose "confirm".
+        List<String> fired1 = new ArrayList<>();
+        ActionHandler handler1 = new ActionHandler(bindings)
+                .on(Actions.SELECT, e -> fired1.add(Actions.SELECT))
+                .on(Actions.CONFIRM, e -> fired1.add(Actions.CONFIRM));
+
+        boolean handled1 = handler1.dispatch(KeyEvent.ofKey(KeyCode.ENTER, bindings));
+        assertThat(handled1).isTrue();
+        assertThat(fired1).containsExactly(Actions.CONFIRM);
+
+        List<String> fired2 = new ArrayList<>();
+        ActionHandler handler2 = new ActionHandler(bindings)
+                .on(Actions.CONFIRM, e -> fired2.add(Actions.CONFIRM))
+                .on(Actions.SELECT, e -> fired2.add(Actions.SELECT));
+
+        boolean handled2 = handler2.dispatch(KeyEvent.ofKey(KeyCode.ENTER, bindings));
+        assertThat(handled2).isTrue();
+        assertThat(fired2).containsExactly(Actions.CONFIRM);
+    }
+
+    @Test
+    void dispatchFiresSelectOnEnterWhenOnlySelectHasHandler() {
         List<String> fired = new ArrayList<>();
-        handler.on(Actions.FOCUS_NEXT, e -> fired.add(Actions.FOCUS_NEXT));
-        handler.on(Actions.FOCUS_PREVIOUS, e -> fired.add(Actions.FOCUS_PREVIOUS));
+        handler.on(Actions.SELECT, e -> fired.add(Actions.SELECT));
 
-        boolean handled = handler.dispatch(KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.SHIFT, bindings));
-
+        boolean handled = handler.dispatch(KeyEvent.ofKey(KeyCode.ENTER, bindings));
         assertThat(handled).isTrue();
-        assertThat(fired).hasSize(1);
+        assertThat(fired).containsExactly(Actions.SELECT);
+    }
+
+    @Test
+    void dispatchFiresFocusPreviousOnShiftTabWhenBothFocusHandlersRegistered() {
+        // Shift+Tab matches "focusPrevious", and plain-Tab trigger must not match Shift+Tab.
+        // Regardless of handler registration order, "focusPrevious" must be fired.
+        List<String> fired1 = new ArrayList<>();
+        ActionHandler handler1 = new ActionHandler(bindings)
+                .on(Actions.FOCUS_NEXT, e -> fired1.add(Actions.FOCUS_NEXT))
+                .on(Actions.FOCUS_PREVIOUS, e -> fired1.add(Actions.FOCUS_PREVIOUS));
+
+        boolean handled1 = handler1.dispatch(KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.SHIFT, bindings));
+        assertThat(handled1).isTrue();
+        assertThat(fired1).containsExactly(Actions.FOCUS_PREVIOUS);
+
+        List<String> fired2 = new ArrayList<>();
+        ActionHandler handler2 = new ActionHandler(bindings)
+                .on(Actions.FOCUS_PREVIOUS, e -> fired2.add(Actions.FOCUS_PREVIOUS))
+                .on(Actions.FOCUS_NEXT, e -> fired2.add(Actions.FOCUS_NEXT));
+
+        boolean handled2 = handler2.dispatch(KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.SHIFT, bindings));
+        assertThat(handled2).isTrue();
+        assertThat(fired2).containsExactly(Actions.FOCUS_PREVIOUS);
+    }
+
+    @Test
+    void dispatchFiresFocusNextOnPlainTabWhenBothFocusHandlersRegistered() {
+        List<String> fired = new ArrayList<>();
+        handler.on(Actions.FOCUS_PREVIOUS, e -> fired.add(Actions.FOCUS_PREVIOUS))
+               .on(Actions.FOCUS_NEXT, e -> fired.add(Actions.FOCUS_NEXT));
+
+        boolean handled = handler.dispatch(KeyEvent.ofKey(KeyCode.TAB, bindings));
+        assertThat(handled).isTrue();
+        assertThat(fired).containsExactly(Actions.FOCUS_NEXT);
+    }
+
+    @Test
+    void dispatchFiresCustomActionOverStandardBindingsOnEnter() {
+        Bindings custom = bindings.toBuilder()
+                .bind(KeyTrigger.key(KeyCode.ENTER), "submit")
+                .build();
+        ActionHandler customHandler = new ActionHandler(custom);
+        List<String> fired = new ArrayList<>();
+        customHandler.on(Actions.CONFIRM, e -> fired.add(Actions.CONFIRM));
+        customHandler.on(Actions.SELECT, e -> fired.add(Actions.SELECT));
+        customHandler.on("submit", e -> fired.add("submit"));
+
+        boolean handled = customHandler.dispatch(KeyEvent.ofKey(KeyCode.ENTER, custom));
+        assertThat(handled).isTrue();
+        assertThat(fired).containsExactly("submit");
+    }
+
+    @Test
+    void dispatchFiresReboundActionOverEarlierActionOnEnter() {
+        Bindings custom = bindings.toBuilder()
+                .rebind(KeyTrigger.key(KeyCode.ENTER), Actions.SELECT)
+                .build();
+        ActionHandler customHandler = new ActionHandler(custom);
+        List<String> fired = new ArrayList<>();
+        customHandler.on(Actions.CONFIRM, e -> fired.add(Actions.CONFIRM));
+        customHandler.on(Actions.SELECT, e -> fired.add(Actions.SELECT));
+
+        boolean handled = customHandler.dispatch(KeyEvent.ofKey(KeyCode.ENTER, custom));
+        assertThat(handled).isTrue();
+        assertThat(fired).containsExactly(Actions.SELECT);
+    }
+
+    @Test
+    void dispatchTieBreaksCustomActionsByLatestBindingOrder() {
+        Bindings custom = DefaultBindings.builder()
+                .bind(KeyTrigger.key(KeyCode.ENTER), "firstAction")
+                .bind(KeyTrigger.key(KeyCode.ENTER), "secondAction")
+                .build();
+
+        // Registration order 1: firstAction then secondAction -> secondAction wins (later bound)
+        List<String> fired1 = new ArrayList<>();
+        ActionHandler handler1 = new ActionHandler(custom)
+                .on("firstAction", e -> fired1.add("firstAction"))
+                .on("secondAction", e -> fired1.add("secondAction"));
+        handler1.dispatch(KeyEvent.ofKey(KeyCode.ENTER, custom));
+        assertThat(fired1).containsExactly("secondAction");
+
+        // Registration order 2: secondAction then firstAction -> secondAction still wins
+        List<String> fired2 = new ArrayList<>();
+        ActionHandler handler2 = new ActionHandler(custom)
+                .on("secondAction", e -> fired2.add("secondAction"))
+                .on("firstAction", e -> fired2.add("firstAction"));
+        handler2.dispatch(KeyEvent.ofKey(KeyCode.ENTER, custom));
+        assertThat(fired2).containsExactly("secondAction");
+    }
+
+    @Test
+    void dispatchPermissiveShiftMatchingWhenUnbound() {
+        // Standard bindings only bind moveUp = Up. Shift+Up should match moveUp permissively.
+        List<String> fired = new ArrayList<>();
+        handler.on(Actions.MOVE_UP, e -> fired.add(Actions.MOVE_UP));
+
+        boolean handled = handler.dispatch(KeyEvent.ofKey(KeyCode.UP, KeyModifiers.SHIFT, bindings));
+        assertThat(handled).isTrue();
+        assertThat(fired).containsExactly(Actions.MOVE_UP);
+    }
+
+    @Test
+    void dispatchExactShiftMatchingBeatsPermissiveShiftMatching() {
+        Bindings custom = bindings.toBuilder()
+                .bind(KeyTrigger.key(KeyCode.UP, false, false, true), "selectUp")
+                .build();
+        ActionHandler customHandler = new ActionHandler(custom);
+        List<String> fired = new ArrayList<>();
+        customHandler.on(Actions.MOVE_UP, e -> fired.add(Actions.MOVE_UP));
+        customHandler.on("selectUp", e -> fired.add("selectUp"));
+
+        // Shift+Up should dispatch selectUp (exact modifier match beats permissive)
+        boolean handledShift = customHandler.dispatch(KeyEvent.ofKey(KeyCode.UP, KeyModifiers.SHIFT, custom));
+        assertThat(handledShift).isTrue();
+        assertThat(fired).containsExactly("selectUp");
+
+        // Plain Up should dispatch moveUp
+        fired.clear();
+        boolean handledPlain = customHandler.dispatch(KeyEvent.ofKey(KeyCode.UP, custom));
+        assertThat(handledPlain).isTrue();
+        assertThat(fired).containsExactly(Actions.MOVE_UP);
+    }
+
+    @Test
+    void dispatchFiresScrollUpOverScrollWhenBothHaveHandlers() {
+        List<String> fired = new ArrayList<>();
+        handler.on(Actions.SCROLL, e -> fired.add(Actions.SCROLL));
+        handler.on(Actions.SCROLL_UP, e -> fired.add(Actions.SCROLL_UP));
+
+        boolean handled = handler.dispatch(MouseEvent.scrollUp(0, 0));
+        assertThat(handled).isTrue();
+        assertThat(fired).containsExactly(Actions.SCROLL_UP);
+    }
+
+    @Test
+    void dispatchFiresScrollWhenOnlyScrollHasHandler() {
+        List<String> fired = new ArrayList<>();
+        handler.on(Actions.SCROLL, e -> fired.add(Actions.SCROLL));
+
+        boolean handled = handler.dispatch(MouseEvent.scrollUp(0, 0));
+        assertThat(handled).isTrue();
+        assertThat(fired).containsExactly(Actions.SCROLL);
     }
 
     @Test
