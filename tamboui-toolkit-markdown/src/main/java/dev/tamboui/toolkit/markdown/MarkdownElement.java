@@ -9,6 +9,7 @@ import java.util.Objects;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.markdown.MarkdownStyles;
 import dev.tamboui.markdown.MarkdownView;
+import dev.tamboui.markdown.MarkdownViewState;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
@@ -49,6 +50,7 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
     private SyntaxTheme syntaxTheme;
     private Overflow overflow;
     private int scroll;
+    private MarkdownViewState state;
 
     private MarkdownElement(String source) {
         this.source = Objects.requireNonNull(source, "source");
@@ -146,6 +148,26 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
     }
 
     /**
+     * Sets the state used to track and control the scroll offset and content dimensions.
+     *
+     * @param state the markdown view state
+     * @return this element for chaining
+     */
+    public MarkdownElement state(MarkdownViewState state) {
+        this.state = state;
+        return this;
+    }
+
+    /**
+     * Returns the markdown view state, if set.
+     *
+     * @return the markdown view state, or null
+     */
+    public MarkdownViewState state() {
+        return state;
+    }
+
+    /**
      * Returns the current markdown source.
      *
      * @return the markdown source
@@ -173,7 +195,12 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
         StylePropertyResolver resolver = context.resolveStyle(this)
             .map(r -> (StylePropertyResolver) r)
             .orElse(StylePropertyResolver.empty());
-        frame.renderWidget(buildView(effectiveStyle, resolver, context), area);
+        MarkdownView view = buildView(effectiveStyle, resolver, context);
+        if (state != null) {
+            frame.renderStatefulWidget(view, area, state);
+        } else {
+            frame.renderWidget(view, area);
+        }
     }
 
     private MarkdownView buildView(Style effectiveStyle, StylePropertyResolver resolver, RenderContext context) {
@@ -185,6 +212,9 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
             .syntaxHighlighter(syntaxHighlighter)
             .syntaxTheme(effectiveSyntaxTheme)
             .scroll(scroll);
+        if (state != null) {
+            b.state(state);
+        }
         if (styles != null) {
             b.styles(styles);
         }

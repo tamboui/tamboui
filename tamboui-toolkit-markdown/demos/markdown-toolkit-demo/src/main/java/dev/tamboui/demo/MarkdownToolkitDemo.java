@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.markdown.MarkdownViewState;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
@@ -74,8 +75,8 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
 
     private final String source;
     private final StyleEngine styleEngine = StyleEngine.create();
+    private final MarkdownViewState state = new MarkdownViewState();
     private int themeIndex;
-    private int scroll;
 
     private MarkdownToolkitDemo(String source) {
         this.source = source;
@@ -122,7 +123,7 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
                 text(" [q] quit ").dim()
             )).rounded().length(3),
             panel(
-                MarkdownElement.markdown(source).scroll(scroll).fill()
+                MarkdownElement.markdown(source).state(state).fill()
             ).rounded().fill()
         );
     }
@@ -133,11 +134,11 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
         }
         KeyEvent key = (KeyEvent) event;
         if (key.isDown()) {
-            scroll++;
+            state.scrollDown();
             return EventResult.HANDLED;
         }
         if (key.isUp()) {
-            scroll = Math.max(0, scroll - 1);
+            state.scrollUp();
             return EventResult.HANDLED;
         }
         if (key.isCharIgnoreCase('t')) {

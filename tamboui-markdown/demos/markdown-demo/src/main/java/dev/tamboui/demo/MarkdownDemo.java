@@ -20,6 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import dev.tamboui.markdown.MarkdownView;
+import dev.tamboui.markdown.MarkdownViewState;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
@@ -40,8 +41,7 @@ public final class MarkdownDemo {
     private static final String BUNDLED_RESOURCE = "/sample.md";
 
     private final String fullSource;
-    private int scroll;
-    private int maxScroll;
+    private final MarkdownViewState state = new MarkdownViewState();
     private int streamLength;
     private boolean streaming;
     private boolean running = true;
@@ -104,6 +104,9 @@ public final class MarkdownDemo {
                 int c = backend.read(50);
                 if (c >= 0) {
                     handleInput(c);
+                    while ((c = backend.read(0)) >= 0) {
+                        handleInput(c);
+                    }
                 }
                 if (streaming && streamLength < fullSource.length()) {
                     long now = System.nanoTime();
@@ -134,12 +137,8 @@ public final class MarkdownDemo {
         MarkdownView view = MarkdownView.builder()
             .source(visibleSourceText)
             .block(frameBlock)
-            .scroll(scroll)
             .build();
-        // Max scroll = total rows minus viewport height; block chrome is included
-        // in both computeHeight and the frame area, so it cancels out.
-        maxScroll = Math.max(0, view.computeHeight(frame.area().width()) - frame.area().height());
-        frame.renderWidget(view, frame.area());
+        frame.renderStatefulWidget(view, frame.area(), state);
     }
 
     private void handleInput(int c) {
@@ -151,17 +150,18 @@ public final class MarkdownDemo {
                 break;
             case 'j':
             case 'J':
-                scroll = Math.min(scroll + 1, maxScroll);
+                state.scrollDown();
                 break;
             case 'k':
             case 'K':
-                scroll = Math.max(0, scroll - 1);
+                state.scrollUp();
                 break;
             case 's':
             case 'S':
                 streaming = !streaming;
                 if (streaming) {
                     streamLength = 0;
+                    state.scrollToBottom();
                 } else {
                     streamLength = fullSource.length();
                 }
