@@ -7,7 +7,9 @@ package dev.tamboui.inline;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
@@ -19,6 +21,7 @@ import dev.tamboui.terminal.AnsiStringBuilder;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.text.CharWidth;
+import dev.tamboui.text.Line;
 import dev.tamboui.text.Text;
 
 /**
@@ -52,6 +55,8 @@ import dev.tamboui.text.Text;
  * @see Buffer#toAnsiString()
  */
 public final class InlineDisplay implements AutoCloseable {
+
+    private static final Pattern LINE_BREAK = Pattern.compile("\r?\n");
 
     private final int height;  // Maximum height
     private final boolean autoWidth;
@@ -277,7 +282,8 @@ public final class InlineDisplay implements AutoCloseable {
     /**
      * Prints a line of text above the display area.
      * The text scrolls up as new lines are added, while the display area
-     * stays in place at the bottom.
+     * stays in place at the bottom. The message may contain line breaks,
+     * and lines wider than the terminal wrap.
      *
      * @param message the message to print
      */
@@ -285,56 +291,69 @@ public final class InlineDisplay implements AutoCloseable {
         ensureInitialized();
         syncWidth();
 
-        if (currentHeight == 0) {
-            // No display allocated yet, just print normally
-            out.println(message);
-            return;
-        }
-
         try {
-            // Move cursor to display line 0
-            backend.carriageReturn();
-            if (lastCursorY > 0) {
-                backend.moveCursorUp(lastCursorY);
+            if (currentHeight > 0) {
+                // Move cursor to display line 0
+                backend.carriageReturn();
+                if (lastCursorY > 0) {
+                    backend.moveCursorUp(lastCursorY);
+                }
+
+                // Remove the display lines and print the message in their place: the terminal
+                // wraps and scrolls it like any other output, however many lines it takes,
+                // and the display is redrawn below it.
+                backend.deleteLines(currentHeight);
+                lastCursorY = 0;
             }
-
-            // Insert a blank line at display line 0 (pushes display content down by 1)
-            backend.insertLines(1);
-
-            // Print the message on the inserted line
-            out.print(message);
-            backend.eraseToEndOfLine();
-
-            // Move to the next line (new display line 0 after the shift)
-            out.print("\n");
-            backend.carriageReturn();
-
-            lastCursorY = 0;
-            out.flush();
+            printLines(message);
         } catch (IOException e) {
             // PrintWriter swallows exceptions, match that behavior
         }
 
         // Redraw the display area from its new position
         redrawDisplayArea(-1, -1);
+        out.flush();
     }
 
     /**
      * Prints styled text above the display area.
+     * Each line of the text is printed on its own line.
      *
      * @param text the styled text to print
      */
     public void println(Text text) {
-        // Render text to a temporary buffer for ANSI conversion
         if (text.lines().isEmpty()) {
             println("");
             return;
         }
 
+        // Render each line to a temporary buffer for ANSI conversion. A line ends with a
+        // style reset, so its background does not spill into the next line when the
+        // terminal scrolls.
         syncWidth();
-        Buffer tempBuffer = Buffer.empty(Rect.of(width, 1));
-        tempBuffer.setLine(0, 0, text.lines().get(0));
-        println(tempBuffer.toAnsiStringTrimmed());
+        List<Line> lines = text.lines();
+        StringBuilder message = new StringBuilder();
+        for (int i = 0; i < lines.size(); i++) {
+            if (i > 0) {
+                message.append('\n');
+            }
+            Buffer lineBuffer = Buffer.empty(Rect.of(width, 1));
+            lineBuffer.setLine(0, 0, lines.get(i));
+            message.append(lineBuffer.toAnsiStringTrimmed());
+        }
+        println(message.toString());
+    }
+
+    /**
+     * Prints each line of the message followed by a line break. Every line starts at
+     * column 0, also on a terminal whose line feed keeps the column (raw output).
+     */
+    private void printLines(String message) throws IOException {
+        for (String line : LINE_BREAK.split(String.valueOf(message), -1)) {
+            out.print(line);
+            out.print("\n");
+            backend.carriageReturn();
+        }
     }
 
     /**
@@ -535,8 +554,11 @@ public final class InlineDisplay implements AutoCloseable {
 
     private void clearDisplayArea() {
         try {
-            // Move to start of display area
+            // Move to start of display area (line 0), from the line the cursor was left on
             backend.carriageReturn();
+            if (lastCursorY > 0) {
+                backend.moveCursorUp(lastCursorY);
+            }
 
             // Clear each line
             for (int y = 0; y < currentHeight; y++) {
@@ -551,6 +573,7 @@ public final class InlineDisplay implements AutoCloseable {
             if (currentHeight > 1) {
                 backend.moveCursorUp(currentHeight - 1);
             }
+            lastCursorY = 0;
             out.flush();
         } catch (IOException e) {
             // PrintWriter swallows exceptions, match that behavior
