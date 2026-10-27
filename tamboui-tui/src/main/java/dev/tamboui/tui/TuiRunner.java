@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -80,9 +79,7 @@ public final class TuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final AtomicBoolean windowTitleSet = new AtomicBoolean(false);
-    private final ScheduledExecutorService scheduler;
-    private final boolean schedulerOwned;
-    private final ScheduledFuture<?> schedulerTask;
+    private final RunnerScheduler runnerScheduler;
     private final AtomicLong frameCount;
     private final Thread shutdownHook;
     private final RenderErrorHandler errorHandler;
@@ -137,19 +134,8 @@ public final class TuiRunner implements AutoCloseable {
         });
 
         // Set up scheduler - use provided scheduler or create one
-        Schedulers.Scheduler schedulerResult = Schedulers.resolve(config.scheduler());
-        this.scheduler = schedulerResult.scheduler();
-        this.schedulerOwned = schedulerResult.owned();
-
-        // Only schedule the internal callback if tick/resize needed
-        Duration schedulerPeriod = computeSchedulerPeriod(config);
-        if (schedulerPeriod != null) {
-            long periodMs = schedulerPeriod.toMillis();
-            this.schedulerTask = scheduler.scheduleAtFixedRate(
-                this::schedulerCallback, periodMs, periodMs, TimeUnit.MILLISECONDS);
-        } else {
-            this.schedulerTask = null;
-        }
+        this.runnerScheduler = new RunnerScheduler(config.scheduler());
+        this.runnerScheduler.start(computeSchedulerPeriod(config), this::schedulerCallback);
 
         // Create and start the input reader thread
         this.inputReader = new TerminalInputReader(backend, eventQueue, config.bindings(), running, config.pollTimeout());
@@ -666,7 +652,7 @@ public final class TuiRunner implements AutoCloseable {
      * @return the scheduler (never null)
      */
     public ScheduledExecutorService scheduler() {
-        return scheduler;
+        return runnerScheduler.service();
     }
 
     /**
@@ -752,21 +738,8 @@ public final class TuiRunner implements AutoCloseable {
             }
         }
 
-        // A scheduler passed in the config is not shut down below, and would otherwise keep
-        // running the callback, and holding on to this runner, after close
-        if (schedulerTask != null) {
-            schedulerTask.cancel(false);
-        }
-
-        // Shutdown scheduler only if we own it
-        if (schedulerOwned) {
-            scheduler.shutdownNow();
-            try {
-                scheduler.awaitTermination(100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        // Close scheduler (cancels periodic task, and shuts down scheduler if runner-owned)
+        runnerScheduler.close();
 
         // Perform cleanup
         cleanup();
