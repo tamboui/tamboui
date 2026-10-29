@@ -7,33 +7,41 @@ package dev.tamboui.terminal;
 /**
  * Keyboard enhancement protocol mode for terminal input.
  * <p>
- * Controls whether and how the Kitty keyboard protocol (progressive keyboard enhancements)
- * is negotiated with the terminal.
+ * Controls which Kitty keyboard protocol flags (progressive keyboard enhancements) are pushed to
+ * the terminal on startup. TamboUI does not negotiate with the terminal: it pushes the flags
+ * unconditionally and pops them on shutdown. Terminals that do not implement the protocol ignore
+ * both sequences; terminals that do implement it preserve any flags set by a parent process (shell
+ * integration, wrapping TUI, tmux) via the protocol's wire-level stack.
  *
  * @see KittyKeyboardSupport
+ * @see Backend#enableKeyboardProtocol(KeyboardProtocol)
  */
 public enum KeyboardProtocol {
 
     /**
      * Never enable Kitty keyboard enhancements.
      * <p>
-     * Conventional legacy terminal input encoding is used.
+     * Conventional legacy terminal input encoding is used; nothing is pushed to the terminal.
      */
     LEGACY(0),
 
     /**
-     * Default mode. Enables safe enhancements supported by the terminal.
+     * Default mode: enables the safe subset of enhancements that preserves ordinary text input.
      * <p>
-     * Enables disambiguation of escape codes and reporting of alternate key layouts
-     * without altering ordinary text input delivery.
+     * Pushes {@link KittyKeyboardSupport#DISAMBIGUATE_ESCAPE_CODES} and
+     * {@link KittyKeyboardSupport#REPORT_ALTERNATE_KEYS}. Disambiguates Escape, Tab vs Ctrl+I,
+     * Enter vs Ctrl+M, and reports shifted and base-layout keys without altering ordinary
+     * character delivery.
      */
     AUTO(KittyKeyboardSupport.AUTO_FLAGS),
 
     /**
      * Full protocol mode.
      * <p>
-     * Requests all enhancements: event types (press, repeat, release),
-     * all keys reported as escape codes, and associated text.
+     * Pushes every flag the protocol defines: disambiguation, event types (press, repeat,
+     * release), alternate keys, all keys reported as escape codes, and associated text. Enables
+     * the richest input stream the terminal can provide; apps opting in should be prepared for
+     * release events on every key.
      */
     FULL(KittyKeyboardSupport.FULL_FLAGS);
 

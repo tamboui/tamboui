@@ -8,17 +8,25 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Utility class for Kitty keyboard protocol support (progressive keyboard enhancements).
+ * Constants, escape-sequence builders and optional terminal-side detection for the Kitty keyboard
+ * protocol (progressive keyboard enhancements).
  * <p>
- * The Kitty keyboard protocol allows applications to progressively opt into richer, unambiguous
- * keyboard input reporting while safely managing terminal modes via push and pop stack controls.
+ * TamboUI pushes keyboard enhancement flags unconditionally on startup via
+ * {@link Backend#enableKeyboardProtocol(KeyboardProtocol)} and pops them on shutdown via
+ * {@link Backend#disableKeyboardProtocol()}. Terminals that do not implement the protocol ignore
+ * both sequences; terminals that do implement it preserve any flags set by a parent process
+ * (shell integration, wrapping TUI, tmux) via the protocol's wire-level stack.
+ * <p>
+ * Apps that need to detect whether the current terminal actually supports the protocol (for UI
+ * adaptation, feature gating, or diagnostics) can call {@link #query(Backend, int)}. This is
+ * opt-in and never invoked by the runner; the runner's default behaviour is push-unconditionally.
  *
- * <p><b>Escape sequences:</b></p>
+ * <p><b>Escape sequences used:</b></p>
  * <ul>
+ *   <li>Push flags: {@code CSI > <flags> u}</li>
+ *   <li>Pop flags: {@code CSI < u}</li>
  *   <li>Query flags: {@code CSI ? u}</li>
  *   <li>Query response: {@code CSI ? <flags> u}</li>
- *   <li>Push flags: {@code CSI > <flags> u}</li>
- *   <li>Pop flags: {@code CSI < [count] u}</li>
  * </ul>
  *
  * @see <a href="https://sw.kovidgoyal.net/kitty/keyboard-protocol/">Kitty Keyboard Protocol</a>
@@ -60,7 +68,7 @@ public final class KittyKeyboardSupport {
     private static final String QUERY = CSI + "?u";
     private static final String POP_ONE = CSI + "<u";
 
-    // Response parsing states
+    // Response parsing states for query()
     private static final int STATE_INITIAL = 0;
     private static final int STATE_ESC = 1;
     private static final int STATE_CSI = 2;
@@ -68,69 +76,6 @@ public final class KittyKeyboardSupport {
     private static final int STATE_FLAGS = 4;
 
     private KittyKeyboardSupport() {
-    }
-
-    /**
-     * Queries the terminal for Kitty keyboard protocol support.
-     * <p>
-     * Sends the {@code CSI ? u} query sequence and parses the {@code CSI ? <flags> u} response.
-     * If the terminal does not respond within the timeout, -1 is returned.
-     *
-     * @param backend   the terminal backend
-     * @param timeoutMs timeout in milliseconds to wait for response
-     * @return the reported flags bitmask, or -1 if unsupported or timed out
-     * @throws IOException if an I/O error occurs
-     */
-    public static int query(Backend backend, int timeoutMs) throws IOException {
-        backend.writeRaw(QUERY);
-        backend.flush();
-        return parseResponse(backend, timeoutMs);
-    }
-
-    /**
-     * Pushes the specified keyboard enhancement flags onto the terminal's keyboard mode stack.
-     *
-     * @param backend the terminal backend
-     * @param flags   the flags to enable
-     * @throws IOException if an I/O error occurs
-     */
-    public static void push(Backend backend, int flags) throws IOException {
-        backend.writeRaw(pushSequence(flags));
-        backend.flush();
-    }
-
-    /**
-     * Pops one keyboard enhancement mode entry from the terminal's keyboard mode stack,
-     * restoring the previous mode.
-     *
-     * @param backend the terminal backend
-     * @throws IOException if an I/O error occurs
-     */
-    public static void pop(Backend backend) throws IOException {
-        backend.writeRaw(POP_ONE);
-        backend.flush();
-    }
-
-    /**
-     * Pops the specified number of keyboard enhancement mode entries from the terminal's
-     * keyboard mode stack.
-     *
-     * @param backend the terminal backend
-     * @param count   the number of entries to pop
-     * @throws IOException if an I/O error occurs
-     */
-    public static void pop(Backend backend, int count) throws IOException {
-        backend.writeRaw(popSequence(count));
-        backend.flush();
-    }
-
-    /**
-     * Returns the query escape sequence ({@code CSI ? u}).
-     *
-     * @return the query sequence
-     */
-    public static String querySequence() {
-        return QUERY;
     }
 
     /**
@@ -144,17 +89,7 @@ public final class KittyKeyboardSupport {
     }
 
     /**
-     * Alias for {@link #pushSequence(int)}.
-     *
-     * @param flags the enhancement flags
-     * @return the push escape sequence
-     */
-    public static String pushMode(int flags) {
-        return pushSequence(flags);
-    }
-
-    /**
-     * Returns the pop escape sequence for popping one entry ({@code CSI < u}).
+     * Returns the pop escape sequence ({@code CSI < u}).
      *
      * @return the pop escape sequence
      */
@@ -163,32 +98,39 @@ public final class KittyKeyboardSupport {
     }
 
     /**
-     * Alias for {@link #popSequence()}.
+     * Returns the query escape sequence ({@code CSI ? u}).
      *
-     * @return the pop escape sequence
+     * @return the query sequence
      */
-    public static String popMode() {
-        return popSequence();
+    public static String querySequence() {
+        return QUERY;
     }
 
     /**
-     * Returns the pop escape sequence for popping multiple entries ({@code CSI < <count> u}).
+     * Queries the terminal for Kitty keyboard protocol support.
+     * <p>
+     * Sends the {@code CSI ? u} query sequence and parses the {@code CSI ? <flags> u} response.
+     * Returns the reported flags bitmask on success, {@code 0} if the terminal responded with no
+     * flags enabled, or {@code -1} if the terminal did not respond within the timeout (treat as
+     * "protocol not supported" for feature detection).
+     * <p>
+     * This method is opt-in: TamboUI's runner never calls it. Apps that want to detect support
+     * for UI adaptation or diagnostics can call it directly, typically before invoking
+     * {@link Backend#enableKeyboardProtocol(KeyboardProtocol)}.
+     * <p>
+     * <b>Warning:</b> query consumes bytes from the backend's input stream. Do not call it
+     * concurrently with other code reading input (such as the TuiRunner's input reader).
+     * Call it before starting the runner, or on a backend that is not yet attached to one.
      *
-     * @param count number of entries to pop
-     * @return the pop escape sequence
+     * @param backend   the terminal backend
+     * @param timeoutMs timeout in milliseconds to wait for response
+     * @return the reported flags bitmask, or {@code -1} if unsupported or timed out
+     * @throws IOException if an I/O error occurs
      */
-    public static String popSequence(int count) {
-        return CSI + "<" + count + "u";
-    }
-
-    /**
-     * Alias for {@link #popSequence(int)}.
-     *
-     * @param count number of entries to pop
-     * @return the pop escape sequence
-     */
-    public static String popMode(int count) {
-        return popSequence(count);
+    public static int query(Backend backend, int timeoutMs) throws IOException {
+        backend.writeRaw(QUERY);
+        backend.flush();
+        return parseResponse(backend, timeoutMs);
     }
 
     private static int parseResponse(Backend backend, int timeoutMs) throws IOException {

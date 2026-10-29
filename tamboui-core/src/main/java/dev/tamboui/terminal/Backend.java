@@ -223,7 +223,7 @@ public interface Backend extends AutoCloseable {
      */
     default boolean enableKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
         if (protocol != null && protocol != KeyboardProtocol.LEGACY && protocol.flags() > 0) {
-            writeRaw(KittyKeyboardSupport.pushMode(protocol.flags()));
+            writeRaw(KittyKeyboardSupport.pushSequence(protocol.flags()));
             flush();
             return true;
         }
@@ -242,7 +242,7 @@ public interface Backend extends AutoCloseable {
      * @see KittyKeyboardSupport
      */
     default void disableKeyboardProtocol() throws IOException {
-        writeRaw(KittyKeyboardSupport.popMode());
+        writeRaw(KittyKeyboardSupport.popSequence());
         flush();
     }
 
