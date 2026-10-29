@@ -36,9 +36,10 @@ class KittyKeyboardLifecycleTest {
             }
 
             @Override
-            public void enableKeyboardProtocol(KeyboardProtocol protocol) throws java.io.IOException {
-                super.enableKeyboardProtocol(protocol);
+            public boolean enableKeyboardProtocol(KeyboardProtocol protocol) throws java.io.IOException {
+                boolean enabled = super.enableKeyboardProtocol(protocol);
                 order.add("enableKeyboardProtocol:" + protocol);
+                return enabled;
             }
 
             @Override

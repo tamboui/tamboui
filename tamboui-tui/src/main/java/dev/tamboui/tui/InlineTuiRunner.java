@@ -76,6 +76,7 @@ public final class InlineTuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final AtomicBoolean windowTitleSet = new AtomicBoolean(false);
+    private final boolean keyboardProtocolEnabled;
     private final ScheduledExecutorService scheduler;
     private final boolean schedulerOwned;
     private final ScheduledFuture<?> schedulerTask;
@@ -86,10 +87,12 @@ public final class InlineTuiRunner implements AutoCloseable {
     private final AtomicReference<Size> lastSize;
     private final TerminalInputReader inputReader;
 
-    private InlineTuiRunner(Backend backend, InlineViewport viewport, InlineTuiConfig config) {
+    private InlineTuiRunner(Backend backend, InlineViewport viewport, InlineTuiConfig config,
+                            boolean keyboardProtocolEnabled) {
         this.backend = backend;
         this.viewport = viewport;
         this.config = config;
+        this.keyboardProtocolEnabled = keyboardProtocolEnabled;
         this.eventQueue = new LinkedBlockingQueue<>();
         this.running = new AtomicBoolean(true);
         this.cleanedUp = new AtomicBoolean(false);
@@ -178,10 +181,7 @@ public final class InlineTuiRunner implements AutoCloseable {
         try {
             // Enable raw mode for key events
             backend.enableRawMode();
-            if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
-                backend.enableKeyboardProtocol(config.keyboardProtocol());
-                keyboardProtocolEnabled = true;
-            }
+            keyboardProtocolEnabled = backend.enableKeyboardProtocol(config.keyboardProtocol());
             if (config.bracketedPaste()) {
                 backend.enableBracketedPaste();
             }
@@ -193,7 +193,7 @@ public final class InlineTuiRunner implements AutoCloseable {
             }
 
             InlineViewport viewport = new InlineViewport(display);
-            return new InlineTuiRunner(backend, viewport, config);
+            return new InlineTuiRunner(backend, viewport, config, keyboardProtocolEnabled);
         } catch (IOException e) {
             closeQuietly(backend, keyboardProtocolEnabled);
             throw new RuntimeIOException("Failed to create inline runner: " + e.getMessage(), e);
@@ -555,7 +555,7 @@ public final class InlineTuiRunner implements AutoCloseable {
             }
         }
 
-        if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+        if (keyboardProtocolEnabled) {
             try {
                 backend.disableKeyboardProtocol();
             } catch (Exception ignored) {

@@ -209,18 +209,25 @@ public interface Backend extends AutoCloseable {
      * keyboard protocol's push operation on the wire so that any flags a parent process
      * had set are preserved and restored by the matching {@link #disableKeyboardProtocol()}.
      * <p>
-     * Calling this with {@link KeyboardProtocol#LEGACY} or a {@code null} protocol is a no-op.
+     * Calling this with {@link KeyboardProtocol#LEGACY} or a {@code null} protocol is a no-op
+     * and returns {@code false}; callers can use the return value to decide whether a matching
+     * {@link #disableKeyboardProtocol()} is required on cleanup.
      *
      * @param protocol the keyboard protocol mode
+     * @return {@code true} if the protocol was enabled and a matching
+     *         {@link #disableKeyboardProtocol()} should be issued on cleanup;
+     *         {@code false} if the call was a no-op
      * @throws IOException if writing to the terminal fails
      * @see KeyboardProtocol
      * @see KittyKeyboardSupport
      */
-    default void enableKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
+    default boolean enableKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
         if (protocol != null && protocol != KeyboardProtocol.LEGACY && protocol.flags() > 0) {
             writeRaw(KittyKeyboardSupport.pushMode(protocol.flags()));
             flush();
+            return true;
         }
+        return false;
     }
 
     /**

@@ -81,6 +81,7 @@ public final class TuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final AtomicBoolean windowTitleSet = new AtomicBoolean(false);
+    private final boolean keyboardProtocolEnabled;
     private final ScheduledExecutorService scheduler;
     private final boolean schedulerOwned;
     private final ScheduledFuture<?> schedulerTask;
@@ -100,10 +101,12 @@ public final class TuiRunner implements AutoCloseable {
     private volatile boolean inErrorState;
     private volatile int errorScroll;
 
-    private TuiRunner(Backend backend, Terminal<Backend> terminal, TuiConfig config) {
+    private TuiRunner(Backend backend, Terminal<Backend> terminal, TuiConfig config,
+                      boolean keyboardProtocolEnabled) {
         this.backend = backend;
         this.terminal = terminal;
         this.config = config;
+        this.keyboardProtocolEnabled = keyboardProtocolEnabled;
         this.eventQueue = new LinkedBlockingQueue<>();
         this.running = new AtomicBoolean(true);
         this.cleanedUp = new AtomicBoolean(false);
@@ -208,10 +211,7 @@ public final class TuiRunner implements AutoCloseable {
             if (config.alternateScreen()) {
                 backend.enterAlternateScreen();
             }
-            if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
-                backend.enableKeyboardProtocol(config.keyboardProtocol());
-                keyboardProtocolEnabled = true;
-            }
+            keyboardProtocolEnabled = backend.enableKeyboardProtocol(config.keyboardProtocol());
             if (config.hideCursor()) {
                 backend.hideCursor();
             }
@@ -223,7 +223,7 @@ public final class TuiRunner implements AutoCloseable {
             }
 
             Terminal<Backend> terminal = new Terminal<>(backend);
-            return new TuiRunner(backend, terminal, config);
+            return new TuiRunner(backend, terminal, config, keyboardProtocolEnabled);
         } catch (Exception e) {
             if (keyboardProtocolEnabled) {
                 try {
@@ -799,7 +799,7 @@ public final class TuiRunner implements AutoCloseable {
             if (windowTitleSet.get()) {
                 backend.restoreWindowTitle();
             }
-            if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+            if (keyboardProtocolEnabled) {
                 backend.disableKeyboardProtocol();
             }
             if (config.bracketedPaste()) {
