@@ -173,14 +173,14 @@ public final class InlineTuiRunner implements AutoCloseable {
      */
     public static InlineTuiRunner create(Backend backend, InlineTuiConfig config) {
         InlineDisplay display;
-        boolean keyboardProtocolPushed = false;
+        boolean keyboardProtocolEnabled = false;
 
         try {
             // Enable raw mode for key events
             backend.enableRawMode();
             if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
-                backend.pushKeyboardProtocol(config.keyboardProtocol());
-                keyboardProtocolPushed = true;
+                backend.enableKeyboardProtocol(config.keyboardProtocol());
+                keyboardProtocolEnabled = true;
             }
             if (config.bracketedPaste()) {
                 backend.enableBracketedPaste();
@@ -195,19 +195,19 @@ public final class InlineTuiRunner implements AutoCloseable {
             InlineViewport viewport = new InlineViewport(display);
             return new InlineTuiRunner(backend, viewport, config);
         } catch (IOException e) {
-            closeQuietly(backend, keyboardProtocolPushed);
+            closeQuietly(backend, keyboardProtocolEnabled);
             throw new RuntimeIOException("Failed to create inline runner: " + e.getMessage(), e);
         } catch (RuntimeException e) {
             // e.g. BackendException, already an unchecked TamboUIException
-            closeQuietly(backend, keyboardProtocolPushed);
+            closeQuietly(backend, keyboardProtocolEnabled);
             throw e;
         }
     }
 
-    private static void closeQuietly(Backend backend, boolean keyboardProtocolPushed) {
-        if (keyboardProtocolPushed) {
+    private static void closeQuietly(Backend backend, boolean keyboardProtocolEnabled) {
+        if (keyboardProtocolEnabled) {
             try {
-                backend.popKeyboardProtocol();
+                backend.disableKeyboardProtocol();
             } catch (Exception ignored) {
                 // best effort during cleanup
             }
@@ -557,7 +557,7 @@ public final class InlineTuiRunner implements AutoCloseable {
 
         if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
             try {
-                backend.popKeyboardProtocol();
+                backend.disableKeyboardProtocol();
             } catch (Exception ignored) {
             }
         }

@@ -348,10 +348,10 @@ public class TuiDemo {
         if (runner != null) {
             try {
                 if (currentProtocol != KeyboardProtocol.LEGACY) {
-                    runner.backend().popKeyboardProtocol();
+                    runner.backend().disableKeyboardProtocol();
                 }
                 if (next != KeyboardProtocol.LEGACY) {
-                    runner.backend().pushKeyboardProtocol(next);
+                    runner.backend().enableKeyboardProtocol(next);
                 }
             } catch (Exception ignored) {
                 // ignore backend toggle errors

@@ -202,17 +202,21 @@ public interface Backend extends AutoCloseable {
     }
 
     /**
-     * Pushes Kitty keyboard enhancement flags to the terminal's keyboard stack.
+     * Enables Kitty keyboard enhancement flags on the terminal.
      * <p>
      * When supported, enables progressive keyboard enhancements such as disambiguation
-     * of escape codes, alternate keys, event types, etc.
+     * of escape codes, alternate keys, event types, etc. Implementations use the Kitty
+     * keyboard protocol's push operation on the wire so that any flags a parent process
+     * had set are preserved and restored by the matching {@link #disableKeyboardProtocol()}.
+     * <p>
+     * Calling this with {@link KeyboardProtocol#LEGACY} or a {@code null} protocol is a no-op.
      *
      * @param protocol the keyboard protocol mode
      * @throws IOException if writing to the terminal fails
      * @see KeyboardProtocol
      * @see KittyKeyboardSupport
      */
-    default void pushKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
+    default void enableKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
         if (protocol != null && protocol != KeyboardProtocol.LEGACY && protocol.flags() > 0) {
             writeRaw(KittyKeyboardSupport.pushMode(protocol.flags()));
             flush();
@@ -220,13 +224,17 @@ public interface Backend extends AutoCloseable {
     }
 
     /**
-     * Pops keyboard enhancement flags from the terminal's keyboard stack.
+     * Disables Kitty keyboard enhancement flags on the terminal.
+     * <p>
+     * Implementations use the Kitty keyboard protocol's pop operation on the wire so that
+     * any flags a parent process had set before {@link #enableKeyboardProtocol(KeyboardProtocol)}
+     * are restored.
      *
      * @throws IOException if writing to the terminal fails
      * @see KeyboardProtocol
      * @see KittyKeyboardSupport
      */
-    default void popKeyboardProtocol() throws IOException {
+    default void disableKeyboardProtocol() throws IOException {
         writeRaw(KittyKeyboardSupport.popMode());
         flush();
     }

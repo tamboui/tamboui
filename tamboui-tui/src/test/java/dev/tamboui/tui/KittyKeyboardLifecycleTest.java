@@ -36,15 +36,15 @@ class KittyKeyboardLifecycleTest {
             }
 
             @Override
-            public void pushKeyboardProtocol(KeyboardProtocol protocol) throws java.io.IOException {
-                super.pushKeyboardProtocol(protocol);
-                order.add("pushKeyboardProtocol:" + protocol);
+            public void enableKeyboardProtocol(KeyboardProtocol protocol) throws java.io.IOException {
+                super.enableKeyboardProtocol(protocol);
+                order.add("enableKeyboardProtocol:" + protocol);
             }
 
             @Override
-            public void popKeyboardProtocol() throws java.io.IOException {
-                super.popKeyboardProtocol();
-                order.add("popKeyboardProtocol");
+            public void disableKeyboardProtocol() throws java.io.IOException {
+                super.disableKeyboardProtocol();
+                order.add("disableKeyboardProtocol");
             }
         };
         TuiConfig config = TuiConfig.builder()
@@ -56,15 +56,15 @@ class KittyKeyboardLifecycleTest {
         try (TuiRunner runner = TuiRunner.create(config)) {
             assertThat(runner).isNotNull();
             assertThat(backend.rawOutput()).contains("\033[>5u");
-            assertThat(order).containsExactly("enterAlternateScreen", "pushKeyboardProtocol:AUTO");
+            assertThat(order).containsExactly("enterAlternateScreen", "enableKeyboardProtocol:AUTO");
         }
 
         // After close: pop sequence must be sent, and must precede leaveAlternateScreen
         assertThat(backend.rawOutput()).contains("\033[<u");
         assertThat(order).containsExactly(
                 "enterAlternateScreen",
-                "pushKeyboardProtocol:AUTO",
-                "popKeyboardProtocol",
+                "enableKeyboardProtocol:AUTO",
+                "disableKeyboardProtocol",
                 "leaveAlternateScreen"
         );
     }

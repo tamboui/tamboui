@@ -200,7 +200,7 @@ public final class TuiRunner implements AutoCloseable {
                 ? BackendFactory.recordIfEnabled(config.backend())
                 : BackendFactory.create(config.backendClassLoader());
 
-        boolean keyboardProtocolPushed = false;
+        boolean keyboardProtocolEnabled = false;
         try {
             if (config.rawMode()) {
                 backend.enableRawMode();
@@ -209,8 +209,8 @@ public final class TuiRunner implements AutoCloseable {
                 backend.enterAlternateScreen();
             }
             if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
-                backend.pushKeyboardProtocol(config.keyboardProtocol());
-                keyboardProtocolPushed = true;
+                backend.enableKeyboardProtocol(config.keyboardProtocol());
+                keyboardProtocolEnabled = true;
             }
             if (config.hideCursor()) {
                 backend.hideCursor();
@@ -225,9 +225,9 @@ public final class TuiRunner implements AutoCloseable {
             Terminal<Backend> terminal = new Terminal<>(backend);
             return new TuiRunner(backend, terminal, config);
         } catch (Exception e) {
-            if (keyboardProtocolPushed) {
+            if (keyboardProtocolEnabled) {
                 try {
-                    backend.popKeyboardProtocol();
+                    backend.disableKeyboardProtocol();
                 } catch (Exception ignored) {
                 }
             }
@@ -800,7 +800,7 @@ public final class TuiRunner implements AutoCloseable {
                 backend.restoreWindowTitle();
             }
             if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
-                backend.popKeyboardProtocol();
+                backend.disableKeyboardProtocol();
             }
             if (config.bracketedPaste()) {
                 backend.disableBracketedPaste();
