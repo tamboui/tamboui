@@ -520,6 +520,21 @@ public final class KeyEvent implements Event {
     }
 
     /**
+     * Returns true if any modifier other than Shift is active (Ctrl, Alt, Super, Hyper or Meta).
+     * <p>
+     * Shift is intentionally excluded because it is part of normal typing of shifted characters.
+     * Useful to distinguish keyboard shortcuts from plain text input, for example when deciding
+     * whether to consult the layout-independent base-layout key or whether to insert the event's
+     * text into a text widget.
+     *
+     * @return true if any non-shift modifier is held
+     * @see KeyModifiers#hasNonShift()
+     */
+    public boolean hasNonShiftModifier() {
+        return modifiers.hasNonShift();
+    }
+
+    /**
      * Returns true if the key was on the numeric keypad.
      *
      * @return true if keypad key

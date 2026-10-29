@@ -152,6 +152,19 @@ public final class KeyModifiers {
     }
 
     /**
+     * Returns true if any modifier other than Shift is active (Ctrl, Alt, Super, Hyper or Meta).
+     * <p>
+     * Shift is intentionally excluded because it is part of normal typing of shifted characters
+     * (e.g. {@code Shift+a} producing {@code "A"}). Useful to distinguish keyboard shortcuts
+     * from plain text input.
+     *
+     * @return true if any non-shift modifier is active
+     */
+    public boolean hasNonShift() {
+        return ctrl || alt || superKey || hyper || meta;
+    }
+
+    /**
      * Returns true if no modifiers are pressed.
      *
      * @return true if no modifiers are active

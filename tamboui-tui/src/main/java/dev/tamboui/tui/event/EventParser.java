@@ -344,9 +344,7 @@ public final class EventParser {
             // Synthesize text only for plain typing. Any non-shift modifier (Ctrl, Alt, Super,
             // Hyper, Meta) means this is a shortcut; the terminal is the authority on associated
             // text for shortcuts, and if it did not provide any we must not fabricate it.
-            boolean isChord = pm.modifiers.ctrl() || pm.modifiers.alt()
-                    || pm.modifiers.superKey() || pm.modifiers.hyper() || pm.modifiers.meta();
-            if (code == KeyCode.CHAR && !isChord) {
+            if (code == KeyCode.CHAR && !pm.modifiers.hasNonShift()) {
                 if (shiftedKeyCode.isPresent() && pm.modifiers.shift()) {
                     text = new String(Character.toChars(shiftedKeyCode.getAsInt()));
                     character = shiftedKeyCode.getAsInt();

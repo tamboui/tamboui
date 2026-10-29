@@ -486,9 +486,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 }
                 // No associated text: this is a shortcut (any non-shift modifier) or an unmapped
                 // control character. Don't fabricate input.
-                if (event.modifiers().ctrl() || event.modifiers().alt()
-                        || event.modifiers().superKey() || event.modifiers().hyper()
-                        || event.modifiers().meta()) {
+                if (event.hasNonShiftModifier()) {
                     return false;
                 }
                 int c = event.codePoint();
