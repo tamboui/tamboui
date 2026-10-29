@@ -411,9 +411,12 @@ public final class BindingSets {
         boolean ctrl = false;
         boolean alt = false;
         boolean shift = false;
+        boolean superKey = false;
+        boolean hyper = false;
+        boolean meta = false;
         String key = text;
 
-        // Parse modifiers
+        // Parse modifiers. Ordered longest-first within overlapping prefixes to avoid ambiguity.
         while (true) {
             String lower = key.toLowerCase();
             if (lower.startsWith("ctrl+")) {
@@ -425,6 +428,15 @@ public final class BindingSets {
             } else if (lower.startsWith("shift+")) {
                 shift = true;
                 key = key.substring(6);
+            } else if (lower.startsWith("super+")) {
+                superKey = true;
+                key = key.substring(6);
+            } else if (lower.startsWith("hyper+")) {
+                hyper = true;
+                key = key.substring(6);
+            } else if (lower.startsWith("meta+")) {
+                meta = true;
+                key = key.substring(5);
             } else {
                 break;
             }
@@ -433,34 +445,46 @@ public final class BindingSets {
         // Check for special key name
         String lowerKey = key.toLowerCase();
         if ("space".equals(lowerKey)) {
-            if (ctrl) {
-                return KeyTrigger.ctrl(' ');
-            }
-            if (alt) {
-                return KeyTrigger.alt(' ');
-            }
-            return KeyTrigger.ch(' ');
+            KeyTrigger t = ctrl ? KeyTrigger.ctrl(' ') : alt ? KeyTrigger.alt(' ') : KeyTrigger.ch(' ');
+            return applyExtendedModifiers(t, superKey, hyper, meta);
         }
 
         KeyCode keyCode = KEY_NAMES.get(lowerKey);
         if (keyCode != null) {
-            return KeyTrigger.key(keyCode, ctrl, alt, shift);
+            KeyTrigger t = KeyTrigger.key(keyCode, ctrl, alt, shift);
+            return applyExtendedModifiers(t, superKey, hyper, meta);
         }
 
         // Single character
         if (key.length() == 1) {
             char c = key.charAt(0);
+            KeyTrigger t;
             if (ctrl) {
-                return KeyTrigger.ctrl(Character.toLowerCase(c));
+                t = KeyTrigger.ctrl(Character.toLowerCase(c));
+            } else if (alt) {
+                t = KeyTrigger.alt(Character.toLowerCase(c));
+            } else {
+                t = KeyTrigger.ch(c);
             }
-            if (alt) {
-                return KeyTrigger.alt(Character.toLowerCase(c));
-            }
-            // Case-sensitive character binding
-            return KeyTrigger.ch(c);
+            return applyExtendedModifiers(t, superKey, hyper, meta);
         }
 
         throw new TuiException("Unknown key: " + text);
+    }
+
+    private static KeyTrigger applyExtendedModifiers(KeyTrigger trigger,
+                                                     boolean superKey, boolean hyper, boolean meta) {
+        KeyTrigger t = trigger;
+        if (superKey) {
+            t = t.withSuper();
+        }
+        if (hyper) {
+            t = t.withHyper();
+        }
+        if (meta) {
+            t = t.withMeta();
+        }
+        return t;
     }
 
     private static MouseTrigger parseMouseTrigger(String text) throws IOException {

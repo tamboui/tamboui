@@ -893,8 +893,11 @@ class EventParserTest {
         // An unknown CSI sequence e.g. ESC[999;888z followed immediately by normal key 'a'
         QueueBackend backend = backendFor("\033[999;888za");
 
-        // The unknown CSI sequence should be consumed and ignored (return null), then 'a' is read
+        // The unknown CSI sequence is consumed atomically and reported as an UNKNOWN key event,
+        // then 'a' is read cleanly from the following byte.
         Event first = EventParser.readEvent(backend, 0);
+        assertThat(first).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) first).code()).isEqualTo(KeyCode.UNKNOWN);
         Event second = EventParser.readEvent(backend, 0);
 
         assertThat(second).isInstanceOf(KeyEvent.class);

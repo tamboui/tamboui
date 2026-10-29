@@ -669,15 +669,21 @@ public final class KeyEvent implements Event {
     }
 
     /**
-     * Returns the character for {@link KeyCode#CHAR} events as a {@link String}, or an empty
-     * string otherwise. Correctly handles the full Unicode range including supplementary
-     * characters (emoji, etc.).
+     * Returns the character this event represents as a {@link String}, or {@code ""} if it does
+     * not represent a typed character.
+     * <p>
+     * Returns the typed character for {@link KeyCode#CHAR} events as well as for keypad
+     * digit/operator events ({@link KeyCode#KP_0}..{@link KeyCode#KP_9}, {@link KeyCode#KP_ADD},
+     * etc.) when the parser has resolved them to a character. If the terminal provided associated
+     * text (IME commits, multi-code-point sequences like ZWJ emoji or flags), that text is
+     * returned verbatim. Correctly handles the full Unicode range including supplementary
+     * characters.
      *
      * <p>Use this for text insertion, display, and string concatenation.
      * Use {@link #codePoint()} for numeric range checks.
      *
-     * @return a {@code String} representing the Unicode character,
-     *         or {@code ""} for non-{@link KeyCode#CHAR} events
+     * @return a {@code String} representing the typed character or associated text,
+     *         or {@code ""} if this event does not represent a character
      */
     public String string() {
         if (text != null && !text.isEmpty()) {
