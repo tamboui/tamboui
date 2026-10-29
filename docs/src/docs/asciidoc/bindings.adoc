@@ -262,6 +262,10 @@ The `Actions` class defines common action names:
 |Application exit
 |===
 
+`TextEditing.handle` applies the navigation and text editing actions to a `TextInputState` or `TextAreaState`, as the toolkit's text inputs do.
+With the emacs bindings, Ctrl+B, Ctrl+F, Ctrl+A, Ctrl+E, Ctrl+H and Ctrl+D edit text.
+A typed character stays text even when the bindings bind it to an action, as vim binds `h` and `x`.
+
 == Next Steps
 
 * link:api-levels.html[API Levels] - choosing between immediate mode, TuiRunner, and Toolkit

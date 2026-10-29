@@ -13,6 +13,7 @@ import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.TextEditing;
 import dev.tamboui.widgets.Clear;
 import dev.tamboui.widgets.barchart.Bar;
 import dev.tamboui.widgets.barchart.BarChart;
@@ -550,18 +551,11 @@ public class WidgetsSnippets {
 
         textInput.render(area, buffer, state);
 
-        // Handle key events
-        if (event.code() == KeyCode.CHAR) {
-            state.insert(event.string());
-        } else if (event.code() == KeyCode.BACKSPACE) {
-            state.deleteBackward();
-        } else if (event.code() == KeyCode.DELETE) {
-            state.deleteForward();
-        } else if (event.code() == KeyCode.LEFT) {
-            state.moveCursorLeft();
-        } else if (event.code() == KeyCode.RIGHT) {
-            state.moveCursorRight();
-        }
+        // Handle key and paste events (returns true when it handled the event)
+        boolean handled = TextEditing.handle(state, event);
+
+        // Or accept only some characters
+        TextEditing.handle(state, event, Character::isDigit);
         // end::text-input[]
     }
 
@@ -588,18 +582,8 @@ public class WidgetsSnippets {
         // Render with cursor visible
         textArea.renderWithCursor(area, buffer, state, frame);
 
-        // Handle key events
-        if (event.code() == KeyCode.CHAR) {
-            state.insert(event.string());
-        } else if (event.code() == KeyCode.ENTER) {
-            state.insert('\n');
-        } else if (event.code() == KeyCode.BACKSPACE) {
-            state.deleteBackward();
-        } else if (event.code() == KeyCode.UP) {
-            state.moveCursorUp();
-        } else if (event.code() == KeyCode.DOWN) {
-            state.moveCursorDown();
-        }
+        // Handle key and paste events; pass the overflow the text area wraps with, if any
+        boolean handled = TextEditing.handle(state, event);
         // end::text-area[]
     }
 

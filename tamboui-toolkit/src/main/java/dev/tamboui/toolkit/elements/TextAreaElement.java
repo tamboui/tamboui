@@ -19,8 +19,10 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.PasteEvent;
+import dev.tamboui.tui.event.TextEditing;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -412,7 +414,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      */
     @Override
     public EventResult handlePasteEvent(PasteEvent event) {
-        state.insert(event.text());
+        TextEditing.handle(state, event);
         if (changeListener != null) {
             changeListener.onTextChange(state.text());
         }
@@ -428,7 +430,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         }
         // Wrap against the width the widget last rendered with, so Up/Down move by the same
         // visual rows the user is looking at.
-        boolean handled = handleTextAreaKey(state, event, state.lastRenderedWidth(),
+        boolean handled = handleTextAreaKey(state, event,
                 renderedOverflow != null ? renderedOverflow : overflow);
         if (handled && changeListener != null) {
             changeListener.onTextChange(state.text());
@@ -439,52 +441,12 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     /**
      * Handles common key events for text area input.
      */
-    private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, int visibleWidth, Overflow overflow) {
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case UP:
-                state.moveCursorUp(visibleWidth, overflow);
-                return true;
-            case DOWN:
-                state.moveCursorDown(visibleWidth, overflow);
-                return true;
-            case HOME:
-                state.moveCursorToLineStart();
-                return true;
-            case END:
-                state.moveCursorToLineEnd();
-                return true;
-            case ENTER:
-                state.insert('\n');
-                return true;
-            case TAB:
-                state.insert("    "); // 4 spaces for tab
-                return true;
-            case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
-                    return false;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                return false;
+    private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, Overflow overflow) {
+        if (event.isKey(KeyCode.TAB)) {
+            state.insert("    "); // 4 spaces for tab
+            return true;
         }
+        return TextEditing.handle(state, event, overflow);
     }
 
     /**
