@@ -334,6 +334,7 @@ public final class KeyTrigger implements InputTrigger {
     }
 
     private static boolean matchesCharacter(KeyEvent event, int target, boolean ignoreCase) {
+        boolean isChord = hasNonShiftModifier(event);
         if (ignoreCase) {
             int t = Character.toLowerCase(target);
             if (Character.toLowerCase(event.codePoint()) == t) {
@@ -346,7 +347,7 @@ public final class KeyTrigger implements InputTrigger {
                     && Character.toLowerCase(event.shiftedKeyCodePoint().getAsInt()) == t) {
                 return true;
             }
-            if (event.baseLayoutKeyCodePoint().isPresent()
+            if (isChord && event.baseLayoutKeyCodePoint().isPresent()
                     && Character.toLowerCase(event.baseLayoutKeyCodePoint().getAsInt()) == t) {
                 return true;
             }
@@ -369,13 +370,27 @@ public final class KeyTrigger implements InputTrigger {
         if (event.shiftedKeyCodePoint().isPresent() && event.shiftedKeyCodePoint().getAsInt() == target) {
             return true;
         }
-        if (event.baseLayoutKeyCodePoint().isPresent() && event.baseLayoutKeyCodePoint().getAsInt() == target) {
+        if (isChord && event.baseLayoutKeyCodePoint().isPresent()
+                && event.baseLayoutKeyCodePoint().getAsInt() == target) {
             return true;
         }
         if (event.keyCodePoint() == target && (!event.hasShift() || Character.isUpperCase(target))) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns true if the event carries any modifier other than Shift (Ctrl, Alt, Super, Hyper, Meta).
+     * <p>
+     * Used to gate consultation of the base-layout key code point: the base-layout key reports
+     * the position of the key on a QWERTY/AZERTY/… layout regardless of the active input layout,
+     * which is the right thing for chord shortcuts (Ctrl+Z works on any layout) but the wrong thing
+     * for plain typing (typing "й" on a Russian layout must not fire a {@code ch('q')} binding).
+     * Shift is intentionally excluded because it is part of normal typing of shifted characters.
+     */
+    private static boolean hasNonShiftModifier(KeyEvent event) {
+        return event.hasCtrl() || event.hasAlt() || event.hasSuper() || event.hasHyper() || event.hasMeta();
     }
 
     @Override

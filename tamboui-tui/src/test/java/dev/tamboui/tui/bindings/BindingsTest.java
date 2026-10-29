@@ -539,19 +539,37 @@ class BindingsTest {
     }
 
     @Test
-    @DisplayName("KeyTrigger matches base layout key code point")
-    void keyTriggerMatchesBaseLayoutKey() {
-        KeyTrigger trigger = KeyTrigger.ch('c');
+    @DisplayName("KeyTrigger matches base layout key code point for chords (Ctrl+с on Russian layout -> Ctrl+c)")
+    void keyTriggerMatchesBaseLayoutKeyForChord() {
+        KeyTrigger trigger = KeyTrigger.ctrl('c');
 
-        // Cyrillic 'с' (code point 1089) with base layout 'c' (code point 99)
-        KeyEvent cyrillicS = KeyEvent.builder()
+        // Ctrl + Cyrillic 'с' (code point 1089) with base layout 'c' (code point 99)
+        KeyEvent ctrlCyrillicS = KeyEvent.builder()
                 .code(KeyCode.CHAR)
                 .character('с')
+                .modifiers(KeyModifiers.CTRL)
                 .keyCodePoint(1089)
                 .baseLayoutKeyCodePoint(99)
                 .build();
 
-        assertThat(trigger.matches(cyrillicS)).isTrue();
+        assertThat(trigger.matches(ctrlCyrillicS)).isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger does not match base layout key for plain typing (typing 'й' on Russian layout is not ch('q'))")
+    void keyTriggerDoesNotMatchBaseLayoutKeyForPlainTyping() {
+        KeyTrigger trigger = KeyTrigger.ch('q');
+
+        // Plain Cyrillic 'й' (code point 1081) with base layout 'q' (code point 113) and no modifier
+        KeyEvent cyrillicI = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('й')
+                .keyCodePoint(1081)
+                .baseLayoutKeyCodePoint(113)
+                .build();
+
+        assertThat(trigger.matches(cyrillicI)).isFalse();
+        assertThat(cyrillicI.isQuit()).isFalse();
     }
 
     @Test
