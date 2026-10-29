@@ -115,6 +115,22 @@ class TextInputElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("TextInputElement does not fire onSubmit twice on an Enter press/release pair")
+    void onSubmitNotFiredOnEnterRelease() {
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        int[] submitCount = {0};
+        TextInputElement element = textInput(state).onSubmit(() -> submitCount[0]++);
+        dev.tamboui.tui.event.KeyEvent enterRelease = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.ENTER)
+                .kind(dev.tamboui.tui.event.KeyEventKind.RELEASE)
+                .build();
+
+        element.handleKeyEvent(enterRelease, true);
+
+        assertThat(submitCount[0]).as("onSubmit must not fire on RELEASE").isZero();
+    }
+
+    @Test
     @DisplayName("TextInputElement ignores character when Super or Meta is pressed")
     void ignoresSuperOrMetaKey() {
         dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();

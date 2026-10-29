@@ -350,11 +350,18 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a character event matching the given code point.
+     * <p>
+     * Release events never match. This is consistent with {@link #isUp()}, {@link #isConfirm()}
+     * and the other binding-backed predicates. To detect release of a specific character, use
+     * {@code event.isRelease() && event.codePoint() == codePoint}.
      *
      * @param codePoint code point to compare
      * @return true if matches
      */
     public boolean isChar(int codePoint) {
+        if (isRelease()) {
+            return false;
+        }
         if (code == KeyCode.CHAR && (character == codePoint || keyCodePoint == codePoint)) {
             if (Character.isLowerCase(codePoint) && hasShift() && !text.isEmpty() && Character.isUpperCase(text.codePointAt(0))) {
                 return false;
@@ -384,11 +391,16 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a character event matching the given code point (case-insensitive).
+     * <p>
+     * Release events never match. See {@link #isChar(int)} for details.
      *
      * @param codePoint code point to compare (case-insensitive)
      * @return true if matches ignoring case
      */
     public boolean isCharIgnoreCase(int codePoint) {
+        if (isRelease()) {
+            return false;
+        }
         int target = Character.toLowerCase(codePoint);
         if (code == KeyCode.CHAR && (Character.toLowerCase(character) == target || Character.toLowerCase(keyCodePoint) == target)) {
             return true;

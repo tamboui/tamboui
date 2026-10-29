@@ -98,6 +98,25 @@ class KeyEventTest {
     }
 
     @Test
+    @DisplayName("isChar and isCharIgnoreCase ignore RELEASE events")
+    void isCharIgnoresRelease() {
+        KeyEvent release = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('q')
+                .kind(KeyEventKind.RELEASE)
+                .build();
+        assertThat(release.isChar('q')).as("isChar on release").isFalse();
+        assertThat(release.isCharIgnoreCase('Q')).as("isCharIgnoreCase on release").isFalse();
+
+        KeyEvent press = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('q')
+                .kind(KeyEventKind.PRESS)
+                .build();
+        assertThat(press.isChar('q')).as("isChar on press").isTrue();
+    }
+
+    @Test
     @DisplayName("isCtrlC returns true for Ctrl+C")
     void isCtrlCReturnsTrue() {
         KeyEvent event = KeyEvent.ofChar('c', KeyModifiers.CTRL);

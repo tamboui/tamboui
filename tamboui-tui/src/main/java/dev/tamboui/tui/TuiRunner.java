@@ -376,28 +376,33 @@ public final class TuiRunner implements AutoCloseable {
         if (event instanceof KeyEvent) {
             KeyEvent keyEvent = (KeyEvent) event;
 
+            // All predicates below (isQuit/isCancel/isUp/isDown/isPageUp/isPageDown/isHome)
+            // go through bindings and ignore release events, and isChar() now ignores release
+            // too, so no explicit kind check is needed.
+
             // Quit on 'q' or Escape
-            if (keyEvent.isQuit() || keyEvent.code() == KeyCode.ESCAPE) {
+            if (keyEvent.isQuit() || keyEvent.isCancel()) {
                 quit();
                 return;
             }
 
-            // Scroll handling
-            if (keyEvent.code() == KeyCode.UP || keyEvent.isChar('k')) {
+            // Scroll handling. Keep explicit 'k'/'j' alongside isUp()/isDown() because the
+            // default BindingSets do not include vim keys.
+            if (keyEvent.isUp() || keyEvent.isChar('k')) {
                 if (errorScroll > 0) {
                     errorScroll--;
                     renderErrorDisplay();
                 }
-            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.isChar('j')) {
+            } else if (keyEvent.isDown() || keyEvent.isChar('j')) {
                 errorScroll++;
                 renderErrorDisplay();
-            } else if (keyEvent.code() == KeyCode.PAGE_UP) {
+            } else if (keyEvent.isPageUp()) {
                 errorScroll = Math.max(0, errorScroll - 10);
                 renderErrorDisplay();
-            } else if (keyEvent.code() == KeyCode.PAGE_DOWN) {
+            } else if (keyEvent.isPageDown()) {
                 errorScroll += 10;
                 renderErrorDisplay();
-            } else if (keyEvent.code() == KeyCode.HOME) {
+            } else if (keyEvent.isHome()) {
                 errorScroll = 0;
                 renderErrorDisplay();
             }

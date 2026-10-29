@@ -24,7 +24,6 @@ import dev.tamboui.layout.Size;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.text.Text;
 import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.ResizeEvent;

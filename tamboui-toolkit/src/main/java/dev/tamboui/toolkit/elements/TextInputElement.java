@@ -319,7 +319,8 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         if (!focused) {
             return EventResult.UNHANDLED;
         }
-        // Handle Enter key - call onSubmit callback if set
+        // Handle Enter key - call onSubmit callback if set.
+        // isConfirm() ignores release events, so onSubmit does not fire twice under FULL.
         if (event.isConfirm() && onSubmit != null) {
             onSubmit.run();
             return EventResult.HANDLED;
