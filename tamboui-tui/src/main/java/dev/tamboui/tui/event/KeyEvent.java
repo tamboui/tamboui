@@ -100,7 +100,7 @@ public final class KeyEvent implements Event {
      * @param baseLayoutKeyCodePoint base-layout key codepoint, if reported
      * @param text                   produced text, or empty string if none
      */
-    public KeyEvent(
+    KeyEvent(
             KeyCode code,
             KeyModifiers modifiers,
             int character,

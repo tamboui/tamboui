@@ -26,6 +26,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyEventKind;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.widgets.input.TextAreaState;
 
@@ -33,7 +34,6 @@ import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static dev.tamboui.toolkit.Toolkit.textArea;
 import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Tests for TextAreaElement.
  */
@@ -364,7 +364,7 @@ class TextAreaElementTest extends AbstractElementTest {
             KeyEvent release = KeyEvent.builder()
                     .code(KeyCode.CHAR)
                     .character('x')
-                    .kind(dev.tamboui.tui.event.KeyEventKind.RELEASE)
+                    .kind(KeyEventKind.RELEASE)
                     .build();
 
             EventResult result = element.handleKeyEvent(release, true);
@@ -380,7 +380,7 @@ class TextAreaElementTest extends AbstractElementTest {
             KeyEvent textEvent = KeyEvent.builder()
                     .code(KeyCode.CHAR)
                     .text("World")
-                    .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                    .kind(KeyEventKind.PRESS)
                     .build();
 
             EventResult result = element.handleKeyEvent(textEvent, true);
@@ -397,7 +397,7 @@ class TextAreaElementTest extends AbstractElementTest {
                     .code(KeyCode.CHAR)
                     .character('s')
                     .modifiers(KeyModifiers.SUPER)
-                    .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                    .kind(KeyEventKind.PRESS)
                     .build();
 
             EventResult result = element.handleKeyEvent(superEvent, true);

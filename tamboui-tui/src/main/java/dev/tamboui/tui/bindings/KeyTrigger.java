@@ -103,30 +103,6 @@ public final class KeyTrigger implements InputTrigger {
     }
 
     /**
-     * Creates a trigger for a special key code with all modifier flags.
-     *
-     * @param code     the key code
-     * @param ctrl     true if Ctrl must be pressed
-     * @param alt      true if Alt must be pressed
-     * @param shift    true if Shift must be pressed
-     * @param superKey true if Super (Command/Windows) must be pressed
-     * @param hyper    true if Hyper must be pressed
-     * @param meta     true if Meta must be pressed
-     * @return a trigger that matches the specified key with modifiers
-     */
-    public static KeyTrigger key(
-            KeyCode code,
-            boolean ctrl,
-            boolean alt,
-            boolean shift,
-            boolean superKey,
-            boolean hyper,
-            boolean meta
-    ) {
-        return new KeyTrigger(code, null, ctrl, alt, shift, superKey, hyper, meta, false, null);
-    }
-
-    /**
      * Creates a trigger for a character (case-sensitive).
      *
      * @param c the character to match

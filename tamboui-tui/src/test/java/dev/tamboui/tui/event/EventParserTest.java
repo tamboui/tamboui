@@ -693,6 +693,26 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("CSI-u associated text is preserved for ZWJ emoji, flag emoji and CJK (per #446)")
+    void associatedTextOfSeveralCodePoints() throws IOException {
+        // ZWJ emoji: woman + ZWJ + laptop (woman technologist glyph)
+        String zwjEmoji = new String(Character.toChars(0x1F469))
+                + "\u200D"
+                + new String(Character.toChars(0x1F4BB));
+        KeyEvent zwj = (KeyEvent) EventParser.readEvent(backendFor("\033[0;;128105:8205:128187u"), 0);
+        assertThat(zwj.text()).as("ZWJ emoji").isEqualTo(zwjEmoji);
+
+        // Flag emoji: regional indicators F + R
+        String flag = new String(Character.toChars(0x1F1EB)) + new String(Character.toChars(0x1F1F7));
+        KeyEvent fr = (KeyEvent) EventParser.readEvent(backendFor("\033[0;;127467:127479u"), 0);
+        assertThat(fr.text()).as("flag emoji").isEqualTo(flag);
+
+        // CJK: U+4E2D
+        KeyEvent cjk = (KeyEvent) EventParser.readEvent(backendFor("\033[0;;20013u"), 0);
+        assertThat(cjk.text()).as("CJK").isEqualTo("\u4E2D");
+    }
+
+    @Test
     @DisplayName("Keypad digits/operators carry both KP_* code and the typed character")
     void keypadDigitsCarryCharacter() throws IOException {
         // Keypad 1: 57400

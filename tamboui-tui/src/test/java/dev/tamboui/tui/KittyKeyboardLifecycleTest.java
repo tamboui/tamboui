@@ -6,6 +6,8 @@ package dev.tamboui.tui;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,35 +17,34 @@ import dev.tamboui.terminal.TestBackend;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class KittyKeyboardLifecycleTest {
 
     @Test
     @DisplayName("TuiRunner with AUTO protocol pushes flags 5 on startup and pops on close")
     void tuiRunnerAutoProtocolLifecycle() throws Exception {
-        java.util.List<String> order = new java.util.ArrayList<>();
+        List<String> order = new ArrayList<>();
         TestBackend backend = new TestBackend(80, 24) {
             @Override
-            public void enterAlternateScreen() throws java.io.IOException {
+            public void enterAlternateScreen() throws IOException {
                 super.enterAlternateScreen();
                 order.add("enterAlternateScreen");
             }
 
             @Override
-            public void leaveAlternateScreen() throws java.io.IOException {
+            public void leaveAlternateScreen() throws IOException {
                 super.leaveAlternateScreen();
                 order.add("leaveAlternateScreen");
             }
 
             @Override
-            public boolean enableKeyboardProtocol(KeyboardProtocol protocol) throws java.io.IOException {
+            public boolean enableKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
                 boolean enabled = super.enableKeyboardProtocol(protocol);
                 order.add("enableKeyboardProtocol:" + protocol);
                 return enabled;
             }
 
             @Override
-            public void disableKeyboardProtocol() throws java.io.IOException {
+            public void disableKeyboardProtocol() throws IOException {
                 super.disableKeyboardProtocol();
                 order.add("disableKeyboardProtocol");
             }

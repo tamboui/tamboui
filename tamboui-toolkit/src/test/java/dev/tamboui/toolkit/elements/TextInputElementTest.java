@@ -14,10 +14,15 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyEventKind;
+import dev.tamboui.tui.event.KeyModifiers;
+import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Tests for TextInputElement.
  */
@@ -83,46 +88,69 @@ class TextInputElementTest extends AbstractElementTest {
     @Test
     @DisplayName("TextInputElement ignores release key events")
     void ignoresReleaseKeyEvents() {
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState("Initial");
+        TextInputState state = new TextInputState("Initial");
         TextInputElement element = textInput(state);
-        dev.tamboui.tui.event.KeyEvent release = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+        KeyEvent release = KeyEvent.builder()
+                .code(KeyCode.CHAR)
                 .character('x')
-                .kind(dev.tamboui.tui.event.KeyEventKind.RELEASE)
+                .kind(KeyEventKind.RELEASE)
                 .build();
 
-        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(release, true);
+        EventResult result = element.handleKeyEvent(release, true);
 
-        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.UNHANDLED);
+        assertThat(result).isEqualTo(EventResult.UNHANDLED);
         assertThat(state.text()).isEqualTo("Initial");
+    }
+
+    @Test
+    @DisplayName("TextInputElement inserts multi-code-point text whole (ZWJ emoji, flag, CJK)")
+    void insertsMultiCodePointText() {
+        String zwj = new String(Character.toChars(0x1F469)) + "\u200D" + new String(Character.toChars(0x1F4BB));
+        String flag = new String(Character.toChars(0x1F1EB)) + new String(Character.toChars(0x1F1F7));
+        String cjk = "\u4E2D";
+
+        for (String text : new String[] {zwj, flag, cjk}) {
+            TextInputState state = new TextInputState();
+            TextInputElement element = textInput(state);
+            KeyEvent event = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .text(text)
+                    .kind(KeyEventKind.PRESS)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(event, true);
+
+            assertThat(result).as("result for \"" + text + "\"").isEqualTo(EventResult.HANDLED);
+            assertThat(state.text()).as("inserted text").isEqualTo(text);
+        }
     }
 
     @Test
     @DisplayName("TextInputElement inserts text from event text() property")
     void insertsAssociatedText() {
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputState state = new TextInputState();
         TextInputElement element = textInput(state);
-        dev.tamboui.tui.event.KeyEvent textEvent = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+        KeyEvent textEvent = KeyEvent.builder()
+                .code(KeyCode.CHAR)
                 .text("Hello")
-                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .kind(KeyEventKind.PRESS)
                 .build();
 
-        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(textEvent, true);
+        EventResult result = element.handleKeyEvent(textEvent, true);
 
-        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.HANDLED);
+        assertThat(result).isEqualTo(EventResult.HANDLED);
         assertThat(state.text()).isEqualTo("Hello");
     }
 
     @Test
     @DisplayName("TextInputElement does not fire onSubmit twice on an Enter press/release pair")
     void onSubmitNotFiredOnEnterRelease() {
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputState state = new TextInputState();
         int[] submitCount = {0};
         TextInputElement element = textInput(state).onSubmit(() -> submitCount[0]++);
-        dev.tamboui.tui.event.KeyEvent enterRelease = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.ENTER)
-                .kind(dev.tamboui.tui.event.KeyEventKind.RELEASE)
+        KeyEvent enterRelease = KeyEvent.builder()
+                .code(KeyCode.ENTER)
+                .kind(KeyEventKind.RELEASE)
                 .build();
 
         element.handleKeyEvent(enterRelease, true);
@@ -133,35 +161,35 @@ class TextInputElementTest extends AbstractElementTest {
     @Test
     @DisplayName("TextInputElement inserts keypad digits (KP_1 under FULL inserts \"1\")")
     void insertsKeypadDigit() {
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputState state = new TextInputState();
         TextInputElement element = textInput(state);
-        dev.tamboui.tui.event.KeyEvent kp1 = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.KP_1)
+        KeyEvent kp1 = KeyEvent.builder()
+                .code(KeyCode.KP_1)
                 .character('1')
-                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .kind(KeyEventKind.PRESS)
                 .build();
 
-        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(kp1, true);
+        EventResult result = element.handleKeyEvent(kp1, true);
 
-        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.HANDLED);
+        assertThat(result).isEqualTo(EventResult.HANDLED);
         assertThat(state.text()).isEqualTo("1");
     }
 
     @Test
     @DisplayName("TextInputElement ignores character when Hyper is pressed")
     void ignoresHyperKey() {
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputState state = new TextInputState();
         TextInputElement element = textInput(state);
-        dev.tamboui.tui.event.KeyEvent hyperEvent = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+        KeyEvent hyperEvent = KeyEvent.builder()
+                .code(KeyCode.CHAR)
                 .character('x')
-                .modifiers(dev.tamboui.tui.event.KeyModifiers.builder().hyper(true).build())
-                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .modifiers(KeyModifiers.builder().hyper(true).build())
+                .kind(KeyEventKind.PRESS)
                 .build();
 
-        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(hyperEvent, true);
+        EventResult result = element.handleKeyEvent(hyperEvent, true);
 
-        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.UNHANDLED);
+        assertThat(result).isEqualTo(EventResult.UNHANDLED);
         assertThat(state.text()).isEmpty();
     }
 
@@ -169,37 +197,37 @@ class TextInputElementTest extends AbstractElementTest {
     @DisplayName("TextInputElement inserts terminal-provided text even on chord (AltGr=Ctrl+Alt -> text)")
     void insertsTextOnChordWhenTerminalProvidesIt() {
         // AltGr+e on Windows/Linux reports as Ctrl+Alt with associated text "\u20ac"
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputState state = new TextInputState();
         TextInputElement element = textInput(state);
-        dev.tamboui.tui.event.KeyEvent altGrEuro = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+        KeyEvent altGrEuro = KeyEvent.builder()
+                .code(KeyCode.CHAR)
                 .character('\u20ac')
                 .text("\u20ac")
-                .modifiers(dev.tamboui.tui.event.KeyModifiers.builder().ctrl(true).alt(true).build())
-                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .modifiers(KeyModifiers.builder().ctrl(true).alt(true).build())
+                .kind(KeyEventKind.PRESS)
                 .build();
 
-        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(altGrEuro, true);
+        EventResult result = element.handleKeyEvent(altGrEuro, true);
 
-        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.HANDLED);
+        assertThat(result).isEqualTo(EventResult.HANDLED);
         assertThat(state.text()).isEqualTo("\u20ac");
     }
 
     @Test
     @DisplayName("TextInputElement ignores character when Super or Meta is pressed")
     void ignoresSuperOrMetaKey() {
-        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputState state = new TextInputState();
         TextInputElement element = textInput(state);
-        dev.tamboui.tui.event.KeyEvent superEvent = dev.tamboui.tui.event.KeyEvent.builder()
-                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+        KeyEvent superEvent = KeyEvent.builder()
+                .code(KeyCode.CHAR)
                 .character('c')
-                .modifiers(dev.tamboui.tui.event.KeyModifiers.SUPER)
-                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .modifiers(KeyModifiers.SUPER)
+                .kind(KeyEventKind.PRESS)
                 .build();
 
-        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(superEvent, true);
+        EventResult result = element.handleKeyEvent(superEvent, true);
 
-        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.UNHANDLED);
+        assertThat(result).isEqualTo(EventResult.UNHANDLED);
         assertThat(state.text()).isEmpty();
     }
 }
