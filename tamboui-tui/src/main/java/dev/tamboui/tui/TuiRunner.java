@@ -200,6 +200,7 @@ public final class TuiRunner implements AutoCloseable {
                 ? BackendFactory.recordIfEnabled(config.backend())
                 : BackendFactory.create(config.backendClassLoader());
 
+        boolean keyboardProtocolPushed = false;
         try {
             if (config.rawMode()) {
                 backend.enableRawMode();
@@ -209,6 +210,7 @@ public final class TuiRunner implements AutoCloseable {
             }
             if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
                 backend.pushKeyboardProtocol(config.keyboardProtocol());
+                keyboardProtocolPushed = true;
             }
             if (config.hideCursor()) {
                 backend.hideCursor();
@@ -223,11 +225,11 @@ public final class TuiRunner implements AutoCloseable {
             Terminal<Backend> terminal = new Terminal<>(backend);
             return new TuiRunner(backend, terminal, config);
         } catch (Exception e) {
-            try {
-                if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
+            if (keyboardProtocolPushed) {
+                try {
                     backend.popKeyboardProtocol();
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
             }
             backend.close();
             throw e;

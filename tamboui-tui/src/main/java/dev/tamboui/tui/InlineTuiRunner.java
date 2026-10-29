@@ -173,12 +173,14 @@ public final class InlineTuiRunner implements AutoCloseable {
      */
     public static InlineTuiRunner create(Backend backend, InlineTuiConfig config) {
         InlineDisplay display;
+        boolean keyboardProtocolPushed = false;
 
         try {
             // Enable raw mode for key events
             backend.enableRawMode();
             if (config.keyboardProtocol() != KeyboardProtocol.LEGACY) {
                 backend.pushKeyboardProtocol(config.keyboardProtocol());
+                keyboardProtocolPushed = true;
             }
             if (config.bracketedPaste()) {
                 backend.enableBracketedPaste();
@@ -193,20 +195,22 @@ public final class InlineTuiRunner implements AutoCloseable {
             InlineViewport viewport = new InlineViewport(display);
             return new InlineTuiRunner(backend, viewport, config);
         } catch (IOException e) {
-            closeQuietly(backend);
+            closeQuietly(backend, keyboardProtocolPushed);
             throw new RuntimeIOException("Failed to create inline runner: " + e.getMessage(), e);
         } catch (RuntimeException e) {
             // e.g. BackendException, already an unchecked TamboUIException
-            closeQuietly(backend);
+            closeQuietly(backend, keyboardProtocolPushed);
             throw e;
         }
     }
 
-    private static void closeQuietly(Backend backend) {
-        try {
-            backend.popKeyboardProtocol();
-        } catch (Exception ignored) {
-            // best effort during cleanup
+    private static void closeQuietly(Backend backend, boolean keyboardProtocolPushed) {
+        if (keyboardProtocolPushed) {
+            try {
+                backend.popKeyboardProtocol();
+            } catch (Exception ignored) {
+                // best effort during cleanup
+            }
         }
         try {
             backend.disableRawMode();

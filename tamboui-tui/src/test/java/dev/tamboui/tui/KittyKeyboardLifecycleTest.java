@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tui;
 
+import java.io.IOException;
 import java.time.Duration;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.terminal.TestBackend;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class KittyKeyboardLifecycleTest {
 
@@ -118,6 +120,107 @@ class KittyKeyboardLifecycleTest {
         }
 
         assertThat(backend.rawOutput()).contains("\033[<u");
+    }
+
+    @Test
+    @DisplayName("TuiRunner does not pop keyboard protocol when startup fails before push")
+    void tuiRunnerDoesNotPopIfPushDidNotHappen() {
+        TestBackend backend = new TestBackend(80, 24) {
+            @Override
+            public void enableRawMode() throws IOException {
+                throw new IOException("not a tty");
+            }
+        };
+        TuiConfig config = TuiConfig.builder()
+                .backend(backend)
+                .keyboardProtocol(KeyboardProtocol.AUTO)
+                .pollTimeout(Duration.ofMillis(20))
+                .build();
+
+        assertThatThrownBy(() -> TuiRunner.create(config)).isInstanceOf(IOException.class);
+
+        assertThat(backend.rawOutput())
+                .as("no Kitty push happened, so no pop may leak to the output")
+                .doesNotContain("\033[>")
+                .doesNotContain("\033[<u");
+    }
+
+    @Test
+    @DisplayName("TuiRunner pops exactly once when startup fails after push")
+    void tuiRunnerPopsOnceWhenFailureFollowsPush() {
+        TestBackend backend = new TestBackend(80, 24) {
+            @Override
+            public void hideCursor() throws IOException {
+                throw new IOException("terminal write failed");
+            }
+        };
+        TuiConfig config = TuiConfig.builder()
+                .backend(backend)
+                .keyboardProtocol(KeyboardProtocol.AUTO)
+                .hideCursor(true)
+                .pollTimeout(Duration.ofMillis(20))
+                .build();
+
+        assertThatThrownBy(() -> TuiRunner.create(config)).isInstanceOf(IOException.class);
+
+        String output = backend.rawOutput();
+        assertThat(countOccurrences(output, "\033[>5u")).as("pushed once").isEqualTo(1);
+        assertThat(countOccurrences(output, "\033[<u")).as("popped once").isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("InlineTuiRunner does not pop keyboard protocol when startup fails before push")
+    void inlineTuiRunnerDoesNotPopIfPushDidNotHappen() {
+        TestBackend backend = new TestBackend(80, 24) {
+            @Override
+            public void enableRawMode() throws IOException {
+                throw new IOException("not a tty");
+            }
+        };
+        InlineTuiConfig config = InlineTuiConfig.builder(4)
+                .keyboardProtocol(KeyboardProtocol.AUTO)
+                .pollTimeout(Duration.ofMillis(20))
+                .build();
+
+        assertThatThrownBy(() -> InlineTuiRunner.create(backend, config))
+                .isInstanceOf(RuntimeException.class);
+
+        assertThat(backend.rawOutput())
+                .as("no Kitty push happened, so no pop may leak to the output")
+                .doesNotContain("\033[>")
+                .doesNotContain("\033[<u");
+    }
+
+    @Test
+    @DisplayName("InlineTuiRunner with LEGACY and a failed startup emits no Kitty sequences")
+    void inlineTuiRunnerLegacyDoesNotPopOnFailure() {
+        TestBackend backend = new TestBackend(80, 24) {
+            @Override
+            public void enableRawMode() throws IOException {
+                throw new IOException("not a tty");
+            }
+        };
+        InlineTuiConfig config = InlineTuiConfig.builder(4)
+                .keyboardProtocol(KeyboardProtocol.LEGACY)
+                .pollTimeout(Duration.ofMillis(20))
+                .build();
+
+        assertThatThrownBy(() -> InlineTuiRunner.create(backend, config))
+                .isInstanceOf(RuntimeException.class);
+
+        assertThat(backend.rawOutput())
+                .doesNotContain("\033[>")
+                .doesNotContain("\033[<u");
+    }
+
+    private static int countOccurrences(String haystack, String needle) {
+        int count = 0;
+        int index = haystack.indexOf(needle);
+        while (index >= 0) {
+            count++;
+            index = haystack.indexOf(needle, index + needle.length());
+        }
+        return count;
     }
 
     @Test
