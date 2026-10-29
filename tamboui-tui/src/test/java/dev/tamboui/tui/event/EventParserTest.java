@@ -693,6 +693,31 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("CSI-u sequences with long associated text are kept intact (IME paste)")
+    void longAssociatedTextIsKept() throws IOException {
+        // Build CSI 0;;CP1:CP2:...:CPN u with 100 CJK code points starting at U+4E2D.
+        int length = 100;
+        StringBuilder expected = new StringBuilder();
+        StringBuilder sequence = new StringBuilder("\033[0;;");
+        for (int i = 0; i < length; i++) {
+            int cp = 0x4E2D + i;
+            expected.appendCodePoint(cp);
+            if (i > 0) {
+                sequence.append(':');
+            }
+            sequence.append(cp);
+        }
+        sequence.append('u');
+
+        KeyEvent event = (KeyEvent) EventParser.readEvent(backendFor(sequence.toString()), 0);
+
+        assertThat(event.text().codePointCount(0, event.text().length()))
+                .as("all code points preserved")
+                .isEqualTo(length);
+        assertThat(event.text()).isEqualTo(expected.toString());
+    }
+
+    @Test
     @DisplayName("Parser does not synthesize text() for Super/Hyper/Meta chords")
     void chordsHaveNoSynthesizedText() throws IOException {
         // Super+x: modifier 8 + 1 = 9. Terminal did not provide associated text (no 2nd/3rd field).
@@ -838,17 +863,18 @@ class EventParserTest {
     }
 
     @Test
-    @DisplayName("Oversized CSI sequence exceeding 128 chars is bounded safely")
-    void oversizedCsiSequenceBoundedSafely() throws IOException {
-        // Create a 140 character parameter sequence inside CSI ... u
+    @DisplayName("Long CSI sequence is consumed atomically and following key still parses")
+    void longCsiSequenceDoesNotCorruptStream() throws IOException {
+        // Create a long CSI parameter sequence (previously bounded by MAX_CSI_LENGTH = 128).
+        // After removing the cap we still need the sequence to be consumed atomically so a
+        // trailing key is not corrupted.
         StringBuilder sb = new StringBuilder("\033[");
         for (int i = 0; i < 140; i++) {
             sb.append('1');
         }
-        sb.append("ux"); // Sequence followed by 'x'
+        sb.append("ux");
         QueueBackend backend = backendFor(sb.toString());
 
-        // Oversized sequence is consumed/aborted without throwing
         EventParser.readEvent(backend, 0);
         Event event = EventParser.readEvent(backend, 0);
 

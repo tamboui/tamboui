@@ -24,7 +24,6 @@ public final class EventParser {
 
     private static final int ESC = 27;
     private static final int PEEK_TIMEOUT = 50;
-    private static final int MAX_CSI_LENGTH = 128;
     private static final String PASTE_END = "\u001b[201~";
 
     private EventParser() {
@@ -193,12 +192,16 @@ public final class EventParser {
             }
         }
 
-        // Sequence with parameters: collect atomically until final terminator byte (0x40..0x7E)
+        // Sequence with parameters: collect atomically until the final terminator byte (0x40..0x7E)
+        // or EOF. No total-length cap: alacritty/vte, crossterm and friends do not cap total length
+        // either, since the Kitty keyboard protocol embeds associated text as colon-separated code
+        // points inline in a single CSI-u sequence and that text has no principled upper bound.
+        // Structural caps (max params, max subparams) can be added later if a specific need arises.
         StringBuilder sb = new StringBuilder();
         sb.append((char) c);
         int terminator = -1;
 
-        while (sb.length() < MAX_CSI_LENGTH) {
+        while (true) {
             int next = backend.read(PEEK_TIMEOUT);
             if (next == -1 || next == -2) {
                 break;
@@ -211,16 +214,7 @@ public final class EventParser {
         }
 
         if (terminator == -1) {
-            // Drain remaining bytes of oversized sequence up to terminator or EOF
-            while (true) {
-                int next = backend.read(PEEK_TIMEOUT);
-                if (next == -1 || next == -2) {
-                    break;
-                }
-                if (next >= 0x40 && next <= 0x7E) {
-                    break;
-                }
-            }
+            // Reached EOF without a terminator: discard the partial sequence.
             return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
         }
 
