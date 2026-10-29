@@ -131,6 +131,44 @@ class TextInputElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("TextInputElement ignores character when Hyper is pressed")
+    void ignoresHyperKey() {
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputElement element = textInput(state);
+        dev.tamboui.tui.event.KeyEvent hyperEvent = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+                .character('x')
+                .modifiers(dev.tamboui.tui.event.KeyModifiers.builder().hyper(true).build())
+                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .build();
+
+        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(hyperEvent, true);
+
+        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.UNHANDLED);
+        assertThat(state.text()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("TextInputElement inserts terminal-provided text even on chord (AltGr=Ctrl+Alt -> text)")
+    void insertsTextOnChordWhenTerminalProvidesIt() {
+        // AltGr+e on Windows/Linux reports as Ctrl+Alt with associated text "\u20ac"
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputElement element = textInput(state);
+        dev.tamboui.tui.event.KeyEvent altGrEuro = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.CHAR)
+                .character('\u20ac')
+                .text("\u20ac")
+                .modifiers(dev.tamboui.tui.event.KeyModifiers.builder().ctrl(true).alt(true).build())
+                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .build();
+
+        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(altGrEuro, true);
+
+        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.HANDLED);
+        assertThat(state.text()).isEqualTo("\u20ac");
+    }
+
+    @Test
     @DisplayName("TextInputElement ignores character when Super or Meta is pressed")
     void ignoresSuperOrMetaKey() {
         dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();

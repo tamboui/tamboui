@@ -693,6 +693,25 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("Parser does not synthesize text() for Super/Hyper/Meta chords")
+    void chordsHaveNoSynthesizedText() throws IOException {
+        // Super+x: modifier 8 + 1 = 9. Terminal did not provide associated text (no 2nd/3rd field).
+        KeyEvent superX = (KeyEvent) EventParser.readEvent(backendFor("\033[120;9u"), 0);
+        assertThat(superX.hasSuper()).isTrue();
+        assertThat(superX.text()).as("Super+x text").isEmpty();
+
+        // Hyper+x: modifier 16 + 1 = 17
+        KeyEvent hyperX = (KeyEvent) EventParser.readEvent(backendFor("\033[120;17u"), 0);
+        assertThat(hyperX.hasHyper()).isTrue();
+        assertThat(hyperX.text()).as("Hyper+x text").isEmpty();
+
+        // Meta+x: modifier 32 + 1 = 33
+        KeyEvent metaX = (KeyEvent) EventParser.readEvent(backendFor("\033[120;33u"), 0);
+        assertThat(metaX.hasMeta()).isTrue();
+        assertThat(metaX.text()).as("Meta+x text").isEmpty();
+    }
+
+    @Test
     @DisplayName("Kitty parses event kinds: Press, Repeat, Release")
     void kittyEventKinds() throws IOException {
         // Press: :1

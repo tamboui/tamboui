@@ -475,14 +475,21 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 state.insert("    "); // 4 spaces for tab
                 return true;
             case CHAR:
-                // Don't consume characters with Ctrl, Alt, Super, or Meta modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt() || event.modifiers().superKey() || event.modifiers().meta()) {
-                    return false;
-                }
+                // Trust event.text() as the terminal's authoritative statement of what the user
+                // typed. The parser only synthesizes text for plain typing, so if text is present
+                // on a chord it was deliberately provided by the terminal (e.g. AltGr+e -> "\u20ac",
+                // which arrives as Ctrl+Alt on Windows/Linux and is legitimate text input).
                 String text = event.text();
                 if (!text.isEmpty()) {
                     state.insert(text);
                     return true;
+                }
+                // No associated text: this is a shortcut (any non-shift modifier) or an unmapped
+                // control character. Don't fabricate input.
+                if (event.modifiers().ctrl() || event.modifiers().alt()
+                        || event.modifiers().superKey() || event.modifiers().hyper()
+                        || event.modifiers().meta()) {
+                    return false;
                 }
                 int c = event.codePoint();
                 if (c >= 32 && c != 127) {
