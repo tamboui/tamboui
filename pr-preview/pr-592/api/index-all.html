@@ -812,7 +812,7 @@ into ANSI escape sequences and delivers them to a provided output sink.</div>
 </dd>
 <dt><a href="dev/tamboui/terminal/KeyboardProtocol.html#AUTO" class="member-name-link">AUTO</a> - Enum constant in enum class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a></dt>
 <dd>
-<div class="block">Default mode.</div>
+<div class="block">Default mode: enables the safe subset of enhancements that preserves ordinary text input.</div>
 </dd>
 <dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#AUTO_FLAGS" class="member-name-link">AUTO_FLAGS</a> - Static variable in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
 <dd>
@@ -3402,7 +3402,8 @@ the ANSI reset sequence (<a href="dev/tamboui/terminal/AnsiStringBuilder.html#RE
 </dd>
 <dt><a href="dev/tamboui/tui/event/KeyEvent.html#codePoint()" class="member-name-link">codePoint()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
 <dd>
-<div class="block">Returns the Unicode code point for <a href="dev/tamboui/tui/event/KeyCode.html#CHAR"><code>KeyCode.CHAR</code></a> events, or <code>0</code> otherwise.</div>
+<div class="block">Returns the Unicode code point this event represents, or <code>0</code> if it does not represent
+a typed character.</div>
 </dd>
 <dt><a href="dev/tamboui/layout/cassowary/Term.html#coefficient()" class="member-name-link">coefficient()</a> - Method in class dev.tamboui.layout.cassowary.<a href="dev/tamboui/layout/cassowary/Term.html" title="class in dev.tamboui.layout.cassowary">Term</a></dt>
 <dd>
@@ -5283,6 +5284,10 @@ horizontally adjacent changed cells (see <a href="dev/tamboui/buffer/DiffResult.
 <dd>
 <div class="block">Disables bracketed paste mode (<code>ESC[?2004l</code>).</div>
 </dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#disableKeyboardProtocol()" class="member-name-link">disableKeyboardProtocol()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Disables Kitty keyboard enhancement flags on the terminal.</div>
+</dd>
 <dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#disableMouseCapture()" class="member-name-link">disableMouseCapture()</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="dev/tamboui/backend/jline3/JLineBackend.html#disableMouseCapture()" class="member-name-link">disableMouseCapture()</a> - Method in class dev.tamboui.backend.jline3.<a href="dev/tamboui/backend/jline3/JLineBackend.html" title="class in dev.tamboui.backend.jline3">JLineBackend</a></dt>
@@ -6000,6 +6005,10 @@ from a shared centre axis.</div>
 <dt><a href="dev/tamboui/terminal/Mode2027Status.html#ENABLED" class="member-name-link">ENABLED</a> - Enum constant in enum class dev.tamboui.terminal.<a href="dev/tamboui/terminal/Mode2027Status.html" title="enum class in dev.tamboui.terminal">Mode2027Status</a></dt>
 <dd>
 <div class="block">Mode 2027 is currently enabled (Ps=1 or Ps=3 in DECRPM response).</div>
+</dd>
+<dt><a href="dev/tamboui/terminal/Backend.html#enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" class="member-name-link">enableKeyboardProtocol(KeyboardProtocol)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
+<dd>
+<div class="block">Enables Kitty keyboard enhancement flags on the terminal.</div>
 </dd>
 <dt><a href="dev/tamboui/backend/aesh/AeshBackend.html#enableMouseCapture()" class="member-name-link">enableMouseCapture()</a> - Method in class dev.tamboui.backend.aesh.<a href="dev/tamboui/backend/aesh/AeshBackend.html" title="class in dev.tamboui.backend.aesh">AeshBackend</a></dt>
 <dd>&nbsp;</dd>
@@ -8718,6 +8727,14 @@ for grid layouts.</div>
 <dd>
 <div class="block">Returns true if this dataset has a name.</div>
 </dd>
+<dt><a href="dev/tamboui/tui/event/KeyModifiers.html#hasNonShift()" class="member-name-link">hasNonShift()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></dt>
+<dd>
+<div class="block">Returns true if any modifier other than Shift is active (Ctrl, Alt, Super, Hyper or Meta).</div>
+</dd>
+<dt><a href="dev/tamboui/tui/event/KeyEvent.html#hasNonShiftModifier()" class="member-name-link">hasNonShiftModifier()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
+<dd>
+<div class="block">Returns true if any modifier other than Shift is active (Ctrl, Alt, Super, Hyper or Meta).</div>
+</dd>
 <dt><a href="dev/tamboui/tui/event/KeyEvent.html#hasNumLock()" class="member-name-link">hasNumLock()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
 <dd>
 <div class="block">Returns true if Num Lock was active.</div>
@@ -10636,10 +10653,6 @@ indicating the child wants to explicitly inherit from parent.</div>
 <dd>
 <div class="block">Creates a trigger for a special key code with modifiers.</div>
 </dd>
-<dt><a href="dev/tamboui/tui/bindings/KeyTrigger.html#key(dev.tamboui.tui.event.KeyCode,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">key(KeyCode, boolean, boolean, boolean, boolean, boolean, boolean)</a> - Static method in class dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></dt>
-<dd>
-<div class="block">Creates a trigger for a special key code with all modifier flags.</div>
-</dd>
 <dt><a href="dev/tamboui/backend/panama/windows/Kernel32.html#KEY_EVENT" class="member-name-link">KEY_EVENT</a> - Static variable in class dev.tamboui.backend.panama.windows.<a href="dev/tamboui/backend/panama/windows/Kernel32.html" title="class in dev.tamboui.backend.panama.windows">Kernel32</a></dt>
 <dd>
 <div class="block">Input record event type: keyboard event.</div>
@@ -10695,10 +10708,6 @@ indicating the child wants to explicitly inherit from parent.</div>
 <dt><a href="dev/tamboui/tui/event/KeyEvent.html#%3Cinit%3E(dev.tamboui.tui.event.KeyCode,dev.tamboui.tui.event.KeyModifiers,int,dev.tamboui.tui.bindings.Bindings)" class="member-name-link">KeyEvent(KeyCode, KeyModifiers, int, Bindings)</a> - Constructor for class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
 <dd>
 <div class="block">Creates a key event with specific bindings.</div>
-</dd>
-<dt><a href="dev/tamboui/tui/event/KeyEvent.html#%3Cinit%3E(dev.tamboui.tui.event.KeyCode,dev.tamboui.tui.event.KeyModifiers,int,dev.tamboui.tui.bindings.Bindings,dev.tamboui.tui.event.KeyEventKind,dev.tamboui.tui.event.KeyEventState,int,java.util.OptionalInt,java.util.OptionalInt,java.lang.String)" class="member-name-link">KeyEvent(KeyCode, KeyModifiers, int, Bindings, KeyEventKind, KeyEventState, int, OptionalInt, OptionalInt, String)</a> - Constructor for class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
-<dd>
-<div class="block">Creates a complete key event with all attributes.</div>
 </dd>
 <dt><a href="dev/tamboui/tui/event/KeyEvent.Builder.html" class="type-name-link" title="class in dev.tamboui.tui.event">KeyEvent.Builder</a> - Class in <a href="dev/tamboui/tui/event/package-summary.html">dev.tamboui.tui.event</a></dt>
 <dd>
@@ -10780,7 +10789,8 @@ indicating the child wants to explicitly inherit from parent.</div>
 </dd>
 <dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html" class="type-name-link" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a> - Class in <a href="dev/tamboui/terminal/package-summary.html">dev.tamboui.terminal</a></dt>
 <dd>
-<div class="block">Utility class for Kitty keyboard protocol support (progressive keyboard enhancements).</div>
+<div class="block">Constants, escape-sequence builders and optional terminal-side detection for the Kitty keyboard
+protocol (progressive keyboard enhancements).</div>
 </dd>
 <dt><a href="dev/tamboui/image/protocol/KittyProtocol.html" class="type-name-link" title="class in dev.tamboui.image.protocol">KittyProtocol</a> - Class in <a href="dev/tamboui/image/protocol/package-summary.html">dev.tamboui.image.protocol</a></dt>
 <dd>
@@ -14556,39 +14566,13 @@ one being typed token-by-token by an LLM) does not flicker as it grows.</div>
 <dd>
 <div class="block">Sets the timeout for polling events.</div>
 </dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#pop(dev.tamboui.terminal.Backend)" class="member-name-link">pop(Backend)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Pops one keyboard enhancement mode entry from the terminal's keyboard mode stack,
-restoring the previous mode.</div>
-</dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#pop(dev.tamboui.terminal.Backend,int)" class="member-name-link">pop(Backend, int)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Pops the specified number of keyboard enhancement mode entries from the terminal's
-keyboard mode stack.</div>
-</dd>
 <dt><a href="dev/tamboui/terminal/Frame.html#popContextKey()" class="member-name-link">popContextKey()</a> - Method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a></dt>
 <dd>
 <div class="block">Pops the most recent context key from the stack.</div>
 </dd>
-<dt><a href="dev/tamboui/terminal/Backend.html#popKeyboardProtocol()" class="member-name-link">popKeyboardProtocol()</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
-<dd>
-<div class="block">Pops keyboard enhancement flags from the terminal's keyboard stack.</div>
-</dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#popMode()" class="member-name-link">popMode()</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Alias for <a href="dev/tamboui/terminal/KittyKeyboardSupport.html#popSequence()"><code>KittyKeyboardSupport.popSequence()</code></a>.</div>
-</dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#popMode(int)" class="member-name-link">popMode(int)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Alias for <a href="dev/tamboui/terminal/KittyKeyboardSupport.html#popSequence(int)"><code>KittyKeyboardSupport.popSequence(int)</code></a>.</div>
-</dd>
 <dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#popSequence()" class="member-name-link">popSequence()</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
 <dd>
-<div class="block">Returns the pop escape sequence for popping one entry (<code>CSI &lt; u</code>).</div>
-</dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#popSequence(int)" class="member-name-link">popSequence(int)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Returns the pop escape sequence for popping multiple entries (<code>CSI &lt; &lt;count&gt; u</code>).</div>
+<div class="block">Returns the pop escape sequence (<code>CSI &lt; u</code>).</div>
 </dd>
 <dt><a href="dev/tamboui/css/parser/Token.html#position()" class="member-name-link">position()</a> - Method in class dev.tamboui.css.parser.<a href="dev/tamboui/css/parser/Token.html" title="class in dev.tamboui.css.parser">Token</a></dt>
 <dd>
@@ -15003,10 +14987,6 @@ inheritance behavior, and optional default value.</div>
 <dd>
 <div class="block">Structural punctuation such as braces, parentheses, commas and semicolons.</div>
 </dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#push(dev.tamboui.terminal.Backend,int)" class="member-name-link">push(Backend, int)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Pushes the specified keyboard enhancement flags onto the terminal's keyboard mode stack.</div>
-</dd>
 <dt><a href="dev/tamboui/text/Text.html#push(dev.tamboui.text.Span)" class="member-name-link">push(Span)</a> - Method in class dev.tamboui.text.<a href="dev/tamboui/text/Text.html" title="class in dev.tamboui.text">Text</a></dt>
 <dd>
 <div class="block">Extends the last line with the given span, or adds a new line if empty.</div>
@@ -15014,14 +14994,6 @@ inheritance behavior, and optional default value.</div>
 <dt><a href="dev/tamboui/terminal/Frame.html#pushContextKey(java.lang.String)" class="member-name-link">pushContextKey(String)</a> - Method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/Frame.html" title="class in dev.tamboui.terminal">Frame</a></dt>
 <dd>
 <div class="block">Pushes a context key onto the stack.</div>
-</dd>
-<dt><a href="dev/tamboui/terminal/Backend.html#pushKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" class="member-name-link">pushKeyboardProtocol(KeyboardProtocol)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
-<dd>
-<div class="block">Pushes Kitty keyboard enhancement flags to the terminal's keyboard stack.</div>
-</dd>
-<dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#pushMode(int)" class="member-name-link">pushMode(int)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
-<dd>
-<div class="block">Alias for <a href="dev/tamboui/terminal/KittyKeyboardSupport.html#pushSequence(int)"><code>KittyKeyboardSupport.pushSequence(int)</code></a>.</div>
 </dd>
 <dt><a href="dev/tamboui/terminal/KittyKeyboardSupport.html#pushSequence(int)" class="member-name-link">pushSequence(int)</a> - Static method in class dev.tamboui.terminal.<a href="dev/tamboui/terminal/KittyKeyboardSupport.html" title="class in dev.tamboui.terminal">KittyKeyboardSupport</a></dt>
 <dd>
@@ -18817,8 +18789,8 @@ rectangular areas using block characters.</div>
 </dd>
 <dt><a href="dev/tamboui/tui/event/KeyEvent.html#string()" class="member-name-link">string()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
 <dd>
-<div class="block">Returns the character for <a href="dev/tamboui/tui/event/KeyCode.html#CHAR"><code>KeyCode.CHAR</code></a> events as a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link"><code>String</code></a>, or an empty
-string otherwise.</div>
+<div class="block">Returns the character this event represents as a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link"><code>String</code></a>, or <code>""</code> if it does
+not represent a typed character.</div>
 </dd>
 <dt><a href="dev/tamboui/widgets/syntax/TokenType.html#STRING" class="member-name-link">STRING</a> - Enum constant in enum class dev.tamboui.widgets.syntax.<a href="dev/tamboui/widgets/syntax/TokenType.html" title="enum class in dev.tamboui.widgets.syntax">TokenType</a></dt>
 <dd>

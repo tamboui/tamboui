@@ -71,17 +71,10 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
-<li><a href="#query(dev.tamboui.terminal.Backend,int)" tabindex="0">query(Backend, int)</a></li>
-<li><a href="#push(dev.tamboui.terminal.Backend,int)" tabindex="0">push(Backend, int)</a></li>
-<li><a href="#pop(dev.tamboui.terminal.Backend)" tabindex="0">pop(Backend)</a></li>
-<li><a href="#pop(dev.tamboui.terminal.Backend,int)" tabindex="0">pop(Backend, int)</a></li>
-<li><a href="#querySequence()" tabindex="0">querySequence()</a></li>
 <li><a href="#pushSequence(int)" tabindex="0">pushSequence(int)</a></li>
-<li><a href="#pushMode(int)" tabindex="0">pushMode(int)</a></li>
 <li><a href="#popSequence()" tabindex="0">popSequence()</a></li>
-<li><a href="#popMode()" tabindex="0">popMode()</a></li>
-<li><a href="#popSequence(int)" tabindex="0">popSequence(int)</a></li>
-<li><a href="#popMode(int)" tabindex="0">popMode(int)</a></li>
+<li><a href="#querySequence()" tabindex="0">querySequence()</a></li>
+<li><a href="#query(dev.tamboui.terminal.Backend,int)" tabindex="0">query(Backend, int)</a></li>
 </ol>
 </li>
 </ol>
@@ -99,17 +92,25 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">KittyKeyboardSupport</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Utility class for Kitty keyboard protocol support (progressive keyboard enhancements).
+<div class="block">Constants, escape-sequence builders and optional terminal-side detection for the Kitty keyboard
+protocol (progressive keyboard enhancements).
 <p>
-The Kitty keyboard protocol allows applications to progressively opt into richer, unambiguous
-keyboard input reporting while safely managing terminal modes via push and pop stack controls.
+TamboUI pushes keyboard enhancement flags unconditionally on startup via
+<a href="Backend.html#enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)"><code>Backend.enableKeyboardProtocol(KeyboardProtocol)</code></a> and pops them on shutdown via
+<a href="Backend.html#disableKeyboardProtocol()"><code>Backend.disableKeyboardProtocol()</code></a>. Terminals that do not implement the protocol ignore
+both sequences; terminals that do implement it preserve any flags set by a parent process
+(shell integration, wrapping TUI, tmux) via the protocol's wire-level stack.
+<p>
+Apps that need to detect whether the current terminal actually supports the protocol (for UI
+adaptation, feature gating, or diagnostics) can call <a href="#query(dev.tamboui.terminal.Backend,int)"><code>query(Backend, int)</code></a>. This is
+opt-in and never invoked by the runner; the runner's default behaviour is push-unconditionally.
 
-<p><b>Escape sequences:</b></p>
+<p><b>Escape sequences used:</b></p>
 <ul>
+  <li>Push flags: <code>CSI &gt; &lt;flags&gt; u</code></li>
+  <li>Pop flags: <code>CSI &lt; u</code></li>
   <li>Query flags: <code>CSI ? u</code></li>
   <li>Query response: <code>CSI ? &lt;flags&gt; u</code></li>
-  <li>Push flags: <code>CSI &gt; &lt;flags&gt; u</code></li>
-  <li>Pop flags: <code>CSI &lt; [count] u</code></li>
 </ul></div>
 <dl class="notes">
 <dt>See Also:</dt>
@@ -183,64 +184,25 @@ enables all progressive protocol enhancements.</div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pop(dev.tamboui.terminal.Backend)" class="member-name-link">pop</a><wbr>(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Pops one keyboard enhancement mode entry from the terminal's keyboard mode stack,
-restoring the previous mode.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pop(dev.tamboui.terminal.Backend,int)" class="member-name-link">pop</a><wbr>(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
- int&nbsp;count)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Pops the specified number of keyboard enhancement mode entries from the terminal's
-keyboard mode stack.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#popMode()" class="member-name-link">popMode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Alias for <a href="#popSequence()"><code>popSequence()</code></a>.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#popMode(int)" class="member-name-link">popMode</a><wbr>(int&nbsp;count)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Alias for <a href="#popSequence(int)"><code>popSequence(int)</code></a>.</div>
-</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#popSequence()" class="member-name-link">popSequence</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the pop escape sequence for popping one entry (<code>CSI &lt; u</code>).</div>
+<div class="block">Returns the pop escape sequence (<code>CSI &lt; u</code>).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#popSequence(int)" class="member-name-link">popSequence</a><wbr>(int&nbsp;count)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pushSequence(int)" class="member-name-link">pushSequence</a><wbr>(int&nbsp;flags)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the pop escape sequence for popping multiple entries (<code>CSI &lt; &lt;count&gt; u</code>).</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#push(dev.tamboui.terminal.Backend,int)" class="member-name-link">push</a><wbr>(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
- int&nbsp;flags)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Pushes the specified keyboard enhancement flags onto the terminal's keyboard mode stack.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pushMode(int)" class="member-name-link">pushMode</a><wbr>(int&nbsp;flags)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Alias for <a href="#pushSequence(int)"><code>pushSequence(int)</code></a>.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#pushSequence(int)" class="member-name-link">pushSequence</a><wbr>(int&nbsp;flags)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns the push escape sequence for the given flags (<code>CSI &gt; &lt;flags&gt; u</code>).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#query(dev.tamboui.terminal.Backend,int)" class="member-name-link">query</a><wbr>(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#query(dev.tamboui.terminal.Backend,int)" class="member-name-link">query</a><wbr>(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
  int&nbsp;timeoutMs)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Queries the terminal for Kitty keyboard protocol support.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#querySequence()" class="member-name-link">querySequence</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#querySequence()" class="member-name-link">querySequence</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns the query escape sequence (<code>CSI ? u</code>).</div>
 </div>
 </div>
@@ -390,78 +352,29 @@ enables all progressive protocol enhancements.</div>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="query(dev.tamboui.terminal.Backend,int)">
-<h3>query</h3>
+<section class="detail" id="pushSequence(int)">
+<h3>pushSequence</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">query</span><wbr><span class="parameters">(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
- int&nbsp;timeoutMs)</span>
-                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Queries the terminal for Kitty keyboard protocol support.
-<p>
-Sends the <code>CSI ? u</code> query sequence and parses the <code>CSI ? &lt;flags&gt; u</code> response.
-If the terminal does not respond within the timeout, -1 is returned.</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">pushSequence</span><wbr><span class="parameters">(int&nbsp;flags)</span></div>
+<div class="block">Returns the push escape sequence for the given flags (<code>CSI &gt; &lt;flags&gt; u</code>).</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>backend</code> - the terminal backend</dd>
-<dd><code>timeoutMs</code> - timeout in milliseconds to wait for response</dd>
+<dd><code>flags</code> - the enhancement flags</dd>
 <dt>Returns:</dt>
-<dd>the reported flags bitmask, or -1 if unsupported or timed out</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if an I/O error occurs</dd>
+<dd>the push escape sequence</dd>
 </dl>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="push(dev.tamboui.terminal.Backend,int)">
-<h3>push</h3>
+<section class="detail" id="popSequence()">
+<h3>popSequence</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">push</span><wbr><span class="parameters">(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
- int&nbsp;flags)</span>
-                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Pushes the specified keyboard enhancement flags onto the terminal's keyboard mode stack.</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">popSequence</span>()</div>
+<div class="block">Returns the pop escape sequence (<code>CSI &lt; u</code>).</div>
 <dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>backend</code> - the terminal backend</dd>
-<dd><code>flags</code> - the flags to enable</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if an I/O error occurs</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="pop(dev.tamboui.terminal.Backend)">
-<h3>pop</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pop</span><wbr><span class="parameters">(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend)</span>
-                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Pops one keyboard enhancement mode entry from the terminal's keyboard mode stack,
-restoring the previous mode.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>backend</code> - the terminal backend</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if an I/O error occurs</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="pop(dev.tamboui.terminal.Backend,int)">
-<h3>pop</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pop</span><wbr><span class="parameters">(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
- int&nbsp;count)</span>
-                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Pops the specified number of keyboard enhancement mode entries from the terminal's
-keyboard mode stack.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>backend</code> - the terminal backend</dd>
-<dd><code>count</code> - the number of entries to pop</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if an I/O error occurs</dd>
+<dt>Returns:</dt>
+<dd>the pop escape sequence</dd>
 </dl>
 </div>
 </section>
@@ -480,87 +393,34 @@ keyboard mode stack.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="pushSequence(int)">
-<h3>pushSequence</h3>
+<section class="detail" id="query(dev.tamboui.terminal.Backend,int)">
+<h3>query</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">pushSequence</span><wbr><span class="parameters">(int&nbsp;flags)</span></div>
-<div class="block">Returns the push escape sequence for the given flags (<code>CSI &gt; &lt;flags&gt; u</code>).</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">query</span><wbr><span class="parameters">(<a href="Backend.html" title="interface in dev.tamboui.terminal">Backend</a>&nbsp;backend,
+ int&nbsp;timeoutMs)</span>
+                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Queries the terminal for Kitty keyboard protocol support.
+<p>
+Sends the <code>CSI ? u</code> query sequence and parses the <code>CSI ? &lt;flags&gt; u</code> response.
+Returns the reported flags bitmask on success, <code>0</code> if the terminal responded with no
+flags enabled, or <code>-1</code> if the terminal did not respond within the timeout (treat as
+"protocol not supported" for feature detection).
+<p>
+This method is opt-in: TamboUI's runner never calls it. Apps that want to detect support
+for UI adaptation or diagnostics can call it directly, typically before invoking
+<a href="Backend.html#enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)"><code>Backend.enableKeyboardProtocol(KeyboardProtocol)</code></a>.
+<p>
+<b>Warning:</b> query consumes bytes from the backend's input stream. Do not call it
+concurrently with other code reading input (such as the TuiRunner's input reader).
+Call it before starting the runner, or on a backend that is not yet attached to one.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>flags</code> - the enhancement flags</dd>
+<dd><code>backend</code> - the terminal backend</dd>
+<dd><code>timeoutMs</code> - timeout in milliseconds to wait for response</dd>
 <dt>Returns:</dt>
-<dd>the push escape sequence</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="pushMode(int)">
-<h3>pushMode</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">pushMode</span><wbr><span class="parameters">(int&nbsp;flags)</span></div>
-<div class="block">Alias for <a href="#pushSequence(int)"><code>pushSequence(int)</code></a>.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>flags</code> - the enhancement flags</dd>
-<dt>Returns:</dt>
-<dd>the push escape sequence</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="popSequence()">
-<h3>popSequence</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">popSequence</span>()</div>
-<div class="block">Returns the pop escape sequence for popping one entry (<code>CSI &lt; u</code>).</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the pop escape sequence</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="popMode()">
-<h3>popMode</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">popMode</span>()</div>
-<div class="block">Alias for <a href="#popSequence()"><code>popSequence()</code></a>.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the pop escape sequence</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="popSequence(int)">
-<h3>popSequence</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">popSequence</span><wbr><span class="parameters">(int&nbsp;count)</span></div>
-<div class="block">Returns the pop escape sequence for popping multiple entries (<code>CSI &lt; &lt;count&gt; u</code>).</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>count</code> - number of entries to pop</dd>
-<dt>Returns:</dt>
-<dd>the pop escape sequence</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="popMode(int)">
-<h3>popMode</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">popMode</span><wbr><span class="parameters">(int&nbsp;count)</span></div>
-<div class="block">Alias for <a href="#popSequence(int)"><code>popSequence(int)</code></a>.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>count</code> - number of entries to pop</dd>
-<dt>Returns:</dt>
-<dd>the pop escape sequence</dd>
+<dd>the reported flags bitmask, or <code>-1</code> if unsupported or timed out</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if an I/O error occurs</dd>
 </dl>
 </div>
 </section>

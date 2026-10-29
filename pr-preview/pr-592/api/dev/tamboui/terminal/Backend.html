@@ -85,8 +85,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#endSynchronizedUpdate()" tabindex="0">endSynchronizedUpdate()</a></li>
 <li><a href="#enableBracketedPaste()" tabindex="0">enableBracketedPaste()</a></li>
 <li><a href="#disableBracketedPaste()" tabindex="0">disableBracketedPaste()</a></li>
-<li><a href="#pushKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" tabindex="0">pushKeyboardProtocol(KeyboardProtocol)</a></li>
-<li><a href="#popKeyboardProtocol()" tabindex="0">popKeyboardProtocol()</a></li>
+<li><a href="#enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" tabindex="0">enableKeyboardProtocol(KeyboardProtocol)</a></li>
+<li><a href="#disableKeyboardProtocol()" tabindex="0">disableKeyboardProtocol()</a></li>
 <li><a href="#scrollUp(int)" tabindex="0">scrollUp(int)</a></li>
 <li><a href="#scrollDown(int)" tabindex="0">scrollDown(int)</a></li>
 <li><a href="#writeRaw(byte%5B%5D)" tabindex="0">writeRaw(byte[])</a></li>
@@ -199,24 +199,34 @@ Implementations handle the actual terminal I/O.</div>
 <div class="block">Disables bracketed paste mode (<code>ESC[?2004l</code>).</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#disableMouseCapture()" class="member-name-link">disableMouseCapture</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#disableKeyboardProtocol()" class="member-name-link">disableKeyboardProtocol</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Disables mouse capture.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#disableRawMode()" class="member-name-link">disableRawMode</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Disables raw mode.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#draw(dev.tamboui.buffer.DiffResult)" class="member-name-link">draw</a><wbr>(<a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;diff)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Draws the given cell updates to the terminal.</div>
+<div class="block">Disables Kitty keyboard enhancement flags on the terminal.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#enableBracketedPaste()" class="member-name-link">enableBracketedPaste</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#disableMouseCapture()" class="member-name-link">disableMouseCapture</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Disables mouse capture.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#disableRawMode()" class="member-name-link">disableRawMode</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Disables raw mode.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#draw(dev.tamboui.buffer.DiffResult)" class="member-name-link">draw</a><wbr>(<a href="../buffer/DiffResult.html" title="class in dev.tamboui.buffer">DiffResult</a>&nbsp;diff)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Draws the given cell updates to the terminal.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#enableBracketedPaste()" class="member-name-link">enableBracketedPaste</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Enables bracketed paste mode (<code>ESC[?2004h</code>).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" class="member-name-link">enableKeyboardProtocol</a><wbr>(<a href="KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a>&nbsp;protocol)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Enables Kitty keyboard enhancement flags on the terminal.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#enableMouseCapture()" class="member-name-link">enableMouseCapture</a>()</code></div>
@@ -302,16 +312,6 @@ Implementations handle the actual terminal I/O.</div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#peek(int)" class="member-name-link">peek</a><wbr>(int&nbsp;timeoutMs)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Peeks at the next character without consuming it.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#popKeyboardProtocol()" class="member-name-link">popKeyboardProtocol</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Pops keyboard enhancement flags from the terminal's keyboard stack.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#pushKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" class="member-name-link">pushKeyboardProtocol</a><wbr>(<a href="KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a>&nbsp;protocol)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Pushes Kitty keyboard enhancement flags to the terminal's keyboard stack.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#read(int)" class="member-name-link">read</a><wbr>(int&nbsp;timeoutMs)</code></div>
@@ -738,18 +738,28 @@ markers so the event parser can deliver the full paste as a single
 </section>
 </li>
 <li>
-<section class="detail" id="pushKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)">
-<h3>pushKeyboardProtocol</h3>
+<section class="detail" id="enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)">
+<h3>enableKeyboardProtocol</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pushKeyboardProtocol</span><wbr><span class="parameters">(<a href="KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a>&nbsp;protocol)</span>
-                           throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Pushes Kitty keyboard enhancement flags to the terminal's keyboard stack.
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">enableKeyboardProtocol</span><wbr><span class="parameters">(<a href="KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a>&nbsp;protocol)</span>
+                                throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Enables Kitty keyboard enhancement flags on the terminal.
 <p>
 When supported, enables progressive keyboard enhancements such as disambiguation
-of escape codes, alternate keys, event types, etc.</div>
+of escape codes, alternate keys, event types, etc. Implementations use the Kitty
+keyboard protocol's push operation on the wire so that any flags a parent process
+had set are preserved and restored by the matching <a href="#disableKeyboardProtocol()"><code>disableKeyboardProtocol()</code></a>.
+<p>
+Calling this with <a href="KeyboardProtocol.html#LEGACY"><code>KeyboardProtocol.LEGACY</code></a> or a <code>null</code> protocol is a no-op
+and returns <code>false</code>; callers can use the return value to decide whether a matching
+<a href="#disableKeyboardProtocol()"><code>disableKeyboardProtocol()</code></a> is required on cleanup.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>protocol</code> - the keyboard protocol mode</dd>
+<dt>Returns:</dt>
+<dd><code>true</code> if the protocol was enabled and a matching
+        <a href="#disableKeyboardProtocol()"><code>disableKeyboardProtocol()</code></a> should be issued on cleanup;
+        <code>false</code> if the call was a no-op</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if writing to the terminal fails</dd>
 <dt>See Also:</dt>
@@ -764,12 +774,16 @@ of escape codes, alternate keys, event types, etc.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="popKeyboardProtocol()">
-<h3>popKeyboardProtocol</h3>
+<section class="detail" id="disableKeyboardProtocol()">
+<h3>disableKeyboardProtocol</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">popKeyboardProtocol</span>()
-                          throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Pops keyboard enhancement flags from the terminal's keyboard stack.</div>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">disableKeyboardProtocol</span>()
+                              throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Disables Kitty keyboard enhancement flags on the terminal.
+<p>
+Implementations use the Kitty keyboard protocol's pop operation on the wire so that
+any flags a parent process had set before <a href="#enableKeyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)"><code>enableKeyboardProtocol(KeyboardProtocol)</code></a>
+are restored.</div>
 <dl class="notes">
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if writing to the terminal fails</dd>
