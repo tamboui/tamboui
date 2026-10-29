@@ -177,6 +177,17 @@ public final class EventParser {
                 case 'Z':
                     // Shift+Tab (backtab) - ESC[Z
                     return KeyEvent.ofKey(KeyCode.TAB, KeyModifiers.SHIFT, bindings);
+                case 'P':
+                    // Legacy xterm form of F1 when no modifiers are present (CSI P).
+                    // Terminals emit this when NumLock is off and no modifier is held.
+                    return KeyEvent.ofKey(KeyCode.F1, bindings);
+                case 'Q':
+                    // Legacy xterm form of F2 (CSI Q).
+                    return KeyEvent.ofKey(KeyCode.F2, bindings);
+                case 'S':
+                    // Legacy xterm form of F4 (CSI S). Note: CSI R is intentionally not
+                    // mapped here because it clashes with the cursor-position report.
+                    return KeyEvent.ofKey(KeyCode.F4, bindings);
                 default:
                     return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
             }

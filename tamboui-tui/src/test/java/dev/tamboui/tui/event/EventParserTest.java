@@ -282,6 +282,22 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("Bare CSI P/Q/S are parsed as unmodified F1/F2/F4 (legacy xterm form)")
+    void bareCsiLetterFunctionKeys() throws IOException {
+        KeyEvent f1 = (KeyEvent) EventParser.readEvent(new QueueBackend(27, '[', 'P'), 0);
+        assertThat(f1.code()).isEqualTo(KeyCode.F1);
+        assertThat(f1.modifiers()).isEqualTo(KeyModifiers.NONE);
+
+        KeyEvent f2 = (KeyEvent) EventParser.readEvent(new QueueBackend(27, '[', 'Q'), 0);
+        assertThat(f2.code()).isEqualTo(KeyCode.F2);
+        assertThat(f2.modifiers()).isEqualTo(KeyModifiers.NONE);
+
+        KeyEvent f4 = (KeyEvent) EventParser.readEvent(new QueueBackend(27, '[', 'S'), 0);
+        assertThat(f4.code()).isEqualTo(KeyCode.F4);
+        assertThat(f4.modifiers()).isEqualTo(KeyModifiers.NONE);
+    }
+
+    @Test
     @DisplayName("Alt+F3 (ESC[1;3R) is parsed as F3 with Alt")
     void altF3ParsedCorrectly() throws IOException {
         QueueBackend backend = new QueueBackend(27, '[', '1', ';', '3', 'R');
