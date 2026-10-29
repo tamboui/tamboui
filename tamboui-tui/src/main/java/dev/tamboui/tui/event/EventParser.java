@@ -334,6 +334,14 @@ public final class EventParser {
         boolean keypad = isKeypadKeyCode(code);
         KeyEventState state = KeyEventState.of(pm.capsLock, pm.numLock, keypad);
 
+        // For keypad digits and operators (KP_0..KP_9, KP_ADD, KP_SUBTRACT, ...), set the character
+        // field so text widgets insert the typed character via the usual codePoint()/string()
+        // accessors. The KP_* KeyCode is preserved so bindings can still target the keypad key
+        // distinctly from its main-row equivalent.
+        if (character == 0) {
+            character = keypadCharacter(code);
+        }
+
         if (text.isEmpty()) {
             // Synthesize text only for plain typing. Any non-shift modifier (Ctrl, Alt, Super,
             // Hyper, Meta) means this is a shortcut; the terminal is the authority on associated
@@ -466,6 +474,37 @@ public final class EventParser {
             case 57453: return KeyCode.ISO_LEVEL3_SHIFT;
             case 57454: return KeyCode.ISO_LEVEL5_SHIFT;
             default: return null;
+        }
+    }
+
+    /**
+     * Returns the character that a keypad digit or arithmetic key would type, or {@code 0} if the
+     * given code is not such a key. Navigation keypad keys (KP_LEFT, KP_ENTER, ...) return {@code 0}
+     * because they do not represent typed characters.
+     */
+    private static int keypadCharacter(KeyCode code) {
+        if (code == null) {
+            return 0;
+        }
+        switch (code) {
+            case KP_0: return '0';
+            case KP_1: return '1';
+            case KP_2: return '2';
+            case KP_3: return '3';
+            case KP_4: return '4';
+            case KP_5: return '5';
+            case KP_6: return '6';
+            case KP_7: return '7';
+            case KP_8: return '8';
+            case KP_9: return '9';
+            case KP_ADD:       return '+';
+            case KP_SUBTRACT:  return '-';
+            case KP_MULTIPLY:  return '*';
+            case KP_DIVIDE:    return '/';
+            case KP_DECIMAL:   return '.';
+            case KP_EQUAL:     return '=';
+            case KP_SEPARATOR: return ',';
+            default: return 0;
         }
     }
 

@@ -496,8 +496,15 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 }
                 return false;
             default:
-                return false;
+                break; // fall through to keypad-typing fallback
         }
+        // Keypad digit/operator (KP_*): parser set the character field; treat as typing without
+        // bypassing the modifier check so shortcut chords stay inert.
+        if (event.codePoint() > 0 && !event.hasNonShiftModifier()) {
+            state.insert(event.string());
+            return true;
+        }
+        return false;
     }
 
     /**

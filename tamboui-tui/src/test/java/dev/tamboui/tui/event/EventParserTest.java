@@ -693,6 +693,27 @@ class EventParserTest {
     }
 
     @Test
+    @DisplayName("Keypad digits/operators carry both KP_* code and the typed character")
+    void keypadDigitsCarryCharacter() throws IOException {
+        // Keypad 1: 57400
+        KeyEvent kp1 = (KeyEvent) EventParser.readEvent(backendFor("\033[57400u"), 0);
+        assertThat(kp1.code()).isEqualTo(KeyCode.KP_1);
+        assertThat(kp1.isKeypad()).isTrue();
+        assertThat(kp1.codePoint()).isEqualTo('1');
+        assertThat(kp1.string()).isEqualTo("1");
+
+        // Keypad Add: 57413
+        KeyEvent kpAdd = (KeyEvent) EventParser.readEvent(backendFor("\033[57413u"), 0);
+        assertThat(kpAdd.code()).isEqualTo(KeyCode.KP_ADD);
+        assertThat(kpAdd.codePoint()).isEqualTo('+');
+
+        // Keypad Enter: 57414 - navigation, no character
+        KeyEvent kpEnter = (KeyEvent) EventParser.readEvent(backendFor("\033[57414u"), 0);
+        assertThat(kpEnter.code()).isEqualTo(KeyCode.KP_ENTER);
+        assertThat(kpEnter.codePoint()).as("navigation keypad keys have no character").isZero();
+    }
+
+    @Test
     @DisplayName("CSI-u sequences with long associated text are kept intact (IME paste)")
     void longAssociatedTextIsKept() throws IOException {
         // Build CSI 0;;CP1:CP2:...:CPN u with 100 CJK code points starting at U+4E2D.

@@ -556,6 +556,34 @@ class BindingsTest {
     }
 
     @Test
+    @DisplayName("Standard bindings match keypad navigation keys (KP_Up -> moveUp, KP_Enter -> confirm)")
+    void standardBindingsMatchKeypadNavigation() {
+        KeyEvent kpUp = KeyEvent.builder().code(KeyCode.KP_UP).build();
+        assertThat(kpUp.isUp()).as("KP_Up triggers moveUp").isTrue();
+
+        KeyEvent kpEnter = KeyEvent.builder().code(KeyCode.KP_ENTER).build();
+        assertThat(kpEnter.isConfirm()).as("KP_Enter triggers confirm").isTrue();
+        assertThat(kpEnter.isSelect()).as("KP_Enter triggers select").isTrue();
+
+        KeyEvent kpHome = KeyEvent.builder().code(KeyCode.KP_HOME).build();
+        assertThat(kpHome.isHome()).as("KP_Home triggers home").isTrue();
+
+        KeyEvent kpDelete = KeyEvent.builder().code(KeyCode.KP_DELETE).build();
+        assertThat(kpDelete.isDeleteForward()).as("KP_Delete triggers deleteForward").isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger.key targets a keypad KeyCode distinctly from its main-row equivalent")
+    void keyTriggerTargetsKeypadDistinctly() {
+        KeyTrigger kpOneTrigger = KeyTrigger.key(KeyCode.KP_1);
+        KeyEvent kp1 = KeyEvent.builder().code(KeyCode.KP_1).character('1').build();
+        KeyEvent main1 = KeyEvent.builder().code(KeyCode.CHAR).character('1').build();
+
+        assertThat(kpOneTrigger.matches(kp1)).as("KP_1 trigger matches KP_1 event").isTrue();
+        assertThat(kpOneTrigger.matches(main1)).as("KP_1 trigger does not match main '1'").isFalse();
+    }
+
+    @Test
     @DisplayName("KeyTrigger does not match base layout key for plain typing (typing 'й' on Russian layout is not ch('q'))")
     void keyTriggerDoesNotMatchBaseLayoutKeyForPlainTyping() {
         KeyTrigger trigger = KeyTrigger.ch('q');

@@ -184,6 +184,65 @@ public final class BindingSets {
         map.put("f10", KeyCode.F10);
         map.put("f11", KeyCode.F11);
         map.put("f12", KeyCode.F12);
+        // Kitty-reportable extended function keys (F13-F35) under the full protocol.
+        map.put("f13", KeyCode.F13);
+        map.put("f14", KeyCode.F14);
+        map.put("f15", KeyCode.F15);
+        map.put("f16", KeyCode.F16);
+        map.put("f17", KeyCode.F17);
+        map.put("f18", KeyCode.F18);
+        map.put("f19", KeyCode.F19);
+        map.put("f20", KeyCode.F20);
+        map.put("f21", KeyCode.F21);
+        map.put("f22", KeyCode.F22);
+        map.put("f23", KeyCode.F23);
+        map.put("f24", KeyCode.F24);
+        map.put("f25", KeyCode.F25);
+        map.put("f26", KeyCode.F26);
+        map.put("f27", KeyCode.F27);
+        map.put("f28", KeyCode.F28);
+        map.put("f29", KeyCode.F29);
+        map.put("f30", KeyCode.F30);
+        map.put("f31", KeyCode.F31);
+        map.put("f32", KeyCode.F32);
+        map.put("f33", KeyCode.F33);
+        map.put("f34", KeyCode.F34);
+        map.put("f35", KeyCode.F35);
+        // Keypad keys under the Kitty keyboard protocol. Spelled out as "Keypad_Enter",
+        // "Keypad_0", etc. to match the full-word convention of other key names
+        // (case-insensitive via lowerKey lookup).
+        // Lookup is case-insensitive; the KeyCode enum uses the shorter KP_ prefix for the
+        // Kitty spec convention, but user-facing binding files spell it out.
+        //
+        map.put("keypad_0", KeyCode.KP_0);
+        map.put("keypad_1", KeyCode.KP_1);
+        map.put("keypad_2", KeyCode.KP_2);
+        map.put("keypad_3", KeyCode.KP_3);
+        map.put("keypad_4", KeyCode.KP_4);
+        map.put("keypad_5", KeyCode.KP_5);
+        map.put("keypad_6", KeyCode.KP_6);
+        map.put("keypad_7", KeyCode.KP_7);
+        map.put("keypad_8", KeyCode.KP_8);
+        map.put("keypad_9", KeyCode.KP_9);
+        map.put("keypad_decimal", KeyCode.KP_DECIMAL);
+        map.put("keypad_divide", KeyCode.KP_DIVIDE);
+        map.put("keypad_multiply", KeyCode.KP_MULTIPLY);
+        map.put("keypad_subtract", KeyCode.KP_SUBTRACT);
+        map.put("keypad_add", KeyCode.KP_ADD);
+        map.put("keypad_enter", KeyCode.KP_ENTER);
+        map.put("keypad_equal", KeyCode.KP_EQUAL);
+        map.put("keypad_separator", KeyCode.KP_SEPARATOR);
+        map.put("keypad_left", KeyCode.KP_LEFT);
+        map.put("keypad_right", KeyCode.KP_RIGHT);
+        map.put("keypad_up", KeyCode.KP_UP);
+        map.put("keypad_down", KeyCode.KP_DOWN);
+        map.put("keypad_pageup", KeyCode.KP_PAGE_UP);
+        map.put("keypad_pagedown", KeyCode.KP_PAGE_DOWN);
+        map.put("keypad_home", KeyCode.KP_HOME);
+        map.put("keypad_end", KeyCode.KP_END);
+        map.put("keypad_insert", KeyCode.KP_INSERT);
+        map.put("keypad_delete", KeyCode.KP_DELETE);
+        map.put("keypad_begin", KeyCode.KP_BEGIN);
         return map;
     }
 

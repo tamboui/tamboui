@@ -683,20 +683,26 @@ public final class KeyEvent implements Event {
         if (text != null && !text.isEmpty()) {
             return text;
         }
-        return code == KeyCode.CHAR && character != 0 ? new String(Character.toChars(character)) : "";
+        return character != 0 ? new String(Character.toChars(character)) : "";
     }
 
     /**
-     * Returns the Unicode code point for {@link KeyCode#CHAR} events, or {@code 0} otherwise.
-     * Use this when you need the numeric value for range checks or comparisons.
+     * Returns the Unicode code point this event represents, or {@code 0} if it does not represent
+     * a typed character.
+     * <p>
+     * Returns the character for {@link KeyCode#CHAR} events as well as for keypad digit/operator
+     * events ({@link KeyCode#KP_0}..{@link KeyCode#KP_9}, {@link KeyCode#KP_ADD}, etc.) when the
+     * parser has resolved them to a character. This lets text input treat keypad typing uniformly
+     * with main-row typing while preserving the keypad {@link KeyCode} for bindings that target
+     * the keypad keys distinctly.
      *
-     * @return the Unicode code point, or {@code 0} for non-{@link KeyCode#CHAR} events
+     * @return the Unicode code point, or {@code 0} if this event does not represent a character
      */
     public int codePoint() {
         if (text != null && !text.isEmpty() && text.codePointCount(0, text.length()) == 1) {
             return text.codePointAt(0);
         }
-        return code == KeyCode.CHAR ? character : 0;
+        return character;
     }
 
     /**

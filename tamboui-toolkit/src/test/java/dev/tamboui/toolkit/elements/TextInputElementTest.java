@@ -131,6 +131,23 @@ class TextInputElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("TextInputElement inserts keypad digits (KP_1 under FULL inserts \"1\")")
+    void insertsKeypadDigit() {
+        dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
+        TextInputElement element = textInput(state);
+        dev.tamboui.tui.event.KeyEvent kp1 = dev.tamboui.tui.event.KeyEvent.builder()
+                .code(dev.tamboui.tui.event.KeyCode.KP_1)
+                .character('1')
+                .kind(dev.tamboui.tui.event.KeyEventKind.PRESS)
+                .build();
+
+        dev.tamboui.toolkit.event.EventResult result = element.handleKeyEvent(kp1, true);
+
+        assertThat(result).isEqualTo(dev.tamboui.toolkit.event.EventResult.HANDLED);
+        assertThat(state.text()).isEqualTo("1");
+    }
+
+    @Test
     @DisplayName("TextInputElement ignores character when Hyper is pressed")
     void ignoresHyperKey() {
         dev.tamboui.widgets.input.TextInputState state = new dev.tamboui.widgets.input.TextInputState();
