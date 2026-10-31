@@ -27,6 +27,7 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.toolkit.event.KeyEventHandler;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.Clear;
@@ -54,6 +55,21 @@ import dev.tamboui.widgets.block.Title;
  * <p>
  * Programmatic values override CSS values when both are set.
  *
+ * <h2>Key Event Handling</h2>
+ * <p>
+ * DialogElement is modal and consumes all keyboard events so they do not leak
+ * to elements behind the dialog. Keys are dispatched in the following order:
+ * <ol>
+ *   <li><b>Children first:</b> Dispatched to child elements with {@code focused=true},
+ *       allowing interactive components like {@code textInput()} to handle typing, cursor, and edit keys.</li>
+ *   <li><b>Content-key hook:</b> If no child handles the key, the handler registered via
+ *       {@link #onKey(KeyEventHandler)} is called. This allows dialog owners to handle
+ *       scrolling, paging, or custom navigation keys without having to subclass child elements.</li>
+ *   <li><b>Escape:</b> Triggers {@link #onCancel(Runnable)} if configured.</li>
+ *   <li><b>Enter:</b> Triggers {@link #onConfirm(Runnable)} if configured.</li>
+ *   <li><b>Modal consume-all:</b> Any remaining unhandled keys are consumed (returning {@code EventResult.HANDLED}).</li>
+ * </ol>
+ *
  * <pre>{@code
  * dialog("Confirm Delete",
  *     text("Delete 3 files?"),
@@ -75,6 +91,7 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     private Integer spacing;
     private Runnable onConfirm;
     private Runnable onCancel;
+    private KeyEventHandler onKey;
 
     /**
      * Creates a new dialog element with default settings.
@@ -281,18 +298,56 @@ public final class DialogElement extends ContainerElement<DialogElement> {
     }
 
     /**
+     * Sets a custom key event handler for this dialog.
+     * <p>
+     * The handler is invoked for keys not handled by the dialog's children,
+     * before the dialog's own Escape (cancel) and Enter (confirm) actions and
+     * the modal consume-all fallback. This is ideal for handling scrolling,
+     * paging, or custom navigation keys without having to subclass child elements.
+     *
+     * @param handler the key event handler
+     * @return this element for chaining
+     */
+    public DialogElement onKey(KeyEventHandler handler) {
+        this.onKey = handler;
+        this.keyHandler = handler;
+        return this;
+    }
+
+    @Override
+    public DialogElement onKeyEvent(KeyEventHandler handler) {
+        return onKey(handler);
+    }
+
+    @Override
+    public KeyEventHandler keyEventHandler() {
+        return onKey != null ? onKey : keyHandler;
+    }
+
+    /**
      * Handles key events for the dialog.
      * <p>
-     * Routes events to children first (via ContainerElement).
-     * Then handles Enter for confirm and Escape for cancel.
+     * Routes events to children first with {@code focused=true} so interactive content
+     * (such as text inputs) can handle keys even when the router offered them to the dialog
+     * as unfocused. If no child handles the key, the {@link #onKey} handler is invoked.
+     * Then handles Escape for cancel and Enter for confirm.
      * Being modal, the dialog consumes all key events.
      */
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        // Route to children first (via ContainerElement)
-        EventResult result = super.handleKeyEvent(event, focused);
-        if (result.isHandled()) {
-            return result;
+        // Route to children first as focused (a modal dialog owns keys while shown)
+        for (Element child : children) {
+            if (child.handleKeyEvent(event, true) == EventResult.HANDLED) {
+                return EventResult.HANDLED;
+            }
+        }
+
+        // Content-key hook (e.g. for scrolling, paging, or custom navigation)
+        if (onKey != null) {
+            EventResult keyResult = onKey.handle(event);
+            if (keyResult != null && keyResult.isHandled()) {
+                return keyResult;
+            }
         }
 
         // Handle Escape to cancel

@@ -4,6 +4,9 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +19,10 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
+import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -351,5 +358,127 @@ class DialogElementTest extends AbstractElementTest {
             }
         }
         return false;
+    }
+
+    // ============ Key event handling tests (#440) ============
+
+    @Test
+    @DisplayName("Children handle key events as focused even when router offers them unfocused")
+    void handleKeyEvent_routesToChildrenAsFocused() {
+        TextInputState inputState = new TextInputState();
+        DialogElement dialog = dialog("Prompt", textInput(inputState));
+
+        // Router passes focused=false when dialog is not the actively focused element
+        EventResult result = dialog.handleKeyEvent(KeyEvent.ofChar('a'), false);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(inputState.text()).isEqualTo("a");
+    }
+
+    @Test
+    @DisplayName("Child key handling takes precedence over onKey hook")
+    void handleKeyEvent_childrenTakePrecedenceOverOnKey() {
+        TextInputState inputState = new TextInputState();
+        AtomicBoolean onKeyInvoked = new AtomicBoolean(false);
+
+        DialogElement dialog = dialog("Prompt", textInput(inputState))
+                .onKey(event -> {
+                    onKeyInvoked.set(true);
+                    return EventResult.HANDLED;
+                });
+
+        EventResult result = dialog.handleKeyEvent(KeyEvent.ofChar('x'), false);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(inputState.text()).isEqualTo("x");
+        assertThat(onKeyInvoked).isFalse();
+    }
+
+    @Test
+    @DisplayName("onKey hook is called for keys not handled by children")
+    void handleKeyEvent_onKeyInvokedForUnhandledKeys() {
+        AtomicReference<KeyCode> receivedCode = new AtomicReference<>();
+
+        DialogElement dialog = dialog("Viewer", text("File content line 1"))
+                .onKey(event -> {
+                    receivedCode.set(event.code());
+                    return EventResult.HANDLED;
+                });
+
+        EventResult result = dialog.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), false);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(receivedCode.get()).isEqualTo(KeyCode.DOWN);
+    }
+
+    @Test
+    @DisplayName("onKey hook returning UNHANDLED falls through to default cancel and confirm handlers")
+    void handleKeyEvent_onKeyFallsThroughWhenUnhandled() {
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        AtomicBoolean confirmed = new AtomicBoolean(false);
+
+        DialogElement dialog = dialog("Confirm", text("Proceed?"))
+                .onKey(event -> EventResult.UNHANDLED)
+                .onCancel(() -> cancelled.set(true))
+                .onConfirm(() -> confirmed.set(true));
+
+        EventResult cancelResult = dialog.handleKeyEvent(KeyEvent.ofKey(KeyCode.ESCAPE), false);
+        assertThat(cancelResult).isEqualTo(EventResult.HANDLED);
+        assertThat(cancelled).isTrue();
+
+        EventResult confirmResult = dialog.handleKeyEvent(KeyEvent.ofKey(KeyCode.ENTER), false);
+        assertThat(confirmResult).isEqualTo(EventResult.HANDLED);
+        assertThat(confirmed).isTrue();
+    }
+
+    @Test
+    @DisplayName("onKey hook can intercept Escape before onCancel is triggered")
+    void handleKeyEvent_onKeyCanInterceptEscape() {
+        AtomicBoolean onKeyIntercepted = new AtomicBoolean(false);
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+
+        DialogElement dialog = dialog("Viewer", text("Content"))
+                .onKey(event -> {
+                    if (event.code() == KeyCode.ESCAPE) {
+                        onKeyIntercepted.set(true);
+                        return EventResult.HANDLED;
+                    }
+                    return EventResult.UNHANDLED;
+                })
+                .onCancel(() -> cancelled.set(true));
+
+        EventResult result = dialog.handleKeyEvent(KeyEvent.ofKey(KeyCode.ESCAPE), false);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(onKeyIntercepted).isTrue();
+        assertThat(cancelled).isFalse();
+    }
+
+    @Test
+    @DisplayName("Modal consume-all swallows remaining unhandled keys")
+    void handleKeyEvent_modalConsumeAllSwallowsOtherKeys() {
+        DialogElement dialog = dialog("Notice", text("Some information"));
+
+        EventResult result = dialog.handleKeyEvent(KeyEvent.ofKey(KeyCode.F5), false);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+    }
+
+    @Test
+    @DisplayName("onKeyEvent and keyEventHandler alias onKey")
+    void onKeyEvent_and_keyEventHandler_aliasesOnKey() {
+        AtomicBoolean handled = new AtomicBoolean(false);
+        DialogElement dialog = dialog("Dialog");
+
+        dialog.onKeyEvent(event -> {
+            handled.set(true);
+            return EventResult.HANDLED;
+        });
+
+        assertThat(dialog.keyEventHandler()).isNotNull();
+
+        EventResult result = dialog.handleKeyEvent(KeyEvent.ofKey(KeyCode.UP), false);
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(handled).isTrue();
     }
 }
