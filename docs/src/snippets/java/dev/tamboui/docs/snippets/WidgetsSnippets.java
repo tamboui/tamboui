@@ -11,6 +11,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.elements.DividerStyle;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.Clear;
@@ -797,5 +798,17 @@ public class WidgetsSnippets {
         row(left, right).spacing(1);
         column(top, middle, bottom).spacing(1);
         // end::toolkit-dsl[]
+    }
+
+    void dividerElement() {
+        // tag::divider[]
+        column(
+            divider(),
+            divider("Introduction").style(DividerStyle.DOUBLE),
+            divider().center("Connection").lineColor(Color.GRAY).centerColor(Color.CYAN),
+            divider().left("Input").center("Processing").right("Output"),
+            divider().style(DividerStyle.ROUNDED)
+        );
+        // end::divider[]
     }
 }

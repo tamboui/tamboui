@@ -21,6 +21,8 @@ import dev.tamboui.toolkit.elements.ChartElement;
 import dev.tamboui.toolkit.elements.Column;
 import dev.tamboui.toolkit.elements.ColumnsElement;
 import dev.tamboui.toolkit.elements.DialogElement;
+import dev.tamboui.toolkit.elements.DividerElement;
+import dev.tamboui.toolkit.elements.DividerStyle;
 import dev.tamboui.toolkit.elements.DockElement;
 import dev.tamboui.toolkit.elements.DualSparklineElement;
 import dev.tamboui.toolkit.elements.FlowElement;
@@ -599,6 +601,53 @@ public final class Toolkit {
      */
     public static Spacer spacer(int length) {
         return Spacer.length(length);
+    }
+
+    // ==================== Divider ====================
+
+    /**
+     * Creates a plain horizontal divider line with default single-line style.
+     * <p>
+     * The divider fills the available width and is 1 row tall.
+     * <pre>{@code
+     * divider()
+     *     .style(SINGLE)
+     *     .fg(Color.CYAN)
+     * }</pre>
+     *
+     * @return a new divider element
+     */
+    public static DividerElement divider() {
+        return new DividerElement();
+    }
+
+    /**
+     * Creates a divider with text on the left side.
+     * <pre>{@code
+     * divider("Section Title")
+     *     .style(BOLD)
+     * }</pre>
+     *
+     * @param leftText the text to display on the left side
+     * @return a new divider element
+     */
+    public static DividerElement divider(String leftText) {
+        return new DividerElement(leftText);
+    }
+
+    /**
+     * Creates a divider with the given line style and no text.
+     * <pre>{@code
+     * divider(DOUBLE).fg(Color.BLUE)
+     * }</pre>
+     *
+     * @param style the divider line style
+     * @return a new divider element
+     */
+    public static DividerElement divider(DividerStyle style) {
+        DividerElement element = new DividerElement();
+        element.style(style);
+        return element;
     }
 
     // ==================== Constraints ====================
