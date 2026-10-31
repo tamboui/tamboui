@@ -14,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
+import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 import dev.tamboui.tui.error.RenderErrorHandler;
@@ -51,6 +52,7 @@ public final class TuiConfig {
     private final Backend backend;
     private final ScheduledExecutorService scheduler;
     private final ClassLoader backendClassLoader;
+    private final KeyboardProtocol keyboardProtocol;
 
     /**
      * Creates a new TUI configuration with the specified options.
@@ -142,6 +144,55 @@ public final class TuiConfig {
             ScheduledExecutorService scheduler,
             ClassLoader backendClassLoader
     ) {
+        this(rawMode, alternateScreen, hideCursor, mouseCapture, mouseMotion, bracketedPaste, pollTimeout, tickRate,
+                resizeGracePeriod, shutdownHook, bindings, errorHandler, errorOutput, fpsOverlayEnabled,
+                postRenderProcessors, backend, scheduler, backendClassLoader, KeyboardProtocol.AUTO);
+    }
+
+    /**
+     * Creates a new TUI configuration with all options including keyboard protocol.
+     *
+     * @param rawMode whether to enable raw terminal mode
+     * @param alternateScreen whether to use the alternate screen buffer
+     * @param hideCursor whether to hide the cursor
+     * @param mouseCapture whether to capture mouse events
+     * @param mouseMotion whether to also capture bare mouse motion (hover) events
+     * @param bracketedPaste whether to enable bracketed paste mode
+     * @param pollTimeout timeout for polling events
+     * @param tickRate interval between tick events, or null to disable
+     * @param resizeGracePeriod grace period for resize events, or null to disable
+     * @param shutdownHook whether to register a JVM shutdown hook
+     * @param bindings the key/mouse bindings for semantic actions
+     * @param errorHandler the handler for render errors
+     * @param errorOutput the output stream for error logging
+     * @param fpsOverlayEnabled whether to show the FPS overlay
+     * @param postRenderProcessors list of post-render processors
+     * @param backend the backend to use (optional)
+     * @param scheduler external scheduler to use, or null to create an internal one
+     * @param backendClassLoader classloader used exclusively for backend discovery, or null for the default
+     * @param keyboardProtocol keyboard protocol mode
+     */
+    public TuiConfig(
+            boolean rawMode,
+            boolean alternateScreen,
+            boolean hideCursor,
+            boolean mouseCapture,
+            boolean mouseMotion,
+            boolean bracketedPaste,
+            Duration pollTimeout,
+            Duration tickRate,
+            Duration resizeGracePeriod,
+            boolean shutdownHook,
+            Bindings bindings,
+            RenderErrorHandler errorHandler,
+            PrintStream errorOutput,
+            boolean fpsOverlayEnabled,
+            List<PostRenderProcessor> postRenderProcessors,
+            Backend backend,
+            ScheduledExecutorService scheduler,
+            ClassLoader backendClassLoader,
+            KeyboardProtocol keyboardProtocol
+    ) {
         this.rawMode = rawMode;
         this.alternateScreen = alternateScreen;
         this.hideCursor = hideCursor;
@@ -162,6 +213,7 @@ public final class TuiConfig {
         this.backend = backend;
         this.scheduler = scheduler;
         this.backendClassLoader = backendClassLoader;
+        this.keyboardProtocol = keyboardProtocol != null ? keyboardProtocol : KeyboardProtocol.AUTO;
     }
 
     /**
@@ -416,6 +468,15 @@ public final class TuiConfig {
     }
 
     /**
+     * Returns the keyboard protocol mode.
+     *
+     * @return the keyboard protocol mode (never null)
+     */
+    public KeyboardProtocol keyboardProtocol() {
+        return keyboardProtocol != null ? keyboardProtocol : KeyboardProtocol.AUTO;
+    }
+
+    /**
      * Returns a builder pre-populated with this config's values.
      * <p>
      * This is useful for creating a modified copy of an existing config.
@@ -442,6 +503,7 @@ public final class TuiConfig {
         b.backend = backend;
         b.scheduler = scheduler;
         b.backendClassLoader = backendClassLoader;
+        b.keyboardProtocol = keyboardProtocol;
         return b;
     }
 
@@ -465,7 +527,8 @@ public final class TuiConfig {
                 && (resizeGracePeriod != null ? resizeGracePeriod.equals(that.resizeGracePeriod) : that.resizeGracePeriod == null)
                 && bindings.equals(that.bindings)
                 && fpsOverlayEnabled == that.fpsOverlayEnabled
-                && Objects.equals(backend, that.backend);
+                && Objects.equals(backend, that.backend)
+                && keyboardProtocol == that.keyboardProtocol;
     }
 
     @Override
@@ -482,13 +545,14 @@ public final class TuiConfig {
         result = 31 * result + bindings.hashCode();
         result = 31 * result + Boolean.hashCode(fpsOverlayEnabled);
         result = 31 * result + Objects.hashCode(backend);
+        result = 31 * result + keyboardProtocol.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, mouseMotion=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s]",
+                "TuiConfig[rawMode=%s, alternateScreen=%s, hideCursor=%s, mouseCapture=%s, mouseMotion=%s, pollTimeout=%s, tickRate=%s, resizeGracePeriod=%s, shutdownHook=%s, bindings=%s, fpsOverlayEnabled=%s, keyboardProtocol=%s]",
                 rawMode,
                 alternateScreen,
                 hideCursor,
@@ -499,7 +563,8 @@ public final class TuiConfig {
                 resizeGracePeriod,
                 shutdownHook,
                 bindings,
-                fpsOverlayEnabled
+                fpsOverlayEnabled,
+                keyboardProtocol
         );
     }
 
@@ -525,6 +590,7 @@ public final class TuiConfig {
         private Backend backend;
         private ScheduledExecutorService scheduler;
         private ClassLoader backendClassLoader;
+        private KeyboardProtocol keyboardProtocol = KeyboardProtocol.AUTO;
 
         private Builder() {
         }
@@ -792,6 +858,20 @@ public final class TuiConfig {
         }
 
         /**
+         * Sets the keyboard protocol mode.
+         * <p>
+         * Defaults to {@link KeyboardProtocol#AUTO}, which enables progressive
+         * enhancements with full backward compatibility.
+         *
+         * @param keyboardProtocol the keyboard protocol mode
+         * @return this builder
+         */
+        public Builder keyboardProtocol(KeyboardProtocol keyboardProtocol) {
+            this.keyboardProtocol = keyboardProtocol != null ? keyboardProtocol : KeyboardProtocol.AUTO;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          *
          * @return the constructed TuiConfig
@@ -815,7 +895,8 @@ public final class TuiConfig {
                     postRenderProcessors,
                     backend,
                     scheduler,
-                    backendClassLoader
+                    backendClassLoader,
+                    keyboardProtocol
             );
         }
     }

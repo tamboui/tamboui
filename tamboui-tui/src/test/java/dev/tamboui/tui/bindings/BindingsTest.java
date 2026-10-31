@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyEventKind;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
@@ -508,6 +509,129 @@ class BindingsTest {
         assertThat(KeyTrigger.ch(' ').describe()).isEqualTo("Space");
         assertThat(KeyTrigger.key(KeyCode.TAB, false, false, true).describe())
             .isEqualTo("Shift+Tab");
+        assertThat(KeyTrigger.key(KeyCode.ENTER).withSuper().describe()).isEqualTo("Super+Enter");
+    }
+
+    @Test
+    @DisplayName("KeyTrigger ignores RELEASE events by default")
+    void keyTriggerIgnoresReleaseByDefault() {
+        KeyTrigger trigger = KeyTrigger.ch('q');
+
+        KeyEvent press = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.PRESS).build();
+        KeyEvent repeat = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.REPEAT).build();
+        KeyEvent release = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.RELEASE).build();
+
+        assertThat(trigger.matches(press)).isTrue();
+        assertThat(trigger.matches(repeat)).isTrue();
+        assertThat(trigger.matches(release)).isFalse();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger with explicit RELEASE kind matches only release events")
+    void keyTriggerWithExplicitReleaseKind() {
+        KeyTrigger trigger = KeyTrigger.ch('q').withKind(dev.tamboui.tui.event.KeyEventKind.RELEASE);
+
+        KeyEvent press = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.PRESS).build();
+        KeyEvent release = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(KeyEventKind.RELEASE).build();
+
+        assertThat(trigger.matches(press)).isFalse();
+        assertThat(trigger.matches(release)).isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger matches base layout key code point for chords (Ctrl+с on Russian layout -> Ctrl+c)")
+    void keyTriggerMatchesBaseLayoutKeyForChord() {
+        KeyTrigger trigger = KeyTrigger.ctrl('c');
+
+        // Ctrl + Cyrillic 'с' (code point 1089) with base layout 'c' (code point 99)
+        KeyEvent ctrlCyrillicS = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('с')
+                .modifiers(KeyModifiers.CTRL)
+                .keyCodePoint(1089)
+                .baseLayoutKeyCodePoint(99)
+                .build();
+
+        assertThat(trigger.matches(ctrlCyrillicS)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Standard bindings match keypad navigation keys (KP_Up -> moveUp, KP_Enter -> confirm)")
+    void standardBindingsMatchKeypadNavigation() {
+        KeyEvent kpUp = KeyEvent.builder().code(KeyCode.KP_UP).build();
+        assertThat(kpUp.isUp()).as("KP_Up triggers moveUp").isTrue();
+
+        KeyEvent kpEnter = KeyEvent.builder().code(KeyCode.KP_ENTER).build();
+        assertThat(kpEnter.isConfirm()).as("KP_Enter triggers confirm").isTrue();
+        assertThat(kpEnter.isSelect()).as("KP_Enter triggers select").isTrue();
+
+        KeyEvent kpHome = KeyEvent.builder().code(KeyCode.KP_HOME).build();
+        assertThat(kpHome.isHome()).as("KP_Home triggers home").isTrue();
+
+        KeyEvent kpDelete = KeyEvent.builder().code(KeyCode.KP_DELETE).build();
+        assertThat(kpDelete.isDeleteForward()).as("KP_Delete triggers deleteForward").isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger.key targets a keypad KeyCode distinctly from its main-row equivalent")
+    void keyTriggerTargetsKeypadDistinctly() {
+        KeyTrigger kpOneTrigger = KeyTrigger.key(KeyCode.KP_1);
+        KeyEvent kp1 = KeyEvent.builder().code(KeyCode.KP_1).character('1').build();
+        KeyEvent main1 = KeyEvent.builder().code(KeyCode.CHAR).character('1').build();
+
+        assertThat(kpOneTrigger.matches(kp1)).as("KP_1 trigger matches KP_1 event").isTrue();
+        assertThat(kpOneTrigger.matches(main1)).as("KP_1 trigger does not match main '1'").isFalse();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger does not match base layout key for plain typing (typing 'й' on Russian layout is not ch('q'))")
+    void keyTriggerDoesNotMatchBaseLayoutKeyForPlainTyping() {
+        KeyTrigger trigger = KeyTrigger.ch('q');
+
+        // Plain Cyrillic 'й' (code point 1081) with base layout 'q' (code point 113) and no modifier
+        KeyEvent cyrillicI = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('й')
+                .keyCodePoint(1081)
+                .baseLayoutKeyCodePoint(113)
+                .build();
+
+        assertThat(trigger.matches(cyrillicI)).isFalse();
+        assertThat(cyrillicI.isQuit()).isFalse();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger matches shifted key code point")
+    void keyTriggerMatchesShiftedKey() {
+        KeyTrigger trigger = KeyTrigger.ch('+');
+
+        KeyEvent shiftedEquals = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .modifiers(KeyModifiers.SHIFT)
+                .keyCodePoint('=')
+                .shiftedKeyCodePoint('+')
+                .text("+")
+                .build();
+
+        assertThat(trigger.matches(shiftedEquals)).isTrue();
+    }
+
+    @Test
+    @DisplayName("KeyTrigger with Super modifier matches event with Super")
+    void keyTriggerSuperModifier() {
+        KeyTrigger trigger = KeyTrigger.key(KeyCode.ENTER).withSuper();
+
+        KeyEvent eventWithSuper = KeyEvent.builder()
+                .code(KeyCode.ENTER)
+                .modifiers(KeyModifiers.SUPER)
+                .build();
+        KeyEvent eventWithoutSuper = KeyEvent.builder()
+                .code(KeyCode.ENTER)
+                .modifiers(KeyModifiers.NONE)
+                .build();
+
+        assertThat(trigger.matches(eventWithSuper)).isTrue();
+        assertThat(trigger.matches(eventWithoutSuper)).isFalse();
     }
 
     // ========== Bindings Interface Tests ==========

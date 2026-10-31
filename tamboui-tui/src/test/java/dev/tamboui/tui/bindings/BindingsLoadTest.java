@@ -95,6 +95,24 @@ class BindingsLoadTest {
     }
 
     @Test
+    @DisplayName("Parse Super, Hyper, Meta modifiers")
+    void parseExtendedModifiers() throws IOException {
+        String props = "pageUp = Super+u\nscrollUp = Hyper+k\nquit = Meta+q\n";
+        Bindings bindings = BindingSets.load(new ByteArrayInputStream(props.getBytes(StandardCharsets.UTF_8)));
+
+        KeyEvent superU = KeyEvent.ofChar('u',
+                KeyModifiers.builder().superKey(true).build(), bindings);
+        KeyEvent hyperK = KeyEvent.ofChar('k',
+                KeyModifiers.builder().hyper(true).build(), bindings);
+        KeyEvent metaQ = KeyEvent.ofChar('q',
+                KeyModifiers.builder().meta(true).build(), bindings);
+
+        assertThat(superU.isPageUp()).as("Super+u -> pageUp").isTrue();
+        assertThat(hyperK.matches("scrollUp")).as("Hyper+k -> scrollUp").isTrue();
+        assertThat(metaQ.isQuit()).as("Meta+q -> quit").isTrue();
+    }
+
+    @Test
     @DisplayName("Parse Alt modifier")
     void parseAltModifier() throws IOException {
         String props = "pageUp = Alt+v\n";

@@ -7,6 +7,7 @@ package dev.tamboui.tui;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 
+import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.bindings.Bindings;
 
@@ -44,9 +45,11 @@ public final class InlineTuiConfig {
     private final boolean bracketedPaste;
     private final Bindings bindings;
     private final ScheduledExecutorService scheduler;
+    private final KeyboardProtocol keyboardProtocol;
 
     private InlineTuiConfig(int height, Duration tickRate, Duration pollTimeout,
-                            boolean clearOnClose, boolean bracketedPaste, Bindings bindings, ScheduledExecutorService scheduler) {
+                            boolean clearOnClose, boolean bracketedPaste, Bindings bindings,
+                            ScheduledExecutorService scheduler, KeyboardProtocol keyboardProtocol) {
         this.height = height;
         this.tickRate = tickRate;
         this.pollTimeout = pollTimeout;
@@ -54,6 +57,7 @@ public final class InlineTuiConfig {
         this.bracketedPaste = bracketedPaste;
         this.bindings = bindings;
         this.scheduler = scheduler;
+        this.keyboardProtocol = keyboardProtocol != null ? keyboardProtocol : KeyboardProtocol.AUTO;
     }
 
     /**
@@ -78,7 +82,8 @@ public final class InlineTuiConfig {
                 false,
                 false,
                 BindingSets.defaults(),
-                null
+                null,
+                KeyboardProtocol.AUTO
         );
     }
 
@@ -156,6 +161,15 @@ public final class InlineTuiConfig {
     }
 
     /**
+     * Returns the keyboard protocol mode.
+     *
+     * @return the keyboard protocol mode
+     */
+    public KeyboardProtocol keyboardProtocol() {
+        return keyboardProtocol != null ? keyboardProtocol : KeyboardProtocol.AUTO;
+    }
+
+    /**
      * Returns the externally-managed scheduler, or null if the runner should create its own.
      * <p>
      * When an external scheduler is provided, the runner will NOT shut it down on close -
@@ -182,14 +196,15 @@ public final class InlineTuiConfig {
         b.bracketedPaste = bracketedPaste;
         b.bindings = bindings;
         b.scheduler = scheduler;
+        b.keyboardProtocol = keyboardProtocol;
         return b;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "InlineTuiConfig[height=%d, tickRate=%s, pollTimeout=%s, clearOnClose=%s]",
-                height, tickRate, pollTimeout, clearOnClose);
+                "InlineTuiConfig[height=%d, tickRate=%s, pollTimeout=%s, clearOnClose=%s, keyboardProtocol=%s]",
+                height, tickRate, pollTimeout, clearOnClose, keyboardProtocol);
     }
 
     /**
@@ -203,6 +218,7 @@ public final class InlineTuiConfig {
         private boolean bracketedPaste = false;
         private Bindings bindings = BindingSets.defaults();
         private ScheduledExecutorService scheduler;
+        private KeyboardProtocol keyboardProtocol = KeyboardProtocol.AUTO;
 
         private Builder(int height) {
             if (height <= 0) {
@@ -307,12 +323,26 @@ public final class InlineTuiConfig {
         }
 
         /**
+         * Sets the keyboard protocol mode.
+         * <p>
+         * Defaults to {@link KeyboardProtocol#AUTO}, which enables progressive
+         * enhancements with full backward compatibility.
+         *
+         * @param keyboardProtocol the keyboard protocol mode
+         * @return this builder
+         */
+        public Builder keyboardProtocol(KeyboardProtocol keyboardProtocol) {
+            this.keyboardProtocol = keyboardProtocol != null ? keyboardProtocol : KeyboardProtocol.AUTO;
+            return this;
+        }
+
+        /**
          * Builds the configuration.
          *
          * @return a new InlineTuiConfig
          */
         public InlineTuiConfig build() {
-            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bracketedPaste, bindings, scheduler);
+            return new InlineTuiConfig(height, tickRate, pollTimeout, clearOnClose, bracketedPaste, bindings, scheduler, keyboardProtocol);
         }
     }
 }
