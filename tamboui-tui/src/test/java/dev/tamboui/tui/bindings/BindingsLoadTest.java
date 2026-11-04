@@ -67,6 +67,33 @@ class BindingsLoadTest {
     }
 
     @Test
+    @DisplayName("An action in the file replaces its standard triggers")
+    void actionInFileReplacesStandardTriggers() throws IOException {
+        String props = "quit = Escape\n";
+        Bindings bindings = BindingSets.load(new ByteArrayInputStream(props.getBytes(StandardCharsets.UTF_8)));
+
+        assertThat(bindings.describeBindings(Actions.QUIT)).isEqualTo("Escape");
+        assertThat(KeyEvent.ofKey(KeyCode.ESCAPE, bindings).isQuit()).as("Escape quits").isTrue();
+        assertThat(KeyEvent.ofChar('q', bindings).isQuit()).as("q quits").isFalse();
+        assertThat(KeyEvent.ofChar('c', KeyModifiers.CTRL, bindings).isQuit()).as("Ctrl+c quits").isFalse();
+    }
+
+    @Test
+    @DisplayName("A file loaded on a base set replaces only the actions it lists")
+    void fileOnBaseSetReplacesOnlyListedActions() throws IOException {
+        String props = "moveUp = w\n";
+        Bindings bindings = BindingSets.load(
+            new ByteArrayInputStream(props.getBytes(StandardCharsets.UTF_8)), BindingSets.vim());
+
+        assertThat(bindings.describeBindings(Actions.MOVE_UP)).isEqualTo("w");
+        assertThat(KeyEvent.ofChar('w', bindings).isUp()).as("w moves up").isTrue();
+        assertThat(KeyEvent.ofChar('k', bindings).isUp()).as("k moves up").isFalse();
+        assertThat(KeyEvent.ofKey(KeyCode.UP, bindings).isUp()).as("Up moves up").isFalse();
+        assertThat(KeyEvent.ofChar('j', bindings).isDown()).as("j moves down").isTrue();
+        assertThat(KeyEvent.ofChar('q', bindings).isQuit()).as("q quits").isTrue();
+    }
+
+    @Test
     @DisplayName("Load bindings from input stream")
     void loadFromInputStream() throws IOException {
         String props = "confirm = Enter\ncancel = Escape\n";

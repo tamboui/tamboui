@@ -235,6 +235,10 @@ contextMenu = Mouse.Right.Press
 Multiple triggers for the same action are comma-separated.
 Modifiers use `Ctrl+`, `Alt+`, `Shift+` prefixes.
 
+A file starts from the standard bindings.
+An action listed in the file gets exactly the triggers listed for it, so `quit = Ctrl+c` removes `q` and `Q`.
+Actions the file does not list keep their standard triggers.
+
 == Standard Actions
 
 The `Actions` class defines common action names:
