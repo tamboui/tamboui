@@ -4,6 +4,8 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.*;
 
 import dev.tamboui.buffer.Buffer;
@@ -20,6 +22,8 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
+import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
+import dev.tamboui.widgets.syntax.SyntaxHighlighter;
 import dev.tamboui.widgets.syntax.SyntaxTheme;
 import dev.tamboui.widgets.syntax.TokenType;
 
@@ -513,6 +517,32 @@ class ElementChildStyleCssTest extends AbstractElementTest {
             assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
             // '"y"' string literal likewise (starts at col 10)
             assertThat(buffer.get(10, 0).style().fg()).contains(Color.BLUE);
+        }
+
+        @Test
+        @DisplayName("syntax colors from CSS don't make the text be highlighted on every render")
+        void cssSyntaxColorsKeepTheHighlight() {
+            String css = "TextAreaElement-syntax-keyword { color: red; }";
+            styleEngine.addStylesheet("test", css);
+            styleEngine.setActiveStylesheet("test");
+            AtomicInteger calls = new AtomicInteger();
+            SyntaxHighlighter counting = (code, language, base, theme) -> {
+                calls.incrementAndGet();
+                return RegexSyntaxHighlighter.defaults().highlight(code, language, base, theme);
+            };
+            TextAreaState state = new TextAreaState("class x = \"y\";");
+
+            Rect area = new Rect(0, 0, 24, 1);
+            Buffer buffer = Buffer.empty(area);
+            for (int frame = 0; frame < 3; frame++) {
+                textArea(state)
+                    .highlighter(counting, "java")
+                    .showCursor(false)
+                    .render(Frame.forTesting(buffer), area, context);
+            }
+
+            assertThat(calls.get()).isEqualTo(1);
+            assertThat(buffer.get(0, 0).style().fg()).contains(Color.RED);
         }
 
         @Test

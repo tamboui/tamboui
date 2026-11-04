@@ -102,6 +102,12 @@ class RegexSyntaxHighlighterTest {
     }
 
     @Test
+    @DisplayName("defaults() returns the same highlighter every time")
+    void defaultsIsOneSharedInstance() {
+        assertThat(RegexSyntaxHighlighter.defaults()).isSameAs(RegexSyntaxHighlighter.defaults());
+    }
+
+    @Test
     @DisplayName("matches a language by id and alias, case-insensitively")
     void resolvesAliases() {
         RegexSyntaxHighlighter hl = RegexSyntaxHighlighter.defaults();

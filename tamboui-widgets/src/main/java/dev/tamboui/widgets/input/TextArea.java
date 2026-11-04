@@ -200,13 +200,12 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
         int scrollRow = state.scrollRow();
         int scrollCol = state.scrollCol();
 
-        // With a highlighter configured, style the full text once per render; the
-        // highlighter emits one Line per logical line. Rows are mapped by index
-        // with a per-line plain fallback, since conventions for a trailing
-        // newline differ (the state counts a final empty line, highlighters
-        // typically trim it).
+        // With a highlighter configured, the state styles the full text once and keeps it until
+        // the text changes; the highlighter emits one Line per logical line. Rows are mapped by
+        // index with a per-line plain fallback, since conventions for a trailing newline differ
+        // (the state counts a final empty line, highlighters typically trim it).
         List<Line> styledLines = highlighter != null
-            ? highlighter.highlight(state.text(), highlightLanguage, style, highlightTheme)
+            ? state.highlightedLines(highlighter, highlightLanguage, style, highlightTheme)
             : null;
 
         for (int y = 0; y < visibleHeight; y++) {
@@ -565,10 +564,12 @@ public final class TextArea implements StatefulWidget<TextAreaState> {
          * Enables syntax highlighting of the text area content using the
          * {@link SyntaxTheme#DEFAULTS default theme}.
          * <p>
-         * The full text is highlighted on each render, so this is intended for
-         * code-editor-sized content; combine with the highlighter's max line
-         * length guard for untrusted input. Highlighting currently applies in
-         * {@link Overflow#CLIP} mode only; wrapped modes render unstyled.
+         * The full text is highlighted when it is first rendered and again only
+         * after it changes (or the highlighter, language, theme or style does);
+         * the {@link TextAreaState} keeps the result in between. Combine with the
+         * highlighter's max line length guard for untrusted input. Highlighting
+         * currently applies in {@link Overflow#CLIP} mode only; wrapped modes
+         * render unstyled.
          *
          * @param highlighter the highlighter (e.g. {@code RegexSyntaxHighlighter.defaults()})
          * @param language the language identifier or alias (e.g. {@code java}, {@code css})
