@@ -249,6 +249,7 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
      * <p>
      * When set, this color overrides the normal border color when the element has focus.
      * If not set, CSS {@code :focus} pseudo-class can be used to style the focused border.
+     * Setting it draws a border around the input, also while it is not focused.
      *
      * @param color the focused border color
      * @return this builder
@@ -265,10 +266,10 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         int placeholderWidth = placeholder != null ? placeholder.length() : 0;
         int contentWidth = Math.max(valueWidth, placeholderWidth);
         // Add minimum width for usability and border if present
-        int borderWidth = (title != null || borderType != null) ? 2 : 0;
+        int borderWidth = hasBorder() ? 2 : 0;
         int width = Math.max(contentWidth, 10) + borderWidth;
         // Single-line input: 1 row, or 3 if bordered
-        int height = (title != null || borderType != null) ? 3 : 1;
+        int height = hasBorder() ? 3 : 1;
         return Size.of(width, height);
     }
 
@@ -351,7 +352,7 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
                 ? focusedBorderColor
                 : borderColor;
 
-        if (title != null || borderType != null || effectiveBorderColor != null) {
+        if (hasBorder()) {
             Block.Builder blockBuilder = Block.builder()
                     .borders(Borders.ALL)
                     .styleResolver(styleResolver(context));
@@ -376,5 +377,13 @@ public final class TextInputElement extends StyledElement<TextInputElement> {
         } else {
             frame.renderStatefulWidget(widget, area, state);
         }
+    }
+
+    /**
+     * Returns whether a border is drawn around the input. A border color asks for one as a title
+     * or border type does, focused or not, so the size reserves room for the border that is drawn.
+     */
+    private boolean hasBorder() {
+        return title != null || borderType != null || borderColor != null || focusedBorderColor != null;
     }
 }

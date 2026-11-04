@@ -331,6 +331,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      * Sets the border color to use when focused.
      * If not set, no special focused border styling is applied
      * (CSS :focused pseudo-class can be used instead).
+     * Setting it draws a border around the text area, also while it is not focused.
      *
      * @param color the focused border color
      * @return this builder
@@ -365,10 +366,10 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         }
         // Add minimum width, line number width if applicable, and border
         int lineNumWidth = showLineNumbers ? 5 : 0;
-        int borderWidth = (title != null || borderType != null) ? 2 : 0;
+        int borderWidth = hasBorder() ? 2 : 0;
         int width = Math.max(maxWidth, 20) + lineNumWidth + borderWidth;
         // Add border height
-        int borderHeight = (title != null || borderType != null) ? 2 : 0;
+        int borderHeight = hasBorder() ? 2 : 0;
         int height = lineCount + borderHeight;
 
         // Wrapped lines take more than one row each; ask the widget, which knows the width its
@@ -552,7 +553,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
                 ? focusedBorderColor
                 : borderColor;
 
-        if (title == null && borderType == null && effectiveBorderColor == null) {
+        if (!hasBorder()) {
             return null;
         }
         Block.Builder blockBuilder = Block.builder()
@@ -568,6 +569,14 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
             blockBuilder.borderColor(effectiveBorderColor);
         }
         return blockBuilder.build();
+    }
+
+    /**
+     * Returns whether a border is drawn around the text. A border color asks for one as a title
+     * or border type does, focused or not, so the size reserves room for the border that is drawn.
+     */
+    private boolean hasBorder() {
+        return title != null || borderType != null || borderColor != null || focusedBorderColor != null;
     }
 
     /**

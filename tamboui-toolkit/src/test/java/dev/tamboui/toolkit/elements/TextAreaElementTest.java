@@ -22,6 +22,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyCode;
@@ -29,6 +30,7 @@ import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.widgets.input.TextAreaState;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static dev.tamboui.toolkit.Toolkit.textArea;
@@ -755,6 +757,50 @@ class TextAreaElementTest extends AbstractElementTest {
 
             assertThat(element.preferredSize(20, -1, RenderContext.empty()).height()).isEqualTo(4);
             assertThat(element.clip().preferredSize(20, -1, RenderContext.empty()).height()).isEqualTo(3);
+        }
+    }
+
+    @Nested
+    @DisplayName("Border color")
+    class BorderColor {
+
+        @Test
+        @DisplayName("A focused border color alone leaves room for the border, so the text stays visible when focused")
+        void focusedBorderColorAlone_keepsTextVisibleWhenFocused() {
+            Buffer buffer = renderAboveNext(
+                textArea(new TextAreaState("hello")).id("ta").focusedBorderColor(Color.CYAN), "ta");
+
+            assertThat(buffer).hasContent(
+                "┌──────────────────┐",
+                "│hello             │",
+                "└──────────────────┘",
+                "next                ");
+            assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+        }
+
+        @Test
+        @DisplayName("A border color alone leaves room for the border it draws")
+        void borderColorAlone_leavesRoomForTheBorder() {
+            Buffer buffer = renderAboveNext(
+                textArea(new TextAreaState("hello")).borderColor(Color.CYAN), null);
+
+            assertThat(buffer).hasContent(
+                "┌──────────────────┐",
+                "│hello             │",
+                "└──────────────────┘",
+                "next                ");
+        }
+
+        /** Renders the element above a "next" text in a 20x4 column, with the given element id focused. */
+        private Buffer renderAboveNext(Element element, String focusedId) {
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            if (focusedId != null) {
+                context.focusManager().setFocus(focusedId);
+            }
+            Rect area = new Rect(0, 0, 20, 4);
+            Buffer buffer = Buffer.empty(area);
+            column(element, text("next")).render(Frame.forTesting(buffer), area, context);
+            return buffer;
         }
     }
 }
