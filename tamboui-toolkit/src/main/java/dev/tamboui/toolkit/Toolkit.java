@@ -1344,6 +1344,9 @@ public static SpinnerElement spinner(String... frames) {
      * @return true if the event was handled, false otherwise
      */
     public static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
+        if (event.isRelease()) {
+            return false;
+        }
         switch (event.code()) {
             case BACKSPACE:
                 state.deleteBackward();
@@ -1364,8 +1367,18 @@ public static SpinnerElement spinner(String... frames) {
                 state.moveCursorToEnd();
                 return true;
             case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                // Trust event.text() as the terminal's authoritative statement of what the user
+                // typed. The parser only synthesizes text for plain typing, so if text is present
+                // on a chord it was deliberately provided by the terminal (e.g. AltGr+e -> "\u20ac",
+                // which arrives as Ctrl+Alt on Windows/Linux and is legitimate text input).
+                String text = event.text();
+                if (!text.isEmpty()) {
+                    state.insert(text);
+                    return true;
+                }
+                // No associated text: this is a shortcut (any non-shift modifier) or an unmapped
+                // control character. Don't fabricate input.
+                if (event.hasNonShiftModifier()) {
                     return false;
                 }
                 int c = event.codePoint();
@@ -1375,8 +1388,15 @@ public static SpinnerElement spinner(String... frames) {
                 }
                 return false;
             default:
-                return false;
+                break; // fall through to keypad-typing fallback
         }
+        // Keypad digit/operator (KP_*): parser set the character field; treat as typing without
+        // bypassing the modifier check so shortcut chords stay inert.
+        if (event.codePoint() > 0 && !event.hasNonShiftModifier()) {
+            state.insert(event.string());
+            return true;
+        }
+        return false;
     }
 
 }

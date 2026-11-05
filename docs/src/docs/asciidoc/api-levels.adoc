@@ -140,6 +140,38 @@ include::{snippets-dir}/dev/tamboui/docs/snippets/ApiLevelsSnippets.java[tags=tu
 
 Set `resizeGracePeriod(null)` to disable automatic resize handling entirely (not recommended).
 
+==== Keyboard Protocol
+
+By default, `TuiRunner` and `InlineTuiRunner` enable progressive keyboard enhancements using the Kitty Keyboard Protocol in `AUTO` mode:
+
+[source,java]
+----
+var config = TuiConfig.builder()
+    .keyboardProtocol(KeyboardProtocol.AUTO) // Default
+    .build();
+----
+
+Available protocol modes in `dev.tamboui.terminal.KeyboardProtocol`:
+
+[cols="1,1,2",options="header"]
+|===
+|Mode |Flags |Description
+
+|`AUTO` (default)
+|5
+|Enables `DISAMBIGUATE_ESCAPE_CODES` and `REPORT_ALTERNATE_KEYS`. Disambiguates ESC, Tab vs Ctrl+I, Enter vs Ctrl+M, and reports base-layout keys while preserving text input.
+
+|`FULL`
+|31
+|Enables all protocol flags: disambiguate, report event types (press, repeat, release), report alternate keys, report all keys as escape codes, and report associated text.
+
+|`LEGACY`
+|0
+|Disables Kitty keyboard protocol enhancements entirely and uses traditional terminal encoding.
+|===
+
+The protocol state stack is pushed automatically after entering alternate screen, and popped cleanly before leaving alternate screen or when the runner is closed.
+
 === Error Handling
 
 When exceptions occur during rendering, TuiRunner catches them and displays an error screen with the stack trace.

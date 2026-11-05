@@ -57,6 +57,7 @@ public class BindingsSnippets {
         KeyTrigger.chIgnoreCase('j');         // j or J
         KeyTrigger.ctrl('u');                 // Ctrl+U
         KeyTrigger.alt('x');                  // Alt+X
+        KeyTrigger.superKey('k');             // Super/Command+K
         // end::key-triggers[]
     }
 

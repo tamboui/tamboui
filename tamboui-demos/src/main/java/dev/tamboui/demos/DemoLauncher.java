@@ -738,6 +738,9 @@ public class DemoLauncher {
      * This is a simplified version that doesn't require the Toolkit dependency.
      */
     private static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
+        if (event.isRelease()) {
+            return false;
+        }
         switch (event.code()) {
             case BACKSPACE:
                 state.deleteBackward();
@@ -758,9 +761,14 @@ public class DemoLauncher {
                 state.moveCursorToEnd();
                 return true;
             case CHAR:
-                // Don't consume characters with Ctrl or Alt modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt()) {
+                // Don't consume characters with Ctrl, Alt, Super, or Meta modifiers - those are control sequences
+                if (event.modifiers().ctrl() || event.modifiers().alt() || event.modifiers().superKey() || event.modifiers().meta()) {
                     return false;
+                }
+                String text = event.text();
+                if (!text.isEmpty()) {
+                    state.insert(text);
+                    return true;
                 }
                 int c = event.codePoint();
                 if (c >= 32 && c != 127) {

@@ -29,6 +29,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
+import dev.tamboui.terminal.KeyboardProtocol;
 import dev.tamboui.terminal.Terminal;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
@@ -80,6 +81,7 @@ public final class TuiRunner implements AutoCloseable {
     private final AtomicBoolean running;
     private final AtomicBoolean cleanedUp;
     private final AtomicBoolean windowTitleSet = new AtomicBoolean(false);
+    private final boolean keyboardProtocolEnabled;
     private final ScheduledExecutorService scheduler;
     private final boolean schedulerOwned;
     private final ScheduledFuture<?> schedulerTask;
@@ -99,10 +101,12 @@ public final class TuiRunner implements AutoCloseable {
     private volatile boolean inErrorState;
     private volatile int errorScroll;
 
-    private TuiRunner(Backend backend, Terminal<Backend> terminal, TuiConfig config) {
+    private TuiRunner(Backend backend, Terminal<Backend> terminal, TuiConfig config,
+                      boolean keyboardProtocolEnabled) {
         this.backend = backend;
         this.terminal = terminal;
         this.config = config;
+        this.keyboardProtocolEnabled = keyboardProtocolEnabled;
         this.eventQueue = new LinkedBlockingQueue<>();
         this.running = new AtomicBoolean(true);
         this.cleanedUp = new AtomicBoolean(false);
@@ -199,6 +203,7 @@ public final class TuiRunner implements AutoCloseable {
                 ? BackendFactory.recordIfEnabled(config.backend())
                 : BackendFactory.create(config.backendClassLoader());
 
+        boolean keyboardProtocolEnabled = false;
         try {
             if (config.rawMode()) {
                 backend.enableRawMode();
@@ -206,6 +211,7 @@ public final class TuiRunner implements AutoCloseable {
             if (config.alternateScreen()) {
                 backend.enterAlternateScreen();
             }
+            keyboardProtocolEnabled = backend.enableKeyboardProtocol(config.keyboardProtocol());
             if (config.hideCursor()) {
                 backend.hideCursor();
             }
@@ -217,8 +223,14 @@ public final class TuiRunner implements AutoCloseable {
             }
 
             Terminal<Backend> terminal = new Terminal<>(backend);
-            return new TuiRunner(backend, terminal, config);
+            return new TuiRunner(backend, terminal, config, keyboardProtocolEnabled);
         } catch (Exception e) {
+            if (keyboardProtocolEnabled) {
+                try {
+                    backend.disableKeyboardProtocol();
+                } catch (Exception ignored) {
+                }
+            }
             backend.close();
             throw e;
         }
@@ -364,28 +376,33 @@ public final class TuiRunner implements AutoCloseable {
         if (event instanceof KeyEvent) {
             KeyEvent keyEvent = (KeyEvent) event;
 
+            // All predicates below (isQuit/isCancel/isUp/isDown/isPageUp/isPageDown/isHome)
+            // go through bindings and ignore release events, and isChar() now ignores release
+            // too, so no explicit kind check is needed.
+
             // Quit on 'q' or Escape
-            if (keyEvent.isQuit() || keyEvent.code() == KeyCode.ESCAPE) {
+            if (keyEvent.isQuit() || keyEvent.isCancel()) {
                 quit();
                 return;
             }
 
-            // Scroll handling
-            if (keyEvent.code() == KeyCode.UP || keyEvent.isChar('k')) {
+            // Scroll handling. Keep explicit 'k'/'j' alongside isUp()/isDown() because the
+            // default BindingSets do not include vim keys.
+            if (keyEvent.isUp() || keyEvent.isChar('k')) {
                 if (errorScroll > 0) {
                     errorScroll--;
                     renderErrorDisplay();
                 }
-            } else if (keyEvent.code() == KeyCode.DOWN || keyEvent.isChar('j')) {
+            } else if (keyEvent.isDown() || keyEvent.isChar('j')) {
                 errorScroll++;
                 renderErrorDisplay();
-            } else if (keyEvent.code() == KeyCode.PAGE_UP) {
+            } else if (keyEvent.isPageUp()) {
                 errorScroll = Math.max(0, errorScroll - 10);
                 renderErrorDisplay();
-            } else if (keyEvent.code() == KeyCode.PAGE_DOWN) {
+            } else if (keyEvent.isPageDown()) {
                 errorScroll += 10;
                 renderErrorDisplay();
-            } else if (keyEvent.code() == KeyCode.HOME) {
+            } else if (keyEvent.isHome()) {
                 errorScroll = 0;
                 renderErrorDisplay();
             }
@@ -787,6 +804,9 @@ public final class TuiRunner implements AutoCloseable {
             if (windowTitleSet.get()) {
                 backend.restoreWindowTitle();
             }
+            if (keyboardProtocolEnabled) {
+                backend.disableKeyboardProtocol();
+            }
             if (config.bracketedPaste()) {
                 backend.disableBracketedPaste();
             }
@@ -948,6 +968,17 @@ public final class TuiRunner implements AutoCloseable {
          */
         public Builder mouseCapture(boolean mouseCapture) {
             this.configBuilder.mouseCapture(mouseCapture);
+            return this;
+        }
+
+        /**
+         * Sets the keyboard protocol mode.
+         *
+         * @param keyboardProtocol the keyboard protocol mode
+         * @return this builder
+         */
+        public Builder keyboardProtocol(KeyboardProtocol keyboardProtocol) {
+            this.configBuilder.keyboardProtocol(keyboardProtocol);
             return this;
         }
 

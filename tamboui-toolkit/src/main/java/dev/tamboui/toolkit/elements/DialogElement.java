@@ -27,7 +27,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.Clear;
 import dev.tamboui.widgets.block.Block;
@@ -295,8 +294,9 @@ public final class DialogElement extends ContainerElement<DialogElement> {
             return result;
         }
 
-        // Handle Escape to cancel
-        if (event.code() == KeyCode.ESCAPE) {
+        // Handle Escape to cancel. isCancel()/isConfirm() both ignore release events, so a
+        // key does not fire onCancel/onConfirm twice under FULL.
+        if (event.isCancel()) {
             if (onCancel != null) {
                 onCancel.run();
             }

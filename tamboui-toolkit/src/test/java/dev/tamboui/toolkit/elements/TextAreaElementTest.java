@@ -26,6 +26,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.KeyEventKind;
 import dev.tamboui.tui.event.KeyModifiers;
 import dev.tamboui.widgets.input.TextAreaState;
 
@@ -33,7 +34,6 @@ import static dev.tamboui.toolkit.Toolkit.column;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static dev.tamboui.toolkit.Toolkit.textArea;
 import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Tests for TextAreaElement.
  */
@@ -355,6 +355,55 @@ class TextAreaElementTest extends AbstractElementTest {
 
             assertThat(result).isEqualTo(EventResult.HANDLED);
             assertThat(element.getState().text()).isEqualTo("    ");
+        }
+
+        @Test
+        @DisplayName("Release key events are ignored")
+        void releaseKeyEventsIgnored() {
+            TextAreaElement element = textArea().text("Hello");
+            KeyEvent release = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character('x')
+                    .kind(KeyEventKind.RELEASE)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(release, true);
+
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().text()).isEqualTo("Hello");
+        }
+
+        @Test
+        @DisplayName("Inserts text from event text() property")
+        void insertsAssociatedText() {
+            TextAreaElement element = textArea().text("");
+            KeyEvent textEvent = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .text("World")
+                    .kind(KeyEventKind.PRESS)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(textEvent, true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().text()).isEqualTo("World");
+        }
+
+        @Test
+        @DisplayName("Characters with Super or Meta modifier are ignored")
+        void ignoresSuperOrMetaCharacters() {
+            TextAreaElement element = textArea().text("");
+            KeyEvent superEvent = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character('s')
+                    .modifiers(KeyModifiers.SUPER)
+                    .kind(KeyEventKind.PRESS)
+                    .build();
+
+            EventResult result = element.handleKeyEvent(superEvent, true);
+
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().text()).isEmpty();
         }
     }
 

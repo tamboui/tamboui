@@ -631,6 +631,9 @@ public final class FormFieldElement extends StyledElement<FormFieldElement> {
             return EventResult.UNHANDLED;
         }
 
+        // Sub-handlers below use isConfirm/isChar/isUp/isDown, all of which ignore release
+        // events, so no explicit kind check is needed.
+
         // Handle based on field type
         switch (fieldType) {
             case TEXT:

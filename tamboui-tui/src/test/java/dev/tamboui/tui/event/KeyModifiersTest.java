@@ -73,5 +73,38 @@ class KeyModifiersTest {
         assertThat(KeyModifiers.CTRL).isEqualTo(KeyModifiers.of(true, false, false));
         assertThat(KeyModifiers.ALT).isEqualTo(KeyModifiers.of(false, true, false));
         assertThat(KeyModifiers.SHIFT).isEqualTo(KeyModifiers.of(false, false, true));
+        assertThat(KeyModifiers.SUPER).isEqualTo(KeyModifiers.of(false, false, false, true, false, false));
+        assertThat(KeyModifiers.HYPER).isEqualTo(KeyModifiers.of(false, false, false, false, true, false));
+        assertThat(KeyModifiers.META).isEqualTo(KeyModifiers.of(false, false, false, false, false, true));
+    }
+
+    @Test
+    @DisplayName("SUPER, HYPER, META have corresponding flags")
+    void extendedModifierFlags() {
+        assertThat(KeyModifiers.SUPER.superKey()).isTrue();
+        assertThat(KeyModifiers.SUPER.ctrl()).isFalse();
+
+        assertThat(KeyModifiers.HYPER.hyper()).isTrue();
+        assertThat(KeyModifiers.HYPER.alt()).isFalse();
+
+        assertThat(KeyModifiers.META.meta()).isTrue();
+        assertThat(KeyModifiers.META.shift()).isFalse();
+    }
+
+    @Test
+    @DisplayName("builder creates combined modifiers")
+    void builderCreatesCombinedModifiers() {
+        KeyModifiers mods = KeyModifiers.builder()
+                .ctrl(true)
+                .superKey(true)
+                .meta(true)
+                .build();
+
+        assertThat(mods.ctrl()).isTrue();
+        assertThat(mods.superKey()).isTrue();
+        assertThat(mods.meta()).isTrue();
+        assertThat(mods.alt()).isFalse();
+        assertThat(mods.shift()).isFalse();
+        assertThat(mods.hyper()).isFalse();
     }
 }
