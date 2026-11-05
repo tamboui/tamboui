@@ -52,7 +52,7 @@ Feedback, issues, and contributions are welcome!
 |Aesh terminal backend
 
 |`{tui-module}`
-|High-level TUI framework with TuiRunner, event handling, bindings, and key helpers
+|High-level TUI framework with TuiRunner, event handling, bindings, key helpers, and the Kitty keyboard protocol (enabled by default)
 
 |`{toolkit-module}`
 |Fluent DSL for declarative UI construction with components and focus management
