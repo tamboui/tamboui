@@ -92,6 +92,9 @@ Bindings vim = BindingSets.vim();            // hjkl navigation, Ctrl+u/d
 Bindings emacs = BindingSets.emacs();        // Ctrl+n/p/f/b navigation</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The named sets (<code>standard()</code>, <code>vim()</code>, <code>emacs()</code>, &#8230;&#8203;) are literal and cross-platform, so they are predictable and testable. Only the effective default, <code>BindingSets.defaults()</code> (what a <code>TuiConfig</code> uses unless you pick a set), resolves the host platform: on macOS it replaces the word-editing actions with their Option (Alt) equivalents to match the system text layer, so <code>Option+Left</code>/<code>Option+Right</code> jump by word and <code>Option+Backspace</code>/<code>Option+Delete</code> delete a word. <code>Ctrl+Left</code>/<code>Ctrl+Right</code> is Mission Control on macOS, so it is deliberately not a word key there; <code>Ctrl+w</code> (a universal readline control byte) still deletes a word on every platform. Off macOS, <code>defaults()</code> is <code>standard()</code> unchanged, with word editing on <code>Ctrl+Left</code>/<code>Ctrl+Right</code> and <code>Ctrl+Backspace</code>/<code>Ctrl+Delete</code> (which need a terminal that reports them, e.g. via the Kitty keyboard protocol).</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -630,6 +633,14 @@ Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixe
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE_BACKWARD</code>, <code>DELETE_FORWARD</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Text editing</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MOVE_WORD_LEFT</code>, <code>MOVE_WORD_RIGHT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word-wise cursor movement (<code>Ctrl+Arrow</code>, or <code>Option+Arrow</code> on macOS)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE_WORD_BACKWARD</code>, <code>DELETE_WORD_FORWARD</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word-wise deletion (<code>Ctrl+Backspace</code>/<code>Ctrl+Delete</code>, or <code>Option+Backspace</code>/<code>Option+Delete</code> on macOS; <code>Ctrl+w</code> everywhere)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QUIT</code></p></td>

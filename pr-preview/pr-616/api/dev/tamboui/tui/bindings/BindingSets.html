@@ -126,7 +126,7 @@ Bindings custom = BindingSets.standard()
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Bindings.html" title="interface in dev.tamboui.tui.bindings">Bindings</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#defaults()" class="member-name-link">defaults</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the default bindings.</div>
+<div class="block">Returns the default bindings for the host platform.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Bindings.html" title="interface in dev.tamboui.tui.bindings">Bindings</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#emacs()" class="member-name-link">emacs</a>()</code></div>
@@ -289,12 +289,16 @@ Based on VS Code's default key bindings for navigation.</div>
 <h3>defaults</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Bindings.html" title="interface in dev.tamboui.tui.bindings">Bindings</a></span>&nbsp;<span class="element-name">defaults</span>()</div>
-<div class="block">Returns the default bindings.
+<div class="block">Returns the default bindings for the host platform.
 <p>
-Currently returns <a href="#standard()"><code>standard()</code></a>.</div>
+This is <a href="#standard()"><code>standard()</code></a> on every platform except macOS, where the
+word-editing keys are replaced with their Option (Alt) equivalents to match
+the system text layer. The named sets (<a href="#standard()"><code>standard()</code></a>, <a href="#vim()"><code>vim()</code></a>,
+etc.) stay literal and cross-platform; only this effective-default entry
+point resolves the host platform.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the default bindings</dd>
+<dd>the platform-appropriate default bindings</dd>
 </dl>
 </div>
 </section>
