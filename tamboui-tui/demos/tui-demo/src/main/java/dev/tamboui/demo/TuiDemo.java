@@ -86,6 +86,10 @@ public class TuiDemo {
     private String lastProducedText = "";
     private KeyEvent lastKeyEvent = null;
     private KeyboardProtocol currentProtocol = KeyboardProtocol.AUTO;
+    // Passive Kitty-keyboard detection: set true the first time an event arrives carrying something
+    // only the protocol produces (release/repeat kind, extended modifier, or an alternate-key code
+    // point). Absence is not proof of no support, so this stays false until a key proves it.
+    private boolean kittyProtocolDetected = false;
 
     private long tickCount = 0;
     private long totalEventsCount = 0;
@@ -179,6 +183,13 @@ public class TuiDemo {
         lastKeyCode = k.code();
         lastProducedText = k.string();
         lastModifiers = k.modifiers();
+
+        // Passive detection: these fields are only ever set by the Kitty keyboard protocol, so
+        // seeing any of them proves the terminal honored the push (AUTO or FULL).
+        if (k.isRelease() || k.isRepeat() || k.hasSuper() || k.hasHyper() || k.hasMeta()
+                || k.shiftedKeyCodePoint().isPresent() || k.baseLayoutKeyCodePoint().isPresent()) {
+            kittyProtocolDetected = true;
+        }
 
         // Release events arrive only under the Kitty FULL protocol. Log them so they are
         // visible, but do not drive actions: one physical key must not fire twice.
@@ -358,6 +369,8 @@ public class TuiDemo {
             }
         }
         currentProtocol = next;
+        // Evidence gathered under the previous mode no longer applies; re-detect for the new one.
+        kittyProtocolDetected = false;
         logEvent(new EventRecord(
                 ++totalEventsCount,
                 " SYSTEM ",
@@ -730,6 +743,10 @@ public class TuiDemo {
                         currentProtocol == KeyboardProtocol.LEGACY
                                 ? Style.EMPTY.fg(Color.RED)
                                 : Style.EMPTY.fg(Color.GREEN).bold())));
+        lines.add(Line.from(Span.raw("  Kitty detect: ").dim(),
+                kittyProtocolDetected
+                        ? Span.raw("YES (terminal honors protocol)").style(Style.EMPTY.fg(Color.GREEN).bold())
+                        : Span.raw("not seen yet - press Shift+A or an F-key").style(Style.EMPTY.fg(Color.YELLOW))));
         lines.add(Line.empty());
 
         lines.add(Line.from(Span.raw("Live Modifiers").bold().cyan()));
