@@ -207,13 +207,13 @@ public class TuiDemo {
         }
 
         // Runtime toggle for the Kitty keyboard protocol (LEGACY -> AUTO -> FULL) via 'p' or 'P'
-        if (k.code() == KeyCode.CHAR && k.string().equalsIgnoreCase("p")) {
+        if (k.isCharIgnoreCase('p')) {
             cycleKeyboardProtocol(runner);
             return true;
         }
 
         // Runtime toggle for mouse motion (DECSET 1003) via 'm' or 'M'
-        if (k.code() == KeyCode.CHAR && k.string().equalsIgnoreCase("m")) {
+        if (k.isCharIgnoreCase('m')) {
             mouseMotionEnabled = !mouseMotionEnabled;
             if (runner != null) {
                 try {
@@ -235,7 +235,7 @@ public class TuiDemo {
         }
 
         // Clear event stream via 'c' or 'C'
-        if (k.code() == KeyCode.CHAR && k.string().equalsIgnoreCase("c")) {
+        if (k.isCharIgnoreCase('c')) {
             eventLog.clear();
             logEvent(new EventRecord(
                     ++totalEventsCount,
