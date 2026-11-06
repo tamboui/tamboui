@@ -346,15 +346,30 @@ class TextAreaElementTest extends AbstractElementTest {
         }
 
         @Test
-        @DisplayName("Tab key inserts 4 spaces")
+        @DisplayName("Tab key is left unhandled so it moves focus out of the text area")
         void tabKey() {
             TextAreaElement element = textArea();
             KeyEvent event = new KeyEvent(KeyCode.TAB, KeyModifiers.NONE, '\0');
 
             EventResult result = element.handleKeyEvent(event, true);
 
-            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().text()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("with tabIndents(), Tab inserts spaces to the next tab stop")
+        void tabIndents() {
+            TextAreaElement element = textArea().tabIndents();
+            KeyEvent tab = new KeyEvent(KeyCode.TAB, KeyModifiers.NONE, '\0');
+
+            assertThat(element.handleKeyEvent(tab, true)).isEqualTo(EventResult.HANDLED);
             assertThat(element.getState().text()).isEqualTo("    ");
+
+            // From column 4, the next tab stop is 4 columns away again.
+            element.getState().insert("ab");
+            assertThat(element.handleKeyEvent(tab, true)).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().text()).isEqualTo("    ab  ");
         }
 
         @Test

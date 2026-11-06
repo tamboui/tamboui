@@ -19,8 +19,10 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.PasteEvent;
+import dev.tamboui.tui.event.TextEditing;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
@@ -83,6 +85,8 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     private boolean showLineNumbers = false;
     private Style lineNumberStyle;
     private Overflow overflow;
+    private boolean tabIndents;
+    private static final int TAB_WIDTH = 4;
     private Overflow renderedOverflow;
     private SyntaxHighlighter highlighter;
     private String highlightLanguage;
@@ -226,6 +230,30 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
      */
     public TextAreaElement overflow(Overflow overflow) {
         this.overflow = overflow;
+        return this;
+    }
+
+    /**
+     * Makes the Tab key indent (insert spaces to the next tab stop) instead of moving focus.
+     * <p>
+     * Equivalent to {@code tabIndents(true)}. By default a text area leaves Tab unhandled so it
+     * moves focus to the next field, which is what forms want; turn this on for an editor-style
+     * text area where Tab should indent. This mirrors Textual's {@code tab_behavior="indent"}.
+     *
+     * @return this builder
+     */
+    public TextAreaElement tabIndents() {
+        return tabIndents(true);
+    }
+
+    /**
+     * Sets whether the Tab key indents (inserts spaces to the next tab stop) or moves focus.
+     *
+     * @param tabIndents true to indent on Tab, false (the default) to let Tab move focus
+     * @return this builder
+     */
+    public TextAreaElement tabIndents(boolean tabIndents) {
+        this.tabIndents = tabIndents;
         return this;
     }
 
@@ -426,85 +454,26 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         if (!focused) {
             return EventResult.UNHANDLED;
         }
+        // Editor-style Tab: insert spaces to the next tab stop instead of letting Tab move focus.
+        // Off by default, so a text-area form field tabs to the next field (see tabIndents()).
+        if (tabIndents && event.isKey(KeyCode.TAB) && !event.isRelease()) {
+            int spaces = TAB_WIDTH - (state.cursorCol() % TAB_WIDTH);
+            state.insert(new String(new char[spaces]).replace('\0', ' '));
+            if (changeListener != null) {
+                changeListener.onTextChange(state.text());
+            }
+            return EventResult.HANDLED;
+        }
         // Wrap against the width the widget last rendered with, so Up/Down move by the same
-        // visual rows the user is looking at.
-        boolean handled = handleTextAreaKey(state, event, state.lastRenderedWidth(),
+        // visual rows the user is looking at. TextEditing drives the edit from the event's
+        // semantic predicates (so it follows the bindings and inserts isTyping() text whole);
+        // Tab is left unhandled so it moves focus out of the text area.
+        boolean handled = TextEditing.handle(state, event,
                 renderedOverflow != null ? renderedOverflow : overflow);
         if (handled && changeListener != null) {
             changeListener.onTextChange(state.text());
         }
         return handled ? EventResult.HANDLED : EventResult.UNHANDLED;
-    }
-
-    /**
-     * Handles common key events for text area input.
-     */
-    private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, int visibleWidth, Overflow overflow) {
-        if (event.isRelease()) {
-            return false;
-        }
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case UP:
-                state.moveCursorUp(visibleWidth, overflow);
-                return true;
-            case DOWN:
-                state.moveCursorDown(visibleWidth, overflow);
-                return true;
-            case HOME:
-                state.moveCursorToLineStart();
-                return true;
-            case END:
-                state.moveCursorToLineEnd();
-                return true;
-            case ENTER:
-                state.insert('\n');
-                return true;
-            case TAB:
-                state.insert("    "); // 4 spaces for tab
-                return true;
-            case CHAR:
-                // Trust event.text() as the terminal's authoritative statement of what the user
-                // typed. The parser only synthesizes text for plain typing, so if text is present
-                // on a chord it was deliberately provided by the terminal (e.g. AltGr+e -> "\u20ac",
-                // which arrives as Ctrl+Alt on Windows/Linux and is legitimate text input).
-                String text = event.text();
-                if (!text.isEmpty()) {
-                    state.insert(text);
-                    return true;
-                }
-                // No associated text: this is a shortcut (any non-shift modifier) or an unmapped
-                // control character. Don't fabricate input.
-                if (event.hasNonShiftModifier()) {
-                    return false;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                break; // fall through to keypad-typing fallback
-        }
-        // Keypad digit/operator (KP_*): parser set the character field; treat as typing without
-        // bypassing the modifier check so shortcut chords stay inert.
-        if (event.codePoint() > 0 && !event.hasNonShiftModifier()) {
-            state.insert(event.string());
-            return true;
-        }
-        return false;
     }
 
     /**

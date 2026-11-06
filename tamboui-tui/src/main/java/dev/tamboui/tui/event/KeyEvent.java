@@ -125,10 +125,11 @@ public final class KeyEvent implements Event {
     }
 
     private static String deriveText(KeyCode code, KeyModifiers modifiers, int character) {
-        if (code == KeyCode.CHAR && character >= 32 && character != 127) {
-            if (!modifiers.ctrl() && !modifiers.alt()) {
-                return new String(Character.toChars(character));
-            }
+        if (code == KeyCode.CHAR && character >= 32 && character != 127 && !modifiers.hasNonShift()) {
+            // Only plain typing produces text. Any non-Shift modifier (Ctrl, Alt, Super, Hyper,
+            // Meta) makes it a shortcut; the terminal is the authority on a chord's text and sets
+            // it explicitly when there is one (e.g. AltGr+e -> "\u20ac").
+            return new String(Character.toChars(character));
         }
         return "";
     }
@@ -883,6 +884,39 @@ public final class KeyEvent implements Event {
      */
     public boolean isDeleteForward() {
         return matches(Actions.DELETE_FORWARD);
+    }
+
+    /**
+     * Returns true if this event represents a typed character that a text field should insert.
+     * <p>
+     * True when the event produces printable text. This covers ordinary {@link KeyCode#CHAR} keys,
+     * keypad digits and operators (resolved to a character by the parser), and multi-code-point
+     * text from an IME or a ZWJ emoji sequence. It is false for navigation and editing keys
+     * (arrows, Enter, Tab, Backspace, Delete, Home, End, ...) and for control characters.
+     * <p>
+     * Terminal-supplied associated text is authoritative: a chord such as {@code AltGr+e} produces
+     * "€" (reported as Ctrl+Alt with text), and it counts as typing. When there is no associated
+     * text, a plain code point is typing only if no non-Shift modifier is held, so a shortcut like
+     * {@code Ctrl+S} or {@code Alt+x} is never inserted.
+     * <p>
+     * Use this instead of switching on {@link #code()} {@code == CHAR} so that keypad typing and
+     * terminal-supplied text are handled uniformly. Pair it with the semantic predicates
+     * ({@link #isLeft()}, {@link #isDeleteBackward()}, ...) to drive a text input or text area.
+     *
+     * @return true if this event should be inserted as text
+     */
+    public boolean isTyping() {
+        if (!text.isEmpty()) {
+            // Terminal stated what this keystroke produces (plain typing or AltGr); honor it over
+            // the modifier check. The parser never puts text on a plain shortcut such as Ctrl+S.
+            int first = text.codePointAt(0);
+            return first >= 32 && first != 127;
+        }
+        if (hasNonShiftModifier()) {
+            return false;
+        }
+        int cp = codePoint();
+        return cp >= 32 && cp != 127;
     }
 
     @Override
