@@ -80,8 +80,9 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Parses raw terminal input into typed <a href="Event.html" title="interface in dev.tamboui.tui.event"><code>Event</code></a> objects.
 <p>
-Handles escape sequences for arrow keys, function keys, navigation keys,
-and mouse events (SGR extended mode).</div>
+Handles escape sequences for standard terminal input, mouse events (SGR mode,
+and the X10 format of terminals without it), and progressive keyboard enhancements
+(Kitty keyboard protocol <code>CSI u</code>).</div>
 </div>
 </section>
 <section class="summary">

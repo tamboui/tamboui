@@ -69,6 +69,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#ctrl(int)" tabindex="0">ctrl(int)</a></li>
 <li><a href="#alt(char)" tabindex="0">alt(char)</a></li>
 <li><a href="#alt(int)" tabindex="0">alt(int)</a></li>
+<li><a href="#superKey(char)" tabindex="0">superKey(char)</a></li>
+<li><a href="#superKey(int)" tabindex="0">superKey(int)</a></li>
+<li><a href="#superKey(dev.tamboui.tui.event.KeyCode)" tabindex="0">superKey(KeyCode)</a></li>
+<li><a href="#withKind(dev.tamboui.tui.event.KeyEventKind)" tabindex="0">withKind(KeyEventKind)</a></li>
+<li><a href="#withSuper()" tabindex="0">withSuper()</a></li>
+<li><a href="#withHyper()" tabindex="0">withHyper()</a></li>
+<li><a href="#withMeta()" tabindex="0">withMeta()</a></li>
 <li><a href="#matches(dev.tamboui.tui.event.Event)" tabindex="0">matches(Event)</a></li>
 <li><a href="#matchesKey(dev.tamboui.tui.event.KeyEvent)" tabindex="0">matchesKey(KeyEvent)</a></li>
 <li><a href="#describe()" tabindex="0">describe()</a></li>
@@ -102,7 +109,7 @@ implements <a href="InputTrigger.html" title="interface in dev.tamboui.tui.bindi
 Key triggers can match:
 <ul>
   <li>A specific <a href="../event/KeyCode.html" title="enum class in dev.tamboui.tui.event"><code>KeyCode</code></a> (e.g., UP, ENTER)</li>
-  <li>A character with optional modifiers (e.g., 'k', Ctrl+'u')</li>
+  <li>A character with optional modifiers (e.g., 'k', Ctrl+'u', Super+'k')</li>
 </ul>
 
 <pre><code>// Match the UP arrow key
@@ -119,6 +126,9 @@ KeyTrigger.ctrl('u')
 
 // Match Alt+V
 KeyTrigger.alt('v')
+
+// Match Super+K (Command/Windows)
+KeyTrigger.superKey('k')
 
 // Match Shift+Tab
 KeyTrigger.key(KeyCode.TAB, false, false, true)
@@ -212,9 +222,44 @@ KeyTrigger.key(KeyCode.TAB, false, false, true)
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if this trigger matches the given key event.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#superKey(char)" class="member-name-link">superKey</a><wbr>(char&nbsp;c)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a trigger for a Super+key combination (Command on macOS, Windows key on PC).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#superKey(int)" class="member-name-link">superKey</a><wbr>(int&nbsp;codePoint)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a trigger for a Super+key combination.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#superKey(dev.tamboui.tui.event.KeyCode)" class="member-name-link">superKey</a><wbr>(<a href="../event/KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;code)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a trigger for a Super+special key combination.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withHyper()" class="member-name-link">withHyper</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a copy of this trigger with the Hyper modifier required.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withKind(dev.tamboui.tui.event.KeyEventKind)" class="member-name-link">withKind</a><wbr>(<a href="../event/KeyEventKind.html" title="enum class in dev.tamboui.tui.event">KeyEventKind</a>&nbsp;kind)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a copy of this trigger configured to match a specific event kind.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withMeta()" class="member-name-link">withMeta</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a copy of this trigger with the Meta modifier required.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withSuper()" class="member-name-link">withSuper</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a copy of this trigger with the Super modifier required.</div>
+</div>
 </div>
 </div>
 </div>
@@ -389,6 +434,105 @@ KeyTrigger.key(KeyCode.TAB, false, false, true)
 </section>
 </li>
 <li>
+<section class="detail" id="superKey(char)">
+<h3>superKey</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">superKey</span><wbr><span class="parameters">(char&nbsp;c)</span></div>
+<div class="block">Creates a trigger for a Super+key combination (Command on macOS, Windows key on PC).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>c</code> - the character pressed with Super</dd>
+<dt>Returns:</dt>
+<dd>a trigger that matches Super + the given character</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="superKey(int)">
+<h3>superKey</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">superKey</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
+<div class="block">Creates a trigger for a Super+key combination.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>codePoint</code> - the code point of the key pressed with Super</dd>
+<dt>Returns:</dt>
+<dd>a trigger that matches Super + the given code point</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="superKey(dev.tamboui.tui.event.KeyCode)">
+<h3>superKey</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">superKey</span><wbr><span class="parameters">(<a href="../event/KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;code)</span></div>
+<div class="block">Creates a trigger for a Super+special key combination.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>code</code> - the special key pressed with Super</dd>
+<dt>Returns:</dt>
+<dd>a trigger that matches Super + the given key</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="withKind(dev.tamboui.tui.event.KeyEventKind)">
+<h3>withKind</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">withKind</span><wbr><span class="parameters">(<a href="../event/KeyEventKind.html" title="enum class in dev.tamboui.tui.event">KeyEventKind</a>&nbsp;kind)</span></div>
+<div class="block">Returns a copy of this trigger configured to match a specific event kind.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>kind</code> - the event kind to match, or null to match press and repeat</dd>
+<dt>Returns:</dt>
+<dd>a new trigger with the specified event kind</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="withSuper()">
+<h3>withSuper</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">withSuper</span>()</div>
+<div class="block">Returns a copy of this trigger with the Super modifier required.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a new trigger with Super enabled</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="withHyper()">
+<h3>withHyper</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">withHyper</span>()</div>
+<div class="block">Returns a copy of this trigger with the Hyper modifier required.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a new trigger with Hyper enabled</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="withMeta()">
+<h3>withMeta</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="KeyTrigger.html" title="class in dev.tamboui.tui.bindings">KeyTrigger</a></span>&nbsp;<span class="element-name">withMeta</span>()</div>
+<div class="block">Returns a copy of this trigger with the Meta modifier required.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a new trigger with Meta enabled</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="matches(dev.tamboui.tui.event.Event)">
 <h3>matches</h3>
 <div class="horizontal-scroll">
@@ -415,10 +559,11 @@ KeyTrigger.key(KeyCode.TAB, false, false, true)
 <p>
 Matching rules:
 <ul>
-  <li>Key code must match</li>
-  <li>Ctrl and Alt modifiers must match exactly</li>
+  <li>Release events are ignored unless explicitly requested with <a href="#withKind(dev.tamboui.tui.event.KeyEventKind)"><code>withKind(KeyEventKind)</code></a></li>
+  <li>Key code must match (or character matches for character triggers)</li>
+  <li>Ctrl, Alt, Super, Hyper, and Meta modifiers must match exactly</li>
   <li>Shift is only checked if explicitly required by the trigger</li>
-  <li>For character triggers, the character must match (respecting ignoreCase)</li>
+  <li>For character triggers, matches logical, shifted, base-layout, or produced text</li>
 </ul></div>
 <dl class="notes">
 <dt>Parameters:</dt>

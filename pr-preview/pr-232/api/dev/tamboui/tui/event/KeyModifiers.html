@@ -56,6 +56,7 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
+<li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
 <li><a href="#field-summary" tabindex="0">Field Summary</a></li>
 <li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
@@ -65,24 +66,34 @@ loadScripts(document, 'script');</script>
 <li><a href="#CTRL" tabindex="0">CTRL</a></li>
 <li><a href="#ALT" tabindex="0">ALT</a></li>
 <li><a href="#SHIFT" tabindex="0">SHIFT</a></li>
+<li><a href="#SUPER" tabindex="0">SUPER</a></li>
+<li><a href="#HYPER" tabindex="0">HYPER</a></li>
+<li><a href="#META" tabindex="0">META</a></li>
 </ol>
 </li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(boolean,boolean,boolean)" tabindex="0">KeyModifiers(boolean, boolean, boolean)</a></li>
+<li><a href="#%3Cinit%3E(boolean,boolean,boolean,boolean,boolean,boolean)" tabindex="0">KeyModifiers(boolean, boolean, boolean, boolean, boolean, boolean)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#of(boolean,boolean,boolean)" tabindex="0">of(boolean, boolean, boolean)</a></li>
+<li><a href="#of(boolean,boolean,boolean,boolean,boolean,boolean)" tabindex="0">of(boolean, boolean, boolean, boolean, boolean, boolean)</a></li>
 <li><a href="#ctrl()" tabindex="0">ctrl()</a></li>
 <li><a href="#alt()" tabindex="0">alt()</a></li>
 <li><a href="#shift()" tabindex="0">shift()</a></li>
+<li><a href="#superKey()" tabindex="0">superKey()</a></li>
+<li><a href="#hyper()" tabindex="0">hyper()</a></li>
+<li><a href="#meta()" tabindex="0">meta()</a></li>
+<li><a href="#hasNonShift()" tabindex="0">hasNonShift()</a></li>
 <li><a href="#isEmpty()" tabindex="0">isEmpty()</a></li>
 <li><a href="#hasAny()" tabindex="0">hasAny()</a></li>
 <li><a href="#equals(java.lang.Object)" tabindex="0">equals(Object)</a></li>
 <li><a href="#hashCode()" tabindex="0">hashCode()</a></li>
 <li><a href="#toString()" tabindex="0">toString()</a></li>
+<li><a href="#builder()" tabindex="0">builder()</a></li>
 </ol>
 </li>
 </ol>
@@ -100,11 +111,28 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">KeyModifiers</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Represents keyboard modifier keys (Ctrl, Alt, Shift).</div>
+<div class="block">Represents keyboard modifier keys (Ctrl, Alt, Shift, Super/Command, Hyper, Meta).</div>
 </div>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="caption"><span>Nested Classes</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static final class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="KeyModifiers.Builder.html" class="type-name-link" title="class in dev.tamboui.tui.event">KeyModifiers.Builder</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Builder for <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event"><code>KeyModifiers</code></a>.</div>
+</div>
+</div>
+</section>
+</li>
 <!-- =========== FIELD SUMMARY =========== -->
 <li>
 <section class="field-summary" id="field-summary">
@@ -125,6 +153,16 @@ loadScripts(document, 'script');</script>
 <div class="block">Only Ctrl pressed.</div>
 </div>
 <div class="col-first even-row-color"><code>static final <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></code></div>
+<div class="col-second even-row-color"><code><a href="#HYPER" class="member-name-link">HYPER</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Only Hyper pressed.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#META" class="member-name-link">META</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Only Meta pressed.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></code></div>
 <div class="col-second even-row-color"><code><a href="#NONE" class="member-name-link">NONE</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">No modifiers pressed.</div>
@@ -133,6 +171,11 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color"><code><a href="#SHIFT" class="member-name-link">SHIFT</a></code></div>
 <div class="col-last odd-row-color">
 <div class="block">Only Shift pressed.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></code></div>
+<div class="col-second even-row-color"><code><a href="#SUPER" class="member-name-link">SUPER</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Only Super (Command on macOS, Windows key on PC) pressed.</div>
 </div>
 </div>
 </section>
@@ -149,7 +192,16 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;alt,
  boolean&nbsp;shift)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Creates a new KeyModifiers instance with the specified modifier flags.</div>
+<div class="block">Creates a new KeyModifiers instance with the standard modifier flags.</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">KeyModifiers</a><wbr>(boolean&nbsp;ctrl,
+ boolean&nbsp;alt,
+ boolean&nbsp;shift,
+ boolean&nbsp;superKey,
+ boolean&nbsp;hyper,
+ boolean&nbsp;meta)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Creates a new KeyModifiers instance with all supported modifier flags.</div>
 </div>
 </div>
 </section>
@@ -170,38 +222,73 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns whether the Alt modifier is active.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ctrl()" class="member-name-link">ctrl</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns whether the Ctrl modifier is active.</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="KeyModifiers.Builder.html" title="class in dev.tamboui.tui.event">KeyModifiers.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#builder()" class="member-name-link">builder</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns a new builder for constructing <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event"><code>KeyModifiers</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ctrl()" class="member-name-link">ctrl</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the Ctrl modifier is active.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasAny()" class="member-name-link">hasAny</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasAny()" class="member-name-link">hasAny</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if any modifier is pressed.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasNonShift()" class="member-name-link">hasNonShift</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if any modifier other than Shift is active (Ctrl, Alt, Super, Hyper or Meta).</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hyper()" class="member-name-link">hyper</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the Hyper modifier is active.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if no modifiers are pressed.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#meta()" class="member-name-link">meta</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the Meta modifier is active.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(boolean,boolean,boolean)" class="member-name-link">of</a><wbr>(boolean&nbsp;ctrl,
  boolean&nbsp;alt,
  boolean&nbsp;shift)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Creates modifiers with the specified flags.</div>
+<div class="block">Creates modifiers with standard flags.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">of</a><wbr>(boolean&nbsp;ctrl,
+ boolean&nbsp;alt,
+ boolean&nbsp;shift,
+ boolean&nbsp;superKey,
+ boolean&nbsp;hyper,
+ boolean&nbsp;meta)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates modifiers with all supported flags.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shift()" class="member-name-link">shift</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the Shift modifier is active.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shift()" class="member-name-link">shift</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#superKey()" class="member-name-link">superKey</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns whether the Shift modifier is active.</div>
+<div class="block">Returns whether the Super (Command/Windows) modifier is active.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
@@ -259,6 +346,33 @@ loadScripts(document, 'script');</script>
 </div>
 </section>
 </li>
+<li>
+<section class="detail" id="SUPER">
+<h3>SUPER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></span>&nbsp;<span class="element-name">SUPER</span></div>
+<div class="block">Only Super (Command on macOS, Windows key on PC) pressed.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="HYPER">
+<h3>HYPER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></span>&nbsp;<span class="element-name">HYPER</span></div>
+<div class="block">Only Hyper pressed.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="META">
+<h3>META</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></span>&nbsp;<span class="element-name">META</span></div>
+<div class="block">Only Meta pressed.</div>
+</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -274,12 +388,35 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">KeyModifiers</span><wbr><span class="parameters">(boolean&nbsp;ctrl,
  boolean&nbsp;alt,
  boolean&nbsp;shift)</span></div>
-<div class="block">Creates a new KeyModifiers instance with the specified modifier flags.</div>
+<div class="block">Creates a new KeyModifiers instance with the standard modifier flags.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>ctrl</code> - true if Ctrl is pressed</dd>
 <dd><code>alt</code> - true if Alt is pressed</dd>
 <dd><code>shift</code> - true if Shift is pressed</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(boolean,boolean,boolean,boolean,boolean,boolean)">
+<h3>KeyModifiers</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">KeyModifiers</span><wbr><span class="parameters">(boolean&nbsp;ctrl,
+ boolean&nbsp;alt,
+ boolean&nbsp;shift,
+ boolean&nbsp;superKey,
+ boolean&nbsp;hyper,
+ boolean&nbsp;meta)</span></div>
+<div class="block">Creates a new KeyModifiers instance with all supported modifier flags.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>ctrl</code> - true if Ctrl is pressed</dd>
+<dd><code>alt</code> - true if Alt is pressed</dd>
+<dd><code>shift</code> - true if Shift is pressed</dd>
+<dd><code>superKey</code> - true if Super (Command/Windows) is pressed</dd>
+<dd><code>hyper</code> - true if Hyper is pressed</dd>
+<dd><code>meta</code> - true if Meta is pressed</dd>
 </dl>
 </div>
 </section>
@@ -299,12 +436,37 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(boolean&nbsp;ctrl,
  boolean&nbsp;alt,
  boolean&nbsp;shift)</span></div>
-<div class="block">Creates modifiers with the specified flags.</div>
+<div class="block">Creates modifiers with standard flags.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>ctrl</code> - true if Ctrl is pressed</dd>
 <dd><code>alt</code> - true if Alt is pressed</dd>
 <dd><code>shift</code> - true if Shift is pressed</dd>
+<dt>Returns:</dt>
+<dd>the key modifiers instance</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="of(boolean,boolean,boolean,boolean,boolean,boolean)">
+<h3>of</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="KeyModifiers.html" title="class in dev.tamboui.tui.event">KeyModifiers</a></span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(boolean&nbsp;ctrl,
+ boolean&nbsp;alt,
+ boolean&nbsp;shift,
+ boolean&nbsp;superKey,
+ boolean&nbsp;hyper,
+ boolean&nbsp;meta)</span></div>
+<div class="block">Creates modifiers with all supported flags.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>ctrl</code> - true if Ctrl is pressed</dd>
+<dd><code>alt</code> - true if Alt is pressed</dd>
+<dd><code>shift</code> - true if Shift is pressed</dd>
+<dd><code>superKey</code> - true if Super (Command/Windows) is pressed</dd>
+<dd><code>hyper</code> - true if Hyper is pressed</dd>
+<dd><code>meta</code> - true if Meta is pressed</dd>
 <dt>Returns:</dt>
 <dd>the key modifiers instance</dd>
 </dl>
@@ -346,6 +508,62 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>true if Shift is pressed</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="superKey()">
+<h3>superKey</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">superKey</span>()</div>
+<div class="block">Returns whether the Super (Command/Windows) modifier is active.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if Super is pressed</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="hyper()">
+<h3>hyper</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">hyper</span>()</div>
+<div class="block">Returns whether the Hyper modifier is active.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if Hyper is pressed</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="meta()">
+<h3>meta</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">meta</span>()</div>
+<div class="block">Returns whether the Meta modifier is active.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if Meta is pressed</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="hasNonShift()">
+<h3>hasNonShift</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">hasNonShift</span>()</div>
+<div class="block">Returns true if any modifier other than Shift is active (Ctrl, Alt, Super, Hyper or Meta).
+<p>
+Shift is intentionally excluded because it is part of normal typing of shifted characters
+(e.g. <code>Shift+a</code> producing <code>"A"</code>). Useful to distinguish keyboard shortcuts
+from plain text input.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if any non-shift modifier is active</dd>
 </dl>
 </div>
 </section>
@@ -408,6 +626,19 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Overrides:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="builder()">
+<h3>builder</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="KeyModifiers.Builder.html" title="class in dev.tamboui.tui.event">KeyModifiers.Builder</a></span>&nbsp;<span class="element-name">builder</span>()</div>
+<div class="block">Returns a new builder for constructing <a href="KeyModifiers.html" title="class in dev.tamboui.tui.event"><code>KeyModifiers</code></a>.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a new builder</dd>
 </dl>
 </div>
 </section>

@@ -83,6 +83,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#showLineNumbers()" tabindex="0">showLineNumbers()</a></li>
 <li><a href="#lineNumberStyle(dev.tamboui.style.Style)" tabindex="0">lineNumberStyle(Style)</a></li>
 <li><a href="#overflow(dev.tamboui.style.Overflow)" tabindex="0">overflow(Overflow)</a></li>
+<li><a href="#tabIndents()" tabindex="0">tabIndents()</a></li>
+<li><a href="#tabIndents(boolean)" tabindex="0">tabIndents(boolean)</a></li>
 <li><a href="#clip()" tabindex="0">clip()</a></li>
 <li><a href="#wrapWord()" tabindex="0">wrapWord()</a></li>
 <li><a href="#wrapCharacter()" tabindex="0">wrapCharacter()</a></li>
@@ -342,6 +344,16 @@ modes render unstyled).</div>
 <div class="block">Returns the style attributes for attribute selector matching.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tabIndents()" class="member-name-link">tabIndents</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Makes the Tab key indent (insert spaces to the next tab stop) instead of moving focus.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tabIndents(boolean)" class="member-name-link">tabIndents</a><wbr>(boolean&nbsp;tabIndents)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets whether the Tab key indents (inserts spaces to the next tab stop) or moves focus.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#text(java.lang.String)" class="member-name-link">text</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;text)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the initial text.</div>
@@ -578,6 +590,38 @@ caret can still reach, so a text area falls back to <code>CLIP</code> for them.<
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>overflow</code> - the overflow mode</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="tabIndents()">
+<h3>tabIndents</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></span>&nbsp;<span class="element-name">tabIndents</span>()</div>
+<div class="block">Makes the Tab key indent (insert spaces to the next tab stop) instead of moving focus.
+<p>
+Equivalent to <code>tabIndents(true)</code>. By default a text area leaves Tab unhandled so it
+moves focus to the next field, which is what forms want; turn this on for an editor-style
+text area where Tab should indent. This mirrors Textual's <code>tab_behavior="indent"</code>.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="tabIndents(boolean)">
+<h3>tabIndents</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TextAreaElement.html" title="class in dev.tamboui.toolkit.elements">TextAreaElement</a></span>&nbsp;<span class="element-name">tabIndents</span><wbr><span class="parameters">(boolean&nbsp;tabIndents)</span></div>
+<div class="block">Sets whether the Tab key indents (inserts spaces to the next tab stop) or moves focus.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>tabIndents</code> - true to indent on Tab, false (the default) to let Tab move focus</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
