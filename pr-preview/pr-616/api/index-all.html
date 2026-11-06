@@ -4849,6 +4849,14 @@ IDE defaults (One Dark / Dark+).</div>
 <dd>
 <div class="block">Delete character forward (Delete).</div>
 </dd>
+<dt><a href="dev/tamboui/tui/bindings/Actions.html#DELETE_WORD_BACKWARD" class="member-name-link">DELETE_WORD_BACKWARD</a> - Static variable in class dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/Actions.html" title="class in dev.tamboui.tui.bindings">Actions</a></dt>
+<dd>
+<div class="block">Delete from the cursor to the start of the previous word.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/bindings/Actions.html#DELETE_WORD_FORWARD" class="member-name-link">DELETE_WORD_FORWARD</a> - Static variable in class dev.tamboui.tui.bindings.<a href="dev/tamboui/tui/bindings/Actions.html" title="class in dev.tamboui.tui.bindings">Actions</a></dt>
+<dd>
+<div class="block">Delete from the cursor to the start of the next word.</div>
+</dd>
 <dt><a href="dev/tamboui/widgets/input/TextAreaState.html#deleteBackward()" class="member-name-link">deleteBackward()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
 <dd>
 <div class="block">Deletes the grapheme cluster before the cursor.</div>
@@ -4874,6 +4882,22 @@ IDE defaults (One Dark / Dark+).</div>
 <dt><a href="dev/tamboui/terminal/Backend.html#deleteLines(int)" class="member-name-link">deleteLines(int)</a> - Method in interface dev.tamboui.terminal.<a href="dev/tamboui/terminal/Backend.html" title="interface in dev.tamboui.terminal">Backend</a></dt>
 <dd>
 <div class="block">Deletes N lines at the current cursor position, pulling lines below up.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#deleteWordBackward()" class="member-name-link">deleteWordBackward()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Deletes from the cursor to the start of the previous word, joining the previous line at the line start.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextInputState.html#deleteWordBackward()" class="member-name-link">deleteWordBackward()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextInputState.html" title="class in dev.tamboui.widgets.input">TextInputState</a></dt>
+<dd>
+<div class="block">Deletes from the cursor to the start of the previous word.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextAreaState.html#deleteWordForward()" class="member-name-link">deleteWordForward()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextAreaState.html" title="class in dev.tamboui.widgets.input">TextAreaState</a></dt>
+<dd>
+<div class="block">Deletes from the cursor to the start of the next word, joining the next line at the line end.</div>
+</dd>
+<dt><a href="dev/tamboui/widgets/input/TextInputState.html#deleteWordForward()" class="member-name-link">deleteWordForward()</a> - Method in class dev.tamboui.widgets.input.<a href="dev/tamboui/widgets/input/TextInputState.html" title="class in dev.tamboui.widgets.input">TextInputState</a></dt>
+<dd>
+<div class="block">Deletes from the cursor to the start of the next word.</div>
 </dd>
 <dt><a href="dev/tamboui/css/parser/Token.Delim.html#%3Cinit%3E(char,dev.tamboui.css.parser.Token.Position)" class="member-name-link">Delim(char, Token.Position)</a> - Constructor for class dev.tamboui.css.parser.<a href="dev/tamboui/css/parser/Token.Delim.html" title="class in dev.tamboui.css.parser">Token.Delim</a></dt>
 <dd>
@@ -10016,6 +10040,15 @@ and right borders plus horizontal padding).</div>
 <dt><a href="dev/tamboui/tui/event/KeyEvent.html#isDeleteForward()" class="member-name-link">isDeleteForward()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
 <dd>
 <div class="block">Returns true if this is a "delete forward" event (Delete) according to the bindings.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/event/KeyEvent.html#isDeleteWordBackward()" class="member-name-link">isDeleteWordBackward()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
+<dd>
+<div class="block">Returns true if this is a "delete previous word" event (Ctrl+Backspace, Ctrl+w) according to
+the bindings.</div>
+</dd>
+<dt><a href="dev/tamboui/tui/event/KeyEvent.html#isDeleteWordForward()" class="member-name-link">isDeleteWordForward()</a> - Method in class dev.tamboui.tui.event.<a href="dev/tamboui/tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a></dt>
+<dd>
+<div class="block">Returns true if this is a "delete next word" event (Ctrl+Delete) according to the bindings.</div>
 </dd>
 <dt><a href="dev/tamboui/css/cascade/PseudoClassState.html#isDisabled()" class="member-name-link">isDisabled()</a> - Method in class dev.tamboui.css.cascade.<a href="dev/tamboui/css/cascade/PseudoClassState.html" title="class in dev.tamboui.css.cascade">PseudoClassState</a></dt>
 <dd>

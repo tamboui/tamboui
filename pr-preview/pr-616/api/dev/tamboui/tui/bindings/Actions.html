@@ -66,6 +66,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#MOVE_RIGHT" tabindex="0">MOVE_RIGHT</a></li>
 <li><a href="#MOVE_WORD_LEFT" tabindex="0">MOVE_WORD_LEFT</a></li>
 <li><a href="#MOVE_WORD_RIGHT" tabindex="0">MOVE_WORD_RIGHT</a></li>
+<li><a href="#DELETE_WORD_BACKWARD" tabindex="0">DELETE_WORD_BACKWARD</a></li>
+<li><a href="#DELETE_WORD_FORWARD" tabindex="0">DELETE_WORD_FORWARD</a></li>
 <li><a href="#PAGE_UP" tabindex="0">PAGE_UP</a></li>
 <li><a href="#PAGE_DOWN" tabindex="0">PAGE_DOWN</a></li>
 <li><a href="#HOME" tabindex="0">HOME</a></li>
@@ -151,6 +153,16 @@ if (event.matches("myApp.customAction")) { ... }
 <div class="col-second even-row-color"><code><a href="#DELETE_FORWARD" class="member-name-link">DELETE_FORWARD</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">Delete character forward (Delete).</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#DELETE_WORD_BACKWARD" class="member-name-link">DELETE_WORD_BACKWARD</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Delete from the cursor to the start of the previous word.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#DELETE_WORD_FORWARD" class="member-name-link">DELETE_WORD_FORWARD</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Delete from the cursor to the start of the next word.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#END" class="member-name-link">END</a></code></div>
@@ -374,6 +386,40 @@ if (event.matches("myApp.customAction")) { ... }
 <dd>
 <ul class="tag-list">
 <li><a href="../../../../constant-values.html#dev.tamboui.tui.bindings.Actions.MOVE_WORD_RIGHT">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="DELETE_WORD_BACKWARD">
+<h3>DELETE_WORD_BACKWARD</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">DELETE_WORD_BACKWARD</span></div>
+<div class="block">Delete from the cursor to the start of the previous word.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../constant-values.html#dev.tamboui.tui.bindings.Actions.DELETE_WORD_BACKWARD">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="DELETE_WORD_FORWARD">
+<h3>DELETE_WORD_FORWARD</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">DELETE_WORD_FORWARD</span></div>
+<div class="block">Delete from the cursor to the start of the next word.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../constant-values.html#dev.tamboui.tui.bindings.Actions.DELETE_WORD_FORWARD">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
