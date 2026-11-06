@@ -37,7 +37,13 @@
 <li><a href="#matching-actions-in-events">Matching Actions in Events</a></li>
 <li><a href="#key-triggers">Key Triggers</a>
 <ul class="sectlevel2">
-<li><a href="#terminal-compatibility">Terminal Compatibility</a></li>
+<li><a href="#keyboard-protocol-and-terminal-compatibility">Keyboard Protocol and Terminal Compatibility</a>
+<ul class="sectlevel3">
+<li><a href="#protocol-modes">Protocol Modes</a></li>
+<li><a href="#legacy-terminal-fallback">Legacy Terminal Fallback</a></li>
+<li><a href="#rich-event-model">Rich Event Model</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#mouse-triggers">Mouse Triggers</a></li>
@@ -124,11 +130,41 @@ With standard bindings, it only matches the Up arrow.</p>
 KeyTrigger.ch('j');                   // Character
 KeyTrigger.chIgnoreCase('j');         // j or J
 KeyTrigger.ctrl('u');                 // Ctrl+U
-KeyTrigger.alt('x');                  // Alt+X</code></pre>
+KeyTrigger.alt('x');                  // Alt+X
+KeyTrigger.superKey('k');             // Super/Command+K</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="terminal-compatibility"><a class="anchor" href="#terminal-compatibility"></a><a class="link" href="#terminal-compatibility">Terminal Compatibility</a></h3>
+<h3 id="keyboard-protocol-and-terminal-compatibility"><a class="anchor" href="#keyboard-protocol-and-terminal-compatibility"></a><a class="link" href="#keyboard-protocol-and-terminal-compatibility">Keyboard Protocol and Terminal Compatibility</a></h3>
+<div class="paragraph">
+<p>TamboUI enables the <strong>Kitty Keyboard Protocol</strong> (<code>CSI u</code> / progressive keyboard enhancement) by default, in <code>AUTO</code> mode.
+On terminals that implement it (Kitty, Ghostty, foot, WezTerm, recent Alacritty, and tmux <code>3.x</code> passthrough, among others) keys are reported unambiguously:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Ctrl+letter</strong> keeps its case - Ctrl+a and Ctrl+Shift+A are distinct.</p>
+</li>
+<li>
+<p><strong>Tab vs Ctrl+I</strong>, <strong>Enter vs Ctrl+M</strong>, and <strong>Escape vs Alt combinations</strong> are disambiguated.</p>
+</li>
+<li>
+<p><strong>Shortcuts match across keyboard layouts</strong> (Cyrillic, AZERTY, Dvorak, &#8230;&#8203;) via base-layout key reporting.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For these terminals the historical control-key limitations below do <strong>not</strong> apply, and you can bind <code>Ctrl+key</code> combinations freely.</p>
+</div>
+<div class="sect3">
+<h4 id="protocol-modes"><a class="anchor" href="#protocol-modes"></a><a class="link" href="#protocol-modes">Protocol Modes</a></h4>
+<div class="paragraph">
+<p>The mode is configured on <code>TuiConfig</code> or <code>InlineTuiConfig</code> via <code>KeyboardProtocol</code> (<code>AUTO</code>, <code>FULL</code>, or <code>LEGACY</code>).
+See <a href="api-levels.html#_keyboard_protocol">API Levels &#8594; Keyboard Protocol</a> for the full mode/flags reference and how the protocol stack is pushed and popped.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="legacy-terminal-fallback"><a class="anchor" href="#legacy-terminal-fallback"></a><a class="link" href="#legacy-terminal-fallback">Legacy Terminal Fallback</a></h4>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -137,10 +173,10 @@ KeyTrigger.alt('x');                  // Alt+X</code></pre>
 </td>
 <td class="content">
 <div class="paragraph">
-<p><strong>Ctrl key bindings have significant limitations</strong> due to how terminals encode keyboard input.</p>
+<p>On terminals that do <strong>not</strong> implement the Kitty protocol - or when you explicitly select <code>KeyboardProtocol.LEGACY</code> - input falls back to classic VT encoding, which has significant limitations.</p>
 </div>
 <div class="paragraph">
-<p>When you press a key combination like Ctrl+A, the terminal does not send "Ctrl" + "A" separately.
+<p>When you press a key combination like Ctrl+A, a legacy terminal does not send "Ctrl" + "A" separately.
 Instead, it sends a single ASCII control character (byte value 1 for Ctrl+A).
 This encoding dates back to the 1970s and causes several problems:</p>
 </div>
@@ -158,7 +194,7 @@ This encoding dates back to the 1970s and causes several problems:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>Alt key bindings are more reliable</strong> because terminals send ESC followed by the actual character:</p>
+<p><strong>Alt key bindings are more reliable</strong> in legacy mode because terminals send ESC followed by the actual character:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -178,7 +214,7 @@ This encoding dates back to the 1970s and causes several problems:</p>
 </table>
 </div>
 <div class="paragraph">
-<p><strong>Recommendation for custom bindings:</strong></p>
+<p><strong>If you need to support legacy terminals as well</strong>, choose custom bindings that degrade gracefully:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -189,7 +225,7 @@ This encoding dates back to the 1970s and causes several problems:</p>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Modifier</th>
-<th class="tableblock halign-left valign-top">Reliability</th>
+<th class="tableblock halign-left valign-top">Legacy reliability</th>
 <th class="tableblock halign-left valign-top">Notes</th>
 </tr>
 </thead>
@@ -207,18 +243,46 @@ This encoding dates back to the 1970s and causes several problems:</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+letter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Good</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Works but loses shift information</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Works but loses shift information in legacy mode</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Poor</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Avoid - ambiguous with other combinations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Avoid - ambiguous with other combinations in legacy mode</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For maximum compatibility, prefer <code>Alt+key</code> bindings for custom actions.
-Use <code>Ctrl+key</code> only for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, etc.).</p>
+<p>With the Kitty protocol active (the default), all of these combinations are fully distinguishable.
+For the widest reach, prefer <code>Alt+key</code> bindings for custom actions and reserve bare <code>Ctrl+key</code> for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, etc.).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="rich-event-model"><a class="anchor" href="#rich-event-model"></a><a class="link" href="#rich-event-model">Rich Event Model</a></h4>
+<div class="paragraph">
+<p>With Kitty protocol support enabled, key events provide rich metadata:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Event Kinds</strong>: <code>KeyEventKind.PRESS</code>, <code>KeyEventKind.REPEAT</code>, and <code>KeyEventKind.RELEASE</code>.
+Existing widgets and <code>KeyTrigger</code> bindings ignore <code>RELEASE</code> events by default to maintain full backward compatibility. You can match release events explicitly using <code>KeyTrigger.withKind(KeyEventKind.RELEASE)</code>.</p>
+</li>
+<li>
+<p><strong>Extended Modifiers</strong>: In addition to Shift, Ctrl, and Alt, <code>KeyModifiers</code> supports <code>superKey</code> (Command / Windows key), <code>hyper</code>, and <code>meta</code>.
+Helpers such as <code>event.hasSuper()</code>, <code>KeyTrigger.superKey('k')</code>, and <code>KeyTrigger.withSuper()</code> are provided.</p>
+</li>
+<li>
+<p><strong>Special, Keypad, and Media Keys</strong>: First-class support for <code>F13</code>–<code>F35</code>, numeric keypad keys (<code>KP_0</code>–<code>KP_9</code>, <code>KP_ENTER</code>, <code>KP_ADD</code>, etc. with <code>event.isKeypad()</code>), lock keys (<code>CAPS_LOCK</code>, <code>NUM_LOCK</code>, <code>SCROLL_LOCK</code>), and media keys.</p>
+</li>
+<li>
+<p><strong>Alternate Keys &amp; Layout Independence</strong>: Terminals report <code>event.keyCodePoint()</code>, <code>event.shiftedKeyCodePoint()</code>, and <code>event.baseLayoutKeyCodePoint()</code> (standard PC-101 layout), allowing shortcuts to match regardless of international keyboard layouts (like Cyrillic, AZERTY, or Dvorak).</p>
+</li>
+<li>
+<p><strong>Associated Text</strong>: <code>event.text()</code> conveys the exact Unicode text generated by the key event (including combining characters and IME input).</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>

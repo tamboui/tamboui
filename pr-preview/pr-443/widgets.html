@@ -1001,6 +1001,10 @@ canvas.render(area, buffer);</code></pre>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>Shapes are drawn one grid point at a time and cut off at the canvas bounds, whatever the scale of the bounds.
+A custom <code>Shape</code> draws through a <code>Painter</code>: <code>getPoint(x, y)</code> maps canvas coordinates to a grid point, <code>paint</code> colors one, and <code>xBounds()</code>, <code>yBounds()</code>, <code>gridWidth()</code> and <code>gridHeight()</code> tell how many grid points a canvas unit spans.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="calendar"><a class="anchor" href="#calendar"></a><a class="link" href="#calendar">Calendar</a></h3>

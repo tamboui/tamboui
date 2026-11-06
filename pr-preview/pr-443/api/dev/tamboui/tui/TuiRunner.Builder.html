@@ -69,6 +69,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#alternateScreen(boolean)" tabindex="0">alternateScreen(boolean)</a></li>
 <li><a href="#hideCursor(boolean)" tabindex="0">hideCursor(boolean)</a></li>
 <li><a href="#mouseCapture(boolean)" tabindex="0">mouseCapture(boolean)</a></li>
+<li><a href="#keyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" tabindex="0">keyboardProtocol(KeyboardProtocol)</a></li>
 <li><a href="#pollTimeout(java.time.Duration)" tabindex="0">pollTimeout(Duration)</a></li>
 <li><a href="#tickRate(java.time.Duration)" tabindex="0">tickRate(Duration)</a></li>
 <li><a href="#noTick()" tabindex="0">noTick()</a></li>
@@ -147,48 +148,53 @@ action handlers.</div>
 <div class="block">Sets whether to hide the cursor.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#mouseCapture(boolean)" class="member-name-link">mouseCapture</a><wbr>(boolean&nbsp;mouseCapture)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#keyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)" class="member-name-link">keyboardProtocol</a><wbr>(<a href="../terminal/KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a>&nbsp;keyboardProtocol)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the keyboard protocol mode.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#mouseCapture(boolean)" class="member-name-link">mouseCapture</a><wbr>(boolean&nbsp;mouseCapture)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets whether to capture mouse events.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#noTick()" class="member-name-link">noTick</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#noTick()" class="member-name-link">noTick</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Disables automatic tick events.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollTimeout(java.time.Duration)" class="member-name-link">pollTimeout</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;pollTimeout)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollTimeout(java.time.Duration)" class="member-name-link">pollTimeout</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;pollTimeout)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the timeout for polling events.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#rawMode(boolean)" class="member-name-link">rawMode</a><wbr>(boolean&nbsp;rawMode)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#rawMode(boolean)" class="member-name-link">rawMode</a><wbr>(boolean&nbsp;rawMode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets whether to enable raw mode.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#renderer(dev.tamboui.tui.Renderer)" class="member-name-link">renderer</a><wbr>(<a href="Renderer.html" title="interface in dev.tamboui.tui">Renderer</a>&nbsp;renderer)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#renderer(dev.tamboui.tui.Renderer)" class="member-name-link">renderer</a><wbr>(<a href="Renderer.html" title="interface in dev.tamboui.tui">Renderer</a>&nbsp;renderer)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the renderer for the application.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resizeGracePeriod(java.time.Duration)" class="member-name-link">resizeGracePeriod</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;resizeGracePeriod)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resizeGracePeriod(java.time.Duration)" class="member-name-link">resizeGracePeriod</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;resizeGracePeriod)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the resize grace period.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdownHook(boolean)" class="member-name-link">shutdownHook</a><wbr>(boolean&nbsp;shutdownHook)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdownHook(boolean)" class="member-name-link">shutdownHook</a><wbr>(boolean&nbsp;shutdownHook)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets whether to register a JVM shutdown hook for cleanup.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tickRate(java.time.Duration)" class="member-name-link">tickRate</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;tickRate)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tickRate(java.time.Duration)" class="member-name-link">tickRate</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;tickRate)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the interval between tick events.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withAutoBindingRegistration()" class="member-name-link">withAutoBindingRegistration</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withAutoBindingRegistration()" class="member-name-link">withAutoBindingRegistration</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Enables automatic registration of action handlers.</div>
 </div>
 </div>
@@ -340,6 +346,21 @@ Equivalent to <code>autoBindingRegistration(true)</code>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>mouseCapture</code> - true to enable mouse capture</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="keyboardProtocol(dev.tamboui.terminal.KeyboardProtocol)">
+<h3>keyboardProtocol</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TuiRunner.Builder.html" title="class in dev.tamboui.tui">TuiRunner.Builder</a></span>&nbsp;<span class="element-name">keyboardProtocol</span><wbr><span class="parameters">(<a href="../terminal/KeyboardProtocol.html" title="enum class in dev.tamboui.terminal">KeyboardProtocol</a>&nbsp;keyboardProtocol)</span></div>
+<div class="block">Sets the keyboard protocol mode.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>keyboardProtocol</code> - the keyboard protocol mode</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
