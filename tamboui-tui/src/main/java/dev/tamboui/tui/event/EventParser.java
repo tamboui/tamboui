@@ -87,7 +87,7 @@ public final class EventParser {
         return KeyEvent.ofChar(c, bindings);
     }
 
-    private static Event parseControlChar(int c, Bindings bindings) {
+    private static KeyEvent parseControlChar(int c, Bindings bindings) {
         switch (c) {
             case 0:
                 return KeyEvent.ofChar(' ', KeyModifiers.CTRL, bindings); // Ctrl+Space (NUL)
@@ -119,11 +119,26 @@ public final class EventParser {
         }
     }
 
+    private static KeyEvent withAlt(KeyEvent event, Bindings bindings) {
+        KeyModifiers modifiers = KeyModifiers.of(event.hasCtrl(), true, event.hasShift());
+        if (event.code() == KeyCode.CHAR) {
+            return KeyEvent.ofChar(event.codePoint(), modifiers, bindings);
+        }
+        return KeyEvent.ofKey(event.code(), modifiers, bindings);
+    }
+
     private static Event parseEscapeSequence(Backend backend, Bindings bindings) throws IOException {
         int next = backend.peek(PEEK_TIMEOUT);
 
         if (next == -2 || next == -1) {
             // Standalone ESC key
+            return KeyEvent.ofKey(KeyCode.ESCAPE, bindings);
+        }
+
+        if (next == ESC) {
+            // The second ESC starts the next key: an Escape of its own, or a sequence such as ESC [ A
+            // (Alt+Up from a terminal that sends Alt as an ESC prefix, or Escape followed quickly by
+            // Up). Leave it unread for the next event, so the rest of the sequence is not typed as text.
             return KeyEvent.ofKey(KeyCode.ESCAPE, bindings);
         }
 
@@ -137,9 +152,21 @@ public final class EventParser {
             return parseSS3(backend, bindings);
         }
 
+        if (next > 0 && next < 32) {
+            // Alt with a control key, sent as an ESC prefix: ESC CR/LF is Alt+Enter, ESC TAB is
+            // Alt+Tab, ESC BS is Alt+Backspace, and ESC 0x01 is Ctrl+Alt+A. Reuse the control-char
+            // mapping and layer Alt on top so every C0 key keeps its meaning and existing modifiers.
+            backend.read(PEEK_TIMEOUT); // consume the control character
+            return withAlt(parseControlChar(next, bindings), bindings);
+        }
+
         // Alt+key
         backend.read(PEEK_TIMEOUT); // consume the character
-        if (next >= 32 && next != 127) {
+        if (next == 127) {
+            // ESC DEL: Alt+Backspace on terminals that send Backspace as DEL (0x7F).
+            return KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.ALT, bindings);
+        }
+        if (next >= 32) {
             return KeyEvent.ofChar(next, KeyModifiers.ALT, bindings);
         }
 
@@ -659,6 +686,16 @@ public final class EventParser {
             code = Integer.parseInt(parts[0]);
         } catch (NumberFormatException e) {
             return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+        }
+
+        // xterm modifyOtherKeys: CSI 27 ; mod ; key ~ (e.g. ESC[27;2;13~ = Shift+Enter). The real
+        // key is the third parameter; normalize to the CSI-u form (key;mod) and reuse its mapping so
+        // Enter/Tab/Backspace/Escape, printable characters and functional keys decode consistently.
+        if (code == 27) {
+            if (parts.length < 3 || parts[2].isEmpty()) {
+                return KeyEvent.ofKey(KeyCode.UNKNOWN, bindings);
+            }
+            return parseKittyCsiU(parts[2] + ";" + parts[1], bindings);
         }
 
         ParsedModifiers pm = parts.length > 1

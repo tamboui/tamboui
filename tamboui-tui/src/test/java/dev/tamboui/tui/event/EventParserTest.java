@@ -1050,6 +1050,125 @@ class EventParserTest {
         assertThat(EventParser.readEvent(backend, 0)).isNull();
     }
 
+    // -- xterm modifyOtherKeys (CSI 27 ; mod ; key ~) --
+
+    @Test
+    @DisplayName("modifyOtherKeys Shift+Enter (ESC[27;2;13~) is parsed as ENTER with Shift")
+    void modifyOtherKeysShiftEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '2', ';', '1', '3', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasShift()).isTrue();
+    }
+
+    @Test
+    @DisplayName("modifyOtherKeys Alt+Enter (ESC[27;3;13~) is parsed as ENTER with Alt")
+    void modifyOtherKeysAltEnterParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '3', ';', '1', '3', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.ENTER);
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
+    @Test
+    @DisplayName("modifyOtherKeys Ctrl+Tab (ESC[27;5;9~) is parsed as TAB with Ctrl")
+    void modifyOtherKeysCtrlTabParsedCorrectly() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '5', ';', '9', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(KeyCode.TAB);
+        assertThat(keyEvent.hasCtrl()).isTrue();
+    }
+
+    @Test
+    @DisplayName("modifyOtherKeys without a key code (ESC[27;2~) is parsed as UNKNOWN")
+    void modifyOtherKeysMissingKeycodeParsedAsUnknown() throws IOException {
+        QueueBackend backend = new QueueBackend(27, '[', '2', '7', ';', '2', '~');
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        assertThat(((KeyEvent) event).code()).isEqualTo(KeyCode.UNKNOWN);
+    }
+
+    // -- Legacy Alt+special keys and ESC-prefix handling (ESC followed by a C0 control byte) --
+
+    @Test
+    @DisplayName("ESC ESC [ A is ESCAPE then UP, not the text \"[A\"")
+    void escEscFollowedBySequenceKeepsTheSequence() throws IOException {
+        // Alt+Up from a terminal that sends Alt as an ESC prefix, or Escape followed quickly by Up.
+        QueueBackend backend = new QueueBackend(27, 27, '[', 'A');
+
+        KeyEvent first = (KeyEvent) EventParser.readEvent(backend, 0);
+        KeyEvent second = (KeyEvent) EventParser.readEvent(backend, 0);
+
+        assertThat(first.code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(second.code()).isEqualTo(KeyCode.UP);
+        assertThat(EventParser.readEvent(backend, 0)).isNull();
+    }
+
+    @Test
+    @DisplayName("Two quick Escape presses (ESC ESC) are two ESCAPE events")
+    void escEscIsTwoEscapes() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 27);
+
+        Event first = EventParser.readEvent(backend, 0);
+        Event second = EventParser.readEvent(backend, 0);
+
+        assertThat(((KeyEvent) first).code()).isEqualTo(KeyCode.ESCAPE);
+        assertThat(((KeyEvent) second).code()).isEqualTo(KeyCode.ESCAPE);
+    }
+
+    @Test
+    @DisplayName("Alt+Enter and Alt+Tab (ESC CR, ESC LF, ESC TAB) are the key with Alt")
+    void escControlKeyIsKeyWithAlt() throws IOException {
+        assertKeyWithAlt(new QueueBackend(27, '\r'), KeyCode.ENTER);
+        assertKeyWithAlt(new QueueBackend(27, '\n'), KeyCode.ENTER);
+        assertKeyWithAlt(new QueueBackend(27, '\t'), KeyCode.TAB);
+    }
+
+    @Test
+    @DisplayName("Alt+Backspace via BS (ESC 0x08) and DEL (ESC 0x7F) is BACKSPACE with Alt")
+    void escBackspaceIsBackspaceWithAlt() throws IOException {
+        assertKeyWithAlt(new QueueBackend(27, 8), KeyCode.BACKSPACE);
+        assertKeyWithAlt(new QueueBackend(27, 127), KeyCode.BACKSPACE);
+    }
+
+    private static void assertKeyWithAlt(QueueBackend backend, KeyCode expected) throws IOException {
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.code()).isEqualTo(expected);
+        assertThat(keyEvent.hasAlt()).isTrue();
+        assertThat(keyEvent.hasCtrl()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Ctrl+Alt+A (ESC 0x01) is 'a' with Ctrl and Alt")
+    void escCtrlLetterIsCtrlAltLetter() throws IOException {
+        QueueBackend backend = new QueueBackend(27, 1);
+
+        Event event = EventParser.readEvent(backend, 0);
+
+        assertThat(event).isInstanceOf(KeyEvent.class);
+        KeyEvent keyEvent = (KeyEvent) event;
+        assertThat(keyEvent.isChar('a')).isTrue();
+        assertThat(keyEvent.hasCtrl()).isTrue();
+        assertThat(keyEvent.hasAlt()).isTrue();
+    }
+
     private static QueueBackend backendFor(String sequence) {
         return new QueueBackend(sequence.codePoints().toArray());
     }
