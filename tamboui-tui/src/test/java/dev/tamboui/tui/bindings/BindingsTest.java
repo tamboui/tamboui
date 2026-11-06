@@ -701,6 +701,66 @@ class BindingsTest {
     }
 
     @Test
+    @DisplayName("macOS replaces word-nav with Option keys, dropping Ctrl+Arrow but keeping Ctrl+w")
+    void macReplacesWordNavWithOptionKeys() {
+        String saved = System.getProperty("os.name");
+        try {
+            System.setProperty("os.name", "Mac OS X");
+            Bindings mac = BindingSets.defaults();
+
+            // Option is the macOS word-editing modifier.
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.ALT, mac).isWordLeft()).isTrue();
+            assertThat(KeyEvent.ofKey(KeyCode.RIGHT, KeyModifiers.ALT, mac).isWordRight()).isTrue();
+            assertThat(KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.ALT, mac).isDeleteWordBackward()).isTrue();
+            assertThat(KeyEvent.ofKey(KeyCode.DELETE, KeyModifiers.ALT, mac).isDeleteWordForward()).isTrue();
+            // Ctrl+Arrow is Mission Control on macOS, so it is no longer a word key.
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL, mac).isWordLeft()).isFalse();
+            assertThat(KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.CTRL, mac).isDeleteWordBackward()).isFalse();
+            // Ctrl+w is the universal readline control byte and is kept.
+            assertThat(KeyEvent.ofChar('w', KeyModifiers.CTRL, mac).isDeleteWordBackward()).isTrue();
+        } finally {
+            restoreOsName(saved);
+        }
+    }
+
+    @Test
+    @DisplayName("named sets stay literal and cross-platform (Ctrl word-nav), even on macOS")
+    void namedSetsStayLiteralOnMac() {
+        String saved = System.getProperty("os.name");
+        try {
+            System.setProperty("os.name", "Mac OS X");
+            // standard()/vim()/etc are the stable cross-platform definitions; only defaults() resolves.
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL, BindingSets.standard()).isWordLeft()).isTrue();
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.ALT, BindingSets.standard()).isWordLeft()).isFalse();
+        } finally {
+            restoreOsName(saved);
+        }
+    }
+
+    @Test
+    @DisplayName("off macOS word-nav stays on the Ctrl keys")
+    void wordNavUsesCtrlOffMac() {
+        String saved = System.getProperty("os.name");
+        try {
+            System.setProperty("os.name", "Linux");
+            Bindings other = BindingSets.defaults();
+
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.ALT, other).isWordLeft()).isFalse();
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL, other).isWordLeft()).isTrue();
+        } finally {
+            restoreOsName(saved);
+        }
+    }
+
+    private static void restoreOsName(String saved) {
+        if (saved == null) {
+            System.clearProperty("os.name");
+        } else {
+            System.setProperty("os.name", saved);
+        }
+    }
+
+    @Test
     @DisplayName("MouseTrigger does not match KeyEvent")
     void mouseTriggerDoesNotMatchKeyEvent() {
         MouseTrigger trigger = MouseTrigger.click();

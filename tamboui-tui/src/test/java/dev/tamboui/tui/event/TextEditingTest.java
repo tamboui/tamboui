@@ -132,16 +132,19 @@ class TextEditingTest {
         @Test
         @DisplayName("Ctrl+Left and Ctrl+Right jump by word, not by character")
         void wordNavigation() {
+            // Pin the cross-platform standard set so Ctrl is the word modifier regardless of host
+            // (defaults() uses Option on macOS).
+            Bindings std = BindingSets.standard();
             TextInputState state = new TextInputState("foo bar baz");
             // Cursor starts at the end.
             assertThat(state.cursorPosition()).isEqualTo(11);
 
-            assertThat(TextEditing.handle(state, KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL))).isTrue();
+            assertThat(TextEditing.handle(state, KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL, std))).isTrue();
             assertThat(state.cursorPosition()).isEqualTo(8); // |baz
-            assertThat(TextEditing.handle(state, KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL))).isTrue();
+            assertThat(TextEditing.handle(state, KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL, std))).isTrue();
             assertThat(state.cursorPosition()).isEqualTo(4); // |bar
 
-            assertThat(TextEditing.handle(state, KeyEvent.ofKey(KeyCode.RIGHT, KeyModifiers.CTRL))).isTrue();
+            assertThat(TextEditing.handle(state, KeyEvent.ofKey(KeyCode.RIGHT, KeyModifiers.CTRL, std))).isTrue();
             assertThat(state.cursorPosition()).isEqualTo(8); // |baz
 
             // A plain arrow still moves one character.
@@ -152,15 +155,16 @@ class TextEditingTest {
         @Test
         @DisplayName("word deletion: Ctrl+Backspace and Ctrl+w delete the previous word, Ctrl+Delete the next")
         void wordDeletion() {
+            Bindings std = BindingSets.standard();
             TextInputState back = new TextInputState("foo bar baz"); // cursor at the end
-            assertThat(TextEditing.handle(back, KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.CTRL))).isTrue();
+            assertThat(TextEditing.handle(back, KeyEvent.ofKey(KeyCode.BACKSPACE, KeyModifiers.CTRL, std))).isTrue();
             assertThat(back.text()).isEqualTo("foo bar ");
-            assertThat(TextEditing.handle(back, KeyEvent.ofChar('w', KeyModifiers.CTRL))).isTrue();
+            assertThat(TextEditing.handle(back, KeyEvent.ofChar('w', KeyModifiers.CTRL, std))).isTrue();
             assertThat(back.text()).isEqualTo("foo ");
 
             TextInputState fwd = new TextInputState("foo bar baz");
             fwd.moveCursorToStart();
-            assertThat(TextEditing.handle(fwd, KeyEvent.ofKey(KeyCode.DELETE, KeyModifiers.CTRL))).isTrue();
+            assertThat(TextEditing.handle(fwd, KeyEvent.ofKey(KeyCode.DELETE, KeyModifiers.CTRL, std))).isTrue();
             assertThat(fwd.text()).isEqualTo("bar baz");
         }
 
