@@ -239,40 +239,6 @@ public final class EventRouter implements AutoCloseable {
     }
 
     private EventResult routeKeyEvent(long routeId, KeyEvent event) {
-        // Handle focus navigation first
-        // Check focusPrevious before focusNext because Shift+Tab is more specific than Tab
-        if (event.isFocusPrevious()) {
-            String fromId = focusManager.focusedId();
-            boolean success = focusManager.focusPrevious();
-            String toId = focusManager.focusedId();
-            if (FocusNavigationEvent.enabled()) {
-                FocusNavigationEvent.commit(routeId, "focusPrevious", success, fromId, toId);
-            }
-            if (success) {
-                if (FocusChangeEvent.enabled()) {
-                    FocusChangeEvent.commit(routeId, fromId, toId, "Shift+Tab navigation");
-                }
-                return EventResult.HANDLED;
-            }
-            return EventResult.UNHANDLED;
-        }
-
-        if (event.isFocusNext()) {
-            String fromId = focusManager.focusedId();
-            boolean success = focusManager.focusNext();
-            String toId = focusManager.focusedId();
-            if (FocusNavigationEvent.enabled()) {
-                FocusNavigationEvent.commit(routeId, "focusNext", success, fromId, toId);
-            }
-            if (success) {
-                if (FocusChangeEvent.enabled()) {
-                    FocusChangeEvent.commit(routeId, fromId, toId, "Tab navigation");
-                }
-                return EventResult.HANDLED;
-            }
-            return EventResult.UNHANDLED;
-        }
-
         // Escape cancels drag first
         if (event.isCancel() && draggingElement != null) {
             if (DragStateEvent.enabled()) {
@@ -332,6 +298,41 @@ public final class EventRouter implements AutoCloseable {
                     }
                 }
             }
+        }
+
+        // Focus navigation after the focused element declines the key, so a focused widget
+        // (e.g. a text area with tabIndents()) can consume Tab before it moves focus.
+        // Check focusPrevious before focusNext because Shift+Tab is more specific than Tab.
+        if (event.isFocusPrevious()) {
+            String fromId = focusManager.focusedId();
+            boolean success = focusManager.focusPrevious();
+            String toId = focusManager.focusedId();
+            if (FocusNavigationEvent.enabled()) {
+                FocusNavigationEvent.commit(routeId, "focusPrevious", success, fromId, toId);
+            }
+            if (success) {
+                if (FocusChangeEvent.enabled()) {
+                    FocusChangeEvent.commit(routeId, fromId, toId, "Shift+Tab navigation");
+                }
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
+        }
+
+        if (event.isFocusNext()) {
+            String fromId = focusManager.focusedId();
+            boolean success = focusManager.focusNext();
+            String toId = focusManager.focusedId();
+            if (FocusNavigationEvent.enabled()) {
+                FocusNavigationEvent.commit(routeId, "focusNext", success, fromId, toId);
+            }
+            if (success) {
+                if (FocusChangeEvent.enabled()) {
+                    FocusChangeEvent.commit(routeId, fromId, toId, "Tab navigation");
+                }
+                return EventResult.HANDLED;
+            }
+            return EventResult.UNHANDLED;
         }
 
         // Call global handlers after focused element but before unfocused elements

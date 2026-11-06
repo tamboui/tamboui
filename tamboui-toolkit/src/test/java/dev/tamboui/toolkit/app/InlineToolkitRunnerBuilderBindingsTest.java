@@ -96,12 +96,11 @@ class InlineToolkitRunnerBuilderBindingsTest extends AbstractElementTest {
     }
 
     /**
-     * Tab is intercepted when event has default bindings — demonstrates
-     * the bug pattern that must not occur via either the Builder or
-     * create() paths.
+     * Even with default bindings (Tab = focusNext), the focused element gets
+     * first refusal on Tab before the EventRouter attempts focus cycling.
      */
     @Test
-    @DisplayName("Tab is intercepted when event has default bindings (demonstrates the bug)")
+    @DisplayName("focused element receives Tab before focus cycling, even with default bindings")
     void tabIsInterceptedWithDefaultBindings() {
         FocusManager focusManager = new FocusManager();
         ElementRegistry elementRegistry = new ElementRegistry();
@@ -132,10 +131,10 @@ class InlineToolkitRunnerBuilderBindingsTest extends AbstractElementTest {
         EventResult result = router.route(tabEvent);
 
         assertThat(handlerCalled.get())
-                .as("Element's handler was NOT called — Tab swallowed by EventRouter focus cycling")
-                .isFalse();
+                .as("Element's handler receives Tab before EventRouter focus cycling")
+                .isTrue();
 
-        assertThat(result).isEqualTo(EventResult.UNHANDLED);
+        assertThat(result).isEqualTo(EventResult.HANDLED);
     }
 
     /**

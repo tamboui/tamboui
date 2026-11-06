@@ -15,13 +15,16 @@ import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.ElementRegistry;
 import dev.tamboui.toolkit.elements.FormFieldElement;
+import dev.tamboui.toolkit.elements.TextAreaElement;
 import dev.tamboui.toolkit.focus.FocusManager;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.form.SelectFieldState;
+import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
 
 import static dev.tamboui.toolkit.Toolkit.formField;
+import static dev.tamboui.toolkit.Toolkit.textArea;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -222,5 +225,45 @@ class EventRouterTest extends AbstractElementTest {
         assertThat(result).isEqualTo(EventResult.UNHANDLED);
         // Focus stays on field1
         assertThat(focusManager.focusedId()).isEqualTo("field1");
+    }
+
+    @Test
+    @DisplayName("focused text area with tabIndents() consumes Tab instead of moving focus")
+    void tabIndentsConsumesTabBeforeFocusNavigation() {
+        TextAreaState state = new TextAreaState("");
+        TextAreaElement area = textArea(state).id("editor").tabIndents();
+        TextInputState nextState = new TextInputState("");
+        FormFieldElement next = formField("Name", nextState).id("next");
+
+        registerElement(area, new Rect(0, 0, 30, 5));
+        registerElement(next, new Rect(0, 5, 30, 1));
+
+        focusManager.setFocus("editor");
+
+        EventResult result = router.route(KeyEvent.ofKey(KeyCode.TAB));
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(focusManager.focusedId()).isEqualTo("editor");
+        assertThat(state.text()).isEqualTo("    ");
+    }
+
+    @Test
+    @DisplayName("focused text area without tabIndents() lets Tab move focus")
+    void tabMovesFocusWithoutTabIndents() {
+        TextAreaState state = new TextAreaState("");
+        TextAreaElement area = textArea(state).id("editor");
+        TextInputState nextState = new TextInputState("");
+        FormFieldElement next = formField("Name", nextState).id("next");
+
+        registerElement(area, new Rect(0, 0, 30, 5));
+        registerElement(next, new Rect(0, 5, 30, 1));
+
+        focusManager.setFocus("editor");
+
+        EventResult result = router.route(KeyEvent.ofKey(KeyCode.TAB));
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(focusManager.focusedId()).isEqualTo("next");
+        assertThat(state.text()).isEmpty();
     }
 }
