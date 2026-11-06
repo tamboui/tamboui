@@ -43,6 +43,7 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
     private Position previousCursorPosition;
     private boolean previousFrameHadRawOutput;
     private List<Rect> previousRawOutputAreas = Collections.emptyList();
+    private boolean needsInitialClear = true;
 
     /**
      * Creates a new terminal instance with the given backend.
@@ -138,6 +139,18 @@ public final class Terminal<B extends Backend> implements AutoCloseable {
 
                 if (!area.equals(currentBuffer.area())) {
                     resize(area);
+                    needsInitialClear = false; // resize() already cleared the screen
+                }
+
+                // Clear the screen once, before the first frame. The frame is diffed against an
+                // empty buffer, so cells that stay blank are never written; without an initial
+                // clear a terminal that preserves its contents when entering the alternate screen
+                // shows the old output through those blank cells (issue #597). Flush immediately so
+                // the clear reaches the terminal even when the first frame has no diff to draw.
+                if (needsInitialClear) {
+                    needsInitialClear = false;
+                    backend.clear();
+                    backend.flush();
                 }
 
                 // Clear current buffer for new frame
