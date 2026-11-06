@@ -81,9 +81,12 @@ loadScripts(document, 'script');</script>
 <div class="block">Finds word boundaries for word-wise cursor movement, the way Ctrl+Left and Ctrl+Right move in a
 text field.
 <p>
-Words are runs of non-whitespace separated by whitespace. Boundaries always fall between a
-whitespace and a non-whitespace character, so they never split a surrogate pair or a grapheme
-cluster whose code points are all non-whitespace.</div>
+Built on the JDK's <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/text/BreakIterator.html#getWordInstance()" title="class or interface in java.text" class="external-link"><code>BreakIterator.getWordInstance()</code></a>, so word breaking follows the Unicode
+text-segmentation rules (UAX&nbsp;#29): it handles scripts without spaces (CJK), keeps
+identifiers and numbers together, and treats punctuation as its own boundary. "Next/previous
+word" means the start of the next/previous run of letters or digits; whitespace and punctuation
+runs are skipped. Boundaries always fall on code-point edges, so they never split a surrogate
+pair.</div>
 </div>
 </section>
 <section class="summary">
@@ -103,15 +106,13 @@ cluster whose code points are all non-whitespace.</div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#nextWord(java.lang.CharSequence,int)" class="member-name-link">nextWord</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&nbsp;text,
  int&nbsp;pos)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the index of the start of the next word at or after <code>pos</code>: it skips the rest of
-the current word and then the whitespace gap.</div>
+<div class="block">Returns the index of the start of the next word at or after <code>pos</code>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#prevWord(java.lang.CharSequence,int)" class="member-name-link">prevWord</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&nbsp;text,
  int&nbsp;pos)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the index of the start of the previous word before <code>pos</code>: it skips any
-whitespace immediately before <code>pos</code> and then the word before that.</div>
+<div class="block">Returns the index of the start of the previous word before <code>pos</code>.</div>
 </div>
 </div>
 </div>
@@ -136,8 +137,8 @@ whitespace immediately before <code>pos</code> and then the word before that.</d
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">nextWord</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&nbsp;text,
  int&nbsp;pos)</span></div>
-<div class="block">Returns the index of the start of the next word at or after <code>pos</code>: it skips the rest of
-the current word and then the whitespace gap. At or past the end it returns the text length.</div>
+<div class="block">Returns the index of the start of the next word at or after <code>pos</code>. At or past the end it
+returns the text length.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>text</code> - the text to scan</dd>
@@ -154,8 +155,7 @@ the current word and then the whitespace gap. At or past the end it returns the 
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">prevWord</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>&nbsp;text,
  int&nbsp;pos)</span></div>
-<div class="block">Returns the index of the start of the previous word before <code>pos</code>: it skips any
-whitespace immediately before <code>pos</code> and then the word before that. At or before the
+<div class="block">Returns the index of the start of the previous word before <code>pos</code>. At or before the
 start it returns <code>0</code>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
