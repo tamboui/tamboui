@@ -52,6 +52,7 @@ import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
 import dev.tamboui.tui.event.KeyEvent;
+import dev.tamboui.tui.event.TextEditing;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
 import dev.tamboui.widgets.form.FieldType;
@@ -1337,66 +1338,17 @@ public static SpinnerElement spinner(String... frames) {
     /**
      * Handles common key events for text input.
      * <p>
-     * Handles: character input, backspace, delete, left/right arrows, home/end.
+     * Delegates to {@link TextEditing}, which drives the edit from the event's semantic predicates
+     * (so it follows the bindings, e.g. the emacs Ctrl+A/Ctrl+E) and inserts
+     * {@link KeyEvent#isTyping()} text whole. Apps without the toolkit can call {@link TextEditing}
+     * directly.
      *
      * @param state the text input state to modify
      * @param event the key event to handle
      * @return true if the event was handled, false otherwise
      */
     public static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
-        if (event.isRelease()) {
-            return false;
-        }
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case HOME:
-                state.moveCursorToStart();
-                return true;
-            case END:
-                state.moveCursorToEnd();
-                return true;
-            case CHAR:
-                // Trust event.text() as the terminal's authoritative statement of what the user
-                // typed. The parser only synthesizes text for plain typing, so if text is present
-                // on a chord it was deliberately provided by the terminal (e.g. AltGr+e -> "\u20ac",
-                // which arrives as Ctrl+Alt on Windows/Linux and is legitimate text input).
-                String text = event.text();
-                if (!text.isEmpty()) {
-                    state.insert(text);
-                    return true;
-                }
-                // No associated text: this is a shortcut (any non-shift modifier) or an unmapped
-                // control character. Don't fabricate input.
-                if (event.hasNonShiftModifier()) {
-                    return false;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                break; // fall through to keypad-typing fallback
-        }
-        // Keypad digit/operator (KP_*): parser set the character field; treat as typing without
-        // bypassing the modifier check so shortcut chords stay inert.
-        if (event.codePoint() > 0 && !event.hasNonShiftModifier()) {
-            state.insert(event.string());
-            return true;
-        }
-        return false;
+        return TextEditing.handle(state, event);
     }
 
 }
