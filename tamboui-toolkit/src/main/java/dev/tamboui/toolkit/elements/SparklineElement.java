@@ -8,9 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.LongFunction;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
@@ -43,6 +45,8 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
     private String title;
     private BorderType borderType;
     private Color borderColor;
+    private LongFunction<Color> colorMapper;
+    private ColorGradient gradient;
 
     /** Creates a sparkline element with no data. */
     public SparklineElement() {
@@ -252,6 +256,39 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
         return this;
     }
 
+    /**
+     * Sets a color mapper function to compute the foreground color for each data point value.
+     *
+     * @param colorMapper function mapping a value to a Color
+     * @return this element
+     */
+    public SparklineElement colorMapper(LongFunction<Color> colorMapper) {
+        this.colorMapper = colorMapper;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the sparkline bars.
+     *
+     * @param stops gradient color stops
+     * @return this element
+     */
+    public SparklineElement gradient(Color... stops) {
+        this.gradient = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the sparkline bars.
+     *
+     * @param gradient the color gradient
+     * @return this element
+     */
+    public SparklineElement gradient(ColorGradient gradient) {
+        this.gradient = gradient;
+        return this;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Sparkline width is typically the data point count
@@ -283,7 +320,16 @@ public final class SparklineElement extends StyledElement<SparklineElement> {
             .style(context.currentStyle())
             .barSet(barSet)
             .direction(direction)
-            .showYAxis(showYAxis);
+            .showYAxis(showYAxis)
+            .styleResolver(styleResolver(context));
+
+        if (colorMapper != null) {
+            builder.colorMapper(colorMapper);
+        }
+
+        if (gradient != null) {
+            builder.gradient(gradient);
+        }
 
         if (xLabels != null) {
             builder.xLabels(xLabels);

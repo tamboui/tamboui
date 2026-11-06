@@ -336,4 +336,42 @@ class GaugeTest {
 
         BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.MAGENTA);
     }
+
+    @Test
+    @DisplayName("Gauge renders with programmatic gradient")
+    void rendersWithGradient() {
+        Gauge gauge = Gauge.builder()
+            .percent(100)
+            .label("")
+            .gradient(Color.GREEN, Color.RED)
+            .build();
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        gauge.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
+        BufferAssertions.assertThat(buffer).at(4, 0).hasForeground(Color.RED);
+    }
+
+    @Test
+    @DisplayName("Gauge renders with CSS gradient properties")
+    void rendersWithCssGradient() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.builder()
+            .set("gradient-low", Color.GREEN)
+            .set("gradient-high", Color.RED)
+            .build();
+        Gauge gauge = Gauge.builder()
+            .percent(100)
+            .label("")
+            .styleResolver(resolver)
+            .build();
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        gauge.render(area, buffer);
+
+        BufferAssertions.assertThat(buffer).at(0, 0).hasForeground(Color.GREEN);
+        BufferAssertions.assertThat(buffer).at(4, 0).hasForeground(Color.RED);
+    }
 }

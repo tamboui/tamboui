@@ -8,9 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.LongFunction;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
@@ -63,6 +65,10 @@ public final class DualSparklineElement extends StyledElement<DualSparklineEleme
     private String title;
     private BorderType borderType;
     private Color borderColor;
+    private LongFunction<Color> topColorMapper;
+    private LongFunction<Color> bottomColorMapper;
+    private ColorGradient topGradient;
+    private ColorGradient bottomGradient;
 
     /** Creates a dual sparkline element with no data. */
     public DualSparklineElement() {
@@ -310,6 +316,97 @@ public final class DualSparklineElement extends StyledElement<DualSparklineEleme
         return this;
     }
 
+    /**
+     * Sets a color mapper function for the top series bars.
+     *
+     * @param topColorMapper function mapping a value to a Color
+     * @return this element
+     */
+    public DualSparklineElement topColorMapper(LongFunction<Color> topColorMapper) {
+        this.topColorMapper = topColorMapper;
+        return this;
+    }
+
+    /**
+     * Sets a color mapper function for the bottom series bars.
+     *
+     * @param bottomColorMapper function mapping a value to a Color
+     * @return this element
+     */
+    public DualSparklineElement bottomColorMapper(LongFunction<Color> bottomColorMapper) {
+        this.bottomColorMapper = bottomColorMapper;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the top series bars.
+     *
+     * @param stops gradient color stops
+     * @return this element
+     */
+    public DualSparklineElement topGradient(Color... stops) {
+        this.topGradient = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the top series bars.
+     *
+     * @param topGradient the color gradient
+     * @return this element
+     */
+    public DualSparklineElement topGradient(ColorGradient topGradient) {
+        this.topGradient = topGradient;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the bottom series bars.
+     *
+     * @param stops gradient color stops
+     * @return this element
+     */
+    public DualSparklineElement bottomGradient(Color... stops) {
+        this.bottomGradient = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the bottom series bars.
+     *
+     * @param bottomGradient the color gradient
+     * @return this element
+     */
+    public DualSparklineElement bottomGradient(ColorGradient bottomGradient) {
+        this.bottomGradient = bottomGradient;
+        return this;
+    }
+
+    /**
+     * Sets the same color gradient for both top and bottom series bars.
+     *
+     * @param stops gradient color stops
+     * @return this element
+     */
+    public DualSparklineElement gradient(Color... stops) {
+        ColorGradient grad = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+        this.topGradient = grad;
+        this.bottomGradient = grad;
+        return this;
+    }
+
+    /**
+     * Sets the same color gradient for both top and bottom series bars.
+     *
+     * @param gradient the color gradient
+     * @return this element
+     */
+    public DualSparklineElement gradient(ColorGradient gradient) {
+        this.topGradient = gradient;
+        this.bottomGradient = gradient;
+        return this;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         int dataLen = Math.max(topData.length, bottomData.length);
@@ -355,6 +452,18 @@ public final class DualSparklineElement extends StyledElement<DualSparklineEleme
         }
         if (bottomForeground != null) {
             builder.bottomForeground(bottomForeground);
+        }
+        if (topColorMapper != null) {
+            builder.topColorMapper(topColorMapper);
+        }
+        if (bottomColorMapper != null) {
+            builder.bottomColorMapper(bottomColorMapper);
+        }
+        if (topGradient != null) {
+            builder.topGradient(topGradient);
+        }
+        if (bottomGradient != null) {
+            builder.bottomGradient(bottomGradient);
         }
         if (max != null) {
             builder.max(max);

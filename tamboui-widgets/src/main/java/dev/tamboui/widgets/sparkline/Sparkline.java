@@ -4,12 +4,19 @@
  */
 package dev.tamboui.widgets.sparkline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.LongFunction;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.ColorGradient;
+import dev.tamboui.style.PropertyDefinition;
+import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
@@ -45,6 +52,28 @@ import dev.tamboui.widgets.block.Block;
  * @see BarSet
  */
 public final class Sparkline implements Widget {
+
+    /**
+     * CSS property for the gradient low stop color ({@code gradient-low}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_LOW =
+            PropertyDefinition.of("gradient-low", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the gradient mid stop color ({@code gradient-mid}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_MID =
+            PropertyDefinition.of("gradient-mid", ColorConverter.INSTANCE);
+
+    /**
+     * CSS property for the gradient high stop color ({@code gradient-high}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_HIGH =
+            PropertyDefinition.of("gradient-high", ColorConverter.INSTANCE);
+
+    static {
+        PropertyRegistry.registerAll(GRADIENT_LOW, GRADIENT_MID, GRADIENT_HIGH);
+    }
 
     /**
      * Direction for rendering sparkline data.
@@ -341,6 +370,8 @@ public final class Sparkline implements Widget {
     private final Style style;
     private final boolean showYAxis;
     private final String[] xLabels;
+    private final LongFunction<Color> colorMapper;
+    private final ColorGradient gradient;
 
     private Sparkline(Builder builder) {
         this.data = builder.data;
@@ -350,6 +381,7 @@ public final class Sparkline implements Widget {
         this.direction = builder.direction;
         this.showYAxis = builder.showYAxis;
         this.xLabels = builder.xLabels;
+        this.colorMapper = builder.colorMapper;
 
         // Resolve style-aware properties
         Color resolvedFg = builder.resolveForeground();
@@ -359,6 +391,31 @@ public final class Sparkline implements Widget {
             baseStyle = baseStyle.fg(resolvedFg);
         }
         this.style = baseStyle;
+
+        // Resolve gradient: programmatic takes precedence over CSS stops
+        ColorGradient resolvedGradient = builder.gradient;
+        if (resolvedGradient == null) {
+            resolvedGradient = builder.resolveGradient();
+        }
+        this.gradient = resolvedGradient;
+    }
+
+    /**
+     * Returns the custom color mapper, if set.
+     *
+     * @return the color mapper, or empty
+     */
+    public Optional<LongFunction<Color>> colorMapper() {
+        return Optional.ofNullable(colorMapper);
+    }
+
+    /**
+     * Returns the color gradient, if set.
+     *
+     * @return the color gradient, or empty
+     */
+    public Optional<ColorGradient> gradient() {
+        return Optional.ofNullable(gradient);
     }
 
     /**
@@ -449,6 +506,17 @@ public final class Sparkline implements Widget {
             }
 
             long value = data[dataIndex];
+            Style columnStyle = effectiveStyle;
+            if (colorMapper != null) {
+                Color mapped = colorMapper.apply(value);
+                if (mapped != null) {
+                    columnStyle = columnStyle.fg(mapped);
+                }
+            } else if (gradient != null) {
+                double ratio = effectiveMax > 0 ? (double) value / effectiveMax : 0.0;
+                columnStyle = columnStyle.fg(gradient.at(ratio));
+            }
+
             // Scale value to sub-pixel height: chartH rows * 8 levels per row
             long barPx = effectiveMax > 0 ? value * chartH * 8 / effectiveMax : 0;
 
@@ -474,7 +542,7 @@ public final class Sparkline implements Widget {
                     symbol = barSet.empty();
                 }
                 int y = sparklineArea.y() + row;
-                buffer.setString(x, y, symbol, effectiveStyle);
+                buffer.setString(x, y, symbol, columnStyle);
                 remaining = remaining >= 8 ? remaining - 8 : 0;
             }
         }
@@ -524,6 +592,11 @@ public final class Sparkline implements Widget {
 
         // Style-aware properties (resolved via styleResolver in build())
         private Color foreground;
+        private LongFunction<Color> colorMapper;
+        private ColorGradient gradient;
+        private Color gradientLow;
+        private Color gradientMid;
+        private Color gradientHigh;
 
         private Builder() {}
 
@@ -695,6 +768,74 @@ public final class Sparkline implements Widget {
         }
 
         /**
+         * Sets a custom color mapper function that maps each data value to a bar foreground color.
+         * <p>
+         * When set, this takes precedence over gradients and base styles.
+         *
+         * @param colorMapper the color mapper function
+         * @return this builder
+         */
+        public Builder colorMapper(LongFunction<Color> colorMapper) {
+            this.colorMapper = colorMapper;
+            return this;
+        }
+
+        /**
+         * Sets color gradient stops to map normalized values in {@code [0, max]} to foreground colors.
+         *
+         * @param stops the color gradient stops
+         * @return this builder
+         */
+        public Builder gradient(Color... stops) {
+            this.gradient = (stops != null && stops.length > 0) ? ColorGradient.of(stops) : null;
+            return this;
+        }
+
+        /**
+         * Sets a color gradient to map normalized values in {@code [0, max]} to foreground colors.
+         *
+         * @param gradient the color gradient
+         * @return this builder
+         */
+        public Builder gradient(ColorGradient gradient) {
+            this.gradient = gradient;
+            return this;
+        }
+
+        /**
+         * Sets the gradient low stop color programmatically.
+         *
+         * @param color the low stop color
+         * @return this builder
+         */
+        public Builder gradientLow(Color color) {
+            this.gradientLow = color;
+            return this;
+        }
+
+        /**
+         * Sets the gradient mid stop color programmatically.
+         *
+         * @param color the mid stop color
+         * @return this builder
+         */
+        public Builder gradientMid(Color color) {
+            this.gradientMid = color;
+            return this;
+        }
+
+        /**
+         * Sets the gradient high stop color programmatically.
+         *
+         * @param color the high stop color
+         * @return this builder
+         */
+        public Builder gradientHigh(Color color) {
+            this.gradientHigh = color;
+            return this;
+        }
+
+        /**
          * Builds the sparkline.
          *
          * @return a new Sparkline
@@ -706,6 +847,25 @@ public final class Sparkline implements Widget {
         // Resolution helpers
         private Color resolveForeground() {
             return styleResolver.resolve(StandardProperties.COLOR, foreground);
+        }
+
+        private ColorGradient resolveGradient() {
+            Color low = styleResolver.resolve(GRADIENT_LOW, gradientLow);
+            Color mid = styleResolver.resolve(GRADIENT_MID, gradientMid);
+            Color high = styleResolver.resolve(GRADIENT_HIGH, gradientHigh);
+
+            List<Color> stops = new ArrayList<>();
+            if (low != null) {
+                stops.add(low);
+            }
+            if (mid != null) {
+                stops.add(mid);
+            }
+            if (high != null) {
+                stops.add(high);
+            }
+
+            return stops.isEmpty() ? null : ColorGradient.of(stops);
         }
     }
 }
