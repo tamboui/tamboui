@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -58,6 +59,11 @@ public final class BindingSets {
     private static final Bindings INTELLIJ = loadBuiltIn("intellij.properties", STANDARD);
     private static final Bindings VSCODE = loadBuiltIn("vscode.properties", STANDARD);
 
+    // macOS variant of the standard set, from standard-macos.properties (convention:
+    // <set>-macos.properties). The named sets above stay literal and cross-platform so they are
+    // predictable and testable; only defaults() resolves the host platform.
+    private static final Bindings STANDARD_MAC = loadMacOverlay("standard", STANDARD);
+
     private BindingSets() {
     }
 
@@ -70,6 +76,27 @@ public final class BindingSets {
             return load(in, base);
         } catch (IOException e) {
             throw new RuntimeIOException("Failed to load built-in bindings: " + resourceName, e);
+        }
+    }
+
+    /**
+     * Loads the {@code <setName>-macos.properties} overlay on top of {@code base}, replacing each
+     * action it names (so macOS word-editing is Option, not an addition to the Ctrl keys). Returns
+     * {@code base} unchanged when no such overlay resource exists, so a set only needs its own file
+     * when it diverges from the inherited macOS mapping.
+     */
+    private static Bindings loadMacOverlay(String setName, Bindings base) {
+        String resource = setName + "-macos.properties";
+        try (InputStream in = BindingSets.class.getClassLoader()
+                .getResourceAsStream(BINDINGS_RESOURCE_PATH + resource)) {
+            if (in == null) {
+                return base;
+            }
+            Properties props = new Properties();
+            props.load(in);
+            return loadFromProperties(props, base, true);
+        } catch (IOException e) {
+            throw new RuntimeIOException("Failed to load built-in bindings: " + resource, e);
         }
     }
 
@@ -141,14 +168,22 @@ public final class BindingSets {
     }
 
     /**
-     * Returns the default bindings.
+     * Returns the default bindings for the host platform.
      * <p>
-     * Currently returns {@link #standard()}.
+     * This is {@link #standard()} on every platform except macOS, where the
+     * word-editing keys are replaced with their Option (Alt) equivalents to match
+     * the system text layer. The named sets ({@link #standard()}, {@link #vim()},
+     * etc.) stay literal and cross-platform; only this effective-default entry
+     * point resolves the host platform.
      *
-     * @return the default bindings
+     * @return the platform-appropriate default bindings
      */
     public static Bindings defaults() {
-        return STANDARD;
+        return isMac() ? STANDARD_MAC : STANDARD;
+    }
+
+    private static boolean isMac() {
+        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("mac");
     }
 
     private static Map<String, KeyCode> createKeyNameMap() {
@@ -374,6 +409,11 @@ public final class BindingSets {
     }
 
     private static Bindings loadFromProperties(Properties props, Bindings base) throws IOException {
+        return loadFromProperties(props, base, false);
+    }
+
+    private static Bindings loadFromProperties(Properties props, Bindings base, boolean replaceActions)
+            throws IOException {
         Bindings.Builder builder;
         if (base != null) {
             builder = base.toBuilder();
@@ -382,6 +422,12 @@ public final class BindingSets {
         }
 
         for (String actionName : props.stringPropertyNames()) {
+            // An overlay that replaces defines each action it names completely: drop the base
+            // triggers first, then bind the ones listed. Used for platform overlays, where e.g.
+            // macOS word-nav is Option, not an addition to the base Ctrl keys.
+            if (replaceActions) {
+                builder.unbind(actionName);
+            }
             String bindingsStr = props.getProperty(actionName);
             String[] parts = bindingsStr.split(",");
 

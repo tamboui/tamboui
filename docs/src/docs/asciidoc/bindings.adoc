@@ -19,6 +19,8 @@ Several binding presets are available:
 include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=predefined-binding-sets]
 ----
 
+The named sets (`standard()`, `vim()`, `emacs()`, ...) are literal and cross-platform, so they are predictable and testable. Only the effective default, `BindingSets.defaults()` (what a `TuiConfig` uses unless you pick a set), resolves the host platform: on macOS it replaces the word-editing actions with their Option (Alt) equivalents to match the system text layer, so `Option+Left`/`Option+Right` jump by word and `Option+Backspace`/`Option+Delete` delete a word. `Ctrl+Left`/`Ctrl+Right` is Mission Control on macOS, so it is deliberately not a word key there; `Ctrl+w` (a universal readline control byte) still deletes a word on every platform. Off macOS, `defaults()` is `standard()` unchanged, with word editing on `Ctrl+Left`/`Ctrl+Right` and `Ctrl+Backspace`/`Ctrl+Delete` (which need a terminal that reports them, e.g. via the Kitty keyboard protocol).
+
 == Matching Actions in Events
 
 Events carry binding information. Use semantic checks instead of hardcoding keys:
@@ -327,6 +329,12 @@ The `Actions` class defines common action names:
 
 |`DELETE_BACKWARD`, `DELETE_FORWARD`
 |Text editing
+
+|`MOVE_WORD_LEFT`, `MOVE_WORD_RIGHT`
+|Word-wise cursor movement (`Ctrl+Arrow`, or `Option+Arrow` on macOS)
+
+|`DELETE_WORD_BACKWARD`, `DELETE_WORD_FORWARD`
+|Word-wise deletion (`Ctrl+Backspace`/`Ctrl+Delete`, or `Option+Backspace`/`Option+Delete` on macOS; `Ctrl+w` everywhere)
 
 |`QUIT`
 |Application exit

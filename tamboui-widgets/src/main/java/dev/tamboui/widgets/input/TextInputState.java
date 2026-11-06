@@ -5,6 +5,7 @@
 package dev.tamboui.widgets.input;
 
 import dev.tamboui.text.GraphemeClusters;
+import dev.tamboui.text.WordBoundaries;
 
 /**
  * State for a TextInput widget, tracking the input text and cursor position.
@@ -106,6 +107,33 @@ public final class TextInputState {
         if (cursorPosition < text.length()) {
             cursorPosition = GraphemeClusters.clusterEnd(text, cursorPosition);
         }
+    }
+
+    /** Deletes from the cursor to the start of the previous word. */
+    public void deleteWordBackward() {
+        int start = WordBoundaries.prevWord(text, cursorPosition);
+        if (start < cursorPosition) {
+            text.delete(start, cursorPosition);
+            cursorPosition = start;
+        }
+    }
+
+    /** Deletes from the cursor to the start of the next word. */
+    public void deleteWordForward() {
+        int end = WordBoundaries.nextWord(text, cursorPosition);
+        if (end > cursorPosition) {
+            text.delete(cursorPosition, end);
+        }
+    }
+
+    /** Moves the cursor to the start of the next word. */
+    public void moveCursorToNextWord() {
+        cursorPosition = WordBoundaries.nextWord(text, cursorPosition);
+    }
+
+    /** Moves the cursor to the start of the previous word. */
+    public void moveCursorToPreviousWord() {
+        cursorPosition = WordBoundaries.prevWord(text, cursorPosition);
     }
 
     /** Moves the cursor to the start. */

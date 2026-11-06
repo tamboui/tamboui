@@ -44,6 +44,18 @@ public final class Actions {
      */
     public static final String MOVE_RIGHT = "moveRight";
 
+    /** Move the cursor to the previous word (word-wise left). */
+    public static final String MOVE_WORD_LEFT = "moveWordLeft";
+
+    /** Move the cursor to the next word (word-wise right). */
+    public static final String MOVE_WORD_RIGHT = "moveWordRight";
+
+    /** Delete from the cursor to the start of the previous word. */
+    public static final String DELETE_WORD_BACKWARD = "deleteWordBackward";
+
+    /** Delete from the cursor to the start of the next word. */
+    public static final String DELETE_WORD_FORWARD = "deleteWordForward";
+
     // Page navigation
     /**
      * Page up (PageUp, vim Ctrl+u, emacs Alt+v, etc.).

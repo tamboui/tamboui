@@ -11,6 +11,7 @@ import java.util.List;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.GraphemeClusters;
+import dev.tamboui.text.WordBoundaries;
 
 /**
  * State for a TextArea widget, tracking multi-line text, cursor position, and scroll offset.
@@ -239,6 +240,51 @@ public final class TextAreaState {
         } else if (cursorRow < lines.size() - 1) {
             cursorRow++;
             cursorCol = 0;
+        }
+    }
+
+    /** Deletes from the cursor to the start of the previous word, joining the previous line at the line start. */
+    public void deleteWordBackward() {
+        StringBuilder line = lines.get(cursorRow);
+        int start = WordBoundaries.prevWord(line, cursorCol);
+        if (start < cursorCol) {
+            textVersion++;
+            line.delete(start, cursorCol);
+            cursorCol = start;
+        } else {
+            deleteBackward();
+        }
+    }
+
+    /** Deletes from the cursor to the start of the next word, joining the next line at the line end. */
+    public void deleteWordForward() {
+        StringBuilder line = lines.get(cursorRow);
+        int end = WordBoundaries.nextWord(line, cursorCol);
+        if (end > cursorCol) {
+            textVersion++;
+            line.delete(cursorCol, end);
+        } else {
+            deleteForward();
+        }
+    }
+
+    /** Moves the cursor to the start of the next word on the current line, crossing to the next line at its end. */
+    public void moveCursorToNextWord() {
+        int next = WordBoundaries.nextWord(lines.get(cursorRow), cursorCol);
+        if (next == cursorCol) {
+            moveCursorRight();
+        } else {
+            cursorCol = next;
+        }
+    }
+
+    /** Moves the cursor to the start of the previous word on the current line, crossing to the previous line at its start. */
+    public void moveCursorToPreviousWord() {
+        int prev = WordBoundaries.prevWord(lines.get(cursorRow), cursorCol);
+        if (prev == cursorCol) {
+            moveCursorLeft();
+        } else {
+            cursorCol = prev;
         }
     }
 

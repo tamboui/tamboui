@@ -93,7 +93,17 @@ public final class TextEditing {
         if (key.isTyping()) {
             return insertTyped(key, allowed, state::insert);
         }
-        if (isEdit(key, KeyCode.BACKSPACE, Actions.DELETE_BACKWARD)) {
+        // Word-wise actions are checked before the plain ones: Ctrl+Left / Ctrl+Backspace also match
+        // the physical Left / Backspace keys, so the word action has to win.
+        if (key.isWordLeft()) {
+            state.moveCursorToPreviousWord();
+        } else if (key.isWordRight()) {
+            state.moveCursorToNextWord();
+        } else if (key.isDeleteWordBackward()) {
+            state.deleteWordBackward();
+        } else if (key.isDeleteWordForward()) {
+            state.deleteWordForward();
+        } else if (isEdit(key, KeyCode.BACKSPACE, Actions.DELETE_BACKWARD)) {
             state.deleteBackward();
         } else if (isEdit(key, KeyCode.DELETE, Actions.DELETE_FORWARD)) {
             state.deleteForward();
@@ -158,6 +168,14 @@ public final class TextEditing {
         Overflow effective = overflow != null ? overflow : Overflow.CLIP;
         if (key.isKey(KeyCode.ENTER)) {
             state.insert('\n');
+        } else if (key.isWordLeft()) {
+            state.moveCursorToPreviousWord();
+        } else if (key.isWordRight()) {
+            state.moveCursorToNextWord();
+        } else if (key.isDeleteWordBackward()) {
+            state.deleteWordBackward();
+        } else if (key.isDeleteWordForward()) {
+            state.deleteWordForward();
         } else if (isEdit(key, KeyCode.BACKSPACE, Actions.DELETE_BACKWARD)) {
             state.deleteBackward();
         } else if (isEdit(key, KeyCode.DELETE, Actions.DELETE_FORWARD)) {
