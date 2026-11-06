@@ -32,6 +32,48 @@ The `is*()` methods delegate to the current bindings.
 With vim bindings, `isUp()` matches Up arrow, `k`, or `Ctrl+p`.
 With standard bindings, it only matches the Up arrow.
 
+=== Prefer Semantic Predicates
+
+Reach for the semantic predicates on `KeyEvent` instead of comparing `event.code()` to a `KeyCode`.
+
+[source,java]
+----
+// Prefer this:
+if (event.isUp()) { ... }
+if (event.isConfirm()) { ... }
+if (event.isDeleteBackward()) { ... }
+
+// Over this:
+if (event.code() == KeyCode.UP) { ... }
+if (event.code() == KeyCode.ENTER) { ... }
+if (event.code() == KeyCode.BACKSPACE) { ... }
+----
+
+A raw `event.code() == KeyCode.UP` check has three problems the predicates avoid:
+
+* It matches **any** modifier combination (Ctrl+Up, Alt+Up), which is usually not what you want.
+* It ignores the bindings, so it never picks up keypad variants, vim keys (`k`), emacs chords (`Ctrl+p`), or a user's custom binding set.
+* It does not filter release events; the predicates do (via `KeyTrigger`), so a key is not acted on twice.
+
+The available predicates, each matching its action in the current bindings:
+`isUp()`, `isDown()`, `isLeft()`, `isRight()`, `isPageUp()`, `isPageDown()`, `isHome()`, `isEnd()`,
+`isSelect()`, `isConfirm()`, `isCancel()`, `isQuit()`, `isFocusNext()`, `isFocusPrevious()`,
+`isDeleteBackward()` and `isDeleteForward()`.
+
+For text fields, use `isTyping()` to decide whether to insert a character: it is true for a typed
+character (including keypad digits, IME and emoji text, and AltGr combinations) and false for
+shortcuts and control keys, so you never insert the letter of a `Ctrl` chord. The
+`dev.tamboui.tui.event.TextEditing` helper applies all of this (typing, editing and paste) to a
+`TextInputState` or `TextAreaState` for you.
+
+[NOTE]
+====
+Comparing `event.code()` directly - or the equivalent `event.isKey(KeyCode.UP)` - is only right when
+you specifically want the *physical* key regardless of the bindings, which is rare. An example is
+moving a floating panel with the arrow keys (spatial movement, where Shift+Arrow is meaningful and
+`hjkl` should not apply); there, `event.isKey(KeyCode.UP)` is the honest choice.
+====
+
 For applications calling `EventParser.readEvent(...)` directly, a read timeout returns `null`, while terminal EOF throws the JDK's `EOFException` (a subclass of `IOException`). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. `TuiRunner` and `InlineTuiRunner` stop their input reader on EOF.
 
 == Key Triggers

@@ -105,21 +105,24 @@ final class FloatingPanelsArea implements Element {
             return result;
         }
 
-        // Handle arrow keys to move the panel
-        int moveStep = event.hasShift() ? 5 : 1; // Shift+Arrow moves faster
-        if (event.code() == KeyCode.UP) {
+        // Move the panel with the physical arrow keys, Shift for a bigger step. This is spatial
+        // movement, not list navigation, so it deliberately uses isKey() (the physical key,
+        // regardless of modifiers) rather than the binding-aware isUp()/isLeft() predicates:
+        // the Shift modifier is meaningful here, and hjkl should not move panels.
+        int moveStep = event.hasShift() ? 5 : 1;
+        if (event.isKey(KeyCode.UP)) {
             fp.y = Math.max(0, fp.y - moveStep);
             return EventResult.HANDLED;
         }
-        if (event.code() == KeyCode.DOWN) {
+        if (event.isKey(KeyCode.DOWN)) {
             fp.y += moveStep;
             return EventResult.HANDLED;
         }
-        if (event.code() == KeyCode.LEFT) {
+        if (event.isKey(KeyCode.LEFT)) {
             fp.x = Math.max(0, fp.x - moveStep);
             return EventResult.HANDLED;
         }
-        if (event.code() == KeyCode.RIGHT) {
+        if (event.isKey(KeyCode.RIGHT)) {
             fp.x += moveStep;
             return EventResult.HANDLED;
         }
@@ -144,7 +147,7 @@ final class FloatingPanelsArea implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (event.code() == KeyCode.CHAR && event.hasAlt()) {
+        if (event.hasAlt()) {
             if (event.isChar('1')) { createPanel(new ClockPanel()); return EventResult.HANDLED; }
             if (event.isChar('2')) { createPanel(new CounterPanel()); return EventResult.HANDLED; }
             if (event.isChar('3')) { createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED; }

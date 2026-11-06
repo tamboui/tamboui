@@ -10,7 +10,6 @@ import java.util.List;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 
 import static dev.tamboui.toolkit.Toolkit.*;
@@ -116,41 +115,43 @@ final class TodoPanel extends PanelContent {
             return EventResult.HANDLED;
         }
 
-        // Input field selected
+        // Input field selected. Use the semantic predicates (event.isTyping(), isDeleteBackward(),
+        // isLeft(), isConfirm(), ...) rather than switching on event.code(): they follow the
+        // bindings and pick up keypad keys and custom layouts for free.
         if (selectedIndex == -1) {
-            if (event.code() == KeyCode.CHAR) {
+            if (event.isTyping()) {
                 if (inputBuffer.length() < 25) {
                     inputBuffer.insert(cursorPosition, event.string());
                     cursorPosition++;
                 }
                 return EventResult.HANDLED;
             }
-            if (event.code() == KeyCode.BACKSPACE) {
+            if (event.isDeleteBackward()) {
                 if (cursorPosition > 0) {
                     inputBuffer.deleteCharAt(cursorPosition - 1);
                     cursorPosition--;
                 }
                 return EventResult.HANDLED;
             }
-            if (event.code() == KeyCode.DELETE) {
+            if (event.isDeleteForward()) {
                 if (cursorPosition < inputBuffer.length()) {
                     inputBuffer.deleteCharAt(cursorPosition);
                 }
                 return EventResult.HANDLED;
             }
-            if (event.code() == KeyCode.LEFT) {
+            if (event.isLeft()) {
                 if (cursorPosition > 0) {
                     cursorPosition--;
                 }
                 return EventResult.HANDLED;
             }
-            if (event.code() == KeyCode.RIGHT) {
+            if (event.isRight()) {
                 if (cursorPosition < inputBuffer.length()) {
                     cursorPosition++;
                 }
                 return EventResult.HANDLED;
             }
-            if (event.code() == KeyCode.ENTER) {
+            if (event.isConfirm()) {
                 var text = inputBuffer.toString().trim();
                 if (!text.isEmpty()) {
                     items.add(text);
@@ -161,7 +162,7 @@ final class TodoPanel extends PanelContent {
             }
         } else {
             // Item selected
-            if (event.code() == KeyCode.ENTER) {
+            if (event.isConfirm()) {
                 var item = items.get(selectedIndex);
                 if (item.startsWith("✓ ")) {
                     items.set(selectedIndex, item.substring(2));
@@ -170,7 +171,7 @@ final class TodoPanel extends PanelContent {
                 }
                 return EventResult.HANDLED;
             }
-            if (event.code() == KeyCode.DELETE || event.code() == KeyCode.BACKSPACE) {
+            if (event.isDeleteForward() || event.isDeleteBackward()) {
                 items.remove(selectedIndex);
                 if (selectedIndex >= items.size()) {
                     selectedIndex = items.size() - 1;
