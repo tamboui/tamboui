@@ -42,6 +42,8 @@ class SynchronizedOutputTest {
 
         List<String> calls = backend.calls();
         assertThat(calls).containsExactly(
+                "clear", // first frame clears the screen once (issue #597)
+                "flush",
                 "beginSynchronizedUpdate",
                 "draw",
                 "hideCursor", // no cursor set on the frame -> hidden on first draw
@@ -125,7 +127,8 @@ class SynchronizedOutputTest {
 
         List<String> calls = backend.calls();
         int esuIndex = calls.indexOf("endSynchronizedUpdate");
-        int flushIndex = calls.indexOf("flush");
+        // lastIndexOf: the first-frame initial clear (issue #597) also flushes, before the ESU.
+        int flushIndex = calls.lastIndexOf("flush");
         assertThat(esuIndex).isGreaterThanOrEqualTo(0);
         assertThat(flushIndex).isGreaterThan(esuIndex);
     }
@@ -191,6 +194,7 @@ class SynchronizedOutputTest {
 
         @Override
         public void clear() throws IOException {
+            calls.add("clear");
         }
 
         @Override
