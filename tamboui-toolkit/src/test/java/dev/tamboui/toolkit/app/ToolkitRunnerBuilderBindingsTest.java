@@ -109,12 +109,13 @@ class ToolkitRunnerBuilderBindingsTest extends AbstractElementTest {
     }
 
     /**
-     * Shows the bug: when Tab events are stamped with DEFAULT bindings
-     * (as happens before the fix), the EventRouter intercepts Tab for focus
-     * cycling and never forwards it to the element handler.
+     * Even with DEFAULT bindings (Tab = focusNext), the focused element gets
+     * first refusal on Tab: the EventRouter routes the key to the focused
+     * element before attempting focus cycling, so an element that consumes
+     * Tab (e.g. a text area with tabIndents()) keeps it.
      */
     @Test
-    @DisplayName("Tab is intercepted when event has default bindings (demonstrates the bug)")
+    @DisplayName("focused element receives Tab before focus cycling, even with default bindings")
     void tabIsInterceptedWithDefaultBindings() {
         FocusManager focusManager = new FocusManager();
         ElementRegistry elementRegistry = new ElementRegistry();
@@ -145,17 +146,15 @@ class ToolkitRunnerBuilderBindingsTest extends AbstractElementTest {
                 .as("Tab matches focusNext with default bindings")
                 .isTrue();
 
-        // Route the event — EventRouter intercepts it for focus cycling
+        // Route the event — the focused element gets it before focus cycling
         EventResult result = router.route(tabEvent);
 
-        // The handler is NEVER called — Tab was swallowed by focus cycling
+        // The focused element's handler consumes Tab
         assertThat(handlerCalled.get())
-                .as("Element's handler was NOT called — Tab swallowed by EventRouter focus cycling")
-                .isFalse();
+                .as("Element's handler receives Tab before EventRouter focus cycling")
+                .isTrue();
 
-        // With only one focusable, focusNext fails, so result is UNHANDLED.
-        // Tab is silently lost.
-        assertThat(result).isEqualTo(EventResult.UNHANDLED);
+        assertThat(result).isEqualTo(EventResult.HANDLED);
     }
 
     /**

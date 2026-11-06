@@ -37,7 +37,8 @@ import static dev.tamboui.toolkit.Toolkit.*;
  * <p>
  * Controls:
  * <ul>
- *   <li>Tab - Switch focus between text areas</li>
+ *   <li>Tab - Indent 4 spaces in the main editor (tabIndents())</li>
+ *   <li>Shift+Tab - Switch focus between text areas</li>
  *   <li>Arrow keys - Move cursor</li>
  *   <li>Home/End - Move to start/end of line</li>
  *   <li>Enter - Insert new line</li>
@@ -123,7 +124,7 @@ public class TextAreaDemo implements Element {
                 spacer(),
                 text(" Lines: " + lineCount + " ").yellow(),
                 text(" Chars: " + charCount + " ").yellow(),
-                text(" [Tab] Switch ").dim(),
+                text(" [Shift+Tab] Switch ").dim(),
                 text(" [CTRL+c] Quit ").dim()
             )).rounded().length(3),
 
@@ -132,7 +133,8 @@ public class TextAreaDemo implements Element {
                 // Left column - Main editor
                 column(
                     textArea(mainEditorState)
-                        .title("Main Editor (clip)")
+                        .title("Main Editor (clip, Tab indents)")
+                        .tabIndents()
                         .showLineNumbers()
                         .rounded()
                         .focusedBorderColor(Color.CYAN)
@@ -169,7 +171,8 @@ public class TextAreaDemo implements Element {
                         text(" Arrow keys - Navigate").dim(),
                         text(" Home/End - Line start/end").dim(),
                         text(" Enter - New line").dim(),
-                        text(" Tab - 4 spaces").dim(),
+                        text(" Tab - indent 4 spaces (main editor)").dim(),
+                        text(" Shift+Tab - switch pane").dim(),
                         text(" Backspace/Del - Delete").dim(),
                         text(" Panes: clip / word / char wrap").dim()
                     )).title("Help").rounded().length(10)
