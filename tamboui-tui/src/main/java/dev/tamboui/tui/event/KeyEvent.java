@@ -779,6 +779,43 @@ public final class KeyEvent implements Event {
     }
 
     /**
+     * Returns true if this is a word-wise "left" event (Ctrl+Left) according to the bindings.
+     *
+     * @return true if this event triggers the move-word-left action
+     */
+    public boolean isWordLeft() {
+        return matches(Actions.MOVE_WORD_LEFT);
+    }
+
+    /**
+     * Returns true if this is a word-wise "right" event (Ctrl+Right) according to the bindings.
+     *
+     * @return true if this event triggers the move-word-right action
+     */
+    public boolean isWordRight() {
+        return matches(Actions.MOVE_WORD_RIGHT);
+    }
+
+    /**
+     * Returns true if this is a "delete previous word" event (Ctrl+Backspace, Ctrl+w) according to
+     * the bindings.
+     *
+     * @return true if this event triggers the delete-word-backward action
+     */
+    public boolean isDeleteWordBackward() {
+        return matches(Actions.DELETE_WORD_BACKWARD);
+    }
+
+    /**
+     * Returns true if this is a "delete next word" event (Ctrl+Delete) according to the bindings.
+     *
+     * @return true if this event triggers the delete-word-forward action
+     */
+    public boolean isDeleteWordForward() {
+        return matches(Actions.DELETE_WORD_FORWARD);
+    }
+
+    /**
      * Returns true if this is a "page up" navigation event according to the bindings.
      *
      * @return true if this event triggers the page-up action
