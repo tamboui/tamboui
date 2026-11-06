@@ -712,6 +712,29 @@ public final class KeyEvent implements Event {
     }
 
     /**
+     * Returns true if this event is the user typing text, as opposed to a navigation key, an
+     * editing key or a shortcut.
+     * <p>
+     * A press or repeat is typing when the terminal provided associated text (even on a chord,
+     * such as AltGr+e producing an euro sign), or when it carries a printable character and no
+     * modifier other than Shift. Key releases, control characters, DEL and shortcut chords are
+     * not typing. Text input handlers check this before bindings-driven predicates such as
+     * {@link #isLeft()}, so that bindings which map letters to actions (the vim {@code hjkl} set)
+     * do not swallow typed characters. Insert the typed text with {@link #string()}.
+     *
+     * @return true if this event should insert {@link #string()} into a text field
+     */
+    public boolean isTyping() {
+        if (!isPressOrRepeat()) {
+            return false;
+        }
+        if (text != null && !text.isEmpty()) {
+            return true;
+        }
+        return !hasNonShiftModifier() && character >= 32 && character != 127;
+    }
+
+    /**
      * Returns the bindings associated with this event.
      *
      * @return the bindings

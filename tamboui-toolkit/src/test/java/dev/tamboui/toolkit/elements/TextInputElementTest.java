@@ -15,6 +15,7 @@ import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyEventKind;
@@ -173,6 +174,110 @@ class TextInputElementTest extends AbstractElementTest {
 
         assertThat(result).isEqualTo(EventResult.HANDLED);
         assertThat(state.text()).isEqualTo("1");
+    }
+
+    @Test
+    @DisplayName("TextInputElement navigates through the configured bindings (emacs Ctrl+B and Ctrl+A)")
+    void navigatesThroughConfiguredBindings() {
+        TextInputState state = new TextInputState();
+        state.insert("hello");
+        TextInputElement element = textInput(state);
+
+        EventResult back = element.handleKeyEvent(
+                KeyEvent.ofChar('b', KeyModifiers.CTRL, BindingSets.emacs()), true);
+        assertThat(back).isEqualTo(EventResult.HANDLED);
+        assertThat(state.cursorPosition()).isEqualTo(4);
+
+        EventResult home = element.handleKeyEvent(
+                KeyEvent.ofChar('a', KeyModifiers.CTRL, BindingSets.emacs()), true);
+        assertThat(home).isEqualTo(EventResult.HANDLED);
+        assertThat(state.cursorPosition()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("TextInputElement moves the cursor on a keypad arrow")
+    void keypadArrowMovesCursor() {
+        TextInputState state = new TextInputState();
+        state.insert("hello");
+        TextInputElement element = textInput(state);
+
+        EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.KP_LEFT), true);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(state.cursorPosition()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("TextInputElement edits and moves with Home, End, Right, Backspace and Delete")
+    void editingAndMovementKeys() {
+        TextInputState state = new TextInputState();
+        state.insert("hello");
+        TextInputElement element = textInput(state);
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.HOME), true);
+        assertThat(state.cursorPosition()).isEqualTo(0);
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.RIGHT), true);
+        assertThat(state.cursorPosition()).isEqualTo(1);
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.END), true);
+        assertThat(state.cursorPosition()).isEqualTo(5);
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.BACKSPACE), true);
+        assertThat(state.text()).isEqualTo("hell");
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.HOME), true);
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DELETE), true);
+        assertThat(state.text()).isEqualTo("ell");
+    }
+
+    @Test
+    @DisplayName("TextInputElement leaves unrelated keys unhandled")
+    void unrelatedKeysAreUnhandled() {
+        TextInputElement element = textInput(new TextInputState());
+
+        assertThat(element.handleKeyEvent(KeyEvent.ofKey(KeyCode.F1), true)).isEqualTo(EventResult.UNHANDLED);
+        assertThat(element.handleKeyEvent(KeyEvent.ofKey(KeyCode.ESCAPE), true)).isEqualTo(EventResult.UNHANDLED);
+    }
+
+    @Test
+    @DisplayName("TextInputElement still moves the cursor on Shift+Left")
+    void shiftLeftMovesCursor() {
+        TextInputState state = new TextInputState();
+        state.insert("hello");
+        TextInputElement element = textInput(state);
+
+        EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.SHIFT), true);
+
+        assertThat(result).isEqualTo(EventResult.HANDLED);
+        assertThat(state.cursorPosition()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("TextInputElement leaves Ctrl+Left unhandled so applications can bind it")
+    void ctrlLeftIsUnhandled() {
+        TextInputState state = new TextInputState();
+        state.insert("hello");
+        TextInputElement element = textInput(state);
+
+        EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL), true);
+
+        assertThat(result).isEqualTo(EventResult.UNHANDLED);
+        assertThat(state.cursorPosition()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("TextInputElement types vim navigation letters instead of navigating (h j k l x g G)")
+    void vimNavigationLettersAreTyped() {
+        TextInputState state = new TextInputState();
+        TextInputElement element = textInput(state);
+
+        for (char letter : "hjklxgG".toCharArray()) {
+            EventResult result = element.handleKeyEvent(KeyEvent.ofChar(letter, BindingSets.vim()), true);
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+        }
+
+        assertThat(state.text()).isEqualTo("hjklxgG");
     }
 
     @Test

@@ -78,7 +78,7 @@ public class DemoLauncher {
         private final String module;
         private final String mainClass;
         private final Set<String> tags;
-        
+
         /**
          * Creates a new demo entry.
          * @param id          the unique demo ID (used for CLI)
@@ -738,46 +738,34 @@ public class DemoLauncher {
      * This is a simplified version that doesn't require the Toolkit dependency.
      */
     private static boolean handleTextInputKey(TextInputState state, KeyEvent event) {
-        if (event.isRelease()) {
-            return false;
+        if (event.isTyping()) {
+            state.insert(event.string());
+            return true;
         }
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case HOME:
-                state.moveCursorToStart();
-                return true;
-            case END:
-                state.moveCursorToEnd();
-                return true;
-            case CHAR:
-                // Don't consume characters with Ctrl, Alt, Super, or Meta modifiers - those are control sequences
-                if (event.modifiers().ctrl() || event.modifiers().alt() || event.modifiers().superKey() || event.modifiers().meta()) {
-                    return false;
-                }
-                String text = event.text();
-                if (!text.isEmpty()) {
-                    state.insert(text);
-                    return true;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                return false;
+        if (event.isDeleteBackward()) {
+            state.deleteBackward();
+            return true;
         }
+        if (event.isDeleteForward()) {
+            state.deleteForward();
+            return true;
+        }
+        if (event.isLeft()) {
+            state.moveCursorLeft();
+            return true;
+        }
+        if (event.isRight()) {
+            state.moveCursorRight();
+            return true;
+        }
+        if (event.isHome()) {
+            state.moveCursorToStart();
+            return true;
+        }
+        if (event.isEnd()) {
+            state.moveCursorToEnd();
+            return true;
+        }
+        return false;
     }
 }

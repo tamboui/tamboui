@@ -5,6 +5,7 @@
 package dev.tamboui.tui.event;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -224,5 +225,101 @@ class KeyEventTest {
         assertThat(event.isChar('+')).isTrue();
         assertThat(event.isChar('=')).isTrue();
         assertThat(event.isChar('-')).isFalse();
+    }
+
+    @Nested
+    @DisplayName("isTyping")
+    class IsTyping {
+
+        private final KeyModifiers ctrlAlt = KeyModifiers.builder().ctrl(true).alt(true).build();
+
+        @Test
+        @DisplayName("is true for a plain or shifted character")
+        void plainAndShiftedCharacters() {
+            assertThat(KeyEvent.ofChar('a').isTyping()).isTrue();
+            assertThat(KeyEvent.ofChar('A', KeyModifiers.SHIFT).isTyping()).isTrue();
+        }
+
+        @Test
+        @DisplayName("is true for the printable range boundaries when no text is provided: space and tilde")
+        void printableBoundariesWithoutText() {
+            KeyEvent space = KeyEvent.builder().code(KeyCode.CHAR).character(' ').build();
+            KeyEvent tilde = KeyEvent.builder().code(KeyCode.CHAR).character('~').build();
+
+            assertThat(space.text()).isEmpty();
+            assertThat(space.isTyping()).isTrue();
+            assertThat(tilde.isTyping()).isTrue();
+        }
+
+        @Test
+        @DisplayName("is false for a shortcut chord that carries no text")
+        void chordWithoutText() {
+            assertThat(KeyEvent.ofChar('a', KeyModifiers.CTRL).isTyping()).isFalse();
+            assertThat(KeyEvent.ofChar('a', KeyModifiers.ALT).isTyping()).isFalse();
+        }
+
+        @Test
+        @DisplayName("is true for a chord when the terminal provides the text (AltGr+e)")
+        void chordWithTerminalProvidedText() {
+            KeyEvent altGrEuro = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character('€')
+                    .text("€")
+                    .modifiers(ctrlAlt)
+                    .build();
+
+            assertThat(altGrEuro.isTyping()).isTrue();
+        }
+
+        @Test
+        @DisplayName("is false for control characters and DEL")
+        void controlCharacters() {
+            assertThat(KeyEvent.ofChar(0x01).isTyping()).isFalse();
+            assertThat(KeyEvent.ofChar(0x1f).isTyping()).isFalse();
+            assertThat(KeyEvent.ofChar(0x7f).isTyping()).isFalse();
+        }
+
+        @Test
+        @DisplayName("is true for a keypad digit and false for a keypad arrow")
+        void keypadKeys() {
+            KeyEvent keypadOne = KeyEvent.builder().code(KeyCode.KP_1).character('1').build();
+
+            assertThat(keypadOne.isTyping()).isTrue();
+            assertThat(KeyEvent.ofKey(KeyCode.KP_LEFT).isTyping()).isFalse();
+        }
+
+        @Test
+        @DisplayName("is false for navigation and editing keys")
+        void nonCharacterKeys() {
+            assertThat(KeyEvent.ofKey(KeyCode.LEFT).isTyping()).isFalse();
+            assertThat(KeyEvent.ofKey(KeyCode.BACKSPACE).isTyping()).isFalse();
+            assertThat(KeyEvent.ofKey(KeyCode.ENTER).isTyping()).isFalse();
+        }
+
+        @Test
+        @DisplayName("is false for a key release")
+        void keyRelease() {
+            KeyEvent release = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character('a')
+                    .kind(KeyEventKind.RELEASE)
+                    .build();
+
+            assertThat(release.isTyping()).isFalse();
+        }
+
+        @Test
+        @DisplayName("is true for multi code point text: ZWJ sequence, flag and CJK")
+        void multiCodePointText() {
+            String zwjSequence = "👩‍💻";
+            String flag = "🇫🇷";
+            String cjk = "世";
+
+            for (String text : new String[] {zwjSequence, flag, cjk}) {
+                KeyEvent event = KeyEvent.builder().code(KeyCode.CHAR).text(text).build();
+
+                assertThat(event.isTyping()).as(text).isTrue();
+            }
+        }
     }
 }

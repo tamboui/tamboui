@@ -19,6 +19,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.PasteEvent;
 import dev.tamboui.widgets.block.Block;
@@ -70,6 +71,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
     private static final Style DEFAULT_CURSOR_STYLE = Style.EMPTY.reversed();
     private static final Style DEFAULT_PLACEHOLDER_STYLE = Style.EMPTY.dim();
     private static final Style DEFAULT_LINE_NUMBER_STYLE = Style.EMPTY.dim();
+    private static final String TAB_AS_SPACES = "    ";
 
     private TextAreaState state;
     private Style cursorStyle;
@@ -438,70 +440,63 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
 
     /**
      * Handles common key events for text area input.
+     * <p>
+     * Typed text is checked first so bindings that map letters to actions (such as vim
+     * {@code hjkl}) do not swallow typed characters; everything else goes through the
+     * bindings-driven predicates. Tab has no semantic predicate (it is bound to focus-next), so it
+     * is matched by key code.
      */
     private static boolean handleTextAreaKey(TextAreaState state, KeyEvent event, int visibleWidth, Overflow overflow) {
-        if (event.isRelease()) {
-            return false;
-        }
-        switch (event.code()) {
-            case BACKSPACE:
-                state.deleteBackward();
-                return true;
-            case DELETE:
-                state.deleteForward();
-                return true;
-            case LEFT:
-                state.moveCursorLeft();
-                return true;
-            case RIGHT:
-                state.moveCursorRight();
-                return true;
-            case UP:
-                state.moveCursorUp(visibleWidth, overflow);
-                return true;
-            case DOWN:
-                state.moveCursorDown(visibleWidth, overflow);
-                return true;
-            case HOME:
-                state.moveCursorToLineStart();
-                return true;
-            case END:
-                state.moveCursorToLineEnd();
-                return true;
-            case ENTER:
-                state.insert('\n');
-                return true;
-            case TAB:
-                state.insert("    "); // 4 spaces for tab
-                return true;
-            case CHAR:
-                // Trust event.text() as the terminal's authoritative statement of what the user
-                // typed. The parser only synthesizes text for plain typing, so if text is present
-                // on a chord it was deliberately provided by the terminal (e.g. AltGr+e -> "\u20ac",
-                // which arrives as Ctrl+Alt on Windows/Linux and is legitimate text input).
-                String text = event.text();
-                if (!text.isEmpty()) {
-                    state.insert(text);
-                    return true;
-                }
-                // No associated text: this is a shortcut (any non-shift modifier) or an unmapped
-                // control character. Don't fabricate input.
-                if (event.hasNonShiftModifier()) {
-                    return false;
-                }
-                int c = event.codePoint();
-                if (c >= 32 && c != 127) {
-                    state.insert(event.string());
-                    return true;
-                }
-                return false;
-            default:
-                break; // fall through to keypad-typing fallback
-        }
-        // Keypad digit/operator (KP_*): parser set the character field; treat as typing without
-        // bypassing the modifier check so shortcut chords stay inert.
-        if (event.codePoint() > 0 && !event.hasNonShiftModifier()) {
+        if (event.isTyping()) {
             state.insert(event.string());
+            return true;
+        }
+        if (event.isConfirm()) {
+            state.insert('\n');
+            return true;
+        }
+        if (event.isPressOrRepeat() && event.code() == KeyCode.TAB) {
+            state.insert(TAB_AS_SPACES);
+            return true;
+        }
+        return handleTextAreaNavigation(state, event, visibleWidth, overflow);
+    }
+
+    /**
+     * Handles the bindings-driven delete and cursor movement actions for a text area.
+     */
+    private static boolean handleTextAreaNavigation(TextAreaState state, KeyEvent event,
+                                                    int visibleWidth, Overflow overflow) {
+        if (event.isDeleteBackward()) {
+            state.deleteBackward();
+            return true;
+        }
+        if (event.isDeleteForward()) {
+            state.deleteForward();
+            return true;
+        }
+        if (event.isLeft()) {
+            state.moveCursorLeft();
+            return true;
+        }
+        if (event.isRight()) {
+            state.moveCursorRight();
+            return true;
+        }
+        if (event.isUp()) {
+            state.moveCursorUp(visibleWidth, overflow);
+            return true;
+        }
+        if (event.isDown()) {
+            state.moveCursorDown(visibleWidth, overflow);
+            return true;
+        }
+        if (event.isHome()) {
+            state.moveCursorToLineStart();
+            return true;
+        }
+        if (event.isEnd()) {
+            state.moveCursorToLineEnd();
             return true;
         }
         return false;

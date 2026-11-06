@@ -14,6 +14,7 @@ import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseButton;
+import dev.tamboui.widgets.input.TextInputState;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -48,6 +49,18 @@ public class BindingsSnippets {
         if (event.isChar('x')) { }
         if (event.isKey(KeyCode.F1)) { }
         // end::matching-actions[]
+    }
+
+    void typedText(KeyEvent event, TextInputState state) {
+        // tag::typed-text[]
+        if (event.isTyping()) {
+            state.insert(event.string());
+        } else if (event.isDeleteBackward()) {
+            state.deleteBackward();
+        } else if (event.isLeft()) {
+            state.moveCursorLeft();
+        }
+        // end::typed-text[]
     }
 
     void keyTriggers() {

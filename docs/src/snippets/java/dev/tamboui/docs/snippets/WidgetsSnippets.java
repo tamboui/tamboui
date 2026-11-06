@@ -551,15 +551,15 @@ public class WidgetsSnippets {
         textInput.render(area, buffer, state);
 
         // Handle key events
-        if (event.code() == KeyCode.CHAR) {
+        if (event.isTyping()) {
             state.insert(event.string());
-        } else if (event.code() == KeyCode.BACKSPACE) {
+        } else if (event.isDeleteBackward()) {
             state.deleteBackward();
-        } else if (event.code() == KeyCode.DELETE) {
+        } else if (event.isDeleteForward()) {
             state.deleteForward();
-        } else if (event.code() == KeyCode.LEFT) {
+        } else if (event.isLeft()) {
             state.moveCursorLeft();
-        } else if (event.code() == KeyCode.RIGHT) {
+        } else if (event.isRight()) {
             state.moveCursorRight();
         }
         // end::text-input[]
@@ -589,15 +589,15 @@ public class WidgetsSnippets {
         textArea.renderWithCursor(area, buffer, state, frame);
 
         // Handle key events
-        if (event.code() == KeyCode.CHAR) {
+        if (event.isTyping()) {
             state.insert(event.string());
-        } else if (event.code() == KeyCode.ENTER) {
+        } else if (event.isConfirm()) {
             state.insert('\n');
-        } else if (event.code() == KeyCode.BACKSPACE) {
+        } else if (event.isDeleteBackward()) {
             state.deleteBackward();
-        } else if (event.code() == KeyCode.UP) {
+        } else if (event.isUp()) {
             state.moveCursorUp();
-        } else if (event.code() == KeyCode.DOWN) {
+        } else if (event.isDown()) {
             state.moveCursorDown();
         }
         // end::text-area[]

@@ -24,6 +24,7 @@ import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.bindings.BindingSets;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.KeyEventKind;
@@ -355,6 +356,94 @@ class TextAreaElementTest extends AbstractElementTest {
 
             assertThat(result).isEqualTo(EventResult.HANDLED);
             assertThat(element.getState().text()).isEqualTo("    ");
+        }
+
+        @Test
+        @DisplayName("Navigates through the configured bindings (emacs Ctrl+B and Ctrl+A)")
+        void navigatesThroughConfiguredBindings() {
+            TextAreaElement element = textArea().text("Hello");
+
+            EventResult back = element.handleKeyEvent(
+                    KeyEvent.ofChar('b', KeyModifiers.CTRL, BindingSets.emacs()), true);
+            assertThat(back).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(4);
+
+            EventResult home = element.handleKeyEvent(
+                    KeyEvent.ofChar('a', KeyModifiers.CTRL, BindingSets.emacs()), true);
+            assertThat(home).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("Keypad arrow moves the cursor")
+        void keypadArrowMovesCursor() {
+            TextAreaElement element = textArea().text("Hello");
+
+            EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.KP_LEFT), true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("Keypad Enter inserts newline")
+        void keypadEnterInsertsNewline() {
+            TextAreaElement element = textArea().text("Hello");
+
+            EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.KP_ENTER), true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().lineCount()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("Types vim navigation letters instead of navigating (h j k l x g G)")
+        void vimNavigationLettersAreTyped() {
+            TextAreaElement element = textArea();
+
+            for (char letter : "hjklxgG".toCharArray()) {
+                EventResult result = element.handleKeyEvent(KeyEvent.ofChar(letter, BindingSets.vim()), true);
+                assertThat(result).isEqualTo(EventResult.HANDLED);
+            }
+
+            assertThat(element.getState().text()).isEqualTo("hjklxgG");
+        }
+
+        @Test
+        @DisplayName("Shift+Left still moves the cursor")
+        void shiftLeftMovesCursor() {
+            TextAreaElement element = textArea().text("Hello");
+
+            EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.SHIFT), true);
+
+            assertThat(result).isEqualTo(EventResult.HANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("Ctrl+Left is left unhandled so applications can bind it")
+        void ctrlLeftIsUnhandled() {
+            TextAreaElement element = textArea().text("Hello");
+
+            EventResult result = element.handleKeyEvent(KeyEvent.ofKey(KeyCode.LEFT, KeyModifiers.CTRL), true);
+
+            assertThat(result).isEqualTo(EventResult.UNHANDLED);
+            assertThat(element.getState().cursorCol()).isEqualTo(5);
+        }
+
+        @Test
+        @DisplayName("Inserts ZWJ sequence, flag and CJK text as single insertions")
+        void insertsMultiCodePointText() {
+            TextAreaElement element = textArea();
+            String zwjSequence = "👩‍💻";
+            String flag = "🇫🇷";
+            String cjk = "世";
+
+            for (String text : new String[] {zwjSequence, flag, cjk}) {
+                element.handleKeyEvent(KeyEvent.builder().code(KeyCode.CHAR).text(text).build(), true);
+            }
+
+            assertThat(element.getState().text()).isEqualTo(zwjSequence + flag + cjk);
         }
 
         @Test

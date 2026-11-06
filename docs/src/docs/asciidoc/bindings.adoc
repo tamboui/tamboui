@@ -32,6 +32,23 @@ The `is*()` methods delegate to the current bindings.
 With vim bindings, `isUp()` matches Up arrow, `k`, or `Ctrl+p`.
 With standard bindings, it only matches the Up arrow.
 
+=== Handling Typed Text
+
+Text fields must tell typing apart from actions. `KeyEvent.isTyping()` is true when a key press or repeat is the user typing text: the terminal provided associated text (even on a chord, such as AltGr+e producing an euro sign), or the event carries a printable character and no modifier other than Shift.
+Key releases, control characters, DEL and shortcut chords such as Ctrl+A are not typing.
+Insert the typed text with `KeyEvent.string()`.
+
+Check `isTyping()` before the action predicates.
+Binding sets such as vim map letters to actions (`h` to `isLeft()`, `x` to `isDeleteForward()`), so a text field that tested `isLeft()` first would move the cursor instead of inserting the letter.
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=typed-text]
+----
+
+`handleTextInputKey` and the toolkit text area follow this order, so keypad arrows, the emacs `Ctrl+A` and `Ctrl+E`, and custom binding sets work in text fields without further code.
+Because bindings compare Ctrl, Alt, Super, Hyper and Meta exactly, a chord such as Ctrl+Left is not treated as Left and is left for the application to bind.
+
 For applications calling `EventParser.readEvent(...)` directly, a read timeout returns `null`, while terminal EOF throws the JDK's `EOFException` (a subclass of `IOException`). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. `TuiRunner` and `InlineTuiRunner` stop their input reader on EOF.
 
 == Key Triggers
