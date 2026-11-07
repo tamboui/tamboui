@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import dev.tamboui.capability.CapabilityProvider;
 import dev.tamboui.capability.CapabilityReportBuilder;
+import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.BackendProvider;
 import dev.tamboui.util.SafeServiceLoader;
 
@@ -53,6 +54,8 @@ public final class CoreCapabilityProvider implements CapabilityProvider {
 
         report.feature(source(), "backend.provider_count", providers.size());
         report.feature(source(), "backend.provider_names", String.join(",", providers.stream().map(BackendProvider::name).collect(Collectors.toList())));
+        report.feature(source(), "backend.selected",
+                BackendFactory.candidateProvider().map(BackendProvider::name).orElse("<none>"));
         for (int i = 0; i < loadErrors.size(); i++) {
             report.feature(source(), "backend.provider_error." + i, loadErrors.get(i));
         }
