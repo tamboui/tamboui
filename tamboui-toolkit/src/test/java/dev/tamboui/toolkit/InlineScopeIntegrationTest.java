@@ -247,11 +247,12 @@ class InlineScopeIntegrationTest extends AbstractElementTest {
             backend.reset();
             display.println("Log message");
 
-            // Should: CR (go to line 0), INSERT_LINES, print message, then redraw
+            // Should: CR (go to line 0), DELETE_LINES (the display), print message, then redraw
             backend.assertTranscript()
                 .expectEventually(OpType.CARRIAGE_RETURN, 0)
-                .expectEventually(OpType.INSERT_LINES, 1)
-                .expectRawContaining("Log message");
+                .expectEventually(OpType.DELETE_LINES, 1)
+                .expectRawContaining("Log message")
+                .expectRawContaining("Status");
         }
 
         @Test
@@ -292,11 +293,11 @@ class InlineScopeIntegrationTest extends AbstractElementTest {
             backend.reset();
             display.println("Message");
 
-            // Should move cursor up by 2 (lastCursorY) before inserting
+            // Should move cursor up by 2 (lastCursorY) before deleting the display lines
             backend.assertTranscript()
                 .expectEventually(OpType.CARRIAGE_RETURN, 0)
                 .expectEventually(OpType.CURSOR_UP, 2)
-                .expectEventually(OpType.INSERT_LINES, 1)
+                .expectEventually(OpType.DELETE_LINES, 3)
                 .expectRawContaining("Message");
         }
     }
