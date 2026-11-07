@@ -62,11 +62,11 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
     }
 
     /**
-     * Returns the list of children (for subclass access).
+     * Returns the list of children (for subclass and container inspection).
      *
      * @return the children list
      */
-    protected List<Element> children() {
+    public List<Element> children() {
         return children;
     }
 
@@ -84,14 +84,15 @@ public abstract class ContainerElement<T extends ContainerElement<T>> extends St
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         // Let custom handler run first if set
         EventResult result = super.handleKeyEvent(event, focused);
-        if (result.isHandled()) {
+        if (result.isHandled() || result == EventResult.FOCUS_NEXT || result == EventResult.FOCUS_PREVIOUS) {
             return result;
         }
 
         // Forward to children (they inherit focused state from parent)
         for (Element child : children) {
-            if (child.handleKeyEvent(event, focused) == EventResult.HANDLED) {
-                return EventResult.HANDLED;
+            EventResult childResult = child.handleKeyEvent(event, focused);
+            if (childResult.isHandled() || childResult == EventResult.FOCUS_NEXT || childResult == EventResult.FOCUS_PREVIOUS) {
+                return childResult;
             }
         }
 
