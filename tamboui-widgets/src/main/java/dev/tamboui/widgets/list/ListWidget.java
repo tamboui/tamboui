@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Style;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
@@ -159,6 +161,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         // Render visible items
         int y = listArea.top();
         int currentOffset = 0;
+        int hOffset = state != null ? state.horizontalOffset() : 0;
 
         for (int i = 0; i < totalItems && y < listArea.bottom(); i++) {
             int itemHeight = itemHeights[i];
@@ -173,7 +176,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
             int startLine = Math.max(0, scrollOffset - currentOffset);
             int visibleItemHeight = Math.min(itemHeight - startLine, listArea.bottom() - y);
 
-            boolean isSelected = state.selected() != null && state.selected() == i;
+            boolean isSelected = state != null && state.selected() != null && state.selected() == i;
 
             // Get item positional style (for zebra striping etc.)
             Style posStyle = Style.EMPTY;
@@ -190,8 +193,40 @@ public final class ListWidget implements StatefulWidget<ListState> {
             }
 
             // Render the item widget
-            Rect itemArea = new Rect(contentX, y, contentWidth, visibleItemHeight);
-            items.get(i).widget().render(itemArea, buffer);
+            if (hOffset == 0) {
+                Rect itemArea = new Rect(contentX, y, contentWidth, visibleItemHeight);
+                items.get(i).widget().render(itemArea, buffer);
+            } else {
+                int itemPreferredWidth = items.get(i).widthOr(0);
+                int renderWidth = Math.max(itemPreferredWidth, contentWidth + hOffset);
+                Rect tempArea = new Rect(0, 0, renderWidth, visibleItemHeight);
+                Buffer tempBuffer = Buffer.empty(tempArea);
+                if (style != null && !style.equals(Style.EMPTY)) {
+                    tempBuffer.setStyle(tempArea, style);
+                }
+                items.get(i).widget().render(tempArea, tempBuffer);
+
+                for (int r = 0; r < visibleItemHeight && y + r < listArea.bottom(); r++) {
+                    int destY = y + r;
+                    for (int col = 0; col < contentWidth; col++) {
+                        int srcX = hOffset + col;
+                        int destX = contentX + col;
+                        if (srcX >= renderWidth) {
+                            break;
+                        }
+                        Cell cell = tempBuffer.get(srcX, r);
+                        if (col == 0 && cell.isContinuation()) {
+                            // First visible column cut a 2-wide character in half; replace with space
+                            buffer.set(destX, destY, new Cell(" ", cell.style()));
+                        } else if (col == contentWidth - 1 && CharWidth.of(cell.symbol()) == 2) {
+                            // Last visible column cannot fit a 2-wide character; replace with space
+                            buffer.set(destX, destY, new Cell(" ", cell.style()));
+                        } else {
+                            buffer.set(destX, destY, cell);
+                        }
+                    }
+                }
+            }
 
             // Apply row style overlays AFTER widget renders
             boolean hasPosStyleBg = posStyle.bg().isPresent();

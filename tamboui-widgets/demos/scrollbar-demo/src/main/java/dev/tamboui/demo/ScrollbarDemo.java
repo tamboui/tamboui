@@ -21,6 +21,7 @@ import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.terminal.Terminal;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
@@ -61,11 +62,13 @@ public class ScrollbarDemo {
         new ScrollbarDemo().run();
     }
 
-    private ScrollbarDemo() {
+    ScrollbarDemo() {
         // Generate sample items
         for (int i = 1; i <= ITEM_COUNT; i++) {
             items.add("Item " + i + " - This is a sample list item with some extra text for horizontal scrolling");
         }
+        int maxItemWidth = items.stream().mapToInt(CharWidth::of).max().orElse(50);
+        horizontalScrollState.contentLength(maxItemWidth);
         listState.select(0);
         verticalScrollState.viewportContentLength(10);
     }
@@ -141,10 +144,12 @@ public class ScrollbarDemo {
             }
             case 'h' -> {
                 horizontalScrollState.prev();
+                syncScrollState();
                 yield true;
             }
             case 'l' -> {
                 horizontalScrollState.next();
+                syncScrollState();
                 yield true;
             }
             case ' ' -> { // Page down
@@ -167,10 +172,12 @@ public class ScrollbarDemo {
             }
             case 'C' -> { // Right arrow
                 horizontalScrollState.next();
+                syncScrollState();
                 yield true;
             }
             case 'D' -> { // Left arrow
                 horizontalScrollState.prev();
+                syncScrollState();
                 yield true;
             }
             case '5' -> { // Page Up (ESC [ 5 ~)
@@ -240,6 +247,27 @@ public class ScrollbarDemo {
         if (selected != null) {
             verticalScrollState.position(selected);
         }
+        listState.setHorizontalOffset(horizontalScrollState.position());
+    }
+
+    ListState listState() {
+        return listState;
+    }
+
+    ScrollbarState verticalScrollState() {
+        return verticalScrollState;
+    }
+
+    ScrollbarState horizontalScrollState() {
+        return horizontalScrollState;
+    }
+
+    boolean handleKey(int key) throws IOException {
+        return handleInput(key, null);
+    }
+
+    boolean handleArrowKey(int code) {
+        return handleEscapeSequence(code);
     }
 
     private void ui(Frame frame) {
@@ -300,11 +328,13 @@ public class ScrollbarDemo {
         Rect innerArea = block.inner(area);
         frame.renderWidget(block, area);
 
-        // Reserve space for scrollbar (1 column on right)
+        // Reserve space for scrollbars (1 column on right, 1 row on bottom)
         Rect listArea = new Rect(innerArea.x(), innerArea.y(),
-            innerArea.width() - 1, innerArea.height());
-        Rect scrollbarArea = new Rect(innerArea.right() - 1, innerArea.y(),
-            1, innerArea.height());
+            innerArea.width() - 1, innerArea.height() - 1);
+        Rect vScrollbarArea = new Rect(innerArea.right() - 1, innerArea.y(),
+            1, innerArea.height() - 1);
+        Rect hScrollbarArea = new Rect(innerArea.x(), innerArea.bottom() - 1,
+            innerArea.width() - 1, 1);
 
         // Create list items
         var listItems = items.stream()
@@ -321,9 +351,10 @@ public class ScrollbarDemo {
 
         // Update viewport content length based on actual visible area
         verticalScrollState.viewportContentLength(listArea.height());
+        horizontalScrollState.viewportContentLength(listArea.width());
 
-        // Render scrollbar
-        Scrollbar scrollbar = Scrollbar.builder()
+        // Render vertical scrollbar
+        Scrollbar vScrollbar = Scrollbar.builder()
             .orientation(ScrollbarOrientation.VERTICAL_RIGHT)
             .thumbStyle(Style.EMPTY.fg(Color.YELLOW))
             .trackStyle(Style.EMPTY.fg(Color.DARK_GRAY))
@@ -331,7 +362,17 @@ public class ScrollbarDemo {
             .endSymbol("▼")
             .build();
 
-        frame.renderStatefulWidget(scrollbar, scrollbarArea, verticalScrollState);
+        frame.renderStatefulWidget(vScrollbar, vScrollbarArea, verticalScrollState);
+
+        // Render horizontal scrollbar
+        Scrollbar hScrollbar = Scrollbar.builder()
+            .orientation(ScrollbarOrientation.HORIZONTAL_BOTTOM)
+            .symbols(Scrollbar.SymbolSet.HORIZONTAL)
+            .thumbStyle(Style.EMPTY.fg(Color.CYAN))
+            .trackStyle(Style.EMPTY.fg(Color.DARK_GRAY))
+            .build();
+
+        frame.renderStatefulWidget(hScrollbar, hScrollbarArea, horizontalScrollState);
     }
 
     private void renderScrollbarShowcase(Frame frame, Rect area) {
@@ -485,6 +526,10 @@ public class ScrollbarDemo {
             Span.raw(" Up  ").dim(),
             Span.raw("↓/j").bold().yellow(),
             Span.raw(" Down  ").dim(),
+            Span.raw("←/h").bold().yellow(),
+            Span.raw(" Left  ").dim(),
+            Span.raw("→/l").bold().yellow(),
+            Span.raw(" Right  ").dim(),
             Span.raw("g").bold().yellow(),
             Span.raw(" First  ").dim(),
             Span.raw("G").bold().yellow(),
