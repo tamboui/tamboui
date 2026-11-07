@@ -13,33 +13,41 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.event.DragHandler;
 import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiConfig;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
-import dev.tamboui.tui.event.MouseEventKind;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * Demonstrates toolkit mouse routing for every button.
+ * Demonstrates toolkit mouse routing for every interaction the {@code EventRouter} delivers:
+ * button presses (left/middle/right), scroll wheel, pointer motion, and drag.
  * <p>
- * Each button press on the target panel is routed through the toolkit
- * {@code EventRouter} to the element's {@code onMouseEvent()} handler. Left,
- * middle, and right presses are all delivered (see #621/#622); before that fix
- * only left presses reached element handlers.
+ * The <b>Click / Scroll</b> panel uses {@code onMouseEvent()} and reports presses, scroll, and the
+ * live pointer position. The <b>Drag</b> panel uses {@code onDrag()} and reports drag start, the
+ * running delta, and release.
  * <p>
- * On a Mac trackpad: left = tap, right = two-finger tap. Middle usually needs a
- * three-button mouse or a helper such as MiddleClick.
+ * Right and middle presses reach the handler thanks to #621/#622; before that fix only left did.
+ * On a Mac trackpad: left = tap, right = two-finger tap, scroll = two-finger slide, drag = press
+ * and move. Middle usually needs a three-button mouse or a helper such as MiddleClick.
  */
 public class MouseDemo extends ToolkitApp {
 
-    private static final int LOG_SIZE = 12;
+    private static final int LOG_SIZE = 10;
 
     private final Deque<String> log = new ArrayDeque<>();
     private int leftCount;
     private int middleCount;
     private int rightCount;
+    private int scrollUpCount;
+    private int scrollDownCount;
+    private int pointerX = -1;
+    private int pointerY = -1;
+    private boolean dragging;
+    private int dragDx;
+    private int dragDy;
     private MouseButton lastButton = MouseButton.NONE;
 
     /**
@@ -54,45 +62,67 @@ public class MouseDemo extends ToolkitApp {
 
     @Override
     protected TuiConfig configure() {
-        return TuiConfig.builder().mouseCapture(true).build();
+        return TuiConfig.builder().mouseCapture(true).mouseMotion(true).build();
     }
 
     @Override
     protected Element render() {
         return column(
-            panel(text(" Mouse Demo - click the target with each button ").bold().cyan())
+            panel(text(" Mouse Demo - press, scroll, move and drag ").bold().cyan())
                 .rounded().borderColor(Color.CYAN).length(3),
 
             row(
                 counterTile("LEFT", leftCount, Color.GREEN, lastButton == MouseButton.LEFT),
                 counterTile("MIDDLE", middleCount, Color.YELLOW, lastButton == MouseButton.MIDDLE),
-                counterTile("RIGHT", rightCount, Color.MAGENTA, lastButton == MouseButton.RIGHT)
+                counterTile("RIGHT", rightCount, Color.MAGENTA, lastButton == MouseButton.RIGHT),
+                counterTile("SCROLL", scrollUpCount + scrollDownCount, Color.CYAN, false)
             ).length(5),
 
-            panel(
-                column(
-                    text(""),
-                    text("   Click here with left, middle, or right   ").bold().centered(),
-                    text("   (right = two-finger tap on a trackpad)   ").dim().centered()
+            row(
+                panel(
+                    column(
+                        text(""),
+                        text("Click (any button) or scroll here").bold().centered(),
+                        text(pointer()).dim().centered(),
+                        text("scroll  up " + scrollUpCount + "  /  down " + scrollDownCount).dim().centered()
+                    )
                 )
-            )
-            .title("Target")
-            .rounded()
-            .borderColor(colorFor(lastButton))
-            .id("target")
-            .focusable()
-            .onMouseEvent(this::handleMouse)
-            .length(6),
+                .title("Click / Scroll")
+                .rounded()
+                .borderColor(colorFor(lastButton))
+                .id("click-target")
+                .focusable()
+                .onMouseEvent(this::handleMouse)
+                .constraint(Constraint.percentage(50)),
+
+                panel(
+                    column(
+                        text(""),
+                        text(dragging ? "Dragging..." : "Press and drag here").bold().centered(),
+                        text("delta (" + dragDx + ", " + dragDy + ")").dim().centered()
+                    )
+                )
+                .title("Drag")
+                .rounded()
+                .borderColor(dragging ? Color.BLUE : Color.DARK_GRAY)
+                .id("drag-target")
+                .onDrag(new DragReadout())
+                .constraint(Constraint.percentage(50))
+            ).length(6),
 
             panel(eventLog())
-                .title("Recent presses")
+                .title("Recent events")
                 .rounded()
                 .borderColor(Color.DARK_GRAY)
                 .fill(),
 
-            panel(text(" Click the target | q: Quit ").dim())
+            panel(text(" Click / scroll / drag the panels | q: Quit ").dim())
                 .rounded().borderColor(Color.DARK_GRAY).length(3)
         );
+    }
+
+    private String pointer() {
+        return pointerX < 0 ? "pointer: (move over me)" : "pointer @ (" + pointerX + ", " + pointerY + ")";
     }
 
     private Element counterTile(String name, int count, Color color, boolean active) {
@@ -104,21 +134,39 @@ public class MouseDemo extends ToolkitApp {
         )
         .rounded()
         .borderColor(color)
-        .constraint(Constraint.percentage(33));
+        .constraint(Constraint.percentage(25));
     }
 
     private Element eventLog() {
         if (log.isEmpty()) {
-            return text("No presses yet - click the target above.").dim();
+            return text("No events yet - press, scroll, or drag a panel above.").dim();
         }
         Element[] lines = log.stream().map(line -> (Element) text(line)).toArray(Element[]::new);
         return column(lines);
     }
 
     private EventResult handleMouse(MouseEvent event) {
-        if (event.kind() != MouseEventKind.PRESS) {
-            return EventResult.UNHANDLED;
+        switch (event.kind()) {
+            case PRESS:
+                return handlePress(event);
+            case SCROLL_UP:
+                scrollUpCount++;
+                record("SCROLL_UP @ (" + event.x() + ", " + event.y() + ")");
+                return EventResult.HANDLED;
+            case SCROLL_DOWN:
+                scrollDownCount++;
+                record("SCROLL_DOWN @ (" + event.x() + ", " + event.y() + ")");
+                return EventResult.HANDLED;
+            case MOVE:
+                pointerX = event.x();
+                pointerY = event.y();
+                return EventResult.HANDLED;
+            default:
+                return EventResult.UNHANDLED;
         }
+    }
+
+    private EventResult handlePress(MouseEvent event) {
         MouseButton button = event.button();
         switch (button) {
             case LEFT:
@@ -155,6 +203,28 @@ public class MouseDemo extends ToolkitApp {
                 return Color.MAGENTA;
             default:
                 return Color.WHITE;
+        }
+    }
+
+    private final class DragReadout implements DragHandler {
+        @Override
+        public void onDragStart(int startX, int startY) {
+            dragging = true;
+            dragDx = 0;
+            dragDy = 0;
+            record("DRAG start @ (" + startX + ", " + startY + ")");
+        }
+
+        @Override
+        public void onDrag(int currentX, int currentY, int deltaX, int deltaY) {
+            dragDx = deltaX;
+            dragDy = deltaY;
+        }
+
+        @Override
+        public void onDragEnd(int endX, int endY) {
+            dragging = false;
+            record("DRAG end @ (" + endX + ", " + endY + "), delta (" + dragDx + ", " + dragDy + ")");
         }
     }
 }
