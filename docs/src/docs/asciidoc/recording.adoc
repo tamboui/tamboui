@@ -144,7 +144,27 @@ Supported commands:
 
 |`<Key>@<delay> <count>`
 |Repeat with delay, e.g. `Down@100ms 5` presses Down five times, 100ms apart
+
+|`Click <x> <y>`, `RightClick <x> <y>`, `MiddleClick <x> <y>`
+|Press and release a mouse button at a cell (0-based `<x> <y>`)
+
+|`MouseDown <x> <y>`, `MouseUp <x> <y>`
+|A separate left-button press or release, for full control
+
+|`MouseMove <x> <y>`
+|Move the pointer with no button held
+
+|`Drag <x1> <y1> <x2> <y2>`
+|Press at the first cell, move to the second, and release, drawing a continuous drag; `Drag@<delay>` sets the pause between steps
+
+|`ScrollUp [count] [x y]`, `ScrollDown [count] [x y]`, `ScrollLeft`, `ScrollRight`
+|Scroll the wheel `count` times (default 1) at a cell, or the screen centre when no cell is given
 |===
+
+Mouse commands are sent as a terminal sends them, the xterm way: SGR 1006 reports
+(`ESC [ < Cb ; Cx ; Cy M` for a press, motion or scroll and `… m` for a release). The application
+under test must enable mouse capture (and mouse motion for `MouseMove`) to receive them. Coordinates
+are terminal cells, matching the positions an app sees in a `MouseEvent`.
 
 `Set`, `Output` and `Require` directives are accepted (for compatibility with tapes shared with the
 `vhs` tool) but the recording geometry and output come from the `tamboui.record.*`

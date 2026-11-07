@@ -5,6 +5,7 @@
 package dev.tamboui.internal.record;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -103,6 +104,54 @@ abstract class Interaction {
 
         String key() {
             return key;
+        }
+    }
+
+    /**
+     * Simulate one or more low-level mouse reports (SGR 1006 encoding). Each step is a button code, a
+     * press/release flag, and a cell position; a position of {@code -1} means the centre of the screen,
+     * resolved when the interaction plays.
+     */
+    static final class Mouse extends Interaction {
+        private final List<Step> steps;
+
+        Mouse(List<Step> steps) {
+            this.steps = steps;
+        }
+
+        List<Step> steps() {
+            return steps;
+        }
+
+        /** One SGR mouse report. */
+        static final class Step {
+            private final int buttonCode;
+            private final boolean release;
+            private final int x;
+            private final int y;
+
+            Step(int buttonCode, boolean release, int x, int y) {
+                this.buttonCode = buttonCode;
+                this.release = release;
+                this.x = x;
+                this.y = y;
+            }
+
+            int buttonCode() {
+                return buttonCode;
+            }
+
+            boolean release() {
+                return release;
+            }
+
+            int x() {
+                return x;
+            }
+
+            int y() {
+                return y;
+            }
         }
     }
 }

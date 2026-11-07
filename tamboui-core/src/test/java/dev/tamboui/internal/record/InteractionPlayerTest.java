@@ -247,6 +247,60 @@ class InteractionPlayerTest {
         return all;
     }
 
+    @Test
+    void clickEmitsSgrPressAndRelease() throws IOException {
+        assertThat(mouseBytes("Click 5 3", null))
+                .isEqualTo("\u001b[<0;6;4M\u001b[<0;6;4m");
+    }
+
+    @Test
+    void rightAndMiddleClickUseTheirButtonCodes() throws IOException {
+        assertThat(mouseBytes("RightClick 5 3", null)).isEqualTo("\u001b[<2;6;4M\u001b[<2;6;4m");
+        assertThat(mouseBytes("MiddleClick 5 3", null)).isEqualTo("\u001b[<1;6;4M\u001b[<1;6;4m");
+    }
+
+    @Test
+    void mouseMoveEmitsMotionWithoutButton() throws IOException {
+        assertThat(mouseBytes("MouseMove 10 2", null)).isEqualTo("\u001b[<35;11;3M");
+    }
+
+    @Test
+    void mouseDownAndUpEmitPressAndRelease() throws IOException {
+        assertThat(mouseBytes("MouseDown 1 1", null)).isEqualTo("\u001b[<0;2;2M");
+        assertThat(mouseBytes("MouseUp 1 1", null)).isEqualTo("\u001b[<0;2;2m");
+    }
+
+    @Test
+    void scrollRepeatsAtExplicitPosition() throws IOException {
+        assertThat(mouseBytes("ScrollDown 2 7 4", null))
+                .isEqualTo("\u001b[<65;8;5M\u001b[<65;8;5M");
+    }
+
+    @Test
+    void scrollWithoutPositionUsesScreenCentre() throws IOException {
+        Buffer buffer = Buffer.empty(new dev.tamboui.layout.Rect(0, 0, 10, 4));
+        assertThat(mouseBytes("ScrollUp", buffer)).isEqualTo("\u001b[<64;6;3M");
+    }
+
+    @Test
+    void dragEmitsPressInterpolatedMotionAndRelease() throws IOException {
+        // Drag from (0,0) to (2,0): press, two interpolated left-drag motions, release.
+        assertThat(mouseBytes("Drag 0 0 2 0", null))
+                .isEqualTo("\u001b[<0;1;1M\u001b[<32;2;1M\u001b[<32;3;1M\u001b[<0;3;1m");
+    }
+
+    private String mouseBytes(String tapeLine, Buffer buffer) throws IOException {
+        Path tape = tempDir.resolve("mouse.tape");
+        Files.write(tape, (tapeLine + "\n").getBytes(StandardCharsets.UTF_8));
+        List<Interaction> interactions = InteractionPlayer.loadFromFile(tape, tempDir.resolve("out.cast"));
+        InteractionPlayer player = new InteractionPlayer(interactions, buffer);
+        StringBuilder sb = new StringBuilder();
+        for (int b : collectKeyBytes(player)) {
+            sb.append((char) b);
+        }
+        return sb.toString();
+    }
+
     private static List<Integer> collectKeyBytes(InteractionPlayer player) {
         List<Integer> bytes = new ArrayList<>();
         while (!player.isFinished()) {

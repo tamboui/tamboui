@@ -213,6 +213,39 @@ final class InteractionPlayer {
             case "wait+screen":
                 addWaitFor(line, "wait+screen".equals(command), args, delayMs, interactions);
                 break;
+            case "click":
+                addClick(line, args, 0, interactions);
+                break;
+            case "rightclick":
+                addClick(line, args, 2, interactions);
+                break;
+            case "middleclick":
+                addClick(line, args, 1, interactions);
+                break;
+            case "mousedown":
+                addButton(line, args, 0, false, interactions);
+                break;
+            case "mouseup":
+                addButton(line, args, 0, true, interactions);
+                break;
+            case "mousemove":
+                addMove(line, args, interactions);
+                break;
+            case "drag":
+                addDrag(line, args, delayMs, interactions);
+                break;
+            case "scrollup":
+                addScroll(line, args, 64, interactions);
+                break;
+            case "scrolldown":
+                addScroll(line, args, 65, interactions);
+                break;
+            case "scrollleft":
+                addScroll(line, args, 66, interactions);
+                break;
+            case "scrollright":
+                addScroll(line, args, 67, interactions);
+                break;
             default:
                 if (isKey(head)) {
                     addRepeatedKey(command, parseRepeatCount(line, args), delayMs, interactions);
@@ -280,6 +313,113 @@ final class InteractionPlayer {
 
     private static void warn(String message) {
         System.err.println("Warning: " + message);
+    }
+
+    /** Parses the whitespace-separated integers of a mouse command, or {@code null} if any is not an integer. */
+    private static int[] parseInts(String args) {
+        if (args.isEmpty()) {
+            return new int[0];
+        }
+        String[] tokens = args.trim().split("\\s+");
+        int[] values = new int[tokens.length];
+        for (int i = 0; i < tokens.length; i++) {
+            try {
+                values[i] = Integer.parseInt(tokens[i]);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return values;
+    }
+
+    private static void addClick(String line, String args, int button, List<Interaction> interactions) {
+        int[] c = parseInts(args);
+        if (c == null || c.length != 2) {
+            warn("Ignoring click without exactly <x> <y>: " + line);
+            return;
+        }
+        List<Interaction.Mouse.Step> steps = new ArrayList<>(2);
+        steps.add(new Interaction.Mouse.Step(button, false, c[0], c[1]));
+        steps.add(new Interaction.Mouse.Step(button, true, c[0], c[1]));
+        interactions.add(new Interaction.Mouse(steps));
+    }
+
+    private static void addButton(String line, String args, int button, boolean release, List<Interaction> interactions) {
+        int[] c = parseInts(args);
+        if (c == null || c.length != 2) {
+            warn("Ignoring mouse button without exactly <x> <y>: " + line);
+            return;
+        }
+        interactions.add(new Interaction.Mouse(Collections.singletonList(
+                new Interaction.Mouse.Step(button, release, c[0], c[1]))));
+    }
+
+    private static void addMove(String line, String args, List<Interaction> interactions) {
+        int[] c = parseInts(args);
+        if (c == null || c.length != 2) {
+            warn("Ignoring MouseMove without exactly <x> <y>: " + line);
+            return;
+        }
+        // Motion with no button held: button bits 3 (none) plus the motion bit 32.
+        interactions.add(new Interaction.Mouse(Collections.singletonList(
+                new Interaction.Mouse.Step(35, false, c[0], c[1]))));
+    }
+
+    private static void addDrag(String line, String args, int delayMs, List<Interaction> interactions) {
+        int[] c = parseInts(args);
+        if (c == null || c.length != 4) {
+            warn("Ignoring Drag without exactly <x1> <y1> <x2> <y2>: " + line);
+            return;
+        }
+        int x1 = c[0];
+        int y1 = c[1];
+        int x2 = c[2];
+        int y2 = c[3];
+        int stepDelay = delayMs > 0 ? delayMs : 30;
+        // Left press, interpolated drag-motion steps, then left release. The left-drag button code is
+        // 0 (left) plus the motion bit 32.
+        interactions.add(new Interaction.Mouse(Collections.singletonList(
+                new Interaction.Mouse.Step(0, false, x1, y1))));
+        int stepCount = Math.max(1, Math.min(60, Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1))));
+        for (int k = 1; k <= stepCount; k++) {
+            int x = x1 + (x2 - x1) * k / stepCount;
+            int y = y1 + (y2 - y1) * k / stepCount;
+            interactions.add(new Interaction.Wait(stepDelay));
+            interactions.add(new Interaction.Mouse(Collections.singletonList(
+                    new Interaction.Mouse.Step(32, false, x, y))));
+        }
+        interactions.add(new Interaction.Mouse(Collections.singletonList(
+                new Interaction.Mouse.Step(0, true, x2, y2))));
+    }
+
+    private static void addScroll(String line, String args, int buttonCode, List<Interaction> interactions) {
+        int[] c = parseInts(args);
+        if (c == null) {
+            warn("Ignoring scroll with non-integer arguments: " + line);
+            return;
+        }
+        int count = 1;
+        int x = -1;
+        int y = -1;
+        // Forms: (none) | <count> | <x> <y> | <count> <x> <y>; -1 means the screen centre at play time.
+        if (c.length == 1) {
+            count = Math.max(1, c[0]);
+        } else if (c.length == 2) {
+            x = c[0];
+            y = c[1];
+        } else if (c.length == 3) {
+            count = Math.max(1, c[0]);
+            x = c[1];
+            y = c[2];
+        } else if (c.length != 0) {
+            warn("Ignoring scroll with too many arguments: " + line);
+            return;
+        }
+        List<Interaction.Mouse.Step> steps = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            steps.add(new Interaction.Mouse.Step(buttonCode, false, x, y));
+        }
+        interactions.add(new Interaction.Mouse(steps));
     }
 
     private static void addRepeatedKey(String key, int count, int delayMs, List<Interaction> interactions) {
@@ -473,6 +613,11 @@ final class InteractionPlayer {
             } else if (interaction instanceof Interaction.KeyPress) {
                 Interaction.KeyPress keyPress = (Interaction.KeyPress) interaction;
                 enqueueKey(keyPress.key());
+                if (!pendingBytes.isEmpty()) {
+                    return pendingBytes.poll();
+                }
+            } else if (interaction instanceof Interaction.Mouse) {
+                enqueueMouse(((Interaction.Mouse) interaction).steps());
                 if (!pendingBytes.isEmpty()) {
                     return pendingBytes.poll();
                 }
@@ -702,5 +847,41 @@ final class InteractionPlayer {
             pendingBytes.add(ESC);
         }
         pendingBytes.add(code);
+    }
+
+    /**
+     * Queues the SGR 1006 mouse report for each step: {@code ESC [ < Cb ; Cx ; Cy M} for a press, motion or
+     * scroll and {@code ESC [ < Cb ; Cx ; Cy m} for a release. Coordinates are 1-based on the wire, as a
+     * terminal sends them; a step position of {@code -1} is resolved to the centre of the current screen.
+     */
+    private void enqueueMouse(List<Interaction.Mouse.Step> steps) {
+        for (Interaction.Mouse.Step step : steps) {
+            int x = step.x();
+            int y = step.y();
+            if (x < 0 || y < 0) {
+                int[] centre = screenCentre();
+                x = centre[0];
+                y = centre[1];
+            }
+            pendingBytes.add(ESC);
+            pendingBytes.add((int) '[');
+            pendingBytes.add((int) '<');
+            addDigits(step.buttonCode());
+            pendingBytes.add((int) ';');
+            addDigits(x + 1);
+            pendingBytes.add((int) ';');
+            addDigits(y + 1);
+            pendingBytes.add((int) (step.release() ? 'm' : 'M'));
+        }
+    }
+
+    /** The centre cell of the current screen, or {@code (0, 0)} when there is no screen yet. */
+    private int[] screenCentre() {
+        Buffer current = screen();
+        if (current == null) {
+            return new int[] {0, 0};
+        }
+        Rect area = current.area();
+        return new int[] {area.left() + area.width() / 2, area.top() + area.height() / 2};
     }
 }
