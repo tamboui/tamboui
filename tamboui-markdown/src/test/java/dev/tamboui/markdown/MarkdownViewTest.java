@@ -18,9 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MarkdownViewTest {
 
     private static Buffer renderInto(MarkdownView view, int width, int height) {
+        return renderInto(view, width, height, null);
+    }
+
+    private static Buffer renderInto(MarkdownView view, int width, int height, MarkdownViewState state) {
         Rect area = new Rect(0, 0, width, height);
         Buffer buffer = Buffer.empty(area);
-        view.render(area, buffer);
+        view.render(area, buffer, state);
         return buffer;
     }
 
@@ -448,5 +452,88 @@ class MarkdownViewTest {
         for (int y = 1; y < 6; y++) {
             assertThat(buffer.get(7, y).symbol()).as("right border on row " + y).isEqualTo("│");
         }
+    }
+
+    @Test
+    @DisplayName("Stateful render updates dimensions and respects scroll offset")
+    void statefulRenderUpdatesDimensions() {
+        String source = "line one\n\nline two\n\nline three";
+        MarkdownView view = MarkdownView.builder().source(source).build();
+        MarkdownViewState state = new MarkdownViewState();
+
+        Buffer buffer = renderInto(view, 30, 3, state);
+
+        assertThat(state.totalRows()).isEqualTo(5);
+        assertThat(state.viewportHeight()).isEqualTo(3);
+        assertThat(state.maxScroll()).isEqualTo(2);
+        assertThat(state.offset()).isEqualTo(0);
+
+        // Row 0 shows "line one"
+        BufferAssertions.assertThat(buffer).hasSymbolAt(0, 0, "l");
+
+        // Scroll down 1
+        state.scrollDown();
+        assertThat(state.offset()).isEqualTo(1);
+
+        Buffer scrolledBuf = renderInto(view, 30, 3, state);
+        // Row 0 is now blank line between "line one" and "line two"
+        assertThat(scrolledBuf.get(0, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Stateful render self-clamps excessive scroll offset to maxScroll")
+    void statefulRenderClampsExcessiveOffset() {
+        String source = "line one\n\nline two\n\nline three";
+        MarkdownView view = MarkdownView.builder().source(source).build();
+        MarkdownViewState state = new MarkdownViewState(100);
+
+        Buffer buffer = renderInto(view, 30, 3, state);
+
+        // Clamps to maxScroll = 2
+        assertThat(state.offset()).isEqualTo(2);
+
+        // Row 0 shows "line two", row 2 shows "line three"
+        BufferAssertions.assertThat(buffer)
+            .hasSymbolAt(0, 0, "l")
+            .hasSymbolAt(5, 0, "t")
+            .hasSymbolAt(0, 2, "l")
+            .hasSymbolAt(5, 2, "t");
+    }
+
+    @Test
+    @DisplayName("Builder state is automatically used when rendering statelessly")
+    void builderStateUsedStatelessly() {
+        String source = "line one\n\nline two\n\nline three";
+        MarkdownViewState state = new MarkdownViewState(1);
+        MarkdownView view = MarkdownView.builder()
+            .source(source)
+            .state(state)
+            .build();
+
+        assertThat(view.state()).contains(state);
+
+        Buffer buffer = renderInto(view, 30, 3);
+        assertThat(state.totalRows()).isEqualTo(5);
+        assertThat(state.offset()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Auto-scroll follows newly appended content during streaming")
+    void autoScrollFollowsStreamingContent() {
+        MarkdownViewState state = new MarkdownViewState();
+        state.scrollToBottom();
+
+        // Step 1: 1 line of content
+        MarkdownView view1 = MarkdownView.builder().source("first line").build();
+        renderInto(view1, 30, 3, state);
+        assertThat(state.offset()).isEqualTo(0);
+
+        // Step 2: Content grows beyond viewport
+        String grown = "line one\n\nline two\n\nline three";
+        MarkdownView view2 = MarkdownView.builder().source(grown).build();
+        renderInto(view2, 30, 3, state);
+
+        // Auto-scroll followed to maxScroll (2)
+        assertThat(state.offset()).isEqualTo(2);
     }
 }
