@@ -1,0 +1,598 @@
+= Themes
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+
+include::_attributes.adoc[]
+
+{project-name} includes a theme system that generates a complete color palette from a small set of semantic colors.
+Define a handful of colors — primary, error, success — and the system auto-derives 25+ shades, text colors, and UI colors.
+Themes integrate with both the CSS engine and the Java API.
+
+== Quick Start
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=quick-start,indent=0]
+----
+
+The `ThemeEngine` generates a `ColorSystem` from the theme's semantic palette and injects every color as a TCSS `$variable`.
+Your stylesheet can then reference them:
+
+[source,css]
+----
+Panel {
+    background: $surface;
+    border-color: $border;
+}
+
+Panel:focus {
+    border-color: $border-focus;
+}
+
+.primary {
+    color: $primary;
+    text-style: bold;
+}
+
+.error {
+    color: $error;
+}
+----
+
+Switch themes at runtime and the same stylesheet produces a completely different look — no extra stylesheets required.
+
+== Architecture
+
+The theme system has three layers:
+
+[cols="1,2",options="header"]
+|===
+|Layer |Responsibility
+
+|*Core* (`{core-module}`)
+|`Theme` definition, `ColorSystem` generation, `ThemePropertyResolver`
+
+|*CSS* (`{css-module}`)
+|`ThemeEngine` bridges themes with `StyleEngine` via `$variable` injection
+
+|*Widgets / Toolkit*
+|TCSS files and Java code consume `$primary`, `$border`, etc.
+|===
+
+Data flow:
+
+----
+Theme (7–12 seed colors)
+  → ColorSystem.generate()  →  25+ derived colors
+      ├── CSS path:   ThemeEngine.injectVariables(styleEngine)
+      │                 → TCSS uses $primary, $surface, ...
+      └── Java path:  theme.toResolver()
+                        → resolver.get(ThemeProperties.PRIMARY)
+----
+
+== Semantic Colors
+
+A `Theme` is built from a small set of _semantic_ colors that describe intent rather than appearance:
+
+[cols="1,3,1",options="header"]
+|===
+|Color |Purpose |Required
+
+|`primary`
+|Main brand / accent color — used for focused borders, selection highlights, active elements
+|Yes
+
+|`secondary`
+|Supporting color — used for secondary actions, alternative highlights
+|Yes
+
+|`error`
+|Errors and destructive actions
+|Yes
+
+|`success`
+|Success messages, positive confirmations
+|Yes
+
+|`warning`
+|Caution messages, non-blocking alerts
+|Yes
+
+|`accent`
+|Decorative accent for emphasis (defaults to `primary` if not set)
+|No
+
+|`info`
+|Informational content (defaults to `secondary` if not set)
+|No
+|===
+
+Additionally, themes may specify surface colors for the background hierarchy:
+
+[cols="1,3",options="header"]
+|===
+|Color |Purpose
+
+|`background`
+|App background — the darkest (or lightest) layer
+
+|`surface`
+|Elevated surface — panels, cards, modals
+
+|`panel`
+|Higher-elevation surface — nested containers, toolbars
+
+|`foreground`
+|Default text / content color
+|===
+
+If surface colors are omitted, they are auto-derived from the `dark` flag and `primary` color.
+
+== Generated Color System
+
+Calling `theme.generate()` produces a `ColorSystem` containing all derived colors.
+These are the colors available as TCSS variables (`$name`) and through `ThemeProperties` constants.
+
+=== Base Semantic Colors
+
+[cols="1,3",options="header"]
+|===
+|Variable |Description
+
+|`$primary`
+|Primary brand color
+
+|`$secondary`
+|Secondary brand color
+
+|`$error`
+|Error / danger color
+
+|`$success`
+|Success / positive color
+
+|`$warning`
+|Warning / caution color
+
+|`$accent`
+|Accent color (if defined on theme)
+
+|`$info`
+|Informational color (if defined on theme)
+|===
+
+=== Surface Hierarchy
+
+[cols="1,3",options="header"]
+|===
+|Variable |Description
+
+|`$background`
+|App background (auto-derived: dark → `#121212`, light → `#efefef`)
+
+|`$surface`
+|Elevated surface (auto-derived: dark → `#1e1e1e`, light → `#f5f5f5`)
+
+|`$panel`
+|Panel / toolbar surface (auto-derived: `surface` blended 10% with `primary`)
+
+|`$foreground`
+|Content color (auto-derived: inverse of `background`)
+|===
+
+=== Shade Variants
+
+Each key color gets light, dark, and muted variants generated via HSL manipulation.
+
+[cols="1,3",options="header"]
+|===
+|Variable |Derivation
+
+|`$primary-light`
+|`primary` lightened by `luminositySpread` (default 15%)
+
+|`$primary-dark`
+|`primary` darkened by `luminositySpread`
+
+|`$primary-muted`
+|`primary` blended 70% towards `background`
+
+|`$secondary-light`
+|`secondary` lightened by `luminositySpread`
+
+|`$secondary-dark`
+|`secondary` darkened by `luminositySpread`
+
+|`$secondary-muted`
+|`secondary` blended 70% towards `background`
+
+|`$error-light`
+|`error` lightened by `luminositySpread`
+
+|`$error-dark`
+|`error` darkened by `luminositySpread`
+|===
+
+=== Text Colors
+
+Text colors ensure readable contrast against the background.
+
+[cols="1,3",options="header"]
+|===
+|Variable |Derivation
+
+|`$text`
+|WCAG contrast text for `background` (white on dark themes, black on light)
+
+|`$text-muted`
+|`text` blended 40% towards `background`
+
+|`$text-disabled`
+|`text` blended 62% towards `background`
+
+|`$text-on-primary`
+|WCAG contrast text for `primary` (for text on primary-colored backgrounds)
+|===
+
+=== UI Colors
+
+[cols="1,3",options="header"]
+|===
+|Variable |Derivation
+
+|`$border`
+|`surface` darkened slightly (2.5%)
+
+|`$border-focus`
+|Same as `primary`
+
+|`$border-muted`
+|`surface` darkened very slightly (1%)
+
+|`$selection-bg`
+|`primary` blended 70% towards `background`
+
+|`$hover-bg`
+|`text` blended 96% towards `background` (subtle highlight)
+|===
+
+== Built-in Themes
+
+{project-name} ships with 7 built-in themes registered in `ThemeRegistry`.
+
+=== auto-terminal
+
+Adapts to your terminal's ANSI color scheme.
+Uses named ANSI colors instead of fixed hex values, so the palette changes when you switch terminal themes.
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |ANSI Blue
+|secondary |ANSI Cyan
+|error |ANSI Red
+|success |ANSI Green
+|warning |ANSI Yellow
+|accent |ANSI Light Blue
+|info |ANSI Light Cyan
+|===
+
+=== tamboui-default
+
+Branded cyan/teal theme.
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |`#00ffff`
+|secondary |`#0080ff`
+|error |`#ff6b6b`
+|success |`#4caf50`
+|warning |`#ffeb3b`
+|accent |`#00ffff`
+|info |`#00bcd4`
+|background |`#000000`
+|surface |`#1a1a1a`
+|panel |`#333333`
+|===
+
+=== nord
+
+Arctic, north-bluish palette. Source: https://www.nordtheme.com/[nordtheme.com]
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |`#88c0d0`
+|secondary |`#81a1c1`
+|error |`#bf616a`
+|success |`#a3be8c`
+|warning |`#ebcb8b`
+|accent |`#b48ead`
+|info |`#8fbcbb`
+|background |`#2e3440`
+|surface |`#3b4252`
+|panel |`#434c5e`
+|foreground |`#eceff4`
+|===
+
+=== gruvbox-dark
+
+Retro groove color scheme. Source: https://github.com/morhetz/gruvbox[gruvbox]
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |`#83a598`
+|secondary |`#d3869b`
+|error |`#fb4934`
+|success |`#b8bb26`
+|warning |`#fabd2f`
+|accent |`#fe8019`
+|info |`#8ec07c`
+|background |`#282828`
+|surface |`#3c3836`
+|panel |`#504945`
+|foreground |`#ebdbb2`
+|===
+
+=== dracula
+
+Dark theme with vibrant colors. Source: https://draculatheme.com/[draculatheme.com]
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |`#bd93f9`
+|secondary |`#8be9fd`
+|error |`#ff5555`
+|success |`#50fa7b`
+|warning |`#f1fa8c`
+|accent |`#ff79c6`
+|info |`#8be9fd`
+|background |`#282a36`
+|surface |`#44475a`
+|panel |`#44475a`
+|foreground |`#f8f8f2`
+|===
+
+=== catppuccin-mocha
+
+Soothing pastel theme. Source: https://catppuccin.com/[catppuccin.com]
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |`#89b4fa`
+|secondary |`#cba6f7`
+|error |`#f38ba8`
+|success |`#a6e3a1`
+|warning |`#f9e2af`
+|accent |`#f5c2e7`
+|info |`#94e2d5`
+|background |`#1e1e2e`
+|surface |`#313244`
+|panel |`#45475a`
+|foreground |`#cdd6f4`
+|===
+
+=== tokyo-night
+
+Clean dark theme inspired by Tokyo's night skyline. Source: https://github.com/enkia/tokyo-night-vscode-theme[tokyo-night]
+
+[cols="1,1",options="header"]
+|===
+|Color |Value
+
+|primary |`#7aa2f7`
+|secondary |`#bb9af7`
+|error |`#f7768e`
+|success |`#9ece6a`
+|warning |`#e0af68`
+|accent |`#ff9e64`
+|info |`#7dcfff`
+|background |`#1a1b26`
+|surface |`#24283b`
+|panel |`#414868`
+|foreground |`#a9b1d6`
+|===
+
+== Creating Custom Themes
+
+Use `Theme.Builder` to create a theme and register it:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=custom-theme,indent=0]
+----
+
+=== Builder Options
+
+[cols="1,1,3",options="header"]
+|===
+|Method |Default |Description
+
+|`name(String)`
+|—
+|Theme name (required)
+
+|`dark(boolean)`
+|`true`
+|Controls auto-derivation of surfaces and text colors
+
+|`primary(String\|Color)`
+|—
+|Primary color (required)
+
+|`secondary(String\|Color)`
+|primary
+|Secondary color
+
+|`error(String\|Color)`
+|ANSI Red
+|Error color
+
+|`success(String\|Color)`
+|ANSI Green
+|Success color
+
+|`warning(String\|Color)`
+|ANSI Yellow
+|Warning color
+
+|`accent(String\|Color)`
+|null
+|Optional accent color
+
+|`info(String\|Color)`
+|null
+|Optional info color
+
+|`background(String\|Color)`
+|auto
+|Background color (auto: `#121212` dark / `#efefef` light)
+
+|`surface(String\|Color)`
+|auto
+|Surface color (auto: `#1e1e1e` dark / `#f5f5f5` light)
+
+|`panel(String\|Color)`
+|auto
+|Panel color (auto: surface blended 10% primary)
+
+|`foreground(String\|Color)`
+|auto
+|Foreground color (auto: inverse of background)
+
+|`luminositySpread(float)`
+|`0.15`
+|How much to lighten/darken for shade variants (0.0–1.0)
+
+|`textAlpha(float)`
+|`0.95`
+|Reserved for future text transparency support
+
+|`variable(String, String)`
+|—
+|Override any generated color by name (e.g., `variable("border", "#4c566a")`)
+|===
+
+=== Variable Overrides
+
+Use `variable()` to override any auto-generated color:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=variable-overrides,indent=0]
+----
+
+== Runtime Theme Switching
+
+Switch themes at runtime and re-inject variables:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=theme-switching,indent=0]
+----
+
+== Using Themes Without CSS
+
+Themes work without the CSS engine via `ThemeProperties` and `StylePropertyResolver`:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=without-css,indent=0]
+----
+
+== Color Manipulation
+
+The `Color` interface provides convenience methods for color manipulation, powered by `ColorManipulation`:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=color-manipulation,indent=0]
+----
+
+Low-level color space conversions are available via `ColorManipulation`:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/ThemeSnippets.java[tag=color-conversions,indent=0]
+----
+
+== Integration with CSS Stylesheets
+
+=== Theme-Aware Stylesheets
+
+Write a single stylesheet that works with any theme:
+
+[source,css]
+----
+/* All $variables come from the active theme */
+
+* {
+    color: $text;
+}
+
+Row, Column {
+    background: $background;
+}
+
+Panel {
+    background: $surface;
+    border-color: $border;
+}
+
+Panel:focus {
+    border-color: $border-focus;
+    border-type: double;
+}
+
+.primary   { color: $primary; text-style: bold; }
+.secondary { color: $secondary; }
+.error     { color: $error; text-style: bold; }
+.success   { color: $success; }
+.warning   { color: $warning; text-style: bold; }
+.info      { color: $info; }
+.muted     { color: $text-muted; }
+.disabled  { color: $text-disabled; }
+
+ListElement-item:selected {
+    background: $selection-bg;
+    color: $primary;
+    text-style: bold;
+}
+----
+
+=== Mixing Theme Variables with Overrides
+
+User-defined TCSS variables take precedence over theme-injected ones:
+
+[source,css]
+----
+/* Override the theme's primary color for this stylesheet */
+$primary: #ff6600;
+
+.custom-branded {
+    color: $primary;  /* Uses #ff6600, not the theme's primary */
+}
+
+.themed-text {
+    color: $secondary;  /* Still uses theme's secondary */
+}
+----
+
+== Next Steps
+
+* link:styling.html[CSS Styling] — full TCSS reference, selectors, properties
+* link:widgets.html[Widgets Reference] — available components to theme
+* link:developer-guide.html[Developer Guide] — creating custom widgets with theme support
