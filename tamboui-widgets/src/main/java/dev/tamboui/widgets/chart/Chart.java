@@ -55,6 +55,13 @@ import static dev.tamboui.util.CollectionUtil.listCopyOf;
  */
 public final class Chart implements Widget {
 
+    /**
+     * A line with an end more than this many cells away from the bottom-left cell of the graph
+     * is first clipped to this distance. That keeps the line arithmetic within the long range;
+     * rounding a clipped end to a cell moves the line by at most half a cell on the graph.
+     */
+    private static final double CLIP_LIMIT = 1 << 29;
+
     private final List<Dataset> datasets;
     private final Axis xAxis;
     private final Axis yAxis;
@@ -261,108 +268,188 @@ public final class Chart implements Widget {
             yRange = 1;
         }
 
-        int[] screenX = new int[data.length];
-        int[] screenY = new int[data.length];
+        // Cell of each point, counted from the bottom-left cell of the graph area. Kept as doubles:
+        // a point far outside the graph has a cell number beyond the int range.
+        double[] cellX = new double[data.length];
+        double[] cellY = new double[data.length];
 
-        // Convert data coordinates to screen coordinates
         for (int i = 0; i < data.length; i++) {
-            double x = data[i][0];
-            double y = data[i][1];
+            double xFraction = (data[i][0] - xMin) / xRange;
+            double yFraction = (data[i][1] - yMin) / yRange;
 
-            // Map to graph area
-            double xFraction = (x - xMin) / xRange;
-            double yFraction = (y - yMin) / yRange;
-
-            screenX[i] = graphArea.x() + (int) Math.round(xFraction * (graphArea.width() - 1));
-            screenY[i] = graphArea.bottom() - 1 - (int) Math.round(yFraction * (graphArea.height() - 1));
+            cellX[i] = roundToCell(xFraction * (graphArea.width() - 1));
+            cellY[i] = roundToCell(yFraction * (graphArea.height() - 1));
         }
 
         // Render based on graph type
         switch (dataset.graphType()) {
             case SCATTER:
-                renderScatter(buffer, graphArea, screenX, screenY, marker, dataStyle);
+                renderScatter(buffer, graphArea, cellX, cellY, marker, dataStyle);
                 break;
             case LINE:
-                renderLine(buffer, graphArea, screenX, screenY, marker, dataStyle);
+                renderLine(buffer, graphArea, cellX, cellY, marker, dataStyle);
                 break;
             case BAR:
-                renderBars(buffer, graphArea, screenX, screenY, dataStyle);
+                renderBars(buffer, graphArea, cellX, cellY, dataStyle);
                 break;
             default:
                 break;
         }
     }
 
-    private void renderScatter(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY,
+    private void renderScatter(Buffer buffer, Rect graphArea, double[] cellX, double[] cellY,
                                 String marker, Style style) {
-        for (int i = 0; i < screenX.length; i++) {
-            int x = screenX[i];
-            int y = screenY[i];
-            if (isInBounds(graphArea, x, y)) {
-                buffer.setString(x, y, marker, style);
+        for (int i = 0; i < cellX.length; i++) {
+            double x = cellX[i];
+            double y = cellY[i];
+            if (x >= 0 && x < graphArea.width() && y >= 0 && y < graphArea.height()) {
+                buffer.setString(graphArea.x() + (int) x, graphArea.bottom() - 1 - (int) y, marker, style);
             }
         }
     }
 
-    private void renderLine(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY,
+    private void renderLine(Buffer buffer, Rect graphArea, double[] cellX, double[] cellY,
                              String marker, Style style) {
         // First render the points
-        renderScatter(buffer, graphArea, screenX, screenY, marker, style);
+        renderScatter(buffer, graphArea, cellX, cellY, marker, style);
 
-        // Then connect with lines
-        for (int i = 0; i < screenX.length - 1; i++) {
-            drawLine(buffer, graphArea, screenX[i], screenY[i], screenX[i + 1], screenY[i + 1], style);
+        // Then connect them, leaving a gap at a point with a NaN or infinite coordinate
+        for (int i = 0; i < cellX.length - 1; i++) {
+            if (isFinite(cellX[i], cellY[i]) && isFinite(cellX[i + 1], cellY[i + 1])) {
+                drawSegment(buffer, graphArea, cellX[i], cellY[i], cellX[i + 1], cellY[i + 1], style);
+            }
         }
     }
 
-    private void renderBars(Buffer buffer, Rect graphArea, int[] screenX, int[] screenY, Style style) {
-        int baseY = graphArea.bottom() - 1;
-
-        for (int i = 0; i < screenX.length; i++) {
-            int x = screenX[i];
-            int topY = screenY[i];
+    private void renderBars(Buffer buffer, Rect graphArea, double[] cellX, double[] cellY, Style style) {
+        for (int i = 0; i < cellX.length; i++) {
+            double x = cellX[i];
+            double y = cellY[i];
+            if (!isFinite(x, y) || x < 0 || x >= graphArea.width() || y < 0) {
+                continue;
+            }
 
             // Draw vertical bar from baseline to data point
-            for (int y = baseY; y >= topY && y >= graphArea.y(); y--) {
-                if (isInBounds(graphArea, x, y)) {
-                    buffer.setString(x, y, "█", style);
-                }
+            int top = (int) Math.min(y, graphArea.height() - 1);
+            for (int row = 0; row <= top; row++) {
+                buffer.setString(graphArea.x() + (int) x, graphArea.bottom() - 1 - row, "█", style);
             }
         }
     }
 
-    private void drawLine(Buffer buffer, Rect graphArea, int x0, int y0, int x1, int y1, Style style) {
-        // Bresenham's line algorithm
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
+    /**
+     * Draws the line between two points given as cells counted from the bottom-left cell of the
+     * graph area, with y going up.
+     */
+    private void drawSegment(Buffer buffer, Rect graphArea, double x0, double y0, double x1, double y1,
+                             Style style) {
+        double[] ends = {x0, y0, x1, y1};
+        double farthest = Math.max(Math.max(Math.abs(x0), Math.abs(y0)), Math.max(Math.abs(x1), Math.abs(y1)));
+        if (farthest > CLIP_LIMIT) {
+            ends = clipToSquare(x0, y0, x1, y1, CLIP_LIMIT);
+            if (ends == null) {
+                return;
+            }
+        }
+        long left = graphArea.x();
+        long bottom = graphArea.bottom() - 1L;
+        drawLine(buffer, graphArea, left + (long) ends[0], bottom - (long) ends[1],
+            left + (long) ends[2], bottom - (long) ends[3], style);
+    }
+
+    /**
+     * Draws the cells of Bresenham's line from (x0, y0) to (x1, y1) that are inside the area.
+     * <p>
+     * Along the longer axis the line moves one cell per step. After k steps it has moved
+     * k * minor / major cells along the other axis, rounded to the nearest cell with ties going
+     * to the start: the same cells as the usual loop that adds up the error step by step. Only
+     * the steps inside the area are visited, so a line to a point far outside costs no more than
+     * a line across the area.
+     */
+    private void drawLine(Buffer buffer, Rect area, long x0, long y0, long x1, long y1, Style style) {
+        long dx = Math.abs(x1 - x0);
+        long dy = Math.abs(y1 - y0);
         int sx = x0 < x1 ? 1 : -1;
         int sy = y0 < y1 ? 1 : -1;
-        int err = dx - dy;
+        // Use different characters based on line direction
+        String lineChar = getLineChar(dx, dy, sx, sy);
 
-        while (true) {
-            if (isInBounds(graphArea, x0, y0)) {
-                // Use different characters based on line direction
-                String lineChar = getLineChar(dx, dy, sx, sy);
-                buffer.setString(x0, y0, lineChar, style);
-            }
+        boolean alongX = dx >= dy;
+        long major = alongX ? dx : dy;
+        long minor = alongX ? dy : dx;
+        long start = alongX ? x0 : y0;
+        int step = alongX ? sx : sy;
+        long low = alongX ? area.x() : area.y();
+        long high = (alongX ? area.right() : area.bottom()) - 1L;
 
-            if (x0 == x1 && y0 == y1) {
-                break;
-            }
-
-            int e2 = 2 * err;
-            if (e2 > -dy) {
-                err -= dy;
-                x0 += sx;
-            }
-            if (e2 < dx) {
-                err += dx;
-                y0 += sy;
+        long first = Math.max(0, step > 0 ? low - start : start - high);
+        long last = Math.min(major, step > 0 ? high - start : start - low);
+        for (long k = first; k <= last; k++) {
+            long side = major == 0 ? 0 : (2 * k * minor + major - 1) / (2 * major);
+            long x = alongX ? x0 + sx * k : x0 + sx * side;
+            long y = alongX ? y0 + sy * side : y0 + sy * k;
+            if (isInBounds(area, x, y)) {
+                buffer.setString((int) x, (int) y, lineChar, style);
             }
         }
     }
 
-    private String getLineChar(int dx, int dy, int sx, int sy) {
+    /**
+     * Clips the segment to the square from -limit to limit on both axes, rounding the ends to
+     * cells.
+     *
+     * @return the ends of the clipped segment as {x0, y0, x1, y1}, or null if it misses the square
+     */
+    private static double[] clipToSquare(double x0, double y0, double x1, double y1, double limit) {
+        // Liang-Barsky: the part of the segment, from 0 to 1, that is on the inner side of all edges
+        double dx = x1 - x0;
+        double dy = y1 - y0;
+        double[] range = {0, 1};
+        if (!clipEdge(-dx, x0 + limit, range) || !clipEdge(dx, limit - x0, range)
+                || !clipEdge(-dy, y0 + limit, range) || !clipEdge(dy, limit - y0, range)) {
+            return null;
+        }
+        double[] ends = {x0 + range[0] * dx, y0 + range[0] * dy, x0 + range[1] * dx, y0 + range[1] * dy};
+        for (int i = 0; i < ends.length; i++) {
+            if (Double.isNaN(ends[i])) {
+                return null;
+            }
+            // Rounding errors of huge coordinates must not move an end out of the square
+            ends[i] = Math.max(-limit, Math.min(limit, roundToCell(ends[i])));
+        }
+        return ends;
+    }
+
+    private static boolean clipEdge(double p, double q, double[] range) {
+        if (p == 0) {
+            return q >= 0;
+        }
+        double t = q / p;
+        if (p < 0) {
+            range[0] = Math.max(range[0], t);
+        } else {
+            range[1] = Math.min(range[1], t);
+        }
+        return range[0] <= range[1];
+    }
+
+    /**
+     * Rounds a position to the nearest cell as {@link Math#round(double)} does. NaN and
+     * infinities are kept, and so are positions from 2^52 up: they are whole numbers already,
+     * but may not fit in a long.
+     */
+    private static double roundToCell(double position) {
+        if (Double.isNaN(position) || Math.abs(position) >= 0x1p52) {
+            return position;
+        }
+        return Math.round(position);
+    }
+
+    private static boolean isFinite(double x, double y) {
+        return Double.isFinite(x) && Double.isFinite(y);
+    }
+
+    private String getLineChar(long dx, long dy, int sx, int sy) {
         if (dx == 0) {
             return "│";
         }
@@ -381,7 +468,7 @@ public final class Chart implements Widget {
         return "╱";
     }
 
-    private boolean isInBounds(Rect area, int x, int y) {
+    private boolean isInBounds(Rect area, long x, long y) {
         return x >= area.x() && x < area.right() && y >= area.y() && y < area.bottom();
     }
 

@@ -15,6 +15,10 @@ import dev.tamboui.text.Line;
  * A dataset to be plotted in a {@link Chart}.
  * <p>
  * Contains data points (x, y coordinates) and rendering configuration.
+ * <p>
+ * A point that falls outside the graph is not drawn, but a line to it is, up to the edge of
+ * the graph. A point with a NaN or infinite coordinate is not drawn at all, and a
+ * {@link GraphType#LINE} dataset is broken there, so a missing value shows as a gap.
  *
  * <pre>{@code
  * Dataset dataset = Dataset.builder()

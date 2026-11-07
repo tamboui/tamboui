@@ -4,8 +4,13 @@
  */
 package dev.tamboui.widgets.chart;
 
-import org.junit.jupiter.api.Test;
+import java.time.Duration;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -13,6 +18,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.widgets.block.Block;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class ChartTest {
 
@@ -370,5 +376,108 @@ class ChartTest {
             .build();
 
         assertThat(chart).isNotNull();
+    }
+
+    @Test
+    void line_to_a_point_far_left_of_the_x_bounds_runs_to_the_left_edge() {
+        // The last 10 seconds in epoch millis, after a sample stamped 0: 3.5 billion cells to the left
+        long now = 1_760_000_000_000L;
+        Chart chart = chart(GraphType.LINE, new double[][] {{0, 1}, {now - 5_000, 1}, {now, 2}},
+            now - 10_000, now, 0, 4);
+
+        BufferAssertions.assertThat(render(chart, 21, 5)).hasContent(
+            "                     ",
+            "                     ",
+            "                ─────",
+            "────────────────     ",
+            "                     ");
+    }
+
+    @Test
+    void lines_between_points_billions_of_cells_outside_the_graph_render_quickly() {
+        double[][] data = new double[11][];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = new double[] {i % 2 == 0 ? -2_100_000_000.0 : 2_100_000_000.0, 2};
+        }
+        Chart chart = chart(GraphType.LINE, data, 0, 10, 0, 4);
+        Buffer buffer = Buffer.empty(new Rect(0, 0, 11, 5));
+
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> chart.render(buffer.area(), buffer));
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "           ",
+            "           ",
+            "───────────",
+            "           ",
+            "           ");
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY})
+    void line_leaves_a_gap_at_a_point_without_a_position(double missing) {
+        String[] expected = {
+            "     ",
+            "• ── ",
+            "     ",
+            "     ",
+            "     "};
+
+        Chart missingY = chart(GraphType.LINE, new double[][] {{0, 3}, {1, missing}, {2, 3}, {3, 3}}, 0, 4, 0, 4);
+        BufferAssertions.assertThat(render(missingY, 5, 5)).hasContent(expected);
+
+        Chart missingX = chart(GraphType.LINE, new double[][] {{0, 3}, {missing, 3}, {2, 3}, {3, 3}}, 0, 4, 0, 4);
+        BufferAssertions.assertThat(render(missingX, 5, 5)).hasContent(expected);
+    }
+
+    @Test
+    void scatter_point_four_billion_cells_right_of_the_graph_is_not_drawn() {
+        // 2^32 + 2 cells to the right; cut to 32 bits, that is column 2
+        Chart chart = chart(GraphType.SCATTER, new double[][] {{4_294_967_298.0, 1}}, 0, 4, 0, 4);
+
+        BufferAssertions.assertThat(render(chart, 5, 5)).hasContent(
+            "     ",
+            "     ",
+            "     ",
+            "     ",
+            "     ");
+    }
+
+    @Test
+    void bar_without_a_value_is_not_drawn() {
+        Chart chart = chart(GraphType.BAR, new double[][] {{1, Double.NaN}, {3, 2}}, 0, 4, 0, 4);
+
+        BufferAssertions.assertThat(render(chart, 5, 5)).hasContent(
+            "     ",
+            "     ",
+            "   █ ",
+            "   █ ",
+            "   █ ");
+    }
+
+    @Test
+    void bar_far_above_the_y_bounds_fills_the_graph_height() {
+        // 2^32 + 2 cells up; cut to 32 bits, that is a bar 3 cells high
+        Chart chart = chart(GraphType.BAR, new double[][] {{3, 4_294_967_298.0}}, 0, 4, 0, 4);
+
+        BufferAssertions.assertThat(render(chart, 5, 5)).hasContent(
+            "   █ ",
+            "   █ ",
+            "   █ ",
+            "   █ ",
+            "   █ ");
+    }
+
+    private static Chart chart(GraphType type, double[][] data, double xMin, double xMax, double yMin, double yMax) {
+        return Chart.builder()
+            .datasets(Dataset.builder().data(data).graphType(type).build())
+            .xAxis(Axis.builder().bounds(xMin, xMax).build())
+            .yAxis(Axis.builder().bounds(yMin, yMax).build())
+            .build();
+    }
+
+    private static Buffer render(Chart chart, int width, int height) {
+        Buffer buffer = Buffer.empty(new Rect(0, 0, width, height));
+        chart.render(buffer.area(), buffer);
+        return buffer;
     }
 }
