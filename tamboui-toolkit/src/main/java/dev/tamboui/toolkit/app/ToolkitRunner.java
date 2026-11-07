@@ -653,7 +653,9 @@ public final class ToolkitRunner implements AutoCloseable {
             if (autoBindingRegistration && app != null) {
                 ActionHandler globalHandler = new ActionHandler(config.bindings())
                         .registerAnnotated(app);
-                runner.eventRouter().addGlobalHandler(globalHandler);
+                if (!globalHandler.isEmpty()) {
+                    runner.eventRouter().addGlobalHandler(globalHandler);
+                }
             }
 
             return runner;
