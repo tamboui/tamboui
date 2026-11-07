@@ -185,6 +185,19 @@ class MarkdownViewTest {
         assertThat(row(buffer, 4)).contains("Then it was parked");
     }
 
+    @Test
+    @DisplayName("sizes table columns from their content")
+    void sizesTableColumnsFromContent() {
+        MarkdownView view = MarkdownView.builder()
+            .source("| Field | Value |\n|---|---|\n| Order ID | ORD-1003 |\n| Items | 1x TSHIRT, 1x CAP, 2x MUG |")
+            .build();
+        Buffer buffer = renderInto(view, 80, 4);
+
+        // the key column is as wide as "Order ID", not half of the width
+        assertThat(row(buffer, 1)).isEqualTo("Order ID ORD-1003");
+        assertThat(row(buffer, 2)).isEqualTo("Items    1x TSHIRT, 1x CAP, 2x MUG");
+    }
+
     private static String row(Buffer buffer, int y) {
         StringBuilder sb = new StringBuilder();
         for (int x = 0; x < buffer.width(); x++) {
