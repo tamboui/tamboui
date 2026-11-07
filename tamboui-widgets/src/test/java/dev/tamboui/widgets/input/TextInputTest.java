@@ -106,4 +106,32 @@ class TextInputTest {
         input.renderWithCursor(buffer2.area(), buffer2, state, null);
         assertThat(buffer2.get(2, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
     }
+
+    @Test
+    @DisplayName("TextInput horizontal scroll accounts for VS16 emoji sequences without drift")
+    void horizontalScrollWithVs16EmojiSequence() {
+        // "\u23FA\uFE0F" (⏺️ record button): 2 chars, display width 2.
+        // 3 record buttons = 6 chars, display width 6 columns.
+        TextInputState state = new TextInputState("\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F");
+        TextInput input = TextInput.builder().build();
+        // Viewport width 5: widthBeforeCursor = 6 >= 5, so scrollDisplayOffset = 6 - 5 + 1 = 2.
+        // The first emoji (width 2) scrolls off.
+        // The visible text has the remaining 2 emoji (width 4).
+        // The cursor should be placed at column 4 (inside 0..4).
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        input.renderWithCursor(area, buffer, state, null);
+
+        // First visible cell has the 2nd record button
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("\u23FA\uFE0F");
+        // Second visible cell is a continuation cell for the wide emoji
+        assertThat(buffer.get(1, 0).isContinuation()).isTrue();
+        // Third visible cell has the 3rd record button
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("\u23FA\uFE0F");
+        // Fourth visible cell is a continuation cell
+        assertThat(buffer.get(3, 0).isContinuation()).isTrue();
+        // Cursor cell is at column 4 (styled with REVERSED modifier)
+        assertThat(buffer.get(4, 0).style().effectiveModifiers()).contains(Modifier.REVERSED);
+    }
 }

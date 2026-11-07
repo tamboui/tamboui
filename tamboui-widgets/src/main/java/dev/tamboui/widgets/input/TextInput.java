@@ -16,6 +16,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
+import dev.tamboui.text.GraphemeClusters;
 import dev.tamboui.text.Masked;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
@@ -141,13 +142,7 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         }
 
         // Find the character index corresponding to scrollDisplayOffset
-        int scrollCharOffset = 0;
-        int widthCount = 0;
-        while (scrollCharOffset < displayText.length() && widthCount < scrollDisplayOffset) {
-            int cp = displayText.codePointAt(scrollCharOffset);
-            widthCount += CharWidth.of(cp);
-            scrollCharOffset += Character.charCount(cp);
-        }
+        int scrollCharOffset = calculateScrollCharOffset(displayText, scrollDisplayOffset);
 
         // Render visible text starting from scrollCharOffset
         String textFromScroll = displayText.substring(scrollCharOffset);
@@ -190,13 +185,16 @@ public final class TextInput implements StatefulWidget<TextInputState> {
         String displayText = maskChar != null ? new Masked(text, maskChar).value() : text;
 
         // Calculate display width of text before cursor
-        int widthBeforeCursor = CharWidth.of(displayBeforeCursor(text, displayText, cursorPos));
+        String beforeCursor = displayBeforeCursor(text, displayText, cursorPos);
+        int widthBeforeCursor = CharWidth.of(beforeCursor);
 
         // Calculate scroll offset in display columns
         int scrollDisplayOffset = widthBeforeCursor >= visibleWidth ? widthBeforeCursor - visibleWidth + 1 : 0;
+        int scrollCharOffset = calculateScrollCharOffset(displayText, scrollDisplayOffset);
 
-        // Cursor X position is the display width before cursor minus scroll offset
-        int cursorX = inputArea.left() + (widthBeforeCursor - scrollDisplayOffset);
+        // Cursor X position is the display width of visible text before cursor
+        int from = Math.min(scrollCharOffset, beforeCursor.length());
+        int cursorX = inputArea.left() + CharWidth.of(beforeCursor.substring(from));
         int cursorY = inputArea.top();
 
         // Render cursor as styled cell in buffer (avoids terminal cursor blink issues)
@@ -209,6 +207,17 @@ public final class TextInput implements StatefulWidget<TextInputState> {
                 frame.setCursorPosition(cursorX, cursorY);
             }
         }
+    }
+
+    private static int calculateScrollCharOffset(String displayText, int scrollDisplayOffset) {
+        int scrollCharOffset = 0;
+        int widthCount = 0;
+        while (scrollCharOffset < displayText.length() && widthCount < scrollDisplayOffset) {
+            int next = GraphemeClusters.clusterEnd(displayText, scrollCharOffset);
+            widthCount += CharWidth.of(displayText.substring(scrollCharOffset, next));
+            scrollCharOffset = next;
+        }
+        return scrollCharOffset;
     }
 
     /**
