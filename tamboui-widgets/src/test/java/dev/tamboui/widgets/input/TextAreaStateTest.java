@@ -409,6 +409,45 @@ class TextAreaStateTest {
         }
 
         @Test
+        @DisplayName("Move cursor up and down keeps the screen column across VS16 emoji")
+        void moveCursorUpDownKeepsScreenColumnAcrossVs16Emoji() {
+            // "\u23FA\uFE0F" (⏺️) is 2 UTF-16 chars but 2 display columns wide.
+            // "\u23FA\uFE0Fx" has display width 3 (2 for ⏺️ + 1 for x).
+            // Cursor at the end: char offset 3, screen column 3.
+            TextAreaState state = new TextAreaState("abcdef\n\u23FA\uFE0Fx");
+            state.moveCursorUp();
+
+            assertThat(state.cursorCol()).isEqualTo(3); // "abc|def"
+
+            state.moveCursorDown();
+
+            assertThat(state.cursorCol()).isEqualTo(3); // back after "x"
+        }
+
+        @Test
+        @DisplayName("ensureCursorVisible with VS16 emoji at the right edge scrolls past whole cluster")
+        void ensureCursorVisibleWithVs16EmojiAtRightEdge() {
+            // "\u23FA\uFE0F" (⏺️) is 2 display columns.
+            // "\u23FA\uFE0Fcd" has display width 4 (2 + 1 + 1).
+            TextAreaState state = new TextAreaState("\u23FA\uFE0Fcd");
+            // In a 3-column viewport, "\u23FA\uFE0Fcd" cannot fit.
+            // It must scroll horizontally past "\u23FA\uFE0F" (char offset 2), never splitting it (offset 1).
+            state.ensureCursorVisible(1, 3);
+            assertThat(state.scrollCol()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("ensureCursorVisible with repeated VS16 emoji scrolls on cluster boundaries")
+        void ensureCursorVisibleWithRepeatedVs16Emoji() {
+            // 3 record emojis: total char length 6, total display width 6.
+            TextAreaState state = new TextAreaState("\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F");
+            // In a 4-column viewport, cursor at offset 6 (at the end).
+            // Only the last emoji (width 2) can fit with the cursor.
+            state.ensureCursorVisible(1, 4);
+            assertThat(state.scrollCol()).isEqualTo(4);
+        }
+
+        @Test
         @DisplayName("Move to line start")
         void moveCursorToLineStart() {
             TextAreaState state = new TextAreaState("Hello");
