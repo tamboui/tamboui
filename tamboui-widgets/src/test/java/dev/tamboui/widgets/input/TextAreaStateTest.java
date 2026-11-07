@@ -514,6 +514,63 @@ class TextAreaStateTest {
 
             assertThat(state.scrollRow()).isEqualTo(1);
         }
+
+        @Test
+        @DisplayName("Ensure cursor visible horizontally scrolls past wide characters without splitting emoji presentation sequences")
+        void ensureCursorVisibleWithVs16EmojiAtRightEdge() {
+            // "\u23FA\uFE0F" (⏺️) is 2 display columns, 'x' is 1 column. Total display width = 3.
+            TextAreaState state = new TextAreaState("\u23FA\uFE0Fx");
+            state.moveCursorToEnd(); // cursorCol = 3
+
+            // In a 3-wide viewport, display width 3 places the caret at col 3 (off-screen);
+            // scrolling must advance past the 2-wide VS16 sequence without splitting it.
+            state.ensureCursorVisible(1, 3);
+
+            assertThat(state.scrollCol()).isEqualTo(2); // scrolled past "\u23FA\uFE0F"
+            int visibleWidth = CharWidth.of(state.getLine(0).substring(state.scrollCol(), state.cursorCol()));
+            assertThat(visibleWidth).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("Ensure cursor visible with a single VS16 emoji at the viewport boundary scrolls past it")
+        void ensureCursorVisibleWithSingleVs16Emoji() {
+            TextAreaState state = new TextAreaState("\u23FA\uFE0F");
+            state.moveCursorToEnd(); // cursorCol = 2
+
+            // Viewport width 2: caret at column 2 is at the right edge; must scroll to show caret at column 0.
+            state.ensureCursorVisible(1, 2);
+
+            assertThat(state.scrollCol()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("Ensure cursor visible with repeated VS16 emoji sequences never splits a sequence")
+        void ensureCursorVisibleWithRepeatedVs16Emoji() {
+            // 3 VS16 emojis = 6 columns total
+            TextAreaState state = new TextAreaState("\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F");
+            state.moveCursorToEnd(); // cursorCol = 6
+
+            // In a 4-wide viewport, caret at col 6 requires scrolling past the first 2 emojis (4 chars)
+            state.ensureCursorVisible(1, 4);
+
+            assertThat(state.scrollCol()).isEqualTo(4); // past first 2 emojis
+            int visibleWidth = CharWidth.of(state.getLine(0).substring(state.scrollCol(), state.cursorCol()));
+            assertThat(visibleWidth).isEqualTo(2); // only 1 emoji visible (2 cols < 4)
+        }
+
+        @Test
+        @DisplayName("Ensure cursor visible never splits a ZWJ sequence across horizontal scroll")
+        void ensureCursorVisibleWithZwjSequence() {
+            // "👨‍🦲" is 5 chars, 2 columns wide
+            TextAreaState state = new TextAreaState("👨‍🦲x");
+            state.moveCursorToEnd(); // cursorCol = 6
+
+            state.ensureCursorVisible(1, 3);
+
+            assertThat(state.scrollCol()).isEqualTo(5); // past entire ZWJ sequence
+            int visibleWidth = CharWidth.of(state.getLine(0).substring(state.scrollCol(), state.cursorCol()));
+            assertThat(visibleWidth).isEqualTo(1);
+        }
     }
 
     @Nested
@@ -580,6 +637,22 @@ class TextAreaStateTest {
                 .isEqualTo("世界");
             assertThat(state.getLine(0).substring(rows.get(1).startCol(), rows.get(1).endCol()))
                 .isEqualTo("你好");
+        }
+
+        @Test
+        @DisplayName("computeDisplayRows with WRAP_CHARACTER measures VS16 emoji sequences as 2-wide")
+        void computeDisplayRowsWrapCharacterVs16Emoji() {
+            // "\u23FA\uFE0F" (⏺️) is 2 display columns each; 3 emojis = 6 columns
+            TextAreaState state = new TextAreaState("\u23FA\uFE0F\u23FA\uFE0F\u23FA\uFE0F");
+
+            // 4-wide area: 2 emojis (4 cols) fit on row 0; 3rd wraps to row 1
+            List<TextAreaState.DisplayRow> rows = state.computeDisplayRows(4, Overflow.WRAP_CHARACTER);
+
+            assertThat(rows).hasSize(2);
+            assertThat(state.getLine(0).substring(rows.get(0).startCol(), rows.get(0).endCol()))
+                .isEqualTo("\u23FA\uFE0F\u23FA\uFE0F");
+            assertThat(state.getLine(0).substring(rows.get(1).startCol(), rows.get(1).endCol()))
+                .isEqualTo("\u23FA\uFE0F");
         }
 
         @Test
