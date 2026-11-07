@@ -96,55 +96,102 @@ Sleep 1s
 Type "q"
 ----
 
-Supported commands:
+Supported commands. The *From* column says whether a command matches
+https://github.com/charmbracelet/vhs[VHS] or is a {project-name} extension — a tape that uses only
+*VHS* commands also renders with the `vhs` tool, while the *TamboUI* commands (the mouse family) do
+not exist upstream.
 
-[cols="1,2"]
+[cols="2,3,1"]
 |===
-|Command |Meaning
+|Command |Meaning |From
 
 |`Type "text"`
 |Type a string (supports `\n`, `\t`, `\"`, `\\`, `\xNN` escapes)
+|VHS
 
 |`Type@<speed> "text"`
 |Type a string with a pause between the characters, e.g. `Type@50ms "hello"`
+|VHS
 
 |`Enter`, `Tab`, `Space`, `Backspace`, `Delete`, `Insert`, `Escape`
 |Named keys
+|VHS
 
 |`Up`, `Down`, `Left`, `Right`, `Home`, `End`, `PageUp`, `PageDown`
 |Navigation keys
+|VHS
 
 |`F1` ... `F12`
 |Function keys
+|VHS
 
 |`Ctrl+<key>`, `Shift+<key>`, `Alt+<key>`
 |Modifier combinations, also combined and on named and function keys (e.g. `Ctrl+C`, `Shift+F8`,
 `Ctrl+Up`, `Shift+Tab`, `Ctrl+Alt+a`)
+|VHS
 
 |`<Key> <count>`
 |Press a key several times, e.g. `Down 3`
-
-|`Sleep <duration>`
-|Pause, e.g. `Sleep 500ms` or `Sleep 2s`
-
-|`Wait /regex/`, `Wait+Line /regex/`
-|Wait until a line of the screen matches the regex (at most 15s); `Wait@10s /regex/` sets the timeout
-
-|`Wait+Screen /regex/`
-|Wait until the screen, its lines joined with newlines, matches the regex
-
-|`Hide`, `Show`
-|The interactions between them are played but left out of the recording, together with the time they take
-
-|`Screenshot`
-|Marks a frame of interest in the recording
-
-|`Source <file>`
-|Include another tape file
+|VHS
 
 |`<Key>@<delay> <count>`
 |Repeat with delay, e.g. `Down@100ms 5` presses Down five times, 100ms apart
+|VHS
+
+|`Sleep <duration>`
+|Pause, e.g. `Sleep 500ms` or `Sleep 2s`
+|VHS
+
+|`Wait /regex/`, `Wait+Line /regex/`
+|Wait until a line of the screen matches the regex (at most 15s); `Wait@10s /regex/` sets the timeout
+|VHS
+
+|`Wait+Screen /regex/`
+|Wait until the screen, its lines joined with newlines, matches the regex
+|VHS
+
+|`Hide`, `Show`
+|The interactions between them are played but left out of the recording, together with the time they take
+|VHS
+
+|`Screenshot`
+|Marks a frame of interest in the recording
+|VHS
+
+|`Source <file>`
+|Include another tape file
+|VHS
+
+|`ScrollUp [count]`, `ScrollDown [count]`
+|Scroll the wheel `count` times (default 1)
+|VHS
+
+|`ScrollUp [count] <x> <y>`, `ScrollDown [count] <x> <y>`, `ScrollLeft`, `ScrollRight`
+|Scroll at a given cell (VHS scrolls at the cursor only), and the left/right wheel directions
+|TamboUI
+
+|`Click <x> <y>`, `RightClick <x> <y>`, `MiddleClick <x> <y>`
+|Press and release a mouse button at a cell (0-based `<x> <y>`)
+|TamboUI
+
+|`MouseDown <x> <y>`, `MouseUp <x> <y>`
+|A separate left-button press or release, for full control
+|TamboUI
+
+|`MouseMove <x> <y>`
+|Move the pointer with no button held
+|TamboUI
+
+|`Drag <x1> <y1> <x2> <y2>`
+|Press at the first cell, move to the second, and release, drawing a continuous drag; `Drag@<delay>` sets the pause between steps
+|TamboUI
 |===
+
+The mouse commands are a {project-name} extension: upstream VHS has only `ScrollUp`/`ScrollDown` (at
+the cursor, no position). They are sent as a terminal sends them, the xterm way: SGR 1006 reports
+(`ESC [ < Cb ; Cx ; Cy M` for a press, motion or scroll and `… m` for a release). The application
+under test must enable mouse capture (and mouse motion for `MouseMove`) to receive them. Coordinates
+are terminal cells, matching the positions an app sees in a `MouseEvent`.
 
 `Set`, `Output` and `Require` directives are accepted (for compatibility with tapes shared with the
 `vhs` tool) but the recording geometry and output come from the `tamboui.record.*`

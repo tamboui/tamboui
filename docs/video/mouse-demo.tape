@@ -8,8 +8,31 @@ Sleep 3
 Show
 
 # Recording
-# Starts in a hands-free attract loop that traces a colour-cycling Lissajous curve: each button/scroll tile glows and
-# fades, and the stroke takes the colour of the last "click" and fades to black.
-Sleep 2s
+# Driven entirely by real scripted mouse events (the new tape mouse commands).
+# The first event hands control over from the demo's attract loop.
+Sleep 800ms
+
+# Right / middle presses glow their tiles
+RightClick 30 18
+Sleep 600ms
+MiddleClick 90 18
+Sleep 600ms
+
+# Move the pointer, then scroll over the canvas -> SCROLL tile
+MouseMove 60 22
+ScrollDown 3 60 22
+Sleep 400ms
+ScrollUp 2 60 22
+Sleep 600ms
+
+# A left click leaves a dot and sets the ink colour
+Click 20 30
+Sleep 600ms
+
+# Drag draws a stroke across the canvas
+Drag 15 32 105 14
+Sleep 120ms
 Screenshot screenshots/mouse-demo.svg
-Sleep 6s
+Sleep 800ms
+
+Type "q"

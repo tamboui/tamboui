@@ -167,21 +167,11 @@ final class InteractionPlayer {
                 continue;
             }
 
-            // Hide and Show keep playing the interactions in between, but leave them out of the recording
-            if (lower.equals("hide")) {
-                interactions.add(new Interaction.Visibility(true));
-                continue;
-            }
-            if (lower.equals("show")) {
-                interactions.add(new Interaction.Visibility(false));
-                continue;
-            }
-
-            parseVhsCommand(outputPath, line, interactions);
+            interactions.addAll(parseVhsCommand(outputPath, line));
         }
     }
 
-    private static void parseVhsCommand(Path outputPath, String line, List<Interaction> interactions) {
+    private static List<Interaction> parseVhsCommand(Path outputPath, String line) {
         // The command is the first word, and it may carry a timing suffix: Command@duration.
         // "Right@2.5s 3" presses Right 3 times with 2.5s between each, "Type@50ms "text"" types a character
         // every 50ms, and "Wait@10s /Ready/" waits at most 10s. Only the first word is checked for '@', so
@@ -198,29 +188,56 @@ final class InteractionPlayer {
         String command = head.toLowerCase(Locale.ROOT);
 
         switch (command) {
+            // Hide and Show keep playing the interactions in between, but leave them out of the recording
+            case "hide":
+                return one(new Interaction.Visibility(true));
+            case "show":
+                return one(new Interaction.Visibility(false));
             case "sleep":
-                interactions.add(new Interaction.Wait(parseDuration(args)));
-                break;
+                return one(new Interaction.Wait(parseDuration(args)));
             case "screenshot":
                 // Resolve screenshot path relative to the .cast file's directory (same folder)
-                interactions.add(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
-                break;
+                return one(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
             case "type":
-                addTypedText(parseQuotedString(args), delayMs, interactions);
-                break;
+                return typedText(parseQuotedString(args), delayMs);
             case "wait":
             case "wait+line":
             case "wait+screen":
-                addWaitFor(line, "wait+screen".equals(command), args, delayMs, interactions);
-                break;
+                return waitFor(line, "wait+screen".equals(command), args, delayMs);
+            case "click":
+                return click(line, args, 0);
+            case "rightclick":
+                return click(line, args, 2);
+            case "middleclick":
+                return click(line, args, 1);
+            case "mousedown":
+                return button(line, args, 0, false);
+            case "mouseup":
+                return button(line, args, 0, true);
+            case "mousemove":
+                return move(line, args);
+            case "drag":
+                return drag(line, args, delayMs);
+            case "scrollup":
+                return scroll(line, args, 64);
+            case "scrolldown":
+                return scroll(line, args, 65);
+            case "scrollleft":
+                return scroll(line, args, 66);
+            case "scrollright":
+                return scroll(line, args, 67);
             default:
                 if (isKey(head)) {
-                    addRepeatedKey(command, parseRepeatCount(line, args), delayMs, interactions);
-                } else {
-                    warn("Ignoring unknown tape command: " + line);
+                    return repeatedKey(command, parseRepeatCount(line, args), delayMs);
                 }
-                break;
+                warn("Ignoring unknown tape command: " + line);
+                return Collections.emptyList();
         }
+    }
+
+    /** A single interaction as a list, for the command cases that produce exactly one. */
+    private static List<Interaction> one(Interaction interaction) {
+        return Collections.singletonList(interaction);
     }
 
     /**
@@ -255,26 +272,28 @@ final class InteractionPlayer {
         }
     }
 
-    private static void addTypedText(String text, int delayMs, List<Interaction> interactions) {
+    private static List<Interaction> typedText(String text, int delayMs) {
+        List<Interaction> interactions = new ArrayList<>(text.length());
         for (int i = 0; i < text.length(); i++) {
             if (i > 0 && delayMs > 0) {
                 interactions.add(new Interaction.Wait(delayMs));
             }
             interactions.add(new Interaction.KeyPress(String.valueOf(text.charAt(i))));
         }
+        return interactions;
     }
 
-    private static void addWaitFor(String line, boolean screen, String args, int timeoutMs,
-                                   List<Interaction> interactions) {
+    private static List<Interaction> waitFor(String line, boolean screen, String args, int timeoutMs) {
         if (args.length() < 2 || !args.startsWith("/") || !args.endsWith("/")) {
             warn("Ignoring Wait without a /regex/ to wait for: " + line);
-            return;
+            return Collections.emptyList();
         }
         try {
             Pattern pattern = Pattern.compile(args.substring(1, args.length() - 1));
-            interactions.add(new Interaction.WaitFor(pattern, screen, timeoutMs > 0 ? timeoutMs : DEFAULT_WAIT_TIMEOUT_MS));
+            return one(new Interaction.WaitFor(pattern, screen, timeoutMs > 0 ? timeoutMs : DEFAULT_WAIT_TIMEOUT_MS));
         } catch (PatternSyntaxException e) {
             warn("Ignoring Wait with an invalid regex: " + line + " (" + e.getDescription() + ")");
+            return Collections.emptyList();
         }
     }
 
@@ -282,13 +301,120 @@ final class InteractionPlayer {
         System.err.println("Warning: " + message);
     }
 
-    private static void addRepeatedKey(String key, int count, int delayMs, List<Interaction> interactions) {
+    /** Parses the whitespace-separated integers of a mouse command, or {@code null} if any is not an integer. */
+    private static int[] parseInts(String args) {
+        if (args.isEmpty()) {
+            return new int[0];
+        }
+        String[] tokens = args.trim().split("\\s+");
+        int[] values = new int[tokens.length];
+        for (int i = 0; i < tokens.length; i++) {
+            try {
+                values[i] = Integer.parseInt(tokens[i]);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return values;
+    }
+
+    private static List<Interaction> click(String line, String args, int button) {
+        int[] c = coords(args, 2, line, "click");
+        if (c == null) {
+            return Collections.emptyList();
+        }
+        return one(new Interaction.Mouse(Arrays.asList(
+                new Interaction.Mouse.Step(button, false, c[0], c[1]),
+                new Interaction.Mouse.Step(button, true, c[0], c[1]))));
+    }
+
+    private static List<Interaction> button(String line, String args, int button, boolean release) {
+        int[] c = coords(args, 2, line, "mouse button");
+        if (c == null) {
+            return Collections.emptyList();
+        }
+        return mouse(new Interaction.Mouse.Step(button, release, c[0], c[1]));
+    }
+
+    private static List<Interaction> move(String line, String args) {
+        int[] c = coords(args, 2, line, "MouseMove");
+        if (c == null) {
+            return Collections.emptyList();
+        }
+        // Motion with no button held: button bits 3 (none) plus the motion bit 32.
+        return mouse(new Interaction.Mouse.Step(35, false, c[0], c[1]));
+    }
+
+    private static List<Interaction> drag(String line, String args, int delayMs) {
+        int[] c = coords(args, 4, line, "Drag");
+        if (c == null) {
+            return Collections.emptyList();
+        }
+        int x1 = c[0];
+        int y1 = c[1];
+        int x2 = c[2];
+        int y2 = c[3];
+        int stepDelay = delayMs > 0 ? delayMs : 30;
+        // Left press, interpolated drag-motion steps, then left release. The left-drag button code is
+        // 0 (left) plus the motion bit 32.
+        List<Interaction> interactions = new ArrayList<>();
+        interactions.add(mouseStep(new Interaction.Mouse.Step(0, false, x1, y1)));
+        int stepCount = Math.max(1, Math.min(60, Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1))));
+        for (int k = 1; k <= stepCount; k++) {
+            int x = x1 + (x2 - x1) * k / stepCount;
+            int y = y1 + (y2 - y1) * k / stepCount;
+            interactions.add(new Interaction.Wait(stepDelay));
+            interactions.add(mouseStep(new Interaction.Mouse.Step(32, false, x, y)));
+        }
+        interactions.add(mouseStep(new Interaction.Mouse.Step(0, true, x2, y2)));
+        return interactions;
+    }
+
+    private static List<Interaction> scroll(String line, String args, int buttonCode) {
+        int[] c = parseInts(args);
+        if (c == null || c.length > 3) {
+            warn("Ignoring scroll with " + (c == null ? "non-integer arguments" : "too many arguments") + ": " + line);
+            return Collections.emptyList();
+        }
+        // Forms: (none) | <count> | <x> <y> | <count> <x> <y>; -1 means the screen centre at play time.
+        int count = c.length == 1 || c.length == 3 ? Math.max(1, c[0]) : 1;
+        int x = c.length == 2 ? c[0] : c.length == 3 ? c[1] : -1;
+        int y = c.length == 2 ? c[1] : c.length == 3 ? c[2] : -1;
+        List<Interaction.Mouse.Step> steps = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            steps.add(new Interaction.Mouse.Step(buttonCode, false, x, y));
+        }
+        return one(new Interaction.Mouse(steps));
+    }
+
+    /** Parses exactly {@code expected} integer coordinates, warning and returning {@code null} otherwise. */
+    private static int[] coords(String args, int expected, String line, String what) {
+        int[] c = parseInts(args);
+        if (c == null || c.length != expected) {
+            warn("Ignoring " + what + " without exactly " + expected + " integer coordinates: " + line);
+            return null;
+        }
+        return c;
+    }
+
+    /** A single mouse report as a one-interaction list. */
+    private static List<Interaction> mouse(Interaction.Mouse.Step step) {
+        return one(mouseStep(step));
+    }
+
+    private static Interaction.Mouse mouseStep(Interaction.Mouse.Step step) {
+        return new Interaction.Mouse(Collections.singletonList(step));
+    }
+
+    private static List<Interaction> repeatedKey(String key, int count, int delayMs) {
+        List<Interaction> interactions = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             if (i > 0 && delayMs > 0) {
                 interactions.add(new Interaction.Wait(delayMs));
             }
             interactions.add(new Interaction.KeyPress(key));
         }
+        return interactions;
     }
 
     private static int parseDuration(String duration) {
@@ -473,6 +599,11 @@ final class InteractionPlayer {
             } else if (interaction instanceof Interaction.KeyPress) {
                 Interaction.KeyPress keyPress = (Interaction.KeyPress) interaction;
                 enqueueKey(keyPress.key());
+                if (!pendingBytes.isEmpty()) {
+                    return pendingBytes.poll();
+                }
+            } else if (interaction instanceof Interaction.Mouse) {
+                enqueueMouse(((Interaction.Mouse) interaction).steps());
                 if (!pendingBytes.isEmpty()) {
                     return pendingBytes.poll();
                 }
@@ -702,5 +833,41 @@ final class InteractionPlayer {
             pendingBytes.add(ESC);
         }
         pendingBytes.add(code);
+    }
+
+    /**
+     * Queues the SGR 1006 mouse report for each step: {@code ESC [ < Cb ; Cx ; Cy M} for a press, motion or
+     * scroll and {@code ESC [ < Cb ; Cx ; Cy m} for a release. Coordinates are 1-based on the wire, as a
+     * terminal sends them; a step position of {@code -1} is resolved to the centre of the current screen.
+     */
+    private void enqueueMouse(List<Interaction.Mouse.Step> steps) {
+        for (Interaction.Mouse.Step step : steps) {
+            int x = step.x();
+            int y = step.y();
+            if (x < 0 || y < 0) {
+                int[] centre = screenCentre();
+                x = centre[0];
+                y = centre[1];
+            }
+            pendingBytes.add(ESC);
+            pendingBytes.add((int) '[');
+            pendingBytes.add((int) '<');
+            addDigits(step.buttonCode());
+            pendingBytes.add((int) ';');
+            addDigits(x + 1);
+            pendingBytes.add((int) ';');
+            addDigits(y + 1);
+            pendingBytes.add((int) (step.release() ? 'm' : 'M'));
+        }
+    }
+
+    /** The centre cell of the current screen, or {@code (0, 0)} when there is no screen yet. */
+    private int[] screenCentre() {
+        Buffer current = screen();
+        if (current == null) {
+            return new int[] {0, 0};
+        }
+        Rect area = current.area();
+        return new int[] {area.left() + area.width() / 2, area.top() + area.height() / 2};
     }
 }
