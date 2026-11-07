@@ -6,225 +6,373 @@
  */
 package dev.tamboui.demo;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.time.Duration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Constraint;
+import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.Style;
 import dev.tamboui.toolkit.app.ToolkitApp;
 import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.event.DragHandler;
 import dev.tamboui.toolkit.event.EventResult;
+import dev.tamboui.tui.RenderClock;
 import dev.tamboui.tui.TuiConfig;
+import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseButton;
 import dev.tamboui.tui.event.MouseEvent;
+import dev.tamboui.widget.Widget;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 
 /**
- * Demonstrates toolkit mouse routing for every interaction the {@code EventRouter} delivers:
- * button presses (left/middle/right), scroll wheel, pointer motion, and drag.
- * <p>
- * The <b>Click / Scroll</b> panel uses {@code onMouseEvent()} and reports presses, scroll, and the
- * live pointer position. The <b>Drag</b> panel uses {@code onDrag()} and reports drag start, the
- * running delta, and release.
+ * Demonstrates toolkit mouse routing. Drag on the canvas to draw; each button and the scroll wheel
+ * light their tile, whose background glows by activity and fades back to black when you stop.
  * <p>
  * Right and middle presses reach the handler thanks to #621/#622; before that fix only left did.
- * On a Mac trackpad: left = tap, right = two-finger tap, scroll = two-finger slide, drag = press
- * and move. Middle usually needs a three-button mouse or a helper such as MiddleClick.
+ * On a Mac trackpad: left = tap, right = two-finger tap, scroll = two-finger slide, draw = drag.
+ * Middle usually needs a three-button mouse or a helper such as MiddleClick. Press {@code c} to
+ * clear the canvas.
  */
 public class MouseDemo extends ToolkitApp {
 
-    private static final int LOG_SIZE = 10;
+    private static final double FADE_SECONDS = 1.2;
 
-    private final Deque<String> log = new ArrayDeque<>();
-    private int leftCount;
-    private int middleCount;
-    private int rightCount;
-    private int scrollUpCount;
-    private int scrollDownCount;
-    private int pointerX = -1;
-    private int pointerY = -1;
-    private boolean dragging;
-    private int dragDx;
-    private int dragDy;
-    private MouseButton lastButton = MouseButton.NONE;
+    private final RenderClock clock = new RenderClock();
+    private final PaintWidget canvas = new PaintWidget();
+
+    private final Tile left = new Tile("LEFT", 0, 255, 0);
+    private final Tile middle = new Tile("MIDDLE", 255, 255, 0);
+    private final Tile right = new Tile("RIGHT", 255, 0, 255);
+    private final Tile scroll = new Tile("SCROLL", 0, 200, 255);
+
+    // Ink the next stroke uses: the colour of the last thing clicked/scrolled before the drag
+    // (defaults to the LEFT colour).
+    private int inkR = 0;
+    private int inkG = 255;
+    private int inkB = 0;
+
+    private final boolean auto;
+    private double autoTime;
+    private double autoLastSwitch = -1.0;
+    private int autoColor;
+    private int autoPrevX = Integer.MIN_VALUE;
+    private int autoPrevY = Integer.MIN_VALUE;
+
+    private MouseDemo(boolean auto) {
+        this.auto = auto;
+    }
 
     /**
-     * Demo entry point.
+     * Demo entry point. Pass {@code --auto} for a hands-free attract loop (used by the demo reel).
      *
      * @param args the CLI arguments
      * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        new MouseDemo().run();
+        boolean auto = args.length > 0 && "--auto".equals(args[0]);
+        new MouseDemo(auto).run();
     }
 
     @Override
     protected TuiConfig configure() {
-        return TuiConfig.builder().mouseCapture(true).mouseMotion(true).build();
+        return TuiConfig.builder()
+            .mouseCapture(true)
+            .mouseMotion(true)
+            .tickRate(Duration.ofMillis(50))
+            .build();
     }
 
     @Override
     protected Element render() {
+        double dt = clock.tick().toNanos() / 1_000_000_000.0;
+        left.decay(dt);
+        middle.decay(dt);
+        right.decay(dt);
+        scroll.decay(dt);
+        canvas.decay(dt);
+        if (auto) {
+            drive(dt);
+        }
+
         return column(
-            panel(text(" Mouse Demo - press, scroll, move and drag ").bold().cyan())
+            panel(text(" Mouse Demo - drag to draw; buttons & scroll glow and fade ").bold().cyan())
                 .rounded().borderColor(Color.CYAN).length(3),
 
-            row(
-                counterTile("LEFT", leftCount, Color.GREEN, lastButton == MouseButton.LEFT),
-                counterTile("MIDDLE", middleCount, Color.YELLOW, lastButton == MouseButton.MIDDLE),
-                counterTile("RIGHT", rightCount, Color.MAGENTA, lastButton == MouseButton.RIGHT),
-                counterTile("SCROLL", scrollUpCount + scrollDownCount, Color.CYAN, false)
-            ).length(5),
+            row(left.render(), middle.render(), right.render(), scroll.render()).length(5),
 
-            row(
-                panel(
-                    column(
-                        text(""),
-                        text("Click (any button) or scroll here").bold().centered(),
-                        text(pointer()).dim().centered(),
-                        text("scroll  up " + scrollUpCount + "  /  down " + scrollDownCount).dim().centered()
-                    )
-                )
-                .title("Click / Scroll")
+            panel(widget(canvas))
+                .title("Canvas - drag to draw  (c: clear)")
                 .rounded()
-                .borderColor(colorFor(lastButton))
-                .id("click-target")
+                .borderColor(canvas.empty() ? Color.DARK_GRAY : Color.CYAN)
+                .id("canvas")
                 .focusable()
+                .onKeyEvent(this::handleKey)
                 .onMouseEvent(this::handleMouse)
-                .constraint(Constraint.percentage(50)),
-
-                panel(
-                    column(
-                        text(""),
-                        text(dragging ? "Dragging..." : "Press and drag here").bold().centered(),
-                        text("delta (" + dragDx + ", " + dragDy + ")").dim().centered()
-                    )
-                )
-                .title("Drag")
-                .rounded()
-                .borderColor(dragging ? Color.BLUE : Color.DARK_GRAY)
-                .id("drag-target")
-                .onDrag(new DragReadout())
-                .constraint(Constraint.percentage(50))
-            ).length(6),
-
-            panel(eventLog())
-                .title("Recent events")
-                .rounded()
-                .borderColor(Color.DARK_GRAY)
+                .onDrag(new PaintDrag())
                 .fill(),
 
-            panel(text(" Click / scroll / drag the panels | q: Quit ").dim())
+            panel(text(" Drag: draw | Click/scroll: glow a tile | c: clear | q: Quit ").dim())
                 .rounded().borderColor(Color.DARK_GRAY).length(3)
         );
     }
 
-    private String pointer() {
-        return pointerX < 0 ? "pointer: (move over me)" : "pointer @ (" + pointerX + ", " + pointerY + ")";
-    }
-
-    private Element counterTile(String name, int count, Color color, boolean active) {
-        return panel(
-            column(
-                text(name).bold().fg(active ? Color.BLACK : color).centered(),
-                text(Integer.toString(count)).bold().centered()
-            )
-        )
-        .rounded()
-        .borderColor(color)
-        .constraint(Constraint.percentage(25));
-    }
-
-    private Element eventLog() {
-        if (log.isEmpty()) {
-            return text("No events yet - press, scroll, or drag a panel above.").dim();
+    /**
+     * Hands-free attract loop for the demo reel: cycles the ink colour (flashing the matching tile,
+     * as if it were clicked) and traces a Lissajous curve across the canvas so the strokes draw and
+     * fade on their own.
+     */
+    private void drive(double dt) {
+        autoTime += dt;
+        if (autoLastSwitch < 0 || autoTime - autoLastSwitch > 1.6) {
+            autoLastSwitch = autoTime;
+            autoColor = (autoColor + 1) % 4;
+            switch (autoColor) {
+                case 0:
+                    left.flash();
+                    setInk(0, 255, 0);
+                    break;
+                case 1:
+                    middle.flash();
+                    setInk(255, 255, 0);
+                    break;
+                case 2:
+                    right.flash();
+                    setInk(255, 0, 255);
+                    break;
+                default:
+                    scroll.flash();
+                    setInk(0, 200, 255);
+                    break;
+            }
         }
-        Element[] lines = log.stream().map(line -> (Element) text(line)).toArray(Element[]::new);
-        return column(lines);
+        Rect a = canvas.area();
+        if (a == null || a.width() < 4 || a.height() < 3) {
+            return;
+        }
+        int cx = a.left() + a.width() / 2;
+        int cy = a.top() + a.height() / 2;
+        int rx = a.width() / 2 - 2;
+        int ry = a.height() / 2 - 1;
+        double t = autoTime * 0.8;
+        int x = cx + (int) Math.round(rx * Math.sin(3 * t));
+        int y = cy + (int) Math.round(ry * Math.sin(2 * t + Math.PI / 2));
+        if (autoPrevX != Integer.MIN_VALUE) {
+            canvas.paintLineAbsolute(autoPrevX, autoPrevY, x, y, inkR, inkG, inkB);
+        } else {
+            canvas.paintAbsolute(x, y, inkR, inkG, inkB);
+        }
+        autoPrevX = x;
+        autoPrevY = y;
+    }
+
+    private EventResult handleKey(KeyEvent event) {
+        if (event.isChar('c')) {
+            canvas.clear();
+            return EventResult.HANDLED;
+        }
+        return EventResult.UNHANDLED;
     }
 
     private EventResult handleMouse(MouseEvent event) {
         switch (event.kind()) {
             case PRESS:
-                return handlePress(event);
+                if (event.button() == MouseButton.MIDDLE) {
+                    middle.flash();
+                    setInk(255, 255, 0);
+                    return EventResult.HANDLED;
+                }
+                if (event.button() == MouseButton.RIGHT) {
+                    right.flash();
+                    setInk(255, 0, 255);
+                    return EventResult.HANDLED;
+                }
+                return EventResult.UNHANDLED;
             case SCROLL_UP:
-                scrollUpCount++;
-                record("SCROLL_UP @ (" + event.x() + ", " + event.y() + ")");
-                return EventResult.HANDLED;
             case SCROLL_DOWN:
-                scrollDownCount++;
-                record("SCROLL_DOWN @ (" + event.x() + ", " + event.y() + ")");
-                return EventResult.HANDLED;
-            case MOVE:
-                pointerX = event.x();
-                pointerY = event.y();
+                scroll.flash();
+                setInk(0, 200, 255);
                 return EventResult.HANDLED;
             default:
                 return EventResult.UNHANDLED;
         }
     }
 
-    private EventResult handlePress(MouseEvent event) {
-        MouseButton button = event.button();
-        switch (button) {
-            case LEFT:
-                leftCount++;
-                break;
-            case MIDDLE:
-                middleCount++;
-                break;
-            case RIGHT:
-                rightCount++;
-                break;
-            default:
-                return EventResult.UNHANDLED;
-        }
-        lastButton = button;
-        record(button + " press @ (" + event.x() + ", " + event.y() + ")");
-        return EventResult.HANDLED;
+    private void setInk(int r, int g, int b) {
+        inkR = r;
+        inkG = g;
+        inkB = b;
     }
 
-    private void record(String line) {
-        log.addFirst(line);
-        while (log.size() > LOG_SIZE) {
-            log.removeLast();
+    /**
+     * A button tile whose background glows on activity and fades to black over {@link #FADE_SECONDS}.
+     */
+    private static final class Tile {
+        private final String name;
+        private final int r;
+        private final int g;
+        private final int b;
+        private int count;
+        private double intensity;
+
+        Tile(String name, int r, int g, int b) {
+            this.name = name;
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+
+        void flash() {
+            intensity = 1.0;
+            count++;
+        }
+
+        void decay(double seconds) {
+            intensity = Math.max(0.0, intensity - seconds / FADE_SECONDS);
+        }
+
+        Element render() {
+            Color bg = Color.rgb((int) (r * intensity), (int) (g * intensity), (int) (b * intensity));
+            Color fg = intensity > 0.5 ? Color.BLACK : Color.rgb(r, g, b);
+            return panel(
+                column(
+                    text(name).bold().fg(fg).centered(),
+                    text(Integer.toString(count)).bold().fg(fg).centered()
+                )
+            )
+            .bg(bg)
+            .rounded()
+            .borderColor(Color.rgb(r, g, b))
+            .constraint(Constraint.percentage(25));
         }
     }
 
-    private Color colorFor(MouseButton button) {
-        switch (button) {
-            case LEFT:
-                return Color.GREEN;
-            case MIDDLE:
-                return Color.YELLOW;
-            case RIGHT:
-                return Color.MAGENTA;
-            default:
-                return Color.WHITE;
+    /**
+     * A widget that paints the cells it is told to, recording its current area so drag coordinates
+     * (which are absolute) can be clipped to the drawing surface. Each painted cell glows at full
+     * intensity and fades to black over {@link #DRAW_FADE_SECONDS}.
+     */
+    private static final class PaintWidget implements Widget {
+        private static final double DRAW_FADE_SECONDS = 3.0;
+
+        private final Map<Long, Ink> cells = new ConcurrentHashMap<>();
+        private Rect area;
+
+        @Override
+        public void render(Rect renderArea, Buffer buffer) {
+            this.area = renderArea;
+            for (Map.Entry<Long, Ink> entry : cells.entrySet()) {
+                long key = entry.getKey();
+                Ink ink = entry.getValue();
+                int x = (int) (key >> 32);
+                int y = (int) (key & 0xFFFFFFFFL);
+                if (renderArea.contains(x, y)) {
+                    Color color = Color.rgb(
+                        (int) (ink.r * ink.intensity),
+                        (int) (ink.g * ink.intensity),
+                        (int) (ink.b * ink.intensity));
+                    buffer.setString(x, y, "\u2588", Style.EMPTY.fg(color));
+                }
+            }
+        }
+
+        void decay(double seconds) {
+            double step = seconds / DRAW_FADE_SECONDS;
+            Iterator<Map.Entry<Long, Ink>> it = cells.entrySet().iterator();
+            while (it.hasNext()) {
+                Ink ink = it.next().getValue();
+                ink.intensity -= step;
+                if (ink.intensity <= 0.0) {
+                    it.remove();
+                }
+            }
+        }
+
+        void paintAbsolute(int x, int y, int r, int g, int b) {
+            if (area != null && area.contains(x, y)) {
+                cells.put(((long) x << 32) | (y & 0xFFFFFFFFL), new Ink(r, g, b));
+            }
+        }
+
+        /** Paints a straight line between two absolute points so a fast drag draws a continuous stroke. */
+        void paintLineAbsolute(int x0, int y0, int x1, int y1, int r, int g, int b) {
+            int dx = Math.abs(x1 - x0);
+            int dy = -Math.abs(y1 - y0);
+            int sx = x0 < x1 ? 1 : -1;
+            int sy = y0 < y1 ? 1 : -1;
+            int err = dx + dy;
+            int x = x0;
+            int y = y0;
+            while (true) {
+                paintAbsolute(x, y, r, g, b);
+                if (x == x1 && y == y1) {
+                    break;
+                }
+                int e2 = 2 * err;
+                if (e2 >= dy) {
+                    err += dy;
+                    x += sx;
+                }
+                if (e2 <= dx) {
+                    err += dx;
+                    y += sy;
+                }
+            }
+        }
+
+        /** A painted cell: its base colour and its current fade intensity. */
+        private static final class Ink {
+            private final int r;
+            private final int g;
+            private final int b;
+            private double intensity = 1.0;
+
+            Ink(int r, int g, int b) {
+                this.r = r;
+                this.g = g;
+                this.b = b;
+            }
+        }
+
+        void clear() {
+            cells.clear();
+        }
+
+        boolean empty() {
+            return cells.isEmpty();
+        }
+
+        Rect area() {
+            return area;
         }
     }
 
-    private final class DragReadout implements DragHandler {
+    private final class PaintDrag implements DragHandler {
+        private int lastX;
+        private int lastY;
+
         @Override
         public void onDragStart(int startX, int startY) {
-            dragging = true;
-            dragDx = 0;
-            dragDy = 0;
-            record("DRAG start @ (" + startX + ", " + startY + ")");
+            left.flash();
+            lastX = startX;
+            lastY = startY;
+            canvas.paintAbsolute(startX, startY, inkR, inkG, inkB);
         }
 
         @Override
         public void onDrag(int currentX, int currentY, int deltaX, int deltaY) {
-            dragDx = deltaX;
-            dragDy = deltaY;
+            canvas.paintLineAbsolute(lastX, lastY, currentX, currentY, inkR, inkG, inkB);
+            lastX = currentX;
+            lastY = currentY;
         }
 
         @Override
         public void onDragEnd(int endX, int endY) {
-            dragging = false;
-            record("DRAG end @ (" + endX + ", " + endY + "), delta (" + dragDx + ", " + dragDy + ")");
+            canvas.paintLineAbsolute(lastX, lastY, endX, endY, inkR, inkG, inkB);
         }
     }
 }
