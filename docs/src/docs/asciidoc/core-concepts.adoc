@@ -222,6 +222,22 @@ A `Span` is a styled piece of text:
 include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=span-basics,indent=0]
 ----
 
+=== Text with ANSI Escape Sequences
+
+Log lines and the output of commands often color their text with ANSI escape sequences.
+`Text.fromAnsi` and `Line.fromAnsi` turn such text into spans with the colors and attributes it sets:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/CoreConceptsSnippets.java[tag=ansi-text,indent=0]
+----
+
+The SGR attributes (bold, dim, italic, underline, blink, reverse, hidden and strikethrough) become modifiers, and
+the colors become a `Color`: the 16 ANSI colors with `Color.ansi`, 256-color indexes with `Color.indexed` and RGB
+with `Color.rgb`. A reset goes back to no style, so the text takes the style of the widget it is shown in.
+All other escape sequences, carriage returns and control characters are dropped, and a tab becomes spaces up to the
+next multiple of 8 columns. `rawContent()` gives the text without escape sequences.
+
 == Widget Interfaces
 
 === Widget (Stateless)
