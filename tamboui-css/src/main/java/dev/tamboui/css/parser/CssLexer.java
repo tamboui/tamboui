@@ -155,6 +155,7 @@ public final class CssLexer {
             case '^':
             case '$':
             case '~':
+            case '/':
                 return new Token.Delim(c, startPos);
             default:
                 throw new CssParseException("Unexpected character: " + c, startPos);

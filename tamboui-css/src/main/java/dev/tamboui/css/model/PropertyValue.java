@@ -6,6 +6,8 @@ package dev.tamboui.css.model;
 
 import java.util.Objects;
 
+import dev.tamboui.css.parser.Token;
+
 /**
  * Represents a CSS property value as parsed from the stylesheet.
  * <p>
@@ -21,16 +23,29 @@ public final class PropertyValue {
 
     private final String raw;
     private final boolean important;
+    private final Token.Position position;
 
     /**
-     * Creates a property value.
+     * Creates a property value with unknown source position.
      *
      * @param raw       the raw value string
      * @param important whether the value has !important
      */
     public PropertyValue(String raw, boolean important) {
-        this.raw = Objects.requireNonNull(raw);
+        this(raw, important, Token.Position.UNKNOWN);
+    }
+
+    /**
+     * Creates a property value with source position.
+     *
+     * @param raw       the raw value string
+     * @param important whether the value has !important
+     * @param position  the position in the source
+     */
+    public PropertyValue(String raw, boolean important, Token.Position position) {
+        this.raw = Objects.requireNonNull(raw, "raw value cannot be null");
         this.important = important;
+        this.position = position != null ? position : Token.Position.UNKNOWN;
     }
 
     /**
@@ -44,6 +59,17 @@ public final class PropertyValue {
     }
 
     /**
+     * Creates a regular (non-important) property value with source position.
+     *
+     * @param raw      the raw value string
+     * @param position the position in the source
+     * @return the property value
+     */
+    public static PropertyValue of(String raw, Token.Position position) {
+        return new PropertyValue(raw, false, position);
+    }
+
+    /**
      * Creates an important (!important) property value.
      *
      * @param raw the raw value string
@@ -51,6 +77,26 @@ public final class PropertyValue {
      */
     public static PropertyValue important(String raw) {
         return new PropertyValue(raw, true);
+    }
+
+    /**
+     * Creates an important (!important) property value with source position.
+     *
+     * @param raw      the raw value string
+     * @param position the position in the source
+     * @return the property value
+     */
+    public static PropertyValue important(String raw, Token.Position position) {
+        return new PropertyValue(raw, true, position);
+    }
+
+    /**
+     * Returns the position in the source where this declaration appeared.
+     *
+     * @return the source position
+     */
+    public Token.Position position() {
+        return position;
     }
 
     /**

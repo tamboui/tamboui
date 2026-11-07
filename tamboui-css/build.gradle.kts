@@ -8,4 +8,7 @@ dependencies {
     api(projects.tambouiCore)
     api(projects.tambouiWidgets)
     testImplementation(testFixtures(projects.tambouiCore))
+
+    compileOnly(libs.jfr.polyfill)
 }
+

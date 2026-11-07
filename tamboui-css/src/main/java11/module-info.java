@@ -7,10 +7,12 @@
 module dev.tamboui.css {
     requires transitive dev.tamboui.core;
     requires transitive dev.tamboui.widgets;
+    requires jdk.jfr;
 
     exports dev.tamboui.css;
     exports dev.tamboui.css.cascade;
     exports dev.tamboui.css.engine;
+    exports dev.tamboui.css.jfr;
     exports dev.tamboui.css.model;
     exports dev.tamboui.css.parser;
     exports dev.tamboui.css.property;
