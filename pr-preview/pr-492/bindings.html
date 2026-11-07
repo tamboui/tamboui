@@ -64,7 +64,12 @@
 </li>
 </ul>
 </li>
-<li><a href="#loading-bindings-from-files">Loading Bindings from Files</a></li>
+<li><a href="#loading-bindings-from-files">Loading Bindings from Files</a>
+<ul class="sectlevel2">
+<li><a href="#per-action-overwrite-how-a-file-layers">Per-action overwrite (how a file layers)</a></li>
+<li><a href="#per-os-overlay-which-files-are-loaded">Per-OS overlay (which files are loaded)</a></li>
+</ul>
+</li>
 <li><a href="#standard-actions">Standard Actions</a></li>
 <li><a href="#next-steps">Next Steps</a></li>
 </ul>
@@ -595,9 +600,62 @@ contextMenu = Mouse.Right.Press</code></pre>
 Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixes.</p>
 </div>
 <div class="paragraph">
-<p>A file starts from the standard bindings.
-An action listed in the file gets exactly the triggers listed for it, so <code>quit = Ctrl+c</code> removes <code>q</code> and <code>Q</code>.
-Actions the file does not list keep their standard triggers.</p>
+<p>Two independent rules govern how a set is assembled: <strong>how</strong> a file composes onto the one below it,
+and <strong>which</strong> files are loaded.</p>
+</div>
+<div class="sect2">
+<h3 id="per-action-overwrite-how-a-file-layers"><a class="anchor" href="#per-action-overwrite-how-a-file-layers"></a><a class="link" href="#per-action-overwrite-how-a-file-layers">Per-action overwrite (how a file layers)</a></h3>
+<div class="paragraph">
+<p>Every properties source is layered on top of a base (a built-in set, or the standard bindings for a
+user file), and layering is <strong>per action, replace</strong> — not additive:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An action the file <strong>lists</strong> gets exactly the triggers listed for it, replacing the base triggers of
+that action. So <code>quit = Ctrl+c</code> makes quit <code>Ctrl+c</code> only, removing the standard <code>q</code> and <code>Q</code>.</p>
+</li>
+<li>
+<p>An action the file <strong>does not list</strong> keeps its base triggers unchanged.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An action can still have <strong>several</strong> triggers — list them comma-separated. Replace is per action, not
+per key: <code>quit = Ctrl+c, q, Q</code> keeps all three, and <code>moveUp = Up, k</code> binds both. To keep a base key
+<strong>and</strong> add one, name them together (<code>quit = Ctrl+c, q</code>), since a listed action no longer inherits its
+base triggers.</p>
+</div>
+<div class="paragraph">
+<p>This is why the named sets differ as they do: <code>emacs.properties</code> lists <code>quit = Ctrl+c</code>, so emacs quits
+only on <code>Ctrl+C</code>, while a set that never mentions <code>quit</code> inherits the standard <code>q</code>, <code>Q</code>, <code>Ctrl+c</code>. The
+same rule applies to your own files and to the OS overlays below — a listed action always replaces,
+never adds.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="per-os-overlay-which-files-are-loaded"><a class="anchor" href="#per-os-overlay-which-files-are-loaded"></a><a class="link" href="#per-os-overlay-which-files-are-loaded">Per-OS overlay (which files are loaded)</a></h3>
+<div class="paragraph">
+<p>Orthogonally, <code>BindingSets.defaults()</code> also looks up an OS-specific overlay by the convention
+<code>&lt;set&gt;-&lt;os&gt;.properties</code>, where <code>&lt;os&gt;</code> is <code>macos</code>, <code>windows</code> or <code>linux</code>, and layers it on top of the
+set (using the same per-action replace rule) when the file exists:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>On macOS, <code>standard-macos.properties</code> makes word navigation use Option (Alt), replacing the Ctrl
+word keys that the system reserves.</p>
+</li>
+<li>
+<p>On an OS with no matching overlay file, the set is used as-is.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The two rules are independent: the per-action overwrite decides how any one file merges; the per-OS
+lookup decides whether an extra, platform-specific file is merged at all. The named accessors
+(<code>standard()</code>, <code>vim()</code>, &#8230;&#8203;) stay literal and cross-platform; only <code>defaults()</code> resolves the host OS.</p>
+</div>
 </div>
 </div>
 </div>
