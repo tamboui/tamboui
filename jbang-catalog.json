@@ -31,6 +31,9 @@
     "modular-demo": {
       "script-ref": "demos/modular-demo/src/main/java/dev/tamboui/demo/modular/ModularDemo.java"
     },
+    "mouse-demo": {
+      "script-ref": "demos/mouse-demo/src/main/java/dev/tamboui/demo/MouseDemo.java"
+    },
     "rflex-demo": {
       "script-ref": "demos/rflex-demo/src/main/java/dev/tamboui/demo/flex/RFlexDemo.java"
     },
