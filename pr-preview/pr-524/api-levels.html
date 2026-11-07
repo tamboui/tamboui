@@ -45,6 +45,7 @@
 <li><a href="#configuration">Configuration</a>
 <ul class="sectlevel3">
 <li><a href="#disabling-ticks">Disabling Ticks</a></li>
+<li><a href="#keyboard-protocol">Keyboard Protocol</a></li>
 </ul>
 </li>
 <li><a href="#error-handling">Error Handling</a></li>
@@ -371,6 +372,56 @@ You can customize this:</p>
 </div>
 <div class="paragraph">
 <p>Set <code>resizeGracePeriod(null)</code> to disable automatic resize handling entirely (not recommended).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="keyboard-protocol"><a class="anchor" href="#keyboard-protocol"></a><a class="link" href="#keyboard-protocol">Keyboard Protocol</a></h4>
+<div class="paragraph">
+<p>By default, <code>TuiRunner</code> and <code>InlineTuiRunner</code> enable progressive keyboard enhancements using the Kitty Keyboard Protocol in <code>AUTO</code> mode:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">var config = TuiConfig.builder()
+    .keyboardProtocol(KeyboardProtocol.AUTO) // Default
+    .build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Available protocol modes in <code>dev.tamboui.terminal.KeyboardProtocol</code>:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Mode</th>
+<th class="tableblock halign-left valign-top">Flags</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AUTO</code> (default)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables <code>DISAMBIGUATE_ESCAPE_CODES</code> and <code>REPORT_ALTERNATE_KEYS</code>. Disambiguates ESC, Tab vs Ctrl+I, Enter vs Ctrl+M, and reports base-layout keys while preserving text input.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FULL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">31</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enables all protocol flags: disambiguate, report event types (press, repeat, release), report alternate keys, report all keys as escape codes, and report associated text.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LEGACY</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disables Kitty keyboard protocol enhancements entirely and uses traditional terminal encoding.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The protocol state stack is pushed automatically after entering alternate screen, and popped cleanly before leaving alternate screen or when the runner is closed.</p>
 </div>
 </div>
 </div>

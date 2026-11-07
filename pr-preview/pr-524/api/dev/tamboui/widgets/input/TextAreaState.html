@@ -81,6 +81,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#deleteForward()" tabindex="0">deleteForward()</a></li>
 <li><a href="#moveCursorLeft()" tabindex="0">moveCursorLeft()</a></li>
 <li><a href="#moveCursorRight()" tabindex="0">moveCursorRight()</a></li>
+<li><a href="#deleteWordBackward()" tabindex="0">deleteWordBackward()</a></li>
+<li><a href="#deleteWordForward()" tabindex="0">deleteWordForward()</a></li>
+<li><a href="#moveCursorToNextWord()" tabindex="0">moveCursorToNextWord()</a></li>
+<li><a href="#moveCursorToPreviousWord()" tabindex="0">moveCursorToPreviousWord()</a></li>
 <li><a href="#moveCursorUp()" tabindex="0">moveCursorUp()</a></li>
 <li><a href="#moveCursorUp(int,dev.tamboui.style.Overflow)" tabindex="0">moveCursorUp(int, Overflow)</a></li>
 <li><a href="#moveCursorDown()" tabindex="0">moveCursorDown()</a></li>
@@ -200,6 +204,16 @@ loadScripts(document, 'script');</script>
 <div class="block">Deletes the grapheme cluster after the cursor.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteWordBackward()" class="member-name-link">deleteWordBackward</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Deletes from the cursor to the start of the previous word, joining the previous line at the line start.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteWordForward()" class="member-name-link">deleteWordForward</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Deletes from the cursor to the start of the next word, joining the next line at the line end.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ensureCursorVisible(int,int)" class="member-name-link">ensureCursorVisible</a><wbr>(int&nbsp;visibleRows,
  int&nbsp;visibleCols)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -283,6 +297,16 @@ no wrapping).</div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToLineStart()" class="member-name-link">moveCursorToLineStart</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Moves the cursor to the start of the current line.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToNextWord()" class="member-name-link">moveCursorToNextWord</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Moves the cursor to the start of the next word on the current line, crossing to the next line at its end.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToPreviousWord()" class="member-name-link">moveCursorToPreviousWord</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Moves the cursor to the start of the previous word on the current line, crossing to the previous line at its start.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveCursorToStart()" class="member-name-link">moveCursorToStart</a>()</code></div>
@@ -557,6 +581,42 @@ widget has been rendered at least once.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorRight</span>()</div>
 <div class="block">Moves the cursor one grapheme cluster to the right.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="deleteWordBackward()">
+<h3>deleteWordBackward</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">deleteWordBackward</span>()</div>
+<div class="block">Deletes from the cursor to the start of the previous word, joining the previous line at the line start.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="deleteWordForward()">
+<h3>deleteWordForward</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">deleteWordForward</span>()</div>
+<div class="block">Deletes from the cursor to the start of the next word, joining the next line at the line end.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="moveCursorToNextWord()">
+<h3>moveCursorToNextWord</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorToNextWord</span>()</div>
+<div class="block">Moves the cursor to the start of the next word on the current line, crossing to the next line at its end.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="moveCursorToPreviousWord()">
+<h3>moveCursorToPreviousWord</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveCursorToPreviousWord</span>()</div>
+<div class="block">Moves the cursor to the start of the previous word on the current line, crossing to the previous line at its start.</div>
 </div>
 </section>
 </li>

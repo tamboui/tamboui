@@ -68,6 +68,10 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#getPoint(double,double)" tabindex="0">getPoint(double, double)</a></li>
 <li><a href="#paint(int,int,dev.tamboui.style.Color)" tabindex="0">paint(int, int, Color)</a></li>
+<li><a href="#xBounds()" tabindex="0">xBounds()</a></li>
+<li><a href="#yBounds()" tabindex="0">yBounds()</a></li>
+<li><a href="#gridWidth()" tabindex="0">gridWidth()</a></li>
+<li><a href="#gridHeight()" tabindex="0">gridHeight()</a></li>
 </ol>
 </li>
 </ol>
@@ -156,12 +160,32 @@ upper-left corner as origin (matching terminal conventions).</div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Converts canvas coordinates to grid coordinates.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#gridHeight()" class="member-name-link">gridHeight</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the number of grid points down the canvas.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#gridWidth()" class="member-name-link">gridWidth</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the number of grid points across the canvas.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#paint(int,int,dev.tamboui.style.Color)" class="member-name-link">paint</a><wbr>(int&nbsp;x,
  int&nbsp;y,
  <a href="../../style/Color.html" title="interface in dev.tamboui.style">Color</a>&nbsp;color)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Paints a colored point at the specified grid coordinates.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#xBounds()" class="member-name-link">xBounds</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the x-axis bounds of the canvas.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#yBounds()" class="member-name-link">yBounds</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the y-axis bounds of the canvas.</div>
 </div>
 </div>
 </div>
@@ -235,6 +259,67 @@ to grid positions suitable for terminal rendering.</div>
 <dd><code>x</code> - the x grid coordinate</dd>
 <dd><code>y</code> - the y grid coordinate</dd>
 <dd><code>color</code> - the color to paint</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="xBounds()">
+<h3>xBounds</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">xBounds</span>()</div>
+<div class="block">Returns the x-axis bounds of the canvas.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a new array <code>{min, max}</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="yBounds()">
+<h3>yBounds</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">yBounds</span>()</div>
+<div class="block">Returns the y-axis bounds of the canvas.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a new array <code>{min, max}</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="gridWidth()">
+<h3>gridWidth</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">gridWidth</span>()</div>
+<div class="block">Returns the number of grid points across the canvas.
+<p>
+<a href="#getPoint(double,double)"><code>getPoint(double, double)</code></a> maps the x bounds onto grid x coordinates
+0 to <code>gridWidth() - 1</code>. A shape can use this, with <a href="#xBounds()"><code>xBounds()</code></a>,
+to step one grid point at a time.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the grid width: two points per cell with braille markers, one otherwise</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="gridHeight()">
+<h3>gridHeight</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">gridHeight</span>()</div>
+<div class="block">Returns the number of grid points down the canvas.
+<p>
+<a href="#getPoint(double,double)"><code>getPoint(double, double)</code></a> maps the y bounds onto grid y coordinates
+0 to <code>gridHeight() - 1</code>. A shape can use this, with <a href="#yBounds()"><code>yBounds()</code></a>,
+to step one grid point at a time.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the grid height: four points per cell with braille markers, two with
+        half blocks, one otherwise</dd>
 </dl>
 </div>
 </section>

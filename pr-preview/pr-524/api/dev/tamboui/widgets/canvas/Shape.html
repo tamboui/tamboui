@@ -93,19 +93,16 @@ rendered using the Canvas widget's drawing infrastructure.
 
     @Override
     public void draw(Painter painter) {
-        // Draw horizontal line
-        for (double dx = -size; dx &lt;= size; dx += 0.5) {
-            painter.getPoint(x + dx, y).ifPresent(p -&gt;
-                painter.paint(p.x(), p.y(), color));
-        }
-        // Draw vertical line
-        for (double dy = -size; dy &lt;= size; dy += 0.5) {
-            painter.getPoint(x, y + dy).ifPresent(p -&gt;
-                painter.paint(p.x(), p.y(), color));
-        }
+        new Line(x - size, y, x + size, y, color).draw(painter);
+        new Line(x, y - size, x, y + size, color).draw(painter);
     }
 }
-</code></pre></div>
+</code></pre>
+<p>
+A shape that paints its own points should space them by grid point, from
+<a href="Painter.html#gridWidth()"><code>Painter.gridWidth()</code></a> and <a href="Painter.html#xBounds()"><code>Painter.xBounds()</code></a>, rather than by a fixed
+distance in canvas coordinates: that leaves gaps when the bounds are small, and
+takes very long when they are large.</div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>

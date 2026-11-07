@@ -46,6 +46,7 @@
 <li><a href="#inline-display-mode-using-low-level-api-demo">Inline display mode using low level API demo</a></li>
 <li><a href="#listelement-demo">ListElement Demo</a></li>
 <li><a href="#module-path-demo">Module Path Demo</a></li>
+<li><a href="#mouse-demo">Mouse Demo</a></li>
 <li><a href="#ratatui-flex-layout-demo">Ratatui Flex Layout Demo</a></li>
 <li><a href="#stack-layout">Stack Layout</a></li>
 </ul>
@@ -236,6 +237,20 @@ AsciinemaPlayer.create('demos/listelement-demo.cast', document.getElementById('p
 <div id="player-modular-demo" class="demo-player"></div>
 <script>
 AsciinemaPlayer.create('demos/modular-demo.cast', document.getElementById('player-modular-demo'), {
+    autoPlay: true, terminalLineHeight: 1, loop: true, fit: 'width'
+});
+</script>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mouse-demo"><a class="anchor" href="#mouse-demo"></a><a class="link" href="#mouse-demo">Mouse Demo</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Demonstrates toolkit mouse routing: left, middle, and right button presses</p>
+</div>
+<div id="player-mouse-demo" class="demo-player"></div>
+<script>
+AsciinemaPlayer.create('demos/mouse-demo.cast', document.getElementById('player-mouse-demo'), {
     autoPlay: true, terminalLineHeight: 1, loop: true, fit: 'width'
 });
 </script>

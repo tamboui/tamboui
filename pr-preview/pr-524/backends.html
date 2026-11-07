@@ -35,6 +35,7 @@
 <ul class="sectlevel1">
 <li><a href="#selecting-a-backend">Selecting a backend</a></li>
 <li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#terminal-input-encoding">Terminal input encoding</a></li>
 </ul>
 </div>
 </div>
@@ -178,6 +179,36 @@ Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backen
 <div class="paragraph">
 <p><strong>No provider loads at all</strong> — each failure is reported with its cause (the first as the
 exception cause, the rest as suppressed exceptions).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="terminal-input-encoding"><a class="anchor" href="#terminal-input-encoding"></a><a class="link" href="#terminal-input-encoding">Terminal input encoding</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Panama backend decodes keyboard and paste input in the charset of the terminal, detected
+from <code>LC_ALL</code>, <code>LC_CTYPE</code> or <code>LANG</code> (falling back to UTF-8). This lets a terminal set to a
+single-byte locale such as <code>ISO-8859-1</code> deliver accented keys and pastes correctly, instead of
+misreading them as the start of a UTF-8 sequence.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>GraalVM native image:</strong> a native image bundles only a limited set of charsets (US-ASCII,
+ISO-8859-1, UTF-8/16) unless it is built with <code>-H:+AddAllCharsets</code>. If the detected locale
+charset is not in the image, the backend falls back to UTF-8 rather than failing at startup —
+so a non-UTF-8 terminal may then decode its input incorrectly. Build your native executable
+with <code>-H:+AddAllCharsets</code> to support such locales. This is a GraalVM configuration limitation,
+not specific to the Panama backend.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>

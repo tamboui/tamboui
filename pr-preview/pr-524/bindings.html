@@ -34,10 +34,20 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#predefined-binding-sets">Predefined Binding Sets</a></li>
-<li><a href="#matching-actions-in-events">Matching Actions in Events</a></li>
+<li><a href="#matching-actions-in-events">Matching Actions in Events</a>
+<ul class="sectlevel2">
+<li><a href="#prefer-semantic-predicates">Prefer Semantic Predicates</a></li>
+</ul>
+</li>
 <li><a href="#key-triggers">Key Triggers</a>
 <ul class="sectlevel2">
-<li><a href="#terminal-compatibility">Terminal Compatibility</a></li>
+<li><a href="#keyboard-protocol-and-terminal-compatibility">Keyboard Protocol and Terminal Compatibility</a>
+<ul class="sectlevel3">
+<li><a href="#protocol-modes">Protocol Modes</a></li>
+<li><a href="#legacy-terminal-fallback">Legacy Terminal Fallback</a></li>
+<li><a href="#rich-event-model">Rich Event Model</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#mouse-triggers">Mouse Triggers</a></li>
@@ -82,6 +92,9 @@ Bindings vim = BindingSets.vim();            // hjkl navigation, Ctrl+u/d
 Bindings emacs = BindingSets.emacs();        // Ctrl+n/p/f/b navigation</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The named sets (<code>standard()</code>, <code>vim()</code>, <code>emacs()</code>, &#8230;&#8203;) are literal and cross-platform, so they are predictable and testable. Only the effective default, <code>BindingSets.defaults()</code> (what a <code>TuiConfig</code> uses unless you pick a set), resolves the host platform: on macOS it replaces the word-editing actions with their Option (Alt) equivalents to match the system text layer, so <code>Option+Left</code>/<code>Option+Right</code> jump by word and <code>Option+Backspace</code>/<code>Option+Delete</code> delete a word. <code>Ctrl+Left</code>/<code>Ctrl+Right</code> is Mission Control on macOS, so it is deliberately not a word key there; <code>Ctrl+w</code> (a universal readline control byte) still deletes a word on every platform. Off macOS, <code>defaults()</code> is <code>standard()</code> unchanged, with word editing on <code>Ctrl+Left</code>/<code>Ctrl+Right</code> and <code>Ctrl+Backspace</code>/<code>Ctrl+Delete</code> (which need a terminal that reports them, e.g. via the Kitty keyboard protocol).</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -107,8 +120,73 @@ if (event.isKey(KeyCode.F1)) { }</code></pre>
 With vim bindings, <code>isUp()</code> matches Up arrow, <code>k</code>, or <code>Ctrl+p</code>.
 With standard bindings, it only matches the Up arrow.</p>
 </div>
+<div class="sect2">
+<h3 id="prefer-semantic-predicates"><a class="anchor" href="#prefer-semantic-predicates"></a><a class="link" href="#prefer-semantic-predicates">Prefer Semantic Predicates</a></h3>
+<div class="paragraph">
+<p>Reach for the semantic predicates on <code>KeyEvent</code> instead of comparing <code>event.code()</code> to a <code>KeyCode</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Prefer this:
+if (event.isUp()) { ... }
+if (event.isConfirm()) { ... }
+if (event.isDeleteBackward()) { ... }
+
+// Over this:
+if (event.code() == KeyCode.UP) { ... }
+if (event.code() == KeyCode.ENTER) { ... }
+if (event.code() == KeyCode.BACKSPACE) { ... }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A raw <code>event.code() == KeyCode.UP</code> check has three problems the predicates avoid:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It matches <strong>any</strong> modifier combination (Ctrl+Up, Alt+Up), which is usually not what you want.</p>
+</li>
+<li>
+<p>It ignores the bindings, so it never picks up keypad variants, vim keys (<code>k</code>), emacs chords (<code>Ctrl+p</code>), or a user&#8217;s custom binding set.</p>
+</li>
+<li>
+<p>It does not filter release events; the predicates do (via <code>KeyTrigger</code>), so a key is not acted on twice.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The available predicates, each matching its action in the current bindings:
+<code>isUp()</code>, <code>isDown()</code>, <code>isLeft()</code>, <code>isRight()</code>, <code>isPageUp()</code>, <code>isPageDown()</code>, <code>isHome()</code>, <code>isEnd()</code>,
+<code>isSelect()</code>, <code>isConfirm()</code>, <code>isCancel()</code>, <code>isQuit()</code>, <code>isFocusNext()</code>, <code>isFocusPrevious()</code>,
+<code>isDeleteBackward()</code> and <code>isDeleteForward()</code>.</p>
+</div>
+<div class="paragraph">
+<p>For text fields, use <code>isTyping()</code> to decide whether to insert a character: it is true for a typed
+character (including keypad digits, IME and emoji text, and AltGr combinations) and false for
+shortcuts and control keys, so you never insert the letter of a <code>Ctrl</code> chord. The
+<code>dev.tamboui.tui.event.TextEditing</code> helper applies all of this (typing, editing and paste) to a
+<code>TextInputState</code> or <code>TextAreaState</code> for you.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Comparing <code>event.code()</code> directly - or the equivalent <code>event.isKey(KeyCode.UP)</code> - is only right when
+you specifically want the <strong>physical</strong> key regardless of the bindings, which is rare. An example is
+moving a floating panel with the arrow keys (spatial movement, where Shift+Arrow is meaningful and
+<code>hjkl</code> should not apply); there, <code>event.isKey(KeyCode.UP)</code> is the honest choice.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>For applications calling <code>EventParser.readEvent(&#8230;&#8203;)</code> directly, a read timeout returns <code>null</code>, while terminal EOF throws the JDK&#8217;s <code>EOFException</code> (a subclass of <code>IOException</code>). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. <code>TuiRunner</code> and <code>InlineTuiRunner</code> stop their input reader on EOF.</p>
+</div>
 </div>
 </div>
 </div>
@@ -124,11 +202,41 @@ With standard bindings, it only matches the Up arrow.</p>
 KeyTrigger.ch('j');                   // Character
 KeyTrigger.chIgnoreCase('j');         // j or J
 KeyTrigger.ctrl('u');                 // Ctrl+U
-KeyTrigger.alt('x');                  // Alt+X</code></pre>
+KeyTrigger.alt('x');                  // Alt+X
+KeyTrigger.superKey('k');             // Super/Command+K</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="terminal-compatibility"><a class="anchor" href="#terminal-compatibility"></a><a class="link" href="#terminal-compatibility">Terminal Compatibility</a></h3>
+<h3 id="keyboard-protocol-and-terminal-compatibility"><a class="anchor" href="#keyboard-protocol-and-terminal-compatibility"></a><a class="link" href="#keyboard-protocol-and-terminal-compatibility">Keyboard Protocol and Terminal Compatibility</a></h3>
+<div class="paragraph">
+<p>TamboUI enables the <strong>Kitty Keyboard Protocol</strong> (<code>CSI u</code> / progressive keyboard enhancement) by default, in <code>AUTO</code> mode.
+On terminals that implement it (Kitty, Ghostty, foot, WezTerm, recent Alacritty, and tmux <code>3.x</code> passthrough, among others) keys are reported unambiguously:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Ctrl+letter</strong> keeps its case - Ctrl+a and Ctrl+Shift+A are distinct.</p>
+</li>
+<li>
+<p><strong>Tab vs Ctrl+I</strong>, <strong>Enter vs Ctrl+M</strong>, and <strong>Escape vs Alt combinations</strong> are disambiguated.</p>
+</li>
+<li>
+<p><strong>Shortcuts match across keyboard layouts</strong> (Cyrillic, AZERTY, Dvorak, &#8230;&#8203;) via base-layout key reporting.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For these terminals the historical control-key limitations below do <strong>not</strong> apply, and you can bind <code>Ctrl+key</code> combinations freely.</p>
+</div>
+<div class="sect3">
+<h4 id="protocol-modes"><a class="anchor" href="#protocol-modes"></a><a class="link" href="#protocol-modes">Protocol Modes</a></h4>
+<div class="paragraph">
+<p>The mode is configured on <code>TuiConfig</code> or <code>InlineTuiConfig</code> via <code>KeyboardProtocol</code> (<code>AUTO</code>, <code>FULL</code>, or <code>LEGACY</code>).
+See <a href="api-levels.html#_keyboard_protocol">API Levels &#8594; Keyboard Protocol</a> for the full mode/flags reference and how the protocol stack is pushed and popped.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="legacy-terminal-fallback"><a class="anchor" href="#legacy-terminal-fallback"></a><a class="link" href="#legacy-terminal-fallback">Legacy Terminal Fallback</a></h4>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -137,10 +245,10 @@ KeyTrigger.alt('x');                  // Alt+X</code></pre>
 </td>
 <td class="content">
 <div class="paragraph">
-<p><strong>Ctrl key bindings have significant limitations</strong> due to how terminals encode keyboard input.</p>
+<p>On terminals that do <strong>not</strong> implement the Kitty protocol - or when you explicitly select <code>KeyboardProtocol.LEGACY</code> - input falls back to classic VT encoding, which has significant limitations.</p>
 </div>
 <div class="paragraph">
-<p>When you press a key combination like Ctrl+A, the terminal does not send "Ctrl" + "A" separately.
+<p>When you press a key combination like Ctrl+A, a legacy terminal does not send "Ctrl" + "A" separately.
 Instead, it sends a single ASCII control character (byte value 1 for Ctrl+A).
 This encoding dates back to the 1970s and causes several problems:</p>
 </div>
@@ -158,7 +266,7 @@ This encoding dates back to the 1970s and causes several problems:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>Alt key bindings are more reliable</strong> because terminals send ESC followed by the actual character:</p>
+<p><strong>Alt key bindings are more reliable</strong> in legacy mode because terminals send ESC followed by the actual character:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -178,7 +286,7 @@ This encoding dates back to the 1970s and causes several problems:</p>
 </table>
 </div>
 <div class="paragraph">
-<p><strong>Recommendation for custom bindings:</strong></p>
+<p><strong>If you need to support legacy terminals as well</strong>, choose custom bindings that degrade gracefully:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -189,7 +297,7 @@ This encoding dates back to the 1970s and causes several problems:</p>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Modifier</th>
-<th class="tableblock halign-left valign-top">Reliability</th>
+<th class="tableblock halign-left valign-top">Legacy reliability</th>
 <th class="tableblock halign-left valign-top">Notes</th>
 </tr>
 </thead>
@@ -207,18 +315,46 @@ This encoding dates back to the 1970s and causes several problems:</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+letter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Good</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Works but loses shift information</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Works but loses shift information in legacy mode</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Poor</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Avoid - ambiguous with other combinations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Avoid - ambiguous with other combinations in legacy mode</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For maximum compatibility, prefer <code>Alt+key</code> bindings for custom actions.
-Use <code>Ctrl+key</code> only for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, etc.).</p>
+<p>With the Kitty protocol active (the default), all of these combinations are fully distinguishable.
+For the widest reach, prefer <code>Alt+key</code> bindings for custom actions and reserve bare <code>Ctrl+key</code> for well-established conventions (Ctrl+C, Ctrl+S, Ctrl+Z, etc.).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="rich-event-model"><a class="anchor" href="#rich-event-model"></a><a class="link" href="#rich-event-model">Rich Event Model</a></h4>
+<div class="paragraph">
+<p>With Kitty protocol support enabled, key events provide rich metadata:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Event Kinds</strong>: <code>KeyEventKind.PRESS</code>, <code>KeyEventKind.REPEAT</code>, and <code>KeyEventKind.RELEASE</code>.
+Existing widgets and <code>KeyTrigger</code> bindings ignore <code>RELEASE</code> events by default to maintain full backward compatibility. You can match release events explicitly using <code>KeyTrigger.withKind(KeyEventKind.RELEASE)</code>.</p>
+</li>
+<li>
+<p><strong>Extended Modifiers</strong>: In addition to Shift, Ctrl, and Alt, <code>KeyModifiers</code> supports <code>superKey</code> (Command / Windows key), <code>hyper</code>, and <code>meta</code>.
+Helpers such as <code>event.hasSuper()</code>, <code>KeyTrigger.superKey('k')</code>, and <code>KeyTrigger.withSuper()</code> are provided.</p>
+</li>
+<li>
+<p><strong>Special, Keypad, and Media Keys</strong>: First-class support for <code>F13</code>–<code>F35</code>, numeric keypad keys (<code>KP_0</code>–<code>KP_9</code>, <code>KP_ENTER</code>, <code>KP_ADD</code>, etc. with <code>event.isKeypad()</code>), lock keys (<code>CAPS_LOCK</code>, <code>NUM_LOCK</code>, <code>SCROLL_LOCK</code>), and media keys.</p>
+</li>
+<li>
+<p><strong>Alternate Keys &amp; Layout Independence</strong>: Terminals report <code>event.keyCodePoint()</code>, <code>event.shiftedKeyCodePoint()</code>, and <code>event.baseLayoutKeyCodePoint()</code> (standard PC-101 layout), allowing shortcuts to match regardless of international keyboard layouts (like Cyrillic, AZERTY, or Dvorak).</p>
+</li>
+<li>
+<p><strong>Associated Text</strong>: <code>event.text()</code> conveys the exact Unicode text generated by the key event (including combining characters and IME input).</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -497,6 +633,14 @@ Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixe
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE_BACKWARD</code>, <code>DELETE_FORWARD</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Text editing</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MOVE_WORD_LEFT</code>, <code>MOVE_WORD_RIGHT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word-wise cursor movement (<code>Ctrl+Arrow</code>, or <code>Option+Arrow</code> on macOS)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE_WORD_BACKWARD</code>, <code>DELETE_WORD_FORWARD</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word-wise deletion (<code>Ctrl+Backspace</code>/<code>Ctrl+Delete</code>, or <code>Option+Backspace</code>/<code>Option+Delete</code> on macOS; <code>Ctrl+w</code> everywhere)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QUIT</code></p></td>

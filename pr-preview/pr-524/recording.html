@@ -172,79 +172,135 @@ Type "q"</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Supported commands:</p>
+<p>Supported commands. The <strong>From</strong> column says whether a command matches
+<a href="https://github.com/charmbracelet/vhs">VHS</a> or is a TamboUI extension — a tape that uses only
+<strong>VHS</strong> commands also renders with the <code>vhs</code> tool, while the <strong>TamboUI</strong> commands (the mouse family) do
+not exist upstream.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
-<col style="width: 66.6667%;">
+<col style="width: 50%;">
+<col style="width: 16.6667%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Command</th>
 <th class="tableblock halign-left valign-top">Meaning</th>
+<th class="tableblock halign-left valign-top">From</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Type "text"</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type a string (supports <code>\n</code>, <code>\t</code>, <code>\"</code>, <code>\\</code>, <code>\xNN</code> escapes)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Type@&lt;speed&gt; "text"</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Type a string with a pause between the characters, e.g. <code>Type@50ms "hello"</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Enter</code>, <code>Tab</code>, <code>Space</code>, <code>Backspace</code>, <code>Delete</code>, <code>Insert</code>, <code>Escape</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Named keys</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Up</code>, <code>Down</code>, <code>Left</code>, <code>Right</code>, <code>Home</code>, <code>End</code>, <code>PageUp</code>, <code>PageDown</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Navigation keys</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>F1</code> &#8230;&#8203; <code>F12</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Function keys</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ctrl+&lt;key&gt;</code>, <code>Shift+&lt;key&gt;</code>, <code>Alt+&lt;key&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modifier combinations, also combined and on named and function keys (e.g. <code>Ctrl+C</code>, <code>Shift+F8</code>,
 <code>Ctrl+Up</code>, <code>Shift+Tab</code>, <code>Ctrl+Alt+a</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>&lt;Key&gt; &lt;count&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Press a key several times, e.g. <code>Down 3</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Sleep &lt;duration&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pause, e.g. <code>Sleep 500ms</code> or <code>Sleep 2s</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Wait /regex/</code>, <code>Wait+Line /regex/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Wait until a line of the screen matches the regex (at most 15s); <code>Wait@10s /regex/</code> sets the timeout</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Wait+Screen /regex/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Wait until the screen, its lines joined with newlines, matches the regex</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Hide</code>, <code>Show</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The interactions between them are played but left out of the recording, together with the time they take</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Screenshot</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marks a frame of interest in the recording</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Source &lt;file&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Include another tape file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>&lt;Key&gt;@&lt;delay&gt; &lt;count&gt;</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Repeat with delay, e.g. <code>Down@100ms 5</code> presses Down five times, 100ms apart</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Sleep &lt;duration&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pause, e.g. <code>Sleep 500ms</code> or <code>Sleep 2s</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Wait /regex/</code>, <code>Wait+Line /regex/</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wait until a line of the screen matches the regex (at most 15s); <code>Wait@10s /regex/</code> sets the timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Wait+Screen /regex/</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wait until the screen, its lines joined with newlines, matches the regex</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Hide</code>, <code>Show</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The interactions between them are played but left out of the recording, together with the time they take</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Screenshot</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Marks a frame of interest in the recording</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Source &lt;file&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Include another tape file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ScrollUp [count]</code>, <code>ScrollDown [count]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scroll the wheel <code>count</code> times (default 1)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VHS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ScrollUp [count] &lt;x&gt; &lt;y&gt;</code>, <code>ScrollDown [count] &lt;x&gt; &lt;y&gt;</code>, <code>ScrollLeft</code>, <code>ScrollRight</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Scroll at a given cell (VHS scrolls at the cursor only), and the left/right wheel directions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TamboUI</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Click &lt;x&gt; &lt;y&gt;</code>, <code>RightClick &lt;x&gt; &lt;y&gt;</code>, <code>MiddleClick &lt;x&gt; &lt;y&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Press and release a mouse button at a cell (0-based <code>&lt;x&gt; &lt;y&gt;</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TamboUI</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MouseDown &lt;x&gt; &lt;y&gt;</code>, <code>MouseUp &lt;x&gt; &lt;y&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A separate left-button press or release, for full control</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TamboUI</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MouseMove &lt;x&gt; &lt;y&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Move the pointer with no button held</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TamboUI</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Drag &lt;x1&gt; &lt;y1&gt; &lt;x2&gt; &lt;y2&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Press at the first cell, move to the second, and release, drawing a continuous drag; <code>Drag@&lt;delay&gt;</code> sets the pause between steps</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TamboUI</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>The mouse commands are a TamboUI extension: upstream VHS has only <code>ScrollUp</code>/<code>ScrollDown</code> (at
+the cursor, no position). They are sent as a terminal sends them, the xterm way: SGR 1006 reports
+(<code>ESC [ &lt; Cb ; Cx ; Cy M</code> for a press, motion or scroll and <code>… m</code> for a release). The application
+under test must enable mouse capture (and mouse motion for <code>MouseMove</code>) to receive them. Coordinates
+are terminal cells, matching the positions an app sees in a <code>MouseEvent</code>.</p>
+</div>
 <div class="paragraph">
 <p><code>Set</code>, <code>Output</code> and <code>Require</code> directives are accepted (for compatibility with tapes shared with the
 <code>vhs</code> tool) but the recording geometry and output come from the <code>tamboui.record.*</code>

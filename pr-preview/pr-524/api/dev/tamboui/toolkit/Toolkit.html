@@ -2458,7 +2458,10 @@ to the buffer.</div>
  <a href="../tui/event/KeyEvent.html" title="class in dev.tamboui.tui.event">KeyEvent</a>&nbsp;event)</span></div>
 <div class="block">Handles common key events for text input.
 <p>
-Handles: character input, backspace, delete, left/right arrows, home/end.</div>
+Delegates to <a href="../tui/event/TextEditing.html" title="class in dev.tamboui.tui.event"><code>TextEditing</code></a>, which drives the edit from the event's semantic predicates
+(so it follows the bindings, e.g. the emacs Ctrl+A/Ctrl+E) and inserts
+<a href="../tui/event/KeyEvent.html#isTyping()"><code>KeyEvent.isTyping()</code></a> text whole. Apps without the toolkit can call <a href="../tui/event/TextEditing.html" title="class in dev.tamboui.tui.event"><code>TextEditing</code></a>
+directly.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>state</code> - the text input state to modify</dd>
