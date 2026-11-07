@@ -24,6 +24,7 @@ import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.block.BorderType;
 import dev.tamboui.widgets.block.Borders;
 import dev.tamboui.widgets.block.Title;
+import dev.tamboui.widgets.table.Cell;
 import dev.tamboui.widgets.table.Row;
 import dev.tamboui.widgets.table.Table;
 import dev.tamboui.widgets.table.TableState;
@@ -273,29 +274,27 @@ public final class TableElement extends StyledElement<TableElement> {
         int totalWidth = 0;
         int numCols = 0;
 
-        // Determine number of columns from header or first row
+        // Determine number of columns from header, rows, or footer
         if (header != null) {
-            numCols = header.cells().size();
-        } else if (!rows.isEmpty()) {
-            numCols = rows.get(0).cells().size();
+            numCols = Math.max(numCols, header.cells().size());
+        }
+        for (Row row : rows) {
+            numCols = Math.max(numCols, row.cells().size());
+        }
+        if (footer != null) {
+            numCols = Math.max(numCols, footer.cells().size());
         }
 
         if (!widths.isEmpty()) {
-            // Use constraint widths
-            for (Constraint w : widths) {
-                if (w instanceof Constraint.Length) {
-                    totalWidth += ((Constraint.Length) w).value();
-                } else {
-                    totalWidth += 10; // Default column width
-                }
-            }
-            // Cycle if fewer widths than columns
-            for (int i = widths.size(); i < numCols; i++) {
+            // Use constraint widths, cycling if fewer widths than columns
+            for (int i = 0; i < numCols; i++) {
                 Constraint w = widths.get(i % widths.size());
                 if (w instanceof Constraint.Length) {
                     totalWidth += ((Constraint.Length) w).value();
+                } else if (w instanceof Constraint.Fit) {
+                    totalWidth += maxColumnContentWidth(i);
                 } else {
-                    totalWidth += 10;
+                    totalWidth += 10; // Default column width
                 }
             }
         } else {
@@ -330,6 +329,31 @@ public final class TableElement extends StyledElement<TableElement> {
         }
 
         return Size.of(totalWidth, height);
+    }
+
+    private int maxColumnContentWidth(int col) {
+        int maxWidth = 0;
+        if (header != null && col < header.cells().size()) {
+            Cell cell = header.cells().get(col);
+            if (cell != null) {
+                maxWidth = Math.max(maxWidth, cell.width());
+            }
+        }
+        for (Row row : rows) {
+            if (col < row.cells().size()) {
+                Cell cell = row.cells().get(col);
+                if (cell != null) {
+                    maxWidth = Math.max(maxWidth, cell.width());
+                }
+            }
+        }
+        if (footer != null && col < footer.cells().size()) {
+            Cell cell = footer.cells().get(col);
+            if (cell != null) {
+                maxWidth = Math.max(maxWidth, cell.width());
+            }
+        }
+        return maxWidth;
     }
 
     @Override

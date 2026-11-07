@@ -219,6 +219,35 @@ class MarkdownViewTest {
     }
 
     @Test
+    @DisplayName("sizes table columns to their content instead of equal percentages (#457)")
+    void sizesTableColumnsFromContent() {
+        String md = "| Field | Value |\n|---|---|\n| Order ID | ORD-1003 |\n| Items | 1x TSHIRT, 1x CAP, 2x MUG |";
+        MarkdownView view = MarkdownView.builder().source(md).build();
+        Buffer buffer = renderInto(view, 80, 4);
+
+        // The key column is as wide as "Order ID" (8), not half the width;
+        // the value column starts right after it plus one space (x = 9).
+        assertThat(row(buffer, 0)).startsWith("Field    Value");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("O"); // "Order ID"
+        assertThat(buffer.get(9, 1).symbol()).isEqualTo("O"); // "ORD-1003" at x=9, not x=40
+        assertThat(buffer.get(9, 2).symbol()).isEqualTo("1"); // "1x TSHIRT..." at x=9
+    }
+
+    @Test
+    @DisplayName("keeps a narrow column narrow when a table is width-constrained (#457)")
+    void narrowColumnKeepsWidthWhenConstrained() {
+        String md = "| ID | Description |\n|---|---|\n| 1 | A very long description that exceeds available space |";
+        MarkdownView view = MarkdownView.builder().source(md).build();
+        Buffer buffer = renderInto(view, 20, 2);
+
+        // "ID" keeps width 2; "Description" starts at x = 3 (2 + 1 spacing)
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("I");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("1");
+        assertThat(buffer.get(3, 1).symbol()).isEqualTo("A");
+    }
+
+    @Test
     @DisplayName("scrolls past the first chunk when scroll is set")
     void scrollsContent() {
         // Layout produces: heading(1) + rule(1) + spacer(1) + paragraph(1) = 4 rows

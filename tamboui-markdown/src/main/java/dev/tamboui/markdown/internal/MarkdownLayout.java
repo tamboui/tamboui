@@ -374,10 +374,10 @@ public final class MarkdownLayout {
             return new LinesChunk(Collections.singletonList(Line.empty()));
         }
 
+        // Size each column to its content; the Table shares space when they do not all fit.
         List<Constraint> widths = new ArrayList<>(columnCount);
-        int per = Math.max(1, 100 / columnCount);
         for (int i = 0; i < columnCount; i++) {
-            widths.add(Constraint.percentage(per));
+            widths.add(Constraint.fit());
         }
 
         Table.Builder tableBuilder = Table.builder()
