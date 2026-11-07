@@ -397,8 +397,9 @@ public final class EventRouter implements AutoCloseable {
             }
         }
 
-        // Handle new press - check for drag or focus
-        if (event.kind() == MouseEventKind.PRESS && event.isLeftButton()) {
+        // Handle new press - route every button to element handlers, but keep the side effects
+        // (click-to-focus, drag start, clear-focus-on-outside-click) left-button-only.
+        if (event.kind() == MouseEventKind.PRESS) {
             // Find element at position (reverse order for z-ordering)
             for (int i = elements.size() - 1; i >= 0; i--) {
                 Element element = elements.get(i);
@@ -410,7 +411,7 @@ public final class EventRouter implements AutoCloseable {
 
                     // Focus the element first (before potential drag)
                     boolean wasFocused = false;
-                    if (element.isFocusable() && element.id() != null) {
+                    if (event.isLeftButton() && element.isFocusable() && element.id() != null) {
                         String prevFocus = focusManager.focusedId();
                         focusManager.setFocus(element.id());
                         wasFocused = true;
@@ -422,7 +423,7 @@ public final class EventRouter implements AutoCloseable {
                     }
 
                     // Check if draggable
-                    if (element.isDraggable() && element instanceof StyledElement) {
+                    if (event.isLeftButton() && element.isDraggable() && element instanceof StyledElement) {
                         StyledElement<?> styled = (StyledElement<?>) element;
                         DragHandler handler = styled.dragHandler();
                         if (handler != null) {
@@ -462,12 +463,14 @@ public final class EventRouter implements AutoCloseable {
                 }
             }
 
-            // Clicked outside all elements - clear focus
-            String prevFocus = focusManager.focusedId();
-            if (prevFocus != null) {
-                focusManager.clearFocus();
-                if (FocusChangeEvent.enabled()) {
-                    FocusChangeEvent.commit(routeId, prevFocus, null, "clicked outside all elements");
+            // Clicked outside all elements - clear focus (left button only)
+            if (event.isLeftButton()) {
+                String prevFocus = focusManager.focusedId();
+                if (prevFocus != null) {
+                    focusManager.clearFocus();
+                    if (FocusChangeEvent.enabled()) {
+                        FocusChangeEvent.commit(routeId, prevFocus, null, "clicked outside all elements");
+                    }
                 }
             }
         }

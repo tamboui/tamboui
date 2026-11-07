@@ -11,6 +11,7 @@ dependencies {
     api(projects.tambouiTui)
     api(projects.tambouiCss)
     testImplementation(testFixtures(projects.tambouiCore))
+    testImplementation(testFixtures(projects.tambouiTui))
     testFixturesImplementation(projects.tambouiTui)
     testFixturesImplementation(testFixtures(projects.tambouiTui))
     testFixturesImplementation(projects.tambouiCore)
