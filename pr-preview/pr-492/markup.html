@@ -28,7 +28,7 @@
 <div id="header">
 <h1>Markup Text</h1>
 <div class="details">
-<span id="revnumber">version 0.6.0-SNAPSHOT</span>
+<span id="revnumber">version 0.7.0-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -281,6 +281,9 @@ Path: C:\\Users\\name      renders as:  Path: C:\Users\name</code></pre>
 </div>
 <div class="paragraph">
 <p>Supported backslash escapes: <code>\[</code>, <code>\]</code>, <code>\\</code>. Other sequences (like <code>\n</code>) are preserved as-is.</p>
+</div>
+<div class="paragraph">
+<p>A <code>[</code> that is not closed by a <code>]</code> on the same line needs no escape: it is plain text, so <code>price[USD 10</code> renders as <code>price[USD 10</code>.</p>
 </div>
 </div>
 </div>
@@ -579,7 +582,7 @@ Text code = MarkupParser.parse(
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.6.0-SNAPSHOT<br>
+Version 0.7.0-SNAPSHOT<br>
 </div>
 </div>
 <script src="_static/highlight/highlight.min.js"></script>
