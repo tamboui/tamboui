@@ -210,20 +210,18 @@ public final class Table implements StatefulWidget<TableState> {
 
         // Render header
         if (header != null) {
-            y = renderRow(buffer, tableArea, y, header, columnWidths, highlightWidth, false, Style.EMPTY);
+            y = renderRow(buffer, tableArea, y, header, 0, tableArea.bottom(),
+                          columnWidths, highlightWidth, false, Style.EMPTY);
         }
 
-        // Calculate available height for data rows
-        int dataHeight = tableArea.bottom() - y;
-        if (footer != null) {
-            dataHeight -= footer.totalHeight();
-        }
+        // Data rows end where the footer starts
+        int dataBottom = tableArea.bottom() - (footer != null ? footer.totalHeight() : 0);
 
         // Render data rows
         int offset = state.offset();
         int currentOffset = 0;
 
-        for (int i = 0; i < rows.size() && y < tableArea.top() + tableArea.height() - (footer != null ? footer.totalHeight() : 0); i++) {
+        for (int i = 0; i < rows.size() && y < dataBottom; i++) {
             Row row = rows.get(i);
             int rowHeight = row.totalHeight();
 
@@ -233,22 +231,26 @@ public final class Table implements StatefulWidget<TableState> {
                 continue;
             }
 
+            // A row partly scrolled out at the top shows only its remaining lines
+            int firstLine = Math.max(0, offset - currentOffset);
             boolean isSelected = state.selected() != null && state.selected() == i;
             Style highlightStyle = isSelected ? rowHighlightStyle : Style.EMPTY;
 
             // Render highlight symbol
-            if (isSelected && highlightWidth > 0) {
+            if (isSelected && highlightWidth > 0 && firstLine < row.height()) {
                 buffer.setString(tableArea.left(), y, highlightSymbol, rowHighlightStyle);
             }
 
-            y = renderRow(buffer, tableArea, y, row, columnWidths, highlightWidth, isSelected, highlightStyle);
+            y = renderRow(buffer, tableArea, y, row, firstLine, dataBottom,
+                          columnWidths, highlightWidth, isSelected, highlightStyle);
             currentOffset += rowHeight;
         }
 
         // Render footer at the bottom
         if (footer != null) {
             int footerY = tableArea.bottom() - footer.totalHeight();
-            renderRow(buffer, tableArea, footerY, footer, columnWidths, highlightWidth, false, Style.EMPTY);
+            renderRow(buffer, tableArea, footerY, footer, 0, tableArea.bottom(),
+                      columnWidths, highlightWidth, false, Style.EMPTY);
         }
     }
 
@@ -278,16 +280,21 @@ public final class Table implements StatefulWidget<TableState> {
         return widthList;
     }
 
-    private int renderRow(Buffer buffer, Rect tableArea, int y, Row row,
+    /**
+     * Renders the lines of {@code row} from {@code firstLine} on at {@code y}, clipped
+     * above {@code bottom}, and returns the y below the row and its bottom margin.
+     */
+    private int renderRow(Buffer buffer, Rect tableArea, int y, Row row, int firstLine, int bottom,
                           List<Integer> columnWidths, int highlightWidth,
                           boolean isSelected, Style highlightStyle) {
         int rowHeight = row.height();
+        int visibleHeight = Math.min(rowHeight - firstLine, bottom - y);
         Style rowStyle = row.style().patch(highlightStyle);
 
-        // Apply row style to the entire row area
-        if (!rowStyle.equals(Style.EMPTY)) {
+        // Apply row style to the visible lines of the row
+        if (!rowStyle.equals(Style.EMPTY) && visibleHeight > 0) {
             Rect rowArea = new Rect(tableArea.left() + highlightWidth, y,
-                                    tableArea.width() - highlightWidth, rowHeight);
+                                    tableArea.width() - highlightWidth, visibleHeight);
             buffer.setStyle(rowArea, rowStyle);
         }
 
@@ -304,10 +311,10 @@ public final class Table implements StatefulWidget<TableState> {
 
                 // Render each line of the cell
                 List<Line> lines = content.lines();
-                for (int lineIdx = 0; lineIdx < Math.min(lines.size(), rowHeight); lineIdx++) {
+                for (int lineIdx = firstLine; lineIdx < Math.min(lines.size(), rowHeight); lineIdx++) {
                     Line line = lines.get(lineIdx);
-                    int lineY = y + lineIdx;
-                    if (lineY >= tableArea.bottom()) {
+                    int lineY = y + lineIdx - firstLine;
+                    if (lineY >= bottom) {
                         break;
                     }
 
@@ -331,7 +338,7 @@ public final class Table implements StatefulWidget<TableState> {
             x += colWidth + columnSpacing;
         }
 
-        return y + rowHeight + row.bottomMargin();
+        return y + rowHeight - firstLine + row.bottomMargin();
     }
 
     /**
