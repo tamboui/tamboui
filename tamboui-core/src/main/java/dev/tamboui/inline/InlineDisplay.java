@@ -463,21 +463,25 @@ public final class InlineDisplay implements AutoCloseable {
             }
 
             // Render each line
-            try (AnsiCellWriter cellWriter = new AnsiCellWriter(out::print)) {
-                for (int y = 0; y < currentHeight; y++) {
-                    if (y > 0) {
-                        out.print("\n");
-                    }
-                    // Clear the line first (from col 0) to remove stale content.
-                    // This avoids calling eraseToEndOfLine after rendering, which
-                    // would interact badly with "pending wrap" state on some terminals.
-                    backend.carriageReturn();
-                    backend.eraseToEndOfLine();
+            for (int y = 0; y < currentHeight; y++) {
+                if (y > 0) {
+                    out.print("\n");
+                }
+                // Clear the line first (from col 0) to remove stale content.
+                // This avoids calling eraseToEndOfLine after rendering, which
+                // would interact badly with "pending wrap" state on some terminals.
+                backend.carriageReturn();
+                backend.eraseToEndOfLine();
 
-                    int lineEnd = findLastContentPosition(y);
-
-                    for (int x = 0; x < lineEnd; x++) {
-                        cellWriter.writeCell(buffer.get(x, y));
+                int lineEnd = findLastContentPosition(y);
+                if (lineEnd > 0) {
+                    // One writer per line resets the style at the end of the line: terminals
+                    // erase with the current background, so the next line's erase would
+                    // otherwise paint it with this line's last background.
+                    try (AnsiCellWriter cellWriter = new AnsiCellWriter(out::print)) {
+                        for (int x = 0; x < lineEnd; x++) {
+                            cellWriter.writeCell(buffer.get(x, y));
+                        }
                     }
                 }
             }
@@ -517,7 +521,8 @@ public final class InlineDisplay implements AutoCloseable {
 
     /**
      * Finds the position after the last non-empty cell on a line,
-     * accounting for wide character display widths.
+     * accounting for wide character display widths. A styled space is not
+     * empty: it can show a background, a reversed cursor or an underline.
      */
     private int findLastContentPosition(int line) {
         for (int x = width - 1; x >= 0; x--) {
@@ -525,9 +530,8 @@ public final class InlineDisplay implements AutoCloseable {
             if (cell.isContinuation()) {
                 continue;
             }
-            String symbol = cell.symbol();
-            if (!symbol.isEmpty() && !symbol.equals(" ")) {
-                return x + CharWidth.of(symbol);
+            if (!cell.isEmpty()) {
+                return x + CharWidth.of(cell.symbol());
             }
         }
         return 0;
