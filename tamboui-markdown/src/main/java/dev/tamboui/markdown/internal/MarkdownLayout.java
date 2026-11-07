@@ -397,9 +397,25 @@ public final class MarkdownLayout {
         Node cellNode = source.getFirstChild();
         while (cellNode != null) {
             if (cellNode instanceof TableCell) {
+                TableCell tableCell = (TableCell) cellNode;
                 Style baseStyle = header ? styles.strong() : Style.EMPTY;
                 List<Span> spans = MarkdownInlineRenderer.renderSpans(cellNode, baseStyle, styles);
-                cells.add(Cell.from(Line.from(spans)));
+                Cell cell = Cell.from(Line.from(spans));
+                if (tableCell.getAlignment() != null) {
+                    switch (tableCell.getAlignment()) {
+                        case CENTER:
+                            cell = cell.centered();
+                            break;
+                        case RIGHT:
+                            cell = cell.rightAligned();
+                            break;
+                        case LEFT:
+                        default:
+                            cell = cell.leftAligned();
+                            break;
+                    }
+                }
+                cells.add(cell);
             }
             cellNode = cellNode.getNext();
         }

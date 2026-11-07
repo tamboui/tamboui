@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
@@ -80,9 +81,11 @@ public final class Table implements StatefulWidget<TableState> {
     private final String highlightSymbol;
     private final int columnSpacing;
     private final HighlightSpacing highlightSpacing;
+    private final List<Alignment> columnAlignments;
 
     private Table(Builder builder) {
         this.widths = listCopyOf(builder.widths);
+        this.columnAlignments = listCopyOf(builder.columnAlignments);
         this.header = builder.header;
         this.footer = builder.footer;
         this.block = builder.block;
@@ -141,6 +144,15 @@ public final class Table implements StatefulWidget<TableState> {
      */
     public List<Row> rows() {
         return rows;
+    }
+
+    /**
+     * Returns the column text alignments.
+     *
+     * @return the list of column alignments
+     */
+    public List<Alignment> columnAlignments() {
+        return columnAlignments;
     }
 
     /**
@@ -312,13 +324,31 @@ public final class Table implements StatefulWidget<TableState> {
                     }
 
                     // Render line content, truncated to column width
-                    int col_x = x;
+                    Alignment align = resolveAlignment(line, cell, col);
+                    int lineWidth = line.width();
+                    int startX = x;
+                    if (lineWidth < colWidth) {
+                        switch (align) {
+                            case CENTER:
+                                startX = x + (colWidth - lineWidth) / 2;
+                                break;
+                            case RIGHT:
+                                startX = x + (colWidth - lineWidth);
+                                break;
+                            case LEFT:
+                            default:
+                                startX = x;
+                                break;
+                        }
+                    }
+
+                    int col_x = startX;
                     List<Span> patchedSpans = line.patchStyle(cellStyle).spans();
                     for (int spanIdx = 0; spanIdx < patchedSpans.size(); spanIdx++) {
                         Span span = patchedSpans.get(spanIdx);
                         String text = span.content();
                         int textWidth = CharWidth.of(text);
-                        int remainingWidth = colWidth - (col_x - x);
+                        int remainingWidth = (x + colWidth) - col_x;
                         if (remainingWidth > 0 && textWidth > 0) {
                             String toRender = textWidth <= remainingWidth ? text : CharWidth.substringByWidth(text, remainingWidth);
                             buffer.setString(col_x, lineY, toRender, span.style());
@@ -332,6 +362,19 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         return y + rowHeight + row.bottomMargin();
+    }
+
+    private Alignment resolveAlignment(Line line, Cell cell, int col) {
+        if (line != null && line.alignment().isPresent()) {
+            return line.alignment().get();
+        }
+        if (cell != null && cell.alignment().isPresent()) {
+            return cell.alignment().get();
+        }
+        if (col < columnAlignments.size() && columnAlignments.get(col) != null) {
+            return columnAlignments.get(col);
+        }
+        return Alignment.LEFT;
     }
 
     /**
@@ -352,6 +395,7 @@ public final class Table implements StatefulWidget<TableState> {
     public static final class Builder {
         private List<Row> rows = new ArrayList<>();
         private List<Constraint> widths = new ArrayList<>();
+        private List<Alignment> columnAlignments = new ArrayList<>();
         private Row header;
         private Row footer;
         private Block block;
@@ -423,6 +467,45 @@ public final class Table implements StatefulWidget<TableState> {
          */
         public Builder widths(Constraint... widths) {
             this.widths = new ArrayList<>(Arrays.asList(widths));
+            return this;
+        }
+
+        /**
+         * Sets the column text alignments.
+         *
+         * @param columnAlignments the column alignments
+         * @return this builder
+         */
+        public Builder columnAlignments(List<Alignment> columnAlignments) {
+            this.columnAlignments = columnAlignments != null ? new ArrayList<>(columnAlignments) : new ArrayList<>();
+            return this;
+        }
+
+        /**
+         * Sets the column text alignments.
+         *
+         * @param columnAlignments the column alignments
+         * @return this builder
+         */
+        public Builder columnAlignments(Alignment... columnAlignments) {
+            this.columnAlignments = columnAlignments != null ? new ArrayList<>(Arrays.asList(columnAlignments)) : new ArrayList<>();
+            return this;
+        }
+
+        /**
+         * Sets the text alignment for a specific column.
+         *
+         * @param column the column index (0-based)
+         * @param alignment the text alignment
+         * @return this builder
+         */
+        public Builder columnAlignment(int column, Alignment alignment) {
+            if (column >= 0) {
+                while (this.columnAlignments.size() <= column) {
+                    this.columnAlignments.add(null);
+                }
+                this.columnAlignments.set(column, alignment);
+            }
             return this;
         }
 

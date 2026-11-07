@@ -69,4 +69,36 @@ class CellTest {
         // Original is unchanged
         assertThat(cell.style()).isEqualTo(Style.EMPTY);
     }
+
+    @Test
+    @DisplayName("Cell alignment methods set and preserve alignment")
+    void alignmentMethods() {
+        Cell cell = Cell.from("Test");
+        assertThat(cell.alignment()).isEmpty();
+
+        Cell right = cell.rightAligned();
+        assertThat(right.alignment()).contains(dev.tamboui.layout.Alignment.RIGHT);
+
+        Cell center = cell.centered();
+        assertThat(center.alignment()).contains(dev.tamboui.layout.Alignment.CENTER);
+
+        Cell left = cell.leftAligned();
+        assertThat(left.alignment()).contains(dev.tamboui.layout.Alignment.LEFT);
+
+        Cell styled = right.style(Style.EMPTY.fg(Color.RED));
+        assertThat(styled.alignment()).contains(dev.tamboui.layout.Alignment.RIGHT);
+        assertThat(styled.style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("Cell falls back to content alignment when cell alignment is not explicitly set")
+    void fallbackToContentAlignment() {
+        Text text = Text.from("Centered").centered();
+        Cell cell = Cell.from(text);
+        assertThat(cell.alignment()).contains(dev.tamboui.layout.Alignment.CENTER);
+
+        // Explicit cell alignment overrides content alignment
+        Cell overridden = cell.rightAligned();
+        assertThat(overridden.alignment()).contains(dev.tamboui.layout.Alignment.RIGHT);
+    }
 }
