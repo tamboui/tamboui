@@ -167,16 +167,6 @@ final class InteractionPlayer {
                 continue;
             }
 
-            // Hide and Show keep playing the interactions in between, but leave them out of the recording
-            if (lower.equals("hide")) {
-                interactions.add(new Interaction.Visibility(true));
-                continue;
-            }
-            if (lower.equals("show")) {
-                interactions.add(new Interaction.Visibility(false));
-                continue;
-            }
-
             interactions.addAll(parseVhsCommand(outputPath, line));
         }
     }
@@ -198,6 +188,11 @@ final class InteractionPlayer {
         String command = head.toLowerCase(Locale.ROOT);
 
         switch (command) {
+            // Hide and Show keep playing the interactions in between, but leave them out of the recording
+            case "hide":
+                return one(new Interaction.Visibility(true));
+            case "show":
+                return one(new Interaction.Visibility(false));
             case "sleep":
                 return one(new Interaction.Wait(parseDuration(args)));
             case "screenshot":
