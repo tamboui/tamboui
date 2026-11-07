@@ -4,6 +4,7 @@
  */
 package dev.tamboui.tfx.effects;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Position;
@@ -12,7 +13,6 @@ import dev.tamboui.style.Color;
 import dev.tamboui.tfx.CellFilter;
 import dev.tamboui.tfx.DirectionalVariance;
 import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.Motion;
 import dev.tamboui.tfx.Shader;
 import dev.tamboui.tfx.SimpleRng;

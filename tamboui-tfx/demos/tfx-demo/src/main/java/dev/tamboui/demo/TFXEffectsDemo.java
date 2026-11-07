@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Margin;
@@ -29,7 +30,6 @@ import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
 import dev.tamboui.tfx.ExpandDirection;
 import dev.tamboui.tfx.Fx;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.Motion;
 import dev.tamboui.tfx.TFxDuration;
 import dev.tamboui.tui.TuiConfig;

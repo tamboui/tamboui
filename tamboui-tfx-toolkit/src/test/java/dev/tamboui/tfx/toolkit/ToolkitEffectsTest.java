@@ -10,6 +10,7 @@ import java.util.function.LongSupplier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
@@ -17,7 +18,6 @@ import dev.tamboui.style.StyledAreaRegistry;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectTimer;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.effects.FadeShader;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.app.ToolkitPostRenderProcessor;
