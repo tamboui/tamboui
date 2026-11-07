@@ -11,11 +11,13 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.tui.event.KeyCode;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.tui.event.MouseEvent;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -153,6 +155,129 @@ class ScrollableElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("children taller than one row are drawn in full when they don't all fit")
+    void tallChildrenDrawnInFullWhenNotAllFit() {
+        ScrollableElement element = scrollable(
+            rows("c0a", "c0b"),
+            rows("c1a", "c1b"),
+            rows("c2a", "c2b"),
+            rows("c3a", "c3b")
+        );
+
+        assertThat(render(element, 10, 4)).hasContent(
+            "c0a      █",
+            "c0b      █",
+            "c1a      │",
+            "c1b      │"
+        );
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+
+        assertThat(render(element, 10, 4)).hasContent(
+            "c1a      │",
+            "c1b      █",
+            "c2a      █",
+            "c2b      │"
+        );
+    }
+
+    @Test
+    @DisplayName("child taller than one row is drawn in full after scrolling")
+    void scrolledTallChildDrawnInFull() {
+        ScrollableElement element = scrollable(
+            text("c0"),
+            rows("c1a", "c1b", "c1c"),
+            text("c2"),
+            text("c3")
+        );
+        render(element, 10, 3);
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+
+        assertThat(render(element, 10, 3)).hasContent(
+            "c1a      │",
+            "c1b      █",
+            "c1c      │"
+        );
+    }
+
+    @Test
+    @DisplayName("each scroll step draws the visible children with their own heights")
+    void scrollingThroughChildrenOfDifferentHeights() {
+        ScrollableElement element = scrollable(
+            text("c0"),
+            rows("c1a", "c1b", "c1c"),
+            text("c2"),
+            rows("c3a", "c3b"),
+            text("c4"),
+            text("c5")
+        );
+
+        assertThat(render(element, 10, 4)).hasContent(
+            "c0       █",
+            "c1a      █",
+            "c1b      │",
+            "c1c      │"
+        );
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+        assertThat(render(element, 10, 4)).hasContent(
+            "c1a      │",
+            "c1b      █",
+            "c1c      █",
+            "c2       │"
+        );
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+        assertThat(render(element, 10, 4)).hasContent(
+            "c2       │",
+            "c3a      █",
+            "c3b      █",
+            "c4       │"
+        );
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+        assertThat(render(element, 10, 4)).hasContent(
+            "c3a      │",
+            "c3b      │",
+            "c4       █",
+            "c5       █"
+        );
+    }
+
+    @Test
+    @DisplayName("children between the scroll indicators are drawn with their own heights")
+    void childrenBetweenIndicatorsDrawnWithTheirOwnHeights() {
+        ScrollableElement element = scrollable(
+            text("c0"),
+            rows("c1a", "c1b", "c1c"),
+            text("c2"),
+            rows("c3a", "c3b"),
+            text("c4"),
+            text("c5")
+        ).scrollUpIndicator(text("^")).scrollDownIndicator(text("v"));
+
+        assertThat(render(element, 10, 5)).hasContent(
+            "c0       █",
+            "c1a      █",
+            "c1b      │",
+            "c1c      │",
+            "v        │"
+        );
+
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+
+        // The up indicator is shown in place of the child at the scroll position (c1)
+        assertThat(render(element, 10, 5)).hasContent(
+            "^        │",
+            "c2       █",
+            "c3a      █",
+            "c3b      │",
+            "v        │"
+        );
+    }
+
+    @Test
     @DisplayName("up indicator shown when scrolled down")
     void upIndicatorShownWhenScrolledDown() {
         ScrollableElement element = scrollable(
@@ -255,5 +380,20 @@ class ScrollableElementTest extends AbstractElementTest {
         assertThat(element.preferredSize(20, 10, null).widthOr(0)).isEqualTo(6);
         // 2 children of height 1 each
         assertThat(element.preferredSize(20, 10, null).heightOr(0)).isEqualTo(2);
+    }
+
+    private static Buffer render(ScrollableElement element, int width, int height) {
+        Rect area = new Rect(0, 0, width, height);
+        Buffer buffer = Buffer.empty(area);
+        element.render(Frame.forTesting(buffer), area, RenderContext.empty());
+        return buffer;
+    }
+
+    private static Element rows(String... lines) {
+        Element[] texts = new Element[lines.length];
+        for (int i = 0; i < lines.length; i++) {
+            texts[i] = text(lines[i]);
+        }
+        return column(texts).length(lines.length);
     }
 }
