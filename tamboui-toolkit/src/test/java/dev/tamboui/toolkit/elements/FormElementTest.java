@@ -12,9 +12,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.buffer.Buffer;
+import dev.tamboui.layout.Rect;
+import dev.tamboui.style.Color;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.widgets.form.*;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.form;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -435,5 +441,35 @@ class FormElementTest extends AbstractElementTest {
         FormElement borderedForm = form(state).field("name", "Name").rounded();
 
         assertThat(borderedForm.preferredSize(-1, -1, null).heightOr(0)).isGreaterThan(plainForm.preferredSize(-1, -1, null).heightOr(0));
+    }
+
+    @Test
+    @DisplayName("A focused border color alone gives each field the rows of a bordered input, so the text stays visible")
+    void focusedBorderColorAlone_givesEachFieldRoomForTheBorder() {
+        FormState state = FormState.builder()
+                .textField("name", "Ada")
+                .booleanField("news", true)
+                .build();
+        FormElement form = form(state)
+                .field("name", "Name")
+                .field("news", "News", FieldType.CHECKBOX)
+                .labelWidth(5)
+                .focusedBorderColor(Color.CYAN);
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.focusManager().setFocus("form-field-name");
+        Rect area = new Rect(0, 0, 20, 7);
+        Buffer buffer = Buffer.empty(area);
+
+        form.render(Frame.forTesting(buffer), area, context);
+
+        assertThat(buffer).hasContent(
+                "      ┌────────────┐",
+                "Name  │Ada         │",
+                "      └────────────┘",
+                "                    ",
+                "                    ",
+                "News  [x]           ",
+                "                    ");
+        assertThat(form.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(7);
     }
 }
