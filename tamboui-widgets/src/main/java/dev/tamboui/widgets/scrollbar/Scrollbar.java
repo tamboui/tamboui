@@ -359,10 +359,10 @@ public final class Scrollbar implements StatefulWidget<ScrollbarState> {
 
         // Get effective styles
         Style effectiveStyle = style != null ? style : Style.EMPTY;
-        Style effectiveThumbStyle = thumbStyle != null ? thumbStyle.patch(effectiveStyle) : effectiveStyle;
-        Style effectiveTrackStyle = trackStyle != null ? trackStyle.patch(effectiveStyle) : effectiveStyle;
-        Style effectiveBeginStyle = beginStyle != null ? beginStyle.patch(effectiveStyle) : effectiveStyle;
-        Style effectiveEndStyle = endStyle != null ? endStyle.patch(effectiveStyle) : effectiveStyle;
+        Style effectiveThumbStyle = thumbStyle != null ? effectiveStyle.patch(thumbStyle) : effectiveStyle;
+        Style effectiveTrackStyle = trackStyle != null ? effectiveStyle.patch(trackStyle) : effectiveStyle;
+        Style effectiveBeginStyle = beginStyle != null ? effectiveStyle.patch(beginStyle) : effectiveStyle;
+        Style effectiveEndStyle = endStyle != null ? effectiveStyle.patch(endStyle) : effectiveStyle;
 
         // Render based on orientation
         if (orientation.isVertical()) {

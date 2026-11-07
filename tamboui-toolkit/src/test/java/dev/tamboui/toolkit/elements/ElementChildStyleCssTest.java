@@ -460,6 +460,32 @@ class ElementChildStyleCssTest extends AbstractElementTest {
         }
 
         @Test
+        @DisplayName("CSS thumb and track colors win over the color inherited from a panel")
+        void cssThumbAndTrackColorsWinOverInheritedColor() {
+            String css = "Panel { color: gray; }"
+                + " ScrollbarElement-thumb { color: yellow; }"
+                + " ScrollbarElement-track { color: blue; }";
+            styleEngine.addStylesheet("test", css);
+            styleEngine.setActiveStylesheet("test");
+
+            Rect area = new Rect(0, 0, 6, 6);
+            Buffer buffer = Buffer.empty(area);
+            Frame frame = Frame.forTesting(buffer);
+
+            ScrollbarState state = new ScrollbarState()
+                .contentLength(100)
+                .viewportContentLength(4)
+                .position(0);
+
+            panel(scrollbar().vertical().state(state))
+                .render(frame, area, context);
+
+            assertThat(buffer)
+                .at(4, 1).hasSymbol("█").hasForeground(Color.YELLOW).and()
+                .at(4, 3).hasSymbol("│").hasForeground(Color.BLUE);
+        }
+
+        @Test
         @DisplayName("scrollbar renders with default symbols")
         void scrollbarRendersWithDefaults() {
             Rect area = new Rect(0, 0, 1, 10);
