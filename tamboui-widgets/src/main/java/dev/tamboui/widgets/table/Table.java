@@ -188,6 +188,15 @@ public final class Table implements StatefulWidget<TableState> {
             return;
         }
 
+        // Keep the selection on an existing row
+        if (state.selected() != null && state.selected() >= rows.size()) {
+            if (rows.isEmpty()) {
+                state.clearSelection();
+            } else {
+                state.select(rows.size() - 1);
+            }
+        }
+
         // Calculate column widths
         int highlightWidth = calculateHighlightWidth(state);
         int availableWidth = tableArea.width() - highlightWidth;
@@ -201,10 +210,12 @@ public final class Table implements StatefulWidget<TableState> {
 
         List<Integer> columnWidths = calculateColumnWidths(availableWidth);
 
-        // Ensure selected row is visible
+        // Ensure selected row is visible, without scrolling past the last row
+        int visibleHeight = viewportHeight(area);
         if (state.selected() != null) {
-            state.scrollToSelected(viewportHeight(area), rows);
+            state.scrollToSelected(visibleHeight, rows);
         }
+        state.setOffset(Math.min(state.offset(), Math.max(0, rowsHeight() - visibleHeight)));
 
         int y = tableArea.top();
 
@@ -262,6 +273,14 @@ public final class Table implements StatefulWidget<TableState> {
             default:
                 return 0;
         }
+    }
+
+    private int rowsHeight() {
+        int height = 0;
+        for (Row row : rows) {
+            height += row.totalHeight();
+        }
+        return height;
     }
 
     private List<Integer> calculateColumnWidths(int availableWidth) {

@@ -4,6 +4,7 @@
  */
 package dev.tamboui.widgets.table;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -95,6 +96,92 @@ class TableTest {
         // Highlight symbol on selected row
         assertThat(buffer.get(0, 1).symbol()).isEqualTo(">");
         assertThat(buffer.get(1, 1).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Selection past the last row moves to the last row")
+    void selectionPastLastRowMovesToLastRow() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("r0"), Row.from("r1"), Row.from("r2")))
+            .widths(Constraint.length(4))
+            .build();
+
+        Rect area = new Rect(0, 0, 8, 3);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+        state.select(9);
+
+        table.render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "   r0   ",
+            "   r1   ",
+            ">> r2   ");
+        assertThat(state.selected()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Table scrolled down shows its last rows after the rows shrink")
+    void scrolledTableShowsLastRowsAfterRowsShrink() {
+        List<Row> rows = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            rows.add(Row.from("r" + i));
+        }
+        Rect area = new Rect(0, 0, 8, 2);
+        TableState state = new TableState();
+        state.select(9);
+        Table.builder().rows(rows).widths(Constraint.length(4)).build()
+            .render(area, Buffer.empty(area), state);
+
+        Buffer buffer = Buffer.empty(area);
+        Table.builder().rows(rows.subList(0, 3)).widths(Constraint.length(4)).build()
+            .render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "   r1   ",
+            ">> r2   ");
+        assertThat(state.offset()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Scroll offset past the rows shows the last rows")
+    void scrollOffsetPastRowsShowsLastRows() {
+        Table table = Table.builder()
+            .rows(Arrays.asList(Row.from("r0"), Row.from("r1"), Row.from("r2")))
+            .widths(Constraint.length(4))
+            .build();
+
+        Rect area = new Rect(0, 0, 4, 2);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+        state.setOffset(8);
+
+        table.render(area, buffer, state);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "r1  ",
+            "r2  ");
+        assertThat(state.offset()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Empty table clears the selection")
+    void emptyTableClearsSelection() {
+        Table table = Table.builder()
+            .header(Row.from("Name"))
+            .widths(Constraint.length(4))
+            .build();
+
+        Rect area = new Rect(0, 0, 8, 2);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+        state.select(4);
+
+        table.render(area, buffer, state);
+
+        assertThat(state.selected()).isNull();
+        // No room is kept for the symbol of a row that is not there
+        BufferAssertions.assertThat(buffer).hasRow(0, "Name    ");
     }
 
     @Test
