@@ -21,6 +21,7 @@ import dev.tamboui.markdown.internal.RenderedChunk;
 import dev.tamboui.markdown.internal.WidgetChunk;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.IntegerConverter;
 import dev.tamboui.style.Modifier;
 import dev.tamboui.style.ModifierConverter;
 import dev.tamboui.style.Overflow;
@@ -63,8 +64,7 @@ import dev.tamboui.widgets.syntax.SyntaxTheme;
  * {@code list-marker}, {@code html}, {@code horizontal-rule},
  * {@code task-checked}, or {@code task-unchecked}.
  *
- * <p>Plus a few string properties that mirror the {@code Checkbox} widget
- * convention:
+ * <p>Plus a few string and integer properties that mirror widget conventions:
  * <ul>
  *   <li>{@link #BLOCKQUOTE_PREFIX} ({@code blockquote-prefix}) — leading bar
  *       glyph drawn at the start of each quoted line; a single space is
@@ -73,6 +73,8 @@ import dev.tamboui.widgets.syntax.SyntaxTheme;
  *       {@link #TASK_UNCHECKED_SYMBOL} ({@code task-unchecked-symbol}) —
  *       glyphs drawn for GFM task-list items; defaults are {@code [x]} and
  *       {@code [ ]}, again followed by a single space.</li>
+ *   <li>{@link #PARAGRAPH_SPACING} ({@code paragraph-spacing}) — number of
+ *       blank lines drawn between paragraphs and blocks; default is {@code 1}.</li>
  * </ul>
  *
  * <p>And the widget-wide {@code text-overflow} property
@@ -93,6 +95,7 @@ import dev.tamboui.widgets.syntax.SyntaxTheme;
  *     blockquote-color: yellow;
  *     blockquote-background: black;
  *     blockquote-prefix: "&gt; ";
+ *     paragraph-spacing: 0;
  * }
  * </pre>
  *
@@ -123,6 +126,9 @@ public final class MarkdownView implements Widget {
     /** CSS property for the unchecked task-list marker glyph. */
     public static final PropertyDefinition<String> TASK_UNCHECKED_SYMBOL =
         PropertyDefinition.of("task-unchecked-symbol", StringConverter.INSTANCE);
+    /** CSS property for the paragraph spacing in blank lines between paragraphs and blocks. */
+    public static final PropertyDefinition<Integer> PARAGRAPH_SPACING =
+        PropertyDefinition.of("paragraph-spacing", IntegerConverter.INSTANCE);
 
     private static final ElementProperties[] HEADINGS = new ElementProperties[] {
         ElementProperties.of("heading-1"),
@@ -154,6 +160,7 @@ public final class MarkdownView implements Widget {
     private final SyntaxTheme syntaxTheme;
     private final Overflow overflow;
     private final int scroll;
+    private final int paragraphSpacing;
 
     private MarkdownView(Builder builder) {
         this.source = Objects.requireNonNull(builder.source, "source");
@@ -176,6 +183,14 @@ public final class MarkdownView implements Widget {
                 .orElse(Overflow.WRAP_WORD);
         }
         this.scroll = builder.scroll;
+        if (builder.paragraphSpacing != null) {
+            this.paragraphSpacing = builder.paragraphSpacing;
+        } else {
+            this.paragraphSpacing = styleResolver
+                .get(PARAGRAPH_SPACING)
+                .map(v -> Math.max(0, v))
+                .orElse(1);
+        }
     }
 
     /**
@@ -185,6 +200,24 @@ public final class MarkdownView implements Widget {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * Returns the number of blank lines inserted between paragraphs and blocks.
+     *
+     * @return the paragraph spacing
+     */
+    public int paragraphSpacing() {
+        return paragraphSpacing;
+    }
+
+    /**
+     * Returns whether compact rendering mode is enabled (paragraph spacing is 0).
+     *
+     * @return {@code true} if compact mode is enabled
+     */
+    public boolean isCompact() {
+        return paragraphSpacing == 0;
     }
 
     /**
@@ -215,7 +248,7 @@ public final class MarkdownView implements Widget {
         MarkdownStyles resolved = resolveStyles();
         int total = 0;
         for (RenderedChunk chunk : MarkdownLayout.layout(
-            root, contentWidth, resolved, overflow, syntaxHighlighter, syntaxTheme)) {
+            root, contentWidth, resolved, overflow, syntaxHighlighter, syntaxTheme, paragraphSpacing)) {
             total += chunk.height(contentWidth);
         }
         return total + chrome;
@@ -241,7 +274,7 @@ public final class MarkdownView implements Widget {
         Node root = MarkdownParserHolder.parser().parse(sanitized);
         MarkdownStyles resolved = resolveStyles();
         List<RenderedChunk> chunks = MarkdownLayout.layout(
-            root, contentArea.width(), resolved, overflow, syntaxHighlighter, syntaxTheme);
+            root, contentArea.width(), resolved, overflow, syntaxHighlighter, syntaxTheme, paragraphSpacing);
 
         int totalRows = 0;
         for (RenderedChunk chunk : chunks) {
@@ -418,6 +451,7 @@ public final class MarkdownView implements Widget {
         private SyntaxTheme syntaxTheme = SyntaxTheme.DEFAULTS;
         private Overflow overflow;
         private int scroll;
+        private Integer paragraphSpacing;
 
         private Builder() {
         }
@@ -535,6 +569,44 @@ public final class MarkdownView implements Widget {
          */
         public Builder syntaxTheme(SyntaxTheme theme) {
             this.syntaxTheme = Objects.requireNonNull(theme, "theme");
+            return this;
+        }
+
+        /**
+         * Sets the number of blank lines to insert between paragraphs and blocks.
+         * The default is 1.
+         *
+         * @param spacing the number of blank lines (&gt;= 0)
+         * @return this builder
+         */
+        public Builder paragraphSpacing(int spacing) {
+            if (spacing < 0) {
+                throw new IllegalArgumentException("paragraphSpacing must be >= 0: " + spacing);
+            }
+            this.paragraphSpacing = spacing;
+            return this;
+        }
+
+        /**
+         * Enables compact rendering mode by suppressing blank lines between paragraphs and blocks.
+         * Equivalent to {@code paragraphSpacing(0)}.
+         *
+         * @return this builder
+         */
+        public Builder compact() {
+            return compact(true);
+        }
+
+        /**
+         * Sets whether compact rendering mode is enabled.
+         * When true, blank lines between paragraphs and blocks are suppressed (0 blank lines).
+         * When false, default paragraph spacing (1 blank line) is used.
+         *
+         * @param compact true for compact mode, false for standard spacing
+         * @return this builder
+         */
+        public Builder compact(boolean compact) {
+            this.paragraphSpacing = compact ? 0 : 1;
             return this;
         }
 

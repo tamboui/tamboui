@@ -49,6 +49,7 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
     private SyntaxTheme syntaxTheme;
     private Overflow overflow;
     private int scroll;
+    private Integer paragraphSpacing;
 
     private MarkdownElement(String source) {
         this.source = Objects.requireNonNull(source, "source");
@@ -146,6 +147,62 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
     }
 
     /**
+     * Sets the number of blank lines to insert between paragraphs and blocks.
+     * The default is 1.
+     *
+     * @param spacing the number of blank lines (&gt;= 0)
+     * @return this element for chaining
+     */
+    public MarkdownElement paragraphSpacing(int spacing) {
+        if (spacing < 0) {
+            throw new IllegalArgumentException("paragraphSpacing must be >= 0: " + spacing);
+        }
+        this.paragraphSpacing = spacing;
+        return this;
+    }
+
+    /**
+     * Enables compact rendering mode by suppressing blank lines between paragraphs and blocks.
+     * Equivalent to {@code paragraphSpacing(0)}.
+     *
+     * @return this element for chaining
+     */
+    public MarkdownElement compact() {
+        return compact(true);
+    }
+
+    /**
+     * Sets whether compact rendering mode is enabled.
+     * When true, blank lines between paragraphs and blocks are suppressed (0 blank lines).
+     * When false, default paragraph spacing (1 blank line) is restored.
+     *
+     * @param compact true for compact mode, false for standard spacing
+     * @return this element for chaining
+     */
+    public MarkdownElement compact(boolean compact) {
+        this.paragraphSpacing = compact ? 0 : 1;
+        return this;
+    }
+
+    /**
+     * Returns the paragraph spacing in lines. Defaults to 1 if not explicitly set.
+     *
+     * @return the paragraph spacing
+     */
+    public int paragraphSpacing() {
+        return paragraphSpacing != null ? paragraphSpacing : 1;
+    }
+
+    /**
+     * Returns whether compact rendering mode is enabled (paragraph spacing is 0).
+     *
+     * @return {@code true} if compact mode is enabled
+     */
+    public boolean isCompact() {
+        return paragraphSpacing() == 0;
+    }
+
+    /**
      * Returns the current markdown source.
      *
      * @return the markdown source
@@ -190,6 +247,9 @@ public final class MarkdownElement extends StyledElement<MarkdownElement> {
         }
         if (overflow != null) {
             b.overflow(overflow);
+        }
+        if (paragraphSpacing != null) {
+            b.paragraphSpacing(paragraphSpacing);
         }
         return b.build();
     }

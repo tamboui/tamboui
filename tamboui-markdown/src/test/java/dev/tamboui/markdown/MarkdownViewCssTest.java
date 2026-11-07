@@ -269,4 +269,42 @@ class MarkdownViewCssTest {
             .get()
             .isEqualTo(Color.YELLOW);
     }
+
+    @Test
+    @DisplayName("CSS paragraph-spacing drives paragraph spacing when unset")
+    void cssParagraphSpacing() {
+        Map<String, String> rules = new HashMap<>();
+        rules.put("paragraph-spacing", "0");
+
+        MarkdownView view = MarkdownView.builder()
+            .source("first\n\nsecond")
+            .styleResolver(resolverOf(rules))
+            .build();
+        Buffer buffer = renderInto(view, 20, 2);
+
+        assertThat(view.paragraphSpacing()).isEqualTo(0);
+        assertThat(view.isCompact()).isTrue();
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("f");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("s");
+    }
+
+    @Test
+    @DisplayName("explicit paragraphSpacing wins over CSS")
+    void explicitParagraphSpacingWinsOverCss() {
+        Map<String, String> rules = new HashMap<>();
+        rules.put("paragraph-spacing", "0");
+
+        MarkdownView view = MarkdownView.builder()
+            .source("first\n\nsecond")
+            .paragraphSpacing(1)
+            .styleResolver(resolverOf(rules))
+            .build();
+        Buffer buffer = renderInto(view, 20, 3);
+
+        assertThat(view.paragraphSpacing()).isEqualTo(1);
+        assertThat(view.isCompact()).isFalse();
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("f");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(0, 2).symbol()).isEqualTo("s");
+    }
 }
