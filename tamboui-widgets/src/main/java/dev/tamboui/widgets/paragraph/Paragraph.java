@@ -240,8 +240,13 @@ public final class Paragraph implements Widget {
         END
     }
 
+    /**
+     * Shortens the lines that are too wide, keeping the style of each span. The ellipsis takes the style of the text
+     * it replaces next to it: the first character cut away for END and MIDDLE, the last one for START.
+     */
     private List<Line> truncateWithEllipsis(List<Line> lines, int maxWidth, EllipsisPosition position) {
         List<Line> result = new ArrayList<>();
+        int ellipsisWidth = CharWidth.of(ELLIPSIS);
 
         for (Line line : lines) {
             if (line.width() <= maxWidth) {
@@ -249,67 +254,82 @@ public final class Paragraph implements Widget {
                 continue;
             }
 
-            // Need to truncate - extract full text content and style from first span
-            String fullText = lineToString(line);
-            Style lineStyle = getLineStyle(line);
-
-            if (maxWidth <= ELLIPSIS.length()) {
+            List<Span> spans = line.spans();
+            List<Span> kept = new ArrayList<>();
+            if (maxWidth <= ellipsisWidth) {
                 // Not enough room for ellipsis, just clip
-                result.add(Line.from(new Span(CharWidth.substringByWidth(fullText, maxWidth), lineStyle)));
+                keepHead(spans, maxWidth, kept);
+                result.add(Line.from(kept));
                 continue;
             }
 
-            String truncated;
+            int availableWidth = maxWidth - ellipsisWidth;
+            List<Span> tail = new ArrayList<>();
+            Style ellipsisStyle;
             switch (position) {
-                case END:
-                    truncated = truncateEnd(fullText, maxWidth);
-                    break;
                 case START:
-                    truncated = truncateStart(fullText, maxWidth);
+                    ellipsisStyle = keepTail(spans, availableWidth, tail);
                     break;
                 case MIDDLE:
-                    truncated = truncateMiddle(fullText, maxWidth);
+                    ellipsisStyle = keepHead(spans, (availableWidth + 1) / 2, kept);
+                    keepTail(spans, availableWidth / 2, tail);
                     break;
+                case END:
                 default:
-                    truncated = truncateEnd(fullText, maxWidth);
+                    ellipsisStyle = keepHead(spans, availableWidth, kept);
+                    break;
             }
-
-            result.add(Line.from(new Span(truncated, lineStyle)));
+            kept.add(new Span(ELLIPSIS, ellipsisStyle));
+            kept.addAll(tail);
+            result.add(Line.from(kept));
         }
 
         return result;
     }
 
-    private String truncateEnd(String text, int maxWidth) {
-        int availableWidth = maxWidth - ELLIPSIS.length();
-        return CharWidth.substringByWidth(text, availableWidth) + ELLIPSIS;
-    }
-
-    private String truncateStart(String text, int maxWidth) {
-        int availableWidth = maxWidth - ELLIPSIS.length();
-        return ELLIPSIS + CharWidth.substringByWidthFromEnd(text, availableWidth);
-    }
-
-    private String truncateMiddle(String text, int maxWidth) {
-        int availableWidth = maxWidth - ELLIPSIS.length();
-        int leftWidth = (availableWidth + 1) / 2;
-        int rightWidth = availableWidth / 2;
-        return CharWidth.substringByWidth(text, leftWidth) + ELLIPSIS
-                + CharWidth.substringByWidthFromEnd(text, rightWidth);
-    }
-
-    private String lineToString(Line line) {
-        StringBuilder sb = new StringBuilder();
-        for (Span span : line.spans()) {
-            sb.append(span.content());
+    /**
+     * Adds the start of a line that fits in {@code width} columns to {@code out}: the spans that fit whole, then the
+     * head of the next span, cut between grapheme clusters. The spans must be wider than {@code width} in total.
+     *
+     * @return the style of the span the cut falls in
+     */
+    private static Style keepHead(List<Span> spans, int width, List<Span> out) {
+        int remaining = width;
+        int i = 0;
+        while (spans.get(i).width() <= remaining) {
+            out.add(spans.get(i));
+            remaining -= spans.get(i).width();
+            i++;
         }
-        return sb.toString();
+        Span cut = spans.get(i);
+        String head = CharWidth.substringByWidth(cut.content(), remaining);
+        if (!head.isEmpty()) {
+            out.add(new Span(head, cut.style()));
+        }
+        return cut.style();
     }
 
-    private Style getLineStyle(Line line) {
-        // Use the style of the first span, or empty if no spans
-        List<Span> spans = line.spans();
-        return spans.isEmpty() ? Style.EMPTY : spans.get(0).style();
+    /**
+     * Adds the end of a line that fits in {@code width} columns to {@code out}: the tail of the span the cut falls
+     * in, cut between grapheme clusters, then the spans after it. The spans must be wider than {@code width} in
+     * total.
+     *
+     * @return the style of the span the cut falls in
+     */
+    private static Style keepTail(List<Span> spans, int width, List<Span> out) {
+        int remaining = width;
+        int i = spans.size() - 1;
+        while (spans.get(i).width() <= remaining) {
+            remaining -= spans.get(i).width();
+            i--;
+        }
+        Span cut = spans.get(i);
+        String tail = CharWidth.substringByWidthFromEnd(cut.content(), remaining);
+        if (!tail.isEmpty()) {
+            out.add(new Span(tail, cut.style()));
+        }
+        out.addAll(spans.subList(i + 1, spans.size()));
+        return cut.style();
     }
 
     private List<Line> wrapLines(List<Line> lines, int maxWidth) {
