@@ -249,6 +249,12 @@ public abstract class GenerateDemosGalleryTask extends DefaultTask {
                 sb.append(demo.description()).append("\n\n");
             }
 
+            // jbang run command
+            sb.append("[source,shell]\n");
+            sb.append("----\n");
+            sb.append("jbang ").append(demo.id()).append("@tamboui/tamboui\n");
+            sb.append("----\n\n");
+
             // Use passthrough block to embed the asciinema player
             sb.append("++++\n");
             sb.append("<div id=\"player-").append(demo.id()).append("\" class=\"demo-player\"></div>\n");
