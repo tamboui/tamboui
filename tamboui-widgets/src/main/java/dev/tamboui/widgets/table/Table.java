@@ -265,10 +265,31 @@ public final class Table implements StatefulWidget<TableState> {
     }
 
     private List<Integer> calculateColumnWidths(int availableWidth) {
+        List<Constraint> resolvedWidths = widths;
+        boolean hasFit = false;
+        for (Constraint c : widths) {
+            if (c instanceof Constraint.Fit) {
+                hasFit = true;
+                break;
+            }
+        }
+
+        if (hasFit) {
+            resolvedWidths = new ArrayList<>(widths.size());
+            for (int col = 0; col < widths.size(); col++) {
+                Constraint c = widths.get(col);
+                if (c instanceof Constraint.Fit) {
+                    resolvedWidths.add(Constraint.length(maxColumnContentWidth(col)));
+                } else {
+                    resolvedWidths.add(c);
+                }
+            }
+        }
+
         // Use Layout to calculate column widths based on constraints
         Rect fakeArea = new Rect(0, 0, availableWidth, 1);
         List<Rect> columnRects = Layout.horizontal()
-            .constraints(widths)
+            .constraints(resolvedWidths)
             .split(fakeArea);
 
         List<Integer> widthList = new ArrayList<>(columnRects.size());
@@ -276,6 +297,22 @@ public final class Table implements StatefulWidget<TableState> {
             widthList.add(rect.width());
         }
         return widthList;
+    }
+
+    private int maxColumnContentWidth(int col) {
+        int maxWidth = 0;
+        if (header != null && col < header.cells().size()) {
+            maxWidth = Math.max(maxWidth, header.cells().get(col).width());
+        }
+        for (Row row : rows) {
+            if (col < row.cells().size()) {
+                maxWidth = Math.max(maxWidth, row.cells().get(col).width());
+            }
+        }
+        if (footer != null && col < footer.cells().size()) {
+            maxWidth = Math.max(maxWidth, footer.cells().get(col).width());
+        }
+        return maxWidth;
     }
 
     private int renderRow(Buffer buffer, Rect tableArea, int y, Row row,

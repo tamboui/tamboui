@@ -399,4 +399,73 @@ class TableTest {
         // Second row "Bob" starts at y=1 and should have blue background
         BufferAssertions.assertThat(buffer).at(0, 1).hasBackground(Color.BLUE);
     }
+
+    @Test
+    @DisplayName("Table with Constraint.fit() derives widths from cell content (#413)")
+    void tableWithFitConstraintsRendersCorrectly() {
+        Row header = Row.from("PID", "NAME", "STATUS");
+        List<Row> rows = Arrays.asList(
+            Row.from("1234", "java", "RUNNING"),
+            Row.from("5678", "node", "IDLE")
+        );
+
+        Table table = Table.builder()
+            .header(header)
+            .rows(rows)
+            .widths(Constraint.fit(), Constraint.fit(), Constraint.fit())
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        // PID=4, NAME=4, STATUS=7 -> Total width = 4 + 1 + 4 + 1 + 7 = 17
+        Rect area = new Rect(0, 0, 30, 4);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Header: "PID NAME STATUS"
+        // Col 0 at x=0: "PID"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("P");
+        // Col 1 at x=4+1=5: "NAME"
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("N");
+        // Col 2 at x=5+4+1=10: "STATUS"
+        assertThat(buffer.get(10, 0).symbol()).isEqualTo("S");
+
+        // Row 1: "1234 java RUNNING"
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("1");
+        assertThat(buffer.get(5, 1).symbol()).isEqualTo("j");
+        assertThat(buffer.get(10, 1).symbol()).isEqualTo("R");
+    }
+
+    @Test
+    @DisplayName("Table with mixed Fit and Fill constraints")
+    void tableWithMixedFitAndFillConstraints() {
+        Row header = Row.from("ID", "DESCRIPTION");
+        List<Row> rows = Arrays.asList(
+            Row.from("1", "First item"),
+            Row.from("20", "Second item")
+        );
+
+        Table table = Table.builder()
+            .header(header)
+            .rows(rows)
+            .widths(Constraint.fit(), Constraint.fill())
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 30, 3);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // ID max width is 2 ("ID" and "20"). Col 0 gets width 2.
+        // Col 1 starts at 2 + 1 = 3.
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("I");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo(" ");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("D");
+    }
 }
