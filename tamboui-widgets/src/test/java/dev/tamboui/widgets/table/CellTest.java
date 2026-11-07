@@ -7,6 +7,7 @@ package dev.tamboui.widgets.table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import dev.tamboui.layout.Alignment;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
 import dev.tamboui.text.Line;
@@ -68,5 +69,40 @@ class CellTest {
         assertThat(styled.style().fg()).contains(Color.RED);
         // Original is unchanged
         assertThat(cell.style()).isEqualTo(Style.EMPTY);
+    }
+
+    @Test
+    @DisplayName("Cell defaults to left alignment")
+    void defaultAlignment() {
+        assertThat(Cell.from("Test").alignment()).isEqualTo(Alignment.LEFT);
+        assertThat(Cell.empty().alignment()).isEqualTo(Alignment.LEFT);
+    }
+
+    @Test
+    @DisplayName("Cell.alignment returns new cell with alignment")
+    void withAlignment() {
+        Cell cell = Cell.from("Test");
+        Cell right = cell.alignment(Alignment.RIGHT);
+
+        assertThat(right.alignment()).isEqualTo(Alignment.RIGHT);
+        // Original is unchanged
+        assertThat(cell.alignment()).isEqualTo(Alignment.LEFT);
+    }
+
+    @Test
+    @DisplayName("Cell.alignment preserves content and style")
+    void alignmentPreservesContentAndStyle() {
+        Style style = Style.EMPTY.fg(Color.RED).bold();
+        Cell cell = Cell.from("Hello").style(style).alignment(Alignment.CENTER);
+
+        assertThat(cell.content().width()).isEqualTo(5);
+        assertThat(cell.style()).isEqualTo(style);
+        assertThat(cell.alignment()).isEqualTo(Alignment.CENTER);
+    }
+
+    @Test
+    @DisplayName("Cell.alignment rejects null")
+    void alignmentRejectsNull() {
+        assertThatNullPointerException().isThrownBy(() -> Cell.from("Test").alignment(null));
     }
 }
