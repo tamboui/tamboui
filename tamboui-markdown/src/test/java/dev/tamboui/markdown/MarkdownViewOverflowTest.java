@@ -9,14 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.commonmark.parser.Parser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.markdown.internal.MarkdownInlineRenderer;
+import dev.tamboui.style.Modifier;
 import dev.tamboui.style.Overflow;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.Style;
@@ -32,6 +35,12 @@ class MarkdownViewOverflowTest {
     private static final String LONG_TEXT =
         "the quick brown fox jumps over the lazy dog and the moon and the stars";
 
+    private static final String CODER = "\uD83D\uDC69\u200D\uD83D\uDCBB";
+    private static final String FAMILY = "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67";
+
+    private static final Predicate<Style> BOLD = style -> style.addModifiers().contains(Modifier.BOLD);
+    private static final Predicate<Style> LINKED = style -> style.hyperlink().isPresent();
+
     private static Buffer renderInto(MarkdownView view, int width, int height) {
         Rect area = new Rect(0, 0, width, height);
         Buffer buffer = Buffer.empty(area);
@@ -39,10 +48,27 @@ class MarkdownViewOverflowTest {
         return buffer;
     }
 
+    private static Buffer renderLine(String source, Overflow overflow, int width) {
+        return renderInto(MarkdownView.builder().source(source).overflow(overflow).build(), width, 1);
+    }
+
     private static String row(Buffer buffer, int y) {
         StringBuilder sb = new StringBuilder();
         for (int x = 0; x < buffer.width(); x++) {
             sb.append(buffer.get(x, y).symbol());
+        }
+        return sb.toString().replaceAll("\\s+$", "");
+    }
+
+    /** Like {@link #row}, with a space for each cell whose style does not pass {@code test}. */
+    private static String cellsWhere(Buffer buffer, int y, Predicate<Style> test) {
+        StringBuilder sb = new StringBuilder();
+        for (int x = 0; x < buffer.width(); x++) {
+            Cell cell = buffer.get(x, y);
+            if (cell.isContinuation()) {
+                continue;
+            }
+            sb.append(test.test(cell.style()) ? cell.symbol() : " ");
         }
         return sb.toString().replaceAll("\\s+$", "");
     }
@@ -155,6 +181,89 @@ class MarkdownViewOverflowTest {
         assertThat(rendered).contains("...");
         assertThat(rendered.indexOf("...")).isGreaterThan(0);
         assertThat(rendered).hasSize(20);
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS keeps the style of each span, and the ellipsis takes the style of the text it replaces")
+    void ellipsisEndKeepsSpanStyles() {
+        Buffer buffer = renderLine("**bold** plain text that is too long", Overflow.ELLIPSIS, 12);
+
+        assertThat(row(buffer, 0)).isEqualTo("bold plai...");
+        assertThat(cellsWhere(buffer, 0, BOLD)).isEqualTo("bold");
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS_START keeps the style of each span")
+    void ellipsisStartKeepsSpanStyles() {
+        Buffer buffer = renderLine("plain text that is too long and ends **bold**", Overflow.ELLIPSIS_START, 12);
+
+        assertThat(row(buffer, 0)).isEqualTo("...ends bold");
+        assertThat(cellsWhere(buffer, 0, BOLD)).isEqualTo("        bold");
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS_MIDDLE keeps the style of each span")
+    void ellipsisMiddleKeepsSpanStyles() {
+        Buffer buffer = renderLine("**bold** plain text that is too long **end**", Overflow.ELLIPSIS_MIDDLE, 12);
+
+        assertThat(row(buffer, 0)).isEqualTo("bold ... end");
+        assertThat(cellsWhere(buffer, 0, BOLD)).isEqualTo("bold     end");
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS keeps a leading link's hyperlink on the link text only")
+    void ellipsisKeepsHyperlinkOnLinkText() {
+        Buffer buffer = renderLine("[link](https://example.com) plain text that is too long", Overflow.ELLIPSIS, 12);
+
+        assertThat(row(buffer, 0)).isEqualTo("link plai...");
+        assertThat(cellsWhere(buffer, 0, LINKED)).isEqualTo("link");
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS in a view narrower than the ellipsis clips the line, keeping the style of each span")
+    void ellipsisNarrowerThanEllipsisKeepsSpanStyles() {
+        Buffer buffer = renderLine("a **bold** text", Overflow.ELLIPSIS, 3);
+
+        assertThat(row(buffer, 0)).isEqualTo("a b");
+        assertThat(cellsWhere(buffer, 0, BOLD)).isEqualTo("  b");
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS modes keep a wide character at the cut whole or leave it out, keeping span styles")
+    void ellipsisWideCharacterAtCut() {
+        Buffer end = renderLine("**ab**\u4E16\u754C and more", Overflow.ELLIPSIS, 8);
+        assertThat(row(end, 0)).isEqualTo("ab\u4E16...");
+        assertThat(cellsWhere(end, 0, BOLD)).isEqualTo("ab");
+
+        Buffer start = renderLine("more and \u4E16\u754C**end**", Overflow.ELLIPSIS_START, 7);
+        assertThat(row(start, 0)).isEqualTo("...end");
+        assertThat(cellsWhere(start, 0, BOLD)).isEqualTo("   end");
+
+        Buffer middle = renderLine("**ab**\u4E16\u754C more text **end**", Overflow.ELLIPSIS_MIDDLE, 9);
+        assertThat(row(middle, 0)).isEqualTo("ab...end");
+        assertThat(cellsWhere(middle, 0, BOLD)).isEqualTo("ab   end");
+    }
+
+    @Test
+    @DisplayName("ELLIPSIS modes keep a ZWJ emoji at the cut whole or leave it out, keeping span styles")
+    void ellipsisZwjEmojiAtCut() {
+        String end = "**ab** " + CODER + " and more";
+        assertThat(row(renderLine(end, Overflow.ELLIPSIS, 7), 0)).isEqualTo("ab ...");
+        Buffer endKept = renderLine(end, Overflow.ELLIPSIS, 8);
+        assertThat(row(endKept, 0)).isEqualTo("ab " + CODER + "...");
+        assertThat(cellsWhere(endKept, 0, BOLD)).isEqualTo("ab");
+
+        String start = "more text " + FAMILY + " **end**";
+        assertThat(row(renderLine(start, Overflow.ELLIPSIS_START, 8), 0)).isEqualTo("... end");
+        Buffer startKept = renderLine(start, Overflow.ELLIPSIS_START, 9);
+        assertThat(row(startKept, 0)).isEqualTo("..." + FAMILY + " end");
+        assertThat(cellsWhere(startKept, 0, BOLD)).isEqualTo("     end");
+
+        String middle = "**ab** " + CODER + " text that is long **end**";
+        assertThat(row(renderLine(middle, Overflow.ELLIPSIS_MIDDLE, 11), 0)).isEqualTo("ab ... end");
+        Buffer middleKept = renderLine(middle, Overflow.ELLIPSIS_MIDDLE, 12);
+        assertThat(row(middleKept, 0)).isEqualTo("ab " + CODER + "... end");
+        assertThat(cellsWhere(middleKept, 0, BOLD)).isEqualTo("ab      end");
     }
 
     @Test
