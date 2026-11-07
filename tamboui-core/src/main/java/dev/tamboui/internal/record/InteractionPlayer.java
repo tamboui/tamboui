@@ -177,11 +177,11 @@ final class InteractionPlayer {
                 continue;
             }
 
-            parseVhsCommand(outputPath, line, interactions);
+            interactions.addAll(parseVhsCommand(outputPath, line));
         }
     }
 
-    private static void parseVhsCommand(Path outputPath, String line, List<Interaction> interactions) {
+    private static List<Interaction> parseVhsCommand(Path outputPath, String line) {
         // The command is the first word, and it may carry a timing suffix: Command@duration.
         // "Right@2.5s 3" presses Right 3 times with 2.5s between each, "Type@50ms "text"" types a character
         // every 50ms, and "Wait@10s /Ready/" waits at most 10s. Only the first word is checked for '@', so
@@ -199,61 +199,50 @@ final class InteractionPlayer {
 
         switch (command) {
             case "sleep":
-                interactions.add(new Interaction.Wait(parseDuration(args)));
-                break;
+                return one(new Interaction.Wait(parseDuration(args)));
             case "screenshot":
                 // Resolve screenshot path relative to the .cast file's directory (same folder)
-                interactions.add(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
-                break;
+                return one(new Interaction.Screenshot(outputPath.getParent().resolve(args)));
             case "type":
-                addTypedText(parseQuotedString(args), delayMs, interactions);
-                break;
+                return typedText(parseQuotedString(args), delayMs);
             case "wait":
             case "wait+line":
             case "wait+screen":
-                addWaitFor(line, "wait+screen".equals(command), args, delayMs, interactions);
-                break;
+                return waitFor(line, "wait+screen".equals(command), args, delayMs);
             case "click":
-                addClick(line, args, 0, interactions);
-                break;
+                return click(line, args, 0);
             case "rightclick":
-                addClick(line, args, 2, interactions);
-                break;
+                return click(line, args, 2);
             case "middleclick":
-                addClick(line, args, 1, interactions);
-                break;
+                return click(line, args, 1);
             case "mousedown":
-                addButton(line, args, 0, false, interactions);
-                break;
+                return button(line, args, 0, false);
             case "mouseup":
-                addButton(line, args, 0, true, interactions);
-                break;
+                return button(line, args, 0, true);
             case "mousemove":
-                addMove(line, args, interactions);
-                break;
+                return move(line, args);
             case "drag":
-                addDrag(line, args, delayMs, interactions);
-                break;
+                return drag(line, args, delayMs);
             case "scrollup":
-                addScroll(line, args, 64, interactions);
-                break;
+                return scroll(line, args, 64);
             case "scrolldown":
-                addScroll(line, args, 65, interactions);
-                break;
+                return scroll(line, args, 65);
             case "scrollleft":
-                addScroll(line, args, 66, interactions);
-                break;
+                return scroll(line, args, 66);
             case "scrollright":
-                addScroll(line, args, 67, interactions);
-                break;
+                return scroll(line, args, 67);
             default:
                 if (isKey(head)) {
-                    addRepeatedKey(command, parseRepeatCount(line, args), delayMs, interactions);
-                } else {
-                    warn("Ignoring unknown tape command: " + line);
+                    return repeatedKey(command, parseRepeatCount(line, args), delayMs);
                 }
-                break;
+                warn("Ignoring unknown tape command: " + line);
+                return Collections.emptyList();
         }
+    }
+
+    /** A single interaction as a list, for the command cases that produce exactly one. */
+    private static List<Interaction> one(Interaction interaction) {
+        return Collections.singletonList(interaction);
     }
 
     /**
@@ -288,26 +277,28 @@ final class InteractionPlayer {
         }
     }
 
-    private static void addTypedText(String text, int delayMs, List<Interaction> interactions) {
+    private static List<Interaction> typedText(String text, int delayMs) {
+        List<Interaction> interactions = new ArrayList<>(text.length());
         for (int i = 0; i < text.length(); i++) {
             if (i > 0 && delayMs > 0) {
                 interactions.add(new Interaction.Wait(delayMs));
             }
             interactions.add(new Interaction.KeyPress(String.valueOf(text.charAt(i))));
         }
+        return interactions;
     }
 
-    private static void addWaitFor(String line, boolean screen, String args, int timeoutMs,
-                                   List<Interaction> interactions) {
+    private static List<Interaction> waitFor(String line, boolean screen, String args, int timeoutMs) {
         if (args.length() < 2 || !args.startsWith("/") || !args.endsWith("/")) {
             warn("Ignoring Wait without a /regex/ to wait for: " + line);
-            return;
+            return Collections.emptyList();
         }
         try {
             Pattern pattern = Pattern.compile(args.substring(1, args.length() - 1));
-            interactions.add(new Interaction.WaitFor(pattern, screen, timeoutMs > 0 ? timeoutMs : DEFAULT_WAIT_TIMEOUT_MS));
+            return one(new Interaction.WaitFor(pattern, screen, timeoutMs > 0 ? timeoutMs : DEFAULT_WAIT_TIMEOUT_MS));
         } catch (PatternSyntaxException e) {
             warn("Ignoring Wait with an invalid regex: " + line + " (" + e.getDescription() + ")");
+            return Collections.emptyList();
         }
     }
 
@@ -332,44 +323,37 @@ final class InteractionPlayer {
         return values;
     }
 
-    private static void addClick(String line, String args, int button, List<Interaction> interactions) {
-        int[] c = parseInts(args);
-        if (c == null || c.length != 2) {
-            warn("Ignoring click without exactly <x> <y>: " + line);
-            return;
+    private static List<Interaction> click(String line, String args, int button) {
+        int[] c = coords(args, 2, line, "click");
+        if (c == null) {
+            return Collections.emptyList();
         }
-        List<Interaction.Mouse.Step> steps = new ArrayList<>(2);
-        steps.add(new Interaction.Mouse.Step(button, false, c[0], c[1]));
-        steps.add(new Interaction.Mouse.Step(button, true, c[0], c[1]));
-        interactions.add(new Interaction.Mouse(steps));
+        return one(new Interaction.Mouse(Arrays.asList(
+                new Interaction.Mouse.Step(button, false, c[0], c[1]),
+                new Interaction.Mouse.Step(button, true, c[0], c[1]))));
     }
 
-    private static void addButton(String line, String args, int button, boolean release, List<Interaction> interactions) {
-        int[] c = parseInts(args);
-        if (c == null || c.length != 2) {
-            warn("Ignoring mouse button without exactly <x> <y>: " + line);
-            return;
+    private static List<Interaction> button(String line, String args, int button, boolean release) {
+        int[] c = coords(args, 2, line, "mouse button");
+        if (c == null) {
+            return Collections.emptyList();
         }
-        interactions.add(new Interaction.Mouse(Collections.singletonList(
-                new Interaction.Mouse.Step(button, release, c[0], c[1]))));
+        return mouse(new Interaction.Mouse.Step(button, release, c[0], c[1]));
     }
 
-    private static void addMove(String line, String args, List<Interaction> interactions) {
-        int[] c = parseInts(args);
-        if (c == null || c.length != 2) {
-            warn("Ignoring MouseMove without exactly <x> <y>: " + line);
-            return;
+    private static List<Interaction> move(String line, String args) {
+        int[] c = coords(args, 2, line, "MouseMove");
+        if (c == null) {
+            return Collections.emptyList();
         }
         // Motion with no button held: button bits 3 (none) plus the motion bit 32.
-        interactions.add(new Interaction.Mouse(Collections.singletonList(
-                new Interaction.Mouse.Step(35, false, c[0], c[1]))));
+        return mouse(new Interaction.Mouse.Step(35, false, c[0], c[1]));
     }
 
-    private static void addDrag(String line, String args, int delayMs, List<Interaction> interactions) {
-        int[] c = parseInts(args);
-        if (c == null || c.length != 4) {
-            warn("Ignoring Drag without exactly <x1> <y1> <x2> <y2>: " + line);
-            return;
+    private static List<Interaction> drag(String line, String args, int delayMs) {
+        int[] c = coords(args, 4, line, "Drag");
+        if (c == null) {
+            return Collections.emptyList();
         }
         int x1 = c[0];
         int y1 = c[1];
@@ -378,57 +362,64 @@ final class InteractionPlayer {
         int stepDelay = delayMs > 0 ? delayMs : 30;
         // Left press, interpolated drag-motion steps, then left release. The left-drag button code is
         // 0 (left) plus the motion bit 32.
-        interactions.add(new Interaction.Mouse(Collections.singletonList(
-                new Interaction.Mouse.Step(0, false, x1, y1))));
+        List<Interaction> interactions = new ArrayList<>();
+        interactions.add(mouseStep(new Interaction.Mouse.Step(0, false, x1, y1)));
         int stepCount = Math.max(1, Math.min(60, Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1))));
         for (int k = 1; k <= stepCount; k++) {
             int x = x1 + (x2 - x1) * k / stepCount;
             int y = y1 + (y2 - y1) * k / stepCount;
             interactions.add(new Interaction.Wait(stepDelay));
-            interactions.add(new Interaction.Mouse(Collections.singletonList(
-                    new Interaction.Mouse.Step(32, false, x, y))));
+            interactions.add(mouseStep(new Interaction.Mouse.Step(32, false, x, y)));
         }
-        interactions.add(new Interaction.Mouse(Collections.singletonList(
-                new Interaction.Mouse.Step(0, true, x2, y2))));
+        interactions.add(mouseStep(new Interaction.Mouse.Step(0, true, x2, y2)));
+        return interactions;
     }
 
-    private static void addScroll(String line, String args, int buttonCode, List<Interaction> interactions) {
+    private static List<Interaction> scroll(String line, String args, int buttonCode) {
         int[] c = parseInts(args);
-        if (c == null) {
-            warn("Ignoring scroll with non-integer arguments: " + line);
-            return;
+        if (c == null || c.length > 3) {
+            warn("Ignoring scroll with " + (c == null ? "non-integer arguments" : "too many arguments") + ": " + line);
+            return Collections.emptyList();
         }
-        int count = 1;
-        int x = -1;
-        int y = -1;
         // Forms: (none) | <count> | <x> <y> | <count> <x> <y>; -1 means the screen centre at play time.
-        if (c.length == 1) {
-            count = Math.max(1, c[0]);
-        } else if (c.length == 2) {
-            x = c[0];
-            y = c[1];
-        } else if (c.length == 3) {
-            count = Math.max(1, c[0]);
-            x = c[1];
-            y = c[2];
-        } else if (c.length != 0) {
-            warn("Ignoring scroll with too many arguments: " + line);
-            return;
-        }
+        int count = c.length == 1 || c.length == 3 ? Math.max(1, c[0]) : 1;
+        int x = c.length == 2 ? c[0] : c.length == 3 ? c[1] : -1;
+        int y = c.length == 2 ? c[1] : c.length == 3 ? c[2] : -1;
         List<Interaction.Mouse.Step> steps = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             steps.add(new Interaction.Mouse.Step(buttonCode, false, x, y));
         }
-        interactions.add(new Interaction.Mouse(steps));
+        return one(new Interaction.Mouse(steps));
     }
 
-    private static void addRepeatedKey(String key, int count, int delayMs, List<Interaction> interactions) {
+    /** Parses exactly {@code expected} integer coordinates, warning and returning {@code null} otherwise. */
+    private static int[] coords(String args, int expected, String line, String what) {
+        int[] c = parseInts(args);
+        if (c == null || c.length != expected) {
+            warn("Ignoring " + what + " without exactly " + expected + " integer coordinates: " + line);
+            return null;
+        }
+        return c;
+    }
+
+    /** A single mouse report as a one-interaction list. */
+    private static List<Interaction> mouse(Interaction.Mouse.Step step) {
+        return one(mouseStep(step));
+    }
+
+    private static Interaction.Mouse mouseStep(Interaction.Mouse.Step step) {
+        return new Interaction.Mouse(Collections.singletonList(step));
+    }
+
+    private static List<Interaction> repeatedKey(String key, int count, int delayMs) {
+        List<Interaction> interactions = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             if (i > 0 && delayMs > 0) {
                 interactions.add(new Interaction.Wait(delayMs));
             }
             interactions.add(new Interaction.KeyPress(key));
         }
+        return interactions;
     }
 
     private static int parseDuration(String duration) {
