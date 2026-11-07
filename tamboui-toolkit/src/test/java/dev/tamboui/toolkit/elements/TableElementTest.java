@@ -212,4 +212,35 @@ class TableElementTest extends AbstractElementTest {
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
     }
+
+    @Test
+    @DisplayName("preferredSize accounts for Constraint.fit() using content width (#413)")
+    void preferredSizeWithFitConstraint() {
+        TableElement element = table()
+            .header("PID", "NAME")
+            .row("1234", "java")
+            .widths(Constraint.fit(), Constraint.fit())
+            .columnSpacing(1);
+
+        // Col 0 = max("PID","1234") = 4; col 1 = max("NAME","java") = 4;
+        // spacing 1 + default highlight symbol "> " (2) = 4 + 4 + 1 + 2 = 11
+        assertThat(element.preferredSize(-1, -1, null).widthOr(0)).isEqualTo(11);
+        assertThat(element.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("TableElement renders content without explicit widths (#305)")
+    void rendersWithoutExplicitWidths() {
+        Rect area = new Rect(0, 0, 30, 5);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        table()
+            .header("Name", "Age")
+            .row("Alice", "30")
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("N");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("A");
+    }
 }

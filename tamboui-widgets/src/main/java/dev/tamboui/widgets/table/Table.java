@@ -6,6 +6,7 @@ package dev.tamboui.widgets.table;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -184,7 +185,8 @@ public final class Table implements StatefulWidget<TableState> {
             tableArea = block.inner(area);
         }
 
-        if (tableArea.isEmpty() || widths.isEmpty()) {
+        List<Constraint> baseWidths = effectiveBaseWidths();
+        if (tableArea.isEmpty() || baseWidths.isEmpty()) {
             return;
         }
 
@@ -196,10 +198,10 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         // Account for column spacing
-        int totalSpacing = columnSpacing * Math.max(0, widths.size() - 1);
+        int totalSpacing = columnSpacing * Math.max(0, baseWidths.size() - 1);
         availableWidth = Math.max(0, availableWidth - totalSpacing);
 
-        List<Integer> columnWidths = calculateColumnWidths(availableWidth);
+        List<Integer> columnWidths = calculateColumnWidths(baseWidths, availableWidth);
 
         // Ensure selected row is visible
         if (state.selected() != null) {
@@ -264,11 +266,12 @@ public final class Table implements StatefulWidget<TableState> {
         }
     }
 
-    private List<Integer> calculateColumnWidths(int availableWidth) {
+    private List<Integer> calculateColumnWidths(List<Constraint> baseWidths, int availableWidth) {
+        List<Constraint> resolved = resolveFitConstraints(baseWidths, availableWidth);
         // Use Layout to calculate column widths based on constraints
         Rect fakeArea = new Rect(0, 0, availableWidth, 1);
         List<Rect> columnRects = Layout.horizontal()
-            .constraints(widths)
+            .constraints(resolved)
             .split(fakeArea);
 
         List<Integer> widthList = new ArrayList<>(columnRects.size());
@@ -276,6 +279,161 @@ public final class Table implements StatefulWidget<TableState> {
             widthList.add(rect.width());
         }
         return widthList;
+    }
+
+    /**
+     * Returns the width constraints to lay out: the explicit ones, or a {@link Constraint#fill()}
+     * per detected column when none were given, so a table built without widths still renders
+     * instead of drawing nothing.
+     *
+     * @return the effective base constraints, one per column
+     */
+    private List<Constraint> effectiveBaseWidths() {
+        if (!widths.isEmpty()) {
+            return widths;
+        }
+        int columnCount = determineColumnCount();
+        if (columnCount <= 0) {
+            return Collections.emptyList();
+        }
+        List<Constraint> derived = new ArrayList<>(columnCount);
+        for (int i = 0; i < columnCount; i++) {
+            derived.add(Constraint.fill());
+        }
+        return derived;
+    }
+
+    private int determineColumnCount() {
+        int count = 0;
+        if (header != null) {
+            count = Math.max(count, header.cells().size());
+        }
+        for (Row row : rows) {
+            count = Math.max(count, row.cells().size());
+        }
+        if (footer != null) {
+            count = Math.max(count, footer.cells().size());
+        }
+        return count;
+    }
+
+    /**
+     * Resolves {@link Constraint#fit()} columns to their content width. When every column is
+     * {@code fit()}, the columns are sized to content and, if they do not all fit, the narrow
+     * columns keep their width while the wide ones share the remaining space. When {@code fit()}
+     * is mixed with other constraints, each {@code fit()} column is pinned to its content width
+     * and the remaining constraints absorb the rest.
+     *
+     * @param base the base constraints
+     * @param availableWidth the width available to the columns, spacing already removed
+     * @return the resolved constraints with no {@code fit()} left
+     */
+    private List<Constraint> resolveFitConstraints(List<Constraint> base, int availableWidth) {
+        boolean anyFit = false;
+        boolean allFit = true;
+        for (Constraint c : base) {
+            if (c instanceof Constraint.Fit) {
+                anyFit = true;
+            } else {
+                allFit = false;
+            }
+        }
+        if (!anyFit) {
+            return base;
+        }
+
+        if (allFit) {
+            int[] desired = new int[base.size()];
+            for (int i = 0; i < base.size(); i++) {
+                desired[i] = Math.max(1, maxColumnContentWidth(i));
+            }
+            int[] allocated = distributeContentWidths(desired, availableWidth);
+            List<Constraint> resolved = new ArrayList<>(base.size());
+            for (int w : allocated) {
+                resolved.add(Constraint.length(w));
+            }
+            return resolved;
+        }
+
+        List<Constraint> resolved = new ArrayList<>(base.size());
+        for (int i = 0; i < base.size(); i++) {
+            Constraint c = base.get(i);
+            resolved.add(c instanceof Constraint.Fit ? Constraint.length(maxColumnContentWidth(i)) : c);
+        }
+        return resolved;
+    }
+
+    private int maxColumnContentWidth(int col) {
+        int maxWidth = 0;
+        if (header != null && col < header.cells().size()) {
+            maxWidth = Math.max(maxWidth, header.cells().get(col).width());
+        }
+        for (Row row : rows) {
+            if (col < row.cells().size()) {
+                maxWidth = Math.max(maxWidth, row.cells().get(col).width());
+            }
+        }
+        if (footer != null && col < footer.cells().size()) {
+            maxWidth = Math.max(maxWidth, footer.cells().get(col).width());
+        }
+        return maxWidth;
+    }
+
+    /**
+     * Distributes {@code availableWidth} across columns that each want {@code desired[i]} columns.
+     * When they all fit, each keeps its content width. Otherwise the narrow columns keep their
+     * width and the wide columns share what is left, any uneven remainder going to earlier wide
+     * columns in document order.
+     *
+     * @param desired the content width each column wants
+     * @param availableWidth the total width to distribute
+     * @return the width allocated to each column
+     */
+    static int[] distributeContentWidths(int[] desired, int availableWidth) {
+        int n = desired.length;
+        if (n == 0) {
+            return new int[0];
+        }
+        if (availableWidth <= 0) {
+            return new int[n];
+        }
+        int totalDesired = 0;
+        for (int w : desired) {
+            totalDesired += w;
+        }
+        if (totalDesired <= availableWidth) {
+            return desired.clone();
+        }
+        Integer[] order = new Integer[n];
+        for (int i = 0; i < n; i++) {
+            order[i] = i;
+        }
+        Arrays.sort(order, (a, b) -> Integer.compare(desired[a], desired[b]));
+        int[] result = new int[n];
+        int remainingWidth = availableWidth;
+        int remainingCols = n;
+        for (int k = 0; k < n; k++) {
+            int col = order[k];
+            int fairShare = remainingWidth / remainingCols;
+            if (desired[col] <= fairShare) {
+                result[col] = desired[col];
+                remainingWidth -= desired[col];
+                remainingCols--;
+            } else {
+                int base = remainingWidth / remainingCols;
+                int rem = remainingWidth % remainingCols;
+                List<Integer> wideCols = new ArrayList<>(remainingCols);
+                for (int j = k; j < n; j++) {
+                    wideCols.add(order[j]);
+                }
+                Collections.sort(wideCols);
+                for (int j = 0; j < wideCols.size(); j++) {
+                    result[wideCols.get(j)] = Math.max(1, base + (j < rem ? 1 : 0));
+                }
+                break;
+            }
+        }
+        return result;
     }
 
     private int renderRow(Buffer buffer, Rect tableArea, int y, Row row,

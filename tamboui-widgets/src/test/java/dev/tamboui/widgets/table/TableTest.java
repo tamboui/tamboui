@@ -259,7 +259,7 @@ class TableTest {
     }
 
     @Test
-    @DisplayName("Table without widths renders nothing")
+    @DisplayName("Table without widths auto-derives fill columns and renders (#305)")
     void noWidths() {
         Table table = Table.builder()
             .rows(Arrays.asList(Row.from("Data")))
@@ -271,8 +271,110 @@ class TableTest {
 
         table.render(area, buffer, state);
 
-        // Without widths, nothing renders
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("a");
+        assertThat(buffer.get(2, 0).symbol()).isEqualTo("t");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("a");
+    }
+
+    @Test
+    @DisplayName("Empty table without widths renders nothing")
+    void emptyTableWithoutWidths() {
+        Table table = Table.builder().build();
+
+        Rect area = new Rect(0, 0, 15, 3);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
         assertThat(buffer.get(0, 0).symbol()).isEqualTo(" ");
+    }
+
+    @Test
+    @DisplayName("Table with Constraint.fit() sizes columns to content width (#413)")
+    void fitConstraintsSizeToContent() {
+        Row header = Row.from("PID", "NAME", "STATUS");
+        List<Row> rows = Arrays.asList(
+            Row.from("1234", "java", "RUNNING"),
+            Row.from("5678", "node", "IDLE")
+        );
+        Table table = Table.builder()
+            .header(header)
+            .rows(rows)
+            .widths(Constraint.fit(), Constraint.fit(), Constraint.fit())
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 40, 3);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Col 0 = max("PID","1234","5678") = 4; col 1 at 4+1=5; col 2 at 5+4+1=10
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("P");
+        assertThat(buffer.get(5, 0).symbol()).isEqualTo("N");
+        assertThat(buffer.get(10, 0).symbol()).isEqualTo("S");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("1");
+        assertThat(buffer.get(5, 1).symbol()).isEqualTo("j");
+        assertThat(buffer.get(10, 1).symbol()).isEqualTo("R");
+    }
+
+    @Test
+    @DisplayName("Table with mixed Fit and Fill constraints pins Fit to content and lets Fill absorb")
+    void mixedFitAndFillConstraints() {
+        Row header = Row.from("ID", "DESCRIPTION");
+        List<Row> rows = Arrays.asList(Row.from("20", "First item"));
+        Table table = Table.builder()
+            .header(header)
+            .rows(rows)
+            .widths(Constraint.fit(), Constraint.fill())
+            .columnSpacing(1)
+            .highlightSymbol("")
+            .build();
+
+        Rect area = new Rect(0, 0, 30, 2);
+        Buffer buffer = Buffer.empty(area);
+        TableState state = new TableState();
+
+        table.render(area, buffer, state);
+
+        // Col 0 max width = 2 ("ID"/"20"); col 1 starts at 2+1=3
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("I");
+        assertThat(buffer.get(1, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(3, 0).symbol()).isEqualTo("D");
+        assertThat(buffer.get(3, 1).symbol()).isEqualTo("F");
+    }
+
+    @Test
+    @DisplayName("distributeContentWidths sizes to content when all columns fit")
+    void distributeSizesToContentWhenAllFit() {
+        assertThat(Table.distributeContentWidths(new int[] {8, 70}, 149)).containsExactly(8, 70);
+    }
+
+    @Test
+    @DisplayName("distributeContentWidths keeps narrow columns and shares remainder among wide ones")
+    void distributeNarrowKeepWideShare() {
+        assertThat(Table.distributeContentWidths(new int[] {8, 70}, 59)).containsExactly(8, 51);
+        assertThat(Table.distributeContentWidths(new int[] {10, 20, 80}, 60)).containsExactly(10, 20, 30);
+    }
+
+    @Test
+    @DisplayName("distributeContentWidths shares remainder evenly, uneven going to earlier columns")
+    void distributeRemainder() {
+        assertThat(Table.distributeContentWidths(new int[] {5, 50, 50}, 55)).containsExactly(5, 25, 25);
+        assertThat(Table.distributeContentWidths(new int[] {5, 50, 50}, 56)).containsExactly(5, 26, 25);
+    }
+
+    @Test
+    @DisplayName("distributeContentWidths handles all-wide, zero/negative, and empty input")
+    void distributeEdgeCases() {
+        assertThat(Table.distributeContentWidths(new int[] {30, 40}, 20)).containsExactly(10, 10);
+        assertThat(Table.distributeContentWidths(new int[] {10, 20}, 0)).containsExactly(0, 0);
+        assertThat(Table.distributeContentWidths(new int[] {10, 20}, -5)).containsExactly(0, 0);
+        assertThat(Table.distributeContentWidths(new int[0], 100)).isEmpty();
     }
 
     @Test
