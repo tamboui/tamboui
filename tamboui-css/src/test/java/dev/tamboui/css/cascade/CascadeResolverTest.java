@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.css.Styleable;
 import dev.tamboui.css.engine.StyleEngine;
+import dev.tamboui.layout.Constraint;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
@@ -312,6 +313,27 @@ class CascadeResolverTest {
         assertThat(resolved.widthConstraint()).isEmpty();
         assertThat(resolved.heightConstraint()).isEmpty();
         assertThat(resolved.background()).hasValue(Color.BLUE);
+    }
+
+    @Test
+    void ratioValueResolvesToRatioConstraint() {
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("Panel { width: 1/3; height: 2/3; }");
+
+        CssStyleResolver resolved = engine.resolve(createStyleable("Panel", null, Collections.emptySet()));
+
+        assertThat(resolved.widthConstraint()).hasValue(Constraint.ratio(1, 3));
+        assertThat(resolved.heightConstraint()).hasValue(Constraint.ratio(2, 3));
+    }
+
+    @Test
+    void ratioWithZeroDenominatorIsIgnored() {
+        StyleEngine engine = StyleEngine.create();
+        engine.addStylesheet("Panel { height: 2/3; }\n#main { height: 1/0; }");
+
+        CssStyleResolver resolved = engine.resolve(createStyleable("Panel", "main", Collections.emptySet()));
+
+        assertThat(resolved.heightConstraint()).hasValue(Constraint.ratio(2, 3));
     }
 
     @Test
