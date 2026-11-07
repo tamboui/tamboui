@@ -120,12 +120,13 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
 
     /**
      * Called internally to handle mouse events.
-     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
+     * Dispatches to {@code @OnAction} annotated methods via ActionHandler, then to a
+     * handler set with {@link #onMouseEvent} or {@link #on}.
      */
     public EventResult handleMouseEvent(MouseEvent event) {
         if (actionHandler != null && actionHandler.dispatch(event)) {
             return EventResult.HANDLED;
         }
-        return EventResult.UNHANDLED;
+        return super.handleMouseEvent(event);
     }
 }

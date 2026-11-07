@@ -19,8 +19,6 @@ import dev.tamboui.toolkit.element.Element;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.toolkit.element.Size;
 import dev.tamboui.toolkit.element.StyledElement;
-import dev.tamboui.toolkit.event.EventResult;
-import dev.tamboui.tui.event.MouseEvent;
 import dev.tamboui.widget.Widget;
 
 /**
@@ -327,27 +325,6 @@ public final class DockElement extends StyledElement<DockElement> {
         }
 
         return Size.of(width, height);
-    }
-
-    @Override
-    public EventResult handleMouseEvent(MouseEvent event) {
-        EventResult result = super.handleMouseEvent(event);
-        if (result.isHandled()) {
-            return result;
-        }
-        // Forward to child regions whose area contains the mouse position
-        Element[] regions = {topElement, bottomElement, leftElement, rightElement, centerElement};
-        for (Element region : regions) {
-            if (region != null) {
-                Rect area = region.renderedArea();
-                if (area != null && area.contains(event.x(), event.y())) {
-                    if (region.handleMouseEvent(event) == EventResult.HANDLED) {
-                        return EventResult.HANDLED;
-                    }
-                }
-            }
-        }
-        return EventResult.UNHANDLED;
     }
 
     @Override
