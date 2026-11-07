@@ -109,13 +109,17 @@ public abstract class Component<T extends Component<T>> extends StyledElement<T>
 
     /**
      * Called internally to handle key events.
-     * Dispatches to {@code @OnAction} annotated methods via ActionHandler.
+     * Dispatches to {@code @OnAction} annotated methods via ActionHandler, then, when focused,
+     * to a handler set with {@link #onKeyEvent} or {@link #on}.
      */
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (focused && actionHandler != null && actionHandler.dispatch(event)) {
+        if (!focused) {
+            return EventResult.UNHANDLED;
+        }
+        if (actionHandler != null && actionHandler.dispatch(event)) {
             return EventResult.HANDLED;
         }
-        return EventResult.UNHANDLED;
+        return super.handleKeyEvent(event, focused);
     }
 
     /**

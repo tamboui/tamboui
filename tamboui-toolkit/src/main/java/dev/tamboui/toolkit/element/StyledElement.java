@@ -1026,6 +1026,21 @@ public abstract class StyledElement<T extends StyledElement<T>> implements Eleme
         return lastRenderedArea;
     }
 
+    /**
+     * Handles a key event by running the handler set with {@link #onKeyEvent(KeyEventHandler)}, if any.
+     * <p>
+     * This is the single place an element's key handler runs: the event router does not call
+     * {@link #keyEventHandler()} again for a {@link StyledElement}, to avoid running it twice for one
+     * key. A subclass that overrides this method <strong>must</strong>, for any key it does not consume
+     * itself, return {@code super.handleKeyEvent(event, focused)} rather than
+     * {@link EventResult#UNHANDLED} — otherwise a handler set with {@code onKeyEvent} is silently
+     * dropped, since the router will not run it.
+     *
+     * @param event the key event
+     * @param focused whether this element (or its subtree) has focus
+     * @return {@link EventResult#HANDLED} if the handler consumed the key, otherwise
+     *     {@link EventResult#UNHANDLED}
+     */
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
         if (keyHandler != null) {
