@@ -63,6 +63,72 @@ public final class LayoutSolver {
         if (n == 0) {
             return new int[0];
         }
+        if (available <= 0) {
+            return new int[n];
+        }
+
+        // Fast path 1: all fixed length constraints
+        boolean allLength = true;
+        long totalLength = (n > 1) ? (long) (n - 1) * spacing : 0;
+        for (int i = 0; i < n; i++) {
+            Constraint c = constraints.get(i);
+            if (c instanceof Constraint.Length) {
+                totalLength += ((Constraint.Length) c).value();
+            } else {
+                allLength = false;
+                break;
+            }
+        }
+        if (allLength) {
+            if (totalLength <= available) {
+                int[] sizes = new int[n];
+                for (int i = 0; i < n; i++) {
+                    sizes[i] = ((Constraint.Length) constraints.get(i)).value();
+                }
+                return sizes;
+            }
+            // Fast path for all Length(1) with spacing == 0 (common for list items / rows)
+            if (spacing == 0) {
+                boolean allOne = true;
+                for (int i = 0; i < n; i++) {
+                    if (((Constraint.Length) constraints.get(i)).value() != 1) {
+                        allOne = false;
+                        break;
+                    }
+                }
+                if (allOne) {
+                    int[] sizes = new int[n];
+                    int fit = Math.min(n, Math.max(0, available));
+                    for (int i = 0; i < fit; i++) {
+                        sizes[i] = 1;
+                    }
+                    return sizes;
+                }
+            }
+        }
+
+        // Fast path 2: all Fill constraints
+        boolean allFill = true;
+        for (int i = 0; i < n; i++) {
+            if (!(constraints.get(i) instanceof Constraint.Fill)) {
+                allFill = false;
+                break;
+            }
+        }
+        if (allFill) {
+            int totalSpacing = (n > 1) ? (n - 1) * spacing : 0;
+            int space = Math.max(0, available - totalSpacing);
+            long totalWeight = 0;
+            for (int i = 0; i < n; i++) {
+                totalWeight += ((Constraint.Fill) constraints.get(i)).weight();
+            }
+            Fraction[] fractionSizes = new Fraction[n];
+            for (int i = 0; i < n; i++) {
+                int w = ((Constraint.Fill) constraints.get(i)).weight();
+                fractionSizes[i] = totalWeight > 0 ? Fraction.of((long) space * w, totalWeight) : Fraction.ZERO;
+            }
+            return roundWithConstraint(fractionSizes, available);
+        }
 
         solver.reset();
 
@@ -199,18 +265,20 @@ public final class LayoutSolver {
     private void collectFillProportionalityConstraints(List<CassowaryConstraint> dest,
                                                        List<Constraint> constraints, Variable[] sizes) {
         int n = constraints.size();
+        int firstFillIdx = -1;
+        Fraction firstScale = Fraction.ZERO;
 
-        // Find all Fill and Min constraints (Min behaves like Fill in non-legacy mode)
         for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                Fraction leftScale = getFillScale(constraints.get(i));
-                Fraction rightScale = getFillScale(constraints.get(j));
-
-                if (!leftScale.isZero() && !rightScale.isZero()) {
-                    // rightScale * leftSize == leftScale * rightSize
-                    // This ensures Fill(2) is twice as large as Fill(1)
-                    dest.add(Expression.variable(sizes[i]).times(rightScale)
-                            .equalTo(Expression.variable(sizes[j]).times(leftScale), FILL_GROW));
+            Fraction scale = getFillScale(constraints.get(i));
+            if (!scale.isZero()) {
+                if (firstFillIdx == -1) {
+                    firstFillIdx = i;
+                    firstScale = scale;
+                } else {
+                    // firstScale * size_i == scale * size_first
+                    // Linear O(K) chaining guarantees identical proportions for all pairs
+                    dest.add(Expression.variable(sizes[i]).times(firstScale)
+                            .equalTo(Expression.variable(sizes[firstFillIdx]).times(scale), FILL_GROW));
                 }
             }
         }
