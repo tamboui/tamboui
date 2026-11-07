@@ -129,7 +129,7 @@ jobs:
               ? `\n\n### Changed pages and demos\n- ${visible.join('\n- ')}${overflow}`
               : '';
             const qrCode = `https://qr.rossjrw.com/?color.dark=0d1117&url=${encodeURIComponent(previewUrl)}`;
-            const body = `${marker}\n📖 Documentation preview: ${previewUrl}${changes}\n\n![QR code](${qrCode})`;
+            const body = `${marker}\n📖 Documentation preview: ${previewUrl}${changes}\n\n<img src="${qrCode}" alt="QR code" width="150">`;
             const comments = await github.paginate(github.rest.issues.listComments, {
               ...context.repo,
               issue_number
