@@ -56,26 +56,23 @@ public class MouseDemo extends ToolkitApp {
     private int inkG = 255;
     private int inkB = 0;
 
-    private final boolean auto;
+    // Starts in the hands-free attract loop so a recording with no input still shows everything;
+    // the first real mouse event hands control to the user, and 'a' re-arms it.
+    private boolean auto = true;
     private double autoTime;
     private double autoLastSwitch = -1.0;
     private int autoColor;
     private int autoPrevX = Integer.MIN_VALUE;
     private int autoPrevY = Integer.MIN_VALUE;
 
-    private MouseDemo(boolean auto) {
-        this.auto = auto;
-    }
-
     /**
-     * Demo entry point. Pass {@code --auto} for a hands-free attract loop (used by the demo reel).
+     * Demo entry point.
      *
      * @param args the CLI arguments
      * @throws Exception on unexpected error
      */
     public static void main(String[] args) throws Exception {
-        boolean auto = args.length > 0 && "--auto".equals(args[0]);
-        new MouseDemo(auto).run();
+        new MouseDemo().run();
     }
 
     @Override
@@ -99,9 +96,11 @@ public class MouseDemo extends ToolkitApp {
             drive(dt);
         }
 
+        String mode = auto ? "AUTO (move mouse to take over)" : "manual (a: auto)";
         return column(
-            panel(text(" Mouse Demo - drag to draw; buttons & scroll glow and fade ").bold().cyan())
-                .rounded().borderColor(Color.CYAN).length(3),
+            panel(text(" Mouse Demo - drag to draw; buttons & scroll glow and fade - " + mode + " ")
+                .bold().fg(auto ? Color.CYAN : Color.WHITE))
+                .rounded().borderColor(auto ? Color.CYAN : Color.DARK_GRAY).length(3),
 
             row(left.render(), middle.render(), right.render(), scroll.render()).length(5),
 
@@ -116,9 +115,22 @@ public class MouseDemo extends ToolkitApp {
                 .onDrag(new PaintDrag())
                 .fill(),
 
-            panel(text(" Drag: draw | Click/scroll: glow a tile | c: clear | q: Quit ").dim())
+            panel(text(" Drag: draw | Click/scroll: glow a tile | a: auto | c: clear | q: Quit ").dim())
                 .rounded().borderColor(Color.DARK_GRAY).length(3)
         );
+    }
+
+    private void stopAuto() {
+        auto = false;
+        autoPrevX = Integer.MIN_VALUE;
+        autoPrevY = Integer.MIN_VALUE;
+    }
+
+    private void startAuto() {
+        auto = true;
+        autoLastSwitch = -1.0;
+        autoPrevX = Integer.MIN_VALUE;
+        autoPrevY = Integer.MIN_VALUE;
     }
 
     /**
@@ -175,10 +187,22 @@ public class MouseDemo extends ToolkitApp {
             canvas.clear();
             return EventResult.HANDLED;
         }
+        if (event.isChar('a')) {
+            if (auto) {
+                stopAuto();
+            } else {
+                startAuto();
+            }
+            return EventResult.HANDLED;
+        }
         return EventResult.UNHANDLED;
     }
 
     private EventResult handleMouse(MouseEvent event) {
+        // Any real mouse event hands control from the attract loop back to the user.
+        if (auto) {
+            stopAuto();
+        }
         switch (event.kind()) {
             case PRESS:
                 if (event.button() == MouseButton.MIDDLE) {
@@ -357,6 +381,9 @@ public class MouseDemo extends ToolkitApp {
 
         @Override
         public void onDragStart(int startX, int startY) {
+            if (auto) {
+                stopAuto();
+            }
             left.flash();
             lastX = startX;
             lastY = startY;
