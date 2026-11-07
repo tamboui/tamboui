@@ -65,6 +65,9 @@ public class MouseDemo extends ToolkitApp {
     private int autoPrevX = Integer.MIN_VALUE;
     private int autoPrevY = Integer.MIN_VALUE;
 
+    private MouseDemo() {
+    }
+
     /**
      * Demo entry point.
      *
