@@ -291,9 +291,9 @@ Based on VS Code's default key bindings for navigation.</div>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Bindings.html" title="interface in dev.tamboui.tui.bindings">Bindings</a></span>&nbsp;<span class="element-name">defaults</span>()</div>
 <div class="block">Returns the default bindings for the host platform.
 <p>
-This is <a href="#standard()"><code>standard()</code></a> on every platform except macOS, where the
-word-editing keys are replaced with their Option (Alt) equivalents to match
-the system text layer. The named sets (<a href="#standard()"><code>standard()</code></a>, <a href="#vim()"><code>vim()</code></a>,
+This is <a href="#standard()"><code>standard()</code></a> with the host OS's overlay (<code>standard-&lt;os&gt;.properties</code>)
+applied, if one exists: on macOS the word-editing keys become their Option (Alt) equivalents
+to match the system text layer. The named sets (<a href="#standard()"><code>standard()</code></a>, <a href="#vim()"><code>vim()</code></a>,
 etc.) stay literal and cross-platform; only this effective-default entry
 point resolves the host platform.</div>
 <dl class="notes">
