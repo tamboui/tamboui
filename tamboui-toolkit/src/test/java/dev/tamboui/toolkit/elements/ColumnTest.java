@@ -372,4 +372,71 @@ class ColumnTest extends AbstractElementTest {
             );
         }
     }
+
+    @Nested
+    @DisplayName("Margin and spacing in the preferred size")
+    class MarginAndSpacingInPreferredSize {
+
+        @Test
+        @DisplayName("A nested column gets rows for its top and bottom margin")
+        void nestedColumnWithMargin() {
+            Rect area = new Rect(0, 0, 20, 6);
+            Buffer buffer = Buffer.empty(area);
+
+            column(column(text("a"), text("b")).margin(1), text("c"))
+                .render(Frame.forTesting(buffer), area, RenderContext.empty());
+
+            assertThat(buffer).hasContent(
+                "                    ",
+                " a                  ",
+                " b                  ",
+                "                    ",
+                "c                   ",
+                "                    "
+            );
+        }
+
+        @Test
+        @DisplayName("A margin and spacing set in CSS count in the preferred size")
+        void nestedColumnWithCssMarginAndSpacing() {
+            StyleEngine styleEngine = StyleEngine.create();
+            styleEngine.addStylesheet("test", ".boxed { margin: 1; spacing: 1; }");
+            styleEngine.setActiveStylesheet("test");
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.setStyleEngine(styleEngine);
+            Rect area = new Rect(0, 0, 20, 6);
+            Buffer buffer = Buffer.empty(area);
+
+            column(column(text("a"), text("b")).addClass("boxed"), text("c"))
+                .render(Frame.forTesting(buffer), area, context);
+
+            assertThat(buffer).hasContent(
+                "                    ",
+                " a                  ",
+                "                    ",
+                " b                  ",
+                "                    ",
+                "c                   "
+            );
+        }
+
+        @Test
+        @DisplayName("Children are measured at the width left inside the margin")
+        void childrenMeasuredInsideMargin() {
+            // "aaaa bbbb cc" fits on one line at width 12, and wraps to two at the 10 left inside the margin
+            Rect area = new Rect(0, 0, 12, 5);
+            Buffer buffer = Buffer.empty(area);
+
+            column(column(text("aaaa bbbb cc").overflow(Overflow.WRAP_WORD)).margin(1), text("next"))
+                .render(Frame.forTesting(buffer), area, RenderContext.empty());
+
+            assertThat(buffer).hasContent(
+                "            ",
+                " aaaa bbbb  ",
+                " cc         ",
+                "            ",
+                "next        "
+            );
+        }
+    }
 }
