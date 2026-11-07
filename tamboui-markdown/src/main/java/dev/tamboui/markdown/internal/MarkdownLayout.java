@@ -5,6 +5,7 @@
 package dev.tamboui.markdown.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -374,10 +375,30 @@ public final class MarkdownLayout {
             return new LinesChunk(Collections.singletonList(Line.empty()));
         }
 
-        List<Constraint> widths = new ArrayList<>(columnCount);
-        int per = Math.max(1, 100 / columnCount);
+        int[] contentWidths = new int[columnCount];
+        if (header != null) {
+            List<Cell> headerCells = header.cells();
+            for (int i = 0; i < Math.min(columnCount, headerCells.size()); i++) {
+                contentWidths[i] = Math.max(contentWidths[i], headerCells.get(i).content().width());
+            }
+        }
+        for (Row row : rows) {
+            List<Cell> cells = row.cells();
+            for (int i = 0; i < Math.min(columnCount, cells.size()); i++) {
+                contentWidths[i] = Math.max(contentWidths[i], cells.get(i).content().width());
+            }
+        }
         for (int i = 0; i < columnCount; i++) {
-            widths.add(Constraint.percentage(per));
+            contentWidths[i] = Math.max(1, contentWidths[i]);
+        }
+
+        int totalSpacing = Math.max(0, columnCount - 1);
+        int availableWidth = Math.max(0, width - totalSpacing);
+        int[] allocatedWidths = calculateColumnWidths(contentWidths, availableWidth);
+
+        List<Constraint> widths = new ArrayList<>(columnCount);
+        for (int w : allocatedWidths) {
+            widths.add(Constraint.length(w));
         }
 
         Table.Builder tableBuilder = Table.builder()
@@ -390,6 +411,67 @@ public final class MarkdownLayout {
         int height = rows.size() + (header != null ? 1 : 0);
         TableState state = new TableState();
         return new WidgetChunk((area, buffer) -> table.render(area, buffer, state), height);
+    }
+
+    static int[] calculateColumnWidths(int[] desiredWidths, int availableWidth) {
+        int n = desiredWidths.length;
+        if (n == 0) {
+            return new int[0];
+        }
+        if (availableWidth <= 0) {
+            return new int[n];
+        }
+
+        int totalDesired = 0;
+        for (int w : desiredWidths) {
+            totalDesired += w;
+        }
+
+        // If all columns fit within available space, size each to its widest cell
+        if (totalDesired <= availableWidth) {
+            return desiredWidths.clone();
+        }
+
+        // When columns don't all fit, narrow columns keep their width, and wide ones share what is left.
+        Integer[] indices = new Integer[n];
+        for (int i = 0; i < n; i++) {
+            indices[i] = i;
+        }
+        Arrays.sort(indices, (a, b) -> Integer.compare(desiredWidths[a], desiredWidths[b]));
+
+        int[] result = new int[n];
+        int remainingWidth = availableWidth;
+        int remainingCols = n;
+
+        for (int i = 0; i < n; i++) {
+            int col = indices[i];
+            int desired = desiredWidths[col];
+            int fairShare = remainingWidth / remainingCols;
+
+            if (desired <= fairShare) {
+                // Narrow column: keeps its width
+                result[col] = desired;
+                remainingWidth -= desired;
+                remainingCols--;
+            } else {
+                // This and all subsequent columns are wide: share what is left among them.
+                int base = remainingWidth / remainingCols;
+                int rem = remainingWidth % remainingCols;
+                List<Integer> wideCols = new ArrayList<>(remainingCols);
+                for (int j = i; j < n; j++) {
+                    wideCols.add(indices[j]);
+                }
+                Collections.sort(wideCols);
+                for (int j = 0; j < wideCols.size(); j++) {
+                    int c = wideCols.get(j);
+                    int share = base + (j < rem ? 1 : 0);
+                    result[c] = Math.max(0, share);
+                }
+                break;
+            }
+        }
+
+        return result;
     }
 
     private static Row buildRow(TableRow source, MarkdownStyles styles, boolean header) {
