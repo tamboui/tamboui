@@ -545,14 +545,9 @@ public final class Paragraph implements Widget {
             wrapped.add(Line.from(lineSpans));
             pos = lineEnd;
 
-            // Skip leading whitespace at the start of next line
-            if (lineEnd < cpCount && lineEnd > 0) {
-                int prevCp = text.codePointAt(cpOffsets[lineEnd - 1]);
-                if (Character.isWhitespace(prevCp)) {
-                    while (pos < cpCount && Character.isWhitespace(text.codePointAt(cpOffsets[pos]))) {
-                        pos++;
-                    }
-                }
+            // Skip the whitespace the line was broken at, so the next line starts with a word
+            while (pos < cpCount && Character.isWhitespace(text.codePointAt(cpOffsets[pos]))) {
+                pos++;
             }
         }
 
@@ -576,6 +571,11 @@ public final class Paragraph implements Widget {
         // If we can fit everything, return the end
         if (maxEnd >= cpCount) {
             return cpCount;
+        }
+
+        // A word that ends right at the edge stays on this line; the whitespace after it is skipped
+        if (maxEnd > startPos && Character.isWhitespace(text.codePointAt(cpOffsets[maxEnd]))) {
+            return maxEnd;
         }
 
         // Look backwards from maxEnd for a word boundary (whitespace)
