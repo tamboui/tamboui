@@ -68,4 +68,45 @@ class SpanTest {
         Span span = Span.raw("Text").style(style);
         assertThat(span.style()).isEqualTo(style);
     }
+
+    @Test
+    @DisplayName("Span constructor strips harmful control characters")
+    void constructorStripsHarmfulControlCodes() {
+        Span span = Span.raw("Hello\u0007\b\u000B\f\rWorld");
+        assertThat(span.content()).isEqualTo("HelloWorld");
+    }
+
+    @Test
+    @DisplayName("Span constructor preserves tab and newline")
+    void constructorPreservesTabAndNewline() {
+        Span span = Span.raw("Line1\tCol2\nLine2");
+        assertThat(span.content()).isEqualTo("Line1\tCol2\nLine2");
+    }
+
+    @Test
+    @DisplayName("Span.stripControlCodes handles individual control characters")
+    void stripControlCodesIndividual() {
+        assertThat(Span.stripControlCodes("Bell\u0007Sound")).isEqualTo("BellSound");
+        assertThat(Span.stripControlCodes("Back\bSpace")).isEqualTo("BackSpace");
+        assertThat(Span.stripControlCodes("Vertical\u000BTab")).isEqualTo("VerticalTab");
+        assertThat(Span.stripControlCodes("Form\fFeed")).isEqualTo("FormFeed");
+        assertThat(Span.stripControlCodes("Carriage\rReturn")).isEqualTo("CarriageReturn");
+        assertThat(Span.stripControlCodes("Windows\r\nNewline")).isEqualTo("Windows\nNewline");
+    }
+
+    @Test
+    @DisplayName("Span.stripControlCodes handles clean strings, null, and empty")
+    void stripControlCodesCleanAndEdgeCases() {
+        String clean = "Normal clean text 123 !@#";
+        assertThat(Span.stripControlCodes(clean)).isSameAs(clean);
+        assertThat(Span.stripControlCodes("")).isEqualTo("");
+        assertThat(Span.stripControlCodes(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Span.stripControlCodes preserves emojis and surrogate pairs")
+    void stripControlCodesPreservesUnicode() {
+        String emojiText = "Hello 👨‍👩‍👧‍👦 \u0007 World 🌍\r!";
+        assertThat(Span.stripControlCodes(emojiText)).isEqualTo("Hello 👨‍👩‍👧‍👦  World 🌍!");
+    }
 }

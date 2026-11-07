@@ -243,6 +243,15 @@ public final class CssStyleResolver implements StylePropertyResolver {
         return get(StandardProperties.TEXT_OVERFLOW);
     }
 
+    /**
+     * Returns the tab-size value in spaces, if set.
+     *
+     * @return the tab-size value
+     */
+    public Optional<Integer> tabSize() {
+        return get(StandardProperties.TAB_SIZE);
+    }
+
     // ═══════════════════════════════════════════════════════════════
     // Border character accessors
     // ═══════════════════════════════════════════════════════════════
@@ -627,6 +636,16 @@ public final class CssStyleResolver implements StylePropertyResolver {
          */
         public Builder heightConstraint(Constraint constraint) {
             return set(StandardProperties.HEIGHT, constraint);
+        }
+
+        /**
+         * Sets the tab size in spaces.
+         *
+         * @param tabSize the tab size
+         * @return this builder
+         */
+        public Builder tabSize(Integer tabSize) {
+            return set(StandardProperties.TAB_SIZE, tabSize);
         }
 
         /**

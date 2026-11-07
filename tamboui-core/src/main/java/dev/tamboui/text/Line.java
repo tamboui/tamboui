@@ -271,6 +271,78 @@ public final class Line {
     }
 
     /**
+     * Returns a new line with all tab characters ('\t') expanded to column-aligned spaces
+     * using the given tab stop size.
+     *
+     * @param tabSize the number of columns per tab stop (must be non-negative)
+     * @return a new line with expanded tabs, or this line if no tabs were present
+     * @throws IllegalArgumentException if tabSize is negative
+     */
+    public Line expandTabs(int tabSize) {
+        if (tabSize < 0) {
+            throw new IllegalArgumentException("tabSize must be non-negative: " + tabSize);
+        }
+        if (spans.isEmpty()) {
+            return this;
+        }
+        boolean hasTab = false;
+        for (int i = 0; i < spans.size(); i++) {
+            if (spans.get(i).content().indexOf('\t') != -1) {
+                hasTab = true;
+                break;
+            }
+        }
+        if (!hasTab) {
+            return this;
+        }
+
+        List<Span> newSpans = new ArrayList<>(spans.size());
+        int col = 0;
+        for (int i = 0; i < spans.size(); i++) {
+            Span span = spans.get(i);
+            String content = span.content();
+            if (content.indexOf('\t') == -1) {
+                col += span.width();
+                newSpans.add(span);
+                continue;
+            }
+            StringBuilder sb = new StringBuilder(content.length() + tabSize);
+            int last = 0;
+            int tabIndex;
+            while ((tabIndex = content.indexOf('\t', last)) != -1) {
+                if (tabIndex > last) {
+                    String before = content.substring(last, tabIndex);
+                    col += CharWidth.of(before);
+                    sb.append(before);
+                }
+                int spaces = tabSize > 0 ? (tabSize - (col % tabSize)) : 0;
+                for (int s = 0; s < spaces; s++) {
+                    sb.append(' ');
+                }
+                col += spaces;
+                last = tabIndex + 1;
+            }
+            if (last < content.length()) {
+                String remaining = content.substring(last);
+                col += CharWidth.of(remaining);
+                sb.append(remaining);
+            }
+            newSpans.add(new Span(sb.toString(), span.style()));
+        }
+        return new Line(newSpans, alignment);
+    }
+
+    /**
+     * Returns a new line with all tab characters ('\t') expanded to column-aligned spaces
+     * using the default tab stop size of 8.
+     *
+     * @return a new line with expanded tabs, or this line if no tabs were present
+     */
+    public Line expandTabs() {
+        return expandTabs(8);
+    }
+
+    /**
      * Returns the spans composing this line.
      *
      * @return the list of spans

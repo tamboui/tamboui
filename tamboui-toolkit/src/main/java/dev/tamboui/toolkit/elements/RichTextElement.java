@@ -4,14 +4,16 @@
  */
 package dev.tamboui.toolkit.elements;
 
+import java.util.Optional;
+
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Overflow;
+import dev.tamboui.style.StandardProperties;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.terminal.Frame;
-import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.text.Text;
 import dev.tamboui.toolkit.element.RenderContext;
@@ -51,6 +53,7 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
     private Text text;
     private Overflow overflow;
     private Alignment alignment;
+    private Integer tabSize;
 
     /**
      * Creates an empty rich text element.
@@ -191,6 +194,30 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
         return this;
     }
 
+    /**
+     * Sets the tab size (number of spaces per tab stop).
+     *
+     * @param tabSize the tab size, must be non-negative
+     * @return this element for chaining
+     * @throws IllegalArgumentException if tabSize is negative
+     */
+    public RichTextElement tabSize(int tabSize) {
+        if (tabSize < 0) {
+            throw new IllegalArgumentException("tabSize must be non-negative: " + tabSize);
+        }
+        this.tabSize = tabSize;
+        return this;
+    }
+
+    /**
+     * Returns the tab size, or empty if not set programmatically.
+     *
+     * @return the tab size
+     */
+    public Optional<Integer> tabSize() {
+        return Optional.ofNullable(tabSize);
+    }
+
     @Override
     public Constraint constraint() {
         if (layoutConstraint != null) {
@@ -207,15 +234,21 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
 
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
-        int maxWidth = 0;
-        for (Line line : text.lines()) {
-            int width = 0;
-            for (Span span : line.spans()) {
-                width += span.width();
-            }
-            maxWidth = Math.max(maxWidth, width);
+        int effectiveTabSize = resolveTabSize(context);
+        Text expanded = text.expandTabs(effectiveTabSize);
+        return Size.of(expanded.width(), expanded.lines().size());
+    }
+
+    private int resolveTabSize(RenderContext context) {
+        if (tabSize != null) {
+            return tabSize;
         }
-        return Size.of(maxWidth, text.lines().size());
+        if (context != null) {
+            return context.resolveStyle(this)
+                    .flatMap(resolver -> resolver.get(StandardProperties.TAB_SIZE))
+                    .orElse(Paragraph.DEFAULT_TAB_SIZE);
+        }
+        return Paragraph.DEFAULT_TAB_SIZE;
     }
 
     @Override
@@ -240,6 +273,9 @@ public final class RichTextElement extends StyledElement<RichTextElement> {
         }
         if (overflow != null) {
             paragraphBuilder.overflow(overflow);
+        }
+        if (tabSize != null) {
+            paragraphBuilder.tabSize(tabSize);
         }
 
         Paragraph paragraph = paragraphBuilder.build();
