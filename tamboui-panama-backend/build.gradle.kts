@@ -17,7 +17,10 @@ tasks.withType<Test> {
 
 graalvmNative {
     binaries.named("test") {
-        buildArgs.addAll("--enable-native-access=ALL-UNNAMED", "-H:+SharedArenaSupport")
+        // AddAllCharsets so the native test exercises the decoder against real single-byte charsets
+        // (ISO-8859-15, ...) rather than GraalVM's reduced default set. Applications opt in themselves;
+        // see InputDecoder / UnixTerminal.detectCharset for the UTF-8 fallback without it.
+        buildArgs.addAll("--enable-native-access=ALL-UNNAMED", "-H:+SharedArenaSupport", "-H:+AddAllCharsets")
     }
     toolchainDetection.set(false)
 }

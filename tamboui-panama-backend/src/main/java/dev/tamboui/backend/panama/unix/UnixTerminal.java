@@ -128,6 +128,13 @@ public final class UnixTerminal implements PlatformTerminal {
      * Checks LC_ALL, LC_CTYPE, and LANG in order of precedence.
      * Falls back to UTF-8 if no encoding is detected or if the
      * detected encoding is not supported.
+     * <p>
+     * <strong>GraalVM native image:</strong> an image bundles only a limited set of charsets
+     * (US-ASCII, ISO-8859-1, UTF-8/16) unless built with {@code -H:+AddAllCharsets}. When the
+     * detected locale charset is not available, this falls back to UTF-8 rather than failing at
+     * startup — so a non-UTF-8 terminal may then decode its input incorrectly. This is a GraalVM
+     * configuration limitation, not specific to this backend; add {@code -H:+AddAllCharsets} to the
+     * native build to support such locales.
      *
      * @return the detected charset, or UTF-8 as default
      */
