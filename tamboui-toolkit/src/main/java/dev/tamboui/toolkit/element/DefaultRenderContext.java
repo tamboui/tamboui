@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -365,9 +366,18 @@ public final class DefaultRenderContext implements RenderContext {
         }
 
         // If no explicit parent, use the element stack (runtime render hierarchy)
-        // This enables descendant selectors for dynamically created elements
+        // This enables descendant selectors for dynamically created elements.
+        // The stack holds the nearest parent on top, while selectors expect the root first,
+        // so walk it from the bottom. An element resolving its own style from inside its
+        // renderContent is on top of the stack itself; it is not its own ancestor.
         if (ancestors.isEmpty() && !elementStack.isEmpty()) {
-            ancestors.addAll(elementStack);
+            Iterator<Styleable> fromRoot = elementStack.descendingIterator();
+            while (fromRoot.hasNext()) {
+                Styleable ancestor = fromRoot.next();
+                if (ancestor != element) {
+                    ancestors.add(ancestor);
+                }
+            }
         }
 
         return ancestors;

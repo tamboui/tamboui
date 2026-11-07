@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.css.Styleable;
+import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
@@ -154,6 +155,35 @@ class DefaultRenderContextChildStyleTest {
             assertThat(evenStyle.bg()).isPresent();
             assertThat(evenStyle.bg().get()).isEqualTo(Color.rgb(0x22, 0x99, 0x22));
         });
+    }
+
+    @Test
+    @DisplayName("childStyle matches a child selector chain through the element stack")
+    void childStyleMatchesChildSelectorChain() {
+        styleEngine.addStylesheet("test", "Column > Panel > ListElement > ListElement-item { background: red; }");
+        styleEngine.setActiveStylesheet("test");
+
+        Styleable column = createStyleable("Column");
+        Styleable panel = createStyleable("Panel");
+        Styleable list = createStyleable("ListElement");
+        context.withElement(column, Style.EMPTY, () ->
+            context.withElement(panel, Style.EMPTY, () ->
+                context.withElement(list, Style.EMPTY, () ->
+                    assertThat(context.childStyle("item", PseudoClassState.NONE).bg()).contains(Color.RED))));
+    }
+
+    @Test
+    @DisplayName("childStyle does not count the parent twice")
+    void childStyleDoesNotCountTheParentTwice() {
+        // Matches only an item inside two nested ListElements; here there is one
+        styleEngine.addStylesheet("test", "ListElement ListElement ListElement-item { background: red; }");
+        styleEngine.setActiveStylesheet("test");
+
+        Styleable column = createStyleable("Column");
+        Styleable list = createStyleable("ListElement");
+        context.withElement(column, Style.EMPTY, () ->
+            context.withElement(list, Style.EMPTY, () ->
+                assertThat(context.childStyle("item", PseudoClassState.NONE).bg()).isEmpty()));
     }
 
     private Styleable createStyleable(String type) {
