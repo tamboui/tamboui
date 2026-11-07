@@ -59,10 +59,11 @@ public final class BindingSets {
     private static final Bindings INTELLIJ = loadBuiltIn("intellij.properties", STANDARD);
     private static final Bindings VSCODE = loadBuiltIn("vscode.properties", STANDARD);
 
-    // macOS variant of the standard set, from standard-macos.properties (convention:
-    // <set>-macos.properties). The named sets above stay literal and cross-platform so they are
-    // predictable and testable; only defaults() resolves the host platform.
-    private static final Bindings STANDARD_MAC = loadMacOverlay("standard", STANDARD);
+    // Platform overlays follow the convention <set>-<os>.properties, where <os> is one of these
+    // tokens. The named sets above stay literal and cross-platform so they are predictable and
+    // testable; only defaults() resolves the host platform, applying the standard overlay for it.
+    private static final String[] PLATFORM_OS = {"macos", "windows", "linux"};
+    private static final Map<String, Bindings> STANDARD_BY_OS = standardOverlays();
 
     private BindingSets() {
     }
@@ -79,14 +80,22 @@ public final class BindingSets {
         }
     }
 
+    private static Map<String, Bindings> standardOverlays() {
+        Map<String, Bindings> overlays = new HashMap<>();
+        for (String os : PLATFORM_OS) {
+            overlays.put(os, loadPlatformOverlay("standard", os, STANDARD));
+        }
+        return overlays;
+    }
+
     /**
-     * Loads the {@code <setName>-macos.properties} overlay on top of {@code base}, replacing each
-     * action it names (so macOS word-editing is Option, not an addition to the Ctrl keys). Returns
-     * {@code base} unchanged when no such overlay resource exists, so a set only needs its own file
-     * when it diverges from the inherited macOS mapping.
+     * Loads the {@code <setName>-<os>.properties} overlay on top of {@code base}, replacing each
+     * action it names (so e.g. macOS word-editing is Option, not an addition to the Ctrl keys).
+     * Returns {@code base} unchanged when no such overlay resource exists, so a set only needs a
+     * file for an OS when it diverges from the base mapping. Works for any set and any OS token.
      */
-    private static Bindings loadMacOverlay(String setName, Bindings base) {
-        String resource = setName + "-macos.properties";
+    private static Bindings loadPlatformOverlay(String setName, String os, Bindings base) {
+        String resource = setName + "-" + os + ".properties";
         try (InputStream in = BindingSets.class.getClassLoader()
                 .getResourceAsStream(BINDINGS_RESOURCE_PATH + resource)) {
             if (in == null) {
@@ -170,20 +179,34 @@ public final class BindingSets {
     /**
      * Returns the default bindings for the host platform.
      * <p>
-     * This is {@link #standard()} on every platform except macOS, where the
-     * word-editing keys are replaced with their Option (Alt) equivalents to match
-     * the system text layer. The named sets ({@link #standard()}, {@link #vim()},
+     * This is {@link #standard()} with the host OS's overlay ({@code standard-<os>.properties})
+     * applied, if one exists: on macOS the word-editing keys become their Option (Alt) equivalents
+     * to match the system text layer. The named sets ({@link #standard()}, {@link #vim()},
      * etc.) stay literal and cross-platform; only this effective-default entry
      * point resolves the host platform.
      *
      * @return the platform-appropriate default bindings
      */
     public static Bindings defaults() {
-        return isMac() ? STANDARD_MAC : STANDARD;
+        return STANDARD_BY_OS.getOrDefault(hostOs(), STANDARD);
     }
 
-    private static boolean isMac() {
-        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("mac");
+    /**
+     * The overlay token for the host OS: {@code macos}, {@code windows}, {@code linux}, or an empty
+     * string when it is none of these (then no overlay applies).
+     */
+    private static String hostOs() {
+        String name = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
+        if (name.contains("mac")) {
+            return "macos";
+        }
+        if (name.contains("win")) {
+            return "windows";
+        }
+        if (name.contains("nux") || name.contains("nix") || name.contains("aix")) {
+            return "linux";
+        }
+        return "";
     }
 
     private static Map<String, KeyCode> createKeyNameMap() {
