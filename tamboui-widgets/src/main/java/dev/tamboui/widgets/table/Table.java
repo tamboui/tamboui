@@ -6,6 +6,7 @@ package dev.tamboui.widgets.table;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -72,6 +73,7 @@ public final class Table implements StatefulWidget<TableState> {
 
     private final List<Row> rows;
     private final List<Constraint> widths;
+    private final List<Constraint> effectiveWidths;
     private final Row header;
     private final Row footer;
     private final Block block;
@@ -123,6 +125,7 @@ public final class Table implements StatefulWidget<TableState> {
         } else {
             this.rows = listCopyOf(builder.rows);
         }
+        this.effectiveWidths = calculateEffectiveWidths();
     }
 
     /**
@@ -184,7 +187,7 @@ public final class Table implements StatefulWidget<TableState> {
             tableArea = block.inner(area);
         }
 
-        if (tableArea.isEmpty() || widths.isEmpty()) {
+        if (tableArea.isEmpty() || effectiveWidths.isEmpty()) {
             return;
         }
 
@@ -196,7 +199,7 @@ public final class Table implements StatefulWidget<TableState> {
         }
 
         // Account for column spacing
-        int totalSpacing = columnSpacing * Math.max(0, widths.size() - 1);
+        int totalSpacing = columnSpacing * Math.max(0, effectiveWidths.size() - 1);
         availableWidth = Math.max(0, availableWidth - totalSpacing);
 
         List<Integer> columnWidths = calculateColumnWidths(availableWidth);
@@ -264,11 +267,40 @@ public final class Table implements StatefulWidget<TableState> {
         }
     }
 
+    private List<Constraint> calculateEffectiveWidths() {
+        if (!widths.isEmpty()) {
+            return widths;
+        }
+        int numCols = determineColumnCount();
+        if (numCols <= 0) {
+            return Collections.emptyList();
+        }
+        List<Constraint> defaultWidths = new ArrayList<>(numCols);
+        for (int i = 0; i < numCols; i++) {
+            defaultWidths.add(Constraint.fill());
+        }
+        return Collections.unmodifiableList(defaultWidths);
+    }
+
+    private int determineColumnCount() {
+        int count = 0;
+        if (header != null) {
+            count = Math.max(count, header.cells().size());
+        }
+        for (Row row : rows) {
+            count = Math.max(count, row.cells().size());
+        }
+        if (footer != null) {
+            count = Math.max(count, footer.cells().size());
+        }
+        return count;
+    }
+
     private List<Integer> calculateColumnWidths(int availableWidth) {
         // Use Layout to calculate column widths based on constraints
         Rect fakeArea = new Rect(0, 0, availableWidth, 1);
         List<Rect> columnRects = Layout.horizontal()
-            .constraints(widths)
+            .constraints(effectiveWidths)
             .split(fakeArea);
 
         List<Integer> widthList = new ArrayList<>(columnRects.size());

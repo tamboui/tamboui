@@ -151,6 +151,22 @@ class TableElementTest extends AbstractElementTest {
     }
 
     @Test
+    @DisplayName("TableElement renders content without explicit widths")
+    void rendersWithoutExplicitWidths() {
+        Rect area = new Rect(0, 0, 30, 5);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        table()
+            .header("Name", "Age")
+            .row("Alice", "30")
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("N");
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("A");
+    }
+
+    @Test
     @DisplayName("highlightSymbol sets selection indicator")
     void highlightSymbol() {
         TableElement element = table()
