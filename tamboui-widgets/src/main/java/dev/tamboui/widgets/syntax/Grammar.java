@@ -93,6 +93,10 @@ public final class Grammar {
 
         /**
          * Creates a single-line rule matching {@code pattern}.
+         * <p>
+         * The pattern is tried at every position, but its anchors see the whole source:
+         * {@code ^} matches at the start of the source, or at the start of any line with
+         * {@link Pattern#MULTILINE}, never just because a token starts there.
          *
          * @param type the token type
          * @param pattern the regex matched against the source from the current position
@@ -107,8 +111,9 @@ public final class Grammar {
          * Creates a single-line rule that is only attempted at the start of a
          * line (the first position of the input or right after a newline).
          * Use this for line-oriented syntax such as properties keys or
-         * indentation-sensitive keys, which plain patterns cannot express
-         * because rules are matched at every position.
+         * indentation-sensitive keys: it matches like a plain pattern starting
+         * with {@code ^} in {@link Pattern#MULTILINE} mode, without being tried
+         * at every position.
          *
          * @param type the token type
          * @param pattern the regex matched against the source from the line start
