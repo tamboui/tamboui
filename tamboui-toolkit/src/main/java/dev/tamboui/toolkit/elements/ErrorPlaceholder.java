@@ -121,9 +121,9 @@ public final class ErrorPlaceholder implements Element {
             Style errorStyle = Style.EMPTY.fg(Color.RED).withExtension(Tags.class, Tags.of("error"));
             Line errorLine = Line.from(new Span("!", errorStyle.bold()), Span.raw(" " + message));
 
-            // Truncate if needed
+            // cut to the inner area, so a long message does not draw over the right border and the elements next to it
             if (inner.width() > 0) {
-                buffer.setLine(inner.left(), inner.top(), errorLine);
+                buffer.setLine(inner.left(), inner.top(), errorLine, inner.width());
             }
         }
     }
