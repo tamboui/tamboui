@@ -5,6 +5,7 @@
 package dev.tamboui.widgets.syntax;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -314,6 +315,49 @@ class RegexSyntaxHighlighterTest {
     }
 
     @Test
+    @DisplayName("YAML keys are keys wherever they start, a value such as timer:tick is not")
+    void yamlValueWithSchemeIsNotAKey() {
+        List<Line> lines = highlight("- route:\n"
+            + "    from:\n"
+            + "      uri: timer:tick\n"
+            + "      parameters: {period: 1000}\n"
+            + "      steps:\n"
+            + "        - to: http://localhost:8080/api\n"
+            + "        - log: ${body}", "yaml");
+
+        assertThat(keys(lines)).containsExactly(
+            "route:", "from:", "uri:", "parameters:", "period:", "steps:", "to:", "log:");
+    }
+
+    @Test
+    @DisplayName("long YAML values are highlighted in linear time")
+    void longYamlValuesAreHighlightedQuickly() {
+        StringBuilder sb = new StringBuilder();
+        for (int line = 0; line < 20; line++) {
+            sb.append("key").append(line).append(": ").append(repeat('x', 9_000)).append('\n');
+        }
+        String yaml = sb.toString();
+
+        List<Line> lines = assertTimeoutPreemptively(Duration.ofSeconds(1), () -> highlight(yaml, "yaml"));
+
+        assertThat(keys(lines)).hasSize(20);
+    }
+
+    @Test
+    @DisplayName("^ in a rule matches at the start of a line, not wherever a token starts")
+    void caretMatchesOnlyAtLineStart() {
+        Grammar grammar = Grammar.builder("diff")
+            .rule(Grammar.Rule.pattern(TokenType.STRING, Pattern.compile("^\\+[^\\n]*", Pattern.MULTILINE)))
+            .rule(Grammar.Rule.pattern(TokenType.NUMBER, Pattern.compile("\\d+")))
+            .build();
+
+        List<Line> lines = RegexSyntaxHighlighter.of(grammar).highlight("kept 2 +3\n+added 4", "diff", BASE, THEME);
+
+        assertThat(lines.get(0).spans()).extracting(Span::content).containsExactly("kept ", "2", " +", "3");
+        assertThat(typeOf(lines, "+added 4")).contains(TokenType.STRING);
+    }
+
+    @Test
     @DisplayName("spans carry their token class as TokenType and Tags extensions")
     void spansCarryTokenClass() {
         List<Line> lines = highlight("class total = \"x\"; // done", "java");
@@ -329,6 +373,18 @@ class RegexSyntaxHighlighterTest {
         // the "syntax-<type>" naming convention
         assertThat(tagsOf(lines, "class")).contains("syntax-keyword");
         assertThat(tagsOf(lines, "// done")).contains("syntax-comment");
+    }
+
+    private static List<String> keys(List<Line> lines) {
+        List<String> keys = new ArrayList<>();
+        for (Line line : lines) {
+            for (Span span : line.spans()) {
+                if (span.style().extension(TokenType.class).orElse(null) == TokenType.KEYWORD) {
+                    keys.add(span.content().trim());
+                }
+            }
+        }
+        return keys;
     }
 
     private static java.util.Optional<TokenType> typeOf(List<Line> lines, String content) {
