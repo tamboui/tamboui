@@ -51,6 +51,7 @@ import dev.tamboui.toolkit.elements.TextElement;
 import dev.tamboui.toolkit.elements.TextInputElement;
 import dev.tamboui.toolkit.elements.TreeElement;
 import dev.tamboui.toolkit.elements.WaveTextElement;
+import dev.tamboui.toolkit.elements.WorldMapElement;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.form.BooleanFieldState;
@@ -59,6 +60,7 @@ import dev.tamboui.widgets.form.FormState;
 import dev.tamboui.widgets.form.SelectFieldState;
 import dev.tamboui.widgets.input.TextAreaState;
 import dev.tamboui.widgets.input.TextInputState;
+import dev.tamboui.widgets.map.MapViewport;
 import dev.tamboui.widgets.scrollbar.ScrollbarState;
 import dev.tamboui.widgets.spinner.SpinnerStyle;
 import dev.tamboui.widgets.tree.TreeNode;
@@ -1153,6 +1155,25 @@ public final class Toolkit {
      */
     public static CanvasElement canvas() {
         return new CanvasElement();
+    }
+
+    /**
+     * Creates an interactive offline world map focused on the whole world.
+     *
+     * @return a new world map element
+     */
+    public static WorldMapElement worldMap() {
+        return new WorldMapElement();
+    }
+
+    /**
+     * Creates an interactive offline world map focused on the given viewport.
+     *
+     * @param viewport the initial geographic bounds
+     * @return a new world map element
+     */
+    public static WorldMapElement worldMap(MapViewport viewport) {
+        return new WorldMapElement().viewport(viewport);
     }
 
     // ==================== Calendar ====================

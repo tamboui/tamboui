@@ -331,4 +331,42 @@ class CanvasTest {
 
         assertThat(canvas).isNotNull();
     }
+
+    @Test
+    void label_anchored_outside_bounds_is_culled() {
+        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
+            .paint(ctx -> ctx.print(20, 5, "Off")).build();
+        Rect area = new Rect(0, 0, 10, 10);
+        Buffer buffer = Buffer.empty(area);
+        canvas.render(area, buffer);
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                assertThat(buffer.get(x, y).symbol()).isEqualTo(" ");
+            }
+        }
+    }
+
+    @Test
+    void label_is_clipped_at_the_right_edge() {
+        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
+            .paint(ctx -> ctx.print(10, 5, "ABCDE")).build();
+        Rect area = new Rect(0, 0, 6, 10);
+        Buffer buffer = Buffer.empty(area);
+        canvas.render(area, buffer);
+        // Anchor at longitude 10 maps to the last column (5); only "A" fits, the rest is clipped.
+        assertThat(buffer.get(5, 5).symbol()).isEqualTo("A");
+    }
+
+    @Test
+    void label_clips_wide_and_grapheme_clusters_on_boundaries() {
+        // CJK is width 2, a ZWJ sequence and a flag are each one grapheme of width 2.
+        String text = "\u4e16\u754c\ud83d\udc68\u200d\ud83e\uddb2\ud83c\uddeb\ud83c\uddf7";
+        Canvas canvas = Canvas.builder().xBounds(0, 10).yBounds(0, 10).marker(Marker.DOT)
+            .paint(ctx -> ctx.print(0, 5, text)).build();
+        Rect area = new Rect(0, 0, 5, 10);
+        Buffer buffer = Buffer.empty(area);
+        // Must not throw and must not write past the right edge (clips on a cluster boundary).
+        canvas.render(area, buffer);
+        assertThat(buffer.get(0, 5).symbol()).isEqualTo("\u4e16");
+    }
 }

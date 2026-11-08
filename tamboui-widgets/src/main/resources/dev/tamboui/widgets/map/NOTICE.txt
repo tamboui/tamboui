@@ -1,0 +1,11 @@
+Natural Earth 1:50m coastline (ne_50m_coastline), public domain.
+Source: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_50m_coastline.geojson
+License: https://www.naturalearthdata.com/about/terms-of-use/
+Downloaded: 2026-10-31
+Source SHA-256: 271f1c4c1908312bac6b29d158ea1356544beafc129f260005300913aa5ea283
+
+coastlines.bin is derived from this source, with coordinates rounded to
+0.01 degrees, preserving line separation and order (1429 lines, 60416 points).
+Format: big-endian int32 line count; per line int32 point count followed
+by pairs of signed int16 longitude, latitude in hundredths of a degree.
+Natural Earth is low resolution and unsuitable for detailed local navigation.

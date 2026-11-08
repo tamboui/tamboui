@@ -11,7 +11,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
-import dev.tamboui.text.Line;
+import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
@@ -237,29 +237,36 @@ public final class Canvas implements Widget {
     }
 
     private void renderLabels(Buffer buffer, Rect area, Context ctx) {
+        double xRange = xBounds[1] - xBounds[0];
+        double yRange = yBounds[1] - yBounds[0];
+        if (xRange == 0 || yRange == 0) {
+            return;
+        }
+        int rightEdge = area.x() + area.width();
         for (Context.Label label : ctx.labels()) {
-            // Convert canvas coordinates to screen coordinates
-            double xRange = xBounds[1] - xBounds[0];
-            double yRange = yBounds[1] - yBounds[0];
-
-            if (xRange == 0 || yRange == 0) {
+            // Cull labels whose anchor is outside the canvas bounds instead of pinning them to an edge.
+            if (label.x() < xBounds[0] || label.x() > xBounds[1]
+                    || label.y() < yBounds[0] || label.y() > yBounds[1]) {
                 continue;
             }
+            int screenX = area.x() + (int) Math.round((label.x() - xBounds[0]) / xRange * (area.width() - 1));
+            int screenY = area.y() + (int) Math.round((yBounds[1] - label.y()) / yRange * (area.height() - 1));
 
-            int screenX = (int) Math.round((label.x() - xBounds[0]) / xRange * (area.width() - 1));
-            int screenY = (int) Math.round((yBounds[1] - label.y()) / yRange * (area.height() - 1));
-
-            screenX = area.x() + Math.max(0, Math.min(area.width() - 1, screenX));
-            screenY = area.y() + Math.max(0, Math.min(area.height() - 1, screenY));
-
-            // Render the line
-            Line line = label.line();
             int x = screenX;
-            List<Span> spans = line.spans();
-            for (int i = 0; i < spans.size(); i++) {
-                Span span = spans.get(i);
-                buffer.setString(x, screenY, span.content(), span.style());
-                x += span.width();
+            for (Span span : label.line().spans()) {
+                if (x >= rightEdge) {
+                    break;
+                }
+                String content = span.content();
+                // Clip the text at the right edge by display width, on a grapheme boundary.
+                if (x + CharWidth.of(content) > rightEdge) {
+                    content = CharWidth.substringByWidth(content, rightEdge - x);
+                }
+                if (content.isEmpty()) {
+                    break;
+                }
+                buffer.setString(x, screenY, content, span.style());
+                x += CharWidth.of(content);
             }
         }
     }
