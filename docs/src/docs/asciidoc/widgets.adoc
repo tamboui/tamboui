@@ -171,6 +171,10 @@ With a wrap mode, a wrapped line continues under its first non-blank character i
 indented line (a list entry, a key and its value) keeps its indent when it wraps. An indent that leaves no room for
 text falls back to the left edge.
 
+`paragraph.lineCount(width)` returns how many rows the paragraph takes when rendered `width` columns wide, block
+included. It lays the text out with the same code as rendering, so use it to size the area for a paragraph or to find
+how far it can scroll instead of counting wrapped rows yourself.
+
 == Selection Widgets
 
 === ListWidget

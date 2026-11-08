@@ -170,6 +170,31 @@ public final class Paragraph implements Widget {
         }
     }
 
+    /**
+     * Returns the number of rows this paragraph takes when rendered {@code width} columns wide,
+     * including the rows of its block: the height that shows all of it without scrolling.
+     * <p>
+     * The text is laid out by the same code as {@link #render}, so the count always matches what is
+     * drawn. With {@link Overflow#WRAP_WORD} or {@link Overflow#WRAP_CHARACTER}, a line takes as many
+     * rows as it wraps into, following the same breaks (after whitespace, {@code -}, {@code /} or
+     * {@code \}), display widths and indent of continuation rows. With the other overflow modes, each
+     * line takes one row. The block's borders, titles and padding add their rows and narrow the width
+     * the text wraps at.
+     *
+     * @param width the width of the area the paragraph will be rendered into
+     * @return the number of rows, or 0 when {@code width} is not positive
+     */
+    public int lineCount(int width) {
+        if (width <= 0) {
+            return 0;
+        }
+        // Tall enough that the block's insets are the only thing taken off the height.
+        Rect area = new Rect(0, 0, width, Short.MAX_VALUE);
+        Rect textArea = block != null ? block.inner(area) : area;
+        int rows = processLines(text.lines(), textArea.width()).size();
+        return rows + area.height() - textArea.height();
+    }
+
     private List<Line> processLines(List<Line> lines, int maxWidth) {
         if (maxWidth <= 0) {
             return Collections.emptyList();
