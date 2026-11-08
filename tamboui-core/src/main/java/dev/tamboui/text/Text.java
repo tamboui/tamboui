@@ -127,6 +127,35 @@ public final class Text {
     }
 
     /**
+     * Creates a text from a string with ANSI escape sequences, such as a log or the output of a command.
+     * <p>
+     * The SGR sequences ({@code ESC [ ... m}) become the style of the spans:
+     * <ul>
+     *   <li>the attributes 1-9 (bold, dim, italic, underlined, slow and rapid blink, reversed, hidden
+     *       and crossed out), and 21-29, which turn them off again (21, doubly underlined, is
+     *       underlined)</li>
+     *   <li>the 16 ANSI colors 30-37 and 90-97 as {@link Color#ansi}, and 38 with {@code 5;n} as
+     *       {@link Color#indexed} or with {@code 2;r;g;b} as {@link Color#rgb}, also in the colon form
+     *       {@code 38:2::r:g:b}; the same for the background (40-47, 100-107 and 48) and for the
+     *       underline color (58)</li>
+     *   <li>0, 39, 49 and 59, which go back to no style, so that the text takes the style of the widget
+     *       it is shown in, as text without escape sequences does</li>
+     * </ul>
+     * Other sequences, such as cursor movement and window titles, are dropped, as are carriage
+     * returns, the other control characters and sequences that are malformed or cut off; the text
+     * around them is kept. A tab becomes unstyled spaces up to the next multiple of 8 columns, and
+     * a style change inside a grapheme cluster takes effect after it, so that wide and joined characters
+     * stay whole. A line feed starts a new line, which keeps the style; a line feed at the end does not
+     * start another line.
+     *
+     * @param text the text with ANSI escape sequences
+     * @return a new text
+     */
+    public static Text fromAnsi(String text) {
+        return AnsiParser.parseText(Objects.requireNonNull(text, "text"));
+    }
+
+    /**
      * Returns the height (number of lines).
      *
      * @return the number of lines
