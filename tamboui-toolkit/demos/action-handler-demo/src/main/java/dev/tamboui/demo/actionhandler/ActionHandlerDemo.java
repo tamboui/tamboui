@@ -71,8 +71,8 @@ public class ActionHandlerDemo {
                 .build();
 
         // Create counter components - they use @OnAction internally
-        var counterA = new CounterComponent("Counter A", Color.CYAN, logger).id("counter-a");
-        var counterB = new CounterComponent("Counter B", Color.MAGENTA, logger).id("counter-b");
+        var counterA = new CounterComponent("Counter A", Color.CYAN, logger).id("counter-a").fill();
+        var counterB = new CounterComponent("Counter B", Color.MAGENTA, logger).id("counter-b").fill();
 
         // Use builder - global actions are registered programmatically to capture local state
         try (var runner = ToolkitRunner.builder()
