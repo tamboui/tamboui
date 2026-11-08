@@ -67,10 +67,12 @@ public final class AnsiStringBuilder {
             sb.append(style.bg().get().toAnsiBackground());
         }
 
-        // Modifiers
+        // Modifiers. NORMAL is the reset written first; its code 0 here would also clear the colors.
         EnumSet<Modifier> modifiers = style.effectiveModifiers();
         for (Modifier mod : modifiers) {
-            sb.append(";").append(mod.code());
+            if (mod != Modifier.NORMAL) {
+                sb.append(";").append(mod.code());
+            }
         }
 
         // Underline color (if supported by terminal)
