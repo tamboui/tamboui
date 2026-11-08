@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
@@ -456,6 +458,87 @@ class GridTest {
         BufferAssertions.assertThat(buffer)
             .hasSymbolAt(0, 2, "B")
             .hasSymbolAt(11, 2, "C");
+    }
+
+    @Test
+    @DisplayName("area-based grid places rows with the flex mode")
+    void areaBasedGridAppliesFlexToRows() {
+        Rect area = new Rect(0, 0, 4, 8);
+        Buffer buffer = Buffer.empty(area);
+
+        Grid.builder()
+            .gridAreas("A", "B")
+            .area("A", fillingWidget("A"))
+            .area("B", fillingWidget("B"))
+            .rowConstraints(Constraint.length(2))
+            .flex(Flex.CENTER)
+            .build()
+            .render(area, buffer);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "    ",
+            "    ",
+            "AAAA",
+            "AAAA",
+            "BBBB",
+            "BBBB",
+            "    ",
+            "    ");
+    }
+
+    @Test
+    @DisplayName("area-based grid spans the flex space between rows")
+    void areaBasedGridSpanCoversFlexSpaceBetweenRows() {
+        Rect area = new Rect(0, 0, 4, 6);
+        Buffer buffer = Buffer.empty(area);
+
+        Grid.builder()
+            .gridAreas("A B", "A C")
+            .area("A", fillingWidget("A"))
+            .area("B", fillingWidget("B"))
+            .area("C", fillingWidget("C"))
+            .rowConstraints(Constraint.length(1))
+            .flex(Flex.SPACE_BETWEEN)
+            .build()
+            .render(area, buffer);
+
+        BufferAssertions.assertThat(buffer).hasContent(
+            "AABB",
+            "AA  ",
+            "AA  ",
+            "AA  ",
+            "AA  ",
+            "AACC");
+    }
+
+    @ParameterizedTest
+    @EnumSource(Flex.class)
+    @DisplayName("area-based grid places rows like a children-based grid")
+    void areaBasedGridPlacesRowsLikeChildrenBasedGrid(Flex flex) {
+        Rect area = new Rect(0, 0, 4, 12);
+        Buffer areaBased = Buffer.empty(area);
+        Buffer childrenBased = Buffer.empty(area);
+
+        Grid.builder()
+            .gridAreas("A", "B", "C")
+            .area("A", fillingWidget("A"))
+            .area("B", fillingWidget("B"))
+            .area("C", fillingWidget("C"))
+            .rowConstraints(Constraint.length(2))
+            .verticalGutter(1)
+            .flex(flex)
+            .build()
+            .render(area, areaBased);
+        Grid.builder()
+            .children(fillingWidget("A"), fillingWidget("B"), fillingWidget("C"))
+            .columnCount(1)
+            .rowConstraints(Constraint.length(2))
+            .verticalGutter(1)
+            .flex(flex)
+            .build()
+            .render(area, childrenBased);
+
+        BufferAssertions.assertThat(areaBased).isEqualTo(childrenBased);
     }
 
     @Test
