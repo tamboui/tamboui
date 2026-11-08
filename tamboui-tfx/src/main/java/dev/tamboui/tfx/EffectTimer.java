@@ -6,6 +6,8 @@ package dev.tamboui.tfx;
 
 import java.util.Objects;
 
+import dev.tamboui.animation.Interpolation;
+
 /**
  * Manages the timing and interpolation of effects.
  * <p>

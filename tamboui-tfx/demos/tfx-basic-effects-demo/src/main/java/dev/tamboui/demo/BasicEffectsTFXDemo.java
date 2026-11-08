@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import dev.tamboui.animation.Interpolation;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Alignment;
 import dev.tamboui.layout.Constraint;
@@ -29,7 +30,6 @@ import dev.tamboui.tfx.CellFilter;
 import dev.tamboui.tfx.Effect;
 import dev.tamboui.tfx.EffectManager;
 import dev.tamboui.tfx.Fx;
-import dev.tamboui.tfx.Interpolation;
 import dev.tamboui.tfx.Motion;
 import dev.tamboui.tfx.TFxColorSpace;
 import dev.tamboui.tfx.TFxDuration;
