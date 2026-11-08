@@ -204,10 +204,12 @@ public final class Layout {
         int totalSpacing = spacing * (constraints.size() - 1);
         int distributable = Math.max(0, available - totalSpacing);
 
-        // Use cached solver results, computing on miss
+        // Use cached solver results, computing on miss. The solver distributes the space left after the
+        // spacing, so it gets no spacing of its own: the gaps are added when positioning below, and
+        // reserving them in the solver as well would take them away twice
         int[] sizes = LayoutCache.instance().computeIfAbsent(
-            constraints, distributable, spacing, flex,
-            () -> new LayoutSolver().solve(constraints, distributable, spacing, flex));
+            constraints, distributable, 0, flex,
+            () -> new LayoutSolver().solve(constraints, distributable, 0, flex));
 
         // Calculate total size used and remaining space for flex positioning
         int totalSize = 0;
