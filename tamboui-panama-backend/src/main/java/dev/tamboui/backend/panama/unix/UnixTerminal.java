@@ -71,6 +71,8 @@ public final class UnixTerminal implements PlatformTerminal {
     private final int ttyFd;
     private final Charset charset;
 
+    private final InputDecoder decoder;
+
     private boolean rawModeEnabled;
     private int peekedChar = -2;
     private final ReentrantLock resizeLock = new ReentrantLock();
@@ -97,6 +99,7 @@ public final class UnixTerminal implements PlatformTerminal {
         }
         this.ttyFd = fd;
         this.charset = detectCharset();
+        this.decoder = new InputDecoder(this::readInternal, charset);
 
         this.arena = Arena.ofShared();
         this.savedTermios = LibC.allocateTermios(arena);
@@ -125,6 +128,13 @@ public final class UnixTerminal implements PlatformTerminal {
      * Checks LC_ALL, LC_CTYPE, and LANG in order of precedence.
      * Falls back to UTF-8 if no encoding is detected or if the
      * detected encoding is not supported.
+     * <p>
+     * <strong>GraalVM native image:</strong> an image bundles only a limited set of charsets
+     * (US-ASCII, ISO-8859-1, UTF-8/16) unless built with {@code -H:+AddAllCharsets}. When the
+     * detected locale charset is not available, this falls back to UTF-8 rather than failing at
+     * startup — so a non-UTF-8 terminal may then decode its input incorrectly. This is a GraalVM
+     * configuration limitation, not specific to this backend; add {@code -H:+AddAllCharsets} to the
+     * native build to support such locales.
      *
      * @return the detected charset, or UTF-8 as default
      */
@@ -312,7 +322,7 @@ public final class UnixTerminal implements PlatformTerminal {
             return c;
         }
 
-        return readCodePoint(timeoutMs);
+        return decoder.read(timeoutMs);
     }
 
     /**
@@ -327,48 +337,8 @@ public final class UnixTerminal implements PlatformTerminal {
             return peekedChar;
         }
 
-        peekedChar = readCodePoint(timeoutMs);
+        peekedChar = decoder.read(timeoutMs);
         return peekedChar;
-    }
-
-    /**
-     * Reads the next byte and, if it is the start of a multi-byte UTF-8 sequence,
-     * reads the continuation bytes and returns the decoded Unicode code point.
-     * For non-UTF-8 charsets the raw byte value is returned as-is.
-     */
-    private int readCodePoint(int timeoutMs) throws IOException {
-        int first = readInternal(timeoutMs);
-        if (first < 0x80 || first < 0) {
-            // ASCII, EOF (-1), or timeout (-2) — return as-is
-            return first;
-        }
-
-        // Determine sequence length from the leading byte
-        int seqLen;
-        if (first < 0xC0) {
-            // Lone continuation byte — not valid UTF-8; return as-is
-            return first;
-        } else if (first < 0xE0) {
-            seqLen = 2;
-        } else if (first < 0xF0) {
-            seqLen = 3;
-        } else if (first < 0xF8) {
-            seqLen = 4;
-        } else {
-            return first;
-        }
-
-        // Read continuation bytes (they must arrive quickly after the leader)
-        int codePoint = first & (0x3F >> (seqLen - 2));
-        for (int i = 1; i < seqLen; i++) {
-            int b = readInternal(50);
-            if (b < 0 || (b & 0xC0) != 0x80) {
-                // Incomplete or invalid sequence — return the leader byte
-                return first;
-            }
-            codePoint = (codePoint << 6) | (b & 0x3F);
-        }
-        return codePoint;
     }
 
     /**

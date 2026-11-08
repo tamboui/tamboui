@@ -114,3 +114,20 @@ Add a backend dependency such as tamboui-jline3-backend or tamboui-panama-backen
 
 *No provider loads at all* — each failure is reported with its cause (the first as the
 exception cause, the rest as suppressed exceptions).
+
+== Terminal input encoding
+
+The Panama backend decodes keyboard and paste input in the charset of the terminal, detected
+from `LC_ALL`, `LC_CTYPE` or `LANG` (falling back to UTF-8). This lets a terminal set to a
+single-byte locale such as `ISO-8859-1` deliver accented keys and pastes correctly, instead of
+misreading them as the start of a UTF-8 sequence.
+
+[NOTE]
+====
+*GraalVM native image:* a native image bundles only a limited set of charsets (US-ASCII,
+ISO-8859-1, UTF-8/16) unless it is built with `-H:+AddAllCharsets`. If the detected locale
+charset is not in the image, the backend falls back to UTF-8 rather than failing at startup —
+so a non-UTF-8 terminal may then decode its input incorrectly. Build your native executable
+with `-H:+AddAllCharsets` to support such locales. This is a GraalVM configuration limitation,
+not specific to the Panama backend.
+====
