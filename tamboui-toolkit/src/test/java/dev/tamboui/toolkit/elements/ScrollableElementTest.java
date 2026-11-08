@@ -256,4 +256,54 @@ class ScrollableElementTest extends AbstractElementTest {
         // 2 children of height 1 each
         assertThat(element.preferredSize(20, 10, null).heightOr(0)).isEqualTo(2);
     }
+
+    @Test
+    @DisplayName("400 children in scrollable element renders instantly")
+    void hundredsOfChildrenRendersInstantly() {
+        dev.tamboui.toolkit.element.Element[] children = new dev.tamboui.toolkit.element.Element[400];
+        for (int i = 0; i < 400; i++) {
+            children[i] = text("Item " + i).length(1);
+        }
+        ScrollableElement element = scrollable(children);
+
+        Rect area = new Rect(0, 0, 100, 43);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        long start = System.currentTimeMillis();
+        element.render(frame, area, RenderContext.empty());
+        long elapsed = System.currentTimeMillis() - start;
+
+        assertThat(elapsed).isLessThan(200);
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("I");
+    }
+
+    @Test
+    @DisplayName("scrolled children align with visible constraints")
+    void scrolledChildrenAlignWithVisibleConstraints() {
+        ScrollableElement element = scrollable(
+            text("First").length(1),
+            text("Second").length(1),
+            text("Third").length(1)
+        );
+
+        Rect area = new Rect(0, 0, 10, 2);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        // Initial render at top
+        element.render(frame, area, RenderContext.empty());
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("F");
+
+        // Scroll down
+        element.handleKeyEvent(KeyEvent.ofKey(KeyCode.DOWN), true);
+        buffer = Buffer.empty(area);
+        frame = Frame.forTesting(buffer);
+        element.render(frame, area, RenderContext.empty());
+
+        // Row 0 should display "Second"
+        assertThat(buffer.get(0, 0).symbol()).isEqualTo("S");
+        // Row 1 should display "Third"
+        assertThat(buffer.get(0, 1).symbol()).isEqualTo("T");
+    }
 }
