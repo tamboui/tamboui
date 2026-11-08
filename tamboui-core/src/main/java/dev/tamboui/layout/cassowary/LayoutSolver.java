@@ -124,10 +124,15 @@ public final class LayoutSolver {
             for (int i = 0; i < n; i++) {
                 totalWeight += ((Constraint.Fill) constraints.get(i)).weight();
             }
+            // When every fill is Fill(0) they share the space equally (weight 1 each), matching the
+            // solver's getFillScale; otherwise distribute by weight, so a Fill(0) next to a weighted
+            // fill gets nothing.
+            boolean allZeroWeight = totalWeight == 0;
+            long effectiveTotal = allZeroWeight ? n : totalWeight;
             Fraction[] fractionSizes = new Fraction[n];
             for (int i = 0; i < n; i++) {
-                int w = ((Constraint.Fill) constraints.get(i)).weight();
-                fractionSizes[i] = totalWeight > 0 ? Fraction.of((long) space * w, totalWeight) : Fraction.ZERO;
+                long w = allZeroWeight ? 1 : ((Constraint.Fill) constraints.get(i)).weight();
+                fractionSizes[i] = Fraction.of((long) space * w, effectiveTotal);
             }
             return roundWithConstraint(fractionSizes, available);
         }
