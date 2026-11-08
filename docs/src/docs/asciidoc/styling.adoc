@@ -463,6 +463,16 @@ TableElement-header {
     color: cyan;
 }
 
+/* Style divider text independently from its line */
+DividerElement-line {
+    color: gray;
+}
+
+DividerElement-center {
+    color: cyan;
+    text-style: bold;
+}
+
 /* Style cursor in text input */
 TextInputElement-cursor {
     text-style: reversed;
