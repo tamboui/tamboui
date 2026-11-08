@@ -7,7 +7,7 @@ package dev.tamboui.image.protocol;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.List;
 
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.error.RuntimeIOException;
@@ -36,6 +36,8 @@ public final class KittyProtocol implements ImageProtocol {
     private static final String ST = "\033\\";    // String Terminator
     private static final int CHUNK_SIZE = 4096;   // Maximum chunk size for transmission
 
+    private final NativeImageCache cache = new NativeImageCache();
+
     /**
      * Creates a new Kitty protocol instance.
      */
@@ -52,17 +54,40 @@ public final class KittyProtocol implements ImageProtocol {
             return;
         }
 
+        // Skip re-transmission when the same image is already shown at the same position.
+        // The image persists on the terminal's graphics layer, so there is nothing to redraw.
+        // A change in screen generation (clear/resize) forces a redraw.
+        List<Rect> stale = cache.staleAreasToClear(image, area, NativeImageCache.generationOf(rawOutput));
+        if (stale == null) {
+            return;
+        }
+        // Delete any previously shown image whose footprint this one does not fully cover, so a
+        // shrinking image (e.g. FILL -> FIT) does not leave the larger one behind on the graphics
+        // layer. d=I frees the image data too.
+        for (Rect staleArea : stale) {
+            // q=2 suppresses the terminal's OK/error reply; without it the reply is read as input.
+            String delete = String.format("\033_Ga=d,d=I,i=%d,q=2\033\\", NativeImageCache.imageId(staleArea));
+            rawOutput.write(delete.getBytes(StandardCharsets.US_ASCII));
+        }
+
         // Move cursor to position
         String cursorMove = String.format("\033[%d;%dH", area.y() + 1, area.x() + 1);
         rawOutput.write(cursorMove.getBytes(StandardCharsets.US_ASCII));
 
-        // Encode image as PNG and then base64
-        // The image should already be scaled by Image.scaleImage() based on the scaling mode
-        byte[] pngData = image.toPng();
-        String base64Data = Base64.getEncoder().encodeToString(pngData);
+        // Encode image as PNG and then base64.
+        // The image should already be scaled by Image.scaleImage() based on the scaling mode.
+        // The base64 payload depends only on the pixels, so it is cached per image to avoid
+        // re-encoding on every frame of the render loop.
+        String base64Data = cache.payload(image, () -> NativeImageCache.encodeBase64(image));
+
+        // Use a stable image id (and matching placement id) derived from the display
+        // position. Reusing the id makes the terminal REPLACE the stored image instead of
+        // accumulating a fresh copy on every frame, which would otherwise grow the terminal
+        // process memory without bound across the render loop.
+        int imageId = NativeImageCache.imageId(area);
 
         // Send image using chunked transmission
-        sendChunked(rawOutput, base64Data, area.width(), area.height());
+        sendChunked(rawOutput, base64Data, imageId, area.width(), area.height());
 
         rawOutput.flush();
     }
@@ -98,7 +123,8 @@ public final class KittyProtocol implements ImageProtocol {
      * <p>
      * For large images, the data must be split into chunks of at most 4096 bytes.
      */
-    private void sendChunked(OutputStream out, String base64Data, int cols, int rows) throws IOException {
+    private void sendChunked(OutputStream out, String base64Data, int imageId, int cols, int rows)
+            throws IOException {
         int offset = 0;
         int length = base64Data.length();
         boolean first = true;
@@ -116,11 +142,14 @@ public final class KittyProtocol implements ImageProtocol {
                 // a=T: action = transmit and display
                 // f=100: format = PNG
                 // t=d: transmission = direct (embedded in escape code)
+                // i=id: image id — reusing it replaces the stored image instead of leaking copies
+                // p=id: placement id — reusing it replaces the placement instead of stacking them
                 // q=2: quiet mode — suppress terminal OK/error responses on stdin
                 // c=cols: display width in cells
                 // r=rows: display height in cells
                 // m=0/1: more chunks follow
-                cmd.append(String.format("a=T,f=100,t=d,q=2,c=%d,r=%d,m=%d;", cols, rows, more ? 1 : 0));
+                cmd.append(String.format("a=T,f=100,t=d,i=%d,p=%d,q=2,c=%d,r=%d,m=%d;",
+                    imageId, imageId, cols, rows, more ? 1 : 0));
                 first = false;
             } else {
                 // Subsequent chunks only need the 'm' flag
@@ -141,13 +170,15 @@ public final class KittyProtocol implements ImageProtocol {
      * This is used for small images that fit in a single transmission.
      */
     @SuppressWarnings("unused")
-    private void sendSimple(OutputStream out, String base64Data, int cols, int rows) throws IOException {
+    private void sendSimple(OutputStream out, String base64Data, int imageId, int cols, int rows)
+            throws IOException {
         // a=T: action = transmit and display
         // f=100: format = PNG
         // t=d: transmission = direct
+        // i=id, p=id: stable image/placement ids so repeated sends replace rather than leak
         // c=cols, r=rows: display size in cells
-        String cmd = String.format("%sa=T,f=100,t=d,q=2,c=%d,r=%d;%s%s",
-            APC, cols, rows, base64Data, ST);
+        String cmd = String.format("%sa=T,f=100,t=d,i=%d,p=%d,q=2,c=%d,r=%d;%s%s",
+            APC, imageId, imageId, cols, rows, base64Data, ST);
         out.write(cmd.getBytes(StandardCharsets.US_ASCII));
     }
 }
