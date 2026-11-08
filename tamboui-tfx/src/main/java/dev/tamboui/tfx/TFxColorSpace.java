@@ -80,374 +80,41 @@ public enum TFxColorSpace {
      * @return The interpolated color
      */
     public Color lerp(Color from, Color to, float alpha) {
-        alpha = java.lang.Math.max(0.0f, java.lang.Math.min(1.0f, alpha));
-        
-        if (alpha == 0.0f) {
-            return from;
-        } else if (alpha == 1.0f) {
-            return to;
-        }
-        
         switch (this) {
             case RGB:
-                return lerpRgb(from, to, alpha);
+                return dev.tamboui.style.ColorMath.lerpRgb(from, to, alpha);
             case HSL:
-                return lerpHsl(from, to, alpha);
+                return dev.tamboui.style.ColorMath.lerpHsl(from, to, alpha);
             case HSV:
-                return lerpHsv(from, to, alpha);
+                return dev.tamboui.style.ColorMath.lerpHsv(from, to, alpha);
             default:
-                return lerpRgb(from, to, alpha);
+                return dev.tamboui.style.ColorMath.lerpRgb(from, to, alpha);
         }
-    }
-    
-    private Color lerpRgb(Color from, Color to, float alpha) {
-        // Convert both colors to RGB components
-        int[] fromRgb = toRgbComponents(from);
-        int[] toRgb = toRgbComponents(to);
-        
-        // Linear interpolation in RGB space
-        int r = lerpComponent(fromRgb[0], toRgb[0], alpha);
-        int g = lerpComponent(fromRgb[1], toRgb[1], alpha);
-        int b = lerpComponent(fromRgb[2], toRgb[2], alpha);
-        
-        return Color.rgb(r, g, b);
-    }
-    
-    private Color lerpHsl(Color from, Color to, float alpha) {
-        float[] fromHsl = toHslInternal(from);
-        float[] toHsl = toHslInternal(to);
-        
-        // Interpolate hue taking shortest path around color wheel
-        float hDiff = toHsl[0] - fromHsl[0];
-        if (hDiff > 180.0f) {
-            hDiff -= 360.0f;
-        } else if (hDiff < -180.0f) {
-            hDiff += 360.0f;
-        }
-        
-        float h = fromHsl[0] + hDiff * alpha;
-        if (h < 0.0f) {
-            h += 360.0f;
-        } else if (h >= 360.0f) {
-            h -= 360.0f;
-        }
-        
-        float s = fromHsl[1] + (toHsl[1] - fromHsl[1]) * alpha;
-        float l = fromHsl[2] + (toHsl[2] - fromHsl[2]) * alpha;
-        
-        return fromHslInternal(h, s, l);
-    }
-    
-    private Color lerpHsv(Color from, Color to, float alpha) {
-        float[] fromHsv = toHsvInternal(from);
-        float[] toHsv = toHsvInternal(to);
-        
-        // Interpolate hue taking shortest path around color wheel
-        float hDiff = toHsv[0] - fromHsv[0];
-        if (hDiff > 180.0f) {
-            hDiff -= 360.0f;
-        } else if (hDiff < -180.0f) {
-            hDiff += 360.0f;
-        }
-        
-        float h = fromHsv[0] + hDiff * alpha;
-        if (h < 0.0f) {
-            h += 360.0f;
-        } else if (h >= 360.0f) {
-            h -= 360.0f;
-        }
-        
-        float s = fromHsv[1] + (toHsv[1] - fromHsv[1]) * alpha;
-        float v = fromHsv[2] + (toHsv[2] - fromHsv[2]) * alpha;
-        
-        return fromHsvInternal(h, s, v);
-    }
-    
-    private int lerpComponent(int from, int to, float alpha) {
-        return java.lang.Math.round(from + (to - from) * alpha);
     }
     
     /**
      * Converts a color to RGB components [r, g, b].
      */
     int[] toRgbComponents(Color color) {
-        if (color instanceof Color.Reset) {
-            // Reset defaults to black for effects
-            return new int[]{0, 0, 0};
-        }
-        Color.Rgb rgb = color.toRgb();
-        return new int[]{rgb.r(), rgb.g(), rgb.b()};
-    }
-    
-    /**
-     * Internal helper: Converts a color to HSL components [h, s, l] where:
-     * h is in degrees (0-360)
-     * s and l are percentages (0-100)
-     */
-    private float[] toHslInternal(Color color) {
-        int[] rgb = toRgbComponents(color);
-        return rgbToHsl(rgb[0], rgb[1], rgb[2]);
-    }
-    
-    /**
-     * Internal helper: Converts a color to HSV components [h, s, v] where:
-     * h is in degrees (0-360)
-     * s and v are percentages (0-100)
-     */
-    private float[] toHsvInternal(Color color) {
-        int[] rgb = toRgbComponents(color);
-        return rgbToHsv(rgb[0], rgb[1], rgb[2]);
-    }
-    
-    /**
-     * Internal helper: Creates a color from HSL values.
-     */
-    private Color fromHslInternal(float h, float s, float l) {
-        int[] rgb = hslToRgb(h, s, l);
-        return Color.rgb(rgb[0], rgb[1], rgb[2]);
-    }
-    
-    /**
-     * Internal helper: Creates a color from HSV values.
-     */
-    private Color fromHsvInternal(float h, float s, float v) {
-        int[] rgb = hsvToRgb(h, s, v);
-        return Color.rgb(rgb[0], rgb[1], rgb[2]);
+        return dev.tamboui.style.ColorMath.toRgbComponents(color);
     }
     
     // Color conversion utilities
     
     float[] rgbToHsl(int r, int g, int b) {
-        float rf = r / 255.0f;
-        float gf = g / 255.0f;
-        float bf = b / 255.0f;
-        
-        float max = java.lang.Math.max(rf, java.lang.Math.max(gf, bf));
-        float min = java.lang.Math.min(rf, java.lang.Math.min(gf, bf));
-        float delta = max - min;
-        
-        // Lightness
-        float l = (max + min) / 2.0f;
-        
-        // Saturation
-        float s;
-        if (delta == 0.0f) {
-            s = 0.0f;
-        } else {
-            s = delta / (1.0f - java.lang.Math.abs(2.0f * l - 1.0f));
-        }
-        
-        // Hue
-        float h;
-        if (delta == 0.0f) {
-            h = 0.0f;
-        } else if (max == rf) {
-            h = 60.0f * (((gf - bf) / delta) % 6.0f);
-        } else if (max == gf) {
-            h = 60.0f * ((bf - rf) / delta + 2.0f);
-        } else {
-            h = 60.0f * ((rf - gf) / delta + 4.0f);
-        }
-        
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        
-        return new float[]{h, s * 100.0f, l * 100.0f};
+        return dev.tamboui.style.ColorMath.rgbToHsl(r, g, b);
     }
     
     int[] hslToRgb(float h, float s, float l) {
-        h = h % 360.0f;
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        s = s / 100.0f;
-        l = l / 100.0f;
-        
-        float c = (1.0f - java.lang.Math.abs(2.0f * l - 1.0f)) * s;
-        float x = c * (1.0f - java.lang.Math.abs((h / 60.0f) % 2.0f - 1.0f));
-        float m = l - c / 2.0f;
-        
-        float r, g, b;
-        if (h < 60.0f) {
-            r = c;
-            g = x;
-            b = 0.0f;
-        } else if (h < 120.0f) {
-            r = x;
-            g = c;
-            b = 0.0f;
-        } else if (h < 180.0f) {
-            r = 0.0f;
-            g = c;
-            b = x;
-        } else if (h < 240.0f) {
-            r = 0.0f;
-            g = x;
-            b = c;
-        } else if (h < 300.0f) {
-            r = x;
-            g = 0.0f;
-            b = c;
-        } else {
-            r = c;
-            g = 0.0f;
-            b = x;
-        }
-        
-        return new int[]{
-            java.lang.Math.round((r + m) * 255.0f),
-            java.lang.Math.round((g + m) * 255.0f),
-            java.lang.Math.round((b + m) * 255.0f)
-        };
+        return dev.tamboui.style.ColorMath.hslToRgb(h, s, l);
     }
     
     float[] rgbToHsv(int r, int g, int b) {
-        float rf = r / 255.0f;
-        float gf = g / 255.0f;
-        float bf = b / 255.0f;
-        
-        float max = java.lang.Math.max(rf, java.lang.Math.max(gf, bf));
-        float min = java.lang.Math.min(rf, java.lang.Math.min(gf, bf));
-        float delta = max - min;
-        
-        // Hue
-        float h;
-        if (delta == 0.0f) {
-            h = 0.0f;
-        } else if (max == rf) {
-            h = 60.0f * (((gf - bf) / delta) % 6.0f);
-        } else if (max == gf) {
-            h = 60.0f * ((bf - rf) / delta + 2.0f);
-        } else {
-            h = 60.0f * ((rf - gf) / delta + 4.0f);
-        }
-        
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        
-        // Saturation
-        float s = max == 0.0f ? 0.0f : delta / max;
-        
-        // Value
-        float v = max;
-        
-        return new float[]{h, s * 100.0f, v * 100.0f};
+        return dev.tamboui.style.ColorMath.rgbToHsv(r, g, b);
     }
     
     int[] hsvToRgb(float h, float s, float v) {
-        h = h % 360.0f;
-        if (h < 0.0f) {
-            h += 360.0f;
-        }
-        s = s / 100.0f;
-        v = v / 100.0f;
-        
-        float c = v * s;
-        float x = c * (1.0f - java.lang.Math.abs((h / 60.0f) % 2.0f - 1.0f));
-        float m = v - c;
-        
-        float r, g, b;
-        if (h < 60.0f) {
-            r = c;
-            g = x;
-            b = 0.0f;
-        } else if (h < 120.0f) {
-            r = x;
-            g = c;
-            b = 0.0f;
-        } else if (h < 180.0f) {
-            r = 0.0f;
-            g = c;
-            b = x;
-        } else if (h < 240.0f) {
-            r = 0.0f;
-            g = x;
-            b = c;
-        } else if (h < 300.0f) {
-            r = x;
-            g = 0.0f;
-            b = c;
-        } else {
-            r = c;
-            g = 0.0f;
-            b = x;
-        }
-        
-        return new int[]{
-            java.lang.Math.round((r + m) * 255.0f),
-            java.lang.Math.round((g + m) * 255.0f),
-            java.lang.Math.round((b + m) * 255.0f)
-        };
-    }
-    
-    /**
-     * Converts ANSI color to approximate RGB values.
-     */
-    private int[] ansiToRgb(dev.tamboui.style.AnsiColor ansiColor) {
-        // Standard ANSI color palette RGB values
-        switch (ansiColor) {
-            case BLACK:
-                return new int[]{0, 0, 0};
-            case RED:
-                return new int[]{205, 0, 0};
-            case GREEN:
-                return new int[]{0, 205, 0};
-            case YELLOW:
-                return new int[]{205, 205, 0};
-            case BLUE:
-                return new int[]{0, 0, 238};
-            case MAGENTA:
-                return new int[]{205, 0, 205};
-            case CYAN:
-                return new int[]{0, 205, 205};
-            case WHITE:
-                return new int[]{229, 229, 229};
-            case BRIGHT_BLACK:
-                return new int[]{127, 127, 127};
-            case BRIGHT_RED:
-                return new int[]{255, 0, 0};
-            case BRIGHT_GREEN:
-                return new int[]{0, 255, 0};
-            case BRIGHT_YELLOW:
-                return new int[]{255, 255, 0};
-            case BRIGHT_BLUE:
-                return new int[]{92, 92, 255};
-            case BRIGHT_MAGENTA:
-                return new int[]{255, 0, 255};
-            case BRIGHT_CYAN:
-                return new int[]{0, 255, 255};
-            case BRIGHT_WHITE:
-                return new int[]{255, 255, 255};
-            default:
-                return new int[]{0, 0, 0};
-        }
-    }
-    
-    /**
-     * Converts indexed color (0-255) to approximate RGB values.
-     */
-    private int[] indexedToRgb(int index) {
-        if (index < 16) {
-            // First 16 are standard ANSI colors
-            return ansiToRgb(dev.tamboui.style.AnsiColor.values()[index]);
-        } else if (index < 232) {
-            // 216-color cube (6x6x6)
-            int cubeIndex = index - 16;
-            int r = cubeIndex / 36;
-            int g = (cubeIndex / 6) % 6;
-            int b = cubeIndex % 6;
-            return new int[]{
-                r == 0 ? 0 : 55 + r * 40,
-                g == 0 ? 0 : 55 + g * 40,
-                b == 0 ? 0 : 55 + b * 40
-            };
-        } else {
-            // Grayscale ramp (232-255)
-            int gray = 8 + (index - 232) * 10;
-            return new int[]{gray, gray, gray};
-        }
+        return dev.tamboui.style.ColorMath.hsvToRgb(h, s, v);
     }
     
     // Public utility methods for creating colors
@@ -461,9 +128,7 @@ public enum TFxColorSpace {
      * @return An RGB color
      */
     public static Color fromHsl(float h, float s, float l) {
-        TFxColorSpace instance = HSL; // Use any instance to access private methods
-        int[] rgb = instance.hslToRgb(h, s, l);
-        return Color.rgb(rgb[0], rgb[1], rgb[2]);
+        return dev.tamboui.style.ColorMath.fromHsl(h, s, l);
     }
     
     /**
@@ -475,9 +140,7 @@ public enum TFxColorSpace {
      * @return An RGB color
      */
     public static Color fromHsv(float h, float s, float v) {
-        TFxColorSpace instance = HSV; // Use any instance to access private methods
-        int[] rgb = instance.hsvToRgb(h, s, v);
-        return Color.rgb(rgb[0], rgb[1], rgb[2]);
+        return dev.tamboui.style.ColorMath.fromHsv(h, s, v);
     }
     
     /**
@@ -489,9 +152,7 @@ public enum TFxColorSpace {
      *         - saturation and lightness are percentages (0-100)
      */
     public static float[] toHsl(Color color) {
-        TFxColorSpace instance = HSL; // Use any instance to access private methods
-        int[] rgb = instance.toRgbComponents(color);
-        return instance.rgbToHsl(rgb[0], rgb[1], rgb[2]);
+        return dev.tamboui.style.ColorMath.toHsl(color);
     }
     
     /**
@@ -503,8 +164,6 @@ public enum TFxColorSpace {
      *         - saturation and value are percentages (0-100)
      */
     public static float[] toHsv(Color color) {
-        TFxColorSpace instance = HSL; // Use any instance to access private methods
-        int[] rgb = instance.toRgbComponents(color);
-        return instance.rgbToHsv(rgb[0], rgb[1], rgb[2]);
+        return dev.tamboui.style.ColorMath.toHsv(color);
     }
 }

@@ -14,6 +14,7 @@ import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Layout;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Backend;
 import dev.tamboui.terminal.BackendFactory;
@@ -51,6 +52,8 @@ public class SparklineDemo {
     private static final String[] X_LABELS = {"-60s", "-30s", "now"};
     private static final int MIN_HEIGHT = 3;
     private static final int MAX_HEIGHT = 20;
+    private static final ColorGradient CPU_GRADIENT =
+            ColorGradient.of(Color.GREEN, Color.YELLOW, Color.RED);
 
     private boolean running = true;
     private boolean compact = true;
@@ -189,13 +192,13 @@ public class SparklineDemo {
             )
             .split(area);
 
-        renderSparkline(frame, rows.get(0), "CPU", cpuData, Color.GREEN,
+        renderSparkline(frame, rows.get(0), "CPU (Gradient)", cpuData, Color.GREEN, CPU_GRADIENT,
                 Sparkline.BarSet.NINE_LEVELS, Sparkline.RenderDirection.LEFT_TO_RIGHT);
-        renderSparkline(frame, rows.get(1), "Memory", memoryData, Color.YELLOW,
+        renderSparkline(frame, rows.get(1), "Memory", memoryData, Color.YELLOW, null,
                 Sparkline.BarSet.NINE_LEVELS, Sparkline.RenderDirection.LEFT_TO_RIGHT);
-        renderSparkline(frame, rows.get(2), "Network", networkData, Color.CYAN,
+        renderSparkline(frame, rows.get(2), "Network", networkData, Color.CYAN, null,
                 Sparkline.BarSet.THREE_LEVELS, Sparkline.RenderDirection.LEFT_TO_RIGHT);
-        renderSparkline(frame, rows.get(3), "Disk (RTL)", diskData, Color.MAGENTA,
+        renderSparkline(frame, rows.get(3), "Disk (RTL)", diskData, Color.MAGENTA, null,
                 Sparkline.BarSet.NINE_LEVELS, Sparkline.RenderDirection.RIGHT_TO_LEFT);
     }
 
@@ -217,25 +220,25 @@ public class SparklineDemo {
             .constraints(Constraint.percentage(50), Constraint.percentage(50))
             .split(rows.get(1));
 
-        renderSparkline(frame, topCols.get(0), "CPU", cpuData, Color.GREEN,
+        renderSparkline(frame, topCols.get(0), "CPU (Gradient)", cpuData, Color.GREEN, CPU_GRADIENT,
                 Sparkline.BarSet.NINE_LEVELS, Sparkline.RenderDirection.LEFT_TO_RIGHT);
-        renderSparkline(frame, topCols.get(1), "Memory", memoryData, Color.YELLOW,
+        renderSparkline(frame, topCols.get(1), "Memory", memoryData, Color.YELLOW, null,
                 Sparkline.BarSet.NINE_LEVELS, Sparkline.RenderDirection.LEFT_TO_RIGHT);
-        renderSparkline(frame, bottomCols.get(0), "Network", networkData, Color.CYAN,
+        renderSparkline(frame, bottomCols.get(0), "Network", networkData, Color.CYAN, null,
                 Sparkline.BarSet.THREE_LEVELS, Sparkline.RenderDirection.LEFT_TO_RIGHT);
-        renderSparkline(frame, bottomCols.get(1), "Disk (RTL)", diskData, Color.MAGENTA,
+        renderSparkline(frame, bottomCols.get(1), "Disk (RTL)", diskData, Color.MAGENTA, null,
                 Sparkline.BarSet.NINE_LEVELS, Sparkline.RenderDirection.RIGHT_TO_LEFT);
     }
 
     private void renderSparkline(Frame frame, Rect area, String name, long[] data,
-            Color color, Sparkline.BarSet barSet, Sparkline.RenderDirection dir) {
+            Color color, ColorGradient gradient, Sparkline.BarSet barSet, Sparkline.RenderDirection dir) {
         long current = data[DATA_SIZE - 1];
         String label = String.format(" %s: %d%% ", name, current);
         String[] labels = dir == Sparkline.RenderDirection.RIGHT_TO_LEFT
                 ? new String[]{"now", "-30s", "-60s"}
                 : X_LABELS;
 
-        Sparkline sparkline = Sparkline.builder()
+        Sparkline.Builder builder = Sparkline.builder()
             .data(data)
             .max(100)
             .style(Style.EMPTY.fg(color))
@@ -250,10 +253,13 @@ public class SparklineDemo {
                 .title(Title.from(Line.from(
                     Span.styled(label, Style.EMPTY.fg(color))
                 )))
-                .build())
-            .build();
+                .build());
 
-        frame.renderWidget(sparkline, area);
+        if (gradient != null) {
+            builder.gradient(gradient);
+        }
+
+        frame.renderWidget(builder.build(), area);
     }
 
     private void renderFooter(Frame frame, Rect area) {

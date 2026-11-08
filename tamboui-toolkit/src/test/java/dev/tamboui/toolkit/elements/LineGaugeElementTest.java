@@ -14,6 +14,7 @@ import dev.tamboui.style.Color;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.element.DefaultRenderContext;
+import dev.tamboui.toolkit.element.RenderContext;
 
 import static dev.tamboui.toolkit.Toolkit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,5 +58,40 @@ class LineGaugeElementTest extends AbstractElementTest {
         // The filled portion of the gauge should have cyan color
         // Label is "Processing" (10 chars), gauge starts at position 10
         assertThat(buffer.get(10, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Test
+    @DisplayName("LineGaugeElement renders with programmatic gradient")
+    void withGradient() {
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        lineGauge(1.0)
+            .gradient(Color.GREEN, Color.RED)
+            .render(frame, area, RenderContext.empty());
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(4, 0).style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("CSS gradient properties style LineGaugeElement")
+    void cssGradientProperties() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", "LineGaugeElement { gradient-low: green; gradient-high: red; }");
+        styleEngine.setActiveStylesheet("test");
+
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+
+        Rect area = new Rect(0, 0, 5, 1);
+        Buffer buffer = Buffer.empty(area);
+        Frame frame = Frame.forTesting(buffer);
+
+        lineGauge(1.0).render(frame, area, context);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(4, 0).style().fg()).contains(Color.RED);
     }
 }
