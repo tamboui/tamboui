@@ -1,10 +1,10 @@
 # Cross-terminal screenshot tests (issue #19).
 #
 # Builds a self-contained demo jar with jbang, runs the Nix cross-terminal screenshot tests,
-# uploads the PNGs, and diffs them against the committed references in screenshots/references/.
-# References live in-repo so updating a baseline is a normal, reviewable PR diff. The current
-# shots + diffs are surfaced through the existing gh-pages PR-preview site (see the companion
-# deploy workflow), not a separate repo.
+# uploads the PNGs, and diffs them against the references on this repo's gh-pages branch
+# (screenshots/references/) — the same branch that hosts the website PR previews, so no separate
+# repo. The diff only reads gh-pages (raw), keeping this PR-triggered job fork-safe; publishing
+# references/galleries to gh-pages is done by a separate write-privileged deploy workflow.
 #
 # Triggers: manual, nightly, and PRs that touch the screenshot harness or the image module —
 # not every PR (each terminal boots a VM, so a full run is slow).
@@ -77,20 +77,20 @@ jobs:
           path: screenshots/
           if-no-files-found: warn
 
-      # --- reference diff against the in-repo baselines (screenshots/references/) ---
+      # --- diff against references on the gh-pages branch (screenshots/references/) ---
       - name: Diff against references with dify
         run: |
           curl -L https://github.com/jihchi/dify/releases/download/v0.7.4/dify-x86_64-unknown-linux-gnu-v0.7.4.tar.gz -o dify.tar.gz
           tar -xzf dify.tar.gz && chmod +x dify
-          mkdir -p diffs
+          base="https://raw.githubusercontent.com/tamboui/tamboui/gh-pages/screenshots/references"
+          mkdir -p diffs refs
           for png in screenshots/*.png; do
             name=$(basename "$png")
-            ref="screenshots/references/$name"
-            if [ -f "$ref" ]; then
-              ./dify "$ref" "$png" || true
+            if curl -f -sL "$base/$name" -o "refs/$name"; then
+              ./dify "refs/$name" "$png" || true
               [ -f diff.png ] && mv diff.png "diffs/diff-$name"
             else
-              echo "::notice::no committed reference for $name (new case); add it under screenshots/references/"
+              echo "::notice::no reference for $name on gh-pages yet (new case)"
             fi
           done
           ls -l diffs || true
