@@ -4,17 +4,10 @@ on:
   push:
     branches:
       - 19-cross-terminal-screenshots
-  workflow_dispatch:
-    inputs:
-      demo:
-        description: jbang catalog alias of the demo to screenshot
-        default: image-demo
-        required: true
 
 jobs:
   screenshots:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: minimal
-        run: echo "demo=${{ github.event.inputs.demo || 'image-demo' }}"
+      - run: echo hello
