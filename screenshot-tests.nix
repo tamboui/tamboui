@@ -66,25 +66,40 @@ let
         """)
 
         # Give the JVM + demo time to start and paint, then screenshot unconditionally.
-        machine.sleep(25)
+        machine.sleep(40)
+        # Diagnostics: the demo's own output + whether a window exists.
+        print("=== demo.log ===")
+        print(machine.execute("cat /tmp/demo.log 2>&1")[1])
+        print("=== sway tree (window titles) ===")
+        print(machine.execute(
+          "systemd-run --uid=test --setenv=XDG_RUNTIME_DIR=/run/user/1000 "
+          "--setenv=WAYLAND_DISPLAY=wayland-1 --pipe --wait -- "
+          "swaymsg -t get_tree 2>&1 | grep -iE '\"name\"|app_id|pid' || true")[1])
         machine.screenshot("screenshot-${terminal}")
       '';
     };
 
-  run = "${jre}/bin/java -jar /tmp/app/demo.jar";
+  # Runs the demo, logs everything, and keeps the terminal alive even if the JVM exits
+  # (so a crash still leaves a visible window + a readable /tmp/demo.log).
+  launcher = pkgs.writeShellScript "run-demo" ''
+    echo "launcher: starting $(date)" > /tmp/demo.log
+    ${jre}/bin/java -jar /tmp/app/demo.jar >> /tmp/demo.log 2>&1
+    echo "launcher: java exited $?" >> /tmp/demo.log
+    sleep 600
+  '';
 in
 {
   # foot: wayland-native, supports sixel.
   foot = makeScreenshotTest {
     terminal = "foot";
-    terminalCommand = "foot ${run}";
+    terminalCommand = "foot ${launcher}";
     terminalPackages = [ pkgs.foot ];
   };
 
   # xterm in VT340 mode: classic sixel path, via xwayland.
   xterm-vt340 = makeScreenshotTest {
     terminal = "xterm-vt340";
-    terminalCommand = "xterm -ti vt340 -fa 'Noto Sans Mono' -fs 16 -e ${run}";
+    terminalCommand = "xterm -ti vt340 -fa 'Noto Sans Mono' -fs 16 -e ${launcher}";
     terminalPackages = [ pkgs.xterm ];
     xwayland = true;
   };
