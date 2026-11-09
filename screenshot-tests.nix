@@ -21,6 +21,9 @@ let
     pkgs.testers.nixosTest {
       name = "tamboui-screenshot-${terminal}";
 
+      # wait_for_text OCRs the framebuffer; this pulls in tesseract + imagemagick.
+      enableOCR = true;
+
       nodes.machine = { pkgs, ... }: {
         virtualisation.memorySize = 4096;
         virtualisation.resolution = { x = 1920; y = 1080; };
