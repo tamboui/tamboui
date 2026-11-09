@@ -7,6 +7,12 @@
 name: screenshots
 
 on:
+  # TEMPORARY: lets us trigger the run from the feature branch without putting the
+  # workflow on main first. Remove this `push:` block before merging; workflow_dispatch
+  # takes over once the file is on the default branch.
+  push:
+    branches:
+      - 19-cross-terminal-screenshots
   workflow_dispatch:
     inputs:
       demo:
@@ -26,7 +32,7 @@ jobs:
         run: |
           # Networked step: jbang resolves //DEPS and bundles everything (classes, jline,
           # //FILES resources) into one jar, so the sandboxed VM needs no network.
-          jbang export fatjar --force -O demo.jar "${{ github.event.inputs.demo }}@tamboui/tamboui"
+          jbang export fatjar --force -O demo.jar "${{ github.event.inputs.demo || 'image-demo' }}@tamboui/tamboui"
           ls -l demo.jar
 
       - uses: cachix/install-nix-action@v30
