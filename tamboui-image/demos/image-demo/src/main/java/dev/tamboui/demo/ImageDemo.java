@@ -24,6 +24,7 @@ import dev.tamboui.image.ImageData;
 import dev.tamboui.image.ImageScaling;
 import dev.tamboui.image.capability.TerminalImageCapabilities;
 import dev.tamboui.image.capability.TerminalImageProtocol;
+import dev.tamboui.image.protocol.AsciiProtocol;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
@@ -70,6 +71,7 @@ public class ImageDemo {
     private static final ImageProtocol SIXEL = new SixelProtocol();
     private static final ImageProtocol KITTY = new KittyProtocol();
     private static final ImageProtocol ITERM2 = new ITermProtocol();
+    private static final ImageProtocol ASCII = new AsciiProtocol();
 
     private boolean running = true;
     private final TerminalImageCapabilities capabilities;
@@ -205,6 +207,9 @@ public class ImageDemo {
             case '5':
                 currentProtocol = ITERM2;
                 break;
+            case '6':
+                currentProtocol = ASCII;
+                break;
             case 'f':
                 currentScaling = ImageScaling.FIT;
                 break;
@@ -332,6 +337,8 @@ public class ImageDemo {
                 return Span.raw("Half-Block (Unicode)").yellow();
             case BRAILLE:
                 return Span.raw("Braille (Unicode)").yellow();
+            case ASCII:
+                return Span.raw("ASCII (Gradient)").yellow();
             default:
                 return Span.raw("None").red();
         }
@@ -399,6 +406,8 @@ public class ImageDemo {
             Span.raw(" Kitty ").dim(),
             Span.raw("5").bold().yellow(),
             Span.raw(" iTerm2 ").dim(),
+            Span.raw("6").bold().yellow(),
+            Span.raw(" ASCII ").dim(),
             Span.raw("a").bold().yellow(),
             Span.raw(" Auto").dim()
         );

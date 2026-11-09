@@ -7,6 +7,7 @@ package dev.tamboui.image.capability;
 import java.util.EnumSet;
 import java.util.Set;
 
+import dev.tamboui.image.protocol.AsciiProtocol;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
 import dev.tamboui.image.protocol.ITermProtocol;
@@ -176,6 +177,8 @@ public final class TerminalImageCapabilities {
                 return new HalfBlockProtocol();
             case BRAILLE:
                 return new BrailleProtocol();
+            case ASCII:
+                return new AsciiProtocol();
             default:
                 return null;
         }
@@ -187,6 +190,7 @@ public final class TerminalImageCapabilities {
         // Always support character-based fallbacks
         supported.add(TerminalImageProtocol.HALF_BLOCK);
         supported.add(TerminalImageProtocol.BRAILLE);
+        supported.add(TerminalImageProtocol.ASCII);
 
         // Check for Kitty terminal
         if (getEnv("KITTY_WINDOW_ID") != null) {
