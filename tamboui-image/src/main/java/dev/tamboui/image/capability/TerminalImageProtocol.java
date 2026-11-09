@@ -43,6 +43,13 @@ public enum TerminalImageProtocol {
     BRAILLE,
 
     /**
+     * ASCII brightness-gradient fallback.
+     * Maps each pixel to a character chosen by luminance (1x1 pixel per cell).
+     * The lowest-fidelity fallback, but works on any terminal.
+     */
+    ASCII,
+
+    /**
      * No image support available.
      */
     NONE
