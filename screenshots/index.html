@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TamboUI — cross-terminal screenshots</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0d1117; color: #e6edf3;
+         font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  header { padding: 2rem 2rem 0.5rem; }
+  h1 { margin: 0 0 .25rem; font-size: 1.5rem; }
+  header p { margin: .25rem 0; color: #9aa7b4; }
+  header a { color: #58a6ff; }
+  .grid { display: grid; gap: 1.5rem; padding: 1.5rem 2rem 3rem;
+          grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+  figure { margin: 0; background: #161b22; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; }
+  figure img { display: block; width: 100%; height: auto; background: #000; }
+  figcaption { display: flex; gap: .75rem; align-items: baseline; padding: .6rem .9rem; }
+  .term { font-weight: 600; }
+  .proto { color: #7ee787; font-size: .85rem; }
+  .note { color: #9aa7b4; font-size: .8rem; margin-left: auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TamboUI — cross-terminal screenshots</h1>
+  <p>Demo: <code>image-demo</code> · rendered in a NixOS VM per terminal · issue
+     <a href="https://github.com/tamboui/tamboui/issues/19">#19</a>.
+     These are the reference baselines; CI diffs new runs against them.</p>
+</header>
+<main class="grid">
+    <figure>
+      <a href="references/screenshot-kitty.png"><img loading="lazy" src="references/screenshot-kitty.png" alt="kitty"></a>
+      <figcaption><span class="term">kitty</span><span class="proto">Kitty Graphics</span><span class="note">full-resolution image</span></figcaption>
+    </figure>
+    <figure>
+      <a href="references/screenshot-ghostty.png"><img loading="lazy" src="references/screenshot-ghostty.png" alt="ghostty"></a>
+      <figcaption><span class="term">ghostty</span><span class="proto">Kitty Graphics</span><span class="note">full-resolution image</span></figcaption>
+    </figure>
+    <figure>
+      <a href="references/screenshot-wezterm.png"><img loading="lazy" src="references/screenshot-wezterm.png" alt="wezterm"></a>
+      <figcaption><span class="term">wezterm</span><span class="proto">Kitty / iTerm2</span><span class="note">graphics protocol</span></figcaption>
+    </figure>
+    <figure>
+      <a href="references/screenshot-foot.png"><img loading="lazy" src="references/screenshot-foot.png" alt="foot"></a>
+      <figcaption><span class="term">foot</span><span class="proto">Half-Block</span><span class="note">unicode half-block</span></figcaption>
+    </figure>
+    <figure>
+      <a href="references/screenshot-xterm-vt340.png"><img loading="lazy" src="references/screenshot-xterm-vt340.png" alt="xterm-vt340"></a>
+      <figcaption><span class="term">xterm-vt340</span><span class="proto">Half-Block</span><span class="note">unicode half-block (vt340/sixel capable)</span></figcaption>
+    </figure>
+    <figure>
+      <a href="references/screenshot-alacritty.png"><img loading="lazy" src="references/screenshot-alacritty.png" alt="alacritty"></a>
+      <figcaption><span class="term">alacritty</span><span class="proto">Half-Block</span><span class="note">unicode half-block</span></figcaption>
+    </figure>
+    <figure>
+      <a href="references/screenshot-konsole.png"><img loading="lazy" src="references/screenshot-konsole.png" alt="konsole"></a>
+      <figcaption><span class="term">konsole</span><span class="proto">Half-Block</span><span class="note">unicode half-block</span></figcaption>
+    </figure>
+</main>
+</body>
+</html>
