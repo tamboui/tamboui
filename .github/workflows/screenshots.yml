@@ -1,0 +1,103 @@
+# Cross-terminal screenshot tests (issue #19).
+#
+# Builds a self-contained demo jar with jbang, runs the Nix cross-terminal screenshot tests,
+# uploads the PNGs, and diffs them against the references on this repo's gh-pages branch
+# (screenshots/references/) — the same branch that hosts the website PR previews, so no separate
+# repo. The diff only reads gh-pages (raw), keeping this PR-triggered job fork-safe; publishing
+# references/galleries to gh-pages is done by a separate write-privileged deploy workflow.
+#
+# Triggers: manual, nightly, and PRs that touch the screenshot harness or the image module —
+# not every PR (each terminal boots a VM, so a full run is slow).
+#
+# NOTE: actions MUST be pinned to a full commit SHA (org policy); tag refs (@v4) make the run
+# fail at startup with a misleading "workflow file issue" banner and zero jobs.
+
+name: screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      demo:
+        description: jbang catalog alias of the demo to screenshot
+        default: image-demo
+        required: true
+  schedule:
+    - cron: "0 4 * * *"
+  pull_request:
+    paths:
+      - ".github/workflows/screenshots.yml"
+      - "screenshot-tests.nix"
+      - "tamboui-image/**"
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: jbangdev/setup-jbang@cc28889678db839e29433f42f9ff25f148b6d8de # main
+
+      - name: Export demo to a self-contained fat jar
+        run: |
+          # Networked step: jbang resolves //DEPS and bundles everything (classes, jline,
+          # //FILES resources) into one jar, so the sandboxed VM needs no network.
+          # Build for Java 21 so the jar runs on the VM's jdk_headless (21); jbang's own JDK is newer.
+          jbang trust add https://github.com/tamboui/
+          demo="${{ github.event.inputs.demo || 'image-demo' }}"
+          jbang export fatjar --java 21 --force -O demo.jar "${demo}@tamboui/tamboui"
+          ls -l demo.jar
+
+      - uses: cachix/install-nix-action@08dcb3a5e62fa31e2da3d490afc4176ef55ecd72 # v30
+        with:
+          # nixosTest + the services.displayManager.* options need a recent nixpkgs.
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Run cross-terminal screenshot tests
+        run: |
+          mkdir -p screenshots
+          for term in foot kitty wezterm ghostty alacritty konsole xterm-vt340; do
+            echo "::group::$term"
+            if out=$(nix build -L --no-link --print-out-paths --impure --expr \
+              "(import ./screenshot-tests.nix { \
+                 pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }).$term"); then
+              cp "$out"/screenshot-*.png "screenshots/screenshot-$term.png" || true
+            else
+              echo "::warning::$term screenshot build failed"
+            fi
+            echo "::endgroup::"
+          done
+          ls -l screenshots || true
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots/
+          if-no-files-found: warn
+
+      # --- diff against references on the gh-pages branch (screenshots/references/) ---
+      - name: Diff against references with dify
+        run: |
+          curl -L https://github.com/jihchi/dify/releases/download/v0.7.4/dify-x86_64-unknown-linux-gnu-v0.7.4.tar.gz -o dify.tar.gz
+          tar -xzf dify.tar.gz && chmod +x dify
+          base="https://raw.githubusercontent.com/tamboui/tamboui/gh-pages/screenshots/references"
+          mkdir -p diffs refs
+          for png in screenshots/*.png; do
+            name=$(basename "$png")
+            if curl -f -sL "$base/$name" -o "refs/$name"; then
+              ./dify "refs/$name" "$png" || true
+              [ -f diff.png ] && mv diff.png "diffs/diff-$name"
+            else
+              echo "::notice::no reference for $name on gh-pages yet (new case)"
+            fi
+          done
+          ls -l diffs || true
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: diffs
+          path: diffs/
+          if-no-files-found: ignore
