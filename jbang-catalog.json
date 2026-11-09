@@ -133,6 +133,12 @@
     "tree-demo": {
       "script-ref": "tamboui-toolkit/demos/tree-demo/src/main/java/dev/tamboui/demo/tree/TreeDemo.java"
     },
+    "worldmap-demo": {
+      "script-ref": "tamboui-toolkit/demos/worldmap-demo/src/main/java/dev/tamboui/demo/WorldMapDemo.java"
+    },
+    "worldmap-live-demo": {
+      "script-ref": "tamboui-toolkit/demos/worldmap-live-demo/src/main/java/dev/tamboui/demo/WorldMapLiveDemo.java"
+    },
     "markdown-toolkit-demo": {
       "script-ref": "tamboui-toolkit-markdown/demos/markdown-toolkit-demo/src/main/java/dev/tamboui/demo/MarkdownToolkitDemo.java"
     },

@@ -63,6 +63,10 @@ include::_attributes.adoc[]
 |Stateless
 |Drawing surface with shapes
 
+|<<world-map,WorldMap>>
+|Stateless
+|Offline world map: coastline, land shading, routes, regions, markers; pan/zoom via the toolkit element
+
 |<<calendar,Calendar>>
 |Stateless
 |Monthly calendar with date styling
@@ -805,3 +809,119 @@ include::{snippets-dir}/dev/tamboui/docs/snippets/WidgetsSnippets.java[tags=tool
 For layout DSL examples (columns, grid, dock, stack, flow), see link:layouts.html[Layouts Reference].
 
 See link:api-levels.html[API Levels] for more details on the Toolkit DSL.
+
+[[world-map]]
+=== WorldMap
+
+`WorldMap` is a stateless, offline `Widget` built on `Canvas`. It bundles a Natural
+Earth 1:50m coastline (about 247 KB) and adds no runtime libraries, no network access
+and no setup. It uses the Braille rasterizer (2 by 4 dots per cell).
+
+[source,java]
+----
+WorldMap map = WorldMap.builder()
+    .viewport(new MapViewport(-6, 16, 44, 58))   // west, east, south, north
+    .tint(Color.rgb(12, 28, 54), Color.rgb(34, 92, 48))  // sea, land
+    .coastlineColor(Color.rgb(140, 200, 255))
+    .route(new RouteShape(new double[][] {{10.49, 55.28}, {-1.55, 47.22}}, Color.MAGENTA))
+    .marker(new MapMarker(10.49, 55.28, Color.YELLOW, "Pederstrup"))
+    .build();
+map.render(area, buffer);
+----
+
+Coordinates are longitude, latitude in degrees, in that order. The default viewport is
+the whole world. For an antimeridian crossing, use unwrapped bounds such as
+`new MapViewport(170, 190, -20, 20)`.
+
+==== Projection and aspect ratio
+
+Coordinates use an equirectangular (plate carrée) projection. Rather than stretching to
+fill the rectangle, the viewport is expanded on its shorter axis to match the rectangle's
+proportions (correcting for a terminal cell being about twice as tall as wide), so the map
+fills the area without distortion and shows a little more geography. The whole globe is the
+one case that cannot fill a non-4:1 rectangle, so it letterboxes. This is plate carrée, not
+Mercator: it is for overviews, not local navigation, and it does not align with Web Mercator
+map tiles. All geographic transforms go through `GeoProjection`, which also converts screen
+positions back to coordinates for hit-testing and pan/zoom.
+
+==== Layers
+
+`WorldMap` composes a small set of layers in a fixed order. They split across two rendering
+planes: a raster plane (cell backgrounds) drawn first, then a vector plane (Canvas foreground).
+
+[cols="1,1,3",options="header"]
+|===
+|Layer |Plane |Notes
+|`tint(water, land)` |raster |Smooth land/sea shading in cell backgrounds, supersampled and blurred for soft coasts. The prettier land option.
+|`landColor(color)` |vector |Braille land fill (`LandShape`). The cheap foreground alternative to `tint`.
+|`region(RegionShape)` |vector |Filled and/or outlined polygon (scanline fill); draw order below the coastline.
+|coastline |vector |`CoastlineShape`, always Braille.
+|`route(RouteShape)` |vector |Geographic polyline; wraps across the antimeridian.
+|markers |overlay |One-cell `●` dot with an optional name, clipped to the widget's right edge.
+|===
+
+Markers outside the viewport are culled; later markers win in the same cell. A marker's
+optional label is drawn beside the dot and clipped (on a grapheme boundary) to the widget
+border, so whatever fits is shown. The widget clears its rectangle each render. Compose a
+`Block` around it for borders.
+
+==== Interaction
+
+The toolkit `WorldMapElement` (via `Toolkit.worldMap(...)`) holds a mutable `MapState` (the
+viewport) and adds keyboard and mouse control, delegating rendering to the stateless `WorldMap`.
+`MapState` is the map counterpart of `ListState`/`TreeState`: supply one with `.state(mapState)`
+so the viewport survives element rebuilds and application code can mutate it (for example a search
+flying to a result) or read it to react to panning.
+
+Controls:
+
+- arrow keys or `h j k l` pan (a fixed fraction of the view),
+- `+` / `-` zoom, `0` resets to the whole world,
+- `r` toggles land shading,
+- the mouse wheel zooms toward the cursor, and dragging with the left button pans.
+
+Panning normalizes longitude across the antimeridian and clamps latitude to the poles; at
+full zoom-out, horizontal panning rotates the centered longitude (all of this lives in
+`MapState`, so it is unit-testable without the toolkit). Run `./run-demo.sh worldmap-demo` to try it.
+
+==== Composing in a Canvas
+
+The layers are reusable `Shape` and raster primitives, so a map can share a Canvas with
+your own routes, points, regions or labels. Configure the Canvas with the bounds you want to
+see; shapes clip to those bounds (`Line` clips since
+https://github.com/tamboui/tamboui/pull/526[PR #526]).
+
+[source,java]
+----
+Canvas canvas = Canvas.builder()
+    .xBounds(-20, 40).yBounds(30, 70).marker(Marker.BRAILLE)
+    .paint(ctx -> {
+        ctx.draw(new LandShape(Color.rgb(0, 60, 0)));      // bundled land fill
+        ctx.draw(new CoastlineShape(Color.CYAN));           // bundled coastline
+        ctx.draw(new RouteShape(new double[][] {{0, 50}, {20, 60}}, Color.RED));
+        ctx.draw(new Points(new double[][] {{10.49, 55.28}}, Color.YELLOW));
+    }).build();
+----
+
+The bundled geometry is Natural Earth 1:50m. To show finer or custom coastlines without bloating
+the jar, pass a `CoastlineData` to `WorldMap.builder().coastlineData(...)` (or to `CoastlineShape`
+and `LandShape` directly). Build it from your own polylines with `CoastlineData.of(double[][])` —
+for example a higher-resolution Natural Earth export converted to longitude/latitude pairs. The
+bundled binary resource is regenerated with the maintainer tool `config/generate-coastlines.java`
+(run with JBang); its format is internal, not public API.
+
+`CoastlineShape`, `LandShape`, `RouteShape` and `RegionShape` read their clipping bounds from
+the Canvas. They take the shorter way around the globe and repeat across the seam, so a
+seam-crossing viewport draws continuously. Generic Canvas shapes (`Points`, `Line`) use Canvas
+coordinates directly and do not inherit this wrapping; supply unwrapped longitudes for them
+when crossing the antimeridian.
+
+==== Extension boundary
+
+The base `WorldMap` must keep working with no GIS, image, HTTP, `java.awt` or geocoding
+libraries, offline and dependency-free. Richer data (higher-resolution or custom coastline,
+country and lake polygons), raster/satellite tiles (via `tamboui-image` protocols), level-of-detail
+fetching while zooming, and geocoding/search are optional providers layered on top: they do
+async work off the render thread and deliver results by updating the element's viewport state.
+Map tiles are Web Mercator and would require a Mercator projection mode, which plugs in behind
+`GeoProjection` without changing the layer code.

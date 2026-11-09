@@ -19,6 +19,7 @@ module dev.tamboui.widgets {
     exports dev.tamboui.widgets.input;
     exports dev.tamboui.widgets.list;
     exports dev.tamboui.widgets.logo;
+    exports dev.tamboui.widgets.map;
     exports dev.tamboui.widgets.paragraph;
     exports dev.tamboui.widgets.scrollbar;
     exports dev.tamboui.widgets.select;
