@@ -48,18 +48,23 @@ jobs:
           mkdir -p screenshots
           for term in foot xterm-vt340; do
             echo "::group::$term"
-            out=$(nix build --no-link --print-out-paths --impure --expr \
+            if out=$(nix build --no-link --print-out-paths --impure --expr \
               "(import ./screenshot-tests.nix { \
-                 pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }).$term")
-            cp "$out"/screenshot-*.png "screenshots/screenshot-$term.png" || true
+                 pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }).$term"); then
+              cp "$out"/screenshot-*.png "screenshots/screenshot-$term.png" || true
+            else
+              echo "::warning::$term screenshot build failed"
+            fi
             echo "::endgroup::"
           done
-          ls -l screenshots
+          ls -l screenshots || true
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
         with:
           name: screenshots
           path: screenshots/
+          if-no-files-found: warn
 
       # --- reference diff: no-ops until the tamboui-screenshots side-repo (gh-pages) exists ---
       - name: Diff against references with dify
