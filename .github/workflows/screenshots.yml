@@ -38,6 +38,8 @@ jobs:
 
       - uses: cachix/install-nix-action@08dcb3a5e62fa31e2da3d490afc4176ef55ecd72 # v30
         with:
+          # nixosTest + the services.displayManager.* options need a recent nixpkgs.
+          nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
             experimental-features = nix-command flakes
 
