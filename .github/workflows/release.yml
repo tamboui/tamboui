@@ -10,20 +10,22 @@ on:
         description: 'Next version'
         required: true
 
+# One release at a time; never let two runs race the bump/publish pushes.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
-  build:
+  # 1. Bump gradle.properties to the release version and push. Idempotent: if main is
+  #    already at the version (e.g. a previous attempt pushed it), it skips the commit.
+  prepare:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: write
     steps:
       - uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Full history + tags so JReleaser can diff from the last release tag for the
-          # changelog; a shallow clone can't find the previous tag and truncates it.
-          fetch-depth: 0
-          fetch-tags: true
       - name: Bump version to final
         run: |
           sed -i -e "s/^version=.*/version=${{ github.event.inputs.version }}/" gradle.properties
@@ -35,17 +37,55 @@ jobs:
           else
             echo "gradle.properties already at ${{ github.event.inputs.version }}; skipping commit"
           fi
+
+  # 2. Publish signed artifacts to Maven Central. This is the one irreversible step
+  #    (Central is immutable), so it is guarded: if the version is already on Central,
+  #    the publish is skipped instead of failing with "component already exists".
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check whether this version is already on Maven Central
+        id: central
+        run: |
+          url="https://repo1.maven.org/maven2/dev/tamboui/tamboui-bom/${{ github.event.inputs.version }}/tamboui-bom-${{ github.event.inputs.version }}.pom"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+          # ponytail: repo1 can lag the portal by minutes, so a rerun within that window
+          # may still attempt a republish and fail fast on the portal's own dup check.
+          if [ "$code" = "200" ]; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::${{ github.event.inputs.version }} already on Maven Central; skipping publish."
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: ./.github/actions/shared-build-setup
+        if: steps.central.outputs.already == 'false'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Execute Gradle build
-        if: env.CENTRAL_USERNAME
+      - name: Publish to Maven Central
+        if: steps.central.outputs.already == 'false' && env.CENTRAL_USERNAME
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
+
+  # 3. Create the draft GitHub release with the auto changelog. JReleaser is configured
+  #    with release.github.overwrite: true, so re-running this job recreates the release.
+  github_release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Full history + tags so JReleaser can diff from the last release tag for the
+          # changelog; a shallow clone can't find the previous tag and truncates it.
+          fetch-depth: 0
+          fetch-tags: true
       - name: Release
         # 'release' (not 'full-release'): create the draft GitHub release without announcing.
         # The announce runs later, from announce.yml, when the draft is published.
@@ -63,10 +103,30 @@ jobs:
           path: |
             out/jreleaser/trace.log
             out/jreleaser/output.properties
+
+  # 4. Publish the documentation site.
+  docs:
+    needs: github_release
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@v6
       - name: Trigger documentation publish
         run: gh workflow run documentation.yml --ref main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 5. Bump gradle.properties to the next development version. Idempotent like prepare.
+  bump_next:
+    needs: docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Bump version to next
         run: |
           sed -i -e "s/^version=.*/version=${{ github.event.inputs.next-version }}/" gradle.properties
