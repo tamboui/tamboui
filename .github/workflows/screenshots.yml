@@ -1,13 +1,78 @@
+# Cross-terminal screenshot tests (issue #19). EXPERIMENTAL prototype — manual dispatch only.
+#
+# Builds a self-contained demo jar with jbang, runs the Nix cross-terminal screenshot tests,
+# uploads the PNGs, and (once a reference side-repo exists) diffs them with dify. The first
+# runs simply produce screenshots to eyeball and to seed references.
+
 name: screenshots
 
 on:
-  push:
-    branches:
-      - 19-cross-terminal-screenshots
+  # Prototype: runs on this PR (push to a feature branch is blocked by org policy).
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      demo:
+        description: jbang catalog alias of the demo to screenshot
+        default: image-demo
+        required: true
 
 jobs:
   screenshots:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - run: echo hello
+
+      - uses: jbangdev/setup-jbang@main
+
+      - name: Export demo to a self-contained fat jar
+        run: |
+          # Networked step: jbang resolves //DEPS and bundles everything (classes, jline,
+          # //FILES resources) into one jar, so the sandboxed VM needs no network.
+          jbang export fatjar --force -O demo.jar "${{ github.event.inputs.demo || 'image-demo' }}@tamboui/tamboui"
+          ls -l demo.jar
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Run cross-terminal screenshot tests
+        run: |
+          mkdir -p screenshots
+          for term in foot xterm-vt340; do
+            echo "::group::$term"
+            out=$(nix build --no-link --print-out-paths --impure --expr \
+              "import ./screenshot-tests.nix { \
+                 pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }.$term")
+            cp "$out"/screenshot-*.png "screenshots/screenshot-$term.png" || true
+            echo "::endgroup::"
+          done
+          ls -l screenshots
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+
+      # --- reference diff: no-ops until the tamboui-screenshots side-repo (gh-pages) exists ---
+      - name: Diff against references with dify
+        run: |
+          curl -L https://github.com/jihchi/dify/releases/download/v0.7.4/dify-x86_64-unknown-linux-gnu-v0.7.4.tar.gz -o dify.tar.gz
+          tar -xzf dify.tar.gz && chmod +x dify
+          base="https://raw.githubusercontent.com/tamboui/tamboui-screenshots/gh-pages/images"
+          mkdir -p diffs refs
+          for png in screenshots/*.png; do
+            name=$(basename "$png")
+            if curl -f -L "$base/$name" -o "refs/$name"; then
+              ./dify "refs/$name" "$png" || true
+              [ -f diff.png ] && mv diff.png "diffs/diff-$name"
+            else
+              echo "::notice::no reference yet for $name (new case)"
+            fi
+          done
+          ls -l diffs || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: diffs
+          path: diffs/
