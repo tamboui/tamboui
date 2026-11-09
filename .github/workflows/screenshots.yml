@@ -48,7 +48,7 @@ jobs:
           mkdir -p screenshots
           for term in foot xterm-vt340; do
             echo "::group::$term"
-            if out=$(nix build --no-link --print-out-paths --impure --expr \
+            if out=$(nix build -L --no-link --print-out-paths --impure --expr \
               "(import ./screenshot-tests.nix { \
                  pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }).$term"); then
               cp "$out"/screenshot-*.png "screenshots/screenshot-$term.png" || true
