@@ -31,6 +31,7 @@ jobs:
         run: |
           # Networked step: jbang resolves //DEPS and bundles everything (classes, jline,
           # //FILES resources) into one jar, so the sandboxed VM needs no network.
+          jbang trust add https://github.com/tamboui/
           demo="${{ github.event.inputs.demo || 'image-demo' }}"
           jbang export fatjar --force -O demo.jar "${demo}@tamboui/tamboui"
           ls -l demo.jar
