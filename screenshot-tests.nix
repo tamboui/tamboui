@@ -16,6 +16,7 @@
 { pkgs, demoJar }:
 
 let
+  # The jbang fatjar is built for Java 21 (jbang export --java 21), matching this JRE.
   jre = pkgs.jdk_headless;
 
   makeScreenshotTest = { terminal, terminalCommand, terminalPackages, xwayland ? false }:

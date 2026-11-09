@@ -33,7 +33,8 @@ jobs:
           # //FILES resources) into one jar, so the sandboxed VM needs no network.
           jbang trust add https://github.com/tamboui/
           demo="${{ github.event.inputs.demo || 'image-demo' }}"
-          jbang export fatjar --force -O demo.jar "${demo}@tamboui/tamboui"
+          # Build for Java 21 so the jar runs on the VM's jdk_headless (21); jbang's own JDK is newer.
+          jbang export fatjar --java 21 --force -O demo.jar "${demo}@tamboui/tamboui"
           ls -l demo.jar
 
       - uses: cachix/install-nix-action@08dcb3a5e62fa31e2da3d490afc4176ef55ecd72 # v30
