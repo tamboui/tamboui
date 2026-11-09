@@ -47,8 +47,8 @@ jobs:
           for term in foot xterm-vt340; do
             echo "::group::$term"
             out=$(nix build --no-link --print-out-paths --impure --expr \
-              "import ./screenshot-tests.nix { \
-                 pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }.$term")
+              "(import ./screenshot-tests.nix { \
+                 pkgs = import <nixpkgs> {}; demoJar = $PWD/demo.jar; }).$term")
             cp "$out"/screenshot-*.png "screenshots/screenshot-$term.png" || true
             echo "::endgroup::"
           done
