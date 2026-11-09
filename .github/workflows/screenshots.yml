@@ -1,23 +1,30 @@
-# Cross-terminal screenshot tests (issue #19). EXPERIMENTAL prototype.
+# Cross-terminal screenshot tests (issue #19).
 #
 # Builds a self-contained demo jar with jbang, runs the Nix cross-terminal screenshot tests,
-# uploads the PNGs, and (once a reference side-repo exists) diffs them with dify. The first
-# runs simply produce screenshots to eyeball and to seed references.
+# uploads the PNGs, and (once the tamboui-screenshots side-repo exists) diffs them with dify.
 #
-# NOTE: actions MUST be pinned to a full commit SHA (org policy); tag refs (@v4) make the
-# run fail at startup with a misleading "workflow file issue" banner and zero jobs.
+# Triggers: manual, nightly, and PRs that touch the screenshot harness or the image module —
+# not every PR (each terminal boots a VM, so a full run is slow).
+#
+# NOTE: actions MUST be pinned to a full commit SHA (org policy); tag refs (@v4) make the run
+# fail at startup with a misleading "workflow file issue" banner and zero jobs.
 
 name: screenshots
 
 on:
-  # Prototype: runs on this PR. (push to a feature branch is blocked by org policy.)
-  pull_request:
   workflow_dispatch:
     inputs:
       demo:
         description: jbang catalog alias of the demo to screenshot
         default: image-demo
         required: true
+  schedule:
+    - cron: "0 4 * * *"
+  pull_request:
+    paths:
+      - ".github/workflows/screenshots.yml"
+      - "screenshot-tests.nix"
+      - "tamboui-image/**"
 
 jobs:
   screenshots:
@@ -31,9 +38,9 @@ jobs:
         run: |
           # Networked step: jbang resolves //DEPS and bundles everything (classes, jline,
           # //FILES resources) into one jar, so the sandboxed VM needs no network.
+          # Build for Java 21 so the jar runs on the VM's jdk_headless (21); jbang's own JDK is newer.
           jbang trust add https://github.com/tamboui/
           demo="${{ github.event.inputs.demo || 'image-demo' }}"
-          # Build for Java 21 so the jar runs on the VM's jdk_headless (21); jbang's own JDK is newer.
           jbang export fatjar --java 21 --force -O demo.jar "${demo}@tamboui/tamboui"
           ls -l demo.jar
 
@@ -47,7 +54,7 @@ jobs:
       - name: Run cross-terminal screenshot tests
         run: |
           mkdir -p screenshots
-          for term in foot xterm-vt340; do
+          for term in foot kitty wezterm ghostty alacritty konsole xterm-vt340; do
             echo "::group::$term"
             if out=$(nix build -L --no-link --print-out-paths --impure --expr \
               "(import ./screenshot-tests.nix { \
@@ -86,6 +93,8 @@ jobs:
           ls -l diffs || true
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
         with:
           name: diffs
           path: diffs/
+          if-no-files-found: ignore

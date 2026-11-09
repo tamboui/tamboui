@@ -1,23 +1,27 @@
-# Cross-terminal screenshot tests (issue #19). EXPERIMENTAL prototype.
+# Cross-terminal screenshot tests (issue #19).
 #
 # Boots a NixOS VM running Sway + a real terminal emulator, runs a prebuilt self-contained
 # TamboUI demo jar in it (jbang export fatjar -> `java -jar`), then screenshots the VM
-# framebuffer unconditionally after a short settle sleep (never fails), so we always get a
-# PNG to eyeball. No marker file, no flag, no TamboUI source change.
-# (OCR-based wait_for_text proved unreliable on TUI glyphs; revisit once the basics work.)
+# framebuffer after a short settle sleep. The screenshot is unconditional (the test never
+# fails), so CI always has a PNG to review. No marker file, no flag, no TamboUI source change.
 #
 # Adapted from benjajaja/ratatui-image/screenshot-tests.nix.
 #
-# `demoJar` is the path to the exported fat jar. The workflow passes it impurely:
-#   nix build --impure --expr 'import ./screenshot-tests.nix {
-#     pkgs = import <nixpkgs> {}; demoJar = /abs/path/demo.jar; }.foot'
-# Pure upgrade (later): make demoJar a fixed-output derivation running `jbang export`.
+# `demoJar` is the path to the exported fat jar (built for Java 21 to match the VM JRE). The
+# workflow passes it impurely:
+#   nix build --impure --expr '(import ./screenshot-tests.nix {
+#     pkgs = import <nixpkgs> {}; demoJar = /abs/path/demo.jar; }).foot'
 
 { pkgs, demoJar }:
 
 let
-  # The jbang fatjar is built for Java 21 (jbang export --java 21), matching this JRE.
   jre = pkgs.jdk_headless;
+
+  # Run the demo attached to the terminal (no output redirection: the TUI must draw to the
+  # terminal, not a file). The demo blocks until quit, keeping the window on screen.
+  launcher = pkgs.writeShellScript "run-demo" ''
+    exec ${jre}/bin/java -jar /tmp/app/demo.jar
+  '';
 
   makeScreenshotTest = { terminal, terminalCommand, terminalPackages, xwayland ? false }:
     pkgs.testers.nixosTest {
@@ -68,28 +72,46 @@ let
 
         # Give the JVM + demo time to start and paint, then screenshot unconditionally.
         machine.sleep(40)
-        # Diagnostics: whether a terminal window actually exists in the tree.
-        print("=== sway tree (window titles) ===")
-        print(machine.execute(
-          "systemd-run --uid=test --setenv=XDG_RUNTIME_DIR=/run/user/1000 "
-          "--setenv=WAYLAND_DISPLAY=wayland-1 --pipe --wait -- "
-          "swaymsg -t get_tree 2>&1 | grep -iE '\"name\"|app_id|pid' || true")[1])
         machine.screenshot("screenshot-${terminal}")
       '';
     };
-
-  # Run the demo attached to the terminal (no output redirection: the TUI must draw to the
-  # terminal, not a file). The demo blocks until quit, keeping the window on screen.
-  launcher = pkgs.writeShellScript "run-demo" ''
-    exec ${jre}/bin/java -jar /tmp/app/demo.jar
-  '';
 in
 {
-  # foot: wayland-native, supports sixel.
+  # Wayland-native terminals.
   foot = makeScreenshotTest {
     terminal = "foot";
     terminalCommand = "foot ${launcher}";
     terminalPackages = [ pkgs.foot ];
+  };
+
+  kitty = makeScreenshotTest {
+    terminal = "kitty";
+    terminalCommand = "kitty ${launcher}";
+    terminalPackages = [ pkgs.kitty ];
+  };
+
+  wezterm = makeScreenshotTest {
+    terminal = "wezterm";
+    terminalCommand = "wezterm start --always-new-process --cwd /tmp/app -- ${launcher}";
+    terminalPackages = [ pkgs.wezterm ];
+  };
+
+  ghostty = makeScreenshotTest {
+    terminal = "ghostty";
+    terminalCommand = "ghostty -e ${launcher}";
+    terminalPackages = [ pkgs.ghostty ];
+  };
+
+  alacritty = makeScreenshotTest {
+    terminal = "alacritty";
+    terminalCommand = "alacritty -e ${launcher}";
+    terminalPackages = [ pkgs.alacritty ];
+  };
+
+  konsole = makeScreenshotTest {
+    terminal = "konsole";
+    terminalCommand = "konsole -e ${launcher}";
+    terminalPackages = [ pkgs.kdePackages.konsole pkgs.kdePackages.qtwayland ];
   };
 
   # xterm in VT340 mode: classic sixel path, via xwayland.
