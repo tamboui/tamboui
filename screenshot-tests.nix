@@ -68,9 +68,7 @@ let
 
         # Give the JVM + demo time to start and paint, then screenshot unconditionally.
         machine.sleep(40)
-        # Diagnostics: the demo's own output + whether a window exists.
-        print("=== demo.log ===")
-        print(machine.execute("cat /tmp/demo.log 2>&1")[1])
+        # Diagnostics: whether a terminal window actually exists in the tree.
         print("=== sway tree (window titles) ===")
         print(machine.execute(
           "systemd-run --uid=test --setenv=XDG_RUNTIME_DIR=/run/user/1000 "
@@ -80,13 +78,10 @@ let
       '';
     };
 
-  # Runs the demo, logs everything, and keeps the terminal alive even if the JVM exits
-  # (so a crash still leaves a visible window + a readable /tmp/demo.log).
+  # Run the demo attached to the terminal (no output redirection: the TUI must draw to the
+  # terminal, not a file). The demo blocks until quit, keeping the window on screen.
   launcher = pkgs.writeShellScript "run-demo" ''
-    echo "launcher: starting $(date)" > /tmp/demo.log
-    ${jre}/bin/java -jar /tmp/app/demo.jar >> /tmp/demo.log 2>&1
-    echo "launcher: java exited $?" >> /tmp/demo.log
-    sleep 600
+    exec ${jre}/bin/java -jar /tmp/app/demo.jar
   '';
 in
 {
