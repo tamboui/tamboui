@@ -28,7 +28,7 @@
 <div id="header">
 <h1>Bindings and Actions</h1>
 <div class="details">
-<span id="revnumber">version 0.7.0-SNAPSHOT</span>
+<span id="revnumber">version 0.8.0-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -64,7 +64,12 @@
 </li>
 </ul>
 </li>
-<li><a href="#loading-bindings-from-files">Loading Bindings from Files</a></li>
+<li><a href="#loading-bindings-from-files">Loading Bindings from Files</a>
+<ul class="sectlevel2">
+<li><a href="#per-action-overwrite-how-a-file-layers">Per-action overwrite (how a file layers)</a></li>
+<li><a href="#per-os-overlay-which-files-are-loaded">Per-OS overlay (which files are loaded)</a></li>
+</ul>
+</li>
 <li><a href="#standard-actions">Standard Actions</a></li>
 <li><a href="#next-steps">Next Steps</a></li>
 </ul>
@@ -91,6 +96,9 @@ Instead of checking for specific keys everywhere, you define bindings that map i
 Bindings vim = BindingSets.vim();            // hjkl navigation, Ctrl+u/d
 Bindings emacs = BindingSets.emacs();        // Ctrl+n/p/f/b navigation</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The named sets (<code>standard()</code>, <code>vim()</code>, <code>emacs()</code>, &#8230;&#8203;) are literal and cross-platform, so they are predictable and testable. Only the effective default, <code>BindingSets.defaults()</code> (what a <code>TuiConfig</code> uses unless you pick a set), resolves the host platform: on macOS it replaces the word-editing actions with their Option (Alt) equivalents to match the system text layer, so <code>Option+Left</code>/<code>Option+Right</code> jump by word and <code>Option+Backspace</code>/<code>Option+Delete</code> delete a word. <code>Ctrl+Left</code>/<code>Ctrl+Right</code> is Mission Control on macOS, so it is deliberately not a word key there; <code>Ctrl+w</code> (a universal readline control byte) still deletes a word on every platform. Off macOS, <code>defaults()</code> is <code>standard()</code> unchanged, with word editing on <code>Ctrl+Left</code>/<code>Ctrl+Right</code> and <code>Ctrl+Backspace</code>/<code>Ctrl+Delete</code> (which need a terminal that reports them, e.g. via the Kitty keyboard protocol).</p>
 </div>
 </div>
 </div>
@@ -494,8 +502,8 @@ For better startup performance and GraalVM native image compatibility, use the a
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">dependencies {
-    implementation("dev.tamboui:tamboui-toolkit:0.7.0-SNAPSHOT")
-    annotationProcessor("dev.tamboui:tamboui-processor:0.7.0-SNAPSHOT")
+    implementation("dev.tamboui:tamboui-toolkit:0.8.0-SNAPSHOT")
+    annotationProcessor("dev.tamboui:tamboui-processor:0.8.0-SNAPSHOT")
 }</code></pre>
 </div>
 </div>
@@ -505,8 +513,8 @@ For better startup performance and GraalVM native image compatibility, use the a
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">dependencies {
-    implementation 'dev.tamboui:tamboui-toolkit:0.7.0-SNAPSHOT'
-    annotationProcessor 'dev.tamboui:tamboui-processor:0.7.0-SNAPSHOT'
+    implementation 'dev.tamboui:tamboui-toolkit:0.8.0-SNAPSHOT'
+    annotationProcessor 'dev.tamboui:tamboui-processor:0.8.0-SNAPSHOT'
 }</code></pre>
 </div>
 </div>
@@ -519,7 +527,7 @@ For better startup performance and GraalVM native image compatibility, use the a
     &lt;dependency&gt;
         &lt;groupId&gt;dev.tamboui&lt;/groupId&gt;
         &lt;artifactId&gt;tamboui-toolkit&lt;/artifactId&gt;
-        &lt;version&gt;0.7.0-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;0.8.0-SNAPSHOT&lt;/version&gt;
     &lt;/dependency&gt;
 &lt;/dependencies&gt;
 
@@ -534,7 +542,7 @@ For better startup performance and GraalVM native image compatibility, use the a
                     &lt;path&gt;
                         &lt;groupId&gt;dev.tamboui&lt;/groupId&gt;
                         &lt;artifactId&gt;tamboui-processor&lt;/artifactId&gt;
-                        &lt;version&gt;0.7.0-SNAPSHOT&lt;/version&gt;
+                        &lt;version&gt;0.8.0-SNAPSHOT&lt;/version&gt;
                     &lt;/path&gt;
                 &lt;/annotationProcessorPaths&gt;
             &lt;/configuration&gt;
@@ -591,6 +599,64 @@ contextMenu = Mouse.Right.Press</code></pre>
 <p>Multiple triggers for the same action are comma-separated.
 Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixes.</p>
 </div>
+<div class="paragraph">
+<p>Two independent rules govern how a set is assembled: <strong>how</strong> a file composes onto the one below it,
+and <strong>which</strong> files are loaded.</p>
+</div>
+<div class="sect2">
+<h3 id="per-action-overwrite-how-a-file-layers"><a class="anchor" href="#per-action-overwrite-how-a-file-layers"></a><a class="link" href="#per-action-overwrite-how-a-file-layers">Per-action overwrite (how a file layers)</a></h3>
+<div class="paragraph">
+<p>Every properties source is layered on top of a base (a built-in set, or the standard bindings for a
+user file), and layering is <strong>per action, replace</strong> — not additive:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An action the file <strong>lists</strong> gets exactly the triggers listed for it, replacing the base triggers of
+that action. So <code>quit = Ctrl+c</code> makes quit <code>Ctrl+c</code> only, removing the standard <code>q</code> and <code>Q</code>.</p>
+</li>
+<li>
+<p>An action the file <strong>does not list</strong> keeps its base triggers unchanged.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An action can still have <strong>several</strong> triggers — list them comma-separated. Replace is per action, not
+per key: <code>quit = Ctrl+c, q, Q</code> keeps all three, and <code>moveUp = Up, k</code> binds both. To keep a base key
+<strong>and</strong> add one, name them together (<code>quit = Ctrl+c, q</code>), since a listed action no longer inherits its
+base triggers.</p>
+</div>
+<div class="paragraph">
+<p>This is why the named sets differ as they do: <code>emacs.properties</code> lists <code>quit = Ctrl+c</code>, so emacs quits
+only on <code>Ctrl+C</code>, while a set that never mentions <code>quit</code> inherits the standard <code>q</code>, <code>Q</code>, <code>Ctrl+c</code>. The
+same rule applies to your own files and to the OS overlays below — a listed action always replaces,
+never adds.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="per-os-overlay-which-files-are-loaded"><a class="anchor" href="#per-os-overlay-which-files-are-loaded"></a><a class="link" href="#per-os-overlay-which-files-are-loaded">Per-OS overlay (which files are loaded)</a></h3>
+<div class="paragraph">
+<p>Orthogonally, <code>BindingSets.defaults()</code> also looks up an OS-specific overlay by the convention
+<code>&lt;set&gt;-&lt;os&gt;.properties</code>, where <code>&lt;os&gt;</code> is <code>macos</code>, <code>windows</code> or <code>linux</code>, and layers it on top of the
+set (using the same per-action replace rule) when the file exists:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>On macOS, <code>standard-macos.properties</code> makes word navigation use Option (Alt), replacing the Ctrl
+word keys that the system reserves.</p>
+</li>
+<li>
+<p>On an OS with no matching overlay file, the set is used as-is.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The two rules are independent: the per-action overwrite decides how any one file merges; the per-OS
+lookup decides whether an extra, platform-specific file is merged at all. The named accessors
+(<code>standard()</code>, <code>vim()</code>, &#8230;&#8203;) stay literal and cross-platform; only <code>defaults()</code> resolves the host OS.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -632,6 +698,14 @@ Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixe
 <td class="tableblock halign-left valign-top"><p class="tableblock">Text editing</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MOVE_WORD_LEFT</code>, <code>MOVE_WORD_RIGHT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word-wise cursor movement (<code>Ctrl+Arrow</code>, or <code>Option+Arrow</code> on macOS)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DELETE_WORD_BACKWARD</code>, <code>DELETE_WORD_FORWARD</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Word-wise deletion (<code>Ctrl+Backspace</code>/<code>Ctrl+Delete</code>, or <code>Option+Backspace</code>/<code>Option+Delete</code> on macOS; <code>Ctrl+w</code> everywhere)</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QUIT</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Application exit</p></td>
 </tr>
@@ -657,7 +731,7 @@ Modifiers use <code>Ctrl+</code>, <code>Alt+</code>, <code>Shift+</code> prefixe
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.7.0-SNAPSHOT<br>
+Version 0.8.0-SNAPSHOT<br>
 </div>
 </div>
 <script src="_static/highlight/highlight.min.js"></script>
