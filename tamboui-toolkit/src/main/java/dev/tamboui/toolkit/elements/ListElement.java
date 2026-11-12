@@ -259,6 +259,37 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     }
 
     /**
+     * Sets the horizontal scroll offset in columns.
+     *
+     * @param offset the horizontal scroll offset
+     * @return this element
+     */
+    public ListElement<T> horizontalOffset(int offset) {
+        listState.setHorizontalOffset(offset);
+        return this;
+    }
+
+    /**
+     * Returns the horizontal scroll offset in columns.
+     *
+     * @return the horizontal scroll offset
+     */
+    public int horizontalOffset() {
+        return listState.horizontalOffset();
+    }
+
+    /**
+     * Adjusts the horizontal scroll offset by a delta.
+     *
+     * @param delta the amount to scroll (positive = right, negative = left)
+     * @return this element
+     */
+    public ListElement<T> scrollHorizontalBy(int delta) {
+        listState.scrollHorizontalBy(delta);
+        return this;
+    }
+
+    /**
      * Sets the highlight style for selected items.
      *
      * @param style the highlight style
@@ -890,6 +921,14 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
                         selectNext(lastItemCount);
                     }
                 }
+                return EventResult.HANDLED;
+            }
+            if (event.kind() == MouseEventKind.SCROLL_LEFT) {
+                listState.scrollHorizontalBy(-3);
+                return EventResult.HANDLED;
+            }
+            if (event.kind() == MouseEventKind.SCROLL_RIGHT) {
+                listState.scrollHorizontalBy(3);
                 return EventResult.HANDLED;
             }
         }
