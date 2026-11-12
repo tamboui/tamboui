@@ -23,6 +23,7 @@ import dev.tamboui.text.CharWidth;
 import dev.tamboui.text.Line;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.common.ScrollPadding;
 import dev.tamboui.widgets.common.SizedWidget;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
@@ -84,6 +85,7 @@ public final class TreeWidget<T> implements StatefulWidget<TreeState> {
     private final Style scrollbarThumbStyle;
     private final Style scrollbarTrackStyle;
     private final int indentWidth;
+    private final int scrollPadding;
 
     // Cached flat entries from last render (for state access)
     private List<FlatEntry<T>> lastFlatEntries = Collections.emptyList();
@@ -102,6 +104,7 @@ public final class TreeWidget<T> implements StatefulWidget<TreeState> {
         this.scrollbarThumbStyle = builder.scrollbarThumbStyle;
         this.scrollbarTrackStyle = builder.scrollbarTrackStyle;
         this.indentWidth = builder.indentWidth;
+        this.scrollPadding = builder.scrollPadding;
     }
 
     /**
@@ -185,9 +188,12 @@ public final class TreeWidget<T> implements StatefulWidget<TreeState> {
             return;
         }
 
-        // Auto-scroll to keep selected item visible
-        FlatEntry<T> selectedEntry = flatEntries.get(selectedIndex);
-        state.scrollToSelected(selectedEntry.cumulativeTop, selectedEntry.height, visibleHeight, totalContentHeight);
+        int[] entryHeights = new int[totalItems];
+        for (int i = 0; i < totalItems; i++) {
+            entryHeights[i] = flatEntries.get(i).height;
+        }
+        state.offset(ScrollPadding.computeOffset(
+                state.offset(), entryHeights, selectedIndex, scrollPadding, visibleHeight));
         int scrollOffset = state.offset();
 
         // Render visible entries
@@ -453,6 +459,7 @@ public final class TreeWidget<T> implements StatefulWidget<TreeState> {
         private Style scrollbarThumbStyle;
         private Style scrollbarTrackStyle;
         private int indentWidth = -1;
+        private int scrollPadding;
         private StylePropertyResolver styleResolver = StylePropertyResolver.empty();
 
         // Expansion state customization
@@ -658,6 +665,22 @@ public final class TreeWidget<T> implements StatefulWidget<TreeState> {
          */
         public Builder<T> indentWidth(int width) {
             this.indentWidth = Math.max(-1, width);
+            return this;
+        }
+
+        /**
+         * Sets the number of nodes to keep visible above and below the selected
+         * node when scrolling, like vim's {@code scrolloff}.
+         * <p>
+         * Defaults to 0, which scrolls only when the selection would leave the
+         * viewport.
+         *
+         * @param padding the number of nodes, negative values are treated as 0
+         * @return this builder
+         * @see ScrollPadding
+         */
+        public Builder<T> scrollPadding(int padding) {
+            this.scrollPadding = Math.max(0, padding);
             return this;
         }
 

@@ -17,6 +17,7 @@ import dev.tamboui.css.cascade.PseudoClassState;
 import dev.tamboui.layout.Constraint;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.IntegerConverter;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.StringConverter;
@@ -74,6 +75,13 @@ import dev.tamboui.widgets.list.ScrollMode;
  *   <li>{@code ListElement-scrollbar-thumb} - styles the scrollbar thumb</li>
  *   <li>{@code ListElement-scrollbar-track} - styles the scrollbar track</li>
  * </ul>
+ * <p>
+ * Supported CSS properties:
+ * <ul>
+ *   <li>{@code scrollbar-policy} - when to show scrollbar: "none", "always", "as-needed"</li>
+ *   <li>{@code highlight-symbol} - symbol shown before selected item (default: "&gt; ")</li>
+ *   <li>{@code scroll-padding} - items kept visible above and below the selection when auto-scrolling (default: 0)</li>
+ * </ul>
  *
  * @param <T> the type of data items backing each list entry
  * @see dev.tamboui.widgets.list.ListWidget for simple text-only lists at the widget level
@@ -103,10 +111,20 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
                     .defaultValue(DEFAULT_HIGHLIGHT_SYMBOL)
                     .build();
 
+    /**
+     * CSS property for the number of items kept visible above and below the
+     * selected item when auto-scrolling.
+     */
+    public static final PropertyDefinition<Integer> SCROLL_PADDING =
+            PropertyDefinition.builder("scroll-padding", IntegerConverter.INSTANCE)
+                    .defaultValue(0)
+                    .build();
+
     static {
         PropertyRegistry.registerAll(
                 SCROLLBAR_POLICY,
-                HIGHLIGHT_SYMBOL
+                HIGHLIGHT_SYMBOL,
+                SCROLL_PADDING
         );
     }
 
@@ -125,6 +143,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
     private boolean autoScroll;
     private boolean autoScrollToEnd;
     private boolean stickyScroll;
+    private Integer scrollPadding;
     private ScrollBarPolicy scrollBarPolicy = ScrollBarPolicy.NONE;
     private Color scrollbarThumbColor;
     private Color scrollbarTrackColor;
@@ -385,6 +404,22 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
             checkScrollModeNotSet("autoScroll");
         }
         this.autoScroll = enabled;
+        return this;
+    }
+
+    /**
+     * Sets the number of items to keep visible above and below the selected
+     * item when scrolling, like vim's {@code scrolloff}.
+     * <p>
+     * Only applies with {@link #autoScroll()}. By default the list scrolls only
+     * when the selection would leave the viewport. Can also be set with the
+     * {@code scroll-padding} CSS property.
+     *
+     * @param padding the number of items, negative values are treated as 0
+     * @return this element
+     */
+    public ListElement<T> scrollPadding(int padding) {
+        this.scrollPadding = Math.max(0, padding);
         return this;
     }
 
@@ -660,6 +695,7 @@ public final class ListElement<T> extends StyledElement<ListElement<T>> {
 
         // Configure scroll mode
         builder.scrollMode(resolveScrollMode());
+        builder.scrollPadding(cssResolver.resolve(SCROLL_PADDING, scrollPadding));
 
         // Configure scrollbar
         configureScrollbar(builder, context, cssResolver);

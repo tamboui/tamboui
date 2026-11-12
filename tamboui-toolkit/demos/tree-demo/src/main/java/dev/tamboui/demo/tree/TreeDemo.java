@@ -176,6 +176,7 @@ public class TreeDemo {
                 .borderColor(Color.WHITE)
                 .highlightSymbol("▶ ")
                 .scrollbar()
+                .scrollPadding(2)
                 .guideStyle(GuideStyle.UNICODE)
                 // Custom renderer: each node displays icon, name, size, and status
                 .nodeRenderer(this::renderNode)

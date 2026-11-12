@@ -22,6 +22,7 @@ import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.tui.error.TuiException;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
 
+import static dev.tamboui.assertj.BufferAssertions.assertThat;
 import static dev.tamboui.toolkit.Toolkit.list;
 import static dev.tamboui.toolkit.Toolkit.text;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -489,5 +490,85 @@ class ListElementTest extends AbstractElementTest {
         list("A", "B").title("Items").render(frame, area, context);
 
         assertThat(buffer.get(0, 0).style().fg()).contains(Color.CYAN);
+    }
+
+    @Nested
+    @DisplayName("Scroll padding")
+    class ScrollPaddingTests {
+
+        private final Rect area = new Rect(0, 0, 4, 4);
+
+        private ListElement<?> sixItemsWithFourthSelected() {
+            ListElement<?> element = list("A", "B", "C", "D", "E", "F").highlightSymbol("").autoScroll();
+            element.selected(3);
+            return element;
+        }
+
+        private Buffer render(ListElement<?> element, RenderContext context) {
+            Buffer buffer = Buffer.empty(area);
+            element.render(Frame.forTesting(buffer), area, context);
+            return buffer;
+        }
+
+        private DefaultRenderContext cssContext(String css) {
+            StyleEngine styleEngine = StyleEngine.create();
+            styleEngine.addStylesheet("test", css);
+            styleEngine.setActiveStylesheet("test");
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.setStyleEngine(styleEngine);
+            return context;
+        }
+
+        @Test
+        @DisplayName("Without scroll padding, the selection may sit on the last visible row")
+        void noPaddingByDefault() {
+            Buffer buffer = render(sixItemsWithFourthSelected(), RenderContext.empty());
+
+            assertThat(buffer).hasContent("A   ", "B   ", "C   ", "D   ");
+        }
+
+        @Test
+        @DisplayName("scrollPadding keeps items visible below the selection")
+        void scrollPaddingScrollsEarly() {
+            Buffer buffer = render(sixItemsWithFourthSelected().scrollPadding(1), RenderContext.empty());
+
+            assertThat(buffer).hasContent("B   ", "C   ", "D   ", "E   ");
+        }
+
+        @Test
+        @DisplayName("scroll-padding CSS property sets the scroll padding")
+        void scrollPaddingFromCss() {
+            Buffer buffer = render(sixItemsWithFourthSelected(), cssContext("ListElement { scroll-padding: 1; }"));
+
+            assertThat(buffer).hasContent("B   ", "C   ", "D   ", "E   ");
+        }
+
+        @Test
+        @DisplayName("Explicit scrollPadding overrides the CSS property")
+        void explicitScrollPaddingOverridesCss() {
+            Buffer buffer = render(sixItemsWithFourthSelected().scrollPadding(0),
+                    cssContext("ListElement { scroll-padding: 1; }"));
+
+            assertThat(buffer).hasContent("A   ", "B   ", "C   ", "D   ");
+        }
+
+        @Test
+        @DisplayName("Negative scrollPadding is treated as 0")
+        void negativeScrollPaddingIsZero() {
+            Buffer buffer = render(sixItemsWithFourthSelected().scrollPadding(-3), RenderContext.empty());
+
+            assertThat(buffer).hasContent("A   ", "B   ", "C   ", "D   ");
+        }
+
+        @Test
+        @DisplayName("scrollPadding has no effect without autoScroll")
+        void scrollPaddingNeedsAutoScroll() {
+            ListElement<?> element = list("A", "B", "C", "D", "E", "F").highlightSymbol("").scrollPadding(1);
+            element.selected(3);
+
+            Buffer buffer = render(element, RenderContext.empty());
+
+            assertThat(buffer).hasContent("A   ", "B   ", "C   ", "D   ");
+        }
     }
 }
