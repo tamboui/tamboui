@@ -10,9 +10,17 @@ import org.junit.jupiter.api.Test;
 
 import dev.tamboui.assertj.BufferAssertions;
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.buffer.Cell;
+import dev.tamboui.buffer.DiffResult;
 import dev.tamboui.image.protocol.BrailleProtocol;
 import dev.tamboui.image.protocol.HalfBlockProtocol;
+import dev.tamboui.image.protocol.ITermProtocol;
+import dev.tamboui.image.protocol.KittyProtocol;
+import dev.tamboui.image.protocol.SixelProtocol;
 import dev.tamboui.layout.Rect;
+import dev.tamboui.terminal.CompletedFrame;
+import dev.tamboui.terminal.Terminal;
+import dev.tamboui.terminal.TestBackend;
 import dev.tamboui.widgets.block.Block;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -343,6 +351,126 @@ class ImageTest {
             "▀▀▀▀▀▀▀▀▀▀",
             "▀▀▀▀▀▀▀▀▀▀",
             "▀▀▀▀▀▀▀▀▀▀");
+    }
+
+    @Test
+    void render_kitty_consecutive_draws_emit_delete_command() {
+        TestBackend backend = new TestBackend(20, 10);
+        Terminal<TestBackend> terminal = new Terminal<>(backend);
+        KittyProtocol kitty = new KittyProtocol();
+
+        ImageData img1 = createTestImage(10, 10, 0xFFFF0000);
+        ImageData img2 = createTestImage(10, 10, 0xFF00FF00);
+
+        // Frame 1: first image
+        terminal.draw(frame -> frame.renderWidget(
+            Image.builder().data(img1).protocol(kitty).build(),
+            new Rect(0, 0, 10, 5)
+        ));
+
+        int firstId = kitty.lastImageId();
+        assertThat(firstId).isGreaterThan(0);
+        assertThat(backend.rawOutput()).doesNotContain("a=d");
+
+        backend.reset();
+
+        // Frame 2: second image (replaces first image)
+        terminal.draw(frame -> frame.renderWidget(
+            Image.builder().data(img2).protocol(kitty).build(),
+            new Rect(0, 0, 10, 5)
+        ));
+
+        int secondId = kitty.lastImageId();
+        assertThat(secondId).isNotEqualTo(firstId);
+        // Must emit delete sequence for firstId
+        assertThat(backend.rawOutput()).contains("\033_Ga=d,d=i,i=" + firstId + ",q=2\033\\");
+    }
+
+    @Test
+    void render_iterm2_marks_display_area_in_buffer() {
+        TestBackend backend = new TestBackend(20, 10);
+        Terminal<TestBackend> terminal = new Terminal<>(backend);
+        ITermProtocol iterm = new ITermProtocol();
+        ImageData img = createTestImage(40, 20, 0xFFFF0000);
+
+        CompletedFrame frame = terminal.draw(f -> f.renderWidget(
+            Image.builder().data(img).scaling(ImageScaling.FILL).protocol(iterm).build(),
+            new Rect(2, 1, 8, 4)
+        ));
+
+        Buffer buffer = frame.buffer();
+        for (int y = 1; y < 5; y++) {
+            for (int x = 2; x < 10; x++) {
+                assertThat(buffer.get(x, y)).isEqualTo(Cell.CONTINUATION);
+            }
+        }
+        assertThat(buffer.get(0, 0)).isEqualTo(Cell.EMPTY);
+        assertThat(buffer.get(1, 1)).isEqualTo(Cell.EMPTY);
+        assertThat(buffer.get(10, 1)).isEqualTo(Cell.EMPTY);
+        assertThat(buffer.get(2, 5)).isEqualTo(Cell.EMPTY);
+    }
+
+    @Test
+    void render_sixel_marks_covered_area_in_buffer() {
+        TestBackend backend = new TestBackend(20, 10);
+        Terminal<TestBackend> terminal = new Terminal<>(backend);
+        SixelProtocol sixel = new SixelProtocol();
+        // 32x32 pixels = 4 columns x 2 rows
+        ImageData img = createTestImage(32, 32, 0xFFFF0000);
+
+        CompletedFrame frame = terminal.draw(f -> f.renderWidget(
+            Image.builder().data(img).scaling(ImageScaling.NONE).protocol(sixel).build(),
+            new Rect(1, 1, 6, 4)
+        ));
+
+        Buffer buffer = frame.buffer();
+        // Covered cells (cols 1..4, rows 1..2)
+        for (int y = 1; y <= 2; y++) {
+            for (int x = 1; x <= 4; x++) {
+                assertThat(buffer.get(x, y)).isEqualTo(Cell.CONTINUATION);
+            }
+        }
+        // Uncovered cells in the widget area
+        assertThat(buffer.get(5, 1)).isEqualTo(Cell.EMPTY);
+        assertThat(buffer.get(1, 3)).isEqualTo(Cell.EMPTY);
+    }
+
+    @Test
+    void render_iterm2_shrinking_image_clears_uncovered_cells_via_diff() {
+        TestBackend backend = new TestBackend(10, 5);
+        Terminal<TestBackend> terminal = new Terminal<>(backend);
+        ITermProtocol iterm = new ITermProtocol();
+
+        ImageData largeImg = createTestImage(80, 40, 0xFFFF0000);
+        ImageData smallImg = createTestImage(32, 16, 0xFF00FF00);
+
+        // Frame 1: large 8x4 image
+        CompletedFrame frame1 = terminal.draw(f -> f.renderWidget(
+            Image.builder().data(largeImg).scaling(ImageScaling.FILL).protocol(iterm).build(),
+            new Rect(0, 0, 8, 4)
+        ));
+
+        // Frame 2: shrunk 4x2 image
+        CompletedFrame frame2 = terminal.draw(f -> f.renderWidget(
+            Image.builder().data(smallImg).scaling(ImageScaling.FILL).protocol(iterm).build(),
+            new Rect(0, 0, 4, 2)
+        ));
+
+        // Diff between frame 1 and frame 2
+        DiffResult diff = new DiffResult(50);
+        frame1.buffer().diff(frame2.buffer(), diff);
+
+        // Uncovered cells must be dirty and contain Cell.EMPTY so the terminal erases them with spaces
+        assertThat(diff.isEmpty()).isFalse();
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 8; x++) {
+                if (x >= 4 || y >= 2) {
+                    assertThat(frame2.buffer().get(x, y)).isEqualTo(Cell.EMPTY);
+                } else {
+                    assertThat(frame2.buffer().get(x, y)).isEqualTo(Cell.CONTINUATION);
+                }
+            }
+        }
     }
 
     private ImageData createTestImage(int width, int height, int argb) {
