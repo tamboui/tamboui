@@ -192,6 +192,28 @@ State methods:
 * `state.selectFirst()` - Jump to first item
 * `state.selectLast(totalItems)` - Jump to last item
 
+[[scroll-padding]]
+==== Scroll Padding
+
+By default the list scrolls only when the selection would leave the viewport, so the selected item ends up on the first or last visible row. `scrollPadding(n)` keeps `n` items visible above and below the selection, like vim's `scrolloff` (and ratatui's `List::scroll_padding`). At the start and end of the list the selection still reaches the edge, and a padding too large for the viewport is reduced so the selection stays visible.
+
+[source,java]
+----
+ListWidget list = ListWidget.builder()
+    .items(items)
+    .scrollPadding(3)
+    .build();
+----
+
+It applies in `ScrollMode.AUTO_SCROLL` (the default). In the toolkit, use `list(...).autoScroll().scrollPadding(3)` or the `scroll-padding` CSS property:
+
+[source,css]
+----
+ListElement {
+    scroll-padding: 3;
+}
+----
+
 [[listwidget-vs-listcontainer]]
 ==== ListWidget vs ListElement
 
@@ -295,6 +317,15 @@ This separation allows:
 |Page Up/Down |Scroll by viewport height
 |===
 
+==== Scroll Padding
+
+`scrollPadding(n)` keeps `n` nodes visible above and below the selected node while navigating, instead of scrolling only once the selection reaches the edge (see <<scroll-padding>>). It is available on `TreeElement`, on `TreeWidget.Builder`, and as the `scroll-padding` CSS property:
+
+[source,java]
+----
+tree(root).scrollPadding(3)
+----
+
 ==== Lazy Loading
 
 Load children on-demand for large trees:
@@ -338,6 +369,14 @@ CSS selectors:
 * `TreeElement-guide` - guide/branch characters
 * `TreeElement-scrollbar-thumb` - scrollbar thumb
 * `TreeElement-scrollbar-track` - scrollbar track
+
+CSS properties:
+
+* `guide-style` - `unicode`, `ascii` or `none`
+* `scrollbar-policy` - `none`, `always` or `as-needed`
+* `highlight-symbol` - symbol shown before the selected node
+* `indent-width` - cells per depth level
+* `scroll-padding` - nodes kept visible above and below the selection
 
 == Data Visualization
 

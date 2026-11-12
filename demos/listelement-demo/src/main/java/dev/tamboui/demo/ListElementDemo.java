@@ -33,6 +33,10 @@ import static dev.tamboui.toolkit.Toolkit.*;
  */
 public class ListElementDemo extends ToolkitApp {
 
+    private static final int ITEM_COUNT = 36;
+    private static final String[] LOG_LEVELS = {"INFO", "WARN", "ERROR"};
+    private static final Color[] LOG_COLORS = {Color.CYAN, Color.YELLOW, Color.RED};
+
     private final ListElement<?> listElement;
 
     private ListElementDemo() {
@@ -49,13 +53,21 @@ public class ListElementDemo extends ToolkitApp {
             .add(row(text("9. ").length(4), text("[").dim().length(1), text("ERROR").red().length(5), text("] ").dim().length(2), text("Log error")))
             .add(row(text("10. ").length(4), text("Progress: ").length(10), gauge(0.75).gaugeColor(Color.GREEN).fill(), text(" 75%").length(5)))
             .add(panel(text("11. Nested panel")).rounded().borderColor(Color.DARK_GRAY).length(3))
-            .add(text("12. Last item"))
-
             .highlightColor(Color.CYAN)
             .highlightSymbol("> ")
             .autoScroll()
+            .scrollPadding(2)
             .scrollbar()
             .scrollbarThumbColor(Color.CYAN);
+
+        // More log entries, so the list is taller than the panel and scrolls
+        for (int i = 12; i < ITEM_COUNT; i++) {
+            int level = i % LOG_LEVELS.length;
+            listElement.add(row(text(i + ". ").length(4), text("[").dim().length(1),
+                text(LOG_LEVELS[level]).fg(LOG_COLORS[level]).length(5), text("] ").dim().length(2),
+                text("Log entry " + i)));
+        }
+        listElement.add(text(ITEM_COUNT + ". Last item"));
     }
 
     /**
@@ -79,7 +91,7 @@ public class ListElementDemo extends ToolkitApp {
             row(
                 // The rich list
                 panel(listElement)
-                    .title("Rich Items (" + 12 + " items)")
+                    .title("Rich Items (" + ITEM_COUNT + " items)")
                     .rounded()
                     .borderColor(Color.WHITE)
                     .id("list-panel")
@@ -99,6 +111,9 @@ public class ListElementDemo extends ToolkitApp {
                         text(" - Rows & columns").yellow(),
                         text(" - Nested panels").magenta(),
                         text(" - Gauges & more").cyan(),
+                        text(""),
+                        text("Scroll padding keeps 2 items").dim(),
+                        text("around the selection.").dim(),
                         text(""),
                         text("No external ListState needed!").dim(),
                         text("Selection & scroll managed").dim(),
@@ -124,7 +139,7 @@ public class ListElementDemo extends ToolkitApp {
             return EventResult.HANDLED;
         }
         if (event.isDown()) {
-            listElement.selectNext(12);
+            listElement.selectNext(ITEM_COUNT);
             return EventResult.HANDLED;
         }
         return EventResult.UNHANDLED;
