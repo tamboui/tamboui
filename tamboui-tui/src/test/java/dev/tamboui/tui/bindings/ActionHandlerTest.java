@@ -320,12 +320,92 @@ class ActionHandlerTest {
         assertThat(target.received).containsExactly(key);
     }
 
+    @Test
+    void isEmptyReturnsTrueWhenNoHandlersAndFalseWhenHandlersExist() {
+        assertThat(handler.isEmpty()).isTrue();
+
+        handler.on("moveUp", e -> {});
+        assertThat(handler.isEmpty()).isFalse();
+
+        handler.off("moveUp");
+        assertThat(handler.isEmpty()).isTrue();
+    }
+
+    @Test
+    void registerAnnotatedSupportsZeroArgMethods() {
+        ZeroArgHandler target = new ZeroArgHandler();
+        handler.registerAnnotated(target);
+
+        assertThat(target.called).isFalse();
+        handler.fire("toggle");
+        assertThat(target.called).isTrue();
+    }
+
+    @Test
+    void registerAnnotatedDiscoversMethodsFromSuperclasses() {
+        ChildHandler target = new ChildHandler();
+        handler.registerAnnotated(target);
+
+        handler.fire("baseAction");
+        handler.fire("childAction");
+
+        assertThat(target.baseCalled).isTrue();
+        assertThat(target.childCalled).isTrue();
+    }
+
+    @Test
+    void registerAnnotatedDoesNotDuplicateOverriddenMethods() {
+        OverridingChildHandler target = new OverridingChildHandler();
+        handler.registerAnnotated(target);
+
+        handler.fire("baseAction");
+
+        assertThat(target.childOverrideCount).isEqualTo(1);
+    }
+
     static class KeyHandlers {
         private final List<KeyEvent> received = new ArrayList<>();
 
         @OnAction("insert")
         void insert(KeyEvent event) {
             received.add(event);
+        }
+    }
+
+    static class ZeroArgHandler {
+        private boolean called = false;
+
+        @OnAction("toggle")
+        void toggle() {
+            called = true;
+        }
+    }
+
+    static class BaseHandler {
+        boolean baseCalled = false;
+
+        @OnAction("baseAction")
+        void onBase() {
+            baseCalled = true;
+        }
+    }
+
+    static class ChildHandler extends BaseHandler {
+        boolean childCalled = false;
+
+        @OnAction("childAction")
+        void onChild() {
+            childCalled = true;
+        }
+    }
+
+    static class OverridingChildHandler extends BaseHandler {
+        int childOverrideCount = 0;
+
+        @Override
+        @OnAction("baseAction")
+        void onBase() {
+            childOverrideCount++;
         }
     }
 }
