@@ -132,6 +132,25 @@ class ConstraintCssTest extends AbstractElementTest {
             // B should be at column 10 (25% of 40)
             assertThat(buffer).hasSymbolAt(10, 0, "B");
         }
+
+        @Test
+        @DisplayName("CSS width: ratio uses that part of the available width")
+        void cssWidthRatio() {
+            styleEngine.addStylesheet(".width-third { width: 1/3; }");
+            setupBuffer(30, 1);
+
+            row(
+                text("A").addClass("width-third"),  // width: 1/3 = 10 columns
+                text("B").addClass("width-third"),  // width: 1/3 = 10 columns
+                text("C")
+            ).render(frame, new Rect(0, 0, 30, 1), context);
+
+            // A at column 0
+            assertThat(buffer).hasSymbolAt(0, 0, "A");
+            // B should be at column 10 and C at column 20 (thirds of 30)
+            assertThat(buffer).hasSymbolAt(10, 0, "B");
+            assertThat(buffer).hasSymbolAt(20, 0, "C");
+        }
     }
 
     @Nested
