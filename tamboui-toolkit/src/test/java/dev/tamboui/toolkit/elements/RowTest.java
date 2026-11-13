@@ -245,4 +245,40 @@ class RowTest extends AbstractElementTest {
         // Minimum height for a row is 1
         assertThat(row.preferredSize(-1, -1, null).heightOr(0)).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("A row with a margin in a column gets rows for its top and bottom margin")
+    void rowWithMarginInColumn() {
+        Rect area = new Rect(0, 0, 20, 4);
+        Buffer buffer = Buffer.empty(area);
+
+        column(row(text("x"), text("y")).margin(1), text("c"))
+            .render(Frame.forTesting(buffer), area, RenderContext.empty());
+
+        assertThat(buffer).hasContent(
+            "                    ",
+            " xy                 ",
+            "                    ",
+            "c                   "
+        );
+    }
+
+    @Test
+    @DisplayName("Spacing set in CSS counts in the preferred width")
+    void cssSpacingCountsInWidth() {
+        StyleEngine styleEngine = StyleEngine.create();
+        styleEngine.addStylesheet("test", ".gap { spacing: 2; }");
+        styleEngine.setActiveStylesheet("test");
+        DefaultRenderContext context = DefaultRenderContext.createEmpty();
+        context.setStyleEngine(styleEngine);
+        Rect area = new Rect(0, 0, 10, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        row(row(text("a"), text("b")).addClass("gap"), text("c"))
+            .render(Frame.forTesting(buffer), area, context);
+
+        assertThat(buffer).hasContent(
+            "a  bc     "
+        );
+    }
 }
