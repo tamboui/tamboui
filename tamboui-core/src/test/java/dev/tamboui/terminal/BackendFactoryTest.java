@@ -349,6 +349,30 @@ class BackendFactoryTest {
         assertThat(BackendFactory.resolveCandidate("  , ,  ", providers)).isEmpty();
     }
 
+    @Test
+    @DisplayName("orderedCandidates returns all providers in order for null or blank spec")
+    void orderedCandidates_nullOrBlankSpec() {
+        BackendProvider alpha = new StubBackendProvider("alpha");
+        BackendProvider beta = new StubBackendProvider("beta");
+        List<BackendProvider> providers = Arrays.asList(alpha, beta);
+
+        assertThat(BackendFactory.orderedCandidates(null, providers)).containsExactly(alpha, beta);
+        assertThat(BackendFactory.orderedCandidates("", providers)).containsExactly(alpha, beta);
+        assertThat(BackendFactory.orderedCandidates("   ", providers)).containsExactly(alpha, beta);
+    }
+
+    @Test
+    @DisplayName("orderedCandidates returns matching providers in spec order")
+    void orderedCandidates_specOrder() {
+        BackendProvider alpha = new StubBackendProvider("alpha");
+        BackendProvider beta = new StubBackendProvider("beta");
+        List<BackendProvider> providers = Arrays.asList(alpha, beta);
+
+        assertThat(BackendFactory.orderedCandidates("beta,alpha", providers)).containsExactly(beta, alpha);
+        assertThat(BackendFactory.orderedCandidates("gamma,beta", providers)).containsExactly(beta);
+        assertThat(BackendFactory.orderedCandidates("gamma,delta", providers)).isEmpty();
+    }
+
     @SuppressWarnings("unchecked")
     private static List<BackendProvider> resolveProviders(String spec, List<BackendProvider> available)
             throws Exception {
