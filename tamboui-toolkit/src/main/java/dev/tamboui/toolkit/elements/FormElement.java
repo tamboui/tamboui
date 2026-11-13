@@ -294,6 +294,7 @@ public final class FormElement extends StyledElement<FormElement> {
 
     /**
      * Sets the border color when focused for all field inputs.
+     * Setting it draws a border around each input, also while it is not focused.
      *
      * @param color the focused border color
      * @return this element for chaining
@@ -305,6 +306,7 @@ public final class FormElement extends StyledElement<FormElement> {
 
     /**
      * Sets the border color when validation fails.
+     * Setting it draws a border around each input, also while its value is valid.
      *
      * @param color the error border color
      * @return this element for chaining
@@ -513,14 +515,14 @@ public final class FormElement extends StyledElement<FormElement> {
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         int inputWidth = 20; // Reasonable default
-        int borderWidth = borderType != null ? 2 : 0;
+        int borderWidth = hasBorder() ? 2 : 0;
         int width = labelWidth + spacing + inputWidth + borderWidth;
 
         int height;
         if (fields.isEmpty()) {
             height = 1;
         } else {
-            int fieldHeight = borderType != null ? 3 : 1;
+            int fieldHeight = hasBorder() ? 3 : 1;
             int errorHeight = showInlineErrors ? 1 : 0;
             int totalHeight = 0;
 
@@ -685,6 +687,14 @@ public final class FormElement extends StyledElement<FormElement> {
         return field;
     }
 
+    /**
+     * Returns whether the field inputs have a border. Each field draws one for a border color as for
+     * a border type, so every field gets the rows of a bordered input.
+     */
+    private boolean hasBorder() {
+        return borderType != null || borderColor != null || focusedBorderColor != null || errorBorderColor != null;
+    }
+
     // ==================== Internal Classes ====================
 
     private static final class FieldConfig {
@@ -741,7 +751,7 @@ public final class FormElement extends StyledElement<FormElement> {
             if (isGroupTitle()) {
                 return 1;
             }
-            int fieldHeight = borderType != null ? 3 : 1;
+            int fieldHeight = hasBorder() ? 3 : 1;
             return showInlineErrors ? fieldHeight + 1 : fieldHeight;
         }
     }
