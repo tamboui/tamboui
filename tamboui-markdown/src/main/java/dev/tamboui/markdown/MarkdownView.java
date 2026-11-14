@@ -6,6 +6,7 @@ package dev.tamboui.markdown;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -30,6 +31,7 @@ import dev.tamboui.style.StringConverter;
 import dev.tamboui.style.Style;
 import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
+import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.syntax.RegexSyntaxHighlighter;
@@ -112,7 +114,7 @@ import dev.tamboui.widgets.syntax.SyntaxTheme;
  *   <li>Images rendered as {@code [image: alt](url)} text spans</li>
  * </ul>
  */
-public final class MarkdownView implements Widget {
+public final class MarkdownView implements Widget, StatefulWidget<MarkdownViewState> {
 
     /** CSS property for the blockquote prefix string drawn at the start of every quoted line. */
     public static final PropertyDefinition<String> BLOCKQUOTE_PREFIX =
@@ -154,6 +156,7 @@ public final class MarkdownView implements Widget {
     private final SyntaxTheme syntaxTheme;
     private final Overflow overflow;
     private final int scroll;
+    private final MarkdownViewState state;
 
     private MarkdownView(Builder builder) {
         this.source = Objects.requireNonNull(builder.source, "source");
@@ -176,6 +179,16 @@ public final class MarkdownView implements Widget {
                 .orElse(Overflow.WRAP_WORD);
         }
         this.scroll = builder.scroll;
+        this.state = builder.state;
+    }
+
+    /**
+     * Returns the markdown view state, if configured on the builder.
+     *
+     * @return optional markdown view state
+     */
+    public Optional<MarkdownViewState> state() {
+        return Optional.ofNullable(state);
     }
 
     /**
@@ -223,7 +236,16 @@ public final class MarkdownView implements Widget {
 
     @Override
     public void render(Rect area, Buffer buffer) {
+        render(area, buffer, this.state);
+    }
+
+    @Override
+    public void render(Rect area, Buffer buffer, MarkdownViewState state) {
+        MarkdownViewState effectiveState = state != null ? state : this.state;
         if (area.isEmpty()) {
+            if (effectiveState != null) {
+                effectiveState.update(0, 0);
+            }
             return;
         }
         buffer.setStyle(area, style);
@@ -233,6 +255,9 @@ public final class MarkdownView implements Widget {
             contentArea = block.inner(area);
         }
         if (contentArea.isEmpty()) {
+            if (effectiveState != null) {
+                effectiveState.update(0, 0);
+            }
             return;
         }
         buffer.setStyle(contentArea, style);
@@ -247,11 +272,18 @@ public final class MarkdownView implements Widget {
         for (RenderedChunk chunk : chunks) {
             totalRows += chunk.height(contentArea.width());
         }
+
+        if (effectiveState != null) {
+            effectiveState.update(totalRows, contentArea.height());
+        }
+
         if (totalRows == 0) {
             return;
         }
 
-        int skip = Math.max(0, Math.min(scroll, Math.max(0, totalRows - contentArea.height())));
+        int skip = effectiveState != null
+            ? effectiveState.offset()
+            : Math.max(0, Math.min(scroll, Math.max(0, totalRows - contentArea.height())));
         int y = contentArea.top();
         int rowsRemaining = contentArea.height();
         int rowsSkipped = 0;
@@ -418,6 +450,7 @@ public final class MarkdownView implements Widget {
         private SyntaxTheme syntaxTheme = SyntaxTheme.DEFAULTS;
         private Overflow overflow;
         private int scroll;
+        private MarkdownViewState state;
 
         private Builder() {
         }
@@ -535,6 +568,17 @@ public final class MarkdownView implements Widget {
          */
         public Builder syntaxTheme(SyntaxTheme theme) {
             this.syntaxTheme = Objects.requireNonNull(theme, "theme");
+            return this;
+        }
+
+        /**
+         * Sets the state used to track and control the scroll offset and content dimensions.
+         *
+         * @param state the markdown view state
+         * @return this builder
+         */
+        public Builder state(MarkdownViewState state) {
+            this.state = state;
             return this;
         }
 
