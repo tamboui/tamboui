@@ -1,0 +1,8 @@
+# TamboUI Logo Material
+newmtl TamboUIColor
+Ka 0.8 0.2 0.8  # Ambient - magenta
+Kd 0.6 0.1 0.6  # Diffuse - magenta
+Ks 1.0 0.5 1.0  # Specular - bright magenta
+Ns 50.0          # Shininess
+d 1.0            # Dissolve (opacity)
+illum 2          # Illumination model
