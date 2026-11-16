@@ -180,8 +180,11 @@ public final class CascadeResolver {
      * Looks up a property definition by name. The standard properties are checked
      * as well, because they are only added to the registry once
      * {@link StandardProperties} has been used, which can be after the first cascade.
+     *
+     * @param prop the property name
+     * @return the property definition, or empty if not registered
      */
-    private static Optional<PropertyDefinition<?>> findProperty(String prop) {
+    public static Optional<PropertyDefinition<?>> findProperty(String prop) {
         Optional<PropertyDefinition<?>> registered = PropertyRegistry.byName(prop);
         return registered.isPresent() ? registered : StandardProperties.byName(prop);
     }
@@ -198,9 +201,18 @@ public final class CascadeResolver {
      */
     static <T> Optional<T> convert(PropertyDefinition<T> property, String value) {
         try {
-            return property.convert(value);
+            Optional<T> result = property.convert(value);
+            if (!result.isPresent() && dev.tamboui.css.jfr.InvalidValueEvent.enabled()) {
+                String reason = dev.tamboui.css.parser.CssParser.isOutOfRange(value) ? "out-of-range" : "unconvertible";
+                dev.tamboui.css.jfr.InvalidValueEvent.commit(property.name(), value, reason);
+            }
+            return result;
         } catch (RuntimeException e) {
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             LOGGER.log(Level.FINE, e, () -> "Ignoring invalid value of CSS property " + property.name() + ": " + value);
+            if (dev.tamboui.css.jfr.InvalidValueEvent.enabled()) {
+                dev.tamboui.css.jfr.InvalidValueEvent.commit(property.name(), value, msg);
+            }
             return Optional.empty();
         }
     }
