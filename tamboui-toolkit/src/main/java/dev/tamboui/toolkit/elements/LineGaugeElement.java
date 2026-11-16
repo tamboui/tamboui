@@ -10,6 +10,7 @@ import java.util.Map;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.element.RenderContext;
@@ -54,6 +55,7 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
     private Style filledStyle;
     private Style unfilledStyle;
     private LineGauge.LineSet lineSet = LineGauge.NORMAL;
+    private ColorGradient gradient;
 
     /** Creates a line gauge with zero progress. */
     public LineGaugeElement() {
@@ -182,6 +184,28 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
         return this;
     }
 
+    /**
+     * Sets a color gradient for the filled portion of the gauge.
+     *
+     * @param stops gradient color stops
+     * @return this element
+     */
+    public LineGaugeElement gradient(Color... stops) {
+        this.gradient = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the filled portion of the gauge.
+     *
+     * @param gradient the color gradient
+     * @return this element
+     */
+    public LineGaugeElement gradient(ColorGradient gradient) {
+        this.gradient = gradient;
+        return this;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Label width + a reasonable gauge width
@@ -215,7 +239,12 @@ public final class LineGaugeElement extends StyledElement<LineGaugeElement> {
             .style(context.currentStyle())
             .filledStyle(effectiveFilledStyle)
             .unfilledStyle(effectiveUnfilledStyle)
-            .lineSet(lineSet);
+            .lineSet(lineSet)
+            .styleResolver(styleResolver(context));
+
+        if (gradient != null) {
+            builder.gradient(gradient);
+        }
 
         if (label != null) {
             builder.label(label);

@@ -14,6 +14,7 @@ import dev.tamboui.buffer.Buffer;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Style;
+import dev.tamboui.style.TestStylePropertyResolver;
 import dev.tamboui.widgets.block.Block;
 
 import static org.assertj.core.api.Assertions.*;
@@ -437,5 +438,77 @@ class SparklineTest {
         // 50/100 = 0.5, 100/100 = 1.0
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("▄");
         assertThat(buffer.get(1, 0).symbol()).isEqualTo("█");
+    }
+
+    @Test
+    @DisplayName("Sparkline renders with color mapper")
+    void rendersWithColorMapper() {
+        Sparkline sparkline = Sparkline.builder()
+            .data(10, 80)
+            .max(100)
+            .colorMapper(val -> val > 50 ? Color.RED : Color.GREEN)
+            .build();
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        sparkline.render(area, buffer);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(1, 0).style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("Sparkline renders with programmatic gradient")
+    void rendersWithGradient() {
+        Sparkline sparkline = Sparkline.builder()
+            .data(0, 100)
+            .max(100)
+            .gradient(Color.GREEN, Color.RED)
+            .build();
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        sparkline.render(area, buffer);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(1, 0).style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("Sparkline renders with CSS gradient properties")
+    void rendersWithCssGradient() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.builder()
+            .set("gradient-low", Color.GREEN)
+            .set("gradient-high", Color.RED)
+            .build();
+        Sparkline sparkline = Sparkline.builder()
+            .data(0, 100)
+            .max(100)
+            .styleResolver(resolver)
+            .build();
+        Rect area = new Rect(0, 0, 2, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        sparkline.render(area, buffer);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.GREEN);
+        assertThat(buffer.get(1, 0).style().fg()).contains(Color.RED);
+    }
+
+    @Test
+    @DisplayName("colorMapper takes precedence over gradient")
+    void colorMapperTakesPrecedenceOverGradient() {
+        Sparkline sparkline = Sparkline.builder()
+            .data(100)
+            .max(100)
+            .gradient(Color.GREEN, Color.RED)
+            .colorMapper(val -> Color.BLUE)
+            .build();
+        Rect area = new Rect(0, 0, 1, 1);
+        Buffer buffer = Buffer.empty(area);
+
+        sparkline.render(area, buffer);
+
+        assertThat(buffer.get(0, 0).style().fg()).contains(Color.BLUE);
     }
 }

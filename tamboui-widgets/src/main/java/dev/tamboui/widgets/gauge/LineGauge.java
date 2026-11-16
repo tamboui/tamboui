@@ -4,11 +4,16 @@
  */
 package dev.tamboui.widgets.gauge;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.StandardProperties;
@@ -17,6 +22,7 @@ import dev.tamboui.style.StylePropertyResolver;
 import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
+import dev.tamboui.widgets.sparkline.Sparkline;
 
 /**
  * A progress indicator that renders as a horizontal line.
@@ -34,6 +40,21 @@ import dev.tamboui.widget.Widget;
  * }</pre>
  */
 public final class LineGauge implements Widget {
+
+    /**
+     * CSS property for the gradient low stop color ({@code gradient-low}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_LOW = Sparkline.GRADIENT_LOW;
+
+    /**
+     * CSS property for the gradient mid stop color ({@code gradient-mid}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_MID = Sparkline.GRADIENT_MID;
+
+    /**
+     * CSS property for the gradient high stop color ({@code gradient-high}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_HIGH = Sparkline.GRADIENT_HIGH;
 
     /**
      * Line character set using thin lines.
@@ -67,7 +88,7 @@ public final class LineGauge implements Widget {
             PropertyDefinition.of("unfilled-color", ColorConverter.INSTANCE);
 
     static {
-        PropertyRegistry.registerAll(FILLED_COLOR, UNFILLED_COLOR);
+        PropertyRegistry.registerAll(FILLED_COLOR, UNFILLED_COLOR, GRADIENT_LOW, GRADIENT_MID, GRADIENT_HIGH);
     }
 
     private final double ratio;
@@ -76,11 +97,18 @@ public final class LineGauge implements Widget {
     private final Style filledStyle;
     private final Style unfilledStyle;
     private final LineSet lineSet;
+    private final ColorGradient gradient;
 
     private LineGauge(Builder builder) {
         this.ratio = builder.ratio;
         this.label = builder.label;
         this.lineSet = builder.lineSet;
+
+        ColorGradient resolvedGradient = builder.gradient;
+        if (resolvedGradient == null) {
+            resolvedGradient = builder.resolveGradient();
+        }
+        this.gradient = resolvedGradient;
 
         // Resolve style-aware properties
         Color resolvedBg = builder.resolveBackground();
@@ -104,6 +132,15 @@ public final class LineGauge implements Widget {
             baseUnfilledStyle = baseUnfilledStyle.fg(resolvedUnfilledColor);
         }
         this.unfilledStyle = baseUnfilledStyle;
+    }
+
+    /**
+     * Returns the color gradient, if configured.
+     *
+     * @return the color gradient, or empty
+     */
+    public Optional<ColorGradient> gradient() {
+        return Optional.ofNullable(gradient);
     }
 
     /**
@@ -164,7 +201,12 @@ public final class LineGauge implements Widget {
 
         // Render filled portion
         for (int x = startX; x < startX + filledWidth; x++) {
-            buffer.set(x, y, new Cell(lineSet.filled(), filledStyle));
+            Style cellStyle = filledStyle;
+            if (gradient != null) {
+                double frac = gaugeWidth > 1 ? (double) (x - startX) / (gaugeWidth - 1) : 0.0;
+                cellStyle = cellStyle.fg(gradient.at(frac));
+            }
+            buffer.set(x, y, new Cell(lineSet.filled(), cellStyle));
         }
 
         // Render unfilled portion
@@ -256,6 +298,10 @@ public final class LineGauge implements Widget {
         private Color background;
         private Color filledColor;
         private Color unfilledColor;
+        private ColorGradient gradient;
+        private Color gradientLow;
+        private Color gradientMid;
+        private Color gradientHigh;
 
         private Builder() {}
 
@@ -420,6 +466,61 @@ public final class LineGauge implements Widget {
         }
 
         /**
+         * Sets the color gradient for the filled portion of the gauge.
+         *
+         * @param stops gradient color stops
+         * @return this builder
+         */
+        public Builder gradient(Color... stops) {
+            this.gradient = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+            return this;
+        }
+
+        /**
+         * Sets the color gradient for the filled portion of the gauge.
+         *
+         * @param gradient the color gradient
+         * @return this builder
+         */
+        public Builder gradient(ColorGradient gradient) {
+            this.gradient = gradient;
+            return this;
+        }
+
+        /**
+         * Sets the gradient low stop color programmatically.
+         *
+         * @param color the low stop color
+         * @return this builder
+         */
+        public Builder gradientLow(Color color) {
+            this.gradientLow = color;
+            return this;
+        }
+
+        /**
+         * Sets the gradient mid stop color programmatically.
+         *
+         * @param color the mid stop color
+         * @return this builder
+         */
+        public Builder gradientMid(Color color) {
+            this.gradientMid = color;
+            return this;
+        }
+
+        /**
+         * Sets the gradient high stop color programmatically.
+         *
+         * @param color the high stop color
+         * @return this builder
+         */
+        public Builder gradientHigh(Color color) {
+            this.gradientHigh = color;
+            return this;
+        }
+
+        /**
          * Builds the line gauge.
          *
          * @return the new line gauge
@@ -439,6 +540,25 @@ public final class LineGauge implements Widget {
 
         private Color resolveUnfilledColor() {
             return styleResolver.resolve(UNFILLED_COLOR, unfilledColor);
+        }
+
+        private ColorGradient resolveGradient() {
+            Color low = styleResolver.resolve(GRADIENT_LOW, gradientLow);
+            Color mid = styleResolver.resolve(GRADIENT_MID, gradientMid);
+            Color high = styleResolver.resolve(GRADIENT_HIGH, gradientHigh);
+
+            List<Color> stops = new ArrayList<>();
+            if (low != null) {
+                stops.add(low);
+            }
+            if (mid != null) {
+                stops.add(mid);
+            }
+            if (high != null) {
+                stops.add(high);
+            }
+
+            return stops.isEmpty() ? null : ColorGradient.of(stops);
         }
     }
 }

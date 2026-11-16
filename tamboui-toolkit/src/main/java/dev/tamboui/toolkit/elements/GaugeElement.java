@@ -10,6 +10,7 @@ import java.util.Map;
 
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.text.CharWidth;
@@ -59,6 +60,7 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
     private String title;
     private BorderType borderType;
     private Color borderColor;
+    private ColorGradient gradient;
 
     /**
      * Creates a new gauge element with zero progress.
@@ -179,6 +181,28 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
         return this;
     }
 
+    /**
+     * Sets a color gradient for the filled portion of the gauge.
+     *
+     * @param stops gradient color stops
+     * @return this element
+     */
+    public GaugeElement gradient(Color... stops) {
+        this.gradient = stops != null && stops.length > 0 ? ColorGradient.of(stops) : null;
+        return this;
+    }
+
+    /**
+     * Sets a color gradient for the filled portion of the gauge.
+     *
+     * @param gradient the color gradient
+     * @return this element
+     */
+    public GaugeElement gradient(ColorGradient gradient) {
+        this.gradient = gradient;
+        return this;
+    }
+
     @Override
     public Size preferredSize(int availableWidth, int availableHeight, RenderContext context) {
         // Label width + some space for the gauge bar
@@ -216,7 +240,12 @@ public final class GaugeElement extends StyledElement<GaugeElement> {
             .ratio(ratio)
             .gaugeStyle(effectiveGaugeStyle)
             .style(effectiveStyle)
-            .useUnicode(useUnicode);
+            .useUnicode(useUnicode)
+            .styleResolver(styleResolver(context));
+
+        if (gradient != null) {
+            builder.gradient(gradient);
+        }
 
         if (label != null) {
             builder.label(label);

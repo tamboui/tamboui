@@ -4,11 +4,16 @@
  */
 package dev.tamboui.widgets.gauge;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import dev.tamboui.buffer.Buffer;
 import dev.tamboui.buffer.Cell;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.ColorConverter;
+import dev.tamboui.style.ColorGradient;
 import dev.tamboui.style.PropertyDefinition;
 import dev.tamboui.style.PropertyRegistry;
 import dev.tamboui.style.StandardProperties;
@@ -20,6 +25,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.text.Span;
 import dev.tamboui.widget.Widget;
 import dev.tamboui.widgets.block.Block;
+import dev.tamboui.widgets.sparkline.Sparkline;
 
 /**
  * A progress bar widget that renders a bar filled according to the progress value.
@@ -39,6 +45,21 @@ import dev.tamboui.widgets.block.Block;
  * }</pre>
  */
 public final class Gauge implements Widget {
+
+    /**
+     * CSS property for the gradient low stop color ({@code gradient-low}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_LOW = Sparkline.GRADIENT_LOW;
+
+    /**
+     * CSS property for the gradient mid stop color ({@code gradient-mid}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_MID = Sparkline.GRADIENT_MID;
+
+    /**
+     * CSS property for the gradient high stop color ({@code gradient-high}).
+     */
+    public static final PropertyDefinition<Color> GRADIENT_HIGH = Sparkline.GRADIENT_HIGH;
 
     // Unicode block characters for sub-cell precision (1/8 increments)
     private static final String[] UNICODE_BLOCKS = {
@@ -62,7 +83,7 @@ public final class Gauge implements Widget {
             PropertyDefinition.of("gauge-color", ColorConverter.INSTANCE);
 
     static {
-        PropertyRegistry.register(GAUGE_COLOR);
+        PropertyRegistry.registerAll(GAUGE_COLOR, GRADIENT_LOW, GRADIENT_MID, GRADIENT_HIGH);
     }
 
     private final double ratio;
@@ -71,12 +92,19 @@ public final class Gauge implements Widget {
     private final Style style;
     private final Style gaugeStyle;
     private final boolean useUnicode;
+    private final ColorGradient gradient;
 
     private Gauge(Builder builder) {
         this.ratio = builder.ratio;
         this.label = builder.label;
         this.block = builder.block;
         this.useUnicode = builder.useUnicode;
+
+        ColorGradient resolvedGradient = builder.gradient;
+        if (resolvedGradient == null) {
+            resolvedGradient = builder.resolveGradient();
+        }
+        this.gradient = resolvedGradient;
 
         // Resolve style-aware properties
         Color resolvedBg = builder.resolveBackground();
@@ -93,6 +121,15 @@ public final class Gauge implements Widget {
             baseGaugeStyle = baseGaugeStyle.fg(resolvedGaugeColor);
         }
         this.gaugeStyle = baseGaugeStyle;
+    }
+
+    /**
+     * Returns the color gradient, if configured.
+     *
+     * @return the color gradient, or empty
+     */
+    public Optional<ColorGradient> gradient() {
+        return Optional.ofNullable(gradient);
     }
 
     /**
@@ -151,8 +188,13 @@ public final class Gauge implements Widget {
 
         // Render filled portion
         for (int x = gaugeArea.left(); x < gaugeArea.left() + fullCells && x < gaugeArea.right(); x++) {
+            Style cellStyle = gaugeStyle;
+            if (gradient != null) {
+                double frac = totalWidth > 1 ? (double) (x - gaugeArea.left()) / (totalWidth - 1) : 0.0;
+                cellStyle = cellStyle.fg(gradient.at(frac));
+            }
             for (int y = gaugeArea.top(); y < gaugeArea.bottom(); y++) {
-                buffer.set(x, y, new Cell(UNICODE_BLOCKS[8], gaugeStyle)); // Full block
+                buffer.set(x, y, new Cell(UNICODE_BLOCKS[8], cellStyle)); // Full block
             }
         }
 
@@ -162,8 +204,13 @@ public final class Gauge implements Widget {
             int blockIndex = (int) (fractional * 8);
             if (blockIndex > 0) {
                 int x = gaugeArea.left() + fullCells;
+                Style cellStyle = gaugeStyle;
+                if (gradient != null) {
+                    double frac = totalWidth > 1 ? (double) (x - gaugeArea.left()) / (totalWidth - 1) : 0.0;
+                    cellStyle = cellStyle.fg(gradient.at(frac));
+                }
                 for (int y = gaugeArea.top(); y < gaugeArea.bottom(); y++) {
-                    buffer.set(x, y, new Cell(UNICODE_BLOCKS[blockIndex], gaugeStyle));
+                    buffer.set(x, y, new Cell(UNICODE_BLOCKS[blockIndex], cellStyle));
                 }
             }
         }
@@ -225,6 +272,10 @@ public final class Gauge implements Widget {
         // Style-aware properties (resolved via styleResolver in build())
         private Color background;
         private Color gaugeColor;
+        private ColorGradient gradient;
+        private Color gradientLow;
+        private Color gradientMid;
+        private Color gradientHigh;
 
         private Builder() {}
 
@@ -378,6 +429,61 @@ public final class Gauge implements Widget {
         }
 
         /**
+         * Sets color gradient stops to map the filled bar across its width.
+         *
+         * @param stops the color gradient stops
+         * @return this builder
+         */
+        public Builder gradient(Color... stops) {
+            this.gradient = (stops != null && stops.length > 0) ? ColorGradient.of(stops) : null;
+            return this;
+        }
+
+        /**
+         * Sets a color gradient to map the filled bar across its width.
+         *
+         * @param gradient the color gradient
+         * @return this builder
+         */
+        public Builder gradient(ColorGradient gradient) {
+            this.gradient = gradient;
+            return this;
+        }
+
+        /**
+         * Sets the gradient low stop color programmatically.
+         *
+         * @param color the low stop color
+         * @return this builder
+         */
+        public Builder gradientLow(Color color) {
+            this.gradientLow = color;
+            return this;
+        }
+
+        /**
+         * Sets the gradient mid stop color programmatically.
+         *
+         * @param color the mid stop color
+         * @return this builder
+         */
+        public Builder gradientMid(Color color) {
+            this.gradientMid = color;
+            return this;
+        }
+
+        /**
+         * Sets the gradient high stop color programmatically.
+         *
+         * @param color the high stop color
+         * @return this builder
+         */
+        public Builder gradientHigh(Color color) {
+            this.gradientHigh = color;
+            return this;
+        }
+
+        /**
          * Builds the gauge.
          *
          * @return the new gauge
@@ -393,6 +499,25 @@ public final class Gauge implements Widget {
 
         private Color resolveGaugeColor() {
             return styleResolver.resolve(GAUGE_COLOR, gaugeColor);
+        }
+
+        private ColorGradient resolveGradient() {
+            Color low = styleResolver.resolve(GRADIENT_LOW, gradientLow);
+            Color mid = styleResolver.resolve(GRADIENT_MID, gradientMid);
+            Color high = styleResolver.resolve(GRADIENT_HIGH, gradientHigh);
+
+            List<Color> stops = new ArrayList<>();
+            if (low != null) {
+                stops.add(low);
+            }
+            if (mid != null) {
+                stops.add(mid);
+            }
+            if (high != null) {
+                stops.add(high);
+            }
+
+            return stops.isEmpty() ? null : ColorGradient.of(stops);
         }
     }
 }

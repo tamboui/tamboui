@@ -719,4 +719,115 @@ class DualSparklineTest {
         // Row 3: spare (empty)
         assertThat(buffer).hasSymbolAt(0, 3, " ");
     }
+
+    @Test
+    @DisplayName("Renders with top and bottom color mappers")
+    void rendersWithTopAndBottomColorMappers() {
+        DualSparkline chart = DualSparkline.builder()
+            .topData(10)
+            .bottomData(20)
+            .max(100)
+            .topColorMapper(val -> Color.GREEN)
+            .bottomColorMapper(val -> Color.BLUE)
+            .showYAxis(false)
+            .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 0, Color.GREEN);
+        assertThat(buffer).hasForegroundAt(0, 2, Color.BLUE);
+    }
+
+    @Test
+    @DisplayName("Renders with top and bottom programmatic gradients")
+    void rendersWithTopAndBottomGradients() {
+        DualSparkline chart = DualSparkline.builder()
+            .topData(0, 100)
+            .bottomData(0, 100)
+            .max(100)
+            .topGradient(Color.GREEN, Color.RED)
+            .bottomGradient(Color.CYAN, Color.MAGENTA)
+            .showYAxis(false)
+            .build();
+        Rect area = new Rect(0, 0, 2, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // Column 0 has 0 value (GREEN for top, CYAN for bottom)
+        // Column 1 has 100 value (RED for top, MAGENTA for bottom)
+        assertThat(buffer).hasForegroundAt(1, 0, Color.RED);
+        assertThat(buffer).hasForegroundAt(1, 2, Color.MAGENTA);
+    }
+
+    @Test
+    @DisplayName("Renders with CSS top and bottom gradients")
+    void rendersWithCssTopAndBottomGradients() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.builder()
+            .set("top-gradient-low", Color.GREEN)
+            .set("top-gradient-high", Color.RED)
+            .set("bottom-gradient-low", Color.CYAN)
+            .set("bottom-gradient-high", Color.MAGENTA)
+            .build();
+        DualSparkline chart = DualSparkline.builder()
+            .topData(100)
+            .bottomData(100)
+            .max(100)
+            .styleResolver(resolver)
+            .showYAxis(false)
+            .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 0, Color.RED);
+        assertThat(buffer).hasForegroundAt(0, 2, Color.MAGENTA);
+    }
+
+    @Test
+    @DisplayName("CSS top and bottom gradients fall back to shared gradient")
+    void cssGradientsFallBackToSharedGradient() {
+        TestStylePropertyResolver resolver = TestStylePropertyResolver.builder()
+            .set("gradient-low", Color.GREEN)
+            .set("gradient-high", Color.RED)
+            .build();
+        DualSparkline chart = DualSparkline.builder()
+            .topData(100)
+            .bottomData(100)
+            .max(100)
+            .styleResolver(resolver)
+            .showYAxis(false)
+            .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        assertThat(buffer).hasForegroundAt(0, 0, Color.RED);
+        assertThat(buffer).hasForegroundAt(0, 2, Color.RED);
+    }
+
+    @Test
+    @DisplayName("Bottom inverse-video partial bar retains gradient color")
+    void bottomInverseVideoRetainsGradientColor() {
+        DualSparkline chart = DualSparkline.builder()
+            .topData(0)
+            .bottomData(4) // half cell -> partial block rendered reversed
+            .max(8)
+            .bottomGradient(Color.GREEN, Color.RED)
+            .showYAxis(false)
+            .build();
+        Rect area = new Rect(0, 0, 1, 3);
+        Buffer buffer = Buffer.empty(area);
+
+        chart.render(area, buffer);
+
+        // 4/8 = 0.5 ratio
+        Style bottomCellStyle = buffer.get(0, 2).style();
+        org.assertj.core.api.Assertions.assertThat(bottomCellStyle.addModifiers()).contains(dev.tamboui.style.Modifier.REVERSED);
+        assertThat(buffer).hasForegroundAt(0, 2, dev.tamboui.style.ColorGradient.of(Color.GREEN, Color.RED).at(0.5));
+    }
 }
