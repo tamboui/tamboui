@@ -305,6 +305,17 @@ public class CoreConceptsSnippets {
         // end::span-basics[]
     }
 
+    void ansiText(String commandOutput) {
+        // tag::ansi-text[]
+        // A log line as written for a terminal: a dim time, a green level and a bold name
+        String log = "\u001b[2m12:00:01\u001b[0m \u001b[32mINFO\u001b[0m Started \u001b[1mshop\u001b[0m";
+        Line line = Line.fromAnsi(log);
+
+        // The output of a command, one line per line feed
+        Paragraph output = Paragraph.from(Text.fromAnsi(commandOutput));
+        // end::ansi-text[]
+    }
+
     // tag::widget-interface[]
     public interface WidgetInterface {
         void render(Rect area, Buffer buffer);
