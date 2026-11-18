@@ -15,6 +15,7 @@ import dev.tamboui.text.Line;
 import dev.tamboui.widget.StatefulWidget;
 import dev.tamboui.widgets.block.Block;
 import dev.tamboui.widgets.common.ScrollBarPolicy;
+import dev.tamboui.widgets.common.ScrollPadding;
 import dev.tamboui.widgets.common.SizedWidget;
 import dev.tamboui.widgets.scrollbar.Scrollbar;
 import dev.tamboui.widgets.scrollbar.ScrollbarOrientation;
@@ -56,6 +57,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
     private final Style scrollbarThumbStyle;
     private final Style scrollbarTrackStyle;
     private final BiFunction<Integer, Integer, Style> itemStyleResolver;
+    private final int scrollPadding;
 
     private ListWidget(Builder builder) {
         this.items = listCopyOf(builder.items);
@@ -68,6 +70,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         this.scrollbarThumbStyle = builder.scrollbarThumbStyle;
         this.scrollbarTrackStyle = builder.scrollbarTrackStyle;
         this.itemStyleResolver = builder.itemStyleResolver;
+        this.scrollPadding = builder.scrollPadding;
     }
 
     /**
@@ -146,7 +149,10 @@ public final class ListWidget implements StatefulWidget<ListState> {
                 state.applyScrollToEnd(totalHeight, visibleHeight);
                 break;
             case AUTO_SCROLL:
-                state.scrollToSelected(visibleHeight, itemHeights);
+                if (state.selected() != null) {
+                    state.setOffset(ScrollPadding.computeOffset(
+                            state.offset(), itemHeights, state.selected(), scrollPadding, visibleHeight));
+                }
                 break;
             default:
                 break;
@@ -252,6 +258,7 @@ public final class ListWidget implements StatefulWidget<ListState> {
         private Style scrollbarThumbStyle;
         private Style scrollbarTrackStyle;
         private BiFunction<Integer, Integer, Style> itemStyleResolver;
+        private int scrollPadding;
 
         private Builder() {
         }
@@ -369,6 +376,22 @@ public final class ListWidget implements StatefulWidget<ListState> {
          */
         public Builder scrollMode(ScrollMode mode) {
             this.scrollMode = mode != null ? mode : ScrollMode.NONE;
+            return this;
+        }
+
+        /**
+         * Sets the number of items to keep visible above and below the selected
+         * item when scrolling, like vim's {@code scrolloff}.
+         * <p>
+         * Only applies in {@link ScrollMode#AUTO_SCROLL}. Defaults to 0, which
+         * scrolls only when the selection would leave the viewport.
+         *
+         * @param padding the number of items, negative values are treated as 0
+         * @return this builder
+         * @see ScrollPadding
+         */
+        public Builder scrollPadding(int padding) {
+            this.scrollPadding = Math.max(0, padding);
             return this;
         }
 

@@ -2,7 +2,7 @@ Source shared_.tape
 
 # Setup
 Hide
-Type jbang rich-list-demo
+Type jbang listelement-demo
 Enter
 Sleep 2
 Show
@@ -10,34 +10,7 @@ Show
 # Recording
 Sleep 1s
 Screenshot screenshots/listelement-demo.svg
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
-Sleep 500ms
-Down
+Down@300ms 30
 Sleep 1s
-Up
-Sleep 500ms
-Up
-Sleep 500ms
-Up
-Sleep 500ms
-Up
+Up@300ms 6
 Sleep 1s
-

@@ -7,9 +7,11 @@ package dev.tamboui.toolkit.elements;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import dev.tamboui.buffer.Buffer;
+import dev.tamboui.css.engine.StyleEngine;
 import dev.tamboui.layout.Rect;
 import dev.tamboui.style.Color;
 import dev.tamboui.style.Modifier;
@@ -17,6 +19,7 @@ import dev.tamboui.style.Style;
 import dev.tamboui.terminal.Frame;
 import dev.tamboui.toolkit.AbstractElementTest;
 import dev.tamboui.toolkit.Toolkit;
+import dev.tamboui.toolkit.element.DefaultRenderContext;
 import dev.tamboui.toolkit.element.RenderContext;
 import dev.tamboui.widgets.tree.GuideStyle;
 import dev.tamboui.widgets.tree.TreeNode;
@@ -820,5 +823,78 @@ class TreeElementTest extends AbstractElementTest {
         assertThat(entries.get(1).node().label()).isEqualTo("Child");
         assertThat(entries.get(1).depth()).isEqualTo(1);
         assertThat(entries.get(1).parent()).isSameAs(root);
+    }
+
+    @Nested
+    @DisplayName("Scroll padding")
+    class ScrollPaddingTests {
+
+        private final Rect area = new Rect(0, 0, 6, 5);
+
+        private TreeElement<Void> treeWithItem2Selected() {
+            TreeNode<Void> root = TreeNode.<Void>of("Root").expanded();
+            for (int i = 0; i < 10; i++) {
+                root.add(TreeNode.<Void>of("Item " + i).leaf());
+            }
+            TreeElement<Void> element = tree(root).guideStyle(GuideStyle.NONE).highlightSymbol("");
+            element.selected(3);
+            return element;
+        }
+
+        private Buffer render(TreeElement<Void> element, RenderContext context) {
+            Buffer buffer = Buffer.empty(area);
+            element.render(Frame.forTesting(buffer), area, context);
+            return buffer;
+        }
+
+        private DefaultRenderContext cssContext(String css) {
+            StyleEngine styleEngine = StyleEngine.create();
+            styleEngine.addStylesheet("test", css);
+            styleEngine.setActiveStylesheet("test");
+            DefaultRenderContext context = DefaultRenderContext.createEmpty();
+            context.setStyleEngine(styleEngine);
+            return context;
+        }
+
+        @Test
+        @DisplayName("Without scroll padding, the tree does not scroll while the selection is visible")
+        void noPaddingByDefault() {
+            Buffer buffer = render(treeWithItem2Selected(), RenderContext.empty());
+
+            assertThat(buffer).hasContent("▼ Root", "Item 0", "Item 1", "Item 2", "Item 3");
+        }
+
+        @Test
+        @DisplayName("scrollPadding scrolls before the selection reaches the last row")
+        void scrollPaddingScrollsEarly() {
+            Buffer buffer = render(treeWithItem2Selected().scrollPadding(2), RenderContext.empty());
+
+            assertThat(buffer).hasContent("Item 0", "Item 1", "Item 2", "Item 3", "Item 4");
+        }
+
+        @Test
+        @DisplayName("scroll-padding CSS property sets the scroll padding")
+        void scrollPaddingFromCss() {
+            Buffer buffer = render(treeWithItem2Selected(), cssContext("TreeElement { scroll-padding: 2; }"));
+
+            assertThat(buffer).hasContent("Item 0", "Item 1", "Item 2", "Item 3", "Item 4");
+        }
+
+        @Test
+        @DisplayName("Explicit scrollPadding overrides the CSS property")
+        void explicitScrollPaddingOverridesCss() {
+            Buffer buffer = render(treeWithItem2Selected().scrollPadding(0),
+                    cssContext("TreeElement { scroll-padding: 2; }"));
+
+            assertThat(buffer).hasContent("▼ Root", "Item 0", "Item 1", "Item 2", "Item 3");
+        }
+
+        @Test
+        @DisplayName("Negative scrollPadding is treated as 0")
+        void negativeScrollPaddingIsZero() {
+            Buffer buffer = render(treeWithItem2Selected().scrollPadding(-3), RenderContext.empty());
+
+            assertThat(buffer).hasContent("▼ Root", "Item 0", "Item 1", "Item 2", "Item 3");
+        }
     }
 }

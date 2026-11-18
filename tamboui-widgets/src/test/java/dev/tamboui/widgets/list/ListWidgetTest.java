@@ -359,4 +359,45 @@ class ListWidgetTest {
 
         assertThat(buffer).isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("ListWidget scrollPadding keeps items visible below the selection")
+    void scrollPaddingKeepsItemsBelowSelection() {
+        ListWidget list = ListWidget.builder()
+            .items("Item 0", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6")
+            .highlightSymbol("")
+            .scrollPadding(1)
+            .build();
+        Rect area = new Rect(0, 0, 10, 5);
+        Buffer buffer = Buffer.empty(area);
+        ListState state = new ListState();
+        state.select(4);
+
+        list.render(area, buffer, state);
+
+        Buffer expected = Buffer.empty(area);
+        for (int row = 0; row < 5; row++) {
+            expected.setString(0, row, "Item " + (row + 1), Style.EMPTY);
+        }
+        expected.setStyle(new Rect(0, 3, 10, 1), Style.EMPTY.reversed());
+        assertThat(buffer).isEqualTo(expected);
+        assertThat(state.offset()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("ListWidget scrollPadding is ignored outside AUTO_SCROLL")
+    void scrollPaddingIgnoredWithoutAutoScroll() {
+        ListWidget list = ListWidget.builder()
+            .items("Item 0", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6")
+            .scrollMode(ScrollMode.NONE)
+            .scrollPadding(1)
+            .build();
+        Rect area = new Rect(0, 0, 10, 5);
+        ListState state = new ListState();
+        state.select(4);
+
+        list.render(area, Buffer.empty(area), state);
+
+        assertThat(state.offset()).isEqualTo(0);
+    }
 }

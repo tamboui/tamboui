@@ -78,6 +78,7 @@ import dev.tamboui.widgets.tree.TreeWidget;
  *   <li>{@code scrollbar-policy} - when to show scrollbar: "none", "always", "as-needed"</li>
  *   <li>{@code highlight-symbol} - symbol shown before selected item (default: "&gt; ")</li>
  *   <li>{@code indent-width} - space per depth level in cells</li>
+ *   <li>{@code scroll-padding} - nodes kept visible above and below the selection when scrolling (default: 0)</li>
  * </ul>
  *
  * <h2>Keyboard Navigation</h2>
@@ -145,12 +146,22 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
     public static final PropertyDefinition<Integer> INDENT_WIDTH =
             PropertyDefinition.of("indent-width", IntegerConverter.INSTANCE);
 
+    /**
+     * CSS property for the number of nodes kept visible above and below the
+     * selected node when scrolling.
+     */
+    public static final PropertyDefinition<Integer> SCROLL_PADDING =
+            PropertyDefinition.builder("scroll-padding", IntegerConverter.INSTANCE)
+                    .defaultValue(0)
+                    .build();
+
     static {
         PropertyRegistry.registerAll(
                 GUIDE_STYLE,
                 SCROLLBAR_POLICY,
                 HIGHLIGHT_SYMBOL,
-                INDENT_WIDTH
+                INDENT_WIDTH,
+                SCROLL_PADDING
         );
     }
 
@@ -166,6 +177,7 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
     private Color scrollbarThumbColor;
     private Color scrollbarTrackColor;
     private int indentWidth = -1; // -1 means use guide style width
+    private Integer scrollPadding;
 
     // TreeState for widget delegation
     private final TreeState treeState = new TreeState();
@@ -371,6 +383,21 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
      */
     public TreeElement<T> indentWidth(int width) {
         this.indentWidth = Math.max(0, width);
+        return this;
+    }
+
+    /**
+     * Sets the number of nodes to keep visible above and below the selected
+     * node when scrolling, like vim's {@code scrolloff}.
+     * <p>
+     * By default the tree scrolls only when the selection would leave the
+     * viewport. Can also be set with the {@code scroll-padding} CSS property.
+     *
+     * @param padding the number of nodes, negative values are treated as 0
+     * @return this element for chaining
+     */
+    public TreeElement<T> scrollPadding(int padding) {
+        this.scrollPadding = Math.max(0, padding);
         return this;
     }
 
@@ -615,6 +642,7 @@ public final class TreeElement<T> extends StyledElement<TreeElement<T>> {
         configureGuideStyle(builder, cssResolver);
         configureHighlight(builder, context, cssResolver);
         configureIndentWidth(builder, cssResolver);
+        builder.scrollPadding(cssResolver.resolve(SCROLL_PADDING, scrollPadding));
         configureScrollbar(builder, context, cssResolver);
         configureNodeRenderer(builder, frame, treeArea, context);
 

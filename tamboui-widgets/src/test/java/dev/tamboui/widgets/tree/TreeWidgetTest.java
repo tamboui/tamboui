@@ -535,4 +535,38 @@ class TreeWidgetTest {
         // Default height is 1, content starts at position 0
         assertThat(buffer.get(0, 0).symbol()).isEqualTo("R");
     }
+
+    @Test
+    @DisplayName("TreeWidget scrollPadding keeps nodes visible around the selection")
+    void scrollPaddingKeepsNodesAroundSelection() {
+        TreeNode<Void> root = TreeNode.<Void>of("Root").expanded();
+        for (int i = 0; i < 10; i++) {
+            root.add(TreeNode.<Void>of("Item " + i).leaf());
+        }
+        TreeWidget<TreeNode<Void>> widget = TreeWidget.<TreeNode<Void>>builder()
+                .model(root)
+                .simpleNodeRenderer(node -> Paragraph.from(node.label()))
+                .guideStyle(GuideStyle.NONE)
+                .highlightSymbol("")
+                .scrollPadding(1)
+                .build();
+        Rect area = new Rect(0, 0, 20, 5);
+        TreeState state = new TreeState();
+
+        state.select(4);
+        widget.render(area, Buffer.empty(area), state);
+        assertThat(state.offset()).isEqualTo(1);
+
+        state.select(2);
+        widget.render(area, Buffer.empty(area), state);
+        assertThat(state.offset()).isEqualTo(1);
+
+        state.select(1);
+        widget.render(area, Buffer.empty(area), state);
+        assertThat(state.offset()).isEqualTo(0);
+
+        state.select(10);
+        widget.render(area, Buffer.empty(area), state);
+        assertThat(state.offset()).isEqualTo(6);
+    }
 }

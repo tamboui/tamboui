@@ -6,6 +6,8 @@ package dev.tamboui.widgets.list;
 
 import java.util.List;
 
+import dev.tamboui.widgets.common.ScrollPadding;
+
 /**
  * State for a List widget, tracking selection and scroll offset.
  */
@@ -181,21 +183,7 @@ public final class ListState {
             return;
         }
 
-        int sel = Math.min(selected, itemHeights.length - 1);
-
-        int selectedTop = 0;
-        for (int i = 0; i < sel; i++) {
-            selectedTop += itemHeights[i];
-        }
-        int selectedBottom = selectedTop + itemHeights[sel];
-
-        if (selectedTop < offset) {
-            offset = selectedTop;
-        } else if (selectedBottom > offset + visibleHeight) {
-            offset = selectedBottom - visibleHeight;
-        }
-
-        offset = Math.max(0, offset);
+        offset = ScrollPadding.computeOffset(offset, itemHeights, selected, 0, visibleHeight);
     }
 
     /**
