@@ -783,8 +783,8 @@ Combine it with the layout system:</p>
             return true;
         }
         if (event instanceof KeyEvent key) {
-            if (key.isChar('+')) { counter++; return true; }
-            if (key.isChar('-')) { counter--; return true; }
+            if (key.isCharPressed('+')) { counter++; return true; }
+            if (key.isCharPressed('-')) { counter--; return true; }
         }
         return false;
     }
@@ -1033,7 +1033,7 @@ myList.selected(0);            // Set selection to specific index</code></pre>
     .id("main")
     .focusable()
     .onKeyEvent(event -&gt; {
-        if (event.isChar('a')) {
+        if (event.isCharPressed('a')) {
             addItem();
             return EventResult.HANDLED;
         }
@@ -1226,11 +1226,11 @@ The rest of the UI continues to render normally.</p>
     }
 
     private EventResult handleKey(KeyEvent event) {
-        if (event.isChar('a')) {
+        if (event.isCharPressed('a')) {
             items.add("New item");
             return EventResult.HANDLED;
         }
-        if (event.isChar('d') &amp;&amp; !items.isEmpty()) {
+        if (event.isCharPressed('d') &amp;&amp; !items.isEmpty()) {
             items.remove(todoList.selected());
             return EventResult.HANDLED;
         }
@@ -1422,7 +1422,7 @@ It handles keyboard and mouse events, tick-based animations, and thread-safe upd
     runner.run(
         // Event handler
         (event, r) -&gt; {
-            if (event instanceof KeyEvent key &amp;&amp; key.isChar('q')) {
+            if (event instanceof KeyEvent key &amp;&amp; key.isCharPressed('q')) {
                 r.quit();
                 return true;
             }
@@ -1601,10 +1601,10 @@ println("Step completed");</code></pre>
         )
         .focusable()
         .onKeyEvent(event -&gt; {
-            if (event.isCharIgnoreCase('y')) {
+            if (event.isCharIgnoreCasePressed('y')) {
                 startNextPhase();
                 return EventResult.HANDLED;
-            } else if (event.isChar('n')) {
+            } else if (event.isCharPressed('n')) {
                 quit();
                 return EventResult.HANDLED;
             }

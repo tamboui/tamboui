@@ -1513,7 +1513,7 @@ Checkbox checkboxCustom = Checkbox.builder()
 checkbox.render(area, buffer, state);
 
 // Handle input
-if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
+if (event.code() == KeyCode.ENTER || (event.isCharPressed(' '))) {
     state.toggle();
 }</code></pre>
 </div>
@@ -1586,7 +1586,7 @@ Toggle toggleInline = Toggle.builder()
 toggle.render(area, buffer, state);
 
 // Handle input
-if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
+if (event.code() == KeyCode.ENTER || (event.isCharPressed(' '))) {
     state.toggle();
 }</code></pre>
 </div>

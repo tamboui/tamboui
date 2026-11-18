@@ -88,7 +88,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#isChar(int)" tabindex="0">isChar(int)</a></li>
 <li><a href="#isCharIgnoreCase(char)" tabindex="0">isCharIgnoreCase(char)</a></li>
 <li><a href="#isCharIgnoreCase(int)" tabindex="0">isCharIgnoreCase(int)</a></li>
+<li><a href="#isCharPressed(int)" tabindex="0">isCharPressed(int)</a></li>
+<li><a href="#isCharReleased(int)" tabindex="0">isCharReleased(int)</a></li>
+<li><a href="#isCharIgnoreCasePressed(int)" tabindex="0">isCharIgnoreCasePressed(int)</a></li>
+<li><a href="#isCharIgnoreCaseReleased(int)" tabindex="0">isCharIgnoreCaseReleased(int)</a></li>
 <li><a href="#isKey(dev.tamboui.tui.event.KeyCode)" tabindex="0">isKey(KeyCode)</a></li>
+<li><a href="#isKeyPressed(dev.tamboui.tui.event.KeyCode)" tabindex="0">isKeyPressed(KeyCode)</a></li>
+<li><a href="#isKeyReleased(dev.tamboui.tui.event.KeyCode)" tabindex="0">isKeyReleased(KeyCode)</a></li>
 <li><a href="#isPress()" tabindex="0">isPress()</a></li>
 <li><a href="#isRepeat()" tabindex="0">isRepeat()</a></li>
 <li><a href="#isRelease()" tabindex="0">isRelease()</a></li>
@@ -361,6 +367,27 @@ a typed character.</div>
 <div class="block">Returns true if this is a character event matching the given code point (case-insensitive).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCharIgnoreCasePressed(int)" class="member-name-link">isCharIgnoreCasePressed</a><wbr>(int&nbsp;codePoint)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this is a press or repeat event matching the given code point
+(case-insensitive).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCharIgnoreCaseReleased(int)" class="member-name-link">isCharIgnoreCaseReleased</a><wbr>(int&nbsp;codePoint)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this is a release event matching the given code point (case-insensitive).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCharPressed(int)" class="member-name-link">isCharPressed</a><wbr>(int&nbsp;codePoint)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this is a press or repeat event matching the given code point.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCharReleased(int)" class="member-name-link">isCharReleased</a><wbr>(int&nbsp;codePoint)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this is a release event matching the given code point.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isConfirm()" class="member-name-link">isConfirm</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if this is a "confirm" event (Enter) according to the bindings.</div>
@@ -425,6 +452,16 @@ the bindings.</div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isKeypad()" class="member-name-link">isKeypad</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if the key was on the numeric keypad.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isKeyPressed(dev.tamboui.tui.event.KeyCode)" class="member-name-link">isKeyPressed</a><wbr>(<a href="KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;keyCode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this is a press or repeat event matching the given key code.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isKeyReleased(dev.tamboui.tui.event.KeyCode)" class="member-name-link">isKeyReleased</a><wbr>(<a href="KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;keyCode)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this is a release event matching the given key code.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isLeft()" class="member-name-link">isLeft</a>()</code></div>
@@ -1005,7 +1042,9 @@ not represent a typed character.</div>
 <h3>isChar</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isChar</span><wbr><span class="parameters">(char&nbsp;c)</span></div>
-<div class="block">Returns true if this is a character event matching the given character (case-sensitive).</div>
+<div class="block">Returns true if this is a character event matching the given character (case-sensitive).
+<p>
+Matches any event kind, release included. See <a href="#isChar(int)"><code>isChar(int)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>c</code> - character to compare</dd>
@@ -1022,9 +1061,10 @@ not represent a typed character.</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isChar</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
 <div class="block">Returns true if this is a character event matching the given code point.
 <p>
-Release events never match. This is consistent with <a href="#isUp()"><code>isUp()</code></a>, <a href="#isConfirm()"><code>isConfirm()</code></a>
-and the other binding-backed predicates. To detect release of a specific character, use
-<code>event.isRelease() &amp;&amp; event.codePoint() == codePoint</code>.</div>
+This tells which character the event is about and matches any event kind, release
+included. To act on a key, use <a href="#isCharPressed(int)"><code>isCharPressed(int)</code></a>: with
+<a href="../../terminal/KeyboardProtocol.html#FULL"><code>KeyboardProtocol.FULL</code></a> every key also arrives as a release
+event, and acting on both runs the action twice.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>codePoint</code> - code point to compare</dd>
@@ -1039,7 +1079,9 @@ and the other binding-backed predicates. To detect release of a specific charact
 <h3>isCharIgnoreCase</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCharIgnoreCase</span><wbr><span class="parameters">(char&nbsp;c)</span></div>
-<div class="block">Returns true if this is a character event matching the given character (case-insensitive).</div>
+<div class="block">Returns true if this is a character event matching the given character (case-insensitive).
+<p>
+Matches any event kind, release included. See <a href="#isCharIgnoreCase(int)"><code>isCharIgnoreCase(int)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>c</code> - character to compare (case-insensitive)</dd>
@@ -1056,12 +1098,105 @@ and the other binding-backed predicates. To detect release of a specific charact
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCharIgnoreCase</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
 <div class="block">Returns true if this is a character event matching the given code point (case-insensitive).
 <p>
-Release events never match. See <a href="#isChar(int)"><code>isChar(int)</code></a> for details.</div>
+Matches any event kind, release included. To act on a key, use
+<a href="#isCharIgnoreCasePressed(int)"><code>isCharIgnoreCasePressed(int)</code></a>. See <a href="#isChar(int)"><code>isChar(int)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>codePoint</code> - code point to compare (case-insensitive)</dd>
 <dt>Returns:</dt>
 <dd>true if matches ignoring case</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCharPressed(int)">
+<h3>isCharPressed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCharPressed</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
+<div class="block">Returns true if this is a press or repeat event matching the given code point.
+<p>
+Use this to act on a character key: like <a href="#isUp()"><code>isUp()</code></a> and the other binding-backed
+predicates it ignores release events, so one key stroke acts once. A held key acts on
+every repeat.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>codePoint</code> - code point to compare</dd>
+<dt>Returns:</dt>
+<dd>true if the character was pressed or repeated</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#isChar(int)"><code>isChar(int)</code></a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCharReleased(int)">
+<h3>isCharReleased</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCharReleased</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
+<div class="block">Returns true if this is a release event matching the given code point.
+<p>
+Terminals report release events only when asked to, as with
+<a href="../../terminal/KeyboardProtocol.html#FULL"><code>KeyboardProtocol.FULL</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>codePoint</code> - code point to compare</dd>
+<dt>Returns:</dt>
+<dd>true if the character was released</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#isChar(int)"><code>isChar(int)</code></a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCharIgnoreCasePressed(int)">
+<h3>isCharIgnoreCasePressed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCharIgnoreCasePressed</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
+<div class="block">Returns true if this is a press or repeat event matching the given code point
+(case-insensitive).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>codePoint</code> - code point to compare (case-insensitive)</dd>
+<dt>Returns:</dt>
+<dd>true if the character was pressed or repeated, ignoring case</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#isCharPressed(int)"><code>isCharPressed(int)</code></a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCharIgnoreCaseReleased(int)">
+<h3>isCharIgnoreCaseReleased</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCharIgnoreCaseReleased</span><wbr><span class="parameters">(int&nbsp;codePoint)</span></div>
+<div class="block">Returns true if this is a release event matching the given code point (case-insensitive).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>codePoint</code> - code point to compare (case-insensitive)</dd>
+<dt>Returns:</dt>
+<dd>true if the character was released, ignoring case</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#isCharReleased(int)"><code>isCharReleased(int)</code></a></li>
+</ul>
+</dd>
 </dl>
 </div>
 </section>
@@ -1073,13 +1208,60 @@ Release events never match. See <a href="#isChar(int)"><code>isChar(int)</code><
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isKey</span><wbr><span class="parameters">(<a href="KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;keyCode)</span></div>
 <div class="block">Returns true if this is a key event matching the given key code.
 <p>
-Release events never match. See <a href="#isChar(int)"><code>isChar(int)</code></a> for details. To detect release of a
-specific key, use <code>event.isRelease() &amp;&amp; event.code() == keyCode</code>.</div>
+This tells which key the event is about and matches any event kind, release included. To
+act on a key, use <a href="#isKeyPressed(dev.tamboui.tui.event.KeyCode)"><code>isKeyPressed(KeyCode)</code></a>. See <a href="#isChar(int)"><code>isChar(int)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>keyCode</code> - key code to compare</dd>
 <dt>Returns:</dt>
 <dd>true if matches</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isKeyPressed(dev.tamboui.tui.event.KeyCode)">
+<h3>isKeyPressed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isKeyPressed</span><wbr><span class="parameters">(<a href="KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;keyCode)</span></div>
+<div class="block">Returns true if this is a press or repeat event matching the given key code.
+<p>
+Use this to act on a key. See <a href="#isCharPressed(int)"><code>isCharPressed(int)</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>keyCode</code> - key code to compare</dd>
+<dt>Returns:</dt>
+<dd>true if the key was pressed or repeated</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#isKey(dev.tamboui.tui.event.KeyCode)"><code>isKey(KeyCode)</code></a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isKeyReleased(dev.tamboui.tui.event.KeyCode)">
+<h3>isKeyReleased</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isKeyReleased</span><wbr><span class="parameters">(<a href="KeyCode.html" title="enum class in dev.tamboui.tui.event">KeyCode</a>&nbsp;keyCode)</span></div>
+<div class="block">Returns true if this is a release event matching the given key code.
+<p>
+Terminals report release events only when asked to, as with
+<a href="../../terminal/KeyboardProtocol.html#FULL"><code>KeyboardProtocol.FULL</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>keyCode</code> - key code to compare</dd>
+<dt>Returns:</dt>
+<dd>true if the key was released</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="#isKey(dev.tamboui.tui.event.KeyCode)"><code>isKey(KeyCode)</code></a></li>
+</ul>
+</dd>
 </dl>
 </div>
 </section>
@@ -1787,7 +1969,7 @@ Use this instead of switching on <a href="#code()"><code>code()</code></a> <code
 terminal-supplied text are handled uniformly. Pair it with the semantic predicates
 (<a href="#isLeft()"><code>isLeft()</code></a>, <a href="#isDeleteBackward()"><code>isDeleteBackward()</code></a>, ...) to drive a text input or text area.
 <p>
-Release events never count as typing. See <a href="#isChar(int)"><code>isChar(int)</code></a> for details.</div>
+Release events never count as typing, so a key stroke inserts its text once.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>true if this event should be inserted as text</dd>

@@ -37,6 +37,7 @@
 <li><a href="#matching-actions-in-events">Matching Actions in Events</a>
 <ul class="sectlevel2">
 <li><a href="#prefer-semantic-predicates">Prefer Semantic Predicates</a></li>
+<li><a href="#matching-specific-keys-and-characters">Matching Specific Keys and Characters</a></li>
 </ul>
 </li>
 <li><a href="#key-triggers">Key Triggers</a>
@@ -116,8 +117,8 @@ if (event.isSelect()) { }
 if (event.matches("delete")) { }
 
 // Low-level - when you need specific keys
-if (event.isChar('x')) { }
-if (event.isKey(KeyCode.F1)) { }</code></pre>
+if (event.isCharPressed('x')) { }
+if (event.isKeyPressed(KeyCode.F1)) { }</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -180,14 +181,58 @@ shortcuts and control keys, so you never insert the letter of a <code>Ctrl</code
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Comparing <code>event.code()</code> directly - or the equivalent <code>event.isKey(KeyCode.UP)</code> - is only right when
+<p>Comparing <code>event.code()</code> directly - or <code>event.isKeyPressed(KeyCode.UP)</code> - is only right when
 you specifically want the <strong>physical</strong> key regardless of the bindings, which is rare. An example is
 moving a floating panel with the arrow keys (spatial movement, where Shift+Arrow is meaningful and
-<code>hjkl</code> should not apply); there, <code>event.isKey(KeyCode.UP)</code> is the honest choice.</p>
+<code>hjkl</code> should not apply); there, <code>event.isKeyPressed(KeyCode.UP)</code> is the honest choice.</p>
 </div>
 </td>
 </tr>
 </table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="matching-specific-keys-and-characters"><a class="anchor" href="#matching-specific-keys-and-characters"></a><a class="link" href="#matching-specific-keys-and-characters">Matching Specific Keys and Characters</a></h3>
+<div class="paragraph">
+<p>When you do need a specific key or character, pick the predicate by what you want to know:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Act on a key stroke</th>
+<th class="tableblock halign-left valign-top">Key released</th>
+<th class="tableblock halign-left valign-top">Which key the event is about (any kind)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isKeyPressed(KeyCode)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isKeyReleased(KeyCode)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isKey(KeyCode)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isCharPressed(int)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isCharReleased(int)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isChar(int)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isCharIgnoreCasePressed(int)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isCharIgnoreCaseReleased(int)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>isCharIgnoreCase(int)</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The <code>*Pressed</code> methods match a press or a repeat, so a held key keeps acting, and never a release.
+Use them to drive actions: with <code>KeyboardProtocol.FULL</code> every key stroke also arrives as a release
+event, and acting on <code>isKey</code> or <code>isChar</code> would run the action twice. Release events only arrive
+when the terminal is asked for them, so under the default <code>AUTO</code> protocol the two forms behave the
+same.</p>
 </div>
 <div class="paragraph">
 <p>For applications calling <code>EventParser.readEvent(&#8230;&#8203;)</code> directly, a read timeout returns <code>null</code>, while terminal EOF throws the JDK&#8217;s <code>EOFException</code> (a subclass of <code>IOException</code>). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. <code>TuiRunner</code> and <code>InlineTuiRunner</code> stop their input reader on EOF.</p>
@@ -343,7 +388,7 @@ For the widest reach, prefer <code>Alt+key</code> bindings for custom actions an
 <ul>
 <li>
 <p><strong>Event Kinds</strong>: <code>KeyEventKind.PRESS</code>, <code>KeyEventKind.REPEAT</code>, and <code>KeyEventKind.RELEASE</code>.
-Existing widgets and <code>KeyTrigger</code> bindings ignore <code>RELEASE</code> events by default to maintain full backward compatibility. You can match release events explicitly using <code>KeyTrigger.withKind(KeyEventKind.RELEASE)</code>.</p>
+Existing widgets and <code>KeyTrigger</code> bindings ignore <code>RELEASE</code> events by default to maintain full backward compatibility. You can match release events explicitly using <code>KeyTrigger.withKind(KeyEventKind.RELEASE)</code>, <code>event.isKeyReleased(KeyCode)</code> or <code>event.isCharReleased(int)</code>.</p>
 </li>
 <li>
 <p><strong>Extended Modifiers</strong>: In addition to Shift, Ctrl, and Alt, <code>KeyModifiers</code> supports <code>superKey</code> (Command / Windows key), <code>hyper</code>, and <code>meta</code>.
