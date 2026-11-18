@@ -255,6 +255,9 @@ public final class RFlexDemo {
         }
 
         KeyEvent k = (KeyEvent) event;
+        if (k.isRelease()) {
+            return false;
+        }
         if (k.isQuit() || k.code() == KeyCode.ESCAPE) {
             runner.quit();
             return false;

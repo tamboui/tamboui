@@ -474,6 +474,9 @@ final class SystemMonitor implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (event.isCharIgnoreCase('s')) {
             sortMode.updateAndGet(mode -> switch (mode) {
                 case CPU -> SystemMetrics.SortMode.MEMORY;

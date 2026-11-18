@@ -100,6 +100,9 @@ final class FloatingPanelsArea implements Element {
     }
 
     private EventResult handlePanelKey(FloatingPanel fp, KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         var result = fp.content.handleKey(event);
         if (result.isHandled()) {
             return result;
@@ -147,6 +150,9 @@ final class FloatingPanelsArea implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (event.hasAlt()) {
             if (event.isChar('1')) { createPanel(new ClockPanel()); return EventResult.HANDLED; }
             if (event.isChar('2')) { createPanel(new CounterPanel()); return EventResult.HANDLED; }

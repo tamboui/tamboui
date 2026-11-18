@@ -90,6 +90,9 @@ public class FlexDemo {
                 .length(4)
                 .focusable()
                 .onKeyEvent(event -> {
+                    if (event.isRelease()) {
+                        return EventResult.UNHANDLED;
+                    }
                     if (event.isLeft()) {
                         modeIndex.updateAndGet(i ->
                                 (i - 1 + FLEX_MODES.length) % FLEX_MODES.length);

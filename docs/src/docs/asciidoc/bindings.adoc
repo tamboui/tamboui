@@ -70,11 +70,54 @@ shortcuts and control keys, so you never insert the letter of a `Ctrl` chord. Th
 
 [NOTE]
 ====
-Comparing `event.code()` directly - or the equivalent `event.isKey(KeyCode.UP)` - is only right when
+Comparing `event.code()` directly - or `event.isKeyPressed(KeyCode.UP)` - is only right when
 you specifically want the *physical* key regardless of the bindings, which is rare. An example is
 moving a floating panel with the arrow keys (spatial movement, where Shift+Arrow is meaningful and
-`hjkl` should not apply); there, `event.isKey(KeyCode.UP)` is the honest choice.
+`hjkl` should not apply); there, `event.isKeyPressed(KeyCode.UP)` is the honest choice.
 ====
+
+=== Matching Specific Keys and Characters
+
+When you do need a specific key or character, pick the predicate by what you want to know:
+
+[cols="1,1,2",options="header"]
+|===
+|Act on a key stroke |Key released |Which key the event is about (any kind)
+
+|`isKeyPressed(KeyCode)`
+|`isKeyReleased(KeyCode)`
+|`isKey(KeyCode)`
+
+|`isCharPressed(int)`
+|`isCharReleased(int)`
+|`isChar(int)`
+
+|`isCharIgnoreCasePressed(int)`
+|`isCharIgnoreCaseReleased(int)`
+|`isCharIgnoreCase(int)`
+|===
+
+The `*Pressed` methods match a press or a repeat, so a held key keeps acting, and never a release.
+Use them to drive actions: with `KeyboardProtocol.FULL` every key stroke also arrives as a release
+event, and acting on `isKey` or `isChar` would run the action twice. Release events only arrive
+when the terminal is asked for them, so under the default `AUTO` protocol the two forms behave the
+same.
+
+==== Ignoring Releases in a Whole Handler
+
+A handler that checks many keys can instead return early on a release, then use the plain checks.
+This also covers direct comparisons such as `event.code() == KeyCode.ESCAPE`, which no predicate
+filters:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=release-guard]
+----
+
+In a `TuiRunner` event handler, return `false` (nothing to redraw) instead of
+`EventResult.UNHANDLED`. Put the guard after the `instanceof KeyEvent` check so mouse and tick
+events still get through. Prefer the `*Pressed` methods for a single check or code meant to be
+copied elsewhere: the guard only protects the lines below it.
 
 For applications calling `EventParser.readEvent(...)` directly, a read timeout returns `null`, while terminal EOF throws the JDK's `EOFException` (a subclass of `IOException`). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. `TuiRunner` and `InlineTuiRunner` stop their input reader on EOF.
 
@@ -155,7 +198,7 @@ For the widest reach, prefer `Alt+key` bindings for custom actions and reserve b
 With Kitty protocol support enabled, key events provide rich metadata:
 
 * **Event Kinds**: `KeyEventKind.PRESS`, `KeyEventKind.REPEAT`, and `KeyEventKind.RELEASE`.
-  Existing widgets and `KeyTrigger` bindings ignore `RELEASE` events by default to maintain full backward compatibility. You can match release events explicitly using `KeyTrigger.withKind(KeyEventKind.RELEASE)`.
+  Existing widgets and `KeyTrigger` bindings ignore `RELEASE` events by default to maintain full backward compatibility. You can match release events explicitly using `KeyTrigger.withKind(KeyEventKind.RELEASE)`, `event.isKeyReleased(KeyCode)` or `event.isCharReleased(int)`.
 * **Extended Modifiers**: In addition to Shift, Ctrl, and Alt, `KeyModifiers` supports `superKey` (Command / Windows key), `hyper`, and `meta`.
   Helpers such as `event.hasSuper()`, `KeyTrigger.superKey('k')`, and `KeyTrigger.withSuper()` are provided.
 * **Special, Keypad, and Media Keys**: First-class support for `F13`–`F35`, numeric keypad keys (`KP_0`–`KP_9`, `KP_ENTER`, `KP_ADD`, etc. with `event.isKeypad()`), lock keys (`CAPS_LOCK`, `NUM_LOCK`, `SCROLL_LOCK`), and media keys.

@@ -136,6 +136,9 @@ public class PicoCLIDemo extends TuiCommand {
     }
 
     private boolean handleKey(KeyEvent k) {
+        if (k.isRelease()) {
+            return false;
+        }
         if (k.isUp()) {
             listState.selectPrevious();
             return true;

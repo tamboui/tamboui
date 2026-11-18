@@ -381,19 +381,19 @@ public final class TuiRunner implements AutoCloseable {
 
             // Quit the error screen on the quit/cancel keys, or always on 'q' as its footer says
             // (the named sets no longer bind 'q' to quit, but the error screen still offers it).
-            if (keyEvent.isQuit() || keyEvent.isCancel() || keyEvent.isCharIgnoreCase('q')) {
+            if (keyEvent.isQuit() || keyEvent.isCancel() || keyEvent.isCharIgnoreCasePressed('q')) {
                 quit();
                 return;
             }
 
             // Scroll handling. Keep explicit 'k'/'j' alongside isUp()/isDown() because the
             // default BindingSets do not include vim keys.
-            if (keyEvent.isUp() || keyEvent.isChar('k')) {
+            if (keyEvent.isUp() || keyEvent.isCharPressed('k')) {
                 if (errorScroll > 0) {
                     errorScroll--;
                     renderErrorDisplay();
                 }
-            } else if (keyEvent.isDown() || keyEvent.isChar('j')) {
+            } else if (keyEvent.isDown() || keyEvent.isCharPressed('j')) {
                 errorScroll++;
                 renderErrorDisplay();
             } else if (keyEvent.isPageUp()) {

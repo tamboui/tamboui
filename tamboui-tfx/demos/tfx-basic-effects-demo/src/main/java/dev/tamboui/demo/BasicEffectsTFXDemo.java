@@ -118,6 +118,9 @@ public class BasicEffectsTFXDemo {
                     if (event instanceof KeyEvent) {
 
                         KeyEvent keyEvent = (KeyEvent) event;
+                        if (keyEvent.isRelease()) {
+                            return false;
+                        }
                         
                         if (keyEvent.isQuit()) {
                             runner.quit();

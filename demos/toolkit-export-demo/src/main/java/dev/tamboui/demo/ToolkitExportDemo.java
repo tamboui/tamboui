@@ -139,6 +139,9 @@ public final class ToolkitExportDemo {
             row(sidebarPanel, contentPanel),
             footerPanel
         ).focusable().onKeyEvent(event -> {
+            if (event.isRelease()) {
+                return EventResult.UNHANDLED;
+            }
             if (event.isQuit() || event.isChar('q') || event.isChar('Q')) {
                 runner.quit();
                 return EventResult.HANDLED;

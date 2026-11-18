@@ -426,8 +426,8 @@ public class ApiLevelsSnippets {
                 return true;
             }
             if (event instanceof KeyEvent key) {
-                if (key.isChar('+')) { counter++; return true; }
-                if (key.isChar('-')) { counter--; return true; }
+                if (key.isCharPressed('+')) { counter++; return true; }
+                if (key.isCharPressed('-')) { counter--; return true; }
             }
             return false;
         }
@@ -615,7 +615,7 @@ public class ApiLevelsSnippets {
             .id("main")
             .focusable()
             .onKeyEvent(event -> {
-                if (event.isChar('a')) {
+                if (event.isCharPressed('a')) {
                     addItem();
                     return EventResult.HANDLED;
                 }
@@ -716,11 +716,11 @@ public class ApiLevelsSnippets {
         }
 
         private EventResult handleKey(KeyEvent event) {
-            if (event.isChar('a')) {
+            if (event.isCharPressed('a')) {
                 items.add("New item");
                 return EventResult.HANDLED;
             }
-            if (event.isChar('d') && !items.isEmpty()) {
+            if (event.isCharPressed('d') && !items.isEmpty()) {
                 items.remove(todoList.selected());
                 return EventResult.HANDLED;
             }
@@ -813,7 +813,7 @@ public class ApiLevelsSnippets {
             runner.run(
                 // Event handler
                 (event, r) -> {
-                    if (event instanceof KeyEvent key && key.isChar('q')) {
+                    if (event instanceof KeyEvent key && key.isCharPressed('q')) {
                         r.quit();
                         return true;
                     }
@@ -964,10 +964,10 @@ public class ApiLevelsSnippets {
             )
             .focusable()
             .onKeyEvent(event -> {
-                if (event.isCharIgnoreCase('y')) {
+                if (event.isCharIgnoreCasePressed('y')) {
                     startNextPhase();
                     return EventResult.HANDLED;
-                } else if (event.isChar('n')) {
+                } else if (event.isCharPressed('n')) {
                     quit();
                     return EventResult.HANDLED;
                 }

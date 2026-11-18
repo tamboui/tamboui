@@ -163,6 +163,9 @@ public final class NewYearDemo extends ToolkitApp {
             .focusedBorderColor(Color.CYAN)
             .bottomTitle(bottomHelp)
             .onKeyEvent(e -> {
+                if (e == null || e.isRelease()) {
+                    return EventResult.UNHANDLED;
+                }
                 if (e != null) {
                     if (e.isChar(' ')) {
                         // Launch a single firework on space press

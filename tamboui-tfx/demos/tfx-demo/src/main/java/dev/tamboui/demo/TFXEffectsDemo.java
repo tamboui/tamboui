@@ -106,6 +106,9 @@ public class TFXEffectsDemo {
                     
                     if (event instanceof KeyEvent) {
                         KeyEvent keyEvent = (KeyEvent) event;
+                        if (keyEvent.isRelease()) {
+                            return false;
+                        }
 
                         if (keyEvent.isQuit() || keyEvent.isCancel()) {
                             runner.quit();

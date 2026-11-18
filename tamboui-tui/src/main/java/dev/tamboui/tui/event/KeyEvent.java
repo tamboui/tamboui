@@ -341,6 +341,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a character event matching the given character (case-sensitive).
+     * <p>
+     * Matches any event kind, release included. See {@link #isChar(int)}.
      *
      * @param c character to compare
      * @return true if matches
@@ -352,17 +354,16 @@ public final class KeyEvent implements Event {
     /**
      * Returns true if this is a character event matching the given code point.
      * <p>
-     * Release events never match. This is consistent with {@link #isUp()}, {@link #isConfirm()}
-     * and the other binding-backed predicates. To detect release of a specific character, use
-     * {@code event.isRelease() && event.codePoint() == codePoint}.
+     * This tells which character the event is about and matches any event kind, release
+     * included. To act on a key, use {@link #isCharPressed(int)}, or return early from the
+     * handler when {@link #isRelease()} is true: with
+     * {@link dev.tamboui.terminal.KeyboardProtocol#FULL} every key also arrives as a release
+     * event, and acting on both runs the action twice.
      *
      * @param codePoint code point to compare
      * @return true if matches
      */
     public boolean isChar(int codePoint) {
-        if (isRelease()) {
-            return false;
-        }
         if (code == KeyCode.CHAR && (character == codePoint || keyCodePoint == codePoint)) {
             if (Character.isLowerCase(codePoint) && hasShift() && !text.isEmpty() && Character.isUpperCase(text.codePointAt(0))) {
                 return false;
@@ -382,6 +383,8 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a character event matching the given character (case-insensitive).
+     * <p>
+     * Matches any event kind, release included. See {@link #isCharIgnoreCase(int)}.
      *
      * @param c character to compare (case-insensitive)
      * @return true if matches ignoring case
@@ -393,15 +396,13 @@ public final class KeyEvent implements Event {
     /**
      * Returns true if this is a character event matching the given code point (case-insensitive).
      * <p>
-     * Release events never match. See {@link #isChar(int)} for details.
+     * Matches any event kind, release included. To act on a key, use
+     * {@link #isCharIgnoreCasePressed(int)}. See {@link #isChar(int)}.
      *
      * @param codePoint code point to compare (case-insensitive)
      * @return true if matches ignoring case
      */
     public boolean isCharIgnoreCase(int codePoint) {
-        if (isRelease()) {
-            return false;
-        }
         int target = Character.toLowerCase(codePoint);
         if (code == KeyCode.CHAR && (Character.toLowerCase(character) == target || Character.toLowerCase(keyCodePoint) == target)) {
             return true;
@@ -421,13 +422,96 @@ public final class KeyEvent implements Event {
     }
 
     /**
+     * Returns true if this is a press or repeat event matching the given code point.
+     * <p>
+     * Use this to act on a character key: like {@link #isUp()} and the other binding-backed
+     * predicates it ignores release events, so one key stroke acts once. A held key acts on
+     * every repeat.
+     *
+     * @param codePoint code point to compare
+     * @return true if the character was pressed or repeated
+     * @see #isChar(int)
+     */
+    public boolean isCharPressed(int codePoint) {
+        return isPressOrRepeat() && isChar(codePoint);
+    }
+
+    /**
+     * Returns true if this is a release event matching the given code point.
+     * <p>
+     * Terminals report release events only when asked to, as with
+     * {@link dev.tamboui.terminal.KeyboardProtocol#FULL}.
+     *
+     * @param codePoint code point to compare
+     * @return true if the character was released
+     * @see #isChar(int)
+     */
+    public boolean isCharReleased(int codePoint) {
+        return isRelease() && isChar(codePoint);
+    }
+
+    /**
+     * Returns true if this is a press or repeat event matching the given code point
+     * (case-insensitive).
+     *
+     * @param codePoint code point to compare (case-insensitive)
+     * @return true if the character was pressed or repeated, ignoring case
+     * @see #isCharPressed(int)
+     */
+    public boolean isCharIgnoreCasePressed(int codePoint) {
+        return isPressOrRepeat() && isCharIgnoreCase(codePoint);
+    }
+
+    /**
+     * Returns true if this is a release event matching the given code point (case-insensitive).
+     *
+     * @param codePoint code point to compare (case-insensitive)
+     * @return true if the character was released, ignoring case
+     * @see #isCharReleased(int)
+     */
+    public boolean isCharIgnoreCaseReleased(int codePoint) {
+        return isRelease() && isCharIgnoreCase(codePoint);
+    }
+
+    /**
      * Returns true if this is a key event matching the given key code.
+     * <p>
+     * This tells which key the event is about and matches any event kind, release included. To
+     * act on a key, use {@link #isKeyPressed(KeyCode)} or return early on {@link #isRelease()}.
+     * See {@link #isChar(int)}.
      *
      * @param keyCode key code to compare
      * @return true if matches
      */
     public boolean isKey(KeyCode keyCode) {
         return code == keyCode;
+    }
+
+    /**
+     * Returns true if this is a press or repeat event matching the given key code.
+     * <p>
+     * Use this to act on a key. See {@link #isCharPressed(int)}.
+     *
+     * @param keyCode key code to compare
+     * @return true if the key was pressed or repeated
+     * @see #isKey(KeyCode)
+     */
+    public boolean isKeyPressed(KeyCode keyCode) {
+        return isPressOrRepeat() && isKey(keyCode);
+    }
+
+    /**
+     * Returns true if this is a release event matching the given key code.
+     * <p>
+     * Terminals report release events only when asked to, as with
+     * {@link dev.tamboui.terminal.KeyboardProtocol#FULL}.
+     *
+     * @param keyCode key code to compare
+     * @return true if the key was released
+     * @see #isKey(KeyCode)
+     */
+    public boolean isKeyReleased(KeyCode keyCode) {
+        return isRelease() && isKey(keyCode);
     }
 
     /**
@@ -568,7 +652,7 @@ public final class KeyEvent implements Event {
      * @return true if Ctrl+C was pressed
      */
     public boolean isCtrlC() {
-        return hasCtrl() && isChar('c');
+        return hasCtrl() && isCharPressed('c');
     }
 
     /**
@@ -939,10 +1023,15 @@ public final class KeyEvent implements Event {
      * Use this instead of switching on {@link #code()} {@code == CHAR} so that keypad typing and
      * terminal-supplied text are handled uniformly. Pair it with the semantic predicates
      * ({@link #isLeft()}, {@link #isDeleteBackward()}, ...) to drive a text input or text area.
+     * <p>
+     * Release events never count as typing, so a key stroke inserts its text once.
      *
      * @return true if this event should be inserted as text
      */
     public boolean isTyping() {
+        if (isRelease()) {
+            return false;
+        }
         if (!text.isEmpty()) {
             // Terminal stated what this keystroke produces (plain typing or AltGr); honor it over
             // the modifier check. The parser never puts text on a plain shortcut such as Ctrl+S.

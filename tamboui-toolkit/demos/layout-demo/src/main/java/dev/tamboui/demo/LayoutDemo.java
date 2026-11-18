@@ -102,6 +102,9 @@ public class LayoutDemo {
                     .fill()
 
             ).focusable().onKeyEvent(event -> {
+                if (event.isRelease()) {
+                    return EventResult.UNHANDLED;
+                }
                 if (event.isChar('1')) {
                     mode = LayoutMode.COLUMNS;
                     return EventResult.HANDLED;

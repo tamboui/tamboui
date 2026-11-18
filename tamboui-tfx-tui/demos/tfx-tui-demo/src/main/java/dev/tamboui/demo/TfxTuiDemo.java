@@ -87,6 +87,9 @@ public class TfxTuiDemo {
     private boolean handleEvent(dev.tamboui.tui.event.Event event, TuiRunner runner) {
         if (event instanceof KeyEvent) {
             KeyEvent keyEvent = (KeyEvent) event;
+            if (keyEvent.isRelease()) {
+                return false;
+            }
 
             if (keyEvent.isQuit() || keyEvent.isCancel()) {
                 runner.quit();

@@ -420,6 +420,9 @@ public class CustomComponentDemo implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         // Handle dialog events when shown
         if (showHelp) {
             if (event.isCancel()) {

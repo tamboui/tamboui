@@ -200,6 +200,9 @@ public class EmojiDemo {
                     .id("emoji-table")
                     .fill()  // Table takes remaining space
                     .onKeyEvent(event -> {
+                        if (event.isRelease()) {
+                            return EventResult.UNHANDLED;
+                        }
                         // Handle table navigation
                         if (event.isDown() || event.isUp()) {
                             if (event.isDown()) {

@@ -118,6 +118,9 @@ public final class FormTableDemo {
     }
 
     private static EventResult handleKey(KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (event.code() == KeyCode.F1) {
             TAB_INDEX.set(0);
             return EventResult.HANDLED;

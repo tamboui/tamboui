@@ -132,6 +132,9 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
             return EventResult.UNHANDLED;
         }
         KeyEvent key = (KeyEvent) event;
+        if (key.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (key.isDown()) {
             scroll++;
             return EventResult.HANDLED;

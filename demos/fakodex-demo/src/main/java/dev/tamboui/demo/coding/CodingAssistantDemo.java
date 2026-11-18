@@ -336,6 +336,9 @@ public class CodingAssistantDemo {
      * @return the event result
      */
     private EventResult handleKey(KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         // Don't process input while working
         if (isProcessing) {
             return EventResult.HANDLED;

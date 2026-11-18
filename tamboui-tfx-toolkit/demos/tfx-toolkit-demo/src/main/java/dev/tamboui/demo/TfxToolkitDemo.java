@@ -167,6 +167,9 @@ public class TfxToolkitDemo {
     }
 
     private EventResult handleKeyEvent(dev.tamboui.tui.event.KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (event.isChar('1')) {
             effects.addEffect("header", Fx.fadeToFg(HEADER_COLOR, 500, Interpolation.SineInOut));
             statusMessage = "Applied fade effect to header";

@@ -33,6 +33,9 @@ public class FileManagerKeyHandler {
      * @return the event result
      */
     public EventResult handle(KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         // Confirmation dialog mode (y/n dialogs)
         if (manager.hasDialog() && !manager.isInputDialog()) {
             return handleDialogKey(event);
