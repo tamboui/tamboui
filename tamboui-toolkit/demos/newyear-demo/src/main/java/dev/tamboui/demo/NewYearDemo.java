@@ -163,12 +163,15 @@ public final class NewYearDemo extends ToolkitApp {
             .focusedBorderColor(Color.CYAN)
             .bottomTitle(bottomHelp)
             .onKeyEvent(e -> {
+                if (e == null || e.isRelease()) {
+                    return EventResult.UNHANDLED;
+                }
                 if (e != null) {
-                    if (e.isCharPressed(' ')) {
+                    if (e.isChar(' ')) {
                         // Launch a single firework on space press
                         fireworks.launchSingleFirework(innerWFinal, innerHFinal, cameraZ, soundManager);
                         return EventResult.HANDLED;
-                    } else if (e.isCharPressed('s') || e.isCharPressed('S')) {
+                    } else if (e.isChar('s') || e.isChar('S')) {
                         // Simulate New Year: trigger midnight show and set countdown to zero
                         simulating = true;
                         if (!midnightTriggered) {

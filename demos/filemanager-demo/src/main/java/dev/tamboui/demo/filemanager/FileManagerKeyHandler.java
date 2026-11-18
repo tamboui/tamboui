@@ -33,6 +33,9 @@ public class FileManagerKeyHandler {
      * @return the event result
      */
     public EventResult handle(KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         // Confirmation dialog mode (y/n dialogs)
         if (manager.hasDialog() && !manager.isInputDialog()) {
             return handleDialogKey(event);
@@ -53,11 +56,11 @@ public class FileManagerKeyHandler {
         }
 
         // Confirmation dialogs
-        if (event.isCharIgnoreCasePressed('y')) {
+        if (event.isCharIgnoreCase('y')) {
             manager.confirmDialog();
             return EventResult.HANDLED;
         }
-        if (event.isCharIgnoreCasePressed('n') || event.isCancel()) {
+        if (event.isCharIgnoreCase('n') || event.isCancel()) {
             manager.dismissDialog();
             return EventResult.HANDLED;
         }
@@ -101,7 +104,7 @@ public class FileManagerKeyHandler {
         }
 
         // Go to parent directory
-        if (event.isKeyPressed(KeyCode.BACKSPACE)) {
+        if (event.isKey(KeyCode.BACKSPACE)) {
             browser.navigateUp();
             return EventResult.HANDLED;
         }
@@ -117,56 +120,56 @@ public class FileManagerKeyHandler {
         }
 
         // Marking files
-        if (event.isKeyPressed(KeyCode.INSERT) || event.isCharPressed(' ')) {
+        if (event.isKey(KeyCode.INSERT) || event.isChar(' ')) {
             browser.toggleMark();
             return EventResult.HANDLED;
         }
-        if (event.isCharPressed('+')) {
+        if (event.isChar('+')) {
             browser.markAll();
             return EventResult.HANDLED;
         }
-        if (event.isCharPressed('-')) {
+        if (event.isChar('-')) {
             browser.unmarkAll();
             return EventResult.HANDLED;
         }
-        if (event.isCharPressed('*')) {
+        if (event.isChar('*')) {
             browser.invertMarks();
             return EventResult.HANDLED;
         }
 
         // File operations (F5, F6, F7, F8)
-        if (event.isKeyPressed(KeyCode.F5) || event.isCharIgnoreCasePressed('c')) {
+        if (event.isKey(KeyCode.F5) || event.isCharIgnoreCase('c')) {
             manager.promptCopy();
             return EventResult.HANDLED;
         }
-        if (event.isKeyPressed(KeyCode.F6) || event.isCharIgnoreCasePressed('m')) {
+        if (event.isKey(KeyCode.F6) || event.isCharIgnoreCase('m')) {
             manager.promptMove();
             return EventResult.HANDLED;
         }
-        if (event.isKeyPressed(KeyCode.F7) || event.isCharIgnoreCasePressed('n')) {
+        if (event.isKey(KeyCode.F7) || event.isCharIgnoreCase('n')) {
             manager.promptMkdir();
             return EventResult.HANDLED;
         }
-        if (event.isKeyPressed(KeyCode.F8) || event.isCharIgnoreCasePressed('d')) {
+        if (event.isKey(KeyCode.F8) || event.isCharIgnoreCase('d')) {
             manager.promptDelete();
             return EventResult.HANDLED;
         }
 
         // Refresh
-        if (event.isCharIgnoreCasePressed('r')) {
+        if (event.isCharIgnoreCase('r')) {
             manager.leftBrowser().refresh();
             manager.rightBrowser().refresh();
             return EventResult.HANDLED;
         }
 
         // Go to directory
-        if (event.isCharIgnoreCasePressed('o')) {
+        if (event.isCharIgnoreCase('o')) {
             manager.promptGoto();
             return EventResult.HANDLED;
         }
 
         // View file
-        if (event.isCharIgnoreCasePressed('v')) {
+        if (event.isCharIgnoreCase('v')) {
             manager.promptViewFile();
             return EventResult.HANDLED;
         }

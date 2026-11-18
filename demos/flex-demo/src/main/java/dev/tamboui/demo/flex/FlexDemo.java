@@ -90,6 +90,9 @@ public class FlexDemo {
                 .length(4)
                 .focusable()
                 .onKeyEvent(event -> {
+                    if (event.isRelease()) {
+                        return EventResult.UNHANDLED;
+                    }
                     if (event.isLeft()) {
                         modeIndex.updateAndGet(i ->
                                 (i - 1 + FLEX_MODES.length) % FLEX_MODES.length);
@@ -100,19 +103,19 @@ public class FlexDemo {
                                 (i + 1) % FLEX_MODES.length);
                         return EventResult.HANDLED;
                     }
-                    if (event.isCharPressed('1')) {
+                    if (event.isChar('1')) {
                         exampleIndex.set(0);
                         return EventResult.HANDLED;
                     }
-                    if (event.isCharPressed('2')) {
+                    if (event.isChar('2')) {
                         exampleIndex.set(1);
                         return EventResult.HANDLED;
                     }
-                    if (event.isCharPressed('3')) {
+                    if (event.isChar('3')) {
                         exampleIndex.set(2);
                         return EventResult.HANDLED;
                     }
-                    if (event.isCharPressed('4')) {
+                    if (event.isChar('4')) {
                         exampleIndex.set(3);
                         return EventResult.HANDLED;
                     }

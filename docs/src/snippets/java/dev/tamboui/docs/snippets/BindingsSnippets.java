@@ -3,6 +3,7 @@ package dev.tamboui.docs.snippets;
 import dev.tamboui.annotations.bindings.OnAction;
 import dev.tamboui.toolkit.component.Component;
 import dev.tamboui.toolkit.element.Element;
+import dev.tamboui.toolkit.event.EventResult;
 import dev.tamboui.tui.TuiRunner;
 import dev.tamboui.tui.bindings.ActionHandler;
 import dev.tamboui.tui.bindings.Actions;
@@ -48,6 +49,22 @@ public class BindingsSnippets {
         if (event.isCharPressed('x')) { }
         if (event.isKeyPressed(KeyCode.F1)) { }
         // end::matching-actions[]
+    }
+
+    EventResult releaseGuard(KeyEvent event) {
+        // tag::release-guard[]
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
+        // Below, every check acts on a press or repeat only
+        if (event.isChar('+') || event.isKey(KeyCode.F5)) {
+            return EventResult.HANDLED;
+        }
+        if (event.code() == KeyCode.ESCAPE) {
+            return EventResult.HANDLED;
+        }
+        return EventResult.UNHANDLED;
+        // end::release-guard[]
     }
 
     void keyTriggers() {

@@ -118,6 +118,9 @@ public class BasicEffectsTFXDemo {
                     if (event instanceof KeyEvent) {
 
                         KeyEvent keyEvent = (KeyEvent) event;
+                        if (keyEvent.isRelease()) {
+                            return false;
+                        }
                         
                         if (keyEvent.isQuit()) {
                             runner.quit();
@@ -141,7 +144,7 @@ public class BasicEffectsTFXDemo {
                         }
                         
                         // Toggle view mode
-                        if (keyEvent.isCharPressed('t') || keyEvent.isCharPressed('T')) {
+                        if (keyEvent.isChar('t') || keyEvent.isChar('T')) {
                             showColoredBlocks = !showColoredBlocks;
                             return true;
                         }

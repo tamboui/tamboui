@@ -103,6 +103,22 @@ event, and acting on `isKey` or `isChar` would run the action twice. Release eve
 when the terminal is asked for them, so under the default `AUTO` protocol the two forms behave the
 same.
 
+==== Ignoring Releases in a Whole Handler
+
+A handler that checks many keys can instead return early on a release, then use the plain checks.
+This also covers direct comparisons such as `event.code() == KeyCode.ESCAPE`, which no predicate
+filters:
+
+[source,java]
+----
+include::{snippets-dir}/dev/tamboui/docs/snippets/BindingsSnippets.java[tags=release-guard]
+----
+
+In a `TuiRunner` event handler, return `false` (nothing to redraw) instead of
+`EventResult.UNHANDLED`. Put the guard after the `instanceof KeyEvent` check so mouse and tick
+events still get through. Prefer the `*Pressed` methods for a single check or code meant to be
+copied elsewhere: the guard only protects the lines below it.
+
 For applications calling `EventParser.readEvent(...)` directly, a read timeout returns `null`, while terminal EOF throws the JDK's `EOFException` (a subclass of `IOException`). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. `TuiRunner` and `InlineTuiRunner` stop their input reader on EOF.
 
 == Key Triggers

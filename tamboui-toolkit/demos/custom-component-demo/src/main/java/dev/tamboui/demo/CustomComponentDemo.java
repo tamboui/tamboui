@@ -420,6 +420,9 @@ public class CustomComponentDemo implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         // Handle dialog events when shown
         if (showHelp) {
             if (event.isCancel()) {
@@ -430,14 +433,14 @@ public class CustomComponentDemo implements Element {
             return EventResult.HANDLED;
         }
 
-        if (event.isCharPressed('s')) {
+        if (event.isChar('s')) {
             // Request export - will happen in next render cycle where we have access to frame
             exportSvgRequested = true;
             return EventResult.HANDLED;
         }
 
         // Handle 'h' to show help dialog
-        if (event.isCharPressed('h')) {
+        if (event.isChar('h')) {
             showHelp = true;
             return EventResult.HANDLED;
         }

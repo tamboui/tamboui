@@ -210,6 +210,9 @@ public class DemoSelector extends ToolkitApp {
     }
 
     private EventResult handleKey(KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         var listSize = displayItems.size();
         var current = demoList.selected();
 

@@ -87,13 +87,16 @@ public class TfxTuiDemo {
     private boolean handleEvent(dev.tamboui.tui.event.Event event, TuiRunner runner) {
         if (event instanceof KeyEvent) {
             KeyEvent keyEvent = (KeyEvent) event;
+            if (keyEvent.isRelease()) {
+                return false;
+            }
 
             if (keyEvent.isQuit() || keyEvent.isCancel()) {
                 runner.quit();
                 return false;
             }
 
-            if (keyEvent.isCharPressed('1')) {
+            if (keyEvent.isChar('1')) {
                 // Sweep in from left - one-shot effect
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sweepIn(Motion.LEFT_TO_RIGHT, 30, 5, BG, 1000, Interpolation.QuadOut));
@@ -101,7 +104,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isCharPressed('2')) {
+            if (keyEvent.isChar('2')) {
                 // Sweep in from top - reveals content
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sweepIn(Motion.UP_TO_DOWN, 20, 0, BG, 800, Interpolation.QuadOut));
@@ -109,7 +112,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isCharPressed('3')) {
+            if (keyEvent.isChar('3')) {
                 // Dissolve and coalesce back - sequence
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sequence(
@@ -120,7 +123,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isCharPressed('4')) {
+            if (keyEvent.isChar('4')) {
                 // Color flash effect - fade to color and back
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sequence(
@@ -131,7 +134,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isCharPressed(' ')) {
+            if (keyEvent.isChar(' ')) {
                 tfx.clearEffects();
                 statusMessage = "Effects cleared";
                 return true;

@@ -200,6 +200,9 @@ public class EmojiDemo {
                     .id("emoji-table")
                     .fill()  // Table takes remaining space
                     .onKeyEvent(event -> {
+                        if (event.isRelease()) {
+                            return EventResult.UNHANDLED;
+                        }
                         // Handle table navigation
                         if (event.isDown() || event.isUp()) {
                             if (event.isDown()) {
@@ -211,27 +214,27 @@ public class EmojiDemo {
                         }
                         
                         // Handle vim-style navigation (j/k)
-                        if (event.isCharPressed('j') || event.isCharPressed('J')) {
+                        if (event.isChar('j') || event.isChar('J')) {
                             tableState.selectNext(filteredEmojis.size());
                             return EventResult.HANDLED;
                         }
-                        if (event.isCharPressed('k') || event.isCharPressed('K')) {
+                        if (event.isChar('k') || event.isChar('K')) {
                             tableState.selectPrevious();
                             return EventResult.HANDLED;
                         }
                         
                         // Handle first/last navigation
-                        if (event.isCharPressed('g')) {
+                        if (event.isChar('g')) {
                             tableState.selectFirst();
                             return EventResult.HANDLED;
                         }
-                        if (event.isCharPressed('G')) {
+                        if (event.isChar('G')) {
                             tableState.selectLast(filteredEmojis.size());
                             return EventResult.HANDLED;
                         }
                         
                         // Toggle codepoint format (Java vs Unicode)
-                        if (event.isCharPressed('w')) {
+                        if (event.isChar('w')) {
                             useJavaFormat = !useJavaFormat;
                             return EventResult.HANDLED;
                         }

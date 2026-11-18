@@ -100,6 +100,9 @@ final class FloatingPanelsArea implements Element {
     }
 
     private EventResult handlePanelKey(FloatingPanel fp, KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         var result = fp.content.handleKey(event);
         if (result.isHandled()) {
             return result;
@@ -110,24 +113,24 @@ final class FloatingPanelsArea implements Element {
         // regardless of modifiers) rather than the binding-aware isUp()/isLeft() predicates:
         // the Shift modifier is meaningful here, and hjkl should not move panels.
         int moveStep = event.hasShift() ? 5 : 1;
-        if (event.isKeyPressed(KeyCode.UP)) {
+        if (event.isKey(KeyCode.UP)) {
             fp.y = Math.max(0, fp.y - moveStep);
             return EventResult.HANDLED;
         }
-        if (event.isKeyPressed(KeyCode.DOWN)) {
+        if (event.isKey(KeyCode.DOWN)) {
             fp.y += moveStep;
             return EventResult.HANDLED;
         }
-        if (event.isKeyPressed(KeyCode.LEFT)) {
+        if (event.isKey(KeyCode.LEFT)) {
             fp.x = Math.max(0, fp.x - moveStep);
             return EventResult.HANDLED;
         }
-        if (event.isKeyPressed(KeyCode.RIGHT)) {
+        if (event.isKey(KeyCode.RIGHT)) {
             fp.x += moveStep;
             return EventResult.HANDLED;
         }
 
-        if (event.isCharIgnoreCasePressed('x') && event.hasAlt()) {
+        if (event.isCharIgnoreCase('x') && event.hasAlt()) {
             panels.removeIf(p -> p.id == fp.id);
             return EventResult.HANDLED;
         }
@@ -147,13 +150,16 @@ final class FloatingPanelsArea implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (event.hasAlt()) {
-            if (event.isCharPressed('1')) { createPanel(new ClockPanel()); return EventResult.HANDLED; }
-            if (event.isCharPressed('2')) { createPanel(new CounterPanel()); return EventResult.HANDLED; }
-            if (event.isCharPressed('3')) { createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED; }
-            if (event.isCharPressed('4')) { createPanel(new QuotePanel()); return EventResult.HANDLED; }
-            if (event.isCharPressed('5')) { createPanel(new ProgressPanel()); return EventResult.HANDLED; }
-            if (event.isCharPressed('6')) { createPanel(new TodoPanel()); return EventResult.HANDLED; }
+            if (event.isChar('1')) { createPanel(new ClockPanel()); return EventResult.HANDLED; }
+            if (event.isChar('2')) { createPanel(new CounterPanel()); return EventResult.HANDLED; }
+            if (event.isChar('3')) { createPanel(new SystemInfoPanel(this::formatUptime)); return EventResult.HANDLED; }
+            if (event.isChar('4')) { createPanel(new QuotePanel()); return EventResult.HANDLED; }
+            if (event.isChar('5')) { createPanel(new ProgressPanel()); return EventResult.HANDLED; }
+            if (event.isChar('6')) { createPanel(new TodoPanel()); return EventResult.HANDLED; }
         }
         return EventResult.UNHANDLED;
     }

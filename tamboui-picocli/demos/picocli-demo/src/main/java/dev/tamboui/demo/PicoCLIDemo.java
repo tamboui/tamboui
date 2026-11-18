@@ -136,6 +136,9 @@ public class PicoCLIDemo extends TuiCommand {
     }
 
     private boolean handleKey(KeyEvent k) {
+        if (k.isRelease()) {
+            return false;
+        }
         if (k.isUp()) {
             listState.selectPrevious();
             return true;
@@ -154,14 +157,14 @@ public class PicoCLIDemo extends TuiCommand {
         }
 
         // 'a' to add item
-        if (k.isCharPressed('a') || k.isCharPressed('A')) {
+        if (k.isChar('a') || k.isChar('A')) {
             items.add("New Item " + (items.size() + 1));
             listState.select(items.size() - 1);
             return true;
         }
 
         // 'd' to delete item
-        if (k.isCharPressed('d') || k.isCharPressed('D')) {
+        if (k.isChar('d') || k.isChar('D')) {
             Integer selected = listState.selected();
             if (selected != null && items.size() > 1) {
                 items.remove((int) selected);

@@ -336,6 +336,9 @@ public class CodingAssistantDemo {
      * @return the event result
      */
     private EventResult handleKey(KeyEvent event) {
+        if (event.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         // Don't process input while working
         if (isProcessing) {
             return EventResult.HANDLED;
@@ -348,19 +351,19 @@ public class CodingAssistantDemo {
         }
 
         // Ctrl+D for demo
-        if (event.isCharPressed('d') && event.hasCtrl()) {
+        if (event.isChar('d') && event.hasCtrl()) {
             runDemo();
             return EventResult.HANDLED;
         }
 
         // Ctrl+H for help
-        if (event.isCharPressed('h') && event.hasCtrl()) {
+        if (event.isChar('h') && event.hasCtrl()) {
             showHelp();
             return EventResult.HANDLED;
         }
 
         // Ctrl+L to clear
-        if (event.isCharPressed('l') && event.hasCtrl()) {
+        if (event.isChar('l') && event.hasCtrl()) {
             lines.clear();
             activeToolCalls.clear();
             activeThinkingText = null;

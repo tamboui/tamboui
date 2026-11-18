@@ -355,7 +355,8 @@ public final class KeyEvent implements Event {
      * Returns true if this is a character event matching the given code point.
      * <p>
      * This tells which character the event is about and matches any event kind, release
-     * included. To act on a key, use {@link #isCharPressed(int)}: with
+     * included. To act on a key, use {@link #isCharPressed(int)}, or return early from the
+     * handler when {@link #isRelease()} is true: with
      * {@link dev.tamboui.terminal.KeyboardProtocol#FULL} every key also arrives as a release
      * event, and acting on both runs the action twice.
      *
@@ -476,7 +477,8 @@ public final class KeyEvent implements Event {
      * Returns true if this is a key event matching the given key code.
      * <p>
      * This tells which key the event is about and matches any event kind, release included. To
-     * act on a key, use {@link #isKeyPressed(KeyCode)}. See {@link #isChar(int)}.
+     * act on a key, use {@link #isKeyPressed(KeyCode)} or return early on {@link #isRelease()}.
+     * See {@link #isChar(int)}.
      *
      * @param keyCode key code to compare
      * @return true if matches

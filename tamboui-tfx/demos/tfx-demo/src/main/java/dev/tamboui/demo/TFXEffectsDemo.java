@@ -106,19 +106,22 @@ public class TFXEffectsDemo {
                     
                     if (event instanceof KeyEvent) {
                         KeyEvent keyEvent = (KeyEvent) event;
+                        if (keyEvent.isRelease()) {
+                            return false;
+                        }
 
                         if (keyEvent.isQuit() || keyEvent.isCancel()) {
                             runner.quit();
                             return false;
                         }
                         
-                        if (keyEvent.isKeyPressed(KeyCode.ENTER)) {
+                        if (keyEvent.isKey(KeyCode.ENTER)) {
                             activeEffectIdx = (activeEffectIdx + 1) % effects.size();
                             restartEffect();
                             return true;
                         }
                         
-                        if (keyEvent.isKeyPressed(KeyCode.BACKSPACE)) {
+                        if (keyEvent.isKey(KeyCode.BACKSPACE)) {
                             activeEffectIdx = (activeEffectIdx == 0) 
                                 ? effects.size() - 1 
                                 : activeEffectIdx - 1;
@@ -126,12 +129,12 @@ public class TFXEffectsDemo {
                             return true;
                         }
                         
-                        if (keyEvent.isCharPressed(' ')) {
+                        if (keyEvent.isChar(' ')) {
                             restartEffect();
                             return true;
                         }
                         
-                        if (keyEvent.isCharPressed('r') || keyEvent.isCharPressed('R')) {
+                        if (keyEvent.isChar('r') || keyEvent.isChar('R')) {
                             activeEffectIdx = rng.nextInt(effects.size());
                             restartEffect();
                             return true;

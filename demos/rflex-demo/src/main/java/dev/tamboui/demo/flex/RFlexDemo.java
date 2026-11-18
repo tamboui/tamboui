@@ -255,43 +255,46 @@ public final class RFlexDemo {
         }
 
         KeyEvent k = (KeyEvent) event;
+        if (k.isRelease()) {
+            return false;
+        }
         if (k.isQuit() || k.code() == KeyCode.ESCAPE) {
             runner.quit();
             return false;
         }
 
-        if (k.isRight() || k.isCharPressed('l')) {
+        if (k.isRight() || k.isChar('l')) {
             selectedTab = SelectedTab.fromIndex(selectedTab.ordinal() + 1);
             return true;
         }
-        if (k.isLeft() || k.isCharPressed('h')) {
+        if (k.isLeft() || k.isChar('h')) {
             selectedTab = SelectedTab.fromIndex(selectedTab.ordinal() - 1);
             return true;
         }
 
-        if (k.isDown() || k.isCharPressed('j')) {
+        if (k.isDown() || k.isChar('j')) {
             scrollOffset = Math.min(maxScrollOffset(), scrollOffset + 1);
             return true;
         }
-        if (k.isUp() || k.isCharPressed('k')) {
+        if (k.isUp() || k.isChar('k')) {
             scrollOffset = Math.max(0, scrollOffset - 1);
             return true;
         }
 
-        if (k.code() == KeyCode.HOME || k.isCharPressed('g')) {
+        if (k.code() == KeyCode.HOME || k.isChar('g')) {
             scrollOffset = 0;
             return true;
         }
-        if (k.code() == KeyCode.END || k.isCharPressed('G')) {
+        if (k.code() == KeyCode.END || k.isChar('G')) {
             scrollOffset = maxScrollOffset();
             return true;
         }
 
-        if (k.isCharPressed('+')) {
+        if (k.isChar('+')) {
             spacing = Math.min(10, spacing + 1);
             return true;
         }
-        if (k.isCharPressed('-')) {
+        if (k.isChar('-')) {
             spacing = Math.max(0, spacing - 1);
             return true;
         }

@@ -33,11 +33,11 @@ final class CounterPanel extends PanelContent {
 
     @Override
     EventResult handleKey(KeyEvent event) {
-        if (event.isCharIgnoreCasePressed('k')) {
+        if (event.isCharIgnoreCase('k')) {
             counter++;
             return EventResult.HANDLED;
         }
-        if (event.isCharIgnoreCasePressed('j')) {
+        if (event.isCharIgnoreCase('j')) {
             counter--;
             return EventResult.HANDLED;
         }

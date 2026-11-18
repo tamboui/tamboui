@@ -132,6 +132,9 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
             return EventResult.UNHANDLED;
         }
         KeyEvent key = (KeyEvent) event;
+        if (key.isRelease()) {
+            return EventResult.UNHANDLED;
+        }
         if (key.isDown()) {
             scroll++;
             return EventResult.HANDLED;
@@ -140,12 +143,12 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
             scroll = Math.max(0, scroll - 1);
             return EventResult.HANDLED;
         }
-        if (key.isCharIgnoreCasePressed('t')) {
+        if (key.isCharIgnoreCase('t')) {
             themeIndex = (themeIndex + 1) % THEMES.length;
             applyTheme();
             return EventResult.HANDLED;
         }
-        if (key.isCharIgnoreCasePressed('q')) {
+        if (key.isCharIgnoreCase('q')) {
             quit();
             return EventResult.HANDLED;
         }
