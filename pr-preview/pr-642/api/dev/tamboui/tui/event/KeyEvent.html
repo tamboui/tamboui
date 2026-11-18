@@ -1062,7 +1062,8 @@ Matches any event kind, release included. See <a href="#isChar(int)"><code>isCha
 <div class="block">Returns true if this is a character event matching the given code point.
 <p>
 This tells which character the event is about and matches any event kind, release
-included. To act on a key, use <a href="#isCharPressed(int)"><code>isCharPressed(int)</code></a>: with
+included. To act on a key, use <a href="#isCharPressed(int)"><code>isCharPressed(int)</code></a>, or return early from the
+handler when <a href="#isRelease()"><code>isRelease()</code></a> is true: with
 <a href="../../terminal/KeyboardProtocol.html#FULL"><code>KeyboardProtocol.FULL</code></a> every key also arrives as a release
 event, and acting on both runs the action twice.</div>
 <dl class="notes">
@@ -1209,7 +1210,8 @@ Terminals report release events only when asked to, as with
 <div class="block">Returns true if this is a key event matching the given key code.
 <p>
 This tells which key the event is about and matches any event kind, release included. To
-act on a key, use <a href="#isKeyPressed(dev.tamboui.tui.event.KeyCode)"><code>isKeyPressed(KeyCode)</code></a>. See <a href="#isChar(int)"><code>isChar(int)</code></a>.</div>
+act on a key, use <a href="#isKeyPressed(dev.tamboui.tui.event.KeyCode)"><code>isKeyPressed(KeyCode)</code></a> or return early on <a href="#isRelease()"><code>isRelease()</code></a>.
+See <a href="#isChar(int)"><code>isChar(int)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>keyCode</code> - key code to compare</dd>

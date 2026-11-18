@@ -37,7 +37,11 @@
 <li><a href="#matching-actions-in-events">Matching Actions in Events</a>
 <ul class="sectlevel2">
 <li><a href="#prefer-semantic-predicates">Prefer Semantic Predicates</a></li>
-<li><a href="#matching-specific-keys-and-characters">Matching Specific Keys and Characters</a></li>
+<li><a href="#matching-specific-keys-and-characters">Matching Specific Keys and Characters</a>
+<ul class="sectlevel3">
+<li><a href="#ignoring-releases-in-a-whole-handler">Ignoring Releases in a Whole Handler</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#key-triggers">Key Triggers</a>
@@ -234,8 +238,37 @@ event, and acting on <code>isKey</code> or <code>isChar</code> would run the act
 when the terminal is asked for them, so under the default <code>AUTO</code> protocol the two forms behave the
 same.</p>
 </div>
+<div class="sect3">
+<h4 id="ignoring-releases-in-a-whole-handler"><a class="anchor" href="#ignoring-releases-in-a-whole-handler"></a><a class="link" href="#ignoring-releases-in-a-whole-handler">Ignoring Releases in a Whole Handler</a></h4>
+<div class="paragraph">
+<p>A handler that checks many keys can instead return early on a release, then use the plain checks.
+This also covers direct comparisons such as <code>event.code() == KeyCode.ESCAPE</code>, which no predicate
+filters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">if (event.isRelease()) {
+    return EventResult.UNHANDLED;
+}
+// Below, every check acts on a press or repeat only
+if (event.isChar('+') || event.isKey(KeyCode.F5)) {
+    return EventResult.HANDLED;
+}
+if (event.code() == KeyCode.ESCAPE) {
+    return EventResult.HANDLED;
+}
+return EventResult.UNHANDLED;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In a <code>TuiRunner</code> event handler, return <code>false</code> (nothing to redraw) instead of
+<code>EventResult.UNHANDLED</code>. Put the guard after the <code>instanceof KeyEvent</code> check so mouse and tick
+events still get through. Prefer the <code>*Pressed</code> methods for a single check or code meant to be
+copied elsewhere: the guard only protects the lines below it.</p>
+</div>
 <div class="paragraph">
 <p>For applications calling <code>EventParser.readEvent(&#8230;&#8203;)</code> directly, a read timeout returns <code>null</code>, while terminal EOF throws the JDK&#8217;s <code>EOFException</code> (a subclass of <code>IOException</code>). Once a bracketed paste starts, its content is read until the end marker even across read timeouts; a partial paste is never emitted just because input pauses. EOF during a paste discards its content. If an end marker never arrives, input waits in paste mode until EOF or application shutdown rather than interpreting a late pasted Enter as a key. Paste content is buffered as a single string with no fixed size limit, so memory use grows with the paste until it completes. <code>TuiRunner</code> and <code>InlineTuiRunner</code> stop their input reader on EOF.</p>
+</div>
 </div>
 </div>
 </div>
