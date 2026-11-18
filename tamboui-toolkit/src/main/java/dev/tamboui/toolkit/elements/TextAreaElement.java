@@ -456,7 +456,7 @@ public final class TextAreaElement extends StyledElement<TextAreaElement> {
         }
         // Editor-style Tab: insert spaces to the next tab stop instead of letting Tab move focus.
         // Off by default, so a text-area form field tabs to the next field (see tabIndents()).
-        if (tabIndents && event.isKey(KeyCode.TAB) && !event.isRelease()) {
+        if (tabIndents && event.isKey(KeyCode.TAB)) {
             int spaces = TAB_WIDTH - (state.cursorCol() % TAB_WIDTH);
             state.insert(new String(new char[spaces]).replace('\0', ' '));
             if (changeListener != null) {

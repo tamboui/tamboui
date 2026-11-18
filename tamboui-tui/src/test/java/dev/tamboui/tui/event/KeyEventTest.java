@@ -117,6 +117,40 @@ class KeyEventTest {
     }
 
     @Test
+    @DisplayName("isKey ignores RELEASE events")
+    void isKeyIgnoresRelease() {
+        for (KeyCode code : new KeyCode[] {KeyCode.ESCAPE, KeyCode.ENTER, KeyCode.TAB, KeyCode.F5}) {
+            assertThat(KeyEvent.ofKey(code, KeyModifiers.NONE, KeyEventKind.PRESS, null).isKey(code))
+                    .as("isKey(%s) on press", code).isTrue();
+            assertThat(KeyEvent.ofKey(code, KeyModifiers.NONE, KeyEventKind.REPEAT, null).isKey(code))
+                    .as("isKey(%s) on repeat", code).isTrue();
+            assertThat(KeyEvent.ofKey(code, KeyModifiers.NONE, KeyEventKind.RELEASE, null).isKey(code))
+                    .as("isKey(%s) on release", code).isFalse();
+        }
+    }
+
+    @Test
+    @DisplayName("isTyping ignores RELEASE events")
+    void isTypingIgnoresRelease() {
+        String[] texts = {"a", "世", "🇫🇷", "👩‍💻"};
+        for (String text : texts) {
+            KeyEvent.Builder press = KeyEvent.builder()
+                    .code(KeyCode.CHAR)
+                    .character(text.codePointAt(0))
+                    .text(text);
+            assertThat(press.kind(KeyEventKind.PRESS).build().isTyping()).as("%s on press", text).isTrue();
+            assertThat(press.kind(KeyEventKind.RELEASE).build().isTyping()).as("%s on release", text).isFalse();
+        }
+
+        KeyEvent releaseWithoutText = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('a')
+                .kind(KeyEventKind.RELEASE)
+                .build();
+        assertThat(releaseWithoutText.isTyping()).as("release without associated text").isFalse();
+    }
+
+    @Test
     @DisplayName("isCtrlC returns true for Ctrl+C")
     void isCtrlCReturnsTrue() {
         KeyEvent event = KeyEvent.ofChar('c', KeyModifiers.CTRL);

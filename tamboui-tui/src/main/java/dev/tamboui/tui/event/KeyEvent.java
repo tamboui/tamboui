@@ -422,12 +422,15 @@ public final class KeyEvent implements Event {
 
     /**
      * Returns true if this is a key event matching the given key code.
+     * <p>
+     * Release events never match. See {@link #isChar(int)} for details. To detect release of a
+     * specific key, use {@code event.isRelease() && event.code() == keyCode}.
      *
      * @param keyCode key code to compare
      * @return true if matches
      */
     public boolean isKey(KeyCode keyCode) {
-        return code == keyCode;
+        return code == keyCode && !isRelease();
     }
 
     /**
@@ -939,10 +942,15 @@ public final class KeyEvent implements Event {
      * Use this instead of switching on {@link #code()} {@code == CHAR} so that keypad typing and
      * terminal-supplied text are handled uniformly. Pair it with the semantic predicates
      * ({@link #isLeft()}, {@link #isDeleteBackward()}, ...) to drive a text input or text area.
+     * <p>
+     * Release events never count as typing. See {@link #isChar(int)} for details.
      *
      * @return true if this event should be inserted as text
      */
     public boolean isTyping() {
+        if (isRelease()) {
+            return false;
+        }
         if (!text.isEmpty()) {
             // Terminal stated what this keystroke produces (plain typing or AltGr); honor it over
             // the modifier check. The parser never puts text on a plain shortcut such as Ctrl+S.
