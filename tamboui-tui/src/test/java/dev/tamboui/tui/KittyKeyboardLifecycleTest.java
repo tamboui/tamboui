@@ -215,6 +215,34 @@ class KittyKeyboardLifecycleTest {
                 .doesNotContain("\033[<u");
     }
 
+    @Test
+    @DisplayName("TuiRunner with the default protocol starts on a backend without raw output")
+    void tuiRunnerDefaultProtocolWithoutRawOutput() throws Exception {
+        TestBackend backend = new RawOutputUnsupportedBackend();
+        TuiConfig config = TuiConfig.builder()
+                .backend(backend)
+                .pollTimeout(Duration.ofMillis(20))
+                .build();
+        assertThat(config.keyboardProtocol()).isEqualTo(KeyboardProtocol.AUTO);
+
+        try (TuiRunner runner = TuiRunner.create(config)) {
+            assertThat(runner).isNotNull();
+        }
+    }
+
+    @Test
+    @DisplayName("InlineTuiRunner with the default protocol starts on a backend without raw output")
+    void inlineTuiRunnerDefaultProtocolWithoutRawOutput() {
+        TestBackend backend = new RawOutputUnsupportedBackend();
+        InlineTuiConfig config = InlineTuiConfig.builder(4)
+                .pollTimeout(Duration.ofMillis(20))
+                .build();
+
+        try (InlineTuiRunner runner = InlineTuiRunner.create(backend, config)) {
+            assertThat(runner).isNotNull();
+        }
+    }
+
     private static int countOccurrences(String haystack, String needle) {
         int count = 0;
         int index = haystack.indexOf(needle);
@@ -240,5 +268,22 @@ class KittyKeyboardLifecycleTest {
         }
 
         assertThat(backend.rawOutput()).doesNotContain("\033[<u");
+    }
+
+    private static final class RawOutputUnsupportedBackend extends TestBackend {
+
+        RawOutputUnsupportedBackend() {
+            super(80, 24);
+        }
+
+        @Override
+        public void writeRaw(byte[] data) {
+            throw new UnsupportedOperationException("Raw output not supported by this backend");
+        }
+
+        @Override
+        public void disableKeyboardProtocol() {
+            throw new AssertionError("keyboard protocol was never enabled, so it must not be disabled");
+        }
     }
 }

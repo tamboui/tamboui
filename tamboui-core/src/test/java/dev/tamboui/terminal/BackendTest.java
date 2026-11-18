@@ -17,6 +17,7 @@ import dev.tamboui.layout.Position;
 import dev.tamboui.layout.Size;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BackendTest {
 
@@ -120,6 +121,43 @@ class BackendTest {
                          "\u001b[K";     // Erase to EOL
 
         assertThat(output.toString(StandardCharsets.UTF_8.name())).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("enableKeyboardProtocol pushes the flags and asks for a pop")
+    void enableKeyboardProtocolPushesFlags() throws IOException {
+        assertThat(backend.enableKeyboardProtocol(KeyboardProtocol.AUTO)).isTrue();
+        assertThat(output.toString(StandardCharsets.UTF_8.name())).isEqualTo("\033[>5u");
+    }
+
+    @Test
+    @DisplayName("enableKeyboardProtocol falls back to legacy when raw output is unsupported")
+    void enableKeyboardProtocolWithoutRawOutput() throws IOException {
+        Backend rawless = new MinimalBackend(output) {
+            @Override
+            public void writeRaw(byte[] data) {
+                throw new UnsupportedOperationException("Raw output not supported by this backend");
+            }
+        };
+
+        assertThat(rawless.enableKeyboardProtocol(KeyboardProtocol.AUTO)).isFalse();
+        assertThat(rawless.enableKeyboardProtocol(KeyboardProtocol.FULL)).isFalse();
+        assertThat(rawless.enableKeyboardProtocol(KeyboardProtocol.LEGACY)).isFalse();
+    }
+
+    @Test
+    @DisplayName("enableKeyboardProtocol still reports I/O errors")
+    void enableKeyboardProtocolPropagatesIoErrors() {
+        Backend failing = new MinimalBackend(output) {
+            @Override
+            public void writeRaw(byte[] data) throws IOException {
+                throw new IOException("terminal write failed");
+            }
+        };
+
+        assertThatThrownBy(() -> failing.enableKeyboardProtocol(KeyboardProtocol.AUTO))
+                .isInstanceOf(IOException.class)
+                .hasMessage("terminal write failed");
     }
 
     /**

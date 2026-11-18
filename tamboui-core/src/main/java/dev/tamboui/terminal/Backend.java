@@ -212,6 +212,10 @@ public interface Backend extends AutoCloseable {
      * Calling this with {@link KeyboardProtocol#LEGACY} or a {@code null} protocol is a no-op
      * and returns {@code false}; callers can use the return value to decide whether a matching
      * {@link #disableKeyboardProtocol()} is required on cleanup.
+     * <p>
+     * If the backend does not support {@link #writeRaw(byte[]) raw output}, the default
+     * implementation falls back to {@link KeyboardProtocol#LEGACY} and returns {@code false},
+     * just as a terminal that does not implement the protocol ignores the push sequence.
      *
      * @param protocol the keyboard protocol mode
      * @return {@code true} if the protocol was enabled and a matching
@@ -223,7 +227,11 @@ public interface Backend extends AutoCloseable {
      */
     default boolean enableKeyboardProtocol(KeyboardProtocol protocol) throws IOException {
         if (protocol != null && protocol != KeyboardProtocol.LEGACY && protocol.flags() > 0) {
-            writeRaw(KittyKeyboardSupport.pushSequence(protocol.flags()));
+            try {
+                writeRaw(KittyKeyboardSupport.pushSequence(protocol.flags()));
+            } catch (UnsupportedOperationException e) {
+                return false;
+            }
             flush();
             return true;
         }
@@ -270,10 +278,19 @@ public interface Backend extends AutoCloseable {
      * Writes raw bytes directly to the terminal output.
      * <p>
      * This is used for native image protocols (Sixel, Kitty, iTerm2) that
-     * require sending escape sequences with binary data.
+     * require sending escape sequences with binary data, and by the default
+     * implementations of many other methods of this interface (bracketed paste,
+     * keyboard protocol, cursor movement, line insertion, window title).
+     * <p>
+     * The default implementation throws {@link UnsupportedOperationException}.
+     * A backend without raw output has limited use, so implementations are
+     * strongly encouraged to override this method; a backend that cannot reach
+     * a real terminal (a headless or test backend) should at least accept and
+     * discard the data rather than throw.
      *
      * @param data the raw bytes to write
      * @throws IOException if writing fails
+     * @throws UnsupportedOperationException if the backend does not support raw output
      */
     default void writeRaw(byte[] data) throws IOException {
         // Optional: not all backends support raw output
