@@ -172,6 +172,8 @@ Available protocol modes in `dev.tamboui.terminal.KeyboardProtocol`:
 
 The protocol state stack is pushed automatically after entering alternate screen, and popped cleanly before leaving alternate screen or when the runner is closed.
 
+A backend that does not support raw output (`Backend.writeRaw` throws `UnsupportedOperationException`) cannot push the flags, so the runner falls back to `LEGACY`, as it does on a terminal that ignores the protocol.
+
 === Error Handling
 
 When exceptions occur during rendering, TuiRunner catches them and displays an error screen with the stack trace.
