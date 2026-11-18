@@ -98,35 +98,62 @@ class KeyEventTest {
     }
 
     @Test
-    @DisplayName("isChar and isCharIgnoreCase ignore RELEASE events")
-    void isCharIgnoresRelease() {
-        KeyEvent release = KeyEvent.builder()
-                .code(KeyCode.CHAR)
-                .character('q')
-                .kind(KeyEventKind.RELEASE)
-                .build();
-        assertThat(release.isChar('q')).as("isChar on release").isFalse();
-        assertThat(release.isCharIgnoreCase('Q')).as("isCharIgnoreCase on release").isFalse();
+    @DisplayName("isChar, isCharIgnoreCase and isKey match every event kind")
+    void identityPredicatesMatchEveryKind() {
+        for (KeyEventKind kind : KeyEventKind.values()) {
+            KeyEvent ch = KeyEvent.builder().code(KeyCode.CHAR).character('q').kind(kind).build();
+            assertThat(ch.isChar('q')).as("isChar on %s", kind).isTrue();
+            assertThat(ch.isCharIgnoreCase('Q')).as("isCharIgnoreCase on %s", kind).isTrue();
 
-        KeyEvent press = KeyEvent.builder()
-                .code(KeyCode.CHAR)
-                .character('q')
-                .kind(KeyEventKind.PRESS)
-                .build();
-        assertThat(press.isChar('q')).as("isChar on press").isTrue();
+            KeyEvent key = KeyEvent.ofKey(KeyCode.ESCAPE, KeyModifiers.NONE, kind, null);
+            assertThat(key.isKey(KeyCode.ESCAPE)).as("isKey on %s", kind).isTrue();
+        }
     }
 
     @Test
-    @DisplayName("isKey ignores RELEASE events")
-    void isKeyIgnoresRelease() {
-        for (KeyCode code : new KeyCode[] {KeyCode.ESCAPE, KeyCode.ENTER, KeyCode.TAB, KeyCode.F5}) {
-            assertThat(KeyEvent.ofKey(code, KeyModifiers.NONE, KeyEventKind.PRESS, null).isKey(code))
-                    .as("isKey(%s) on press", code).isTrue();
-            assertThat(KeyEvent.ofKey(code, KeyModifiers.NONE, KeyEventKind.REPEAT, null).isKey(code))
-                    .as("isKey(%s) on repeat", code).isTrue();
-            assertThat(KeyEvent.ofKey(code, KeyModifiers.NONE, KeyEventKind.RELEASE, null).isKey(code))
-                    .as("isKey(%s) on release", code).isFalse();
+    @DisplayName("*Pressed predicates match press and repeat, *Released predicates match release")
+    void pressedAndReleasedPredicates() {
+        for (KeyEventKind kind : KeyEventKind.values()) {
+            boolean released = kind == KeyEventKind.RELEASE;
+            for (String text : new String[] {"q", "\u4e16", "\ud83c\uddeb\ud83c\uddf7", "\ud83d\udc69\u200d\ud83d\udcbb"}) {
+                int cp = text.codePointAt(0);
+                KeyEvent ch = KeyEvent.builder().code(KeyCode.CHAR).character(cp).text(text).kind(kind).build();
+                assertThat(ch.isCharPressed(cp)).as("isCharPressed(%s) on %s", text, kind).isEqualTo(!released);
+                assertThat(ch.isCharReleased(cp)).as("isCharReleased(%s) on %s", text, kind).isEqualTo(released);
+            }
+            KeyEvent upper = KeyEvent.builder().code(KeyCode.CHAR).character('Q').kind(kind).build();
+            assertThat(upper.isCharIgnoreCasePressed('q')).as("isCharIgnoreCasePressed on %s", kind).isEqualTo(!released);
+            assertThat(upper.isCharIgnoreCaseReleased('q')).as("isCharIgnoreCaseReleased on %s", kind).isEqualTo(released);
+
+            for (KeyCode code : new KeyCode[] {KeyCode.ESCAPE, KeyCode.ENTER, KeyCode.TAB, KeyCode.F5}) {
+                KeyEvent key = KeyEvent.ofKey(code, KeyModifiers.NONE, kind, null);
+                assertThat(key.isKeyPressed(code)).as("isKeyPressed(%s) on %s", code, kind).isEqualTo(!released);
+                assertThat(key.isKeyReleased(code)).as("isKeyReleased(%s) on %s", code, kind).isEqualTo(released);
+            }
         }
+    }
+
+    @Test
+    @DisplayName("*Pressed and *Released predicates reject other keys")
+    void pressedAndReleasedRejectOtherKeys() {
+        KeyEvent press = KeyEvent.ofKey(KeyCode.ENTER, KeyModifiers.NONE, KeyEventKind.PRESS, null);
+        KeyEvent release = KeyEvent.ofKey(KeyCode.ENTER, KeyModifiers.NONE, KeyEventKind.RELEASE, null);
+        assertThat(press.isKeyPressed(KeyCode.ESCAPE)).isFalse();
+        assertThat(release.isKeyReleased(KeyCode.ESCAPE)).isFalse();
+        assertThat(press.isCharPressed('q')).isFalse();
+        assertThat(release.isCharReleased('q')).isFalse();
+    }
+
+    @Test
+    @DisplayName("isCtrlC ignores RELEASE events")
+    void isCtrlCIgnoresRelease() {
+        KeyEvent release = KeyEvent.builder()
+                .code(KeyCode.CHAR)
+                .character('c')
+                .modifiers(KeyModifiers.CTRL)
+                .kind(KeyEventKind.RELEASE)
+                .build();
+        assertThat(release.isCtrlC()).isFalse();
     }
 
     @Test

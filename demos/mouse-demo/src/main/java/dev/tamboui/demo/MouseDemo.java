@@ -186,11 +186,11 @@ public class MouseDemo extends ToolkitApp {
     }
 
     private EventResult handleKey(KeyEvent event) {
-        if (event.isChar('c')) {
+        if (event.isCharPressed('c')) {
             canvas.clear();
             return EventResult.HANDLED;
         }
-        if (event.isChar('a')) {
+        if (event.isCharPressed('a')) {
             if (auto) {
                 stopAuto();
             } else {

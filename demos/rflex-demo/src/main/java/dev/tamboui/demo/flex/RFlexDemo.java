@@ -260,38 +260,38 @@ public final class RFlexDemo {
             return false;
         }
 
-        if (k.isRight() || k.isChar('l')) {
+        if (k.isRight() || k.isCharPressed('l')) {
             selectedTab = SelectedTab.fromIndex(selectedTab.ordinal() + 1);
             return true;
         }
-        if (k.isLeft() || k.isChar('h')) {
+        if (k.isLeft() || k.isCharPressed('h')) {
             selectedTab = SelectedTab.fromIndex(selectedTab.ordinal() - 1);
             return true;
         }
 
-        if (k.isDown() || k.isChar('j')) {
+        if (k.isDown() || k.isCharPressed('j')) {
             scrollOffset = Math.min(maxScrollOffset(), scrollOffset + 1);
             return true;
         }
-        if (k.isUp() || k.isChar('k')) {
+        if (k.isUp() || k.isCharPressed('k')) {
             scrollOffset = Math.max(0, scrollOffset - 1);
             return true;
         }
 
-        if (k.code() == KeyCode.HOME || k.isChar('g')) {
+        if (k.code() == KeyCode.HOME || k.isCharPressed('g')) {
             scrollOffset = 0;
             return true;
         }
-        if (k.code() == KeyCode.END || k.isChar('G')) {
+        if (k.code() == KeyCode.END || k.isCharPressed('G')) {
             scrollOffset = maxScrollOffset();
             return true;
         }
 
-        if (k.isChar('+')) {
+        if (k.isCharPressed('+')) {
             spacing = Math.min(10, spacing + 1);
             return true;
         }
-        if (k.isChar('-')) {
+        if (k.isCharPressed('-')) {
             spacing = Math.max(0, spacing - 1);
             return true;
         }

@@ -102,31 +102,31 @@ public class LayoutDemo {
                     .fill()
 
             ).focusable().onKeyEvent(event -> {
-                if (event.isChar('1')) {
+                if (event.isCharPressed('1')) {
                     mode = LayoutMode.COLUMNS;
                     return EventResult.HANDLED;
                 }
-                if (event.isChar('2')) {
+                if (event.isCharPressed('2')) {
                     mode = LayoutMode.GRID;
                     return EventResult.HANDLED;
                 }
-                if (event.isChar('3')) {
+                if (event.isCharPressed('3')) {
                     mode = LayoutMode.FLOW;
                     return EventResult.HANDLED;
                 }
-                if (event.isChar('4')) {
+                if (event.isCharPressed('4')) {
                     mode = LayoutMode.DOCK;
                     return EventResult.HANDLED;
                 }
-                if (event.isChar('5')) {
+                if (event.isCharPressed('5')) {
                     mode = LayoutMode.GRID_AREAS;
                     return EventResult.HANDLED;
                 }
-                if (event.isChar('+') || event.isChar('=')) {
+                if (event.isCharPressed('+') || event.isCharPressed('=')) {
                     spacing = Math.min(spacing + 1, 5);
                     return EventResult.HANDLED;
                 }
-                if (event.isChar('-')) {
+                if (event.isCharPressed('-')) {
                     spacing = Math.max(spacing - 1, 0);
                     return EventResult.HANDLED;
                 }

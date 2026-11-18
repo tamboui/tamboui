@@ -45,8 +45,8 @@ public class BindingsSnippets {
         if (event.matches("delete")) { }
 
         // Low-level - when you need specific keys
-        if (event.isChar('x')) { }
-        if (event.isKey(KeyCode.F1)) { }
+        if (event.isCharPressed('x')) { }
+        if (event.isKeyPressed(KeyCode.F1)) { }
         // end::matching-actions[]
     }
 

@@ -623,7 +623,7 @@ public class WidgetsSnippets {
         checkbox.render(area, buffer, state);
 
         // Handle input
-        if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
+        if (event.code() == KeyCode.ENTER || (event.isCharPressed(' '))) {
             state.toggle();
         }
         // end::checkbox[]
@@ -656,7 +656,7 @@ public class WidgetsSnippets {
         toggle.render(area, buffer, state);
 
         // Handle input
-        if (event.code() == KeyCode.ENTER || (event.isChar(' '))) {
+        if (event.code() == KeyCode.ENTER || (event.isCharPressed(' '))) {
             state.toggle();
         }
         // end::toggle[]

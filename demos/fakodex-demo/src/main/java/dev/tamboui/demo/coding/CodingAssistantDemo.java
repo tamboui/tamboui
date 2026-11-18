@@ -348,19 +348,19 @@ public class CodingAssistantDemo {
         }
 
         // Ctrl+D for demo
-        if (event.isChar('d') && event.hasCtrl()) {
+        if (event.isCharPressed('d') && event.hasCtrl()) {
             runDemo();
             return EventResult.HANDLED;
         }
 
         // Ctrl+H for help
-        if (event.isChar('h') && event.hasCtrl()) {
+        if (event.isCharPressed('h') && event.hasCtrl()) {
             showHelp();
             return EventResult.HANDLED;
         }
 
         // Ctrl+L to clear
-        if (event.isChar('l') && event.hasCtrl()) {
+        if (event.isCharPressed('l') && event.hasCtrl()) {
             lines.clear();
             activeToolCalls.clear();
             activeThinkingText = null;

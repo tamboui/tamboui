@@ -236,7 +236,7 @@ public class AeshSshHttpDemo implements java.util.function.Consumer<Connection> 
             appendToLog(eventStr);
             
             // Handle specific keys
-            if (event.isChar('c')) {
+            if (event.isCharPressed('c')) {
                 counter++;
                 return EventResult.HANDLED;
             }

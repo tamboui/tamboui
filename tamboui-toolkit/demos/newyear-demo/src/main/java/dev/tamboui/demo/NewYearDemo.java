@@ -164,11 +164,11 @@ public final class NewYearDemo extends ToolkitApp {
             .bottomTitle(bottomHelp)
             .onKeyEvent(e -> {
                 if (e != null) {
-                    if (e.isChar(' ')) {
+                    if (e.isCharPressed(' ')) {
                         // Launch a single firework on space press
                         fireworks.launchSingleFirework(innerWFinal, innerHFinal, cameraZ, soundManager);
                         return EventResult.HANDLED;
-                    } else if (e.isChar('s') || e.isChar('S')) {
+                    } else if (e.isCharPressed('s') || e.isCharPressed('S')) {
                         // Simulate New Year: trigger midnight show and set countdown to zero
                         simulating = true;
                         if (!midnightTriggered) {

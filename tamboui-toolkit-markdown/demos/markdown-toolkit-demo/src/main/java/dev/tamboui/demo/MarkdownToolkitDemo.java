@@ -140,12 +140,12 @@ public final class MarkdownToolkitDemo extends ToolkitApp {
             scroll = Math.max(0, scroll - 1);
             return EventResult.HANDLED;
         }
-        if (key.isCharIgnoreCase('t')) {
+        if (key.isCharIgnoreCasePressed('t')) {
             themeIndex = (themeIndex + 1) % THEMES.length;
             applyTheme();
             return EventResult.HANDLED;
         }
-        if (key.isCharIgnoreCase('q')) {
+        if (key.isCharIgnoreCasePressed('q')) {
             quit();
             return EventResult.HANDLED;
         }

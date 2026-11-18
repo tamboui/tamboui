@@ -167,45 +167,45 @@ public class TfxToolkitDemo {
     }
 
     private EventResult handleKeyEvent(dev.tamboui.tui.event.KeyEvent event) {
-        if (event.isChar('1')) {
+        if (event.isCharPressed('1')) {
             effects.addEffect("header", Fx.fadeToFg(HEADER_COLOR, 500, Interpolation.SineInOut));
             statusMessage = "Applied fade effect to header";
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('2')) {
+        if (event.isCharPressed('2')) {
             effects.addEffect("content", Fx.fadeToFg(CONTENT_COLOR, 600, Interpolation.SineInOut));
             statusMessage = "Applied fade effect to content";
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('3')) {
+        if (event.isCharPressed('3')) {
             effects.addEffect("footer", Fx.fadeToFg(FOOTER_COLOR, 400, Interpolation.SineInOut));
             statusMessage = "Applied fade effect to footer";
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('4')) {
+        if (event.isCharPressed('4')) {
             effects.addGlobalEffect(Fx.dissolve(1500, Interpolation.QuadOut));
             statusMessage = "Applied global dissolve effect";
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('5')) {
+        if (event.isCharPressed('5')) {
             // CSS class selector - targets all elements with .main-panel class
             effects.addEffectBySelector(".main-panel", Fx.fadeToFg(ACCENT_COLOR, 400, Interpolation.SineInOut));
             statusMessage = "Applied effect to .main-panel (3 panels)";
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('6')) {
+        if (event.isCharPressed('6')) {
             // Type selector - targets all Panel elements
             effects.addEffectBySelector("Panel", Fx.fadeToFg(Color.WHITE, 300, Interpolation.QuadOut));
             statusMessage = "Applied effect to all Panel types (4 panels)";
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('7')) {
+        if (event.isCharPressed('7')) {
             // Descendant selector - targets .highlight spans inside #looping-panel only
             effects.addEffectBySelector("#looping-panel .highlight",
                     Fx.fadeTo(Color.GRAY, Color.rgb(0x00, 0xff, 0x00), 600, Interpolation.SineInOut).pingPong());
@@ -213,7 +213,7 @@ public class TfxToolkitDemo {
             return EventResult.HANDLED;
         }
 
-        if (event.isChar(' ')) {
+        if (event.isCharPressed(' ')) {
             effects.clear();
             // Re-add the looping word effects after clearing (using CSS class selectors)
             effects.addEffectBySelector(".looping",

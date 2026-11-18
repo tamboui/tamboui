@@ -184,11 +184,11 @@ public class MvcSnippets {
     }
 
     private static EventResult handleNormalMode(KeyEvent event, TodoController ctrl) {
-        if (event.isChar('a')) { ctrl.startInput(); return EventResult.HANDLED; }
+        if (event.isCharPressed('a')) { ctrl.startInput(); return EventResult.HANDLED; }
         if (event.isUp()) { ctrl.moveUp(); return EventResult.HANDLED; }
         if (event.isDown()) { ctrl.moveDown(); return EventResult.HANDLED; }
         if (event.isSelect()) { ctrl.toggleSelected(); return EventResult.HANDLED; }
-        if (event.isChar('d')) { ctrl.deleteSelected(); return EventResult.HANDLED; }
+        if (event.isCharPressed('d')) { ctrl.deleteSelected(); return EventResult.HANDLED; }
         return EventResult.UNHANDLED;
     }
     // end::handle-event[]
@@ -222,7 +222,7 @@ public class MvcSnippets {
         }
 
         private EventResult handleNormalMode(KeyEvent event) {
-            if (event.isChar('a')) {
+            if (event.isCharPressed('a')) {
                 controller.startInput();
                 return EventResult.HANDLED;
             }
@@ -486,11 +486,11 @@ public class MvcSnippets {
                 return EventResult.UNHANDLED;
             }
 
-            if (event.isChar('a')) { ctrl.startEditing(); return EventResult.HANDLED; }
+            if (event.isCharPressed('a')) { ctrl.startEditing(); return EventResult.HANDLED; }
             if (event.isUp()) { ctrl.cursorUp(); return EventResult.HANDLED; }
             if (event.isDown()) { ctrl.cursorDown(); return EventResult.HANDLED; }
             if (event.isSelect()) { ctrl.toggle(); return EventResult.HANDLED; }
-            if (event.isChar('d')) { ctrl.delete(); return EventResult.HANDLED; }
+            if (event.isCharPressed('d')) { ctrl.delete(); return EventResult.HANDLED; }
             return EventResult.UNHANDLED;
         }
 

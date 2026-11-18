@@ -166,7 +166,7 @@ public final class TextEditing {
             return insertTyped(key, null, state::insert);
         }
         Overflow effective = overflow != null ? overflow : Overflow.CLIP;
-        if (key.isKey(KeyCode.ENTER)) {
+        if (key.isKeyPressed(KeyCode.ENTER)) {
             state.insert('\n');
         } else if (key.isWordLeft()) {
             state.moveCursorToPreviousWord();
@@ -202,7 +202,7 @@ public final class TextEditing {
     // to its action, such as the emacs Ctrl+B for MOVE_LEFT. Typing is checked first, so a letter
     // a binding uses for navigation (vim h, l) is still inserted as text in a field.
     private static boolean isEdit(KeyEvent key, KeyCode code, String action) {
-        return key.isKey(code) || key.matches(action);
+        return key.isKeyPressed(code) || key.matches(action);
     }
 
     private static boolean insertTyped(KeyEvent key, IntPredicate allowed, Consumer<String> insert) {

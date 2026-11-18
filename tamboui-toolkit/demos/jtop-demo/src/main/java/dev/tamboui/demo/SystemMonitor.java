@@ -474,7 +474,7 @@ final class SystemMonitor implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (event.isCharIgnoreCase('s')) {
+        if (event.isCharIgnoreCasePressed('s')) {
             sortMode.updateAndGet(mode -> switch (mode) {
                 case CPU -> SystemMetrics.SortMode.MEMORY;
                 case MEMORY -> SystemMetrics.SortMode.PID;
@@ -482,7 +482,7 @@ final class SystemMonitor implements Element {
             });
             return EventResult.HANDLED;
         }
-        if (event.isCharIgnoreCase('c')) {
+        if (event.isCharIgnoreCasePressed('c')) {
             cpuViewMode.updateAndGet(mode -> switch (mode) {
                 case BARS -> CpuViewMode.SPARKLINES;
                 case SPARKLINES -> CpuViewMode.CHART;

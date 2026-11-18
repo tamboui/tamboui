@@ -139,11 +139,11 @@ public final class ToolkitExportDemo {
             row(sidebarPanel, contentPanel),
             footerPanel
         ).focusable().onKeyEvent(event -> {
-            if (event.isQuit() || event.isChar('q') || event.isChar('Q')) {
+            if (event.isQuit() || event.isCharPressed('q') || event.isCharPressed('Q')) {
                 runner.quit();
                 return EventResult.HANDLED;
             }
-            if (event.isChar('e') || event.isChar('E')) {
+            if (event.isCharPressed('e') || event.isCharPressed('E')) {
                 runner.runOnRenderThread(this::doExport);
                 return EventResult.HANDLED;
             }

@@ -93,7 +93,7 @@ public class TfxTuiDemo {
                 return false;
             }
 
-            if (keyEvent.isChar('1')) {
+            if (keyEvent.isCharPressed('1')) {
                 // Sweep in from left - one-shot effect
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sweepIn(Motion.LEFT_TO_RIGHT, 30, 5, BG, 1000, Interpolation.QuadOut));
@@ -101,7 +101,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isChar('2')) {
+            if (keyEvent.isCharPressed('2')) {
                 // Sweep in from top - reveals content
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sweepIn(Motion.UP_TO_DOWN, 20, 0, BG, 800, Interpolation.QuadOut));
@@ -109,7 +109,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isChar('3')) {
+            if (keyEvent.isCharPressed('3')) {
                 // Dissolve and coalesce back - sequence
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sequence(
@@ -120,7 +120,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isChar('4')) {
+            if (keyEvent.isCharPressed('4')) {
                 // Color flash effect - fade to color and back
                 tfx.clearEffects();
                 tfx.addEffect(Fx.sequence(
@@ -131,7 +131,7 @@ public class TfxTuiDemo {
                 return true;
             }
 
-            if (keyEvent.isChar(' ')) {
+            if (keyEvent.isCharPressed(' ')) {
                 tfx.clearEffects();
                 statusMessage = "Effects cleared";
                 return true;

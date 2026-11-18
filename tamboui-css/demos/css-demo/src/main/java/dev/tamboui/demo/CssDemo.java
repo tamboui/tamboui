@@ -175,7 +175,7 @@ public class CssDemo implements Element {
 
     @Override
     public EventResult handleKeyEvent(KeyEvent event, boolean focused) {
-        if (event.isCharIgnoreCase('t')) {
+        if (event.isCharIgnoreCasePressed('t')) {
             toggleTheme();
             return EventResult.HANDLED;
         }

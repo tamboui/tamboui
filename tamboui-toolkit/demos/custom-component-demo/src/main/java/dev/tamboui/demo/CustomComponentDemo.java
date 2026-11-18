@@ -430,14 +430,14 @@ public class CustomComponentDemo implements Element {
             return EventResult.HANDLED;
         }
 
-        if (event.isChar('s')) {
+        if (event.isCharPressed('s')) {
             // Request export - will happen in next render cycle where we have access to frame
             exportSvgRequested = true;
             return EventResult.HANDLED;
         }
 
         // Handle 'h' to show help dialog
-        if (event.isChar('h')) {
+        if (event.isCharPressed('h')) {
             showHelp = true;
             return EventResult.HANDLED;
         }

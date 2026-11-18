@@ -335,7 +335,7 @@ public class CoreConceptsSnippets {
         // tag::key-event-basics[]
         // Check specific keys
         if (event.code() == KeyCode.ENTER) { /* handle enter */ }
-        if (event.isChar('q')) { /* handle q */ }
+        if (event.isCharPressed('q')) { /* handle q */ }
 
         // Check modifiers
         if (event.modifiers().ctrl()) { /* Ctrl is held */ }

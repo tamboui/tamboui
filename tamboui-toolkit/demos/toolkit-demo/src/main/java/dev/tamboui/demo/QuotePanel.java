@@ -40,11 +40,11 @@ final class QuotePanel extends PanelContent {
 
     @Override
     EventResult handleKey(KeyEvent event) {
-        if (event.isRight() || event.isCharIgnoreCase('l')) {
+        if (event.isRight() || event.isCharIgnoreCasePressed('l')) {
             quoteIndex = (quoteIndex + 1) % QUOTES.length;
             return EventResult.HANDLED;
         }
-        if (event.isLeft() || event.isCharIgnoreCase('h')) {
+        if (event.isLeft() || event.isCharIgnoreCasePressed('h')) {
             quoteIndex = (quoteIndex - 1 + QUOTES.length) % QUOTES.length;
             return EventResult.HANDLED;
         }

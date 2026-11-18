@@ -211,27 +211,27 @@ public class EmojiDemo {
                         }
                         
                         // Handle vim-style navigation (j/k)
-                        if (event.isChar('j') || event.isChar('J')) {
+                        if (event.isCharPressed('j') || event.isCharPressed('J')) {
                             tableState.selectNext(filteredEmojis.size());
                             return EventResult.HANDLED;
                         }
-                        if (event.isChar('k') || event.isChar('K')) {
+                        if (event.isCharPressed('k') || event.isCharPressed('K')) {
                             tableState.selectPrevious();
                             return EventResult.HANDLED;
                         }
                         
                         // Handle first/last navigation
-                        if (event.isChar('g')) {
+                        if (event.isCharPressed('g')) {
                             tableState.selectFirst();
                             return EventResult.HANDLED;
                         }
-                        if (event.isChar('G')) {
+                        if (event.isCharPressed('G')) {
                             tableState.selectLast(filteredEmojis.size());
                             return EventResult.HANDLED;
                         }
                         
                         // Toggle codepoint format (Java vs Unicode)
-                        if (event.isChar('w')) {
+                        if (event.isCharPressed('w')) {
                             useJavaFormat = !useJavaFormat;
                             return EventResult.HANDLED;
                         }

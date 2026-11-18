@@ -141,7 +141,7 @@ public class BasicEffectsTFXDemo {
                         }
                         
                         // Toggle view mode
-                        if (keyEvent.isChar('t') || keyEvent.isChar('T')) {
+                        if (keyEvent.isCharPressed('t') || keyEvent.isCharPressed('T')) {
                             showColoredBlocks = !showColoredBlocks;
                             return true;
                         }

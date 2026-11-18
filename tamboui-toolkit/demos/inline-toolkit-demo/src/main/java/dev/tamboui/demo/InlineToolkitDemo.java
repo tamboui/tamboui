@@ -221,7 +221,7 @@ public class InlineToolkitDemo extends InlineApp {
     }
 
     private EventResult handleDetailsKey(KeyEvent keyEvent) {
-        if (keyEvent.isCharIgnoreCase('d')) {
+        if (keyEvent.isCharIgnoreCasePressed('d')) {
             showDetails = !showDetails;
             return EventResult.HANDLED;
         }
