@@ -877,7 +877,15 @@ The cursor position does not change.</div>
 <div class="block">Writes raw bytes directly to the terminal output.
 <p>
 This is used for native image protocols (Sixel, Kitty, iTerm2) that
-require sending escape sequences with binary data.</div>
+require sending escape sequences with binary data, and by the default
+implementations of many other methods of this interface (bracketed paste,
+keyboard protocol, cursor movement, line insertion, window title).
+<p>
+The default implementation throws <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link"><code>UnsupportedOperationException</code></a>.
+A backend without raw output has limited use, so implementations are
+strongly encouraged to override this method; a backend that cannot reach
+a real terminal (a headless or test backend) should at least accept and
+discard the data rather than throw.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>data</code> - the raw bytes to write</dd>
