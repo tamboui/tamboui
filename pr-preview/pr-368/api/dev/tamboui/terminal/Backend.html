@@ -752,7 +752,11 @@ had set are preserved and restored by the matching <a href="#disableKeyboardProt
 <p>
 Calling this with <a href="KeyboardProtocol.html#LEGACY"><code>KeyboardProtocol.LEGACY</code></a> or a <code>null</code> protocol is a no-op
 and returns <code>false</code>; callers can use the return value to decide whether a matching
-<a href="#disableKeyboardProtocol()"><code>disableKeyboardProtocol()</code></a> is required on cleanup.</div>
+<a href="#disableKeyboardProtocol()"><code>disableKeyboardProtocol()</code></a> is required on cleanup.
+<p>
+If the backend does not support <a href="#writeRaw(byte%5B%5D)"><code>raw output</code></a>, the default
+implementation falls back to <a href="KeyboardProtocol.html#LEGACY"><code>KeyboardProtocol.LEGACY</code></a> and returns <code>false</code>,
+just as a terminal that does not implement the protocol ignores the push sequence.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>protocol</code> - the keyboard protocol mode</dd>
@@ -839,12 +843,21 @@ are restored.</div>
 <div class="block">Writes raw bytes directly to the terminal output.
 <p>
 This is used for native image protocols (Sixel, Kitty, iTerm2) that
-require sending escape sequences with binary data.</div>
+require sending escape sequences with binary data, and by the default
+implementations of many other methods of this interface (bracketed paste,
+keyboard protocol, cursor movement, line insertion, window title).
+<p>
+The default implementation throws <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link"><code>UnsupportedOperationException</code></a>.
+A backend without raw output has limited use, so implementations are
+strongly encouraged to override this method; a backend that cannot reach
+a real terminal (a headless or test backend) should at least accept and
+discard the data rather than throw.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>data</code> - the raw bytes to write</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if writing fails</dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link">UnsupportedOperationException</a></code> - if the backend does not support raw output</dd>
 </dl>
 </div>
 </section>
