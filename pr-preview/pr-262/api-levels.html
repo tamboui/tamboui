@@ -423,6 +423,9 @@ You can customize this:</p>
 <div class="paragraph">
 <p>The protocol state stack is pushed automatically after entering alternate screen, and popped cleanly before leaving alternate screen or when the runner is closed.</p>
 </div>
+<div class="paragraph">
+<p>A backend that does not support raw output (<code>Backend.writeRaw</code> throws <code>UnsupportedOperationException</code>) cannot push the flags, so the runner falls back to <code>LEGACY</code>, as it does on a terminal that ignores the protocol.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
