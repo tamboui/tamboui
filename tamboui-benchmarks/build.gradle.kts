@@ -1,6 +1,6 @@
 plugins {
     id("dev.tamboui.java-library")
-    id("me.champeau.jmh") version "0.7.3"
+    id("me.champeau.jmh") version "0.7.4"
 }
 
 description = "Performance benchmarks for TamboUI using JMH"
